@@ -135,20 +135,18 @@ void Pdiag_Double::diago_double_begin(
 	char uplo='U';
 	const int inc=1;
 
-    int nprocs, myid;
-    MPI_Status status;
-    MPI_Comm_size(pv->comm_2D, &nprocs);
-    MPI_Comm_rank(pv->comm_2D, &myid);
-
-	// parallel diagonalize the
-	// H | psi > = S | psi >
-	// problem.
-	int loc_pos;
-
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, ks_solver",GlobalV::KS_SOLVER);
     if(GlobalV::KS_SOLVER=="hpseps")
     {
-        double *eigen = new double[GlobalV::NLOCAL];
+        // parallel diagonalize the
+        // H | psi > = S | psi >
+        // problem.
+        int loc_pos;
+        
+        int  myid;
+        MPI_Comm_rank(pv->comm_2D, &myid);
+
+        double* eigen = new double[GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
         double* Z = new double[pv->loc_size * GlobalV::NLOCAL];
@@ -229,75 +227,10 @@ void Pdiag_Double::diago_double_begin(
         delete[] eigen;
 	    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
 
-		// convert wave function to band distribution
-			// and calculate the density matrix in the tranditional way
-			// redistribute eigenvectors to wfc / wfc_aug
-
-		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
-		int pos=0;
-		for(int i=0; i<myid; ++i)
-		{
-			pos+=pv->loc_sizes[i];
-		}
-		int naroc[2]; // maximum number of row or column
-		double **ctot;
-
-		if(this->out_lowf && myid==0)
-		{
-			ctot = new double*[GlobalV::NBANDS];
-			for (int i=0; i<GlobalV::NBANDS; i++)
-			{
-				ctot[i] = new double[GlobalV::NLOCAL];
-				ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
-			}
-			ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
-		}
-
-        double *work=new double[maxnloc]; // work/buffer matrix
-        int info;
-		for(int iprow=0; iprow<pv->dim0; ++iprow)
-		{
-			for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
-			{
-				const int coord[2]={iprow, ipcol};
-				int src_rank;
-				MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
-				if(myid==src_rank)
-				{
-					BlasConnector::copy(pv->nloc_wfc, lowf.wfc_gamma[ik].c, inc, work, inc);
-					naroc[0]=pv->nrow;
-					naroc[1]=pv->ncol_bands;
-				}
-				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
-				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
-
-				if(out_lowf)
-                {
-                    double** wfc = nullptr;
-                    info = lowf.set_wfc_grid(naroc, pv->nb,
-                        pv->dim0, pv->dim1, iprow, ipcol,
-                        work, wfc, myid, ctot);
-				}//out_lowf
-			}//loop ipcol
-		}//loop iprow
-
-		if(out_lowf && myid==0)
-		{
-			std::stringstream ss;
-			ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
-			// mohan add 2012-04-03, because we need the occupations for the
-				// first iteration.
-			WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
-			for (int i=0; i<GlobalV::NBANDS; i++)
-			{
-				delete[] ctot[i];
-			}
-			delete[] ctot;
-		}
-
-		delete[] work;
-		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
-	} // GenELPA method
+        double** wfc_grid = nullptr;    //output but not do "2d-to-grid" conversion
+        lowf.wfc_2d_to_grid(this->out_lowf, lowf.wfc_gamma[ik].c, wfc_grid);
+        
+    } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="lapack_gv")
 	{
 		lowf.wfc_gamma[ik].create(pv->ncol_bands, pv->nrow, false);
@@ -485,19 +418,14 @@ void Pdiag_Double::diago_complex_begin(
 	char uplo='U';
 	const int inc=1;
 
-    int nprocs, myid;
-    MPI_Status status;
-    MPI_Comm_size(pv->comm_2D, &nprocs);
-    MPI_Comm_rank(pv->comm_2D, &myid);
-
-	// parallel diagonalize the
-	// H | psi > = S | psi >
-	// problem.
-	int loc_pos;
-
 	if(GlobalV::KS_SOLVER=="hpseps")
-	{
-        double *eigen = new double[GlobalV::NLOCAL];
+    {
+        // parallel diagonalize the
+        // H | psi > = S | psi >
+        // problem.
+        int loc_pos;
+        
+        double* eigen = new double[GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
         assert(pv->loc_size > 0);
@@ -526,9 +454,6 @@ void Pdiag_Double::diago_complex_begin(
     {
         double *eigen = new double[GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
-        long maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
-        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
         lowf.wfc_k[ik].create(pv->ncol_bands, pv->nrow);            // Fortran order
 
         static elpa_t handle;
@@ -552,146 +477,16 @@ void Pdiag_Double::diago_complex_begin(
         BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
-        //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
-        std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
-        int naroc[2]; // maximum number of row or column
-        int info;
-        for(int iprow=0; iprow<pv->dim0; ++iprow)
-        {
-            for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
-            {
-                const int coord[2]={iprow, ipcol};
-                int src_rank;
-                MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
-                if(myid==src_rank)
-                {
-                    BlasConnector::copy(pv->nloc_wfc, lowf.wfc_k[ik].c, inc, work, inc);
-                    naroc[0]=pv->nrow;
-                    naroc[1]=pv->ncol_bands;
-                }
-                info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
-                info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
-
-                if(this->out_lowf)
-                {
-                    std::complex<double> **ctot;
-                    if(myid==0)
-                    {
-                        ctot = new std::complex<double>*[GlobalV::NBANDS];
-                        for (int i=0; i<GlobalV::NBANDS; i++)
-                        {
-                            ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
-                            ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
-                        }
-                        ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
-                    }
-					// mohan update 2021-02-12, delete BFIELD option
-					info=lowf.set_wfc_grid(naroc, pv->nb,
-							pv->dim0, pv->dim1, iprow, ipcol,
-							work, lowf.wfc_k_grid[ik], myid, ctot);
-                    std::stringstream ss;
-	                ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
-                    // mohan add 2012-04-03, because we need the occupations for the
-                    // first iteration.
-                    WF_Local::write_lowf_complex( ss.str(), ctot, ik );//mohan add 2010-09-09
-                    if(myid==0)
-                    {
-                        for (int i=0; i<GlobalV::NBANDS; i++)
-                        {
-                            delete[] ctot[i];
-                        }
-                        delete[] ctot;
-                    }
-                }
-                else
-                {
-                    // mohan update 2021-02-12, delte BFIELD option
-                    info = lowf.set_wfc_grid(naroc, pv->nb,
-							pv->dim0, pv->dim1, iprow, ipcol,
-							work, lowf.wfc_k_grid[ik]);
-				}
-            }
-        }
-        delete[] work;
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+        lowf.wfc_2d_to_grid(this->out_lowf, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
+        
     } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
 		diag_scalapack_gvx.pzhegvx_diag(pv->desc, pv->ncol, pv->nrow, ch_mat, cs_mat, ekb, lowf.wfc_k[ik]);		// Peize Lin add 2021.11.02
 
-		// the follow will be deleted after finish newdm
-		{
-			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
-			ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+        lowf.wfc_2d_to_grid(this->out_lowf, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
 
-			int info;
-			long maxnloc; // maximum number of elements in local matrix
-			info=MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
-			info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
-			std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
-
-			int naroc[2]; // maximum number of row or column
-			for(int iprow=0; iprow<pv->dim0; ++iprow)
-			{
-				for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
-				{
-					const int coord[2]={iprow, ipcol};
-					int src_rank;
-					info=MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
-					if(myid==src_rank)
-					{
-						BlasConnector::copy(pv->nloc_wfc, lowf.wfc_k[ik].c, inc, work, inc);
-						naroc[0]=pv->nrow;
-						naroc[1]=pv->ncol_bands;
-					}
-					info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
-					info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
-
-					if(this->out_lowf)
-					{
-						std::complex<double> **ctot;
-						if(myid==0)
-						{
-							ctot = new std::complex<double>*[GlobalV::NBANDS];
-							for (int i=0; i<GlobalV::NBANDS; i++)
-							{
-								ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
-								ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
-							}
-							ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
-						}
-						// mohan update 2021-02-12, delete BFIELD option
-						info=lowf.set_wfc_grid(naroc, pv->nb,
-								pv->dim0, pv->dim1, iprow, ipcol,
-								work, lowf.wfc_k_grid[ik], myid, ctot);
-						std::stringstream ss;
-						ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
-						// mohan add 2012-04-03, because we need the occupations for the
-						// first iteration.
-						WF_Local::write_lowf_complex( ss.str(), ctot, ik );//mohan add 2010-09-09
-						if(myid==0)
-						{
-							for (int i=0; i<GlobalV::NBANDS; i++)
-							{
-								delete[] ctot[i];
-							}
-							delete[] ctot;
-						}
-					}
-					else
-					{
-                        // mohan update 2021-02-12, delte BFIELD option
-                        info = lowf.set_wfc_grid(naroc, pv->nb,
-								pv->dim0, pv->dim1, iprow, ipcol,
-								work, lowf.wfc_k_grid[ik]);
-					}
-				}
-			}
-			delete[] work;
-			ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
-		}
-	}
+    }
 
 #endif
 	return;

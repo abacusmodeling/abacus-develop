@@ -73,20 +73,6 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg)
             wfc_gamma_grid[is][ib] = new double[GlobalC::GridT.lgd];
     }
 
-    const Parallel_Orbitals* pv = lowf.ParaV;
-    
-    //calculate maxnloc for bcasting 2d-wfc
-    int nprocs, myid;
-    MPI_Comm_size(pv->comm_2D, &nprocs);
-    MPI_Comm_rank(pv->comm_2D, &myid);
-    
-    long maxnloc; // maximum number of elements in local matrix
-	MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
-    MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
-    const int inc = 1;
-    int naroc[2]; // maximum number of row or column
-    double* work = new double[maxnloc]; // work/buffer matrix 
-    
     for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
 		if(bands_picked[ib])
@@ -99,34 +85,9 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg)
 
 				//---------------------------------------------------------
 				// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
-				// we need to fix this function in near future.
-				// -- mohan add 2021-02-09
+				// and 2d-to-grid conversion is unified into `wfc_2d_to_grid`.
 				//---------------------------------------------------------
-				//ModuleBase::WARNING_QUIT("IState_Charge::idmatrix","need to update LOWF.WFC_GAMMA");
-				
-				//convert 2d `wfc_gamma` to grid `wfc_gamma_grid`
-				int info;
-				for(int iprow=0; iprow<pv->dim0; ++iprow)
-				{
-					for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
-					{
-						const int coord[2]={iprow, ipcol};
-						int src_rank;
-						MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
-						if(myid==src_rank)
-						{
-							BlasConnector::copy(pv->nloc_wfc, lowf.wfc_gamma[is].c, inc, work, inc);
-							naroc[0]=pv->nrow;
-							naroc[1]=pv->ncol_bands;
-						}
-						info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
-						info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
-
-                        info = lowf.set_wfc_grid(naroc, pv->nb,
-                            pv->dim0, pv->dim1, iprow, ipcol,
-                            work, wfc_gamma_grid[is]);
-					}//loop ipcol
-				}//loop iprow
+                lowf.wfc_2d_to_grid(0, lowf.wfc_gamma[is].c, wfc_gamma_grid[is]);
 
 				gg.cal_env( wfc_gamma_grid[is][ib], GlobalC::CHR.rho[is] );
 
@@ -141,7 +102,6 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg)
 		}
 	}
 
-    delete[] work;
     delete[] bands_picked;
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {

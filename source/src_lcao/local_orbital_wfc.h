@@ -60,6 +60,16 @@ public:
     /// For multi-k, T = complex<double>;
     /// Set myid and ctot when output is needed;
     /// Set wfc as nullptr when 2d-to-grid convertion is not needed.
+    
+    // Notice: here I reload this function rather than use template
+    // (in which the implementation should be put in header file )
+    // because sub-function `write_lowf_complex`contains GlobalC declared in `global.h`
+    // which will cause lots of "not defined" if included in a header file.
+    void wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wfc_grid);
+    void wfc_2d_to_grid(int out_lowf, std::complex<double>* wfc_2d, std::complex<double>** wfc_grid, int ik);
+
+
+private:
     template <typename T>
     int set_wfc_grid(
         int naroc[2],
@@ -73,14 +83,13 @@ public:
         int myid = -1,
         T** ctot = nullptr);
 
-private:
-
 	bool wfck_flag; 
 	bool complex_flag;
 	bool allocate_flag;
 
 };
 
+#ifdef __MPI
 template <typename T>
 int Local_Orbital_wfc::set_wfc_grid(
     int naroc[2],
@@ -94,7 +103,8 @@ int Local_Orbital_wfc::set_wfc_grid(
     int myid,
     T** ctot)
 {
-    ModuleBase::TITLE(" Local_Orbital_wfc","set_wfc_grid");
+    ModuleBase::TITLE(" Local_Orbital_wfc", "set_wfc_grid");
+    if (!wfc && !ctot) return 0;
     for (int j = 0; j < naroc[1]; ++j)
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
@@ -103,15 +113,16 @@ int Local_Orbital_wfc::set_wfc_grid(
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
 	        int mu_local=GlobalC::GridT.trace_lo[igrow];
-            if (wfc != nullptr && mu_local >= 0)
+            if (wfc && mu_local >= 0)
             {
                 wfc[igcol][mu_local]=work[j*naroc[0]+i];
             }
-            if (ctot != nullptr && myid == 0)
+            if (ctot && myid == 0)
                 ctot[igcol][igrow] = work[j * naroc[0] + i];
         }
     }
     return 0;
 }
+#endif
 
 #endif
