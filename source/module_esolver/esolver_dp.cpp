@@ -8,19 +8,10 @@
 namespace ModuleESolver
 {
 
-ESolver_DP::~ESolver_DP()
-{
-    delete[] dp_force;
-}
-
 void ESolver_DP::Init(Input &inp, UnitCell_pseudo &ucell)
 {
     dp_potential = 0;
-    dp_force = new ModuleBase::Vector3<double> [ucell.nat];
-    for(int i=0; i<ucell.nat; ++i)
-    {
-        dp_force->set(0,0,0);
-    }
+    dp_force.create(ucell.nat,3);
     dp_virial.create(3,3);
 
     cell.resize(9);
@@ -57,7 +48,7 @@ void ESolver_DP::Run(int istep, UnitCell_pseudo &ucell)
 #ifdef __DPMD
     if(access("graph.pb", 0) == -1)
     {
-        ModuleBase::WARNING_QUIT("DP_pot", "Can not find greph.pb !");
+        ModuleBase::WARNING_QUIT("DP_pot", "Can not find graph.pb !");
     }
 
     deepmd::DeepPot dp ("graph.pb");
@@ -73,9 +64,9 @@ void ESolver_DP::Run(int istep, UnitCell_pseudo &ucell)
 
     for(int i=0; i<ucell.nat;  ++i)
     {
-        dp_force[i].x = f[3*i]/fact_f;
-        dp_force[i].y = f[3*i+1]/fact_f;
-        dp_force[i].z = f[3*i+2]/fact_f;
+        dp_force(i,0) = f[3*i]/fact_f;
+        dp_force(i,1) = f[3*i+1]/fact_f;
+        dp_force(i,2) = f[3*i+2]/fact_f;
     }
 
     for(int i=0; i<3; ++i)
@@ -97,17 +88,12 @@ void ESolver_DP::cal_Energy(energy &en)
 
 void ESolver_DP::cal_Force(ModuleBase::matrix &force)
 {
-
+    force = dp_force;
 }
 
 void ESolver_DP::cal_Stress(ModuleBase::matrix &stress)
 {
     stress = dp_virial;
-}
-
-int ESolver_DP:: getiter()
-{
-
 }
 
 }

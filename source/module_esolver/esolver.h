@@ -24,7 +24,7 @@ public:
     ESolver(){
         tag = "ESolver";
     }
-    virtual ~ESolver(){};
+    // virtual ~ESolver(){};
 
     //virtual void Init(Input_EnSolver &inp, matrix &lattice_v)=0
     virtual void Init(Input &inp, UnitCell_pseudo &cell)=0;
@@ -41,7 +41,7 @@ public:
         Record_adj& ra /**< would be a 2nd-module of Cell*/,
         Local_Orbital_Charge& loc /**< EState*/,
         Local_Orbital_wfc& lowf /**< Psi*/,
-        LCAO_Hamilt& uhm /**< Hamilt*/) = 0;
+        LCAO_Hamilt& uhm /**< Hamilt*/) {};
     
     virtual void cal_Energy(energy &en) = 0; 
     virtual void cal_Force(ModuleBase::matrix &force) = 0;

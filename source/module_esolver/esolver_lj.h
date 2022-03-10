@@ -4,7 +4,6 @@
 #include "./esolver.h"
 //--------------temporary----------------------------
 #include "../module_neighbor/sltk_grid_driver.h"
-#include "../module_base/matrix.h"
 //---------------------------------------------------
 
 namespace ModuleESolver
@@ -17,15 +16,9 @@ public:
     {
         tag = "ESolver_LJ";
     }
-    ~ESolver_LJ();
     
     void Init(Input &inp, UnitCell_pseudo &cell) override;
     void Run(int istep, UnitCell_pseudo& cell) override;
-    void Run(int istep,
-        Record_adj& ra,
-        Local_Orbital_Charge& loc,
-        Local_Orbital_wfc& lowf,
-        LCAO_Hamilt& uhm) override {};
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;
     void cal_Stress(ModuleBase::matrix &stress) override;
@@ -37,16 +30,13 @@ public:
     void LJ_virial(const ModuleBase::Vector3<double> &force, 
         const ModuleBase::Vector3<double> &dtau);
 
-
-    int getiter();
-
 //--------------temporary----------------------------
     Grid_Driver grid_neigh;
     double lj_rcut;
     double lj_sigma;
     double lj_epsilon;
     double lj_potential;
-    ModuleBase::Vector3<double> *lj_force;
+    ModuleBase::matrix lj_force;
     ModuleBase::matrix lj_virial;
 //---------------------------------------------------
 };

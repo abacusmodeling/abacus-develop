@@ -6,19 +6,10 @@
 namespace ModuleESolver
 {
 
-ESolver_LJ::~ESolver_LJ()
-{
-    delete[] lj_force;
-}
-
 void ESolver_LJ::Init(Input &inp, UnitCell_pseudo &ucell)
 {
     lj_potential = 0;
-    lj_force = new ModuleBase::Vector3<double> [ucell.nat];
-    for(int i=0; i<ucell.nat; ++i)
-    {
-        lj_force->set(0,0,0);
-    }
+    lj_force.create(ucell.nat,3);
     lj_virial.create(3,3);
 
     lj_rcut = inp.mdp.rcut_lj;
@@ -57,7 +48,9 @@ void ESolver_LJ::Run(int istep, UnitCell_pseudo &ucell)
                 {
                     lj_potential += LJ_energy(distance); // - LJ_energy(lj_rcut);
                     ModuleBase::Vector3<double> f_ij = LJ_force(distance, dtau);
-                    lj_force[index] += f_ij;
+                    lj_force(index,0) += f_ij.x;
+                    lj_force(index,1) += f_ij.y;
+                    lj_force(index,2) += f_ij.z;
                     LJ_virial(f_ij, dtau);
                 }
             }
@@ -84,17 +77,12 @@ void ESolver_LJ::cal_Energy(energy &en)
 
 void ESolver_LJ::cal_Force(ModuleBase::matrix &force)
 {
-
+    force = lj_force;
 }
 
 void ESolver_LJ::cal_Stress(ModuleBase::matrix &stress)
 {
     stress = lj_virial;
-}
-
-int ESolver_LJ:: getiter()
-{
-
 }
 
 double ESolver_LJ::LJ_energy(const double d)
