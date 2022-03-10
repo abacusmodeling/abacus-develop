@@ -221,7 +221,6 @@ void Record_adj::for_2d(Parallel_Orbitals &pv, bool gamma_only)
 					info[iat][cb][2] = GlobalC::GridD.getBox(ad).z; 
 					info[iat][cb][3] = T2;
                     info[iat][cb][4] = I2;
-                    if (I2 > 10|| I2<0) exit(-1);
                     ++cb;
 				}
 			}//end ad
