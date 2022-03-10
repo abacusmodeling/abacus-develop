@@ -274,7 +274,7 @@ void Pdiag_Double::diago_double_begin(
 				if(out_lowf)
 				{
                     info=lowf.q2CTOT(myid, naroc, pv->nb,
-                        pv->dim0, pv->dim1, iprow, ipcol, pv->loc_size,
+                        pv->dim0, pv->dim1, iprow, ipcol,
                         work, ctot);
 				}//out_lowf
 			}//loop ipcol

@@ -67,20 +67,17 @@ public:
         int dim1,
         int iprow,
         int ipcol,
-        int loc_size,
         double* work,
         double** CTOT);
 
     //for gamma_only, 2d-to-grid without output
     int  q2WFC(
-        int myid,
         int naroc[2],
         int nb,
         int dim0,
         int dim1,
         int iprow,
         int ipcol,
-        int loc_size,
         double* work,
         double** WFC);
 

@@ -122,8 +122,8 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg)
 						info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
 						info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
 
-                        info=lowf.q2WFC(myid, naroc, pv->nb,
-                            pv->dim0, pv->dim1, iprow, ipcol, pv->loc_size,
+                        info=lowf.q2WFC(naroc, pv->nb,
+                            pv->dim0, pv->dim1, iprow, ipcol,
                             work, wfc_gamma_grid[is]);
 					}//loop ipcol
 				}//loop iprow

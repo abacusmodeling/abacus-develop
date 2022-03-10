@@ -154,7 +154,6 @@ int  Local_Orbital_wfc::q2CTOT(
 	int dim1,
 	int iprow,
 	int ipcol,
-	int loc_size,
 	double* work,
 	double** CTOT)
 {
@@ -173,14 +172,12 @@ int  Local_Orbital_wfc::q2CTOT(
 }
 
 int  Local_Orbital_wfc::q2WFC(
-	int myid,
 	int naroc[2],
 	int nb,
 	int dim0,
 	int dim1,
 	int iprow,
 	int ipcol,
-	int loc_size,
 	double* work,
 	double** WFC)
 {
