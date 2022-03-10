@@ -101,28 +101,28 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
 			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-			error = WF_Local::read_lowf_complex( this->wfc_k_grid[ik], ik, lowf);
-		}
+            error = WF_Local::read_lowf_complex(this->wfc_k_grid[ik], ik, lowf);
 #ifdef __MPI
-		Parallel_Common::bcast_int(error);
+            Parallel_Common::bcast_int(error);
 #endif
-		GlobalV::ofs_running << " Error=" << error << std::endl;
-		if(error==1)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
-		}
-		else if(error==2)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
-		}
-		else if(error==3)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
-		}
-		else if(error==4)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
-		}
+            GlobalV::ofs_running << " Error=" << error << std::endl;
+            if(error==1)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+            }
+            else if(error==2)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+            }
+            else if(error==3)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+            }
+            else if(error==4)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+            }
+        }
 	}
 	else
 	{
@@ -172,6 +172,35 @@ int  Local_Orbital_wfc::q2CTOT(
     return 0;
 }
 
+int  Local_Orbital_wfc::q2WFC(
+	int myid,
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	int loc_size,
+	double* work,
+	double** WFC)
+{
+    ModuleBase::TITLE(" Local_Orbital_wfc","q2WFC");
+    for (int j = 0; j < naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=GlobalV::NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow = globalIndex(i, nb, dim0, iprow);
+            int mu_local = GlobalC::GridT.trace_lo[igrow];
+            if (mu_local >= 0 )
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+        }
+    }
+    return 0;
+}
 
 int  Local_Orbital_wfc::q2WFC_complex(
 	int naroc[2],
