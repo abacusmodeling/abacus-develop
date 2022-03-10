@@ -52,7 +52,8 @@ public:
     ///=========================================
     static int globalIndex(int localindex, int nblk, int nprocs, int myproc);
     static int localIndex(int globalindex, int nblk, int nprocs, int& myproc);
-    
+
+#ifdef __MPI
     ///=========================================
     ///Parallel: convert the distribution of wavefunction from 2D to grid
     ///=========================================
@@ -67,7 +68,7 @@ public:
     // which will cause lots of "not defined" if included in a header file.
     void wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wfc_grid);
     void wfc_2d_to_grid(int out_lowf, std::complex<double>* wfc_2d, std::complex<double>** wfc_grid, int ik);
-
+#endif
 
 private:
     template <typename T>

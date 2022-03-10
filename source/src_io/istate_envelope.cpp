@@ -86,9 +86,16 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg)
 				//---------------------------------------------------------
 				// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 				// and 2d-to-grid conversion is unified into `wfc_2d_to_grid`.
-				//---------------------------------------------------------
+                //---------------------------------------------------------
+#ifdef __MPI
                 lowf.wfc_2d_to_grid(0, lowf.wfc_gamma[is].c, wfc_gamma_grid[is]);
-
+#else
+                for (int i = 0;i < GlobalV::NBANDS;++i)
+                {
+                    for (int j = 0;j < GlobalV::NLOCAL;++j)
+                        wfc_gamma_grid[is][i][j] = lowf.wfc_gamma[is](i, j);
+                }
+#endif
 				gg.cal_env( wfc_gamma_grid[is][ib], GlobalC::CHR.rho[is] );
 
 
