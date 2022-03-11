@@ -19,8 +19,7 @@ input_conv.o\
 run_pw.o\
 run_lcao.o\
 
-OBJS_PW=xc_type.o \
-xc_functional.o\
+OBJS_PW=xc_functional.o\
 xc_3.o \
 vdwd2.o\
 vdwd2_parameters.o\
@@ -265,7 +264,6 @@ write_HS.o\
 write_HS_R.o\
 write_dm.o\
 write_wfc_realspace.o\
-potential_libxc.o \
 potential_libxc_meta.o \
 efield.o \
 magnetism.o\

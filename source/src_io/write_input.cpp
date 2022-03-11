@@ -195,7 +195,6 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"vl_in_h", vl_in_h,"calculate the local potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vnl_in_h", vnl_in_h,"calculate the nonlocal potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vh_in_h", vh_in_h,"calculate the hartree potential or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"vxc_in_h", vxc_in_h,"calculate the xc potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vion_in_h", vion_in_h,"calculate the local ionic potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_force", test_force, "test the force");
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_stress", test_stress, "test the force");
@@ -275,7 +274,7 @@ void Input::Print(const std::string &fn)const
 	//ModuleBase::GlobalFunc::OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
 	
 	ofs << "\n#Parameters (17.exx)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hybrid_type",exx_hybrid_type,"no, hf, pbe0, hse or opt_orb");
+	ModuleBase::GlobalFunc::OUTP(ofs,"dft_functional",dft_functional,"no, hf, pbe0, hse or opt_orb");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hybrid_alpha",exx_hybrid_alpha,"");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hse_omega",exx_hse_omega,"");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_separate_loop",exx_separate_loop,"0 or 1");
