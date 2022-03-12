@@ -108,7 +108,6 @@ void Input::Print(const std::string &fn)const
 
 	ofs << "\n#Parameters (4.LCAO)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"basis_type",basis_type,"PW; LCAO in pw; LCAO");
-	ModuleBase::GlobalFunc::OUTP(ofs,"new_dm",new_dm,"Type of density matrix; 0: old 1: new");
 	if(ks_solver=="HPSEPS" || ks_solver=="genelpa" || ks_solver=="scalapack_gvx")
 	{
 		ModuleBase::GlobalFunc::OUTP(ofs,"nb2d",nb2d,"2d distribution of atoms");

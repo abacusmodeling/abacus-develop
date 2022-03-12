@@ -11,12 +11,12 @@ Langevin::Langevin(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet
 
 Langevin::~Langevin(){}
 
-void Langevin::setup()
+void Langevin::setup(ModuleESolver::ESolver *p_ensolve)
 {
     ModuleBase::TITLE("Langevin", "setup");
     ModuleBase::timer::tick("Langevin", "setup");
     
-    Verlet::setup();
+    Verlet::setup(p_ensolve);
 
     post_force();
 

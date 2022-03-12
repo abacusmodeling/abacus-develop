@@ -138,8 +138,9 @@ private:
     void get_MPI_GVectors(void);
     void columns_and_pw_distribution_2(void);
 // #else
-    void get_GVectors(void);
 #endif
+    void get_GVectors(void);
+
 
 
 
