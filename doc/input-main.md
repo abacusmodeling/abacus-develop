@@ -32,10 +32,6 @@
     - [Density of states](#density-of-states)
 
         [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale)
-
-    - [Electric field](#electric-field)
-    
-        [efield](#efield) | [edir](#edir) | [emaxpos](#emaxpos) | [eopreg](#eopreg) | [eamp](#eamp)
     
     - [Exact exchange](#exact-exchange) (under tests)
     
@@ -912,43 +908,6 @@ This part of variables are used to control the calculation of DOS.
 
     [back to top](#input-file)
 
-### Electric field
-This part of variables are used to control the addition of an external electric field. It is achieved by adding a saw-like potential to the local ionic potential.
-
-- efield<a id="efield"></a>
-    - *Type*: Boolean
-    - *Description*: Controls whether to add the external electric field. When set to 1, the electric field is turned on. When set to 0, there is no electric field.
-    - *Default*: 0.
-
-    [back to top](#input-file)
-
-- edir<a id="edir"></a>
-    - *Type*: Integer
-    - *Description*: Tells which reciprocal lattice vector the external electric field aligns with. Allowed values are 1,2, and 3, corresponding to the three reciprocal lattice vectors respectively.
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- emaxpos<a id="emaxpos"></a>
-    - *Type*: Real
-    - *Description*: Position of the maximum of the saw-like potential along the reciprocal lattice vector specified by edir, 0 < emaxpos < 1.
-    - *Default*: 0.5
-
-    [back to top](#input-file)
-
-- eopreg<a id="eopreg"></a>
-    - *Type*: Real
-    - *Description*: The saw-like potential increases in the region from `(emaxpos+eopreg-1)` to `(emaxpos)`, then decreases to 0 until (emaxpos+eopreg), in units of the crystal vector `edir`. Important: the change of slope of this potential must be located in the empty region, or else unphysical forces will result.
-    - *Default*: 0.1
-
-    [back to top](#input-file)
-
-- eamp<a id="eamp"></a>
-    - *Type*: Real
-    - *Description*: Amplitude of the electric field, in atomic unit: 1 a.u. = 51.4220632*10^10 V/m.
-    - *Default*: 0.001
-
-    [back to top](#input-file)
 
 ### DeePKS
 This part of variables are used to control the usage of DeePKS method (a comprehensive data-driven approach to improve accuracy of DFT).
