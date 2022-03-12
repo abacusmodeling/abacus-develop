@@ -40,6 +40,9 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"symmetry_prec",symmetry_prec,"accuracy for symmetry"); // LiuXh add 2021-08-12, accuracy for symmetry
 	ModuleBase::GlobalFunc::OUTP(ofs,"nelec",nelec,"input number of electrons");
 	ModuleBase::GlobalFunc::OUTP(ofs,"tot_magnetization",tot_magnetization,"total magnetization of the system");
+    ModuleBase::GlobalFunc::OUTP(ofs,"mulliken", GlobalV::mulliken," mulliken  charge or not");//qifeng add 2019/9/10
+    ModuleBase::GlobalFunc::OUTP(ofs,"noncolin",noncolin,"using non-collinear-spin");
+    ModuleBase::GlobalFunc::OUTP(ofs,"lspinorb",lspinorb,"consider the spin-orbit interaction");
 
 	ofs << "\n#Parameters (2.PW)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"ecutwfc",ecutwfc,"#energy cutoff for wave functions");
@@ -205,16 +208,6 @@ void Input::Print(const std::string &fn)const
 			<< vdw_period.z<< " #periods of periodic structure" << std::endl;
 	
 	
-	ofs << "\n#Parameters (14.spectrum)" << std::endl;              // pengfei Li add 2016-11-23
-	ModuleBase::GlobalFunc::OUTP(ofs,"ocp",GlobalV::ocp,"change occupation or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"ocp_set",GlobalV::ocp_set,"set occupation");
-	ModuleBase::GlobalFunc::OUTP(ofs,"mulliken", GlobalV::mulliken," mulliken  charge or not");//qifeng add 2019/9/10
-
-
-	ModuleBase::GlobalFunc::OUTP(ofs,"noncolin",noncolin,"using non-collinear-spin");
-	ModuleBase::GlobalFunc::OUTP(ofs,"lspinorb",lspinorb,"consider the spin-orbit interaction");
-	
-	
 	ofs << "\n#Parameters (14.exx)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"dft_functional",dft_functional,"no, hf, pbe0, hse or opt_orb");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hybrid_alpha",exx_hybrid_alpha,"");
@@ -249,6 +242,8 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_vexttype",td_vexttype,"extern potential type");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_vextout",td_vextout,"output extern potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_dipoleout",td_dipoleout,"output dipole or not");
+    ModuleBase::GlobalFunc::OUTP(ofs,"ocp",GlobalV::ocp,"change occupation or not");
+    ModuleBase::GlobalFunc::OUTP(ofs,"ocp_set",GlobalV::ocp_set,"set occupation");
 
 	
 	ofs << "\n#Parameters (17.berry_wannier)" << std::endl;
