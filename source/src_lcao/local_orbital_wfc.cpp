@@ -146,118 +146,154 @@ int Local_Orbital_wfc::localIndex(int globalindex, int nblk, int nprocs, int& my
     return int(globalindex/(nblk*nprocs))*nblk+globalindex%nblk;
 }
 
-int  Local_Orbital_wfc::q2CTOT(
-	int myid,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double** CTOT)
+#ifdef __MPI
+void Local_Orbital_wfc::wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wfc_grid)
 {
-    ModuleBase::TITLE(" Local_Orbital_wfc","q2CTOT");
-    for (int j = 0; j < naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
-        }
-    }
-    return 0;
-}
+    ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
+    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
 
-int  Local_Orbital_wfc::q2WFC(
-	int myid,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double** WFC)
-{
-    ModuleBase::TITLE(" Local_Orbital_wfc","q2WFC");
-    for (int j = 0; j < naroc[1]; ++j)
+    const Parallel_Orbitals* pv = this->ParaV;
+    const int inc = 1;
+    int  myid;
+    MPI_Comm_rank(pv->comm_2D, &myid);
+    int info;
+    
+    //calculate maxnloc for bcasting 2d-wfc
+    long maxnloc; // maximum number of elements in local matrix
+    info=MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+    info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
+    double *work=new double[maxnloc]; // work/buffer matrix
+
+    double** ctot;
+    if (out_lowf && myid == 0)
     {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        for(int i=0; i<naroc[0]; ++i)
+        ctot = new double* [GlobalV::NBANDS];
+        for (int i=0; i<GlobalV::NBANDS; i++)
         {
-            int igrow = globalIndex(i, nb, dim0, iprow);
-            int mu_local = GlobalC::GridT.trace_lo[igrow];
-            if (mu_local >= 0 )
+            ctot[i] = new double[GlobalV::NLOCAL];
+            ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
+        }
+        ModuleBase::Memory::record("Local_Orbital_wfc", "ctot", GlobalV::NBANDS * GlobalV::NLOCAL, "double");
+    }
+
+    int naroc[2]; // maximum number of row or column
+    for(int iprow=0; iprow<pv->dim0; ++iprow)
+    {
+        for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
+        {
+            const int coord[2]={iprow, ipcol};
+            int src_rank;
+            info=MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
+            if(myid==src_rank)
             {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+                BlasConnector::copy(pv->nloc_wfc, wfc_2d, inc, work, inc);
+                naroc[0]=pv->nrow;
+                naroc[1]=pv->ncol_bands;
             }
-        }
-    }
-    return 0;
-}
+            info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
+            info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
 
-int  Local_Orbital_wfc::q2WFC_complex(
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	std::complex<double>* work,
-	std::complex<double>** WFC)
-{
-    ModuleBase::TITLE(" Local_Orbital_wfc","q2WFC_complex");
-    for (int j = 0; j < naroc[1]; ++j)
+            if (out_lowf)
+                info = this->set_wfc_grid(naroc, pv->nb,
+                    pv->dim0, pv->dim1, iprow, ipcol,
+                    work, wfc_grid, myid, ctot);
+            else
+                info = this->set_wfc_grid(naroc, pv->nb,
+                        pv->dim0, pv->dim1, iprow, ipcol,
+                        work, wfc_grid);
+
+        }//loop ipcol
+    }//loop iprow
+    if(out_lowf && myid == 0)
     {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        for(int i=0; i<naroc[0]; ++i)
+        std::stringstream ss;
+        ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
+        WF_Local::write_lowf(ss.str(), ctot);
+        for (int i = 0; i < GlobalV::NBANDS; i++)
         {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GlobalC::GridT.trace_lo[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
+            delete[] ctot[i];
         }
+        delete[] ctot;
     }
-    return 0;
+    delete[] work;
+    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
 }
 
 
-int  Local_Orbital_wfc::q2WFC_CTOT_complex(
-	int myid,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	std::complex<double>* work,
-	std::complex<double>** WFC,
-	std::complex<double>** CTOT)
+void Local_Orbital_wfc::wfc_2d_to_grid(
+    int out_lowf,
+    std::complex<double>* wfc_2d,
+    std::complex<double>** wfc_grid,
+    int ik)
 {
-    ModuleBase::TITLE(" Local_Orbital_wfc","q2WFC_CTOT_complex");
-    for (int j = 0; j < naroc[1]; ++j)
+    ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
+    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
+
+    const Parallel_Orbitals* pv = this->ParaV;
+    const int inc = 1;
+    int  myid;
+    MPI_Comm_rank(pv->comm_2D, &myid);
+    int info;
+    
+    //calculate maxnloc for bcasting 2d-wfc
+    long maxnloc; // maximum number of elements in local matrix
+    info=MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+    info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
+    std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
+
+    std::complex<double> **ctot;
+    if (out_lowf && myid == 0)
     {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        for(int i=0; i<naroc[0]; ++i)
+        ctot = new std::complex<double>*[GlobalV::NBANDS];
+        for (int i=0; i<GlobalV::NBANDS; i++)
         {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GlobalC::GridT.trace_lo[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+            ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
+            ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
         }
+        ModuleBase::Memory::record("Local_Orbital_wfc", "ctot", GlobalV::NBANDS * GlobalV::NLOCAL, "cdouble");
     }
-    return 0;
+    
+    int naroc[2]; // maximum number of row or column
+    for(int iprow=0; iprow<pv->dim0; ++iprow)
+    {
+        for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
+        {
+            const int coord[2]={iprow, ipcol};
+            int src_rank;
+            info=MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
+            if(myid==src_rank)
+            {
+                BlasConnector::copy(pv->nloc_wfc, wfc_2d, inc, work, inc);
+                naroc[0]=pv->nrow;
+                naroc[1]=pv->ncol_bands;
+            }
+            info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
+            info = MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
+            
+            if (out_lowf)
+                info = this->set_wfc_grid(naroc, pv->nb,
+                    pv->dim0, pv->dim1, iprow, ipcol,
+                    work, wfc_grid, myid, ctot);
+            else
+                // mohan update 2021-02-12, delte BFIELD option
+                info = this->set_wfc_grid(naroc, pv->nb,
+                        pv->dim0, pv->dim1, iprow, ipcol,
+                        work, wfc_grid);
+        }//loop ipcol
+    }//loop iprow
+
+    if (out_lowf && myid == 0)
+    {
+        std::stringstream ss;
+        ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";
+        WF_Local::write_lowf_complex(ss.str(), ctot, ik);
+        for (int i = 0; i < GlobalV::NBANDS; i++)
+        {
+            delete[] ctot[i];
+        }
+        delete[] ctot;
+    }
+    delete[] work;
+    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
 }
+#endif

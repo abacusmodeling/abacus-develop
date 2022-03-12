@@ -258,8 +258,8 @@ void LOOP_elec::solver(const int& istep,
 	else if (GlobalV::CALCULATION=="ienvelope")
 	{
 		IState_Envelope IEP;
-		IEP.begin(lowf, this->UHM->GG);
-	}
+        IEP.begin(lowf, this->UHM->GG, INPUT.out_wf);
+    }
 	else
 	{
 		ModuleBase::WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
