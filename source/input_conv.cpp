@@ -141,7 +141,6 @@ void Input_Conv::Convert(void)
 	GlobalV::VL_IN_H = INPUT.vl_in_h;
 	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
 	GlobalV::VH_IN_H = INPUT.vh_in_h;
-	GlobalV::VXC_IN_H = INPUT.vxc_in_h;
 	GlobalV::VION_IN_H = INPUT.vion_in_h;
 	GlobalV::TEST_FORCE = INPUT.test_force;
 	GlobalV::TEST_STRESS = INPUT.test_stress;
@@ -308,20 +307,20 @@ void Input_Conv::Convert(void)
 		const std::string command0 = "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if (GlobalV::MY_RANK == 0)
 			system(command0.c_str());
-		if (INPUT.exx_hybrid_type == "no")
+		if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse" || INPUT.dft_functional == "opt_orb")
 		{
 			GlobalC::restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_H = true;
 		}
 		else
 		{
 			GlobalC::restart.info_save.save_charge = true;
-			GlobalC::restart.info_save.save_H = true;
 		}
 	}
 	if (INPUT.restart_load)
 	{
 		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
-		if (INPUT.exx_hybrid_type == "no")
+		if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse" || INPUT.dft_functional == "opt_orb")
 		{
 			GlobalC::restart.info_load.load_charge = true;
 		}
@@ -336,28 +335,30 @@ void Input_Conv::Convert(void)
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------
 #ifdef __LCAO
-	if (INPUT.exx_hybrid_type == "no")
+
+	if (INPUT.dft_functional == "hf")
 	{
-		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+	}
+	else if (INPUT.dft_functional == "pbe0")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+	}
+	else if (INPUT.dft_functional == "hse")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+	}
+	else if (INPUT.dft_functional == "opt_orb")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
 	}
 	else
 	{
-		if (INPUT.exx_hybrid_type == "hf")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
-		}
-		else if (INPUT.exx_hybrid_type == "pbe0")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
-		}
-		else if (INPUT.exx_hybrid_type == "hse")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
-		}
-		else if (INPUT.exx_hybrid_type == "opt_orb")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
-		}
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+	}
+
+	if(GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
+	{
 		GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
 		GlobalC::exx_global.info.hse_omega = INPUT.exx_hse_omega;
 		GlobalC::exx_global.info.separate_loop = INPUT.exx_separate_loop;
@@ -457,16 +458,6 @@ void Input_Conv::Convert(void)
 
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
-
-	// wenfei 2021-7-28
-	if (GlobalV::DFT_FUNCTIONAL == "scan")
-	{
-		if (GlobalV::BASIS_TYPE != "pw")
-		{
-			ModuleBase::WARNING_QUIT("Input_conv", "add metaGGA for pw first");
-		}
-		GlobalV::DFT_META = 1;
-	}
 
 	ModuleBase::timer::tick("Input_Conv", "Convert");
 //-----------------------------------------------

@@ -77,6 +77,7 @@ class Input
 // electrons / spin
 //==========================================================
     std::string dft_functional;	// input DFT functional.
+	bool use_libxc;         // whether to use LIBXC
 	int nspin;				// LDA ; LSDA ; non-linear spin
     double nelec;			// total number of electrons
     int lmaxmax;
@@ -151,7 +152,6 @@ class Input
 	int vnl_in_h;			// calculate the vnl or not.
 
 	int vh_in_h;			// calculate the hartree potential or not
-	int vxc_in_h;			// calculate the xc potential or not
 	int vion_in_h;			// calculate the local ionic potential or not
 	//only relevant when vl_in_h = 1
 
@@ -295,8 +295,6 @@ class Input
 // exx
 // Peize Lin add 2018-06-20
 //==========================================================
-	std::string exx_hybrid_type;		// "no", "hf", "pbe0", "hse"
-
 	double exx_hybrid_alpha;
 	double exx_hse_omega;
 

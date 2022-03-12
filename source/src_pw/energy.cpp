@@ -16,7 +16,6 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
-#include "H_XC_pw.h"
 #ifdef __DEEPKS
 #include "../src_lcao/../module_deepks/LCAO_deepks.h"
 #endif
@@ -55,7 +54,7 @@ void energy::calculate_harris(const int &flag)
 	else if(flag==2)
 	{
 		this->etot_harris = eband + deband_harris 
-		+ (H_XC_pw::etxc - etxcc) 
+		+ (etxc - etxcc) 
 		+ H_Ewald_pw::ewald_energy 
 		+ H_Hartree_pw::hartree_energy 
 		+ demet
@@ -93,7 +92,7 @@ void energy::calculate_etot(void)
 	ModuleBase::TITLE("energy","calculate_etot");
 	//std::cout << "\n demet in etot = " << demet << std::endl;
 	this->etot = eband + deband 
-	+ (H_XC_pw::etxc - etxcc) 
+	+ (etxc - etxcc) 
 	+ H_Ewald_pw::ewald_energy 
 	+ H_Hartree_pw::hartree_energy 
 	+ demet
@@ -171,7 +170,7 @@ void energy::print_etot(
 			this->print_format("E_band", eband);
 			this->print_format("E_one_elec", eband + deband);
 			this->print_format("E_Hartree", H_Hartree_pw::hartree_energy);
-			this->print_format("E_xc", H_XC_pw::etxc - etxcc);
+			this->print_format("E_xc", etxc - etxcc);
 			this->print_format("E_Ewald", H_Ewald_pw::ewald_energy);
 			this->print_format("E_demet", demet); //mohan add 2011-12-02
 			this->print_format("E_descf", descf);
@@ -389,7 +388,7 @@ double energy::delta_e(void)
     for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
     {
     	deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
-		if(GlobalV::DFT_META)
+		if(XC_Functional::get_func_type() == 3)
 		{
 			deband_aux -= GlobalC::CHR.kin_r[0][ir] * GlobalC::pot.vofk(0,ir);
 		}
@@ -400,7 +399,7 @@ double energy::delta_e(void)
     	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
     	{
     		deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
-			if(GlobalV::DFT_META)
+			if(XC_Functional::get_func_type() == 3)
 			{
 				deband_aux -= GlobalC::CHR.kin_r[1][ir] * GlobalC::pot.vofk(1,ir);
 			}
@@ -445,7 +444,7 @@ void energy::delta_escf(void)
     for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
     {
 		this->descf -= ( GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho_save[0][ir] ) * GlobalC::pot.vr(0, ir);
-		if(GlobalV::DFT_META)
+		if(XC_Functional::get_func_type() == 3)
 		{
          	this->descf -= ( GlobalC::CHR.kin_r[0][ir] - GlobalC::CHR.kin_r_save[0][ir] ) * GlobalC::pot.vofk(0, ir);
 		}
@@ -456,7 +455,7 @@ void energy::delta_escf(void)
        	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
        	{
            	this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
-			if(GlobalV::DFT_META)
+			if(XC_Functional::get_func_type() == 3)
 			{
            		this->descf -= ( GlobalC::CHR.kin_r[1][ir] - GlobalC::CHR.kin_r_save[1][ir] ) * GlobalC::pot.vofk(1, ir);
 			}
@@ -549,15 +548,12 @@ void energy::set_exx()
 			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	};
-	if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
+	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type )				// HF
 	{
 		this->exx = exx_energy();
 	}
-	else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
-	{
-		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
-	}
-	else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
+	else if( Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+			 Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// PBE0 or HSE
 	{
 		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
 	}

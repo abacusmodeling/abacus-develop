@@ -19,6 +19,7 @@
 #include "../src_pw/global.h"
 #include "../src_io/winput.h"
 #include "../module_base/matrix.h"
+#include "../module_base/timer.h"
 
 ///
 /// The LCAO_Deepks contains subroutines for implementation of the DeePKS method in atomic basis.
