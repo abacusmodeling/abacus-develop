@@ -46,6 +46,9 @@ To add a unit test:
 AddTest(
   TARGET <module_name>_<test_name> # this is the executable file name of the test
   SOURCES <test_name>.cpp
+
+  # OPTIONAL: if this test requires external libraries, add them with "LIBS" statement.
+  LIBS math_libs # `math_libs` includes all math libraries in ABACUS.
 )
 ```
 
