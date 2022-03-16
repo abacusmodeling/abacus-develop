@@ -122,5 +122,7 @@ fi
 if ! test -z "$deepks_bandgap" && [ $deepks_bandgap -eq 1 ]; then
 	odelta=`python get_odelta.py`
 	echo "odelta $odelta" >>$1
+	oprec=`python get_oprec.py`
+	echo "oprec $oprec" >> $1
 fi
 
