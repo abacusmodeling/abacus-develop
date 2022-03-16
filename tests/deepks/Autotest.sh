@@ -3,7 +3,7 @@
 # ABACUS executable path
 abacus=abacus
 # number of mpi processes
-np=3
+np=4
 # threshold with unit: eV
 threshold=0.0000001
 # check accuracy
