@@ -4,7 +4,8 @@
 //==========================================================
 #include "input_update.h"
 #include "src_pw/global.h"
-#include "src_pw/tools.h"
+#include "module_base/global_function.h"
+#include "module_base/global_variable.h"
 #include "input.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_io/optical.h"
@@ -264,6 +265,7 @@ bool Update_input::Read(const std::string &fn)
     return true;
 }//end read_parameters
 
+#include "src_parallel/parallel_common.h"
 #ifdef __MPI
 void Update_input::Bcast()
 {

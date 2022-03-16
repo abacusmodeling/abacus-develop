@@ -1,7 +1,8 @@
 #ifndef HS_MATRIX_H
 #define HS_MATRIX_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 // mohan add this file 2010-09-10
 namespace HS_Matrix

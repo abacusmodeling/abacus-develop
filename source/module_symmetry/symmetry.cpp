@@ -3,6 +3,10 @@
 //#include "../src_pw/global.h"
 //#include "symm_other.h"
 
+#include "../module_base/mathzone.h"
+#include "../module_base/constants.h"
+#include "../module_base/timer.h"
+
 namespace ModuleSymmetry
 {
 Symmetry::Symmetry()

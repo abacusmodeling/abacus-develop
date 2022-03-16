@@ -1,7 +1,9 @@
 #ifndef FORCE_STRESS_LCAO_H
 #define FORCE_STRESS_LCAO_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
 #include "FORCE_k.h"
 //#include "./force_lcao_gamma.h"
 #include "../src_pw/stress_func.h"

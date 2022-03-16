@@ -14,6 +14,14 @@
 
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../src_parallel/parallel_orbitals.h"
+#include "../src_lcao/LCAO_matrix.h"
+#include "../module_base/intarray.h"
+#include "../module_base/complexmatrix.h"
+#include "../src_lcao/global_fp.h"
+#include "../src_pw/global.h"
+#include "../src_io/winput.h"
+#include "../module_base/matrix.h"
+#include "../module_base/timer.h"
 
 ///
 /// The LCAO_Deepks contains subroutines for implementation of the DeePKS method in atomic basis.

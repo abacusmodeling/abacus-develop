@@ -252,7 +252,7 @@ bool Stochastic_Chebychev::checkconverge(
     arrayn_1 = new std::complex<double> [ndim];
 
     ModuleBase::GlobalFunc::DCOPY(wavein, arrayn_1, ndim);
-    //LapackConnector::copy(ndim,wavein,1,arrayn_1,1); 
+    //BlasConnector::copy(ndim,wavein,1,arrayn_1,1); 
     if(tmin == tmax) 
 	{
 		tmax += stept;

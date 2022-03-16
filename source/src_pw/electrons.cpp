@@ -1,4 +1,5 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "global.h"
 #include "electrons.h"
 #include "../src_pw/symmetry_rho.h"
@@ -184,14 +185,15 @@ void Electrons::self_consistent(const int &istep)
 
 		// calculate exact-exchange
 #ifdef __LCAO
-		switch(GlobalC::xcf.iexch_now)						// Peize Lin add 2019-03-09
-		{
-			case 5:    case 6:   case 9:
-				if( !GlobalC::exx_global.info.separate_loop )
-				{
-					GlobalC::exx_lip.cal_exx();
-				}
-				break;
+		if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
+			Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
+        {
+            if( !GlobalC::exx_global.info.separate_loop )
+            {
+                GlobalC::exx_lip.cal_exx();
+            }
+            break;
 		}
 #endif
         //(2) save change density as previous charge,

@@ -3,6 +3,7 @@
 
 #include "cmd_neighbor.h"
 #include "../module_base/vector3.h"
+#include "../module_base/matrix.h"
 #include "../module_cell/unitcell_pseudo.h"
 #include "../module_neighbor/sltk_grid_driver.h"
 

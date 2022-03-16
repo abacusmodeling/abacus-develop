@@ -3,6 +3,8 @@
 #include "../src_lcao/wavefunc_in_pw.h"
 #include "../src_io/winput.h"
 #include "../src_io/chi0_hilbert.h"
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 wavefunc::wavefunc()
 {

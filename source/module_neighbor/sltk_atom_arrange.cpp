@@ -2,6 +2,7 @@
 #include "sltk_atom_input.h"
 #include "sltk_grid.h"
 #include "sltk_grid_driver.h"
+#include "../module_base/timer.h"
 
 // update the followig class in near future 
 #include "../module_cell/unitcell.h"

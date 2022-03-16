@@ -34,15 +34,14 @@ void Run_pw::plane_wave_line(void)
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
-    // mohan add 2010-09-06
-	// Yu Liu move here 2021-06-27
-	// because the number of element type
-	// will easily be ignored, so here
-	// I warn the user again for each type.
-	for(int it=0; it<GlobalC::ucell.ntype; it++)
+	if(GlobalC::ucell.atoms[0].xc_func=="HSE"||GlobalC::ucell.atoms[0].xc_func=="PBE0")
 	{
-		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
-    }
+		XC_Functional::set_xc_type("pbe");
+	}
+	else
+	{
+		XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
+	}
 
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
@@ -59,7 +58,7 @@ void Run_pw::plane_wave_line(void)
 
     // print information
     // mohan add 2021-01-30
-    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv);
 
     // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);

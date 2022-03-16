@@ -1,11 +1,10 @@
 #include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
-#include "../src_pw/potential_libxc.h"
 #include "./dftu.h"  //Quxin add for DFT+U on 20201029
 // new
-#include "../src_pw/H_XC_pw.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
+#include "../module_base/timer.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"	//caoyu add for deepks 2021-06-03
 #endif
@@ -807,13 +806,14 @@ void Force_Stress_LCAO::calStressPwPart(
 	//--------------------------------------------------------
 	for(int i=0;i<3;i++)
 	{
-		sigmaxc(i,i) =  -(H_XC_pw::etxc) / GlobalC::ucell.omega;
+		sigmaxc(i,i) =  -(GlobalC::en.etxc) / GlobalC::ucell.omega;
 	}
 	//Exchange-correlation for PBE
 	sc_pw.stress_gga(sigmaxc);
 	return;
 }
 
+#include "../module_base/mathzone.h"
 //do symmetry for total force
 void Force_Stress_LCAO::forceSymmetry(ModuleBase::matrix& fcs)
 {

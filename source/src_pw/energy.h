@@ -1,6 +1,7 @@
 #ifndef ENERGY_H
 #define ENERGY_H
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 class energy
 {
@@ -46,6 +47,8 @@ class energy
     double descf;
 
     double etxcc;          // the nlcc exchange and correlation
+	double etxc;
+	double vtxc;
 	double exx;            // the exact exchange energy.
 	double evdw;			// the vdw energy				// Peize Lin add 2021.03.09
 

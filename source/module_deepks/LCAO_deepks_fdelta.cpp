@@ -10,6 +10,8 @@
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
+#include "../module_base/vector3.h"
+#include "../module_base/timer.h"
 
 void stress_fill( 
     const double& lat0_, 

@@ -1,5 +1,6 @@
 #include "record_adj.h"
 #include "../src_pw/global.h"
+#include "../module_base/timer.h"
 
 Record_adj::Record_adj(){}
 Record_adj::~Record_adj(){}

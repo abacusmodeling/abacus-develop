@@ -29,8 +29,7 @@ std::string	CALCULATION = "scf";
 int		EFIELD = 0; // 5: add electric field
 int		DIPOLE = 0; // 7: add dipole field
 
-std::string  DFT_FUNCTIONAL = "none";
-bool	DFT_META = 0;
+std::string  DFT_FUNCTIONAL = "default";
 int 	NSPIN = 1; // LDA
 bool	TWO_EFERMI = 0; // two fermi energy, exist only magnetization is fixed.
 int 	CURRENT_SPIN = 0;
@@ -76,7 +75,6 @@ int T_IN_H = 1; // mohan add 2010-11-28
 int VL_IN_H = 1;
 int VNL_IN_H = 1;
 int VH_IN_H = 1;
-int VXC_IN_H = 1;
 int VION_IN_H = 1;
 int ZEEMAN_IN_H = 1;
 double  STRESS_THR = 1.0e-2; //LiuXh add 20180515

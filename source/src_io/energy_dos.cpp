@@ -1,5 +1,6 @@
 #include "dos.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
 #include "../src_pw/wavefunc.h"
@@ -13,10 +14,11 @@
 #include "../src_lcao/wfc_dm_2d.h"
 #include "../module_neighbor/sltk_atom_arrange.h"//qifeng-2019-01-21
 #endif
-#include "../module_base/lapack_connector.h"
+#include "../module_base/blas_connector.h"
 #include "../module_base/scalapack_connector.h"
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
+#include "../src_parallel/parallel_reduce.h"
 #include <vector>
 #ifdef __MPI
 #include<mpi.h>
@@ -323,7 +325,7 @@ void energy::perform_dos(void)
 							const int ic = GlobalC::ParaO.trace_loc_col[i];
 							waveg[j] = Mulk[0](ic,ir)*D.wfc_gamma[is](ic,ir);
 							const double x = waveg[j].real();
-							LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
+							BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 						}
 					} 
 				}//ib
@@ -445,7 +447,7 @@ void energy::perform_dos(void)
 
 									waveg[j] = Mulk[0](ic,ir)*D.wfc_k[ik](ic,ir);
 									const double x = waveg[j].real();
-									LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
+									BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 
 								}
 							}                             

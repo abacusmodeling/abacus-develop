@@ -32,18 +32,12 @@ namespace ModuleBase
         }
     }
 
-    void Bspline::cleanp()
-    {
-        delete[] bezier;
-        bezier = NULL;
-    }
-
     double Bspline::bezier_ele(int n)
     {
         return this->bezier[n];
     }
 
-    void Bspline::getbslpine(double x)
+    void Bspline::getbspline(double x)
     {
         bezier[0] = 1.0;
         for(int k = 1 ; k <= norder ; ++k)

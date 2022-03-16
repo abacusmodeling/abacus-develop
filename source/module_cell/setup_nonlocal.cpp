@@ -1,4 +1,5 @@
 #include "setup_nonlocal.h"
+#include "../src_parallel/parallel_common.h"
 
 #ifdef __LCAO
 //#include "../src_pw/global.h"
@@ -18,6 +19,7 @@ InfoNonlocal::~InfoNonlocal()
 	delete[] nproj;
 }
 
+#include "../module_base/complexmatrix.h"
 void InfoNonlocal::Set_NonLocal(
     const int &it, 
     Atom* atom, 

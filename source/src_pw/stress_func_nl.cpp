@@ -1,6 +1,7 @@
 #include "stress_func.h"
 #include "../module_base/math_polyint.h"
 #include "../module_base/math_ylmreal.h"
+#include "../module_base/timer.h"
 
 //calculate the nonlocal pseudopotential stress in PW
 void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
@@ -55,7 +56,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 			///
 			///only occupied band should be calculated.
 			///
-			if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
+			if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 			for (int i = 0; i < nkb; i++) 
 			{
                 for (int ig = 0; ig < GlobalC::wf.npw; ig++) {
@@ -139,7 +140,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 					///
 					///only occupied band should be calculated.
 					///
-					if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
+					if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 					for (int i=0; i<nkb; i++)
 					{
 						for (int ig=0; ig<GlobalC::wf.npw; ig++) 
@@ -168,7 +169,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 					///
 					///only occupied band should be calculated.
 					///
-					if(GlobalC::wf.wg(ik, ib) < 1.0e-5) continue;
+					if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 					double fac = GlobalC::wf.wg(ik, ib) * 1.0;
 					int iat = 0;
 					int sum = 0;

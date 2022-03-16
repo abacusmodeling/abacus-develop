@@ -48,29 +48,29 @@ void Run_MD_PW::md_ions_pw(void)
     // allocation for ion movement.
     CE.allocate_ions();
 
-    // determine the mdtype
+    // determine the md_type
     Verlet *verlet;
-    if(INPUT.mdp.mdtype == -1)
+    if(INPUT.mdp.md_type == -1)
     {
         verlet = new FIRE(INPUT.mdp, GlobalC::ucell); 
     }
-    else if(INPUT.mdp.mdtype == 0)
+    else if(INPUT.mdp.md_type == 0)
     {
         verlet = new NVE(INPUT.mdp, GlobalC::ucell); 
     }
-    else if(INPUT.mdp.mdtype==1)
-    {
-        verlet = new NVT_ADS(INPUT.mdp, GlobalC::ucell);
-    }
-    else if(INPUT.mdp.mdtype==2)
+    else if(INPUT.mdp.md_type==1)
     {
         verlet = new NVT_NHC(INPUT.mdp, GlobalC::ucell);
     }
-    else if(INPUT.mdp.mdtype == 3)
+    else if(INPUT.mdp.md_type==2)
     {
         verlet = new Langevin(INPUT.mdp, GlobalC::ucell);
     }
-    else if(INPUT.mdp.mdtype==4)
+    else if(INPUT.mdp.md_type == 3)
+    {
+        verlet = new NVT_ADS(INPUT.mdp, GlobalC::ucell);
+    }
+    else if(INPUT.mdp.md_type==4)
     {
         verlet = new MSST(INPUT.mdp, GlobalC::ucell); 
         cellchange = true;
@@ -122,7 +122,7 @@ void Run_MD_PW::md_ions_pw(void)
             verlet->stress += verlet->virial;
         }
 
-        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.dumpfreq == 0)
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
             Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
             verlet->outputMD();
@@ -130,7 +130,7 @@ void Run_MD_PW::md_ions_pw(void)
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
 
-        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.rstfreq == 0)
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_restartfreq == 0)
         {
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
@@ -303,7 +303,7 @@ void Run_MD_PW::md_force_virial(
                     eiter += elec.iter;
                     if (elec.iter == 1 || hybrid_step == GlobalC::exx_global.info.hybrid_step - 1) // exx converge
                         break;
-                    GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+                    XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                     GlobalC::exx_lip.cal_exx();
                 }
             }
@@ -311,7 +311,7 @@ void Run_MD_PW::md_force_virial(
             {
                 elec.self_consistent(istep);
                 eiter += elec.iter;
-                GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+                XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                 elec.self_consistent(istep);
                 eiter += elec.iter;
             }

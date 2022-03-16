@@ -5,6 +5,9 @@
 #endif
 //#include "../src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
+#include "../module_base/global_file.h"
+#include "../src_parallel/parallel_common.h"
+#include "../module_base/constants.h"
 
 UnitCell_pseudo::UnitCell_pseudo()
 {
@@ -268,31 +271,17 @@ void UnitCell_pseudo::setup_cell(
 
 	for(int it=0; it<ntype; it++)
 	{
-		for(int j=0; j<4; j++)
+		if(atoms[0].xc_func !=atoms[it].xc_func)
 		{
-			if(atoms[0].dft[j]!=atoms[it].dft[j])
-			{
-				GlobalV::ofs_warning << "\n type " << atoms[0].label << " functional is " 
-				<< atoms[0].dft[0] << " " << atoms[0].dft[1] << " "
-				<< atoms[0].dft[2] << " " << atoms[0].dft[3];
-				
-				GlobalV::ofs_warning << "\n type " << atoms[it].label << " functional is " 
-				<< atoms[it].dft[0] << " " << atoms[it].dft[1] << " "
-				<< atoms[it].dft[2] << " " << atoms[it].dft[3] << std::endl;
-				
-				ModuleBase::WARNING_QUIT("setup_cell","All DFT functional must consistent.");
-			}
+			GlobalV::ofs_warning << "\n type " << atoms[0].label << " functional is " 
+			<< atoms[0].xc_func;
+			
+			GlobalV::ofs_warning << "\n type " << atoms[it].label << " functional is " 
+			<< atoms[it].xc_func << std::endl;
+			
+			ModuleBase::WARNING_QUIT("setup_cell","All DFT functional must consistent.");
 		}
 	}
-
-	// mohan add 2010-09-06
-	// because the number of element type
-	// will easily be ignored, so here
-	// I warn the user again for each type.
-	//for(int it=0; it<ntype; it++)
-	//{
-	//	GlobalC::xcf.which_dft(atoms[it].dft);
-	//}
 
 	// setup the total number of PAOs
 	this->cal_natomwfc(log);

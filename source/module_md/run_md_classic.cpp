@@ -8,6 +8,7 @@
 #include "Langevin.h"
 #include "../input.h"
 #include "../src_io/print_info.h"
+#include "../module_base/timer.h"
 
 Run_MD_CLASSIC::Run_MD_CLASSIC(){}
 
@@ -26,29 +27,29 @@ void Run_MD_CLASSIC::classic_md_line(void)
 #endif
 	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
-    // determine the mdtype
+    // determine the md_type
     Verlet *verlet;
-    if(INPUT.mdp.mdtype == -1)
+    if(INPUT.mdp.md_type == -1)
     {
         verlet = new FIRE(INPUT.mdp, ucell_c); 
     }
-    else if(INPUT.mdp.mdtype == 0)
+    else if(INPUT.mdp.md_type == 0)
     {
         verlet = new NVE(INPUT.mdp, ucell_c); 
     }
-    else if(INPUT.mdp.mdtype == 1)
-    {
-        verlet = new NVT_ADS(INPUT.mdp, ucell_c);
-    }
-    else if(INPUT.mdp.mdtype == 2)
+    else if(INPUT.mdp.md_type == 1)
     {
         verlet = new NVT_NHC(INPUT.mdp, ucell_c);
     }
-    else if(INPUT.mdp.mdtype == 3)
+    else if(INPUT.mdp.md_type == 2)
     {
         verlet = new Langevin(INPUT.mdp, ucell_c);
     }
-    else if(INPUT.mdp.mdtype == 4)
+    else if(INPUT.mdp.md_type == 3)
+    {
+        verlet = new NVT_ADS(INPUT.mdp, ucell_c);
+    }
+    else if(INPUT.mdp.md_type == 4)
     {
         verlet = new MSST(INPUT.mdp, ucell_c); 
     }
@@ -74,7 +75,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
             verlet->stress +=  verlet->virial;
         }
 
-        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.dumpfreq == 0)
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
             Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
             verlet->outputMD();
@@ -82,7 +83,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
 
-        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.rstfreq == 0)
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_restartfreq == 0)
         {
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;

@@ -1,7 +1,9 @@
 #ifndef GRID_BASE_BETA_H
 #define GRID_BASE_BETA_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix3.h"
 #include "../module_orbital/ORB_atomic_lm.h"
 
 //AUTHOR : mohan

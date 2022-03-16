@@ -2,6 +2,8 @@
 #ifdef __LCAO
 #include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
+#include "../module_base/timer.h"
+#include "../module_base/constants.h"
 
 #ifndef __CELL
 #include "../src_pw/global.h"
@@ -349,6 +351,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 	return 0;
 }
 
+#include "../module_base/mathzone.h"
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.

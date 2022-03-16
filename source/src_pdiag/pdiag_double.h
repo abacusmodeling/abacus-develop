@@ -1,7 +1,10 @@
 #ifndef PDIAG_DOUBLE_H
 #define PDIAG_DOUBLE_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
+#include "../module_base/complexmatrix.h"
 #include "pdiag_basic.h"
 #include "diag_scalapack_gvx.h"
 

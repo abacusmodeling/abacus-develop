@@ -1,11 +1,13 @@
 #include "global.h"
 #include "hip/hip_runtime.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 // #include "hamilt_pw.cuh"
 #include "../module_base/blas_connector.h"
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 #include "hamilt_pw_hip.h"
 #include "myfunc.h"
+#include "../module_base/timer.h"
 using namespace HipCheck;
 
 __global__ void cast_d2f(float *dst, double *src, int size)
@@ -316,17 +318,17 @@ void Hamilt_PW::diagH_subspace(const int ik,
 				}
 			}
 		};
-		if (5 == GlobalC::xcf.iexch_now && 0 == GlobalC::xcf.igcx_now) // HF
+		if(XC_Functional::get_func_type()==4)
 		{
-			add_Hexx(1);
-		}
-		else if (6 == GlobalC::xcf.iexch_now && 8 == GlobalC::xcf.igcx_now) // PBE0
-		{
-			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
-		}
-		else if (9 == GlobalC::xcf.iexch_now && 12 == GlobalC::xcf.igcx_now) // HSE
-		{
-			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
+			if ( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type ) // HF
+			{
+				add_Hexx(1);
+			}
+			else if (Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+					Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type) // PBE0 or HSE
+			{
+				add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
+			}
 		}
 	}
 #endif
@@ -1576,7 +1578,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 	// (4) the metaGGA part
 	//------------------------------------
 	// timer::tick("Hamilt_PW","meta");
-	if (GlobalV::DFT_META)
+	if (XC_Functional::get_func_type() == 3)
 	{
 		tmhpsi = hpsi;
 		tmpsi_in = psi_in;

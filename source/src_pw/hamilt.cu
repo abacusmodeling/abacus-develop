@@ -4,6 +4,8 @@
 #include "diago_david.h"
 #include "diago_cg.cuh"
 #include "cufft.h"
+#include "../module_base/timer.h"
+
 using namespace CudaCheck;
 
 Hamilt::Hamilt() 
@@ -19,7 +21,6 @@ Hamilt::~Hamilt()
 #endif
 }
 
-// in tools.h
 
 __global__ void hamilt_cast_d2f(float *dst, double *src, int size)
 {
@@ -420,10 +421,6 @@ void Hamilt::diagH_LAPACK(
     // cout<<"hvec: "<<hvec.nr<<" "<<hvec.nc<<endl;
 
     int lwork=0;
-    //========================================
-    // int ILAENV();
-    // ILAENV returns optimal block size "nb"
-    //========================================
 
     ModuleBase::ComplexMatrix sdum(nstart, ldh);
     ModuleBase::ComplexMatrix hdum;
@@ -433,8 +430,6 @@ void Hamilt::diagH_LAPACK(
     const bool all_eigenvalues = (nstart == nbands);
 
     int nb = LapackConnector::ilaenv(1, "ZHETRD", "U", nstart, -1, -1, -1);
-//  int nb = ILAENV(1,  "ZHETRD", "U", n, -1, -1, -1);
-//  int nb = 32;
 
     if (nb < 1)
     {

@@ -7,7 +7,7 @@
 
 #ifdef __NORMAL
 #else
-#include "lapack_connector.h"
+#include "blas_connector.h"
 #endif
 
 namespace ModuleBase
@@ -185,7 +185,7 @@ ComplexMatrix operator*(const ComplexMatrix &m1, const ComplexMatrix &m2)
 	}
 #else
 	// Peize Lin accelerate 2017-10-27
-	LapackConnector::gemm('N', 'N', m1.nr, m2.nc, m1.nc,
+	BlasConnector::gemm('N', 'N', m1.nr, m2.nc, m1.nc,
 		1, m1.c, m1.nc, m2.c, m2.nc,
 		0, mprod.c, mprod.nc);
 #endif

@@ -1,7 +1,10 @@
 #ifndef LCAO_MATRIX_H
 #define LCAO_MATRIX_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/vector3.h"
+#include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_orbitals.h"
 
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
@@ -79,9 +82,9 @@ class LCAO_Matrix
     double ****HR_tr;
 
 
-    complex<double> ****Hloc_fixedR_tr_soc;
-    complex<double> ****SlocR_tr_soc;
-    complex<double> ****HR_tr_soc;
+    std::complex<double> ****Hloc_fixedR_tr_soc;
+    std::complex<double> ****SlocR_tr_soc;
+    std::complex<double> ****HR_tr_soc;
 
     // jingan add 2021-6-4, modify 2021-12-2
     // Sparse form of HR and SR, the format is [R_direct_coor][orbit_row][orbit_col]

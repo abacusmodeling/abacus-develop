@@ -8,7 +8,7 @@
 #include<vector>
 
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 
 #ifdef _OPENMP

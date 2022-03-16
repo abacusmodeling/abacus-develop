@@ -3,6 +3,8 @@
 #include "../module_orbital/ORB_read.h"
 #include "grid_base.h"
 #include "global_fp.h" // mohan add 2021-01-30
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 Grid_Base::Grid_Base()
 { 
@@ -41,6 +43,7 @@ Grid_Base::~Grid_Base()
 	delete[] yy2;
 }
 
+#include "../module_base/mathzone.h"
 void Grid_Base::init(
     const ModuleBase::Matrix3 &latvec_in,
     const double &lat0_in,

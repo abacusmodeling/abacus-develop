@@ -1,5 +1,7 @@
 #include "diago_cg.h"
 #include "global.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 int Diago_CG::moved = 0;
 
@@ -497,7 +499,7 @@ double Diago_CG::ddot_real
     double *pL,*pR;
     pL=(double *)psi_L;
     pR=(double *)psi_R;
-    double result=LapackConnector::dot(dim2,pL,1,pR,1);
+    double result=BlasConnector::dot(dim2,pL,1,pR,1);
     if(reduce)  Parallel_Reduce::reduce_double_pool( result );
     return result;
     //======================================================================
@@ -510,64 +512,3 @@ double Diago_CG::ddot_real
     return result.real();*/
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
-
-std::complex<double> Diago_CG::ddot
-(
-    const int & dim,
-    const std::complex<double> * psi_L,
-    const std::complex<double> * psi_R
-)
-{
-    std::complex<double> result(0, 0);
-    for (int i = 0; i < dim ; i++)
-    {
-        result += conj(psi_L[i]) *  psi_R[i] ;
-    }
-    Parallel_Reduce::reduce_complex_double_pool( result );
-    return result;
-}  // end of ddot
-
-// this return <psi(m)|psik>
-std::complex<double> Diago_CG::ddot
-(
-    const int & dim,
-    const ModuleBase::ComplexMatrix &psi,
-    const int & m,
-    std::complex<double> *psik
-)
-{
-    std::complex<double> result(0, 0);
-    assert(dim > 0) ;
-
-    for (int i = 0; i < dim ; i++)
-    {
-        result += conj(psi(m, i)) *  psik[i] ;
-    }
-
-    Parallel_Reduce::reduce_complex_double_pool( result );
-
-    return result;
-}  // end of ddot
-
-
-// this return <psi_L(m) | psi_R(n)>
-std::complex<double> Diago_CG::ddot
-(
-    const int & dim,
-    const ModuleBase::ComplexMatrix &psi_L,
-    const int & m,
-    const ModuleBase::ComplexMatrix &psi_R,
-    const int & n
-)
-{
-    std::complex<double> result = ModuleBase::ZERO;
-    assert( (dim>0) && (dim<=psi_L.nc) && (dim<=psi_R.nc) );
-
-    for ( int i = 0; i < dim ; i++)
-    {
-        result += conj( psi_L(m,i) ) * psi_R(n,i) ;
-    }
-    Parallel_Reduce::reduce_complex_double_pool( result );
-
-    return result;
-} // end of ddot

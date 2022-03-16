@@ -6,6 +6,7 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../module_base/global_variable.h"
+#include "../module_base/timer.h"
 
 #ifndef __CMD
 #include "../src_pw/run_md_pw.h"
@@ -234,7 +235,7 @@ void MD_func::force_virial(const int &istep,
 	ModuleBase::TITLE("MD_func", "force_stress");
     ModuleBase::timer::tick("MD_func", "force_stress");
 
-	if(mdp.md_potential == "LJ")
+	if(mdp.md_ensolver == "LJ")
 	{
 		bool which_method = unit_in.judge_big_cell();
 		if(which_method)
@@ -267,12 +268,12 @@ void MD_func::force_virial(const int &istep,
 								stress);
 		}
 	}
-	else if(mdp.md_potential == "DP")
+	else if(mdp.md_ensolver == "DP")
 	{
 		DP_potential::DP_pot(unit_in, potential, force, stress);
 	}
 #ifndef __CMD
-	else if(mdp.md_potential == "FP")
+	else if(mdp.md_ensolver == "FP")
 	{
 		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{

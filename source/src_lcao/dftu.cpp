@@ -11,6 +11,7 @@
 #include <cmath>
 #include <sstream>
 #include <complex>
+#include "../module_base/memory.h"
 
 #include "dftu.h"
 #include "../module_base/constants.h"
@@ -24,6 +25,7 @@
 #include "../module_orbital/ORB_gen_tables.h"
 #include "../src_pw/charge.h"
 #include "LCAO_nnr.h"
+#include "../module_base/timer.h"
 
 extern "C"
 {

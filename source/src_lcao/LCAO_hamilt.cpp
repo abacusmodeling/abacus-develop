@@ -4,9 +4,12 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "global_fp.h" // mohan add 2021-01-30
 #include "dftu.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_xc/xc_functional.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"	//caoyu add 2021-07-26
 #endif
+#include "../module_base/timer.h"
 
 LCAO_Hamilt::LCAO_Hamilt()
 { 
@@ -87,17 +90,20 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
             this->GG.cal_vlocal(GlobalC::pot.vr_eff1);
 
             // Peize Lin add 2016-12-03
-            if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
+            if(XC_Functional::get_func_type()==4)
             {
-                GlobalC::exx_lcao.add_Hexx(ik,1);
-            }
-            else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
-            {
-                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
-            }
-            else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
-            {
-                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+                if( Exx_Global::Hybrid_Type::HF == GlobalC::exx_lcao.info.hybrid_type ) //HF
+                {
+                    GlobalC::exx_lcao.add_Hexx(ik,1);
+                }
+                else if( Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type )			// PBE0
+                {
+                    GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+                }
+                else if( Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// HSE
+                {
+                    GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+                }
             }
         }
 
@@ -246,17 +252,20 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
         }
 
         // Peize Lin add 2016-12-03
-        if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
+        if(XC_Functional::get_func_type()==4)
         {
-            GlobalC::exx_lcao.add_Hexx(ik,1);
-        }
-        else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
-        {
-            GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
-        }
-        else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
-        {
-            GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+            if( Exx_Global::Hybrid_Type::HF  == GlobalC::exx_lcao.info.hybrid_type )				// HF
+            {
+                GlobalC::exx_lcao.add_Hexx(ik,1);
+            }
+            else if( Exx_Global::Hybrid_Type::PBE0  == GlobalC::exx_lcao.info.hybrid_type )			// PBE0
+            {
+                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+            }
+            else if( Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// HSE
+            {
+                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+            }
         }
     }
 

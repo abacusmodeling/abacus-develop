@@ -1,6 +1,5 @@
 #ifndef MYMATH_H
 #define MYMATH_H
-//#include "../src_pw/tools.h"
 #if defined __FFTW2
 #include "fftw.h"
 #elif defined __FFTW3

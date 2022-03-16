@@ -1,6 +1,7 @@
 #include "dos.h"
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
+#include "../src_parallel/parallel_reduce.h"
 
 void energy::perform_dos_pw(void)
 {

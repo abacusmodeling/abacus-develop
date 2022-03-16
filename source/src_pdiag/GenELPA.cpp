@@ -65,12 +65,12 @@
 #include <cmath>
 #include <cfloat>
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 extern "C"
 {
 //    #include "pblas.h"
-    #include "Cblacs.h"
+    #include "../module_base/blacs_connector.h"
 //    #include "scalapack.h"
     #include "my_elpa.h"
 	#include "../module_base/scalapack_connector.h"

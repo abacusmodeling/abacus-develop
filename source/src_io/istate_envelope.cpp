@@ -1,6 +1,7 @@
 #include "istate_envelope.h"
 #include "../src_pw/global.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 IState_Envelope::IState_Envelope()
 {}

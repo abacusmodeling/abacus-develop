@@ -10,8 +10,7 @@
 #include "exx_abfs-screen-schwarz.h"
 #include "exx_abfs-screen-cauchy.h"
 #include "../module_base/element_basis_index.h"
-#include "../src_pw/xc_type.h"
-#include "../src_pw/exx_global.h"
+#include "../module_xc/exx_global.h"
 
 #if EXX_DM==1
 #include "exx_abfs-parallel-communicate-dm.h"

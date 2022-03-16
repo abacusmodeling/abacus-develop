@@ -31,7 +31,6 @@ extern int 		DIPOLE;				// 7 add dipole correction
 
 
 extern std::string   DFT_FUNCTIONAL;		// 6.5 change the DFT functional from input file.
-extern bool		DFT_META;		// whether is meta-GGA
 extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8
@@ -89,7 +88,6 @@ extern int T_IN_H; // 23, calculate T in H or not.
 extern int VL_IN_H; // 24, calculate Vl in H or not.
 extern int VNL_IN_H; // 25, calculate Vnl in H or not.
 extern int VH_IN_H; // 26, calculate Vh in H or not.
-extern int VXC_IN_H; // 27, calculate Vxc in H or not.
 extern int VION_IN_H; // 28, calculate Vion_loc in H or not.
 extern double   STRESS_THR; //LiuXh add 20180515
 
