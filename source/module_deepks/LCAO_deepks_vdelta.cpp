@@ -1,13 +1,16 @@
 //This file contains subroutines related to V_delta, which is the deepks contribution to Hamiltonian
 //defined as |alpha>V(D)<alpha|
+//as well as subroutines for printing them for checking
 //It also contains subroutine related to calculating e_delta_bands, which is basically
 //tr (rho * V_delta)
 
 //Four subroutines are contained in the file:
 //1. add_v_delta : adds deepks contribution to hamiltonian, for gamma only
 //2. add_v_delta_k : counterpart of 1, for multi-k
-//3. cal_e_delta_band : calculates e_delta_bands for gamma only
-//4. cal_e_delta_band_k : counterpart of 4, for multi-k
+//3. check_v_delta : prints H_V_delta for checking
+//4. check_v_delta_k : prints H_V_deltaR for checking
+//5. cal_e_delta_band : calculates e_delta_bands for gamma only
+//6. cal_e_delta_band_k : counterpart of 4, for multi-k
 
 #ifdef __DEEPKS
 
@@ -21,11 +24,14 @@
 void LCAO_Deepks::add_v_delta(const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO)
+    const int* trace_loc_row,
+    const int* trace_loc_col,
+	const int nrow,
+	const int ncol)
 {
     ModuleBase::TITLE("LCAO_DESCRIPTOR", "add_v_delta");
     ModuleBase::timer::tick ("LCAO_gen_fixedH","add_v_delta");
-    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,ParaO.nloc); //init before calculate
+    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,nrow*ncol); //init before calculate
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
 
@@ -70,13 +76,13 @@ void LCAO_Deepks::add_v_delta(const UnitCell_pseudo &ucell,
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = ParaO.trace_loc_row[iw1_all];
+						const int iw1_local = trace_loc_row[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = ParaO.trace_loc_col[iw2_all];
+							const int iw2_local = trace_loc_col[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
@@ -109,11 +115,11 @@ void LCAO_Deepks::add_v_delta(const UnitCell_pseudo &ucell,
 
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
-                                iic=iw1_local+iw2_local*ParaO.nrow;
+                                iic=iw1_local+iw2_local*nrow;
                             }
                             else
                             {
-                                iic=iw1_local*ParaO.ncol+iw2_local;
+                                iic=iw1_local*ncol+iw2_local;
                             }
                             this->H_V_delta[iic] += nlm;
 						}//iw2
@@ -127,12 +133,36 @@ void LCAO_Deepks::add_v_delta(const UnitCell_pseudo &ucell,
 	return;
 }
 
+void LCAO_Deepks::check_v_delta(const int nrow, const int ncol)
+{
+	ofstream ofs("H_V_delta.dat");
+	ofs << std::setprecision(10);
+	for(int irow=0;irow<nrow;irow++)
+	{
+		for (int icol=0;icol<ncol;icol++)
+		{
+			int iic;
+			if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+			{
+				iic=irow+icol*nrow;
+			}
+			else
+			{
+				iic=irow*ncol+icol;
+			}
+			ofs<<H_V_delta[iic]<< " ";
+		}
+		ofs << std::endl;
+	}
+}
+
 //this subroutine calculates H_V_deltaR
 //used in multi-k calculations
 void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO,
+    const int* trace_loc_row,
+    const int* trace_loc_col,
     const int nnr_in)
 {
     ModuleBase::TITLE("LCAO_DESCRIPTOR", "add_v_delta_k");
@@ -260,7 +290,7 @@ void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
 						for (int iw1=0; iw1<atom1->nw*GlobalV::NPOL; iw1++)
 						{
 							const int iw1_all = start1 + iw1;
-							const int mu = ParaO.trace_loc_row[iw1_all];
+							const int mu = trace_loc_row[iw1_all];
 							if(mu < 0)continue; 
 
 							// fix a serious bug: atom2[T2] -> atom2
@@ -268,7 +298,7 @@ void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
 							for (int iw2=0; iw2<atom2->nw*GlobalV::NPOL; iw2++)
 							{
 								const int iw2_all = start2 + iw2;
-								const int nu = ParaO.trace_loc_col[iw2_all];						
+								const int nu = trace_loc_col[iw2_all];						
 								if(nu < 0)continue;
   
                                 std::vector<double> nlm1 = this->nlm_save_k[iat][key_1][iw1_all][0];
@@ -306,7 +336,7 @@ void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
 					{
 						const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
 						const int iw1_all = start1 + j;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = trace_loc_row[iw1_all];
 						if(mu < 0)continue; 
 
 						// fix a serious bug: atom2[T2] -> atom2
@@ -315,7 +345,7 @@ void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
 						{
 							const int k0 = k/GlobalV::NPOL;
 							const int iw2_all = start2 + k;
-							const int nu = ParaO.trace_loc_col[iw2_all];						
+							const int nu = trace_loc_col[iw2_all];						
 							if(nu < 0)continue;
 
 							nnr++;
@@ -335,9 +365,23 @@ void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
     return;
 }
 
+void LCAO_Deepks::check_v_delta_k(const int nnr)
+{
+	ofstream ofs("H_V_deltaR.dat");
+	ofs<<std::setprecision(10);
+	for(int iir=0;iir<nnr;iir++)
+	{
+		ofs<<H_V_deltaR[iir]<<" ";
+		if(iir%6==5) ofs<<std::endl;
+	}
+}
+
 //calculating sum of correction band energies
 //for gamma_only calculations
-void LCAO_Deepks::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm, const Parallel_Orbitals &ParaO)
+void LCAO_Deepks::cal_e_delta_band(const ModuleBase::matrix &dm,
+	const int* trace_loc_row,
+    const int* trace_loc_col,
+	const int nrow)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_e_delta_band");
     this->e_delta_band = 0;
@@ -345,16 +389,13 @@ void LCAO_Deepks::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm, co
     {
         for (int j = 0; j < GlobalV::NLOCAL; ++j)
         {
-            const int mu = ParaO.trace_loc_row[j];
-            const int nu = ParaO.trace_loc_col[i];
+            const int mu = trace_loc_row[j];
+            const int nu = trace_loc_col[i];
             
             if (mu >= 0 && nu >= 0)
             {                
-                const int index=nu*ParaO.nrow+mu;
-                for (int is = 0; is < GlobalV::NSPIN; ++is)
-                {
-                    this->e_delta_band += dm[is](nu, mu) * this->H_V_delta[index];
-                }
+                const int index=nu*nrow+mu;
+				this->e_delta_band += dm(nu, mu) * this->H_V_delta[index];
             }
         }
     }
@@ -367,8 +408,11 @@ void LCAO_Deepks::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm, co
 //calculating sum of correction band energies
 //for multi_k calculations
 void LCAO_Deepks::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix> &dm,
-    const Parallel_Orbitals &ParaO,
-    const int nks)
+    const int* trace_loc_row,
+    const int* trace_loc_col,
+    const int nks,
+	const int nrow,
+	const int ncol)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_e_delta_band");
     std::complex<double> e_delta_band_k=std::complex<double>(0.0,0.0);
@@ -376,19 +420,19 @@ void LCAO_Deepks::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix
     {
         for (int j = 0; j < GlobalV::NLOCAL; ++j)
         {
-            const int mu = ParaO.trace_loc_row[j];
-            const int nu = ParaO.trace_loc_col[i];
+            const int mu = trace_loc_row[j];
+            const int nu = trace_loc_col[i];
             
             if (mu >= 0 && nu >= 0)
             {                
                 int iic;
                 if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                 {
-                    iic=mu+nu*ParaO.nrow;
+                    iic=mu+nu*nrow;
                 }
                 else
                 {
-                    iic=mu*ParaO.ncol+nu;
+                    iic=mu*ncol+nu;
                 }
                 for(int ik=0;ik<nks;ik++)
                 {
@@ -397,15 +441,11 @@ void LCAO_Deepks::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix
             }
         }
     }
-#ifdef __MPI
-    Parallel_Reduce::reduce_complex_double_all(e_delta_band_k);
-#endif
-    if(e_delta_band_k.imag()>1e-12)
-    {
-        GlobalV::ofs_running << "e_delta_band_k : " << e_delta_band_k << std::endl;
-        //ModuleBase::WARNING_QUIT("e_delta_band_k","energy should be real!");
-    }
+
     this->e_delta_band = e_delta_band_k.real();
+#ifdef __MPI
+    Parallel_Reduce::reduce_double_all(this->e_delta_band);
+#endif
     return;
 }
 

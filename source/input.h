@@ -383,10 +383,18 @@ class Input
 //==========================================================
 // DeepKS -- added by caoyu and mohan
 //==========================================================
-    int out_descriptor; // (need libnpy) output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
-	int lmax_descriptor; //lmax used in descriptor, mohan added 2021-01-03
-	int deepks_scf;	//(need libnpy and libtorch) if set 1, a trained model would be needed to cal V_delta and F_delta
-	string model_file;		//needed when deepks_scf=1
+    bool deepks_out_labels; // (need libnpy) prints energy and force labels and descriptors for training, wenfei 2022-1-12
+	bool deepks_scf;	//(need libnpy and libtorch) if set 1, a trained model would be needed to cal V_delta and F_delta
+	bool deepks_bandgap; //for bandgap label. QO added 2021-12-15	
+	
+	bool deepks_out_unittest; //if set 1, prints intermediate quantities that shall be used for making unit test
+
+	string deepks_model;		//needed when deepks_scf=1
+
+	//the following 3 are used when generating jle.orb
+	int deepks_descriptor_lmax; //lmax used in descriptor, mohan added 2021-01-03
+	double deepks_descriptor_rcut;
+	double deepks_descriptor_ecut;
 
 //==========================================================
 // variables for test only

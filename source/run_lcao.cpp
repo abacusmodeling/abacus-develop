@@ -85,6 +85,7 @@ void Run_lcao::lcao_line(void)
 
     // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
+
 	GlobalC::LOWF.orb_con.read_orb_first(
 		GlobalV::ofs_running,
 		GlobalC::ORB,
@@ -94,7 +95,7 @@ void Run_lcao::lcao_line(void)
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax,
-		GlobalV::out_descriptor,
+		GlobalV::deepks_setorb,
 		INPUT.out_r_matrix,
 		GlobalV::FORCE,
 		GlobalV::MY_RANK);
@@ -111,7 +112,7 @@ void Run_lcao::lcao_line(void)
 		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.lat0,
-		GlobalV::out_descriptor,
+		GlobalV::deepks_setorb,
 		Exx_Abfs::Lmax,
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,
@@ -168,13 +169,10 @@ void Run_lcao::lcao_line(void)
 #ifdef __DEEPKS
 	//wenfei 2021-12-19
 	//if we are performing DeePKS calculations, we need to load a model
-	if (GlobalV::out_descriptor)
+	if (GlobalV::deepks_scf)
 	{
-		if (GlobalV::deepks_scf)
-		{
-			// load the DeePKS model from deep neural network
-    		GlobalC::ld.load_model(INPUT.model_file);
-		}
+		// load the DeePKS model from deep neural network
+		GlobalC::ld.load_model(INPUT.deepks_model);
 	}
 #endif
 

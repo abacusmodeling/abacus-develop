@@ -77,8 +77,10 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::kv);
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d);
     	GlobalC::ld.cal_descriptor();
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
@@ -86,8 +88,10 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::kv,
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d,
 			isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
@@ -96,7 +100,35 @@ void Force_LCAO_k::ftable_k (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
+        if(GlobalV::deepks_out_unittest)
+        {
+			GlobalC::ld.print_dm_k(GlobalC::kv.nks,GlobalC::LOC.wfc_dm_2d.dm_k);
+			GlobalC::ld.check_projected_dm();
+			GlobalC::ld.check_descriptor(GlobalC::ucell);
+			GlobalC::ld.check_gedm();
+			GlobalC::ld.add_v_delta_k(GlobalC::ucell,
+				GlobalC::ORB,
+				GlobalC::GridD,
+				GlobalC::ParaO.trace_loc_row,
+				GlobalC::ParaO.trace_loc_col,
+				GlobalC::LNNR.nnr);
+			GlobalC::ld.check_v_delta_k(GlobalC::LNNR.nnr);
+			for(int ik=0;ik<GlobalC::kv.nks;ik++)
+			{
+				GlobalC::LNNR.folding_fixedH(ik);
+			}
+			GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+				GlobalC::ParaO.trace_loc_row,
+				GlobalC::ParaO.trace_loc_col,
+				GlobalC::kv.nks,
+				GlobalC::ParaO.nrow,
+				GlobalC::ParaO.ncol);
+			ofstream ofs("E_delta_bands.dat");
+			ofs <<std::setprecision(10)<< GlobalC::ld.e_delta_band;
+			ofstream ofs1("E_delta.dat");
+			ofs1 <<std::setprecision(10)<< GlobalC::ld.E_delta;
+			GlobalC::ld.check_f_delta(GlobalC::ucell.nat, svnl_dalpha);
+        }
     }
 #endif
 

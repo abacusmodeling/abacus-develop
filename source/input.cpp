@@ -240,8 +240,11 @@ void Input::Default(void)
     out_charge = 0;
 	out_dm = 0;
 
-	out_descriptor = 0; // caoyu added 2020-11-24, mohan added 2021-01-03
-	lmax_descriptor = 2; // mohan added 2021-01-03
+	deepks_out_labels = 0; // caoyu added 2020-11-24, mohan added 2021-01-03
+	deepks_scf = 0;
+	deepks_bandgap = 0;
+	deepks_out_unittest = 0;
+	deepks_descriptor_lmax = 2; // mohan added 2021-01-03
 
     out_potential = 0;
     out_wf = 0;
@@ -913,22 +916,30 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, out_dm);
         }
-        else if (strcmp("out_descriptor", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
+        else if (strcmp("deepks_out_labels", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
-            read_value(ifs, out_descriptor);
+            read_value(ifs, deepks_out_labels);
         }
-        else if (strcmp("lmax_descriptor", word) == 0)// mohan added 2021-01-03
-        {
-            read_value(ifs, lmax_descriptor);
-		}
-		else if (strcmp("deepks_scf", word) == 0) // caoyu added 2021-06-02
+		else if (strcmp("deepks_scf", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
             read_value(ifs, deepks_scf);
-		}
-		else if (strcmp("model_file", word) == 0) // caoyu added 2021-06-03
-        {
-            read_value(ifs, model_file);
         }
+		else if (strcmp("deepks_bandgap", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
+        {
+            read_value(ifs, deepks_bandgap);
+        }
+        else if (strcmp("deepks_out_unittest", word) == 0)// mohan added 2021-01-03
+        {
+            read_value(ifs, deepks_out_unittest);
+		}
+		else if (strcmp("deepks_model", word) == 0) // caoyu added 2021-06-03
+        {
+            read_value(ifs, deepks_model);
+        }
+		else if (strcmp("deepks_descriptor_lmax", word) == 0) // QO added 2021-12-15
+        {
+            read_value(ifs, deepks_descriptor_lmax);
+		}
 		else if (strcmp("out_potential", word) == 0)
         {
             read_value(ifs, out_potential);
@@ -1845,16 +1856,19 @@ void Input::Bcast()
     Parallel_Common::bcast_string( charge_extrap );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( out_charge );
     Parallel_Common::bcast_int( out_dm );
-    Parallel_Common::bcast_int( out_descriptor ); // caoyu added 2020-11-24, mohan modified 2021-01-03
-    Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
-    Parallel_Common::bcast_int( deepks_scf ); // caoyu add 2021-06-02
-	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
+
+    Parallel_Common::bcast_bool( deepks_out_labels ); // caoyu added 2020-11-24, mohan modified 2021-01-03
+	Parallel_Common::bcast_bool( deepks_scf );
+	Parallel_Common::bcast_bool( deepks_bandgap );
+	Parallel_Common::bcast_bool( deepks_out_unittest );
+	Parallel_Common::bcast_string( deepks_model );
+	Parallel_Common::bcast_int( deepks_descriptor_lmax );
 
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_int( out_wf );
     Parallel_Common::bcast_int( out_wf_r );
 	Parallel_Common::bcast_int( out_dos );
-        Parallel_Common::bcast_int( out_band );
+	Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
 	Parallel_Common::bcast_int( out_hs2 ); //LiuXh add 2019-07-15
 	Parallel_Common::bcast_int( out_r_matrix ); // jingan add 2019-8-14

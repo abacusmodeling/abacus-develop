@@ -116,10 +116,10 @@ void Run_pw::plane_wave_line(void)
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
-    if(GlobalV::BASIS_TYPE=="pw" && GlobalV::out_descriptor==1)
+    if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
     {
         Numerical_Descriptor nc;
-        nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);
+        nc.output_descriptor(GlobalC::wf.evc, INPUT.deepks_descriptor_lmax);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
