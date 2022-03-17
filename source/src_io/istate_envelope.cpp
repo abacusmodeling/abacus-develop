@@ -137,7 +137,7 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg, int& out_wf
             WF_io::write_wfc2(ssw.str(), pw_wfc_g, GlobalC::pw.gcar);
         }
         if(out_wf_r)
-		    Write_Wfc_Realspace::write_wfc_realspace_1(pw_wfc_g, "wfc_realspace");
+		    Write_Wfc_Realspace::write_wfc_realspace_1(pw_wfc_g, "wfc_realspace", false);
         delete[] pw_wfc_g;
     }  
     
@@ -168,7 +168,7 @@ void IState_Envelope::set_pw_wfc(PW_Basis& pwb,
             Porter[ir] += std::complex<double>(rho[is][ir], 0.0);
 
     //call FFT
-    pwb.FFT_chg.FFT3D(Porter.data(), -1);
+    pwb.FFT_wfc.FFT3D(Porter.data(), -1);
 
     // set pw_wfc_g
     // ig2fftw: the index map from i_ngk(local) to i_ngmw(local)
