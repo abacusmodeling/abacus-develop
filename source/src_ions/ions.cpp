@@ -48,53 +48,6 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 		if(GlobalV::OUT_LEVEL=="ie")
 		{
 			Print_Info::print_screen(stress_step, force_step, istep);
-/*        	std::cout << " -------------------------------------------" << std::endl;
-			if(GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
-			{
-        		std::cout << " STEP OF ION RELAXATION : " << istep << std::endl;
-			}
-            else if(GlobalV::CALCULATION=="cell-relax")
-            {
-                std::cout << " RELAX CELL : " << stress_step << std::endl;
-                std::cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
-            }
-			else if(GlobalV::CALCULATION=="scf") //add 4 lines 2015-09-06, xiaohui
-			{
-        			std::cout << " SELF-CONSISTENT : " << std::endl;
-			}
-			else if(GlobalV::CALCULATION=="nscf") //add 4 lines 2015-09-06, xiaohui
-			{
-        			std::cout << " NONSELF-CONSISTENT : " << std::endl;
-			}
-			else if(GlobalV::CALCULATION=="md")
-			{
-        		std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-			}
-        	std::cout << " -------------------------------------------" << std::endl;
-
-        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-			if(GlobalV::CALCULATION=="relax")
-			{
-        		GlobalV::ofs_running << " STEP OF ION RELAXATION : " << istep << std::endl;
-			}
-            else if(GlobalV::CALCULATION=="cell-relax")
-            {
-                GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
-                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
-            }
-			else if(GlobalV::CALCULATION=="md")
-			{
-        		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-			}
-			else if(GlobalV::CALCULATION=="scf")
-            {
-                GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
-            }
-            else if(GlobalV::CALCULATION=="nscf")
-            {
-                GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
-            }
-        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;*/
 		}
 
 	//----------------------------------------------------------
@@ -154,7 +107,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 						eiter += elec.iter;
 						if( elec.iter==1 || hybrid_step==GlobalC::exx_global.info.hybrid_step-1 )		// exx converge
 							break;
-						GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);							
+						XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);					
 						GlobalC::exx_lip.cal_exx();
 					}						
 				}
@@ -162,7 +115,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 				{
 					elec.self_consistent(istep-1);	
 					eiter += elec.iter;
-					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+					XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 					elec.self_consistent(istep-1);
 					eiter += elec.iter;
 				}

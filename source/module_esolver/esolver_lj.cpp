@@ -12,9 +12,9 @@ void ESolver_LJ::Init(Input &inp, UnitCell_pseudo &ucell)
     lj_force.create(ucell.nat,3);
     lj_virial.create(3,3);
 
-    lj_rcut = inp.mdp.rcut_lj;
-    lj_epsilon = inp.mdp.epsilon_lj;
-    lj_sigma = inp.mdp.sigma_lj;
+    lj_rcut = inp.mdp.lj_rcut;
+    lj_epsilon = inp.mdp.lj_epsilon;
+    lj_sigma = inp.mdp.lj_sigma;
 
     atom_arrange::search(
             GlobalV::SEARCH_PBC,

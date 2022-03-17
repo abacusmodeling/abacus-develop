@@ -24,14 +24,16 @@ void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
-	// mohan add 2010-09-06
-	// Yu Liu move here 2021-06-27
-	// because the number of element type
-	// will easily be ignored, so here
-	// I warn the user again for each type.
-	for(int it=0; it<ucell.ntype; it++)
+	// it has been established that that
+	// xc_func is same for all elements, therefore
+	// only the first one if used
+	if(GlobalC::ucell.atoms[0].xc_func=="HSE" || GlobalC::ucell.atoms[0].xc_func=="PBE0")
 	{
-		GlobalC::xcf.which_dft(ucell.atoms[it].dft);
+		XC_Functional::set_xc_type("pbe");
+	}
+	else
+	{
+		XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 	}
 
     //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
@@ -50,7 +52,7 @@ void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 
     // print information
     // mohan add 2021-01-30
-    Print_Info::setup_parameters(ucell, GlobalC::kv, GlobalC::xcf);
+    Print_Info::setup_parameters(ucell, GlobalC::kv);
 
 //--------------------------------------
 // cell relaxation should begin here
@@ -77,8 +79,6 @@ void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
-
-	// Peize Lin add 2018-11-30
 #ifdef __MPI 
 	if(GlobalV::CALCULATION=="nscf")
 	{
@@ -87,7 +87,7 @@ void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				break;
 		}
 	}

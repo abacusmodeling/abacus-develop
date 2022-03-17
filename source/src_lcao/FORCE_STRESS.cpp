@@ -1,9 +1,7 @@
 #include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
-#include "../src_pw/potential_libxc.h"
 #include "./dftu.h"  //Quxin add for DFT+U on 20201029
 // new
-#include "../src_pw/H_XC_pw.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #include "../module_base/timer.h"
@@ -807,7 +805,7 @@ void Force_Stress_LCAO::calStressPwPart(
 	//--------------------------------------------------------
 	for(int i=0;i<3;i++)
 	{
-		sigmaxc(i,i) =  -(H_XC_pw::etxc) / GlobalC::ucell.omega;
+		sigmaxc(i,i) =  -(GlobalC::en.etxc) / GlobalC::ucell.omega;
 	}
 	//Exchange-correlation for PBE
 	sc_pw.stress_gga(sigmaxc);

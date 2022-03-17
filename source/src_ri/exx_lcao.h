@@ -10,8 +10,7 @@
 #include "exx_abfs-screen-schwarz.h"
 #include "exx_abfs-screen-cauchy.h"
 #include "../module_base/element_basis_index.h"
-#include "../src_pw/xc_type.h"
-#include "../src_pw/exx_global.h"
+#include "../module_xc/exx_global.h"
 #include "src_lcao/local_orbital_charge.h"
 
 #if EXX_DM==1

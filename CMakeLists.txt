@@ -225,8 +225,8 @@ IF (BUILD_TESTING)
   enable_testing()
   find_package(Threads)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  find_package(GTest)
-  if(NOT ${GTEST_FOUND})
+  find_package(GTest HINTS /usr/local/lib/ ${GTEST_DIR})
+  if(NOT ${GTest_FOUND})
     include(FetchContent)
     FetchContent_Declare(
       googletest
@@ -260,7 +260,6 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     symmetry
     md
-    symmetry
     neighbor
     orb
     io
@@ -272,6 +271,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     pw
     ri
     driver
+    xc
     esolver
     -lm
 )

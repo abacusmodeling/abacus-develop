@@ -32,10 +32,6 @@
     - [Density of states](#density-of-states)
 
         [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale)
-
-    - [Electric field](#electric-field)
-    
-        [efield](#efield) | [edir](#edir) | [emaxpos](#emaxpos) | [eopreg](#eopreg) | [eamp](#eamp)
     
     - [Exact exchange](#exact-exchange) (under tests)
     
@@ -43,7 +39,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpfred](#md-dumpfred) | [md_rstfred](#md-rstfred) | [md_tfreq](#md-tfreq) | [MNHC](#mnhc) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale) | [damp](#damp)
+        [md_type](#md-type) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
 
     - [DFT+U correction](#DFT_U-correction)
 
@@ -912,43 +908,6 @@ This part of variables are used to control the calculation of DOS.
 
     [back to top](#input-file)
 
-### Electric field
-This part of variables are used to control the addition of an external electric field. It is achieved by adding a saw-like potential to the local ionic potential.
-
-- efield<a id="efield"></a>
-    - *Type*: Boolean
-    - *Description*: Controls whether to add the external electric field. When set to 1, the electric field is turned on. When set to 0, there is no electric field.
-    - *Default*: 0.
-
-    [back to top](#input-file)
-
-- edir<a id="edir"></a>
-    - *Type*: Integer
-    - *Description*: Tells which reciprocal lattice vector the external electric field aligns with. Allowed values are 1,2, and 3, corresponding to the three reciprocal lattice vectors respectively.
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- emaxpos<a id="emaxpos"></a>
-    - *Type*: Real
-    - *Description*: Position of the maximum of the saw-like potential along the reciprocal lattice vector specified by edir, 0 < emaxpos < 1.
-    - *Default*: 0.5
-
-    [back to top](#input-file)
-
-- eopreg<a id="eopreg"></a>
-    - *Type*: Real
-    - *Description*: The saw-like potential increases in the region from `(emaxpos+eopreg-1)` to `(emaxpos)`, then decreases to 0 until (emaxpos+eopreg), in units of the crystal vector `edir`. Important: the change of slope of this potential must be located in the empty region, or else unphysical forces will result.
-    - *Default*: 0.1
-
-    [back to top](#input-file)
-
-- eamp<a id="eamp"></a>
-    - *Type*: Real
-    - *Description*: Amplitude of the electric field, in atomic unit: 1 a.u. = 51.4220632*10^10 V/m.
-    - *Default*: 0.001
-
-    [back to top](#input-file)
 
 ### DeePKS
 This part of variables are used to control the usage of DeePKS method (a comprehensive data-driven approach to improve accuracy of DFT).
@@ -1113,17 +1072,17 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Description*: control the ensemble to run md.
         - -1: FIRE method to relax;
         - 0: NVE ensemble;
-        - 1: NVT ensemble with Anderson thermostat;
-        - 2: NVT ensemble with Nose Hoover Chain;
-        - 3: NVT ensemble with Langevin method;
+        - 1: NVT ensemble with Nose Hoover Chain;
+        - 2: NVT ensemble with Langevin method;
+        - 3: NVT ensemble with Anderson thermostat;
         - 4: MSST method; 
-    - *Default*: 2
+    - *Default*: 1
 
     [back to top](#input-file)
 
-- md_potential<a id="md-potential"></a>
+- md_ensolver<a id="md-ensolver"></a>
     - *Type*: String
-    - *Description*: choose the potential type.
+    - *Description*: choose the energy solver for MD.
         - FP: First-Principles MD;
         - LJ: Leonard Jones potential;
         - DP: DeeP potential;
@@ -1131,7 +1090,7 @@ This part of variables are used to control the molecular dynamics calculations.
 
     [back to top](#input-file)
 
-- md_rstmd<a id="md-rstmd"></a>
+- md_restart<a id="md-restart"></a>
     - *Type*: Boolean
     - *Description*: to control whether restart md.
         - 0: When set to 0, ABACUS will calculate md normolly.
@@ -1139,7 +1098,7 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 0
 
     [back to top](#input-file)
-- md_dt<a id="md_dt"></a>
+- md_dt<a id="md-dt"></a>
     - *Type*: Double
     - *Description*: This is the time step(fs) used in md simulation .
     - *Default*: 1
@@ -1147,27 +1106,22 @@ This part of variables are used to control the molecular dynamics calculations.
     [back to top](#input-file)
 - md_tfirst & md_tlast<a id="md-t"></a>
     - *Type*: Double
-    - *Description*: This is the temperature used in md simulation, md_tlast’s default value is md_tfirst. If md_tlast is setted and be different from the md_tfirst, ABACUS will automatically generate a linear temperature gradient file named ”ChangeTemp.dat”, you can also set this file according to your needs instead.
+    - *Description*: This is the temperature (K) used in md simulation, md_tlast’s default value is md_tfirst. If md_tlast is set to be different from md_tfirst, ABACUS will automatically change the temperature from md_tfirst to md_tlast.
     - *Default*: No default
 
     [back to top](#input-file)
-- md_qmass<a id="md-qmass"></a>
-    - *Type*: Double
-    - *Description*: Inertia of extended system variable. Used only when md_type is 4, you should set a number which is larger than 0. Note that Qmass of NHC is set by md_tfreq.
-    - *Default*: No default
 
-    [back to top](#input-file)
-- md_dumpfred<a id="md-dumpfred"></a>
+- md_dumpfreq<a id="md-dumpfreq"></a>
     - *Type*: Integer
     - *Description*:This is the frequence to dump md information.
     - *Default*: 1
 
     [back to top](#input-file)
 
-- md_rstfred<a id="md-rstfred"></a>
+- md_restartfreq<a id="md-restartfreq"></a>
     - *Type*: Integer
     - *Description*:This is the frequence to output restart information.
-    - *Default*: 1
+    - *Default*: 5
 
     [back to top](#input-file)
 
@@ -1180,63 +1134,70 @@ This part of variables are used to control the molecular dynamics calculations.
 
     [back to top](#input-file)
 
-- MNHC<a id="mnhc"></a>
+- md_mnhc<a id="md-mnhc"></a>
     - *Type*: Integer
     - *Description*: Number of Nose-Hoover chains.
     - *Default*: 4
 
     [back to top](#input-file)
 
-- rcut_lj<a id="rcut_lj"></a>
+- lj_rcut<a id="lj-rcut"></a>
     - *Type*: Real
     - *Description*: Cut-off radius for Leonard Jones potential (angstrom).
     - *Default*: 8.5 (for He)
 
     [back to top](#input-file)
 
-- epsilon_lj<a id="epsilon_lj"></a>
+- lj_epsilon<a id="lj-epsilon"></a>
     - *Type*: Real
     - *Description*: The value of epsilon for Leonard Jones potential (eV).
     - *Default*: 0.01032 (for He)
 
     [back to top](#input-file)
 
-- sigma_lj<a id="sigma_lj"></a>
+- lj_sigma<a id="lj-sigma"></a>
     - *Type*: Real
     - *Description*: The value of sigma for Leonard Jones potential (angstrom).
     - *Default*: 3.405 (for He)
 
     [back to top](#input-file)
 
-- direction<a id="direction"></a>
+- msst_direction<a id="msst-direction"></a>
     - *Type*: Integer
     - *Description*: the direction of shock wave for MSST.
     - *Default*: 2 (z direction)
 
     [back to top](#input-file)
 
-- velocity<a id="velocity"></a>
+- msst_vel<a id="msst-vel"></a>
     - *Type*: Real
     - *Description*: the velocity of shock wave (\AA/fs) for MSST.
     - *Default*: 0
 
     [back to top](#input-file)
 
-- viscosity<a id="viscosity"></a>
+- msst_vis<a id="msst-vis"></a>
     - *Type*: Real
     - *Description*: artificial viscosity (mass/length/time) for MSST.
     - *Default*: 0
 
     [back to top](#input-file)
 
-- tscale<a id="tscale"></a>
+- msst_tscale<a id="msst-tscale"></a>
     - *Type*: Real
     - *Description*: reduction in initial temperature (0~1) used to compress volume in MSST.
     - *Default*: 0
 
     [back to top](#input-file)
 
-- damp<a id="damp"></a>
+- msst_qmass<a id="msst-qmass"></a>
+    - *Type*: Double
+    - *Description*: Inertia of extended system variable. Used only when md_type is 4, you should set a number which is larger than 0. Note that Qmass of NHC is set by md_tfreq.
+    - *Default*: No default
+
+    [back to top](#input-file)
+
+- md_damp<a id="md-damp"></a>
     - *Type*: Real
     - *Description*: damping parameter (fs) used to add force in Langevin method.
     - *Default*: 1

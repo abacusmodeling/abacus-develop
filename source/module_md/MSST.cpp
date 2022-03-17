@@ -10,9 +10,9 @@ MSST::MSST(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para
 {
     std::cout << "MSST" << std::endl;
 
-    mdp.Qmass = mdp.Qmass / pow(ModuleBase::ANGSTROM_AU, 4) / pow(ModuleBase::AU_to_MASS, 2);
-    mdp.velocity = mdp.velocity * ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
-    mdp.viscosity = mdp.viscosity / ModuleBase::AU_to_MASS / ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
+    mdp.msst_qmass = mdp.msst_qmass / pow(ModuleBase::ANGSTROM_AU, 4) / pow(ModuleBase::AU_to_MASS, 2);
+    mdp.msst_vel = mdp.msst_vel * ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
+    mdp.msst_vis = mdp.msst_vis / ModuleBase::AU_to_MASS / ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
 
     old_v = new ModuleBase::Vector3<double> [ucell.nat];
     dilation.set(1,1,1);
@@ -38,13 +38,13 @@ void MSST::setup(ModuleESolver::ESolver *p_esolver)
     ModuleBase::TITLE("MSST", "setup");
     ModuleBase::timer::tick("MSST", "setup");
 
-    int sd = mdp.direction;
+    int sd = mdp.msst_direction;
 
     MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 
-    if(mdp.rstMD)
+    if(mdp.md_restart)
     {
         restart();
     }
@@ -55,17 +55,17 @@ void MSST::setup(ModuleESolver::ESolver *p_esolver)
         p0 = stress(sd, sd);
         e0 = potential + kinetic;
 
-        if(kinetic > 0 && mdp.tscale > 0)
+        if(kinetic > 0 && mdp.msst_tscale > 0)
         {
-            double fac1 = mdp.tscale * totmass * 2.0 * kinetic / mdp.Qmass;
+            double fac1 = mdp.msst_tscale * totmass * 2.0 * kinetic / mdp.msst_qmass;
             omega[sd] = -1.0 * sqrt(fac1);
             double fac2 = omega[sd] / v0;
 
-            std::cout << "initial strain rate = " << fac2 << "    tscale = " << mdp.tscale << std::endl;
+            std::cout << "initial strain rate = " << fac2 << "    msst_tscale = " << mdp.msst_tscale << std::endl;
 
             for(int i=0; i<ucell.nat; ++i)
             {
-                vel[i] *= sqrt(1.0 - mdp.tscale);
+                vel[i] *= sqrt(1.0 - mdp.msst_tscale);
             }
         }
 
@@ -81,8 +81,8 @@ void MSST::first_half()
     ModuleBase::TITLE("MSST", "first_half");
     ModuleBase::timer::tick("MSST", "first_half");
 
-    const int sd = mdp.direction;
-    const double dthalf = 0.5 * mdp.dt;
+    const int sd = mdp.msst_direction;
+    const double dthalf = 0.5 * mdp.md_dt;
 
     energy_ = potential + kinetic;
 
@@ -120,7 +120,7 @@ void MSST::first_half()
     // propagate atom positions 1 time step
     for(int i=0; i<ucell.nat; ++i)
     {
-        pos[i] += vel[i] * mdp.dt;
+        pos[i] += vel[i] * mdp.md_dt;
     }
     ucell.update_pos_tau(pos);
     ucell.periodic_boundary_adjustment();
@@ -139,8 +139,8 @@ void MSST::second_half()
     ModuleBase::TITLE("MSST", "second_half");
     ModuleBase::timer::tick("MSST", "second_half");
 
-    const int sd = mdp.direction;
-    const double dthalf = 0.5 * mdp.dt;
+    const int sd = mdp.msst_direction;
+    const double dthalf = 0.5 * mdp.md_dt;
 
     energy_ = potential + kinetic;
 
@@ -155,7 +155,7 @@ void MSST::second_half()
     propagate_voldot();
 
     // calculate Lagrangian position
-    lag_pos -= mdp.velocity * ucell.omega / v0 * mdp.dt;
+    lag_pos -= mdp.msst_vel * ucell.omega / v0 * mdp.md_dt;
 
     ModuleBase::timer::tick("MSST", "second_half");
 }
@@ -174,7 +174,7 @@ void MSST::write_restart()
 		std::ofstream file(ssc.str().c_str());
 
         file << step_ + step_rst_ << std::endl;
-		file << omega[mdp.direction] << std::endl;
+		file << omega[mdp.msst_direction] << std::endl;
         file << e0 << std::endl;
         file << v0 << std::endl;
         file << p0 << std::endl;
@@ -201,14 +201,14 @@ void MSST::restart()
             ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
 		}
 
-		file >> step_rst_ >> omega[mdp.direction] >> e0 >> v0 >> p0 >> lag_pos;
+		file >> step_rst_ >> omega[mdp.msst_direction] >> e0 >> v0 >> p0 >> lag_pos;
 
 		file.close();
 	}
 
 #ifdef __MPI
 	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	MPI_Bcast(&omega[mdp.direction], 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&omega[mdp.msst_direction], 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&e0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&v0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&p0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -235,7 +235,7 @@ double MSST::vel_sum()
 
 void MSST::rescale(double volume)
 {
-    int sd = mdp.direction;
+    int sd = mdp.msst_direction;
 
     dilation[sd] = volume/ucell.omega;
     ucell.latvec.e11 *= dilation[0];
@@ -254,9 +254,9 @@ void MSST::rescale(double volume)
 
 void MSST::propagate_vel()
 {
-    const int sd = mdp.direction;
-    const double dthalf = 0.5 * mdp.dt;
-    const double fac = mdp.viscosity * pow(omega[sd], 2) / (vsum * ucell.omega);
+    const int sd = mdp.msst_direction;
+    const double dthalf = 0.5 * mdp.md_dt;
+    const double fac = mdp.msst_vis * pow(omega[sd], 2) / (vsum * ucell.omega);
 
     for(int i=0; i<ucell.nat; ++i)
     {
@@ -283,12 +283,12 @@ void MSST::propagate_vel()
 
 void MSST::propagate_voldot()
 {
-    const int sd = mdp.direction;
-    const double dthalf = 0.5 * mdp.dt;
+    const int sd = mdp.msst_direction;
+    const double dthalf = 0.5 * mdp.md_dt;
     double p_current = stress(sd, sd);
-    double p_msst = mdp.velocity * mdp.velocity * totmass * (v0 - ucell.omega) / (v0 * v0);
-    double const_A = totmass * (p_current - p0 - p_msst) / mdp.Qmass;
-    double const_B = totmass * mdp.viscosity / (mdp.Qmass * ucell.omega);
+    double p_msst = mdp.msst_vel * mdp.msst_vel * totmass * (v0 - ucell.omega) / (v0 * v0);
+    double const_A = totmass * (p_current - p0 - p_msst) / mdp.msst_qmass;
+    double const_B = totmass * mdp.msst_vis / (mdp.msst_qmass * ucell.omega);
 
     // prevent the increase of volume
     if(ucell.omega > v0 && const_A > 0)

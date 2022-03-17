@@ -4,6 +4,7 @@ on:
   pull_request_target:
     branches:
       - develop
+      - tryEigen
       - update_MD
       - ABACUS_2.2.0_beta
       - deepks
@@ -12,9 +13,11 @@ on:
       - TDDFT
 jobs:
 
+jobs:
   test:
     name: Do the job on the runner
     runs-on: self-hosted
+    if: github.repository_owner == 'deepmodeling'
     container: ghcr.io/deepmodeling/abacus-development-kit:gnu
     steps:
       - name: Checkout

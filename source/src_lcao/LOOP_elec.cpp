@@ -190,18 +190,11 @@ void LOOP_elec::solver(const int& istep,
 	{
 	#ifdef __MPI
 		//Peize Lin add 2016-12-03
-		switch(GlobalC::exx_lcao.info.hybrid_type)
+		if( Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type 
+			|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type 
+			|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type )
 		{
-			case Exx_Global::Hybrid_Type::HF:
-			case Exx_Global::Hybrid_Type::PBE0:
-			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_lcao.cal_exx_ions(*lowf.ParaV);
-				break;
-			case Exx_Global::Hybrid_Type::No:
-			case Exx_Global::Hybrid_Type::Generate_Matrix:
-				break;
-			default:
-				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+			GlobalC::exx_lcao.cal_exx_ions(*lowf.ParaV);
 		}
 
 		// No exx
@@ -225,7 +218,7 @@ void LOOP_elec::solver(const int& istep,
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
-					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+					XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
 					
 					ELEC_scf es;
@@ -238,8 +231,7 @@ void LOOP_elec::solver(const int& istep,
 			}
 			else
 			{
-				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-
+				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				ELEC_scf es;
 				es.scf(istep-1, loc, lowf, *this->UHM);
 			}

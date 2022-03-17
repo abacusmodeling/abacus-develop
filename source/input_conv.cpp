@@ -71,18 +71,6 @@ void Input_Conv::Convert(void)
 	GlobalV::PSEUDORCUT = INPUT.pseudo_rcut;
 	GlobalV::RENORMWITHMESH = INPUT.renormwithmesh;
 
-
-	// Electrical Field
-	GlobalV::EFIELD = INPUT.efield;
-	Efield::edir = INPUT.edir;
-	Efield::emaxpos = INPUT.emaxpos;
-	Efield::eopreg = INPUT.eopreg;
-	Efield::eamp = INPUT.eamp;
-
-	// optical
-	Optical::opt_epsilon2 = INPUT.opt_epsilon2; // mohan add 2010-03-24
-	Optical::opt_nbands = INPUT.opt_nbands; // number of bands for optical transition.
-
 	GlobalV::DFT_FUNCTIONAL = INPUT.dft_functional;
 	GlobalV::NSPIN = INPUT.nspin;
 	GlobalV::CURRENT_SPIN = 0;
@@ -155,7 +143,6 @@ void Input_Conv::Convert(void)
 	GlobalV::VL_IN_H = INPUT.vl_in_h;
 	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
 	GlobalV::VH_IN_H = INPUT.vh_in_h;
-	GlobalV::VXC_IN_H = INPUT.vxc_in_h;
 	GlobalV::VION_IN_H = INPUT.vion_in_h;
 	GlobalV::TEST_FORCE = INPUT.test_force;
 	GlobalV::TEST_STRESS = INPUT.test_stress;
@@ -173,105 +160,6 @@ void Input_Conv::Convert(void)
 	GlobalC::wf.mem_saver = INPUT.mem_saver; // mohan add 2010-09-07
 	GlobalC::en.printe = INPUT.printe; // mohan add 2011-03-16
 
-//----------------------------------------------------------
-// about spectrum, pengfei 2016-12-14
-//----------------------------------------------------------
-#ifdef __LCAO
-	if ((INPUT.spectral_type == "eels" && INPUT.eels_method == 0)
-		|| (INPUT.spectral_type == "None" && INPUT.eels_method == 0 && INPUT.kmesh_interpolation))
-	{
-		if (INPUT.spectral_type == "eels")
-		{
-			GlobalC::chi0_hilbert.epsilon = true;
-		}
-		else if (INPUT.spectral_type == "None")
-		{
-			GlobalC::chi0_hilbert.epsilon = false;
-		}
-		// GlobalC::chi0_hilbert.epsilon = INPUT.epsilon;
-		GlobalC::chi0_hilbert.kernel_type = INPUT.kernel_type;
-		GlobalC::chi0_hilbert.system = INPUT.system_type;
-		GlobalC::chi0_hilbert.eta = INPUT.eta;
-		GlobalC::chi0_hilbert.domega = INPUT.domega;
-		GlobalC::chi0_hilbert.nomega = INPUT.nomega;
-		GlobalC::chi0_hilbert.dim = INPUT.ecut_chi;
-		// GlobalC::chi0_hilbert.oband = INPUT.oband;
-
-		GlobalC::chi0_hilbert.q_start[0] = INPUT.q_start[0];
-		GlobalC::chi0_hilbert.q_start[1] = INPUT.q_start[1];
-		GlobalC::chi0_hilbert.q_start[2] = INPUT.q_start[2];
-
-		GlobalC::chi0_hilbert.direct[0] = INPUT.q_direct[0];
-		GlobalC::chi0_hilbert.direct[1] = INPUT.q_direct[1];
-		GlobalC::chi0_hilbert.direct[2] = INPUT.q_direct[2];
-
-		// GlobalC::chi0_hilbert.start_q = INPUT.start_q;
-		// GlobalC::chi0_hilbert.interval_q = INPUT.interval_q;
-		GlobalC::chi0_hilbert.nq = INPUT.nq;
-		GlobalC::chi0_hilbert.out_epsilon = INPUT.out_epsilon;
-		GlobalC::chi0_hilbert.out_chi = INPUT.out_chi;
-		GlobalC::chi0_hilbert.out_chi0 = INPUT.out_chi0;
-		GlobalC::chi0_hilbert.fermi_level = INPUT.fermi_level;
-		GlobalC::chi0_hilbert.coulomb_cutoff = INPUT.coulomb_cutoff;
-		GlobalC::chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
-		for (int i = 0; i < 100; i++)
-		{
-			GlobalC::chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0];
-			GlobalC::chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1];
-			GlobalC::chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2];
-		}
-		GlobalC::chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0];
-		GlobalC::chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1];
-		GlobalC::chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
-	}
-#endif
-
-	// if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
-	if (INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
-	{
-		// GlobalC::chi0_standard.epsilon = INPUT.epsilon;
-		GlobalC::chi0_standard.epsilon = true;
-		GlobalC::chi0_standard.system = INPUT.system_type;
-		GlobalC::chi0_standard.eta = INPUT.eta;
-		GlobalC::chi0_standard.domega = INPUT.domega;
-		GlobalC::chi0_standard.nomega = INPUT.nomega;
-		GlobalC::chi0_standard.dim = INPUT.ecut_chi;
-		// GlobalC::chi0_standard.oband = INPUT.oband;
-		GlobalC::chi0_standard.q_start[0] = INPUT.q_start[0];
-		GlobalC::chi0_standard.q_start[1] = INPUT.q_start[1];
-		GlobalC::chi0_standard.q_start[2] = INPUT.q_start[2];
-		GlobalC::chi0_standard.direct[0] = INPUT.q_direct[0];
-		GlobalC::chi0_standard.direct[1] = INPUT.q_direct[1];
-		GlobalC::chi0_standard.direct[2] = INPUT.q_direct[2];
-		// GlobalC::chi0_standard.start_q = INPUT.start_q;
-		// GlobalC::chi0_standard.interval_q = INPUT.interval_q;
-		GlobalC::chi0_standard.nq = INPUT.nq;
-		GlobalC::chi0_standard.out_epsilon = INPUT.out_epsilon;
-	}
-
-	// if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 1) )
-	if (INPUT.spectral_type == "absorption" && INPUT.absorption_method == 1)
-	{
-		// GlobalC::epsilon0_pwscf.epsilon = INPUT.epsilon0;
-		GlobalC::epsilon0_pwscf.epsilon = true;
-		GlobalC::epsilon0_pwscf.intersmear = INPUT.eta;
-		GlobalC::epsilon0_pwscf.intrasmear = INPUT.intrasmear;
-		GlobalC::epsilon0_pwscf.domega = INPUT.domega;
-		GlobalC::epsilon0_pwscf.nomega = INPUT.nomega;
-		GlobalC::epsilon0_pwscf.shift = INPUT.shift;
-		GlobalC::epsilon0_pwscf.metalcalc = INPUT.metalcalc;
-		GlobalC::epsilon0_pwscf.degauss = INPUT.eps_degauss;
-	}
-
-	// if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 0))
-	if (INPUT.spectral_type == "absorption" && INPUT.absorption_method == 0)
-	{
-		// GlobalC::epsilon0_vasp.epsilon = INPUT.epsilon0;
-		GlobalC::epsilon0_vasp.epsilon = true;
-		GlobalC::epsilon0_vasp.domega = INPUT.domega;
-		GlobalC::epsilon0_vasp.nomega = INPUT.nomega;
-		GlobalC::epsilon0_vasp.eta = INPUT.eta;
-	}
 
 	if (INPUT.dft_plus_u)
 	{
@@ -421,20 +309,20 @@ void Input_Conv::Convert(void)
 		const std::string command0 = "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if (GlobalV::MY_RANK == 0)
 			system(command0.c_str());
-		if (INPUT.exx_hybrid_type == "no")
+		if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse" || INPUT.dft_functional == "opt_orb")
 		{
 			GlobalC::restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_H = true;
 		}
 		else
 		{
 			GlobalC::restart.info_save.save_charge = true;
-			GlobalC::restart.info_save.save_H = true;
 		}
 	}
 	if (INPUT.restart_load)
 	{
 		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
-		if (INPUT.exx_hybrid_type == "no")
+		if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse" || INPUT.dft_functional == "opt_orb")
 		{
 			GlobalC::restart.info_load.load_charge = true;
 		}
@@ -450,28 +338,30 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 #ifdef __MPI // liyuanbo 2022/2/23
 #ifdef __LCAO
-	if (INPUT.exx_hybrid_type == "no")
+
+	if (INPUT.dft_functional == "hf")
 	{
-		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+	}
+	else if (INPUT.dft_functional == "pbe0")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+	}
+	else if (INPUT.dft_functional == "hse")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+	}
+	else if (INPUT.dft_functional == "opt_orb")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
 	}
 	else
 	{
-		if (INPUT.exx_hybrid_type == "hf")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
-		}
-		else if (INPUT.exx_hybrid_type == "pbe0")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
-		}
-		else if (INPUT.exx_hybrid_type == "hse")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
-		}
-		else if (INPUT.exx_hybrid_type == "opt_orb")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
-		}
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+	}
+
+	if(GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
+	{
 		GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
 		GlobalC::exx_global.info.hse_omega = INPUT.exx_hse_omega;
 		GlobalC::exx_global.info.separate_loop = INPUT.exx_separate_loop;
@@ -570,16 +460,6 @@ void Input_Conv::Convert(void)
 
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
-
-	// wenfei 2021-7-28
-	if (GlobalV::DFT_FUNCTIONAL == "scan")
-	{
-		if (GlobalV::BASIS_TYPE != "pw")
-		{
-			ModuleBase::WARNING_QUIT("Input_conv", "add metaGGA for pw first");
-		}
-		GlobalV::DFT_META = 1;
-	}
 
 	ModuleBase::timer::tick("Input_Conv", "Convert");
 //-----------------------------------------------

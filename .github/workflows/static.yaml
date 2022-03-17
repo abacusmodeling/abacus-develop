@@ -6,6 +6,7 @@ on:
 jobs:
   clang-tidy:
     runs-on: self-hosted
+    if: github.repository_owner == 'deepmodeling'
     container: ghcr.io/deepmodeling/abacus-development-kit:gnu
     steps:
       - name: Checkout Pull Request

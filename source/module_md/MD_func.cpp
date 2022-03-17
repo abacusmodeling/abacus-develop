@@ -237,7 +237,8 @@ void MD_func::force_virial(
 {
 	ModuleBase::TITLE("MD_func", "force_stress");
     ModuleBase::timer::tick("MD_func", "force_stress");
-	if(mdp.md_potential == "LJ")
+
+	if(mdp.md_ensolver == "LJ")
 	{
 		bool which_method = unit_in.judge_big_cell();
 		if(which_method)
@@ -270,12 +271,12 @@ void MD_func::force_virial(
 								stress);
 		}
 	}
-	else if(mdp.md_potential == "DP")
+	else if(mdp.md_ensolver == "DP")
 	{
 		DP_potential::DP_pot(unit_in, potential, force, stress);
 	}
 #ifndef __CMD
-	else if(mdp.md_potential == "FP")
+	else if(mdp.md_ensolver == "FP")
 	{
 		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{

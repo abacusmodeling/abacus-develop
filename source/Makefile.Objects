@@ -19,9 +19,7 @@ input_conv.o\
 run_pw.o\
 run_lcao.o\
 
-OBJS_PW=xc_type.o \
-xc_functional.o\
-xc_3.o \
+OBJS_PW=xc_3.o \
 vdwd2.o\
 vdwd2_parameters.o\
 vdwd3.o\
@@ -232,22 +230,35 @@ OBJS_ESOLVER=esolver.o\
     esolver_ks.o\
     esolver_fp.o\
     esolver_ks_pw.o\
-    esolver_ks_lcao.o
+    esolver_ks_lcao.o\
+    esolver_lj.o\
+    esolver_dp.o\
+
+OBJS_XC=xc_funct_corr_gga.o \
+xc_funct_corr_lda.o \
+xc_funct_exch_gga.o \
+xc_funct_exch_lda.o \
+xc_funct_hcth.o \
+xc_functional_gradcorr.o \
+xc_functional_vxc.o \
+xc_functional_wrapper_gcxc.o \
+xc_functional_wrapper_tauxc.o \
+xc_functional_wrapper_xc.o \
+xc_functional.o \
 
 OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\
 $(OBJS_LCAO)\
 $(OBJS_ESOLVER)\
+$(OBJS_XC)\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
 charge_broyden.o \
 charge_extra.o \
-xc_gga_pw.o \
 potential.o \
 H_Ewald_pw.o\
 H_Hartree_pw.o\
-H_XC_pw.o \
 H_TDDFT_pw.o\
 read_rho.o\
 read_atoms.o\
@@ -271,8 +282,6 @@ write_HS.o\
 write_HS_R.o\
 write_dm.o\
 write_wfc_realspace.o\
-potential_libxc.o \
-potential_libxc_meta.o \
 efield.o \
 magnetism.o\
 optical.o\

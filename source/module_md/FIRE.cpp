@@ -43,7 +43,7 @@ void FIRE::first_half()
         {
             if(ionmbl[i][k])
             {
-                vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+                vel[i][k] += 0.5*force[i][k]*mdp.md_dt/allmass[i];
             }
         }
     }
@@ -56,7 +56,7 @@ void FIRE::first_half()
         {
             if(ionmbl[i][k])
             {
-                pos[i][k] += vel[i][k]*mdp.dt;
+                pos[i][k] += vel[i][k]*mdp.md_dt;
             }
         }
     }
@@ -102,7 +102,7 @@ void FIRE::write_restart()
         file << alpha << std::endl;
         file << negative_count << std::endl;
         file << dt_max << std::endl;
-        file << mdp.dt << std::endl;
+        file << mdp.md_dt << std::endl;
 		file.close();
 	}
 #ifdef __MPI
@@ -124,7 +124,7 @@ void FIRE::restart()
             ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat ！");
 		}
 
-		file >> step_rst_ >> alpha >> negative_count >> dt_max >> mdp.dt;
+		file >> step_rst_ >> alpha >> negative_count >> dt_max >> mdp.md_dt;
 
 		file.close();
 	}
@@ -134,7 +134,7 @@ void FIRE::restart()
     MPI_Bcast(&alpha, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&negative_count, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&dt_max, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&mdp.dt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&mdp.md_dt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 #endif
 }
 
@@ -165,7 +165,7 @@ void FIRE::check_FIRE()
 	double sumforce = 0;
 	double normvel = 0;
 
-    if(dt_max < 0) dt_max = 2.5 * mdp.dt;   //initial dt_max
+    if(dt_max < 0) dt_max = 2.5 * mdp.md_dt;   //initial dt_max
 	
 	for(int i =0; i<ucell.nat; ++i)
     {
@@ -190,13 +190,13 @@ void FIRE::check_FIRE()
 	    negative_count++;
 		if(negative_count >= N_min)
         {
-			mdp.dt = min(mdp.dt*finc, dt_max);
+			mdp.md_dt = min(mdp.md_dt*finc, dt_max);
 			alpha *= f_alpha;
 		}
 	}
 	else
 	{
-		mdp.dt *= fdec;
+		mdp.md_dt *= fdec;
 		negative_count = 0;
 		
 		for(int i=0; i<ucell.nat; ++i)

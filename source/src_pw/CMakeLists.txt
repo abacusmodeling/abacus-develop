@@ -1,7 +1,6 @@
 list(APPEND objects
     H_Ewald_pw.cpp
     H_Hartree_pw.cpp
-    H_XC_pw.cpp
     VL_in_pw.cpp
     VNL_in_pw.cpp
     charge.cpp
@@ -19,8 +18,6 @@ list(APPEND objects
     magnetism.cpp
     occupy.cpp
     potential.cpp
-    potential_libxc.cpp
-    potential_libxc_meta.cpp
     pw_basis.cpp
     bspline_sf.cpp
     pw_complement.cpp
@@ -51,9 +48,6 @@ list(APPEND objects
     wf_atomic.cpp
     wf_igk.cpp
     xc_3.cpp
-    xc_functional.cpp
-    xc_gga_pw.cpp
-    xc_type.cpp
     run_md_pw.cpp)
 if(USE_CUDA)
     list(APPEND objects

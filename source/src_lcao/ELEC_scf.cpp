@@ -180,14 +180,12 @@ void ELEC_scf::scf(const int& istep,
 
 #ifdef __MPI
 		// calculate exact-exchange
-		switch(GlobalC::xcf.iexch_now)						// Peize Lin add 2018-10-30
+		if(XC_Functional::get_func_type()==4)
 		{
-			case 5:    case 6:   case 9:
-				if( !GlobalC::exx_global.info.separate_loop )
-				{
-					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
-				}
-				break;
+			if( !GlobalC::exx_global.info.separate_loop )
+			{
+				GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
+			}
 		}
 #endif
 
@@ -277,13 +275,11 @@ void ELEC_scf::scf(const int& istep,
 		GlobalC::en.set_exx();
 
 		// Peize Lin add 2020.04.04
-		if(Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type)
+		if(XC_Functional::get_func_type()==4)
 		{
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
-				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
 				GlobalC::restart.info_load.restart_exx = true;
 			}
