@@ -11,6 +11,7 @@ on:
       - planewave
       - pw_refactor
       - TDDFT
+
 jobs:
   test:
     name: Do the job on the runner
