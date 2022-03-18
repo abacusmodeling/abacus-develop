@@ -611,9 +611,9 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
                                 DGridV_22, DGridV_23, DGridV_33, drr);
 								
 					free(vldr3);		vldr3=nullptr;
-					free(block_iw);		block_iw=nullptr;
-					free(block_index);	block_index=nullptr;
-					free(block_size);	block_size=nullptr;
+					delete[] block_iw;
+					delete[] block_index;
+					delete[] block_size;
                 }// k
             }// j
         }// i

@@ -31,9 +31,9 @@ namespace Gint_Tools
 	void get_block_info(
 		const int na_grid,
 		const int grid_index,
-		int * block_iw,
-		int * block_index,
-		int * block_size
+		int * &block_iw,
+		int * &block_index,
+		int * &block_size
 	);
 
 	// whether the atom-grid distance is larger than cutoff

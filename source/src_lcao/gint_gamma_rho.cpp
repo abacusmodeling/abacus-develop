@@ -238,9 +238,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 							cal_flag, psir_ylm.ptr_2D, vindex, DM, rho);
 
 						free(vindex);			vindex=nullptr;
-						free(block_size);		block_size=nullptr;
-						free(block_iw);			block_iw=nullptr;
-						free(block_index);		block_index=nullptr;
+                        delete[] block_iw;
+                        delete[] block_index;
+                        delete[] block_size;
 
 						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 							free(cal_flag[ib]);

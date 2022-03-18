@@ -40,14 +40,14 @@ namespace Gint_Tools
 	void get_block_info(
 		const int na_grid,
 		const int grid_index,
-		int * block_iw,
-		int * block_index,
-		int * block_size		
+		int * &block_iw,
+		int * &block_index,
+		int * &block_size	
 	)
 	{
-		block_iw = (int*)malloc(na_grid*sizeof(int));
-		block_index = (int*)malloc((na_grid+1)*sizeof(int));
-		block_size = (int*)malloc(na_grid*sizeof(int));
+		block_iw = new int[na_grid];
+		block_index = new int[na_grid+1];
+		block_size = new int[na_grid];
 
 		block_index[0] = 0;
 		for (int id=0; id<na_grid; id++)

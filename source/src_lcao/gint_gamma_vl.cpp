@@ -407,9 +407,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 							vldr3, psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, lgd_now, GridVlocal_thread.ptr_2D);
 						
 						free(vldr3);		vldr3=nullptr;
-						free(block_iw);		block_iw=nullptr;
-						free(block_index);		block_index=nullptr;
-						free(block_size);		block_size=nullptr;
+                        delete[] block_iw;
+                        delete[] block_index;
+                        delete[] block_size;
 
 						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 							free(cal_flag[ib]);
