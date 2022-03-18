@@ -597,14 +597,8 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 					//------------------------------------------------------
 					// index of wave functions for each block
 					//------------------------------------------------------
-					int *block_iw = Gint_Tools::get_block_iw(na_grid, grid_index, this->max_size);
-					
-					int* block_index = Gint_Tools::get_block_index(na_grid, grid_index);
-					
-					//------------------------------------------------------
-					// band size: number of columns of a band
-					//------------------------------------------------------------------
-					int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
+                    int * block_iw, * block_index, * block_size;
+                    Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 
 					Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
 					Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
