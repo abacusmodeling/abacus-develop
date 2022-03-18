@@ -166,7 +166,7 @@ bool Dos::calculate_dos
 	}
 	std::vector<double> dos;
 	std::vector<double> ene;
-	std::vector<double> dos2; //dos_smearing
+	std::vector<double> dos_smearing; //dos_smearing
 
 #ifdef __MPI
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -250,7 +250,7 @@ bool Dos::calculate_dos
 	//now use Gaussian smearing to smooth the dos and write to DOS_is_smearing
 	if(GlobalV::MY_RANK==0)
 	{
-		dos2.resize(dos.size()-1);
+		dos_smearing.resize(dos.size()-1);
 
 		//double b = INPUT.b_coef;
 		double b = sqrt(2.0)*GlobalC::en.bcoeff;
@@ -266,7 +266,7 @@ bool Dos::calculate_dos
 				// EXPLAIN : if en
 				//----------------------------------------------------------
 				Gauss = exp(-de2/b/b)/sqrt(3.1415926)/b;
-				dos2[j] += dos[i]*Gauss;
+				dos_smearing[j] += dos[i]*Gauss;
 			}
 		}
 
@@ -276,9 +276,9 @@ bool Dos::calculate_dos
 		double sum2=0.0;
 		for(int i=0;i<dos.size()-1;i++)
 		{
-			sum2 += dos2[i];
+			sum2 += dos_smearing[i];
 			ofs1 <<std::setw(20)<<ene[i]
-				<<std::setw(20)<<dos2[i]
+				<<std::setw(20)<<dos_smearing[i]
 				<<std::setw(20)<<sum2<<"\n";
 		}
 	}
