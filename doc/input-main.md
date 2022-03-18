@@ -783,7 +783,13 @@ This part of variables are used to control the output of properties.
     [back to top](#input-file)
 - out_wf<a id="out-wf"></a>
     - *Type*: Integer
-    - *Description*: Only used in **planewave basis** set. When set this variable to 1, it outputs the coefficients of wave functions into text files. The file names are WAVEFUNC$K.txt, where $K is the index of k point. When set this variable to 2, results are stored in binary files. The file names are WAVEFUNC$K.dat.
+    - *Description*: Only used in **planewave basis** and **ienvelope calculation in localized orbitals** set. When set this variable to 1, it outputs the coefficients of wave functions into text files. The file names are WAVEFUNC$K.txt, where $K is the index of k point. When set this variable to 2, results are stored in binary files. The file names are WAVEFUNC$K.dat.
+    - *Default*: 0
+
+    [back to top](#input-file)
+- out_wf_r<a id="out-wf-r"></a>
+    - *Type*: Integer
+    - *Description*: Only used in **planewave basis** and **ienvelope calculation in localized orbitals** set. When set this variable to 1, it outputs real-space wave functions into  `OUT.suffix/wfc_realspace/`. The file names are wfc_realspace$K$B, where $K is the index of k point, $B is the index of band. 
     - *Default*: 0
 
     [back to top](#input-file)

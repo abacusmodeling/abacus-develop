@@ -250,7 +250,7 @@ void LOOP_elec::solver(const int& istep,
 	else if (GlobalV::CALCULATION=="ienvelope")
 	{
 		IState_Envelope IEP;
-        IEP.begin(lowf, this->UHM->GG, INPUT.out_wf);
+        IEP.begin(lowf, this->UHM->GG, INPUT.out_wf, GlobalC::wf.out_wf_r);
     }
 	else
 	{
