@@ -29,7 +29,6 @@ protected:
 	int nbz;
 	int ncxyz;
 	int nbz_start;
-	int* nnn;
 
 };
 

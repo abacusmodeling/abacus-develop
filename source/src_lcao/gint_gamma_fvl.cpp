@@ -89,8 +89,6 @@ inline void cal_psir_ylm_dphi(
             //array to store spherical harmonics and its derivatives
             std::vector<double> rly;
             std::vector<std::vector<double>> grly;
-            // >>> the old method
-            // ylma[id] = new double[nnn[it]]; // liaochen found this bug 2010/03/29
             // Ylm::get_ylm_real(GlobalC::ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
             // <<<
             // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
