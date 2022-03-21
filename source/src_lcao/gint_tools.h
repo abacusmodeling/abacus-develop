@@ -28,6 +28,12 @@ namespace Gint_Tools
 		const int jby,
 		const int kbz);
 
+	//------------------------------------------------------
+	// na_grid : #. atoms for this group of grids
+	// block_iw : size na_grid, index of the first orbital on this atom
+	// block_size : size na_grid, number of orbitals on this atom
+	// block_index : size na_grid+1, start from 0, accumulates block_size
+	//------------------------------------------------------
 	void get_block_info(
 		const int na_grid,
 		const int grid_index,

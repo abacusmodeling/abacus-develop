@@ -592,9 +592,6 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 					//------------------------------------------------------------------
 					double *vldr3 = get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 					
-					//------------------------------------------------------
-					// index of wave functions for each block
-					//------------------------------------------------------
                     int * block_iw, * block_index, * block_size;
                     Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 

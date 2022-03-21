@@ -374,9 +374,6 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						const int kbz=k*GlobalC::pw.bz-GlobalC::pw.nczp_start;
 
-						//------------------------------------------------------
-						// index of wave functions for each block
-						//------------------------------------------------------
                         int * block_iw, * block_index, * block_size;
                         Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 						//------------------------------------------------------

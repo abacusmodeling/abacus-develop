@@ -215,9 +215,6 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 						// here vindex refers to local potentials
 						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
 						
-						//------------------------------------------------------
-						// band size: number of columns of a band
-						//------------------------------------------------------------------
                         int * block_iw, * block_index, * block_size;
                         Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 
