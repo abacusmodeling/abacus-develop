@@ -53,14 +53,16 @@ void Run_lcao::lcao_line(void)
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
-	// mohan add 2010-09-06
-	// Yu Liu move here 2021-06-27
-	// because the number of element type
-	// will easily be ignored, so here
-	// I warn the user again for each type.
-	for(int it=0; it<GlobalC::ucell.ntype; it++)
+	// it has been established that that
+	// xc_func is same for all elements, therefore
+	// only the first one if used
+	if(GlobalC::ucell.atoms[0].xc_func=="HSE" || GlobalC::ucell.atoms[0].xc_func=="PBE0")
 	{
-		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
+		XC_Functional::set_xc_type("pbe");
+	}
+	else
+	{
+		XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
@@ -79,10 +81,11 @@ void Run_lcao::lcao_line(void)
 
     // print information
     // mohan add 2021-01-30
-    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv);
 
     // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
+
 	GlobalC::LOWF.orb_con.read_orb_first(
 		GlobalV::ofs_running,
 		GlobalC::ORB,
@@ -92,7 +95,7 @@ void Run_lcao::lcao_line(void)
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax,
-		GlobalV::out_descriptor,
+		GlobalV::deepks_setorb,
 		INPUT.out_r_matrix,
 		GlobalV::FORCE,
 		GlobalV::MY_RANK);
@@ -109,7 +112,7 @@ void Run_lcao::lcao_line(void)
 		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.lat0,
-		GlobalV::out_descriptor,
+		GlobalV::deepks_setorb,
 		Exx_Abfs::Lmax,
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,
@@ -151,8 +154,6 @@ void Run_lcao::lcao_line(void)
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
-
-	// Peize Lin add 2018-11-30
 	if(GlobalV::CALCULATION=="nscf")
 	{
 		switch(GlobalC::exx_global.info.hybrid_type)
@@ -160,7 +161,7 @@ void Run_lcao::lcao_line(void)
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				break;
 		}
 	}
@@ -168,13 +169,10 @@ void Run_lcao::lcao_line(void)
 #ifdef __DEEPKS
 	//wenfei 2021-12-19
 	//if we are performing DeePKS calculations, we need to load a model
-	if (GlobalV::out_descriptor)
+	if (GlobalV::deepks_scf)
 	{
-		if (GlobalV::deepks_scf)
-		{
-			// load the DeePKS model from deep neural network
-    		GlobalC::ld.load_model(INPUT.model_file);
-		}
+		// load the DeePKS model from deep neural network
+		GlobalC::ld.load_model(INPUT.deepks_model);
 	}
 #endif
 

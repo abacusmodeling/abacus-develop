@@ -167,13 +167,14 @@ else()
     message(WARNING "Cannot find the correct library for Fortran.")
   endif()
 endif()
-target_link_libraries(${ABACUS_BIN_NAME} ${math_libs})
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
   find_package(Torch REQUIRED)
   include_directories(${TORCH_INCLUDE_DIRS})
-  target_link_libraries(${ABACUS_BIN_NAME} ${TORCH_LIBRARIES})
+  target_link_libraries(${ABACUS_BIN_NAME} deepks)
+  list(APPEND math_libs ${TORCH_LIBRARIES})
+
   add_compile_options(${TORCH_CXX_FLAGS})
 
   find_path(libnpy_SOURCE_DIR
@@ -191,6 +192,8 @@ if(ENABLE_DEEPKS)
   include_directories(${libnpy_SOURCE_DIR}/include)
   add_compile_definitions(__DEEPKS)
 endif()
+
+target_link_libraries(${ABACUS_BIN_NAME} ${math_libs})
 
 if(DEFINED Libxc_DIR)
   set(ENABLE_LIBXC ON)
@@ -260,7 +263,6 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     symmetry
     md
-    symmetry
     neighbor
     orb
     io
@@ -272,6 +274,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     pw
     ri
     driver
+    xc
     -lm
 )
 

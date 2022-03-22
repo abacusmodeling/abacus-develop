@@ -197,7 +197,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 //std::string
 	Parallel_Common::bcast_string( psd );
 	Parallel_Common::bcast_string( pp_type );
-	Parallel_Common::bcast_string( dft, 4 );
+	Parallel_Common::bcast_string( xc_func );
 
 	if(GlobalV::MY_RANK!=0)
 	{

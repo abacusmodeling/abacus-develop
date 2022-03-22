@@ -125,10 +125,7 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 	this->tvanp = upf.tvanp;// if USPP
 	this->nlcc = upf.nlcc;// Non linear core corrections( bool ?)
 	
-	for(int i=0; i<4; i++)
-	{
-		this->dft[i] = upf.dft[i];
-	}
+	this->xc_func = upf.xc_func;
 
 	this->zv = upf.zp;
 	this->etotps = upf.etotps;
@@ -377,7 +374,7 @@ void pseudo_nc::print_pseudo_h(std::ofstream &ofs)
     ofs << "\n pp_type  " << pp_type;
     ofs << "\n tvanp    " << tvanp;
     ofs << "\n nlcc " << nlcc;
-    ofs << "\n dft  " << dft;
+    ofs << "\n dft  " << xc_func;
     ofs << "\n zv       " << zv;
     ofs << "\n etotps   " << etotps;
     ofs << "\n ecutwfc " << ecutwfc;

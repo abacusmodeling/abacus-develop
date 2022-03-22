@@ -51,7 +51,7 @@ public:
 
 	int lmax;
 
-	//void print_Table_DSR(void);		//caoyu add 2021-03-20
+	void print_Table_DSR(LCAO_Orbitals &orb);		//caoyu add 2021-03-20
 
 private:
 

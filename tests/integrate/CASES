@@ -33,6 +33,15 @@
 108_PW_RE_MB
 108_PW_RE_MG
 109_PW_CR
+109_PW_CR_fix_a
+109_PW_CR_fix_ab
+109_PW_CR_fix_abc
+109_PW_CR_fix_ac
+109_PW_CR_fix_b
+109_PW_CR_fix_bc
+109_PW_CR_fix_c
+109_PW_CR_fix_volume
+109_PW_CR_moveatoms
 110_PW_SY_symmetry
 111_PW_elec_add
 111_PW_elec_minus

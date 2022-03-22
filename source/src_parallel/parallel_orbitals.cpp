@@ -72,7 +72,7 @@ void Parallel_Orbitals::set_trace(void)
     || GlobalV::KS_SOLVER=="cg"
     || GlobalV::KS_SOLVER=="dav") //xiaohui add 2013-09-02
 	{
-		std::cout << " common settings for trace_loc_row and dtraace_loc_col " << std::endl;
+		std::cout << " common settings for trace_loc_row and trace_loc_col " << std::endl;
 		for (int i=0; i<GlobalV::NLOCAL; i++)
 		{
 			trace_loc_row[i] = i;

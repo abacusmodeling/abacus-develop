@@ -86,14 +86,16 @@ void Force_LCAO_gamma::ftable_gamma (
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO);
+            GlobalC::ParaO.trace_loc_row,
+            GlobalC::ParaO.trace_loc_col);
     	GlobalC::ld.cal_descriptor();
         GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
         GlobalC::ld.cal_f_delta_gamma(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            GlobalC::ParaO.trace_loc_row,
+            GlobalC::ParaO.trace_loc_col,
             isstress, svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
@@ -102,7 +104,31 @@ void Force_LCAO_gamma::ftable_gamma (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
+        if(GlobalV::deepks_out_unittest)
+        {
+            GlobalC::ld.print_dm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+            GlobalC::ld.check_projected_dm();
+            GlobalC::ld.check_descriptor(GlobalC::ucell);
+            GlobalC::ld.check_gedm();
+            GlobalC::ld.add_v_delta(GlobalC::ucell,
+                        GlobalC::ORB,
+                        GlobalC::GridD,
+                        GlobalC::ParaO.trace_loc_row,
+                        GlobalC::ParaO.trace_loc_col,
+                        GlobalC::ParaO.nrow,
+                        GlobalC::ParaO.ncol);
+            GlobalC::ld.check_v_delta(GlobalC::ParaO.nrow,GlobalC::ParaO.ncol);
+
+            GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+                GlobalC::ParaO.trace_loc_row,
+                GlobalC::ParaO.trace_loc_col,
+                GlobalC::ParaO.nrow);
+			ofstream ofs("E_delta_bands.dat");
+			ofs <<std::setprecision(10)<< GlobalC::ld.e_delta_band;
+			ofstream ofs1("E_delta.dat");
+			ofs1 <<std::setprecision(10)<< GlobalC::ld.E_delta;
+            GlobalC::ld.check_f_delta(GlobalC::ucell.nat, svnl_dalpha);
+        }
     }
 #endif
     

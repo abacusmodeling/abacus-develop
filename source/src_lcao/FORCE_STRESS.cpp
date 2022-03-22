@@ -1,9 +1,7 @@
 #include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
-#include "../src_pw/potential_libxc.h"
 #include "./dftu.h"  //Quxin add for DFT+U on 20201029
 // new
-#include "../src_pw/H_XC_pw.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #include "../module_base/timer.h"
@@ -305,18 +303,12 @@ void Force_Stress_LCAO::getForceStress(
 
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
-		if (GlobalV::out_descriptor) //not parallelized yet
+		if (GlobalV::deepks_out_labels) //not parallelized yet
 		{
-			if(GlobalV::MY_RANK==0)
-			{
-            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy", GlobalC::ucell.nat); //Ty/Bohr, F_tot
-			}
+            GlobalC::ld.save_npy_f(fcs, "f_tot.npy", GlobalC::ucell.nat); //Ty/Bohr, F_tot
             if (GlobalV::deepks_scf)
             {
-				if(GlobalV::MY_RANK==0)
-				{
-                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy", GlobalC::ucell.nat); //Ry/Bohr, F_base
-				}
+                GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy", GlobalC::ucell.nat); //Ry/Bohr, F_base
 
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
@@ -324,7 +316,8 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO);
+						GlobalC::ParaO.trace_loc_row,
+    					GlobalC::ParaO.trace_loc_col);
 				}
 				else
 				{			
@@ -332,21 +325,20 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO,
-						GlobalC::kv);	
+						GlobalC::ParaO.trace_loc_row,
+    					GlobalC::ParaO.trace_loc_col,
+						GlobalC::kv.nks,
+						GlobalC::kv.kvec_d);	
 				}
+				if(GlobalV::deepks_out_unittest) GlobalC::ld.check_gdmx(GlobalC::ucell.nat);
 				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);
-				if(GlobalV::MY_RANK==0)
-				{
-					GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
-				}
+				
+				if(GlobalV::deepks_out_unittest) GlobalC::ld.check_gvx(GlobalC::ucell.nat);
+				GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
             }
             else
             {
-				if(GlobalV::MY_RANK==0)
-				{
-                	GlobalC::ld.save_npy_f(fcs, "f_base.npy", GlobalC::ucell.nat); //no scf, F_base=F_tot
-				}
+                GlobalC::ld.save_npy_f(fcs, "f_base.npy", GlobalC::ucell.nat); //no scf, F_base=F_tot
             }
 
         }
@@ -814,7 +806,7 @@ void Force_Stress_LCAO::calStressPwPart(
 	//--------------------------------------------------------
 	for(int i=0;i<3;i++)
 	{
-		sigmaxc(i,i) =  -(H_XC_pw::etxc) / GlobalC::ucell.omega;
+		sigmaxc(i,i) =  -(GlobalC::en.etxc) / GlobalC::ucell.omega;
 	}
 	//Exchange-correlation for PBE
 	sc_pw.stress_gga(sigmaxc);

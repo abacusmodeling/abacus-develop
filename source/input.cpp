@@ -132,19 +132,10 @@ void Input::Default(void)
 	towannier90 = false;
 	NNKP = "seedname.nnkp";
 	wannier_spin = "up";
-
-    efield = 0;
-	edir = 1;
-	emaxpos = 0.5;
-	eopreg = 0.1;
-	eamp = 0.001; // (a.u. = 51.44 * 10^10 V/m )
-
-	opt_epsilon2 = false;//mohan add 2010-03-24
-	opt_nbands = 0;
 //----------------------------------------------------------
 // electrons / spin
 //----------------------------------------------------------
-	dft_functional = "none";
+	dft_functional = "default";
     nspin = 1;
     nelec = 0.0;
     lmaxmax = 2;
@@ -214,7 +205,6 @@ void Input::Default(void)
 	vl_in_h = 1;
 	vnl_in_h = 1;
 	vh_in_h = 1;
-	vxc_in_h = 1;
 	vion_in_h = 1;
 	test_force = 0;
 	test_stress = 0;
@@ -250,8 +240,11 @@ void Input::Default(void)
     out_charge = 0;
 	out_dm = 0;
 
-	out_descriptor = 0; // caoyu added 2020-11-24, mohan added 2021-01-03
-	lmax_descriptor = 2; // mohan added 2021-01-03
+	deepks_out_labels = 0; // caoyu added 2020-11-24, mohan added 2021-01-03
+	deepks_scf = 0;
+	deepks_bandgap = 0;
+	deepks_out_unittest = 0;
+	deepks_descriptor_lmax = 2; // mohan added 2021-01-03
 
     out_potential = 0;
     out_wf = 0;
@@ -277,17 +270,6 @@ void Input::Default(void)
 	lcao_dr = 0.01;
 	lcao_rmax = 30; // (a.u.)
 //----------------------------------------------------------
-// Selinv
-//----------------------------------------------------------
-	selinv_npole = 40;
-	selinv_temp = 2000;
-	selinv_gap = 0.0;
-	selinv_deltae = 2.0;
-	selinv_mu = -1.0;
-	selinv_threshold = 1.0e-3;
-	selinv_niter = 50;
-
-//----------------------------------------------------------
 // vdw									//jiyy add 2019-08-04
 //----------------------------------------------------------
     vdw_method="none";
@@ -308,54 +290,9 @@ void Input::Default(void)
 	vdw_model="radius";
 	vdw_period = {3,3,3};
 
-//-----------------------------------------------------------
-// spectrum                                                                      // pengfei Li add 2016-11-23
-//-----------------------------------------------------------
-    //epsilon=false;
-	//epsilon_choice=0;
-	spectral_type="None";
-	spectral_method=0;
-	kernel_type="rpa";
-	eels_method=0;
-	absorption_method=0;
-	system_type="bulk";
-	eta=0.05;
-	domega=0.01;
-	nomega=300;
-	ecut_chi=1;
-	//oband=1;
-	q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
-	q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
-	//start_q=1;
-	//interval_q=1;
-	nq=1;
-	out_epsilon=true;
-	out_chi=false;
-	out_chi0=false;
-	fermi_level=0.0;
-	coulomb_cutoff=false;
-
-	kmesh_interpolation=false;
-	for(int i=0; i<100; i++)
-	{
-		qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
-	}
-
-	lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
-
-	//epsilon0 = false;
-	//intersmear = 0.01;
-	intrasmear = 0.0;
-	shift = 0.0;
-	metalcalc = false;
-	eps_degauss = 0.01;
-
-	//epsilon0_choice = 0;
-
 //----------------------------------------------------------
 // exx										//Peize Lin add 2018-06-20
 //----------------------------------------------------------
-	exx_hybrid_type = "no";
 
 	exx_hybrid_alpha = 0.25;
 	exx_hse_omega = 0.11;
@@ -617,34 +554,6 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, wannier_spin);
 		}
-        else if (strcmp("efield", word) == 0)// electrical field
-        {
-            read_value(ifs, efield);
-        }
-        else if (strcmp("edir", word) == 0)// electrical field direction
-        {
-            read_value(ifs, edir);
-        }
-        else if (strcmp("emaxpos", word) == 0)// electrical field maximal field
-        {
-            read_value(ifs, emaxpos);
-        }
-        else if (strcmp("eopreg", word) == 0)// amplitute of the inverse region
-        {
-            read_value(ifs, eopreg);
-        }
-        else if (strcmp("eamp", word) == 0)// electrical field amplitute
-        {
-            read_value(ifs, eamp);
-        }
-        else if (strcmp("opt_epsilon2", word) == 0)// optical field
-        {
-            read_value(ifs, opt_epsilon2);
-        }
-        else if (strcmp("opt_nbands", word) == 0)// bands for optical calculations
-        {
-            read_value(ifs, opt_nbands);
-        }
 //----------------------------------------------------------
 // electrons / spin
 //----------------------------------------------------------
@@ -892,10 +801,6 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, vh_in_h);
         }
-        else if (strcmp("vxc_in_h", word) == 0)
-        {
-            read_value(ifs, vxc_in_h);
-        }
         else if (strcmp("vion_in_h", word) == 0)
         {
             read_value(ifs, vion_in_h);
@@ -1011,22 +916,30 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, out_dm);
         }
-        else if (strcmp("out_descriptor", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
+        else if (strcmp("deepks_out_labels", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
-            read_value(ifs, out_descriptor);
+            read_value(ifs, deepks_out_labels);
         }
-        else if (strcmp("lmax_descriptor", word) == 0)// mohan added 2021-01-03
-        {
-            read_value(ifs, lmax_descriptor);
-		}
-		else if (strcmp("deepks_scf", word) == 0) // caoyu added 2021-06-02
+		else if (strcmp("deepks_scf", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
             read_value(ifs, deepks_scf);
-		}
-		else if (strcmp("model_file", word) == 0) // caoyu added 2021-06-03
-        {
-            read_value(ifs, model_file);
         }
+		else if (strcmp("deepks_bandgap", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
+        {
+            read_value(ifs, deepks_bandgap);
+        }
+        else if (strcmp("deepks_out_unittest", word) == 0)// mohan added 2021-01-03
+        {
+            read_value(ifs, deepks_out_unittest);
+		}
+		else if (strcmp("deepks_model", word) == 0) // caoyu added 2021-06-03
+        {
+            read_value(ifs, deepks_model);
+        }
+		else if (strcmp("deepks_descriptor_lmax", word) == 0) // QO added 2021-12-15
+        {
+            read_value(ifs, deepks_descriptor_lmax);
+		}
 		else if (strcmp("out_potential", word) == 0)
         {
             read_value(ifs, out_potential);
@@ -1114,34 +1027,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("lcao_rmax", word) == 0)
         {
             read_value(ifs, lcao_rmax);
-        }
-        else if (strcmp("selinv_npole", word) == 0)
-        {
-            read_value(ifs, selinv_npole);
-        }
-        else if (strcmp("selinv_temp", word) == 0)
-        {
-            read_value(ifs, selinv_temp);
-        }
-        else if (strcmp("selinv_deltae", word) == 0)
-        {
-            read_value(ifs, selinv_deltae);
-        }
-        else if (strcmp("selinv_gap", word) == 0)
-        {
-            read_value(ifs, selinv_gap);
-        }
-        else if (strcmp("selinv_mu", word) == 0)
-        {
-            read_value(ifs, selinv_mu);
-        }
-        else if (strcmp("selinv_threshold", word) == 0)
-        {
-            read_value(ifs, selinv_threshold);
-        }
-        else if (strcmp("selinv_niter", word) == 0)
-        {
-            read_value(ifs, selinv_niter);
         }
 		// about molecular dynamics
 		//added begin by zheng daye
@@ -1366,92 +1251,6 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, restart_load);
         }
-//--------------------------------------------------------
-// epsilon           pengfei Li 2016-11-23
-//--------------------------------------------------------
-		else if (strcmp("spectral_type", word) == 0)
-	    {
-	        read_value(ifs, spectral_type);
-	    }
-		else if (strcmp("spectral_method", word) == 0)
-	    {
-	        read_value(ifs, spectral_method);
-	    }
-		else if (strcmp("kernel_type", word) == 0)
-	    {
-	        read_value(ifs, kernel_type);
-	    }
-		else if (strcmp("eels_method", word) == 0)
-	    {
-	        read_value(ifs, eels_method);
-	    }
-		else if (strcmp("absorption_method", word) == 0)
-	    {
-	        read_value(ifs, absorption_method);
-	    }
-	    else if (strcmp("system", word) == 0)
-	    {
-	        read_value(ifs, system_type);
-	    }
-	    else if (strcmp("eta", word) == 0)
-	    {
-	        read_value(ifs, eta);
-	    }
-	    else if (strcmp("domega", word) == 0)
-	    {
-	        read_value(ifs, domega);
-	    }
-	    else if (strcmp("nomega", word) == 0)
-	    {
-	        read_value(ifs, nomega);
-	    }
-	    else if (strcmp("ecut_chi", word) == 0)
-	    {
-	        read_value(ifs, ecut_chi);
-	    }
-	    else if (strcmp("q_start", word) == 0)
-	    {
-			ifs >> q_start[0]; ifs >> q_start[1]; read_value(ifs, q_start[2]);
-	    }
-	    else if (strcmp("q_direction", word) == 0)
-	    {
-			ifs >> q_direct[0]; ifs >> q_direct[1]; read_value(ifs, q_direct[2]);
-	    }
-	    else if (strcmp("nq", word) == 0)
-	    {
-	        read_value(ifs, nq);
-	    }
-	    else if (strcmp("out_epsilon", word) == 0)
-	    {
-	        read_value(ifs, out_epsilon);
-	    }
-	    else if (strcmp("out_chi", word) == 0)
-	    {
-	        read_value(ifs, out_chi);
-	    }
-	    else if (strcmp("out_chi0", word) == 0)
-	    {
-	        read_value(ifs, out_chi0);
-	    }
-	    else if (strcmp("fermi_level", word) == 0)
-	    {
-	        read_value(ifs, fermi_level);
-	    }
-	    else if (strcmp("coulomb_cutoff", word) == 0)
-	    {
-	        read_value(ifs, coulomb_cutoff);
-	    }
-	    else if (strcmp("kmesh_interpolation", word) == 0)
-	    {
-	        read_value(ifs, kmesh_interpolation);
-	    }
-	    else if (strcmp("qcar", word) == 0)
-	    {
-	         for(int i=0; i<nq; i++)
-	         {
-	             ifs >> qcar[i][0]; ifs >> qcar[i][1]; read_value(ifs, qcar[i][2]);
-	         }
-	    }
         else if (strcmp("ocp", word) == 0)
         {
             read_value(ifs, GlobalV::ocp);
@@ -1465,34 +1264,13 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, GlobalV::mulliken);
 		}//qifeng add 2019/9/10
-	    else if (strcmp("supercell_scale", word) == 0)
-	    {
-	        ifs >> lcao_box[0]; ifs >> lcao_box[1];
-	        read_value(ifs, lcao_box[2]);
-	    }
-	    else if (strcmp("intrasmear", word) == 0)
-	    {
-	        read_value(ifs, intrasmear);
-	    }
-	    else if (strcmp("shift", word) == 0)
-	    {
-	        read_value(ifs, shift);
-	    }
-	    else if (strcmp("metalcalc", word) == 0)
-	    {
-	        read_value(ifs, metalcalc);
-	    }
-	    else if (strcmp("eps_degauss", word) == 0)
-	    {
-	        read_value(ifs, eps_degauss);
-	    }
 //----------------------------------------------------------
 // exx
 // Peize Lin add 2018-06-20
 //----------------------------------------------------------
-        else if (strcmp("exx_hybrid_type", word) == 0)
+        else if (strcmp("dft_functional", word) == 0)
         {
-            read_value(ifs, exx_hybrid_type);
+            read_value(ifs, dft_functional);
         }
         else if (strcmp("exx_hybrid_alpha", word) == 0)
         {
@@ -1987,15 +1765,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_bool(towannier90);
 	Parallel_Common::bcast_string(NNKP);
 	Parallel_Common::bcast_string(wannier_spin);
-    Parallel_Common::bcast_int( efield );
-    Parallel_Common::bcast_int( edir );
-    Parallel_Common::bcast_double( emaxpos );
-    Parallel_Common::bcast_double( eopreg );
-    Parallel_Common::bcast_double( eamp );
-
-
-    Parallel_Common::bcast_bool( opt_epsilon2 );
-    Parallel_Common::bcast_int( opt_nbands );
 
 	Parallel_Common::bcast_string( dft_functional );
     Parallel_Common::bcast_int( nspin );
@@ -2059,7 +1828,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );
 	Parallel_Common::bcast_int( vh_in_h );
-	Parallel_Common::bcast_int( vxc_in_h );
 	Parallel_Common::bcast_int( vion_in_h );
 
 	Parallel_Common::bcast_int( test_force );
@@ -2088,16 +1856,19 @@ void Input::Bcast()
     Parallel_Common::bcast_string( charge_extrap );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( out_charge );
     Parallel_Common::bcast_int( out_dm );
-    Parallel_Common::bcast_int( out_descriptor ); // caoyu added 2020-11-24, mohan modified 2021-01-03
-    Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
-    Parallel_Common::bcast_int( deepks_scf ); // caoyu add 2021-06-02
-	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
+
+    Parallel_Common::bcast_bool( deepks_out_labels ); // caoyu added 2020-11-24, mohan modified 2021-01-03
+	Parallel_Common::bcast_bool( deepks_scf );
+	Parallel_Common::bcast_bool( deepks_bandgap );
+	Parallel_Common::bcast_bool( deepks_out_unittest );
+	Parallel_Common::bcast_string( deepks_model );
+	Parallel_Common::bcast_int( deepks_descriptor_lmax );
 
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_int( out_wf );
     Parallel_Common::bcast_int( out_wf_r );
 	Parallel_Common::bcast_int( out_dos );
-        Parallel_Common::bcast_int( out_band );
+	Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
 	Parallel_Common::bcast_int( out_hs2 ); //LiuXh add 2019-07-15
 	Parallel_Common::bcast_int( out_r_matrix ); // jingan add 2019-8-14
@@ -2116,15 +1887,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( lcao_dk );
 	Parallel_Common::bcast_double( lcao_dr );
 	Parallel_Common::bcast_double( lcao_rmax );
-
-	// mohan add 2011-09-28
-	Parallel_Common::bcast_int( selinv_npole);
-	Parallel_Common::bcast_double( selinv_temp);
-	Parallel_Common::bcast_double( selinv_gap);
-	Parallel_Common::bcast_double( selinv_deltae);
-	Parallel_Common::bcast_double( selinv_mu);
-	Parallel_Common::bcast_double( selinv_threshold);
-	Parallel_Common::bcast_int( selinv_niter);
 /*
 	// mohan add 2011-11-07
 	Parallel_Common::bcast_double( mdp.dt );
@@ -2203,62 +1965,13 @@ void Input::Bcast()
 	Parallel_Common::bcast_int(td_vexttype);
 	Parallel_Common::bcast_int(td_vextout);
 	Parallel_Common::bcast_int(td_dipoleout);
-    // pengfei Li add 2016-11-23
-    //Parallel_Common::bcast_bool( epsilon );
-	//Parallel_Common::bcast_int( epsilon_choice );
-	Parallel_Common::bcast_string( spectral_type );
-	Parallel_Common::bcast_int( spectral_method );
-	Parallel_Common::bcast_string( kernel_type );
-	Parallel_Common::bcast_int( eels_method );
-	Parallel_Common::bcast_int( absorption_method );
-    Parallel_Common::bcast_string( system_type );
-    Parallel_Common::bcast_double( eta );
-    Parallel_Common::bcast_double( domega );
-    Parallel_Common::bcast_int( nomega );
-    Parallel_Common::bcast_int( ecut_chi );
-    //Parallel_Common::bcast_int( oband );
-	Parallel_Common::bcast_double( q_start[0]);
-	Parallel_Common::bcast_double( q_start[1]);
-	Parallel_Common::bcast_double( q_start[2]);
-	Parallel_Common::bcast_double( q_direct[0]);
-	Parallel_Common::bcast_double( q_direct[1]);
-	Parallel_Common::bcast_double( q_direct[2]);
-    //Parallel_Common::bcast_int( start_q );
-    //Parallel_Common::bcast_int( interval_q );
-    Parallel_Common::bcast_int( nq );
-    Parallel_Common::bcast_bool( out_epsilon );
-    Parallel_Common::bcast_bool( out_chi );
-    Parallel_Common::bcast_bool( out_chi0 );
-    Parallel_Common::bcast_double( fermi_level );
-    Parallel_Common::bcast_bool( coulomb_cutoff );
-    Parallel_Common::bcast_bool( kmesh_interpolation );
 	Parallel_Common::bcast_bool( test_just_neighbor );
-    for(int i=0; i<100; i++)
-    {
-        Parallel_Common::bcast_double( qcar[i][0] );
-        Parallel_Common::bcast_double( qcar[i][1] );
-        Parallel_Common::bcast_double( qcar[i][2] );
-    }
 	Parallel_Common::bcast_int(GlobalV::ocp);
-	// Parallel_Common::bcast_int(ocp_n);
 	Parallel_Common::bcast_string(GlobalV::ocp_set);
-        // for(int i=0; i<10000; i++)
-        // {
-            // Parallel_Common::bcast_double( GlobalV::ocp_kb[i] );
-        // }
-                Parallel_Common::bcast_int( GlobalV::mulliken);//qifeng add 2019/9/10
-	Parallel_Common::bcast_int( lcao_box[0] );
-	Parallel_Common::bcast_int( lcao_box[1] );
-	Parallel_Common::bcast_int( lcao_box[2] );
-	//Parallel_Common::bcast_bool( epsilon0 );
-	//Parallel_Common::bcast_double( intersmear );
-	Parallel_Common::bcast_double( intrasmear );
-	Parallel_Common::bcast_double( shift );
-	Parallel_Common::bcast_bool( metalcalc );
-	Parallel_Common::bcast_double( eps_degauss );
+    Parallel_Common::bcast_int( GlobalV::mulliken);//qifeng add 2019/9/10
 
 	// Peize Lin add 2018-06-20
-	Parallel_Common::bcast_string( exx_hybrid_type );
+	Parallel_Common::bcast_string( dft_functional );
 	Parallel_Common::bcast_double( exx_hybrid_alpha );
 	Parallel_Common::bcast_double( exx_hse_omega );
 	Parallel_Common::bcast_bool( exx_separate_loop );
@@ -2342,32 +2055,6 @@ void Input::Check(void)
 	else if(diago_proc>GlobalV::NPROC)
 	{
 		diago_proc = GlobalV::NPROC;
-	}
-
-    if (efield && symmetry)
-    {
-        symmetry = false;
-        ModuleBase::WARNING_QUIT("Input","Presently no symmetry can be used with electric field");
-    }
-
-    if (efield && nspin>2)
-    {
-        ModuleBase::WARNING_QUIT("Input","nspin>2 not available with electric field.");
-    }
-
-	if (edir < 1 || edir > 3)
-	{
-		ModuleBase::WARNING_QUIT("Input","edir should be 1, 2 or 3.");
-	}
-
-	if (emaxpos < 0.0 || emaxpos >= 1.0)
-	{
-		ModuleBase::WARNING_QUIT("Input","emaxpos should be [0,1)");
-	}
-
-	if (eopreg < 0.0 || eopreg >= 1.0)
-	{
-		ModuleBase::WARNING_QUIT("Input","eopreg should be [0,1)");
 	}
 
 
@@ -2765,11 +2452,6 @@ void Input::Check(void)
 		 ModuleBase::WARNING_QUIT("Input","ion_dynamics can only be sd, cg, bfgs or cg_bfgs.");
 	}
 
-	if(opt_epsilon2==true && opt_nbands==0)
-	{
-		ModuleBase::WARNING_QUIT("Input","please Input the opt_nbands for optical properties calculations");
-	}
-
 	if(basis_type=="pw")
 	{
 		bx=1;
@@ -2836,42 +2518,7 @@ void Input::Check(void)
 		}
 	}
 
-	if(spectral_type!="None" && spectral_type!="eels" && spectral_type!="absorption")
-	{
-		ModuleBase::WARNING_QUIT("INPUT","spectral_type must be eels or absorption !");
-	}
-
-	// pengfei 2016-12-14
-	if(spectral_type!="None")
-	{
-		if( system_type!="bulk" && system_type!="surface")
-		{
-			ModuleBase::WARNING_QUIT("Input","system must be bulk or surface");
-		}
-		if( kernel_type!="rpa")
-		{
-			ModuleBase::WARNING_QUIT("Input","Now kernel_type must be rpa!");
-		}
-		if( q_start[0] == 0 && q_start[1] == 0 && q_start[2] == 0)
-		{
-			ModuleBase::WARNING_QUIT("INPUT","Gamma point is not allowed!");
-		}
-		if( q_direct[0] == 0 && q_direct[1] == 0 && q_direct[2] == 0)
-		{
-			ModuleBase::WARNING_QUIT("INPUT","You must choose a direction!");
-		}
-	}
-
-	if(exx_hybrid_type!="no" &&
-		exx_hybrid_type!="hf" &&
-		exx_hybrid_type!="pbe0" &&
-		exx_hybrid_type!="hse" &&
-		exx_hybrid_type!="opt_orb")
-	{
-		ModuleBase::WARNING_QUIT("INPUT","exx_hybrid_type must be no or hf or pbe0 or hse or opt_orb");
-	}
-
-	if(exx_hybrid_type=="hf" || exx_hybrid_type=="pbe0" || exx_hybrid_type=="hse")
+	if(dft_functional=="hf" || dft_functional=="pbe0" || dft_functional=="hse")
 	{
 		if(exx_hybrid_alpha<0 || exx_hybrid_alpha>1)
 		{
@@ -2893,7 +2540,7 @@ void Input::Check(void)
 			ModuleBase::WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
 		}
 	}
-	if(exx_hybrid_type=="opt_orb")
+	if(dft_functional=="opt_orb")
 	{
 		if(exx_opt_orb_lmax<0)
 		{

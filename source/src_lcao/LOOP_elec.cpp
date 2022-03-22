@@ -154,15 +154,27 @@ void LOOP_elec::before_solver(const int &istep)
 #ifdef __DEEPKS
     //for each ionic step, the overlap <psi|alpha> must be rebuilt
     //since it depends on ionic positions
-    if (GlobalV::out_descriptor)
+    if (GlobalV::deepks_setorb)
     {
 		//build and save <psi(0)|alpha(R)> at beginning
         GlobalC::ld.build_psialpha(GlobalV::FORCE,
 			GlobalC::ucell,
 			GlobalC::ORB,
 			GlobalC::GridD,
-			GlobalC::ParaO,
+			GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
 			GlobalC::UOT);
+
+		if(GlobalV::deepks_out_unittest)
+		{
+			GlobalC::ld.check_psialpha(GlobalV::FORCE,
+					GlobalC::ucell,
+					GlobalC::ORB,
+					GlobalC::GridD,
+					GlobalC::ParaO.trace_loc_row,
+					GlobalC::ParaO.trace_loc_col,
+					GlobalC::UOT);
+		}
     }
 #endif
 
@@ -180,18 +192,11 @@ void LOOP_elec::solver(const int &istep)
 			|| GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") //pengfei 2014-10-13
 	{
 		//Peize Lin add 2016-12-03
-		switch(GlobalC::exx_lcao.info.hybrid_type)
+		if( Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type 
+			|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type 
+			|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type )
 		{
-			case Exx_Global::Hybrid_Type::HF:
-			case Exx_Global::Hybrid_Type::PBE0:
-			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_lcao.cal_exx_ions();
-				break;
-			case Exx_Global::Hybrid_Type::No:
-			case Exx_Global::Hybrid_Type::Generate_Matrix:
-				break;
-			default:
-				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+			GlobalC::exx_lcao.cal_exx_ions();
 		}
 
 		// No exx
@@ -213,7 +218,7 @@ void LOOP_elec::solver(const int &istep)
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
-					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+					XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 					GlobalC::exx_lcao.cal_exx_elec();
 					
 					ELEC_scf es;
@@ -226,8 +231,7 @@ void LOOP_elec::solver(const int &istep)
 			}
 			else
 			{
-				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-
+				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				ELEC_scf es;
 				es.scf(istep-1);
 				
