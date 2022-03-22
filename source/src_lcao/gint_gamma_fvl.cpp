@@ -89,8 +89,6 @@ inline void cal_psir_ylm_dphi(
             //array to store spherical harmonics and its derivatives
             std::vector<double> rly;
             std::vector<std::vector<double>> grly;
-            // >>> the old method
-            // ylma[id] = new double[nnn[it]]; // liaochen found this bug 2010/03/29
             // Ylm::get_ylm_real(GlobalC::ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
             // <<<
             // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
@@ -594,17 +592,8 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 					//------------------------------------------------------------------
 					double *vldr3 = get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 					
-					//------------------------------------------------------
-					// index of wave functions for each block
-					//------------------------------------------------------
-					int *block_iw = Gint_Tools::get_block_iw(na_grid, grid_index, this->max_size);
-					
-					int* block_index = Gint_Tools::get_block_index(na_grid, grid_index);
-					
-					//------------------------------------------------------
-					// band size: number of columns of a band
-					//------------------------------------------------------------------
-					int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
+                    int * block_iw, * block_index, * block_size;
+                    Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 
 					Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
 					Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
@@ -619,9 +608,9 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
                                 DGridV_22, DGridV_23, DGridV_33, drr);
 								
 					free(vldr3);		vldr3=nullptr;
-					free(block_iw);		block_iw=nullptr;
-					free(block_index);	block_index=nullptr;
-					free(block_size);	block_size=nullptr;
+					delete[] block_iw;
+					delete[] block_index;
+					delete[] block_size;
                 }// k
             }// j
         }// i

@@ -4,12 +4,10 @@
 
 Grid_Base_Beta::Grid_Base_Beta()
 { 
-	this->nnn = new int[1];
 }
 
 Grid_Base_Beta::~Grid_Base_Beta()
 {
-	delete[] nnn;
 }
 
 void Grid_Base_Beta::prepare(
@@ -23,13 +21,6 @@ void Grid_Base_Beta::prepare(
 
 	this->latvec0 = this->latvec;
 	this->latvec0 *= this->lat0;
-
-	delete[] this->nnn;
-	this->nnn = new int[GlobalC::ucell.ntype];
-	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
-	{
-		this->nnn[T1] = (GlobalC::ucell.atoms[T1].nwl+1) * (GlobalC::ucell.atoms[T1].nwl+1);
-	//	std::cout << "\n nnn = " << nnn[T1];
-	}	
+	
 	return;
 }
