@@ -202,7 +202,7 @@ void ELEC_scf::scf(const int& istep,
 		}
 		else
 		{
-			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
+			if(ELEC_evolve::tddft && istep >= 2 && iter > 1)
 			{
 				ELEC_evolve::evolve_psi(istep, uhm, lowf);
 			}
@@ -248,7 +248,7 @@ void ELEC_scf::scf(const int& istep,
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
 
-		if (GlobalV::ocp == 1)
+		if (GlobalV::ocp == 1 && ELEC_evolve::tddft && istep >= 2  && iter > 1)
 		{
 			for (int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
@@ -423,6 +423,17 @@ void ELEC_scf::scf(const int& istep,
 		{
 			GlobalC::pot.set_vrs_tddft(istep);
 		}
+
+		if (conv_elec)
+                {
+                        GlobalV::ofs_running<<endl;
+                        GlobalV::ofs_running<<"print ekb : ";
+                        for(int ib=0; ib<GlobalV::NBANDS; ++ib)
+                        {
+                        GlobalV::ofs_running << " " << GlobalC::wf.ekb[0][ib]*13.605693;
+                        }
+                        GlobalV::ofs_running<<endl;
+                }
 
 		//time_finish=std::time(NULL);
 #ifdef __MPI

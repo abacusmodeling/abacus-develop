@@ -13,14 +13,14 @@ class Evolve_LCAO_Matrix
 	Evolve_LCAO_Matrix(LCAO_Matrix *lm);
 	~Evolve_LCAO_Matrix();
 	
-    void evolve_complex_matrix(const int& ik, Local_Orbital_wfc &lowf)const;
+    void evolve_complex_matrix(const int& ik, Local_Orbital_wfc &lowf, double* ekb)const;
 
 private:
     LCAO_Matrix* LM;
 
-	void using_LAPACK_complex(const int &ik, std::complex<double>*** wfc_k_grid, std::complex<double> **c_init)const;
+	void using_LAPACK_complex(const int &ik, std::complex<double>** wfc_k_grid, ModuleBase::ComplexMatrix &wfc_k , ModuleBase::ComplexMatrix &wfc_k_laststep, double* ekb)const;
 #ifdef __MPI
-	int using_ScaLAPACK_complex(const int &ik, ModuleBase::ComplexMatrix &wfc_2d)const;
+	int using_ScaLAPACK_complex(const int &ik, ModuleBase::ComplexMatrix &wfc_2d ,double* ekb)const;
 #endif
 };
 

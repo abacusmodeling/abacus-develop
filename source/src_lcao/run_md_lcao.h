@@ -22,6 +22,13 @@ class Run_MD_LCAO
         double &potential, 
         ModuleBase::Vector3<double>* force, 
         ModuleBase::matrix& virial);
+	void md_force_virial(ModuleESolver::ESolver *p_esolver,
+		const int &istep,
+        const int& numIon, 
+        double &potential, 
+        ModuleBase::Vector3<double>* force, 
+        ModuleBase::matrix& virial,
+        Local_Orbital_wfc& LOWF_md);
 
 	private:
 
