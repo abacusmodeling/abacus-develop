@@ -20,7 +20,8 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
     std::vector<ModuleBase::ComplexMatrix>& dm_k)
 {
 	ModuleBase::TITLE("ELEC_cbands_k","cal_bands");
-	ModuleBase::timer::tick("ELEC_cbands_k","cal_bands");
+    ModuleBase::timer::tick("ELEC_cbands_k", "cal_bands");
+    const Parallel_Orbitals* pv = lowf.ParaV;
 
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
@@ -33,8 +34,10 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *lowf.ParaV,
-			GlobalC::kv);
+            pv->trace_loc_row,
+			pv->trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d);
     	GlobalC::ld.cal_descriptor();
 		//calculate dE/dD
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
@@ -43,8 +46,9 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 		GlobalC::ld.add_v_delta_k(GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *lowf.ParaV,
-			lowf.ParaV->nnr);
+            pv->trace_loc_row,
+			pv->trace_loc_col,
+			pv->nnr);
 	}
 #endif
 

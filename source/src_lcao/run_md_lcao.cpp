@@ -59,7 +59,7 @@ void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleESolver::ESolver *p_esolv
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
     opt_ions(p_esolver);
-    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::deepks_setorb, GlobalC::ucell.infoNL.nproj);
     
     return;
 }

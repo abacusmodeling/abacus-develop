@@ -10,7 +10,8 @@ namespace Dos
 	bool calculate_dos(
 		const int &is,
 		const std::vector<int> &isk,
-		const std::string &fn,// file address.
+		const std::string &fn,// file address for DOS.
+		const std::string &fn1,// file address for DOS_smearing.
 		const double &de_ev, // delta energy in ev.
 		const double &emax_ev,// maximal energy in ev.
 		const double &emin_ev,// minimal energy in ev.

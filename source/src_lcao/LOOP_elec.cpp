@@ -161,15 +161,28 @@ void LOOP_elec::before_solver(const int& istep,
 #ifdef __DEEPKS
     //for each ionic step, the overlap <psi|alpha> must be rebuilt
     //since it depends on ionic positions
-    if (GlobalV::out_descriptor)
+    if (GlobalV::deepks_setorb)
     {
-		//build and save <psi(0)|alpha(R)> at beginning
+        const Parallel_Orbitals* pv;
+        //build and save <psi(0)|alpha(R)> at beginning
         GlobalC::ld.build_psialpha(GlobalV::FORCE,
 			GlobalC::ucell,
 			GlobalC::ORB,
 			GlobalC::GridD,
-			*lowf.ParaV,
+			pv->trace_loc_row,
+			pv->trace_loc_col,
 			GlobalC::UOT);
+
+		if(GlobalV::deepks_out_unittest)
+		{
+			GlobalC::ld.check_psialpha(GlobalV::FORCE,
+					GlobalC::ucell,
+					GlobalC::ORB,
+					GlobalC::GridD,
+					pv->trace_loc_row,
+					pv->trace_loc_col,
+					GlobalC::UOT);
+		}
     }
 #endif
 

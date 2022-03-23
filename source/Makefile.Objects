@@ -121,7 +121,6 @@ gint_k_init.o\
 gint_k_vl.o\
 gint_k_rho.o\
 gint_k_fvl.o\
-grid_base.o\
 grid_base_beta.o\
 ORB_control.o\
 ORB_read.o\
@@ -158,6 +157,7 @@ LCAO_diago.o\
 LCAO_evolve.o\
 LCAO_deepks.o\
 LCAO_deepks_fdelta.o\
+LCAO_deepks_odelta.o\
 LCAO_deepks_io.o\
 LCAO_deepks_mpi.o\
 LCAO_deepks_pdm.o\

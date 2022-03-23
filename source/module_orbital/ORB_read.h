@@ -26,7 +26,7 @@ class LCAO_Orbitals
 		std::ofstream &ofs_in, // mohan add 2021-05-07
 		const int &ntype_in,
 		const int &lmax_in,
-		const int &out_descriptor, //  mohan add 2021-04-25
+		const bool &deepks_setorb, //  mohan add 2021-04-25
 		const int &out_r_matrix, // mohan add 2021-04-26
 		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank); // mohan add 2021-04-26

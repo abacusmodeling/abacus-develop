@@ -109,25 +109,6 @@ public:
 		const int &nband
 	);
 
-//==========================================================
-// MEMBER FUNCTION : calculate_dos
-// DO : output DOS in nscf case.
-// RETURN : = TRUE (seccess)
-//  	    = FALSE (failure)
-//==========================================================
-	bool calculate_dos
-	(
- 		const std::string &fa, // file address.
-		const double de_ev, // delta energy in ev
-		const double emax_ev, // maximal energy in ev.
-		const double emin_ev, // minimal energy in ev.
-		const int nks, // number of k points included.
-		const int nbands, // number of nbands included.
-		const ModuleBase::matrix &et// store energy for each k point
-		                    // and each band
-	);
-
-
 #ifdef __MPI
 //==========================================================
 // MEMBER FUNCTION : out_charge_mpi

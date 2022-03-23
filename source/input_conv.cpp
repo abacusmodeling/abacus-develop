@@ -461,14 +461,25 @@ void Input_Conv::Convert(void)
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
 
-	ModuleBase::timer::tick("Input_Conv", "Convert");
+
 //-----------------------------------------------
 // caoyu add for DeePKS
 //-----------------------------------------------
 #ifdef __DEEPKS
-	GlobalV::out_descriptor = INPUT.out_descriptor;
 	GlobalV::deepks_scf = INPUT.deepks_scf;
+	GlobalV::deepks_bandgap = INPUT.deepks_bandgap; //QO added for bandgap label 2021-12-15
+	GlobalV::deepks_out_unittest = INPUT.deepks_out_unittest;
+	GlobalV::deepks_out_labels = INPUT.deepks_out_labels;
+	if(GlobalV::deepks_out_unittest)
+	{
+		GlobalV::deepks_out_labels = 1;
+		GlobalV::deepks_scf = 1;
+		if (GlobalV::NPROC>1) ModuleBase::WARNING_QUIT("Input_conv","generate deepks unittest with only 1 processor");
+		if (GlobalV::FORCE!=1) ModuleBase::WARNING_QUIT("Input_conv","force is required in generating deepks unittest");
+		if (GlobalV::STRESS!=1) ModuleBase::WARNING_QUIT("Input_conv","stress is required in generating deepks unittest");
+	}
+	if(GlobalV::deepks_scf || GlobalV::deepks_out_labels) GlobalV::deepks_setorb = 1;
 #endif
-
-	return;
+	ModuleBase::timer::tick("Input_Conv","Convert");	
+    return;
 }

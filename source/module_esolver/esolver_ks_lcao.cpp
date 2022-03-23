@@ -96,13 +96,10 @@ void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 #ifdef __DEEPKS
 	//wenfei 2021-12-19
 	//if we are performing DeePKS calculations, we need to load a model
-	if (GlobalV::out_descriptor)
+	if (GlobalV::deepks_scf)
 	{
-		if (GlobalV::deepks_scf)
-		{
-			// load the DeePKS model from deep neural network
-    		GlobalC::ld.load_model(INPUT.model_file);
-		}
+		// load the DeePKS model from deep neural network
+		GlobalC::ld.load_model(INPUT.deepks_model);
 	}
 #endif
 

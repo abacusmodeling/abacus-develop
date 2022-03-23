@@ -299,15 +299,19 @@ void ELEC_scf::scf(const int& istep,
         
 #ifdef __DEEPKS
         if(GlobalV::deepks_scf) 
-		{
-			if(GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            const Parallel_Orbitals* pv = lowf.ParaV;
+            if (GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				GlobalC::ld.cal_e_delta_band(loc.dm_gamma,*lowf.ParaV);
-			}
+                GlobalC::ld.cal_e_delta_band(loc.dm_gamma,
+                    pv->trace_loc_row, pv->trace_loc_col, pv->nrow);
+            }
 			else
 			{
-				GlobalC::ld.cal_e_delta_band_k(loc.dm_k,*lowf.ParaV,GlobalC::kv.nks);
-			}
+                GlobalC::ld.cal_e_delta_band_k(loc.dm_k,
+                    pv->trace_loc_row, pv->trace_loc_col, 
+                    GlobalC::kv.nks, pv->nrow, pv->ncol);
+            }
 		}
 #endif
 		// (4) mohan add 2010-06-24
@@ -527,20 +531,6 @@ void ELEC_scf::scf(const int& istep,
 				{
 					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				}
-#ifdef __DEEPKS
-				if (GlobalV::out_descriptor)	//caoyu add 2021-06-04
-				{
-                    GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
-                    if (GlobalV::deepks_scf) {
-                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
-                    }
-                    else
-                    {
-                        GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
-                    }
-
-				}
-#endif
 			}
 			else
 			{
@@ -549,6 +539,80 @@ void ELEC_scf::scf(const int& istep,
 				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
 			}
 
+			if(conv_elec || iter==GlobalV::NITER)
+			{
+#ifdef __DEEPKS
+				//calculating deepks correction to bandgap
+				//and save the results
+				if (GlobalV::deepks_bandgap)
+				{
+					int nocc = GlobalC::CHR.nelec/2;
+					ModuleBase::matrix wg_hl;
+					wg_hl.create(GlobalV::NSPIN, GlobalV::NBANDS);
+		
+					for(int is=0; is<GlobalV::NSPIN; is++)
+					{
+						for(int ib=0; ib<GlobalV::NBANDS; ib++)
+						{
+							wg_hl(is,ib) = 0.0;
+						
+							if(ib == nocc-1)
+								wg_hl(is,ib) = -1.0;
+							else if(ib == nocc)
+								wg_hl(is,ib) = 1.0;
+						}
+					}
+
+                    std::vector<ModuleBase::matrix> dm_bandgap_gamma;
+                    std::vector<ModuleBase::ComplexMatrix> dm_bandgap_k;
+				
+					if(GlobalV::GAMMA_ONLY_LOCAL)
+                    {
+                        dm_bandgap_gamma.resize(GlobalV::NSPIN);
+                        loc.cal_dm(wg_hl, lowf.wfc_gamma, dm_bandgap_gamma);
+                        GlobalC::ld.cal_o_delta(dm_bandgap_gamma, *lowf.ParaV);
+					}			
+					else
+                    {
+                        dm_bandgap_k.resize(GlobalC::kv.nks);
+                        loc.cal_dm(wg_hl, lowf.wfc_k, dm_bandgap_k);
+                        GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *lowf.ParaV, GlobalC::kv.nks);
+					}
+					if(GlobalV::deepks_out_labels)
+					{
+						GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1] - GlobalC::ld.o_delta, "o_base.npy");
+						GlobalC::ld.cal_orbital_precalc(dm_bandgap_gamma,
+							GlobalC::ucell.nat,
+							GlobalC::ucell,
+							GlobalC::ORB,
+							GlobalC::GridD,
+							*lowf.ParaV);
+						GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
+					}	
+				}
+
+				if (GlobalV::deepks_out_labels)	//caoyu add 2021-06-04
+				{
+					int nocc = GlobalC::CHR.nelec/2;
+					GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_tot.npy");
+					if (!GlobalV::deepks_bandgap)
+					{
+						GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_base.npy");  // no scf, o_tot=o_base	
+					}
+
+					GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
+                    if (GlobalV::deepks_scf)
+					{
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
+					}
+                    else
+                    {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
+												
+                    }
+				}
+#endif
+			}
 //			ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
 			ModuleBase::timer::tick("ELEC_scf","scf");
 			return;

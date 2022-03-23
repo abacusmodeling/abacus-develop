@@ -1,10 +1,11 @@
-//wenfei 2022-1-5
+//wenfei 2022-1-11
 //This file contains subroutines for calculating F_delta,
 //which is defind as sum_mu,nu rho_mu,nu d/dX (<chi_mu|alpha>V(D)<alpha|chi_nu>)
 
-//There are two subroutines in this file:
+//There are 3 subroutines in this file:
 //1. cal_f_delta_gamma, which is used for gamma point calculation
 //2. cal_f_delta_k, which is used for multi-k calculation
+//3. check_f_delta, which prints F_delta into F_delta.dat for checking
 
 #ifdef __DEEPKS
 
@@ -12,13 +13,32 @@
 #include "../module_base/vector3.h"
 #include "../module_base/timer.h"
 
+void stress_fill( 
+    const double& lat0_, 
+    const double& omega_,
+    ModuleBase::matrix& stress_matrix)
+{
+    assert(omega_>0.0);
+    double weight = lat0_ / omega_ ;
+    for(int i=0;i<3;++i)
+    {
+        for(int j=0;j<3;++j)
+        {
+            if(j>i) stress_matrix(j,i) = stress_matrix(i,j);
+            stress_matrix(i,j) *= weight ;
+        }
+    }
+}
+
+
 //force for gamma only calculations
 //Pulay and HF terms are calculated together
 void LCAO_Deepks::cal_f_delta_gamma(const ModuleBase::matrix& dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO,
+    const int* trace_loc_row,
+    const int* trace_loc_col,
     const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_f_delta_gamma");
@@ -79,13 +99,13 @@ void LCAO_Deepks::cal_f_delta_gamma(const ModuleBase::matrix& dm,
                     for (int iw1=0; iw1<nw1_tot; ++iw1)
                     {
                         const int iw1_all = start1 + iw1;
-                        const int iw1_local = ParaO.trace_loc_col[iw1_all];
+                        const int iw1_local = trace_loc_col[iw1_all];
                         if(iw1_local < 0)continue;
 
                         for (int iw2=0; iw2<nw2_tot; ++iw2)
                         {
                             const int iw2_all = start2 + iw2;
-                            const int iw2_local = ParaO.trace_loc_row[iw2_all];
+                            const int iw2_local = trace_loc_row[iw2_all];
                             if(iw2_local < 0)continue;
 
                             double nlm[3]={0,0,0};
@@ -167,9 +187,10 @@ void LCAO_Deepks::cal_f_delta_gamma(const ModuleBase::matrix& dm,
 
                                 for(int ipol=0;ipol<3;ipol++)
                                 {
-                                    svnl_dalpha(0,ipol) -= dm(iw1_local, iw2_local) * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1.0;
-                                    svnl_dalpha(1,ipol) -= dm(iw1_local, iw2_local) * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1.0;
-                                    svnl_dalpha(2,ipol) -= dm(iw1_local, iw2_local) * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1.0;
+                                    for(int jpol=ipol;jpol<3;jpol++)
+                                    {
+                                        svnl_dalpha(ipol, jpol) += dm(iw1_local, iw2_local) * (nlm[jpol] * r0[ipol] + nlm_t[jpol] * r1[ipol]);
+                                    }
                                 }
                             }
                         }//iw2
@@ -181,13 +202,7 @@ void LCAO_Deepks::cal_f_delta_gamma(const ModuleBase::matrix& dm,
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dalpha(i,j) *=  ucell.lat0 / ucell.omega;
-            }
-        }
+        stress_fill(ucell.lat0, ucell.omega, svnl_dalpha);
     }
 
     return;
@@ -200,8 +215,10 @@ void LCAO_Deepks::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO,
-    const K_Vectors &kv,
+    const int* trace_loc_row,
+    const int* trace_loc_col,
+    const int nks,
+    const std::vector<ModuleBase::Vector3<double>> &kvec_d,
     const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_f_delta_hf_k_new");
@@ -269,19 +286,19 @@ void LCAO_Deepks::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm
                     for (int iw1=0; iw1<nw1_tot; ++iw1)
                     {
                         const int iw1_all = start1 + iw1;
-                        const int iw1_local = ParaO.trace_loc_col[iw1_all];
+                        const int iw1_local = trace_loc_col[iw1_all];
                         if(iw1_local < 0)continue;
 
                         for (int iw2=0; iw2<nw2_tot; ++iw2)
                         {
                             const int iw2_all = start2 + iw2;
-                            const int iw2_local = ParaO.trace_loc_row[iw2_all];
+                            const int iw2_local = trace_loc_row[iw2_all];
                             if(iw2_local < 0)continue;
                             double dm_current;
                             std::complex<double> tmp = 0.0;
-                            for(int ik=0;ik<kv.nks;ik++)
+                            for(int ik=0;ik<nks;ik++)
                             {
-                                const double arg = - ( kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
+                                const double arg = - ( kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw1_local, iw2_local) * kphase;
                             }
@@ -382,16 +399,35 @@ void LCAO_Deepks::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dalpha(i,j) =  svnl_dalpha(i,j) * ucell.lat0 / ucell.omega;
-            }
-        }
+        stress_fill(ucell.lat0, ucell.omega, svnl_dalpha);
+    }
+    ModuleBase::timer::tick("LCAO_Deepks","cal_f_delta_hf_k_new");
+    return;
+}
+
+//prints F_delta into F_delta.dat
+void LCAO_Deepks::check_f_delta(const int nat, ModuleBase::matrix& svnl_dalpha)
+{
+    ModuleBase::TITLE("LCAO_Deepks", "check_F_delta");
+
+    ofstream ofs("F_delta.dat");
+    ofs<<std::setprecision(10);
+
+    for (int iat=0; iat<nat; iat++)
+    {
+        ofs << F_delta(iat,0) << " " << F_delta(iat,1) << " " << F_delta(iat,2) << std::endl;
     }
 
-    ModuleBase::timer::tick("LCAO_Deepks","cal_f_delta_hf_k_new");
+    ofstream ofs1("stress_delta.dat");
+    ofs1<<std::setprecision(10);
+    for (int ipol=0; ipol<3; ipol++)
+    {
+        for (int jpol=0; jpol<3; jpol++)
+        {
+            ofs1 << svnl_dalpha(ipol,jpol) << " ";
+        }
+        ofs1 << std::endl;
+    }    
     return;
 }
 

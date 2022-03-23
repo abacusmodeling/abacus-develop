@@ -117,18 +117,23 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
 
 	if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_projected_DM(dm_gamma[0],
+        const Parallel_Orbitals* pv = this->LM->ParaV;
+        GlobalC::ld.cal_projected_DM(dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *this->LM->ParaV);
+            pv->trace_loc_row,
+            pv->trace_loc_col);
     	GlobalC::ld.cal_descriptor();        
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 		GlobalC::ld.add_v_delta(GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *this->LM->ParaV);
-        for(int iic=0;iic<this->LM->ParaV->nloc;iic++)
+            pv->trace_loc_row,
+            pv->trace_loc_col,
+            pv->nrow,
+            pv->ncol);
+        for(int iic=0;iic<pv->nloc;iic++)
         {
             this->LM->Hloc[iic] += GlobalC::ld.H_V_delta[iic];
         }

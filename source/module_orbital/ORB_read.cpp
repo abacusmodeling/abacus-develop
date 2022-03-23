@@ -105,7 +105,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	std::ofstream &ofs_in,
 	const int &ntype_in, 
 	const int &lmax_in,
-	const int &out_descriptor,
+	const bool &deepks_setorb,
 	const int &out_r_matrix,
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
@@ -212,7 +212,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	///>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-	if (out_descriptor>0)	//condition: descriptor in lcao line
+	if (deepks_setorb)	//condition: descriptor in lcao line
 	{
 		
 		delete[] this->Alpha;

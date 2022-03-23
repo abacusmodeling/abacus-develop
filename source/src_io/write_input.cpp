@@ -100,10 +100,15 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_dm",out_dm,">0 output density matrix");
 
 	// for deepks
-	ModuleBase::GlobalFunc::OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");
-	ModuleBase::GlobalFunc::OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");
-	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_scf",deepks_scf,">0 load a model and mix int in SCF");
-	ModuleBase::GlobalFunc::OUTP(ofs,"model_file",model_file,"file dir of traced pytorch model: 'model.ptg");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_out_labels",deepks_out_labels,">0 compute descriptor for deepks");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_scf",deepks_scf,">0 add V_delta to Hamiltonian");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_bandgap",deepks_bandgap,">0 for bandgap label");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_out_unittest",deepks_out_unittest,"if set 1, prints intermediate quantities that shall be used for making unit test");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_model",deepks_model,"file dir of traced pytorch model: 'model.ptg");
+
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_descriptor_lmax",deepks_descriptor_lmax,"lmax used in generating descriptor");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_descriptor_rcut",deepks_descriptor_rcut,"rcut used in generating descriptor");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_descriptor_ecut",deepks_descriptor_ecut,"ecut used in generating descriptor");
 
 
 	ofs << "\n#Parameters (4.LCAO)" << std::endl;

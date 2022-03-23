@@ -191,15 +191,19 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
-        if (GlobalV::out_descriptor)
+        const Parallel_Orbitals* pv = this->LOWF.ParaV;
+        if (GlobalV::deepks_out_labels || GlobalV::deepks_scf)
         {
+            //this part is for integrated test of deepks
+            //so it is printed no matter even if deepks_out_labels is not used
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
                 GlobalC::ld.cal_projected_DM(this->LOC.dm_gamma[0],
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
-                    *this->LOWF.ParaV);
+                    pv->trace_loc_row,
+                    pv->trace_loc_col);
             }
             else
             {
@@ -207,27 +211,37 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
-                    *this->LOWF.ParaV,
-                    GlobalC::kv);
+                    pv->trace_loc_row,
+                    pv->trace_loc_col,
+                    GlobalC::kv.nks,
+                    GlobalC::kv.kvec_d);
             }
-
             GlobalC::ld.cal_descriptor();    //final descriptor
-            GlobalC::ld.print_descriptor(GlobalC::ucell.nat);
-            GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
+            GlobalC::ld.check_descriptor(GlobalC::ucell);
             
-            if (GlobalV::deepks_scf)
+            if (GlobalV::deepks_out_labels) GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
+        }
+
+        if (GlobalV::deepks_scf)
+        {
+            if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                if(GlobalV::GAMMA_ONLY_LOCAL)
-                {
-                    GlobalC::ld.cal_e_delta_band(this->LOC.dm_gamma, *this->LOWF.ParaV);
-                }
-                else
-                {
-                    GlobalC::ld.cal_e_delta_band_k(this->LOC.dm_k, *this->LOWF.ParaV, GlobalC::kv.nks);
-                }
-                std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
-                std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
+                GlobalC::ld.cal_e_delta_band(this->LOC.dm_gamma,
+                    pv->trace_loc_row,
+                    pv->trace_loc_col,
+                    pv->nrow);
             }
+            else
+            {
+                GlobalC::ld.cal_e_delta_band_k(this->LOC.dm_k,
+                pv->trace_loc_row,
+                pv->trace_loc_col,
+                GlobalC::kv.nks,
+                pv->nrow,
+                pv->ncol);
+            }
+            std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
+            std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
         }
 #endif
         time_t fstart = time(NULL);
