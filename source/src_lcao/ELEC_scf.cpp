@@ -424,17 +424,6 @@ void ELEC_scf::scf(const int& istep,
 			GlobalC::pot.set_vrs_tddft(istep);
 		}
 
-		if (conv_elec)
-                {
-                        GlobalV::ofs_running<<endl;
-                        GlobalV::ofs_running<<"print ekb : ";
-                        for(int ib=0; ib<GlobalV::NBANDS; ++ib)
-                        {
-                        GlobalV::ofs_running << " " << GlobalC::wf.ekb[0][ib]*13.605693;
-                        }
-                        GlobalV::ofs_running<<endl;
-                }
-
 		//time_finish=std::time(NULL);
 #ifdef __MPI
 		double duration = (double)(MPI_Wtime() - clock_start);
