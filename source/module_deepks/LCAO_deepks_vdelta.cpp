@@ -395,7 +395,7 @@ void LCAO_Deepks::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm,
             if (mu >= 0 && nu >= 0)
             {                
                 const int index=nu*nrow+mu;
-                for (int is = 0; is < GlobalV::NSPIN; ++is)
+                for (int is = 0; is < dm.size(); ++is)  //dm.size() == GlobalV::NSPIN
                 {
                     this->e_delta_band += dm[is](nu, mu) * this->H_V_delta[index];
                 }
