@@ -738,19 +738,19 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	char transb = 'N';
 	int occBands = occ_bands;
 	int nlocal = GlobalV::NLOCAL;
-	double alpha=1.0, beta=0.0;
+	double alpha[2]={1.0, 0.0}, beta[2]={0.0, 0.0};
 	int one = 1;
 #ifdef __MPI
-	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha,
+	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha[0],
 			lowf.wfc_k.at(ik_L).c,&one,&one,lowf.ParaV->desc,
 							  midmatrix,&one,&one,lowf.ParaV->desc,
-													   &beta,
+													   &beta[0],
 							   C_matrix,&one,&one,lowf.ParaV->desc);
 							   
-	pzgemm_(&transb,&transb,&occBands,&occBands,&nlocal,&alpha,
+	pzgemm_(&transb,&transb,&occBands,&occBands,&nlocal,&alpha[0],
 								 C_matrix,&one,&one,lowf.ParaV->desc,
 			lowf.wfc_k.at(ik_R).c,&one,&one,lowf.ParaV->desc,
-														 &beta,
+														 &beta[0],
 							   out_matrix,&one,&one,lowf.ParaV->desc);	
 
 	//int *ipiv = new int[ lowf.ParaV->nrow+lowf.ParaV->desc[4] ];
