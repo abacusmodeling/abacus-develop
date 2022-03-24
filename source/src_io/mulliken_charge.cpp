@@ -196,7 +196,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 
 						const int NB= i+1;
 
-						const double one_float=1.0, zero_float=0.0;
+						const double one_float[2]={1.0, 0.0}, zero_float[2]={0.0, 0.0};
 						const int one_int=1;
 						//   const int two_int=2;
 
@@ -206,10 +206,10 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 						pzgemv_(
 								&T_char,
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
-								&one_float,
+								&one_float[0],
 								uhm.LM->Sloc2.data(), &one_int, &one_int, pv->desc,
 								Dwf.c, &one_int, &NB, pv->desc, &one_int,
-								&zero_float,
+								&zero_float[0],
 								mud[0].c, &one_int, &NB, pv->desc,
 								&one_int);
 					#endif
