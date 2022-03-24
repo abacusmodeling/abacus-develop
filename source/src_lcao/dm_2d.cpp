@@ -135,7 +135,7 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
             BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
         }
         // C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
-        const double one_float=1.0, zero_float=0.0;
+        const double one_float[2]={1.0, 0.0}, zero_float[2]={0.0, 0.0};
         const int one_int=1;
         const char N_char='N', T_char='T';
         dm_k[ik].create( this->ParaV->ncol, this->ParaV->nrow );
@@ -143,10 +143,10 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
         pzgemm_(
             &N_char, &T_char,
             &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
-            &one_float,
+            &one_float[0],
             wg_wfc.c, &one_int, &one_int, this->ParaV->desc_wfc,
             wfc_k[ik].c, &one_int, &one_int, this->ParaV->desc_wfc,
-            &zero_float,
+            &zero_float[0],
             dm_k[ik].c, &one_int, &one_int, this->ParaV->desc);
     #else
         const int lda=GlobalV::NLOCAL;

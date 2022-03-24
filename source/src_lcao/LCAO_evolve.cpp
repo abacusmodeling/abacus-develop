@@ -442,8 +442,8 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 	char transb = 'T'; //This place requires subsequent testing of different transb.
 	int descb = 0; 
 
-	double alpha_1 = 1.0;
-	double beta_1 = 0.0;
+	double alpha_1[2] = {1.0, 0.0};
+	double beta_1[2] = {0.0, 0.0};
 
 	//cout << "*Htmp2: " << *Htmp2 << endl;
 	//cout << "begin06:" << endl;
@@ -452,10 +452,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 	pzgemm_(
 		&transa, &transb,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-		&alpha_1,
+		&alpha_1[0],
 		Htmp2, &one_int, &one_int, this->LM->ParaV->desc,
 		Htmp1, &one_int, &one_int, this->LM->ParaV->desc, 
-		&beta_1,
+		&beta_1[0],
 		Htmp3, &one_int, &one_int, this->LM->ParaV->desc);
 
 	
@@ -465,10 +465,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 	pzgemv_(
 		&transa,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-		&alpha_1,
+		&alpha_1[0],
 		Htmp3, &one_int, &one_int, this->LM->ParaV->desc,
 		wfc_2d.c, &one_int, &one_int, this->LM->ParaV->desc, &one_int, 
-		&beta_1,
+		&beta_1[0],
 		wfc_2d.c, &one_int, &one_int, this->LM->ParaV->desc, &one_int
         );
 
