@@ -3,6 +3,7 @@
 #include "../src_pdiag/pdiag_double.h"
 #include "../src_io/write_HS.h"
 #include "../module_base/timer.h"
+#include "../src_io/wf_local.h"
 //xiaohui modified 2013-03-23
 //#include "../src_develop/src_siao/selinv.h"
 
@@ -131,6 +132,13 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		GlobalC::wf.ekb[ik][ib] = en[ib];
+	}
+
+	if (Pdiag_Double::out_lowf)
+	{
+		std::stringstream ss;
+        ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";
+        WF_Local::write_lowf_complex(ss.str(), wfc_k_grid, ik);
 	}
 
 	return;

@@ -202,7 +202,7 @@ void ELEC_scf::scf(const int& istep,
 		}
 		else
 		{
-			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
+			if(ELEC_evolve::tddft && istep >= 2 && iter > 1)
 			{
 				ELEC_evolve::evolve_psi(istep, uhm, lowf);
 			}
@@ -248,7 +248,7 @@ void ELEC_scf::scf(const int& istep,
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
 
-		if (GlobalV::ocp == 1)
+		if (GlobalV::ocp == 1 && ELEC_evolve::tddft && istep >= 2  && iter > 1)
 		{
 			for (int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
