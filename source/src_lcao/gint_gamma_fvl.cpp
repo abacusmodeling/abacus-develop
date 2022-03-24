@@ -716,26 +716,28 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 			Parallel_Reduce::reduce_double_pool( tmp22, GlobalV::NLOCAL );
 			Parallel_Reduce::reduce_double_pool( tmp23, GlobalV::NLOCAL );
 			Parallel_Reduce::reduce_double_pool( tmp33, GlobalV::NLOCAL );
-		}
+        }
+
+        const Parallel_Orbitals* pv = this->LM->ParaV;
 
         for (int j=0; j<GlobalV::NLOCAL; j++)
         {
-            if (!GlobalC::ParaO.in_this_processor(i,j))
+            if (!pv->in_this_processor(i,j))
             {
                 continue;
             }
-            GlobalC::LM.set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
+            this->LM->set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
             if(GlobalV::STRESS)
             {
-                const int irr = GlobalC::ParaO.trace_loc_row[ i ];
-                const int icc = GlobalC::ParaO.trace_loc_col[ j ];
-                const int index = irr * GlobalC::ParaO.ncol + icc;
-                GlobalC::LM.DHloc_fixed_11[index] += tmp11[j];
-                GlobalC::LM.DHloc_fixed_12[index] += tmp12[j];
-                GlobalC::LM.DHloc_fixed_13[index] += tmp13[j];
-                GlobalC::LM.DHloc_fixed_22[index] += tmp22[j];
-                GlobalC::LM.DHloc_fixed_23[index] += tmp23[j];
-                GlobalC::LM.DHloc_fixed_33[index] += tmp33[j];
+                const int irr = pv->trace_loc_row[ i ];
+                const int icc = pv->trace_loc_col[ j ];
+                const int index = irr * pv->ncol + icc;
+                this->LM->DHloc_fixed_11[index] += tmp11[j];
+                this->LM->DHloc_fixed_12[index] += tmp12[j];
+                this->LM->DHloc_fixed_13[index] += tmp13[j];
+                this->LM->DHloc_fixed_22[index] += tmp22[j];
+                this->LM->DHloc_fixed_23[index] += tmp23[j];
+                this->LM->DHloc_fixed_33[index] += tmp33[j];
             }
         }
     }
@@ -788,8 +790,8 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     // {
     //     for(int j=0; j<GlobalV::NLOCAL; ++j)
     //     {
-    //         if(GlobalC::ParaO.in_this_processor(i,j))
-    //             GlobalC::LM.set_force (i,j,DGridV_x[i][j], DGridV_y[i][j], DGridV_z[i][j],'N');
+    //         if(pv->in_this_processor(i,j))
+    //             this->LM->set_force (i,j,DGridV_x[i][j], DGridV_y[i][j], DGridV_z[i][j],'N');
     //     }
     // }
     // delete[] tmp;

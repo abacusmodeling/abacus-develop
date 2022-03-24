@@ -46,12 +46,12 @@ NVT_NHC::~NVT_NHC()
     delete []veta;
 }
 
-void NVT_NHC::setup()
+void NVT_NHC::setup(ModuleESolver::ESolver *p_ensolve)
 {
     ModuleBase::TITLE("NVT_NHC", "setup");
     ModuleBase::timer::tick("NVT_NHC", "setup");
 
-    Verlet::setup();
+    Verlet::setup(p_ensolve);
 
     temp_target();
     

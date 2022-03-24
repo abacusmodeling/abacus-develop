@@ -357,7 +357,6 @@ void Input::Default(void)
 
 	cell_factor = 1.2; //LiuXh add 20180619
 
-	new_dm=1; // Shen Yu add 2019/5/9
 	GlobalV::mulliken=0;// qi feng add 2019/9/10
 
 //----------------------------------------------------------			//Peize Lin add 2020-04-04
@@ -1356,10 +1355,6 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, cell_factor);
 		}
-		else if (strcmp("newdm", word) == 0)
-		{
-			read_value(ifs, new_dm);
-		}
 		else if (strcmp("test_just_neighbor", word) == 0)
 		{
 			read_value(ifs, test_just_neighbor);
@@ -1996,7 +1991,6 @@ void Input::Bcast()
 
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
-    Parallel_Common::bcast_int( new_dm ); // Shen Yu add 2019/5/9
     Parallel_Common::bcast_bool( restart_save ); // Peize Lin add 2020.04.04
     Parallel_Common::bcast_bool( restart_load ); // Peize Lin add 2020.04.04
 

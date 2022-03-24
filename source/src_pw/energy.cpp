@@ -68,29 +68,12 @@ void energy::calculate_harris(const int &flag)
 		}
 #endif
 #ifdef __DEEPKS
-        if(GlobalV::deepks_scf) 
-		{
-			this->etot_harris += GlobalC::ld.E_delta;  //caoyu add 2021-08-10
-			if(GlobalV::GAMMA_ONLY_LOCAL)
-			{
-				GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
-					GlobalC::ParaO.trace_loc_row,
-					GlobalC::ParaO.trace_loc_col,
-					GlobalC::ParaO.nrow);
-			}
-			else
-			{
-				GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,
-					GlobalC::ParaO.trace_loc_row,
-					GlobalC::ParaO.trace_loc_col,
-					GlobalC::kv.nks,
-					GlobalC::ParaO.nrow,
-					GlobalC::ParaO.ncol);
-			}
-			this->etot_harris -= GlobalC::ld.e_delta_band;
-		}
+        if (GlobalV::deepks_scf)
+        {
+            this->etot_harris += GlobalC::ld.E_delta - GlobalC::ld.e_delta_band;
+        }
 #endif
-	}
+    }
 	
 	return;
 }
@@ -133,24 +116,7 @@ void energy::calculate_etot(void)
 #ifdef __DEEPKS
 	if (GlobalV::deepks_scf)
 	{
-		this->etot += GlobalC::ld.E_delta;
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
-				GlobalC::ParaO.trace_loc_row,
-				GlobalC::ParaO.trace_loc_col,
-				GlobalC::ParaO.nrow);
-		}
-		else
-		{
-			GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,
-				GlobalC::ParaO.trace_loc_row,
-				GlobalC::ParaO.trace_loc_col,
-				GlobalC::kv.nks,
-				GlobalC::ParaO.nrow,
-				GlobalC::ParaO.ncol);
-		}
-        this->etot -= GlobalC::ld.e_delta_band;
+		this->etot += GlobalC::ld.E_delta - GlobalC::ld.e_delta_band;
 	}
 #endif
 	return;
@@ -545,6 +511,7 @@ void energy::print_band(const int &ik)
 
 // Peize Lin add 2016-12-03
 #ifdef __LCAO
+#ifdef __MPI
 void energy::set_exx()
 {
 	ModuleBase::TITLE("energy", "set_exx");
@@ -576,4 +543,5 @@ void energy::set_exx()
 
 	return;
 }
-#endif
+#endif //__MPI
+#endif //_LCAO

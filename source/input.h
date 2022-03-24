@@ -349,17 +349,6 @@ class Input
     double cell_factor; //LiuXh add 20180619
 
 //==========================================================
-// new DM algorithm test
-// add by Shen Yu @ 2019/5/9
-// newDM values:
-//  0: not use new DM algorithm;
-//  1: use new DM algorithm and show no debug information
-//  2: use new DM algorithm and only show key debug information
-//  3: use new DM algorithm and show all detail debug information
-//==========================================================
-    int new_dm;
-
-//==========================================================
 //    DFT+U       Xin Qu added on 2020-10-29
 //==========================================================
     bool dft_plus_u;                //true:DFT+U correction; false：standard DFT calcullation(default)
