@@ -19,10 +19,10 @@
  * Class Diago_David is used to solve the eigenvalues
  * This unittest test the function Diago_David::diag()
  * with different examples.
- * 	- the Halmit matrix (npw=100,500,1000) produced by random with sparsity of 90%
- *  - the Halmit matrix (npw=100,500,1000) produced by random with sparsity of 50%
- *  - the Halmit matrix (npw=100,500,1000) produced by random with sparsity of 0%
- *  - the Halmit matrix read from "data-H"
+ * 	- the hamilt matrix (npw=100,500,1000) produced by random with sparsity of 90%
+ *  - the hamilt matrix (npw=100,500,1000) produced by random with sparsity of 50%
+ *  - the hamilt matrix (npw=100,500,1000) produced by random with sparsity of 0%
+ *  - the hamilt matrix read from "data-H"
  * 
  * The test is passed when the eignvalues are closed to these calculated by LAPACK.
  *  
@@ -92,7 +92,7 @@ public:
 
 class DiagoDavTest : public ::testing::TestWithParam<DiagoDavPrepare> {};
 
-TEST_P(DiagoDavTest,RandomHalmit)
+TEST_P(DiagoDavTest,RandomHamilt)
 {
 	DiagoDavPrepare ddp = GetParam();
 	if (DETAILINFO) std::cout << "npw=" << ddp.npw << ", nband=" << ddp.nband << ", sparsity=" 
