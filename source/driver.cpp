@@ -12,6 +12,7 @@
 #include "src_io/print_info.h"
 #include "module_base/timer.h"
 #include "module_base/memory.h"
+#include "module_esolver/esolver.h"
 
 Driver::Driver(){}
 
