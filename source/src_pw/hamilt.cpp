@@ -82,7 +82,7 @@ void Hamilt::diagH_pw(
 
                     avg_iter += 1.0;
                 }
-                Diago_CG cg;
+                Diago_CG cg(&GlobalC::hm.hpw);
 
 				bool reorder = true;
 
@@ -106,7 +106,7 @@ void Hamilt::diagH_pw(
             }
 	   		else if(GlobalV::KS_SOLVER=="dav")
         	{
-				Diago_David david;
+				Diago_David david(&GlobalC::hm.hpw);
 				if(GlobalV::NPOL==1)
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],

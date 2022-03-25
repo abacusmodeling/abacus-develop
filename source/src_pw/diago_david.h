@@ -14,14 +14,16 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/complexmatrix.h"
 
+#include "src_pw/hamilt_pw.h"
+
 class Diago_David
 {
 public:
 
-    Diago_David();
+    Diago_David(Hamilt_PW* phamilt);
     ~Diago_David();
 
-    static void SchmitOrth(
+    void SchmitOrth(
         const int& npw,
         const int n_band,
         const int m,
@@ -51,6 +53,8 @@ public:
         double &avg_iter);
 
 private:
+
+    Hamilt_PW* hpw;
 
     int test_david;
 
