@@ -75,8 +75,9 @@ class DiagoCGPrepare
         {
             for (int j = 0; j < npw; j++)
             {
-                // psiguess(i,j) = ev(j,i)*(1+u(p)/10.);
-                psiguess(i, j) = ev(j, i) * u(p) / 10.;
+		double rand = static_cast<double>(u(p))/10.;
+                // psiguess(i,j) = ev(j,i)*(1+rand);
+                psiguess(i, j) = ev(j, i) * rand;
             }
         }
         // run cg
