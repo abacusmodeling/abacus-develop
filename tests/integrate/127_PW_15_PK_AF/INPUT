@@ -29,4 +29,3 @@ ks_solver    cg
 basis_type   pw
 symmetry     0
 nspin        2
-#newdm       1

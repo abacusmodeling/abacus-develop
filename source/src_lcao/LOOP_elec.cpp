@@ -163,7 +163,7 @@ void LOOP_elec::before_solver(const int& istep,
     //since it depends on ionic positions
     if (GlobalV::deepks_setorb)
     {
-        const Parallel_Orbitals* pv;
+        const Parallel_Orbitals* pv = this->UHM->LM->ParaV;
         //build and save <psi(0)|alpha(R)> at beginning
         GlobalC::ld.build_psialpha(GlobalV::FORCE,
 			GlobalC::ucell,
