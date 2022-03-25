@@ -72,7 +72,9 @@ public:
 
 		//do Diago_David::diag()
 		double* en = new double[npw];
-		Diago_David dav;
+		
+		Hamilt_PW hpw;
+		Diago_David dav(&hpw);
 		clock_t start,end;
 		start = clock();
 		dav.diag(psi,en,npw,nband,precondition,order,eps,maxiter,notconv,avg_iter);
