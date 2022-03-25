@@ -1,13 +1,15 @@
 #include "diago_cg.h"
-#include "global.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
+#include "module_base/constants.h"
+#include "module_base/blas_connector.h"
 
 int Diago_CG::moved = 0;
 
 
-Diago_CG::Diago_CG()
+Diago_CG::Diago_CG(Hamilt_PW* phamilt)
 {
+    this->hpw = phamilt;
     test_cg=0;
 }
 Diago_CG::~Diago_CG() {}
@@ -66,10 +68,10 @@ void Diago_CG::diag
         if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << std::endl;
         for (int i=0; i<dim; i++) phi_m[i] = phi(m, i);
 
-        GlobalC::hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
+        this->hpw->s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
-        GlobalC::hm.hpw.h_1psi(dim , phi_m, hphi, sphi);
+        this->hpw->h_1psi(dim , phi_m, hphi, sphi);
 
         e[m] = this->ddot_real(dim, phi_m, hphi );
 
@@ -210,7 +212,7 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
     if (test_cg==1) ModuleBase::TITLE("Diago_CG","orthogonal_gradient");
     //ModuleBase::timer::tick("Diago_CG","orth_grad");
 
-    GlobalC::hm.hpw.s_1psi(dim , g, sg);
+    this->hpw->s_1psi(dim , g, sg);
     int inc=1;
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
@@ -341,7 +343,7 @@ bool Diago_CG::update_psi(
 {
     if (test_cg==1) ModuleBase::TITLE("Diago_CG","update_psi");
     //ModuleBase::timer::tick("Diago_CG","update");
-    GlobalC::hm.hpw.h_1psi(dim, cg, hcg, scg);
+    this->hpw->h_1psi(dim, cg, hcg, scg);
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
 
     if (cg_norm < 1.0e-10 ) return 1;
@@ -476,7 +478,7 @@ void Diago_CG::schmit_orth
     {
         psi_m[ig] /= psi_norm;
     }
-    GlobalC::hm.hpw.s_1psi(dim, psi_m, sphi); // sphi = S|psi(m)>
+    this->hpw->s_1psi(dim, psi_m, sphi); // sphi = S|psi(m)>
 
     delete [] lagrange ;
     //ModuleBase::timer::tick("Diago_CG","schmit_orth");
