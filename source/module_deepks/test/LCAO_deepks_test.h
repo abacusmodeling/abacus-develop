@@ -56,7 +56,7 @@ public:
 	int ntype=0;
 	int nnr;
 
-	ModuleBase::matrix dm;
+	std::vector<ModuleBase::matrix> dm;
 	std::vector<ModuleBase::ComplexMatrix> dm_k;
 
 //preparation

@@ -628,6 +628,7 @@ void PW_Basis::get_MPI_GVectors(void)
     //=====================================
 }//end setup_mpi_GVectors
 // #else
+#endif
 void PW_Basis::get_GVectors(void)
 {
     if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_GVectors");
@@ -681,7 +682,6 @@ void PW_Basis::get_GVectors(void)
     ModuleBase::timer::tick("PW_Basis","get_GVectors");
     return;
 }//end get_GVectors;
-#endif
 
 void PW_Basis::get_nggm(const int ngmc_local)
 {

@@ -89,8 +89,6 @@ inline void cal_psir_ylm_dphi(
             //array to store spherical harmonics and its derivatives
             std::vector<double> rly;
             std::vector<std::vector<double>> grly;
-            // >>> the old method
-            // ylma[id] = new double[nnn[it]]; // liaochen found this bug 2010/03/29
             // Ylm::get_ylm_real(GlobalC::ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
             // <<<
             // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
@@ -594,17 +592,8 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 					//------------------------------------------------------------------
 					double *vldr3 = get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 					
-					//------------------------------------------------------
-					// index of wave functions for each block
-					//------------------------------------------------------
-					int *block_iw = Gint_Tools::get_block_iw(na_grid, grid_index, this->max_size);
-					
-					int* block_index = Gint_Tools::get_block_index(na_grid, grid_index);
-					
-					//------------------------------------------------------
-					// band size: number of columns of a band
-					//------------------------------------------------------------------
-					int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
+                    int * block_iw, * block_index, * block_size;
+                    Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 
 					Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
 					Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
@@ -619,9 +608,9 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
                                 DGridV_22, DGridV_23, DGridV_33, drr);
 								
 					free(vldr3);		vldr3=nullptr;
-					free(block_iw);		block_iw=nullptr;
-					free(block_index);	block_index=nullptr;
-					free(block_size);	block_size=nullptr;
+					delete[] block_iw;
+					delete[] block_index;
+					delete[] block_size;
                 }// k
             }// j
         }// i
@@ -727,26 +716,28 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 			Parallel_Reduce::reduce_double_pool( tmp22, GlobalV::NLOCAL );
 			Parallel_Reduce::reduce_double_pool( tmp23, GlobalV::NLOCAL );
 			Parallel_Reduce::reduce_double_pool( tmp33, GlobalV::NLOCAL );
-		}
+        }
+
+        const Parallel_Orbitals* pv = this->LM->ParaV;
 
         for (int j=0; j<GlobalV::NLOCAL; j++)
         {
-            if (!GlobalC::ParaO.in_this_processor(i,j))
+            if (!pv->in_this_processor(i,j))
             {
                 continue;
             }
-            GlobalC::LM.set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
+            this->LM->set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
             if(GlobalV::STRESS)
             {
-                const int irr = GlobalC::ParaO.trace_loc_row[ i ];
-                const int icc = GlobalC::ParaO.trace_loc_col[ j ];
-                const int index = irr * GlobalC::ParaO.ncol + icc;
-                GlobalC::LM.DHloc_fixed_11[index] += tmp11[j];
-                GlobalC::LM.DHloc_fixed_12[index] += tmp12[j];
-                GlobalC::LM.DHloc_fixed_13[index] += tmp13[j];
-                GlobalC::LM.DHloc_fixed_22[index] += tmp22[j];
-                GlobalC::LM.DHloc_fixed_23[index] += tmp23[j];
-                GlobalC::LM.DHloc_fixed_33[index] += tmp33[j];
+                const int irr = pv->trace_loc_row[ i ];
+                const int icc = pv->trace_loc_col[ j ];
+                const int index = irr * pv->ncol + icc;
+                this->LM->DHloc_fixed_11[index] += tmp11[j];
+                this->LM->DHloc_fixed_12[index] += tmp12[j];
+                this->LM->DHloc_fixed_13[index] += tmp13[j];
+                this->LM->DHloc_fixed_22[index] += tmp22[j];
+                this->LM->DHloc_fixed_23[index] += tmp23[j];
+                this->LM->DHloc_fixed_33[index] += tmp33[j];
             }
         }
     }
@@ -799,8 +790,8 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     // {
     //     for(int j=0; j<GlobalV::NLOCAL; ++j)
     //     {
-    //         if(GlobalC::ParaO.in_this_processor(i,j))
-    //             GlobalC::LM.set_force (i,j,DGridV_x[i][j], DGridV_y[i][j], DGridV_z[i][j],'N');
+    //         if(pv->in_this_processor(i,j))
+    //             this->LM->set_force (i,j,DGridV_x[i][j], DGridV_y[i][j], DGridV_z[i][j],'N');
     //     }
     // }
     // delete[] tmp;

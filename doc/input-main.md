@@ -59,7 +59,7 @@
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
-        [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour) | [new_dm](#new-dm) | [test_just_neighbor](#test-just-neighbor)
+        [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour) | [test_just_neighbor](#test-just-neighbor)
     - [DeePKS](#deepks)
     
         [deepks_out_labels](#out-descriptor) | [deepks_descriptor_lmax](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [deepks_model](#model-file)
@@ -783,7 +783,13 @@ This part of variables are used to control the output of properties.
     [back to top](#input-file)
 - out_wf<a id="out-wf"></a>
     - *Type*: Integer
-    - *Description*: Only used in **planewave basis** set. When set this variable to 1, it outputs the coefficients of wave functions into text files. The file names are WAVEFUNC$K.txt, where $K is the index of k point. When set this variable to 2, results are stored in binary files. The file names are WAVEFUNC$K.dat.
+    - *Description*: Only used in **planewave basis** and **ienvelope calculation in localized orbitals** set. When set this variable to 1, it outputs the coefficients of wave functions into text files. The file names are WAVEFUNC$K.txt, where $K is the index of k point. When set this variable to 2, results are stored in binary files. The file names are WAVEFUNC$K.dat.
+    - *Default*: 0
+
+    [back to top](#input-file)
+- out_wf_r<a id="out-wf-r"></a>
+    - *Type*: Integer
+    - *Description*: Only used in **planewave basis** and **ienvelope calculation in localized orbitals** set. When set this variable to 1, it outputs real-space wave functions into  `OUT.suffix/wfc_realspace/`. The file names are wfc_realspace$K$B, where $K is the index of k point, $B is the index of band. 
     - *Default*: 0
 
     [back to top](#input-file)
@@ -1525,17 +1531,6 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Type*: Boolean
     - *Description*: If set to 1, output to terminal will have some color.
     - *Default*: 0
-
-    [back to top](#input-file)
-
-- new_dm<a id="new-dm"></a>
-
-    - *Type*: Integer
-    - *Description*: Controls output of some debug information related to our density matrix data-structures.
-        - 1: show no debug information
-        - 2: only show key debug information
-        - 3: show all detail debug information
-    - *Default*: 1
 
     [back to top](#input-file)
 
