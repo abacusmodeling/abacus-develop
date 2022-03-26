@@ -2,6 +2,7 @@
 #define ISTATE_ENVELOPE_H
 #include "src_lcao/local_orbital_wfc.h"
 #include "src_lcao/gint_gamma.h"
+#include "src_lcao/gint_k.h"
 #include "src_pw/pw_basis.h"
 
 class IState_Envelope
@@ -10,7 +11,10 @@ class IState_Envelope
 	IState_Envelope();
 	~IState_Envelope();
 
+    /// for gamma_only
     void begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf, int& out_wf_r);
+    /// for multi-k
+    void begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, int& out_wf_r);
 
 private:
 	bool *bands_picked;
