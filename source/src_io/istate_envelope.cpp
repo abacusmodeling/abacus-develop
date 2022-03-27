@@ -109,7 +109,7 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg, int& out_wf
 
 				GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 				std::stringstream ss;
-				ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
+				ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_s_" << is+1 << "_ENV";
 				// 0 means definitely output charge density.
 				bool for_plot = true;
                 GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ss.str(), 3, for_plot);
@@ -202,43 +202,39 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_k &gk, int& out_wf, in
             pw_wfc_g[ik].create(GlobalV::NBANDS, GlobalC::kv.ngk[ik], true);
     }
 
-
     for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
         if(bands_picked[ib])
         {
-            const int nspin0 = (GlobalV::NSPIN== 2) ? 2 : 1;
-            for (int is = 0;is < nspin0;++is)
-                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
-            for (int is = 0;is < GlobalV::NSPIN;++is)
+            const int nspin0 = (GlobalV::NSPIN == 2) ? 2 : 1;
+            for (int ik = 0; ik < GlobalC::kv.nks; ++ik)    //the loop of nspin0 is included
             {
-                for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
-                {
-                    std::cout << " Perform envelope function for kpoint " << ik << ",  band"<< ib + 1 << std::endl;
-                    //  2d-to-grid conversion is unified into `wfc_2d_to_grid`.
+                const int ispin = GlobalC::kv.isk[ik];
+                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[ispin], GlobalC::pw.nrxx);
+                std::cout << " Perform envelope function for kpoint " << ik << ",  band" << ib + 1 << std::endl;
+                //  2d-to-grid conversion is unified into `wfc_2d_to_grid`.
 #ifdef __MPI
-                    // need to deal with NSPIN=4 !!!!
-                    lowf.wfc_2d_to_grid(0, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
+                // need to deal with NSPIN=4 !!!!
+                lowf.wfc_2d_to_grid(0, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
 #else
-                    for (int i = 0;i < GlobalV::NBANDS;++i)
-                    {
-                        for (int j = 0;j < GlobalV::NLOCAL;++j)
-                            wfc_k_grid[ik][i][j] = lowf.wfc_k[ik](i, j);
-                    }
-#endif
-                    gk.cal_env_k( ik, lowf.wfc_k_grid[ik][ib], GlobalC::CHR.rho[is] );
-
-                    GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
-                    std::stringstream ss;
-                    ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
-                    // 0 means definitely output charge density.
-                    bool for_plot = true;
-                    GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ss.str(), 3, for_plot);
-                    
-                    if (out_wf || out_wf_r) //only for gamma_only now
-                        this->set_pw_wfc(GlobalC::pw, 0, ib, GlobalV::NSPIN, GlobalC::kv.ngk[0],
-                            GlobalC::CHR.rho_save, pw_wfc_g[0]);
+                for (int i = 0;i < GlobalV::NBANDS;++i)
+                {
+                    for (int j = 0;j < GlobalV::NLOCAL;++j)
+                        wfc_k_grid[ik][i][j] = lowf.wfc_k[ik](i, j);
                 }
+#endif
+                //deal with NSPIN=4
+                gk.cal_env_k(ik, lowf.wfc_k_grid[ik][ib], GlobalC::CHR.rho[ispin]);
+                
+                std::stringstream ss;
+                ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_k_" << ik / nspin0 + 1 << "_s_" << ispin + 1 << "_ENV";
+
+                bool for_plot = true;   //if false, separate the output into spin up and spin down
+                GlobalC::CHR.write_rho(GlobalC::CHR.rho[ispin], ispin, 0, ss.str(), 3, for_plot);
+                
+                if (out_wf || out_wf_r) //only for gamma_only now
+                    this->set_pw_wfc(GlobalC::pw, ik, ib, GlobalV::NSPIN, GlobalC::kv.ngk[ik],
+                        GlobalC::CHR.rho, pw_wfc_g[ik]);
             }
         }
     }
@@ -283,6 +279,6 @@ void IState_Envelope::set_pw_wfc(PW_Basis& pwb,
 
     // set pw_wfc_g
     // ig2fftw: the index map from i_ngk(local) to i_ngmw(local)
-    for (int ig = 0;ig < ngk;++ig)     // is it right (check local index)???
+    for (int ig = 0;ig < ngk;++ig)
         wfc_g(ib,ig) = Porter[pwb.ig2fftw[GlobalC::wf.igk(ik, ig)]];
 }

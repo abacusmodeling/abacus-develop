@@ -227,12 +227,16 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 
                     //find R by which_unitcell and cal kphase
                     const int id_ucell = GlobalC::GridT.which_unitcell[mcell_index1];
-                    const int Rx = GlobalC::GridT.ucell_index2x[id_ucell];
-                    const int Ry = GlobalC::GridT.ucell_index2y[id_ucell];
-                    const int Rz = GlobalC::GridT.ucell_index2z[id_ucell];
-
-                    ModuleBase::Vector3<double> R(Rx, Ry, Rz);
-                    const double arg = ( GlobalC::kv.kvec_d[ik] * R ) * ModuleBase::TWO_PI;
+                    const int Rx = GlobalC::GridT.ucell_index2x[id_ucell] + GlobalC::GridT.minu1;
+                    const int Ry = GlobalC::GridT.ucell_index2y[id_ucell] + GlobalC::GridT.minu2;
+                    const int Rz = GlobalC::GridT.ucell_index2z[id_ucell] + GlobalC::GridT.minu3;
+                    ModuleBase::Vector3<double> R((double)Rx, (double)Ry, (double)Rz);
+                    //std::cout << "kvec_d: " << GlobalC::kv.kvec_d[ik].x << " " << GlobalC::kv.kvec_d[ik].y << " " << GlobalC::kv.kvec_d[ik].z << std::endl;
+                    //std::cout << "kvec_c: " << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
+                    //std::cout << "R: " << R.x << " " << R.y << " " << R.z << std::endl;
+                    const double arg = (GlobalC::kv.kvec_d[ik] * R) * ModuleBase::TWO_PI;
+                    const double arg1 = (GlobalC::kv.kvec_c[ik] * (R.x * GlobalC::ucell.a1 + R.y * GlobalC::ucell.a2 + R.z * GlobalC::ucell.a3)) * ModuleBase::TWO_PI;
+                    //std::cout << "arg0=" << arg << ", arg1=" << arg1 << std::endl;
                     const std::complex<double> kphase = std::complex <double>(cos(arg), sin(arg));
 
                     // get the start index of local orbitals.
@@ -240,15 +244,25 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 					for (int ib=0; ib<GlobalC::pw.bxyz; ib++)
 					{
 						if(cal_flag[ib][ia1])
-						{
-							int iw1_lo = GlobalC::GridT.trace_lo[start1];
-							double* psi1 = psir_ylm[ib][ia1];
+                        {
+                            int iw1_lo;
+                            double* psi1 = psir_ylm[ib][ia1];
                             std::complex<double> tmp = (0.0, 0.0);
-                            for (int iw = 0; iw < atom1->nw; ++iw, ++iw1_lo)
+                            if (GlobalV::NSPIN == 4) // is it a simple add of 2 spins?
                             {
-                                //std::cout << wfc_k[iw1_lo] << " ";  //zero?
-                                tmp += std::complex<double>(psi1[iw], 0.0) * wfc_k[iw1_lo] * kphase;
-							}//iw
+                                for (int is = 0;is < 2;++is)
+                                {
+                                    iw1_lo = GlobalC::GridT.trace_lo[start1] / GlobalV::NPOL + GlobalC::GridT.lgd / GlobalV::NPOL * is;
+                                    for (int iw = 0;iw < atom1->nw;++iw, ++iw1_lo)
+                                            tmp += std::complex<double>(psi1[iw], 0.0) * wfc_k[iw1_lo] * kphase;
+                                }
+                            }
+                            else
+                            {
+                                iw1_lo = GlobalC::GridT.trace_lo[start1];
+                                for (int iw = 0; iw < atom1->nw; ++iw, ++iw1_lo)
+                                    tmp += std::complex<double>(psi1[iw], 0.0) * wfc_k[iw1_lo] * kphase;
+                            }
                             rho[vindex[ib]] += tmp.real();
                             
                             // std::cout << "tmp.real()=" << tmp.real() << std::endl;  //for test
