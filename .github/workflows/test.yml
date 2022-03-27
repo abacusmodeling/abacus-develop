@@ -11,6 +11,7 @@ on:
       - planewave
       - pw_refactor
       - TDDFT
+      - envelope-fix
 
 jobs:
   test:
