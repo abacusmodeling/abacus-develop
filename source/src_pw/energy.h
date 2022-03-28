@@ -75,7 +75,7 @@ class energy
     //=========================================================
 	void calculate_etot(void);
 	void print_etot(const bool converged, const int &itep, const int &iter, 
-	const double &dr2, const double &duration, const double &ethr=0, const double &avg_iter=0, bool print = true);
+	const double &scf_thr, const double &duration, const double &diag_thr_e=0, const double &avg_iter=0, bool print = true);
 
 	void print_band(const int &ik);
 

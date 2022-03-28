@@ -155,13 +155,13 @@ void Stochastic_Iter::itermu(int &iter)
     if(iter == 1)
     {
         dmu = 2;
-        th_ne = 0.1 * GlobalV::DRHO2 * GlobalC::CHR.nelec;
+        th_ne = 0.1 * GlobalV::SCF_THR * GlobalC::CHR.nelec;
         std::cout<<"th_ne "<<th_ne<<std::endl;
     }
     else
     {
         dmu = 0.1;
-        th_ne = GlobalV::DRHO2 * 1e-2 * GlobalC::CHR.nelec;
+        th_ne = GlobalV::SCF_THR * 1e-2 * GlobalC::CHR.nelec;
     }
     sumpolyval();
     mu = mu0 - dmu;

@@ -25,13 +25,13 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 	}
 
 	// allocation for ion movement.	
-	if(GlobalV::FORCE)
+	if(GlobalV::CAL_FORCE)
 	{
 		IMM.allocate();
 		CE.allocate_ions();
 	}
 
-	if(GlobalV::STRESS)                    // pengfei Li 2018-05-14
+	if(GlobalV::CAL_STRESS)                    // pengfei Li 2018-05-14
 	{
 		LCM.allocate();
 	}
@@ -41,7 +41,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 	int stress_step = 1;
 	bool stop= false;
 	
-    while(istep <= GlobalV::NSTEP && !stop)
+    while(istep <= GlobalV::RELAX_NSTEP && !stop)
     {
 		time_t estart = time(NULL);
 
@@ -129,7 +129,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			eiter = elec.iter;
         }
 
-		if(GlobalC::pot.out_potential == 2)
+		if(GlobalC::pot.out_pot == 2)
 		{
 			std::stringstream ssp;
 			std::stringstream ssp_ave;
@@ -154,7 +154,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			double etime_min = difftime(eend, estart)/60.0; 
 			double ftime_min = difftime(fend, fstart)/60.0; 
 			std::stringstream ss;
-			ss << GlobalV::MOVE_IONS << istep;
+			ss << GlobalV::RELAX_METHOD << istep;
 			
 			std::cout << " " << std::setw(7) << ss.str() 
 			<< std::setw(5) << eiter 
@@ -186,7 +186,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
 	}
 
-	if(GlobalC::wf.out_wf_r == 1)				// Peize Lin add 2021.11.21
+	if(GlobalC::wf.out_wfc_r == 1)				// Peize Lin add 2021.11.21
 	{
 		Write_Wfc_Realspace::write_wfc_realspace_1(GlobalC::wf.evc, "wfc_realspace", true);
 	}	
@@ -200,18 +200,18 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 	ModuleBase::TITLE("Ions","after_scf");
 	//calculate and gather all parts of total ionic forces
 	ModuleBase::matrix force;
-	if(GlobalV::FORCE)
+	if(GlobalV::CAL_FORCE)
 	{
 		this->gather_force_pw(p_esolver, force);
 	}
 	//calculate and gather all parts of stress
 	ModuleBase::matrix stress;
-	if(GlobalV::STRESS)
+	if(GlobalV::CAL_STRESS)
 	{
 		this->gather_stress_pw(p_esolver, stress);
 	}
 	//stop in last step
-	if(istep==GlobalV::NSTEP)
+	if(istep==GlobalV::RELAX_NSTEP)
 	{
 		return 1;
 	}
@@ -282,7 +282,7 @@ bool Ions::if_do_relax()
 //		if(!IMM.get_converged()) return 1;
 		else 
 		{
-			assert(GlobalV::FORCE==1);
+			assert(GlobalV::CAL_FORCE==1);
 			return 1;
 		}
 	}
@@ -305,7 +305,7 @@ bool Ions::if_do_cellrelax()
 		}
 		else 
 		{
-			assert(GlobalV::STRESS==1);
+			assert(GlobalV::CAL_STRESS==1);
 			return 1;
 		}
 	}

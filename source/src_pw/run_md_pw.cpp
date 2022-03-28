@@ -69,7 +69,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
     }
 
     // md cycle
-    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::NSTEP && !verlet->stop)
+    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::RELAX_NSTEP && !verlet->stop)
     {
         if(verlet->step_ == 0)
         {
@@ -138,7 +138,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         verlet->step_++;
     }
 
-    if (GlobalC::pot.out_potential == 2)
+    if (GlobalC::pot.out_pot == 2)
     {
         std::stringstream ssp;
         std::stringstream ssp_ave;
@@ -268,7 +268,7 @@ void Run_MD_PW::md_force_virial(
 		force[ion].z =fcs(ion, 2)/2.0;
 	}
 
-	if(GlobalV::STRESS)
+	if(GlobalV::CAL_STRESS)
 	{
 		// Stress_PW ss;
 		// ss.cal_stress(virial);

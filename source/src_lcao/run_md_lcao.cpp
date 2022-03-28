@@ -114,7 +114,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
     }
 
     // md cycle
-    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::NSTEP && !verlet->stop)
+    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::RELAX_NSTEP && !verlet->stop)
     {
         if(verlet->step_ == 0)
         {
@@ -181,7 +181,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
         verlet->step_++;
     }
 
-    if (GlobalC::pot.out_potential == 2)
+    if (GlobalC::pot.out_pot == 2)
     {
         std::stringstream ssp;
         std::stringstream ssp_ave;
@@ -263,7 +263,7 @@ void Run_MD_LCAO::md_force_virial(
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL(RA_md);
-    FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
+    FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         LOC_md, LOWF_md, UHM_md, fcs, virial);
     RA_md.delete_grid();

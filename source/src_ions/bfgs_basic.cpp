@@ -147,7 +147,7 @@ void BFGS_Basic::check_wolfe_conditions(void)
 	// enlarge trst radius is not good.
     bool wolfe2 = abs(dot) > - this->w2 * dot_p;
 
-	if(GlobalV::test_ion_dynamics)
+	if(GlobalV::test_relax_method)
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"etot - etot_p",etot-etot_p);
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"w1 * dot_p",w1 * dot_p);
@@ -223,18 +223,18 @@ void BFGS_Basic::new_step(void)
 		// we haven't succes before, but we also need to decide a direction
 		// this is the case when BFGS first start			
 		// if the gradient is very small now, 
-		// we don't need large trust_radius_ini, 
+		// we don't need large bfgs_init, 
 		// we choose a smaller one. 
 		if( Ions_Move_Basic::largest_grad < 0.01)
 		{
-			trust_radius_ini = std::min(0.2, trust_radius_ini );
+			bfgs_init = std::min(0.2, bfgs_init );
 		}
                 
                 Ions_Move_Basic::best_xxx = std::fabs(Ions_Move_Basic::best_xxx); 
                 
                 // std::cout << "best_xxx=" << " " << best_xxx <<std::endl;
                 
-                trust_radius_ini = std::min( Ions_Move_Basic::best_xxx, trust_radius_ini );     //cg to bfgs initial trust_radius   13-8-10 pengfei
+                bfgs_init = std::min( Ions_Move_Basic::best_xxx, bfgs_init );     //cg to bfgs initial trust_radius   13-8-10 pengfei
 	}
 	else if(Ions_Move_Basic::update_iter>1)
 	{
@@ -294,7 +294,7 @@ void BFGS_Basic::new_step(void)
         //std::cout<<"update_iter="<<Ions_Move_Basic::update_iter<<std::endl;
 	if(Ions_Move_Basic::update_iter==1)
 	{       
-		trust_radius = trust_radius_ini;
+		trust_radius = bfgs_init;
 		
                 this->tr_min_hit = false;
 	}
@@ -346,16 +346,16 @@ void BFGS_Basic::compute_trust_radius(void)
 
     if(this->wolfe_flag)
     {
-        trust_radius = std::min(trust_radius_max, 2.0*a*trust_radius_old);
+        trust_radius = std::min(bfgs_rmax, 2.0*a*trust_radius_old);
     }
     else
     {
 		// mohan fix bug 2011-03-13 2*a*trust_radius_old -> a*trust_radius_old
-        trust_radius = std::min(trust_radius_max, a*trust_radius_old);
+        trust_radius = std::min(bfgs_rmax, a*trust_radius_old);
         trust_radius = std::min(trust_radius, norm_move);
     }
 
-	if(GlobalV::test_ion_dynamics)
+	if(GlobalV::test_relax_method)
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wolfe_flag",wolfe_flag);
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"trust_radius_old",trust_radius_old);
@@ -364,7 +364,7 @@ void BFGS_Basic::compute_trust_radius(void)
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Trust_radius (Bohr)",trust_radius);
 	}
 
-    if( trust_radius < trust_radius_min )
+    if( trust_radius < bfgs_rmin )
     {
         //the history should be reset, we got trapped
         if(tr_min_hit)
@@ -379,7 +379,7 @@ void BFGS_Basic::compute_trust_radius(void)
         {
             move[i] = -grad[i];
         }
-        trust_radius = trust_radius_min;
+        trust_radius = bfgs_rmin;
         tr_min_hit = true;
     }
     else

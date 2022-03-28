@@ -3,27 +3,27 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
-void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, bool bit, const int &out_hs,  const Parallel_Orbitals &pv)
+void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, bool bit, const int &out_mat_hs,  const Parallel_Orbitals &pv)
 {   
-    if(out_hs==1)
+    if(out_mat_hs==1)
     {
         save_HS(Hloc, Sloc, bit, pv);
     }
-    else if(out_hs==2)
+    else if(out_mat_hs==2)
     {
         save_HS(Hloc, Sloc, bit, pv);
     }
-    else if(out_hs==3)
+    else if(out_mat_hs==3)
     {
         //please call individually
     }
-    else if(out_hs==0)
+    else if(out_mat_hs==0)
     {
         // do nothing.
     }
     else
     {
-        ModuleBase::WARNING("Diago_LCAO_Matrix","unrecorganized out_hs value.");
+        ModuleBase::WARNING("Diago_LCAO_Matrix","unrecorganized out_mat_hs value.");
     }
     return;
 }
@@ -369,19 +369,19 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit, const Parall
 }
 
 //LiuXh, 2017-03-21
-void HS_Matrix::saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_hs, const Parallel_Orbitals &pv)
+void HS_Matrix::saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_mat_hs, const Parallel_Orbitals &pv)
 {   
-    if(out_hs==1)
+    if(out_mat_hs==1)
     {
         save_HS_complex(Hloc, Sloc, bit, pv);
     }
-    else if(out_hs==0)
+    else if(out_mat_hs==0)
     {
         // do nothing.
     }
     else
     {
-        ModuleBase::WARNING("Diago_LCAO_Matrix","unrecorganized out_hs value.");
+        ModuleBase::WARNING("Diago_LCAO_Matrix","unrecorganized out_mat_hs value.");
     }
     return;
 }
