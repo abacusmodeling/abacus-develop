@@ -1,7 +1,7 @@
 #include "global.h"
 #include "hamilt.h"
 #include "hip/hip_runtime.h"
-// #include "diago_cg.h"
+// 
 #include "diago_cg_hip.h"
 #include "diago_david.h"
 #include "../module_base/timer.h"

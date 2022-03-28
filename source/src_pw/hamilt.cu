@@ -1,6 +1,5 @@
 #include "global.h"
 #include "hamilt.h"
-// #include "diago_cg.h"
 #include "diago_david.h"
 #include "diago_cg.cuh"
 #include "cufft.h"
@@ -285,7 +284,7 @@ void Hamilt::diagH_pw(
             }
 	   		else if(GlobalV::KS_SOLVER=="dav")
         	{
-				Diago_David david;
+				Diago_David david(&GlobalC::hm.hpw);
 				if(GlobalV::NPOL==1)
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],

@@ -3,7 +3,6 @@
 #include "global.h"
 #include "sto_iter.h"
 #include "occupy.h"
-#include "diago_cg.h"
 #include "../module_base/timer.h" 
 
 double Stochastic_Iter:: mu;
@@ -415,8 +414,8 @@ void Stochastic_Iter::sum_stoband()
                 stoche.calfinalvec(stohchi.hchi_reciprocal, pchi, out, nchip);
                 hout = new std::complex<double> [npwall];
                 stohchi.hchi_reciprocal(out,hout,nchip);
-                stok_eband = Diago_CG::ddot_real(npwall, out, hout,false) * DeltaE 
-                            +  Diago_CG::ddot_real(npwall, out, out,false) * Ebar;
+                stok_eband = ModuleBase::GlobalFunc::ddot_real(npwall, out, hout,false) * DeltaE 
+                            +  ModuleBase::GlobalFunc::ddot_real(npwall, out, out,false) * Ebar;
                 sto_eband += stok_eband * GlobalC::kv.wk[ik];
                 std::complex<double> *tmpout = out;
             for(int ichi = 0; ichi < nchip ; ++ichi)
