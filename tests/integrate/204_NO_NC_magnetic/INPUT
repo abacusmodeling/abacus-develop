@@ -25,4 +25,3 @@ mixing_ndim 10
 ks_solver     genelpa
 basis_type    lcao
 symmetry      1
-#newdm   1

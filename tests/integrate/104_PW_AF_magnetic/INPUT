@@ -25,4 +25,3 @@ mixing_ndim 10
 ks_solver     cg
 basis_type    pw
 symmetry      1
-#newdm   1
