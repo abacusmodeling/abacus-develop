@@ -165,7 +165,7 @@ void LOOP_elec::before_solver(const int& istep,
     {
         const Parallel_Orbitals* pv = this->UHM->LM->ParaV;
         //build and save <psi(0)|alpha(R)> at beginning
-        GlobalC::ld.build_psialpha(GlobalV::FORCE,
+        GlobalC::ld.build_psialpha(GlobalV::CAL_FORCE,
 			GlobalC::ucell,
 			GlobalC::ORB,
 			GlobalC::GridD,
