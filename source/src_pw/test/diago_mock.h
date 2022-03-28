@@ -30,19 +30,137 @@ namespace DIAGOTEST
             hm(i,i) = std::complex<double> {real,0.0};
         }
     }
+
+	//totaly same as the original code.
+	void diagH_LAPACK(
+		const int nstart,
+		const int nbands,
+		const ModuleBase::ComplexMatrix &hc,
+		const ModuleBase::ComplexMatrix &sc,
+		const int ldh, // nstart
+		double *e,
+		ModuleBase::ComplexMatrix &hvec)
+	{
+	    int lwork=0;
+	
+	    ModuleBase::ComplexMatrix sdum(nstart, ldh);
+	    ModuleBase::ComplexMatrix hdum;
+	
+	    sdum = sc;
+	
+	    const bool all_eigenvalues = (nstart == nbands);
+	
+	    //workspace query
+	    int nb = LapackConnector::ilaenv(1, "ZHETRD", "U", nstart, -1, -1, -1);
+	
+	    if (nb < 1)
+	    {
+	        nb = std::max(1, nstart);
+	    }
+	
+		if (nb == 1 || nb >= nstart)
+	    {
+	        lwork = 2 * nstart; // mohan modify 2009-08-02
+	    }
+	    else
+	    {
+	        lwork = (nb + 1) * nstart;
+	    }
+	
+	    std::complex<double> *work = new std::complex<double>[lwork];
+		ModuleBase::GlobalFunc::ZEROS(work, lwork);
+		
+	    //=====================================================================
+	    // input s and (see below) h are copied so that they are not destroyed
+	    //=====================================================================
+	
+	    int info = 0;
+	    int rwork_dim;
+	    if (all_eigenvalues)
+	    {
+	        rwork_dim = 3*nstart-2;
+	    }
+	    else
+	    {
+	        rwork_dim = 7*nstart;
+	    }
+	
+	    double *rwork = new double[rwork_dim];
+	    ModuleBase::GlobalFunc::ZEROS( rwork, rwork_dim );
+	
+	    if (all_eigenvalues)
+	    {
+	        //===========================
+	        // calculate all eigenvalues
+	        //===========================
+	        hvec = hc;
+	        LapackConnector::zhegv(1, 'V', 'U', nstart, hvec , ldh, sdum, ldh, e, work , lwork , rwork, info);
+	    }
+	    else
+	    {
+	        //=====================================
+	        // calculate only m lowest eigenvalues
+	        //=====================================
+	        int *iwork = new int [5*nstart];
+	        int *ifail = new int[nstart];
+	
+	        ModuleBase::GlobalFunc::ZEROS(rwork,7*nstart);
+	        ModuleBase::GlobalFunc::ZEROS(iwork,5*nstart);
+	        ModuleBase::GlobalFunc::ZEROS(ifail,nstart);
+	
+	        hdum.create(nstart, ldh);
+	        hdum = hc;
+	
+	    	//=============================
+	    	// Number of calculated bands
+	    	//=============================
+	    	int mm = nbands;
+	
+	        LapackConnector::zhegvx
+	        (
+	                1,      //INTEGER
+	                'V',    //CHARACTER*1
+	                'I',    //CHARACTER*1
+	                'U',    //CHARACTER*1
+	                nstart, //INTEGER
+	                hdum,   //COMPLEX*16 array
+	                ldh,    //INTEGER
+	                sdum,   //COMPLEX*16 array
+	                ldh,    //INTEGER
+	           		0.0,    //DOUBLE PRECISION
+	                0.0,    //DOUBLE PRECISION
+	                1,      //INTEGER
+	                nbands, //INTEGER
+	                0.0,    //DOUBLE PRECISION
+	                mm,     //INTEGER
+	                e,      //DOUBLE PRECISION array
+	                hvec,   //COMPLEX*16 array
+	                ldh,    //INTEGER
+	                work,   //DOUBLE array, dimension (MAX(1,LWORK))
+	                lwork,  //INTEGER
+	                rwork , //DOUBLE PRECISION array, dimension (7*N)
+	                iwork,  //INTEGER array, dimension (5*N)
+	                ifail,  //INTEGER array, dimension (N)
+	                info    //INTEGER
+	        );
+	
+	        delete[] iwork;
+	        delete[] ifail;
+	    }
+	    delete[] rwork;
+	    delete[] work;
+	
+		return;
+	}
 }
 
-namespace GlobalC
-{
-	Hamilt hm;
-}
 
 class HPsi
 {
     /**
-     * This calss used to produce the Halmit matrix, the initial 
+     * This calss used to produce the Hermite matrix, the initial 
      * guess wave function, and the precondition by the random 
-     * number. The elements of Halmit matrix and wave function are
+     * number. The elements of Hermite matrix and wave function are
      * between -1.0 to 1.0, and the preconddition is between 1.0 to 2.0.
      * 
      * The parameters in construct function or function create()
@@ -53,7 +171,7 @@ class HPsi
      *                  (0 means no sparsity, 10 means a diagonal matrix)
      * 
      * After instantiation a HPsi, one can use below functions:
-     *  - hamilt(): return the Halmit matrix (type: ModuleBase::ComplexMatrix)
+     *  - hamilt(): return the Hermite matrix (type: ModuleBase::ComplexMatrix)
      *  - psi(): return the wavefunction (type: ModuleBase::ComplexMatrix) 
      *  - precond(): return the precondition (type: double Pointer) 
      * 
@@ -92,6 +210,7 @@ class HPsi
             {
                 double mincoef = 0.0;
                 double realp= pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
+                //double imagp= pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
                 if (u(e) % 10 > (sparsity-1)) mincoef = 1.0;
                 if(i==j)
                 {
@@ -99,6 +218,7 @@ class HPsi
                 }
                 else
                 {
+                    //hmatrix(i,j) = mincoef*std::complex<double>{realp,imagp};
                     hmatrix(i,j) = mincoef*std::complex<double>{realp,0.0};
                     hmatrix(j,i) = conj(hmatrix(i,j));
                 }
@@ -216,7 +336,7 @@ void Hamilt_PW::diagH_subspace(
 
 	delete []aux;
 
-	GlobalC::hm.diagH_LAPACK(n_band, n_band, hc, sc, n_band, en, hvec);
+	DIAGOTEST::diagH_LAPACK(n_band, n_band, hc, sc, n_band, en, hvec);
 
 	char transa = 'N';
 	char transb = 'T';
@@ -229,126 +349,4 @@ void Hamilt_PW::diagH_subspace(
 			evc(ib,ig) = evctmp(ib,ig);
 		}
 	}
-}
-
-//totaly same as the original code.
-void Hamilt::diagH_LAPACK(
-	const int nstart,
-	const int nbands,
-	const ModuleBase::ComplexMatrix &hc,
-	const ModuleBase::ComplexMatrix &sc,
-	const int ldh, // nstart
-	double *e,
-	ModuleBase::ComplexMatrix &hvec)
-{
-    int lwork=0;
-
-    ModuleBase::ComplexMatrix sdum(nstart, ldh);
-    ModuleBase::ComplexMatrix hdum;
-
-    sdum = sc;
-
-    const bool all_eigenvalues = (nstart == nbands);
-
-    //workspace query
-    int nb = LapackConnector::ilaenv(1, "ZHETRD", "U", nstart, -1, -1, -1);
-
-    if (nb < 1)
-    {
-        nb = std::max(1, nstart);
-    }
-
-	if (nb == 1 || nb >= nstart)
-    {
-        lwork = 2 * nstart; // mohan modify 2009-08-02
-    }
-    else
-    {
-        lwork = (nb + 1) * nstart;
-    }
-
-    std::complex<double> *work = new std::complex<double>[lwork];
-	ModuleBase::GlobalFunc::ZEROS(work, lwork);
-	
-    //=====================================================================
-    // input s and (see below) h are copied so that they are not destroyed
-    //=====================================================================
-
-    int info = 0;
-    int rwork_dim;
-    if (all_eigenvalues)
-    {
-        rwork_dim = 3*nstart-2;
-    }
-    else
-    {
-        rwork_dim = 7*nstart;
-    }
-
-    double *rwork = new double[rwork_dim];
-    ModuleBase::GlobalFunc::ZEROS( rwork, rwork_dim );
-
-    if (all_eigenvalues)
-    {
-        //===========================
-        // calculate all eigenvalues
-        //===========================
-        hvec = hc;
-        LapackConnector::zhegv(1, 'V', 'U', nstart, hvec , ldh, sdum, ldh, e, work , lwork , rwork, info);
-    }
-    else
-    {
-        //=====================================
-        // calculate only m lowest eigenvalues
-        //=====================================
-        int *iwork = new int [5*nstart];
-        int *ifail = new int[nstart];
-
-        ModuleBase::GlobalFunc::ZEROS(rwork,7*nstart);
-        ModuleBase::GlobalFunc::ZEROS(iwork,5*nstart);
-        ModuleBase::GlobalFunc::ZEROS(ifail,nstart);
-
-        hdum.create(nstart, ldh);
-        hdum = hc;
-
-    	//=============================
-    	// Number of calculated bands
-    	//=============================
-    	int mm = nbands;
-
-        LapackConnector::zhegvx
-        (
-                1,      //INTEGER
-                'V',    //CHARACTER*1
-                'I',    //CHARACTER*1
-                'U',    //CHARACTER*1
-                nstart, //INTEGER
-                hdum,   //COMPLEX*16 array
-                ldh,    //INTEGER
-                sdum,   //COMPLEX*16 array
-                ldh,    //INTEGER
-           		0.0,    //DOUBLE PRECISION
-                0.0,    //DOUBLE PRECISION
-                1,      //INTEGER
-                nbands, //INTEGER
-                0.0,    //DOUBLE PRECISION
-                mm,     //INTEGER
-                e,      //DOUBLE PRECISION array
-                hvec,   //COMPLEX*16 array
-                ldh,    //INTEGER
-                work,   //DOUBLE array, dimension (MAX(1,LWORK))
-                lwork,  //INTEGER
-                rwork , //DOUBLE PRECISION array, dimension (7*N)
-                iwork,  //INTEGER array, dimension (5*N)
-                ifail,  //INTEGER array, dimension (N)
-                info    //INTEGER
-        );
-
-        delete[] iwork;
-        delete[] ifail;
-    }
-    delete[] rwork;
-    delete[] work;
-
-	return;
 }
