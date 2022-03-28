@@ -18,11 +18,6 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg, int& out_wf
 
 	std::cout << " perform |psi(band, r)| for selected bands." << std::endl;
 
-	if(!GlobalV::GAMMA_ONLY_LOCAL)
-	{
-		ModuleBase::WARNING_QUIT("IState_Envelope::begin","Only available for GAMMA_ONLY_LOCAL now.");
-	}
-
 	// (1) 
 	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
@@ -114,7 +109,7 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg, int& out_wf
 
 				GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 				std::stringstream ss;
-				ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
+				ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_s_" << is+1 << "_ENV";
 				// 0 means definitely output charge density.
 				bool for_plot = true;
                 GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ss.str(), 3, for_plot);
@@ -151,6 +146,118 @@ void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_Gamma &gg, int& out_wf
     return;
 }
 
+void IState_Envelope::begin(Local_Orbital_wfc &lowf, Gint_k &gk, int& out_wf, int& out_wf_r)
+{
+	ModuleBase::TITLE("IState_Envelope","begin");
+
+	std::cout << " perform |psi(band, r)| for selected bands." << std::endl;
+
+	// (1) 
+	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
+
+	// (1.2) read in LOWF_GAMMA.dat
+
+	// mohan update 2011-03-21
+	// if ucell is odd, it's correct,
+	// if ucell is even, it's also correct.
+	// +1.0e-8 in case like (2.999999999+1)/2
+	int fermi_band = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 ) ;
+	int bands_below = GlobalV::NBANDS_ISTATE;
+	int bands_above = GlobalV::NBANDS_ISTATE;
+
+	std::cout << " number of electrons = " << GlobalC::CHR.nelec << std::endl;
+	std::cout << " number of occupied bands = " << fermi_band << std::endl;
+	std::cout << " plot band decomposed charge density below fermi surface with " 
+	<< bands_below << " bands." << std::endl;
+	
+	// (2) cicle:
+	
+	// (2.1) calculate the selected density matrix
+	// from wave functions.
+
+	// (2.2) carry out the grid integration to
+	// get the charge density.
+
+	// (2.3) output the charge density in .cub format.
+	this->bands_picked = new bool[GlobalV::NBANDS];
+	ModuleBase::GlobalFunc::ZEROS(bands_picked, GlobalV::NBANDS);
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
+	{
+		if( ib >= fermi_band - bands_below ) 
+		{
+			if( ib < fermi_band + bands_above)
+			{
+				bands_picked[ib] = true;
+			}
+		}
+	}
+
+    //for pw-wfc in G space
+    ModuleBase::ComplexMatrix* pw_wfc_g;
+    
+    if (out_wf || out_wf_r)
+    {
+        pw_wfc_g = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
+        for (int ik = 0;ik < GlobalC::kv.nks;++ik)
+            pw_wfc_g[ik].create(GlobalV::NBANDS, GlobalC::kv.ngk[ik], true);
+    }
+
+    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+	{
+        if(bands_picked[ib])
+        {
+            const int nspin0 = (GlobalV::NSPIN == 2) ? 2 : 1;
+            for (int ik = 0; ik < GlobalC::kv.nks; ++ik)    //the loop of nspin0 is included
+            {
+                const int ispin = GlobalC::kv.isk[ik];
+                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[ispin], GlobalC::pw.nrxx);
+                std::cout << " Perform envelope function for kpoint " << ik << ",  band" << ib + 1 << std::endl;
+                //  2d-to-grid conversion is unified into `wfc_2d_to_grid`.
+#ifdef __MPI
+                // need to deal with NSPIN=4 !!!!
+                lowf.wfc_2d_to_grid(0, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
+#else
+                for (int i = 0;i < GlobalV::NBANDS;++i)
+                {
+                    for (int j = 0;j < GlobalV::NLOCAL;++j)
+                        wfc_k_grid[ik][i][j] = lowf.wfc_k[ik](i, j);
+                }
+#endif
+                //deal with NSPIN=4
+                gk.cal_env_k(ik, lowf.wfc_k_grid[ik][ib], GlobalC::CHR.rho[ispin]);
+                
+                std::stringstream ss;
+                ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_k_" << ik / nspin0 + 1 << "_s_" << ispin + 1 << "_ENV";
+
+                bool for_plot = true;   //if false, separate the output into spin up and spin down
+                GlobalC::CHR.write_rho(GlobalC::CHR.rho[ispin], ispin, 0, ss.str(), 3, for_plot);
+                
+                if (out_wf || out_wf_r) //only for gamma_only now
+                    this->set_pw_wfc(GlobalC::pw, ik, ib, GlobalV::NSPIN, GlobalC::kv.ngk[ik],
+                        GlobalC::CHR.rho, pw_wfc_g[ik]);
+            }
+        }
+    }
+
+    if (out_wf || out_wf_r)
+    {
+        if (out_wf)
+        {
+            std::stringstream ssw;
+            ssw << GlobalV::global_out_dir << "WAVEFUNC";
+            std::cout << " write G-space wavefunction into \"" <<
+                GlobalV::global_out_dir << "/" << ssw.str() << "\" files." << std::endl;
+            WF_io::write_wfc2(ssw.str(), pw_wfc_g, GlobalC::pw.gcar);
+        }
+        if(out_wf_r)
+		    Write_Wfc_Realspace::write_wfc_realspace_1(pw_wfc_g, "wfc_realspace", false);
+        delete[] pw_wfc_g;
+    }  
+    
+    delete[] bands_picked;
+    return;
+}
+
 //for each band
 void IState_Envelope::set_pw_wfc(PW_Basis& pwb,
     const int& ik, const int& ib, const int& nspin,const int& ngk, 
@@ -172,6 +279,6 @@ void IState_Envelope::set_pw_wfc(PW_Basis& pwb,
 
     // set pw_wfc_g
     // ig2fftw: the index map from i_ngk(local) to i_ngmw(local)
-    for (int ig = 0;ig < ngk;++ig)     // is it right (check local index)???
+    for (int ig = 0;ig < ngk;++ig)
         wfc_g(ib,ig) = Porter[pwb.ig2fftw[GlobalC::wf.igk(ik, ig)]];
 }

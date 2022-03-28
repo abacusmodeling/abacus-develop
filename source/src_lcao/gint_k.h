@@ -99,6 +99,15 @@ class Gint_k : public Gint_k_init
     void cal_rho_k(double** DM_R_in);
 
     //------------------------------------------------------
+    // in gint_k_env.cpp 
+    //------------------------------------------------------
+    // calculate the envelop function via grid integrals
+    void cal_env_k(
+        int ik, 
+        const std::complex<double>* wfc_k,
+        double* rho);
+
+    //------------------------------------------------------
     // in gint_k_fvl.cpp 
     //------------------------------------------------------
     // calculate the force (many k-points).
