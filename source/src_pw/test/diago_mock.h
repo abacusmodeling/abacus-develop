@@ -154,10 +154,6 @@ namespace DIAGOTEST
 	}
 }
 
-//namespace GlobalC
-//{
-//	Hamilt hm;
-//}
 
 class HPsi
 {
