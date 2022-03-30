@@ -149,7 +149,7 @@ void Force_LCAO_gamma::allocate_gamma(const Parallel_Orbitals &pv)
     ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_y, pv.nloc);
     ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_z, pv.nloc);
     //allocate stress part in gamma_only-line, added by zhengdy-stress
-    if(GlobalV::STRESS)
+    if(GlobalV::CAL_STRESS)
     {
         this->UHM->LM->DSloc_11 = new double [pv.nloc];
         this->UHM->LM->DSloc_12 = new double [pv.nloc];
@@ -220,7 +220,7 @@ void Force_LCAO_gamma::finish_ftable_gamma(void)
     delete [] this->UHM->LM->DHloc_fixed_x;
     delete [] this->UHM->LM->DHloc_fixed_y;
     delete [] this->UHM->LM->DHloc_fixed_z;
-    if(GlobalV::STRESS)//added by zhengdy-stress
+    if(GlobalV::CAL_STRESS)//added by zhengdy-stress
     {
         delete [] this->UHM->LM->DSloc_11;
         delete [] this->UHM->LM->DSloc_12;

@@ -23,9 +23,9 @@ void Run_MD_CLASSIC::classic_md_line(void)
 
 	// Setup the unitcell.
 #ifdef __LCAO
-	ucell_c.setup_cell_classic(GlobalC::ORB, GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
+	ucell_c.setup_cell_classic(GlobalC::ORB, GlobalV::stru_file, GlobalV::ofs_running, GlobalV::ofs_warning);
 #else
-    ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
+    ucell_c.setup_cell_classic(GlobalV::stru_file, GlobalV::ofs_running, GlobalV::ofs_warning);
 #endif
 	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
@@ -57,7 +57,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
     }
 
     // md cycle
-    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::NSTEP && !verlet->stop )
+    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::MD_NSTEP && !verlet->stop )
     {
         if(verlet->step_ == 0)
         {
