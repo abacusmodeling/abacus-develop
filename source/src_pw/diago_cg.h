@@ -5,11 +5,13 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/complexmatrix.h"
 
+#include "src_pw/hamilt_pw.h"
+
 class Diago_CG
 {
 	public:
 
-    Diago_CG();
+    Diago_CG(Hamilt_PW* phamilt);
     ~Diago_CG();
 
     static int moved;
@@ -33,7 +35,7 @@ class Diago_CG
         int &notconv,
         double &avg_iter);
 
-    static void schmit_orth(
+    void schmit_orth(
         const int &dim,
         const int &dmx,
         const int &end,
@@ -43,6 +45,9 @@ class Diago_CG
     );
 
 	private:
+
+    /// temp operator pointer
+    Hamilt_PW* hpw;
 
     int test_cg;
 

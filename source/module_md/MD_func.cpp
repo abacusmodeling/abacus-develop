@@ -14,6 +14,7 @@
 
 #ifdef __LCAO
 #include "../src_lcao/run_md_lcao.h"
+Parallel_Orbitals* MD_func::ParaV = nullptr;
 #endif
 
 
@@ -225,7 +226,9 @@ void MD_func::InitPos(
 }
 
 //calculate potential, force and virial
-void MD_func::force_virial(const int &istep,
+void MD_func::force_virial(
+		ModuleESolver::ESolver *p_esolver,
+		const int &istep,
 		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,
 		double &potential,
@@ -235,7 +238,7 @@ void MD_func::force_virial(const int &istep,
 	ModuleBase::TITLE("MD_func", "force_stress");
     ModuleBase::timer::tick("MD_func", "force_stress");
 
-	if(mdp.md_potential == "LJ")
+	if(mdp.md_ensolver == "LJ")
 	{
 		bool which_method = unit_in.judge_big_cell();
 		if(which_method)
@@ -268,23 +271,23 @@ void MD_func::force_virial(const int &istep,
 								stress);
 		}
 	}
-	else if(mdp.md_potential == "DP")
+	else if(mdp.md_ensolver == "DP")
 	{
 		DP_potential::DP_pot(unit_in, potential, force, stress);
 	}
 #ifndef __CMD
-	else if(mdp.md_potential == "FP")
+	else if(mdp.md_ensolver == "FP")
 	{
 		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			Run_MD_PW md_pw;
-			md_pw.md_force_virial(istep, unit_in.nat, potential, force, stress);
+			md_pw.md_force_virial(p_esolver, istep, unit_in.nat, potential, force, stress);
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao")
 		{
-			Run_MD_LCAO md_lcao;
-			md_lcao.md_force_virial(istep, unit_in.nat, potential, force, stress);
+			Run_MD_LCAO md_lcao(*ParaV);
+			md_lcao.md_force_virial(p_esolver,istep, unit_in.nat, potential, force, stress);
 		}
 #endif
 	}

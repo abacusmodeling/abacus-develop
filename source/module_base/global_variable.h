@@ -31,7 +31,6 @@ extern int 		DIPOLE;				// 7 add dipole correction
 
 
 extern std::string   DFT_FUNCTIONAL;		// 6.5 change the DFT functional from input file.
-extern bool		DFT_META;		// whether is meta-GGA
 extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8
@@ -89,7 +88,6 @@ extern int T_IN_H; // 23, calculate T in H or not.
 extern int VL_IN_H; // 24, calculate Vl in H or not.
 extern int VNL_IN_H; // 25, calculate Vnl in H or not.
 extern int VH_IN_H; // 26, calculate Vh in H or not.
-extern int VXC_IN_H; // 27, calculate Vxc in H or not.
 extern int VION_IN_H; // 28, calculate Vion_loc in H or not.
 extern double   STRESS_THR; //LiuXh add 20180515
 
@@ -197,8 +195,20 @@ extern int test_deconstructor;
 
 extern bool FINAL_SCF; //LiuXh add 20180619
 
-extern bool out_descriptor; //caoyu add 2021-10-16 for DeePKS
-extern bool deepks_scf; //caoyu add 2021-10-16 for DeePKS
+extern bool deepks_out_labels; // (need libnpy) prints energy and force labels and descriptors for training, wenfei 2022-1-12
+extern bool deepks_scf;	//(need libnpy and libtorch) if set 1, a trained model would be needed to cal V_delta and F_delta
+extern bool deepks_bandgap; //for bandgap label. QO added 2021-12-15
+
+extern bool deepks_setorb;
+
+extern bool deepks_out_unittest; //if set 1, prints intermediate quantities that shall be used for making unit test
+
+extern std::string deepks_model;		//needed when deepks_scf=1
+
+//the following 3 are used when generating jle.orb
+extern int deepks_descriptor_lmax; //lmax used in descriptor, mohan added 2021-01-03
+extern double deepks_descriptor_rcut;
+extern double deepks_descriptor_ecut;
 
 //method for dealing with non-local potential in Hamiltonian matrix, 0 for old, 1 for new
 extern int vnl_method;

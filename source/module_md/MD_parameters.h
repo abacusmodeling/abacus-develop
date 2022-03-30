@@ -8,63 +8,63 @@ class MD_parameters
 public:
     MD_parameters()
 	{
-		rstMD = 0;
-		mdtype = 2;
-		dt = 1;
-		tfirst = 0;
-		tlast = -1;
-		dumpfreq = 1;
-		rstfreq = 1;
+		md_restart = 0;
+		md_type = 1;
+		md_dt = 1;
+		md_tfirst = 0;
+		md_tlast = -1;
+		md_dumpfreq = 1;
+		md_restartfreq = 1;
 
 		// Classic MD 
-		md_potential = "FP";
-		rcut_lj = 8.5;        
-		epsilon_lj = 0.01032; 
-		sigma_lj = 3.405;     
+		md_ensolver = "FP";
+		lj_rcut = 8.5;        
+		lj_epsilon = 0.01032; 
+		lj_sigma = 3.405;     
 
 		// MSST
-		direction = 2;
-		Qmass = 1;
-		velocity = 0;
-		viscosity = 0;
-		tscale = 0.01;
+		msst_direction = 2;
+		msst_qmass = 1;
+		msst_vel = 0;
+		msst_vis = 0;
+		msst_tscale = 0.01;
 
 		// NHC
-		tfreq = 1;
-		MNHC = 4;
+		md_tfreq = 1;
+		md_mnhc = 4;
 
 		// Langevin
-		damp = 1;
+		md_damp = 1;
 	};
     ~MD_parameters(){};
 
-    int rstMD;          // 1: restart MD, 0: no restart MD
-	int mdtype;         // -1: FIRE, 0: NVE, 1: NVT ADS, 2: NVT NHC, 3: NPT, 4: MSST 
-    double dt ;         // Time increment (hbar/E_hartree)
-    double tfirst;      // Temperature (in Hartree, 1 Hartree ~ 3E5 K)
-    double tlast;       // Target temperature
-    int dumpfreq;       // The period to dump MD information
-	int rstfreq;        // The period to output MD restart information
+    bool md_restart;              // 1: restart MD, 0: no restart MD
+	int md_type;                  // -1: FIRE, 0: NVE, 1: NVT NHC, 2: LGV, 3: NVT ADS, 4: MSST 
+    double md_dt;                 // Time increment (hbar/E_hartree)
+    double md_tfirst;             // Temperature (in Hartree, 1 Hartree ~ 3E5 K)
+    double md_tlast;              // Target temperature
+    int md_dumpfreq;              // The period to dump MD information
+	int md_restartfreq;           // The period to output MD restart information
 
 	// Classic MD               // liuyu 2021-07-30
-	std::string md_potential;   // choose potential: LJ, DP, FP
-	double rcut_lj;             // cutoff radius of LJ potential (\AA)
-	double epsilon_lj;          // the value of epsilon for LJ potential (eV)
-	double sigma_lj;            // the value of sigma for LJ potential (\AA)
+	std::string md_ensolver;    // choose potential: LJ, DP, FP
+	double lj_rcut;             // cutoff radius of LJ potential (\AA)
+	double lj_epsilon;          // the value of epsilon for LJ potential (eV)
+	double lj_sigma;            // the value of sigma for LJ potential (\AA)
 
 	// MSST
-	int direction;              // shock direction: 0, 1, 2
-	double velocity;            // shock velocity (\AA/fs)
-	double Qmass;               // cell mass-like parameter (mass^2/length^4)
-	double viscosity;           // artificial viscosity (mass/length/time)
-	double tscale;              // reduction in initial temperature (0~1)
+	int msst_direction;              // shock direction: 0, 1, 2
+	double msst_vel;            // shock msst_vel (\AA/fs)
+	double msst_qmass;               // cell mass-like parameter (mass^2/length^4)
+	double msst_vis;           // artificial msst_vis (mass/length/time)
+	double msst_tscale;              // reduction in initial temperature (0~1)
 
 	// NHC
-	double tfreq;               // Oscillation frequency, used to determine Qmass of NHC
-	int MNHC;                   // num of NHC
+	double md_tfreq;               // Oscillation frequency, used to determine msst_qmass of NHC
+	int md_mnhc;                   // num of NHC
 
 	// Langevin
-	double damp;                // damping parameter (time units)
+	double md_damp;                // damping parameter (time units)
 };
 
 

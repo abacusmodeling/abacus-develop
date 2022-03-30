@@ -8,21 +8,21 @@
 NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
     // convert to a.u. unit
-    mdp.tfreq *= ModuleBase::AU_to_FS;
+    mdp.md_tfreq *= ModuleBase::AU_to_FS;
 
-    if(mdp.tfirst == 0)
+    if(mdp.md_tfirst == 0)
     {
-        std::cout << " tfirst must be larger than 0 in NHC !!! " << std::endl;
-        ModuleBase::WARNING_QUIT("NVT_NHC", " tfirst must be larger than 0 in NHC !!! ");
+        std::cout << " md_tfirst must be larger than 0 in NHC !!! " << std::endl;
+        ModuleBase::WARNING_QUIT("NVT_NHC", " md_tfirst must be larger than 0 in NHC !!! ");
     }
 
     // init NHC
-    Q = new double [mdp.MNHC];
-	G = new double [mdp.MNHC];
-	eta = new double [mdp.MNHC];
-	veta = new double [mdp.MNHC];
+    Q = new double [mdp.md_mnhc];
+	G = new double [mdp.md_mnhc];
+	eta = new double [mdp.md_mnhc];
+	veta = new double [mdp.md_mnhc];
 
-    for(int i=0; i<mdp.MNHC; ++i)
+    for(int i=0; i<mdp.md_mnhc; ++i)
     {
         eta[i] = veta[i] = G[i] = 0;
     }
@@ -46,18 +46,18 @@ NVT_NHC::~NVT_NHC()
     delete []veta;
 }
 
-void NVT_NHC::setup()
+void NVT_NHC::setup(ModuleESolver::ESolver *p_ensolve)
 {
     ModuleBase::TITLE("NVT_NHC", "setup");
     ModuleBase::timer::tick("NVT_NHC", "setup");
 
-    Verlet::setup();
+    Verlet::setup(p_ensolve);
 
     temp_target();
     
     update_mass();
     
-    for(int m=1; m<mdp.MNHC; ++m)
+    for(int m=1; m<mdp.md_mnhc; ++m)
     {
         G[m] = (Q[m-1]*veta[m-1]*veta[m-1]-t_target) / Q[m];
     }
@@ -106,13 +106,13 @@ void NVT_NHC::write_restart()
 		std::ofstream file(ssc.str().c_str());
 
         file << step_ + step_rst_ << std::endl;
-        file << mdp.MNHC << std::endl;
-        for(int i=0; i<mdp.MNHC; ++i)
+        file << mdp.md_mnhc << std::endl;
+        for(int i=0; i<mdp.md_mnhc; ++i)
         {
             file << eta[i] << "   ";
         }
         file << std::endl;
-        for(int i=0; i<mdp.MNHC; ++i)
+        for(int i=0; i<mdp.md_mnhc; ++i)
         {
             file << veta[i] << "   ";
         }
@@ -138,16 +138,16 @@ void NVT_NHC::restart()
 		}
         double Mnum;
 		file >> step_rst_ >> Mnum;
-        if(Mnum != mdp.MNHC)
+        if(Mnum != mdp.md_mnhc)
 		{
 			std::cout<< "Num of NHC is not the same !" << std::endl;
             ModuleBase::WARNING_QUIT("NVT_NHC", "no Restart_md.dat ！");
 		}
-        for(int i=0; i<mdp.MNHC; ++i)
+        for(int i=0; i<mdp.md_mnhc; ++i)
         {
             file >> eta[i];
         }
-        for(int i=0; i<mdp.MNHC; ++i)
+        for(int i=0; i<mdp.md_mnhc; ++i)
         {
             file >> veta[i];
         }
@@ -157,8 +157,8 @@ void NVT_NHC::restart()
 
 #ifdef __MPI
 	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(eta, mdp.MNHC, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(veta, mdp.MNHC, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(eta, mdp.md_mnhc, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(veta, mdp.md_mnhc, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 #endif
 }
 
@@ -185,12 +185,12 @@ void NVT_NHC::integrate()
     {
         for(int j=0; j<nsy; ++j)
         {
-            double delta = w[j] * mdp.dt / nc;
+            double delta = w[j] * mdp.md_dt / nc;
 
             // propogate veta
-            veta[mdp.MNHC-1] += G[mdp.MNHC-1] * delta /4.0;
+            veta[mdp.md_mnhc-1] += G[mdp.md_mnhc-1] * delta /4.0;
 
-            for(int m=mdp.MNHC-2; m>=0; --m)
+            for(int m=mdp.md_mnhc-2; m>=0; --m)
             {
                 double aa = exp(-veta[m]*delta/8.0);
                 veta[m] = veta[m] * aa * aa + G[m] * aa * delta /4.0;
@@ -210,20 +210,20 @@ void NVT_NHC::integrate()
             }
 
             // propogate eta
-            for(int m=0; m<mdp.MNHC; ++m)
+            for(int m=0; m<mdp.md_mnhc; ++m)
             {
                 eta[m] += veta[m] * delta / 2.0;
             }
 
             // propogate veta
-            for(int m=0; m<mdp.MNHC-1; ++m)
+            for(int m=0; m<mdp.md_mnhc-1; ++m)
             {
                 double aa = exp(-veta[m+1]*delta/8.0);
                 veta[m] = veta[m] * aa * aa + G[m] * aa * delta /4.0;
 
                 G[m+1] = (Q[m]*veta[m]*veta[m]-t_target) / Q[m+1];
             }
-            veta[mdp.MNHC-1] += G[mdp.MNHC-1] * delta /4.0;
+            veta[mdp.md_mnhc-1] += G[mdp.md_mnhc-1] * delta /4.0;
         }
     }
     
@@ -236,14 +236,14 @@ void NVT_NHC::integrate()
 void NVT_NHC::temp_target()
 {
     double delta = (double)(step_ + step_rst_) / GlobalV::NSTEP;
-    t_target = mdp.tfirst + delta * (mdp.tlast - mdp.tfirst);
+    t_target = mdp.md_tfirst + delta * (mdp.md_tlast - mdp.md_tfirst);
 }
 
 void NVT_NHC::update_mass()
 {
-    Q[0] = (3*ucell.nat - frozen_freedom_) * t_target / mdp.tfreq / mdp.tfreq;
-    for(int m=1; m<mdp.MNHC; ++m)
+    Q[0] = (3*ucell.nat - frozen_freedom_) * t_target / mdp.md_tfreq / mdp.md_tfreq;
+    for(int m=1; m<mdp.md_mnhc; ++m)
     {
-        Q[m] = t_target / mdp.tfreq / mdp.tfreq;
+        Q[m] = t_target / mdp.md_tfreq / mdp.md_tfreq;
     }
 }

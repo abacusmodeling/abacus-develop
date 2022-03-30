@@ -26,8 +26,7 @@ mixing_beta             0.4
 #Parameters (6.Deepks)
 force			1
 test_force			1
-out_descriptor          1
-lmax_descriptor			2
-newdm		1
+deepks_out_labels          1
+deepks_descriptor_lmax			2
 deepks_scf	1
-model_file	model.ptg
+deepks_model	model.ptg

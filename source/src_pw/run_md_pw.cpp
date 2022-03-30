@@ -1,13 +1,5 @@
 #include "run_md_pw.h"
-#include "forces.h"
-#include "stress_pw.h"
 #include "global.h" // use chr.
-#include "vdwd2.h"
-#include "vdwd3.h"
-#include "vdwd2_parameters.h"
-#include "vdwd3_parameters.h"
-#include "pw_complement.h"
-#include "pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../module_md/MD_func.h"
 #include "../module_md/FIRE.h"
@@ -25,7 +17,7 @@ Run_MD_PW::Run_MD_PW()
 
 Run_MD_PW::~Run_MD_PW(){}
 
-void Run_MD_PW::md_ions_pw(void)
+void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("Run_MD_PW", "md_ions_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
@@ -48,29 +40,29 @@ void Run_MD_PW::md_ions_pw(void)
     // allocation for ion movement.
     CE.allocate_ions();
 
-    // determine the mdtype
+    // determine the md_type
     Verlet *verlet;
-    if(INPUT.mdp.mdtype == -1)
+    if(INPUT.mdp.md_type == -1)
     {
         verlet = new FIRE(INPUT.mdp, GlobalC::ucell); 
     }
-    else if(INPUT.mdp.mdtype == 0)
+    else if(INPUT.mdp.md_type == 0)
     {
         verlet = new NVE(INPUT.mdp, GlobalC::ucell); 
     }
-    else if(INPUT.mdp.mdtype==1)
-    {
-        verlet = new NVT_ADS(INPUT.mdp, GlobalC::ucell);
-    }
-    else if(INPUT.mdp.mdtype==2)
+    else if(INPUT.mdp.md_type==1)
     {
         verlet = new NVT_NHC(INPUT.mdp, GlobalC::ucell);
     }
-    else if(INPUT.mdp.mdtype == 3)
+    else if(INPUT.mdp.md_type==2)
     {
         verlet = new Langevin(INPUT.mdp, GlobalC::ucell);
     }
-    else if(INPUT.mdp.mdtype==4)
+    else if(INPUT.mdp.md_type == 3)
+    {
+        verlet = new NVT_ADS(INPUT.mdp, GlobalC::ucell);
+    }
+    else if(INPUT.mdp.md_type==4)
     {
         verlet = new MSST(INPUT.mdp, GlobalC::ucell); 
         cellchange = true;
@@ -81,7 +73,7 @@ void Run_MD_PW::md_ions_pw(void)
     {
         if(verlet->step_ == 0)
         {
-            verlet->setup();
+            verlet->setup(p_esolver);
         }
         else
         {
@@ -113,7 +105,7 @@ void Run_MD_PW::md_ions_pw(void)
             GlobalC::wf.wfcinit();
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
+            MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 
@@ -122,7 +114,7 @@ void Run_MD_PW::md_ions_pw(void)
             verlet->stress += verlet->virial;
         }
 
-        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.dumpfreq == 0)
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
             Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
             verlet->outputMD();
@@ -130,7 +122,7 @@ void Run_MD_PW::md_ions_pw(void)
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
 
-        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.rstfreq == 0)
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_restartfreq == 0)
         {
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
@@ -159,81 +151,14 @@ void Run_MD_PW::md_ions_pw(void)
     return;
 }
 
-void Run_MD_PW::md_cells_pw()
+void Run_MD_PW::md_cells_pw(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("Run_MD_PW", "md_cells_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 
-    GlobalC::wf.allocate(GlobalC::kv.nks);
-
-    GlobalC::UFFT.allocate();
-
-    //=======================
-    // init pseudopotential
-    //=======================
-    GlobalC::ppcell.init(GlobalC::ucell.ntype);
-
-    //=====================
-    // init hamiltonian
-    // only allocate in the beginning of ELEC LOOP!
-    //=====================
-    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
-
-    //=================================
-    // initalize local pseudopotential
-    //=================================
-    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
-
-    //======================================
-    // Initalize non local pseudopotential
-    //======================================
-    GlobalC::ppcell.init_vnl(GlobalC::ucell);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
-
-    //=========================================================
-    // calculate the total local pseudopotential in real space
-    //=========================================================
-    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
-
-    GlobalC::pot.newd();
-
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
-
-    //==================================================
-    // create GlobalC::ppcell.tab_at , for trial wave functions.
-    //==================================================
-    GlobalC::wf.init_at_1();
-
-    //================================
-    // Initial start wave functions
-    //================================
-    if (GlobalV::NBANDS != 0 ) // liuyu update 2021-12-10
-    {
-        GlobalC::wf.wfcinit();
-    }
-#ifdef __LCAO
-    switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
-    {
-    case Exx_Global::Hybrid_Type::HF:
-    case Exx_Global::Hybrid_Type::PBE0:
-    case Exx_Global::Hybrid_Type::HSE:
-        GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &GlobalC::ucell);
-        break;
-    case Exx_Global::Hybrid_Type::No:
-        break;
-    case Exx_Global::Hybrid_Type::Generate_Matrix:
-    default:
-        throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-    }
-#endif
-
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
-
     // ion optimization begins
     // electron density optimization is included in ion optimization
-
-    this->md_ions_pw();
+    this->md_ions_pw(p_esolver);
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
@@ -244,6 +169,7 @@ void Run_MD_PW::md_cells_pw()
 }
 
 void Run_MD_PW::md_force_virial(
+    ModuleESolver::ESolver *p_esolver,
     const int &istep,
     const int& numIon, 
     double &potential, 
@@ -282,12 +208,15 @@ void Run_MD_PW::md_force_virial(
     {
         Electrons elec;
 #ifdef __LCAO
+#ifdef __MPI
         if (Exx_Global::Hybrid_Type::No == GlobalC::exx_global.info.hybrid_type)
         {
+#endif
 #endif
             elec.self_consistent(istep);
             eiter = elec.iter;
 #ifdef __LCAO
+#ifdef __MPI
         }
         else if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
         {
@@ -303,7 +232,7 @@ void Run_MD_PW::md_force_virial(
                     eiter += elec.iter;
                     if (elec.iter == 1 || hybrid_step == GlobalC::exx_global.info.hybrid_step - 1) // exx converge
                         break;
-                    GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+                    XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                     GlobalC::exx_lip.cal_exx();
                 }
             }
@@ -311,12 +240,13 @@ void Run_MD_PW::md_force_virial(
             {
                 elec.self_consistent(istep);
                 eiter += elec.iter;
-                GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
+                XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                 elec.self_consistent(istep);
                 eiter += elec.iter;
             }
         }
-#endif
+#endif // __MPI
+#endif // __LCAO
     }
     // mohan added 2021-01-28, perform stochastic calculations
     else if (GlobalV::CALCULATION == "md-sto")
@@ -327,8 +257,9 @@ void Run_MD_PW::md_force_virial(
     }
 
     ModuleBase::matrix fcs;
-	Forces ff;
-	ff.init(fcs);
+	// Forces ff;
+	// ff.init(fcs);
+    p_esolver->cal_Force(fcs);
 
 	for(int ion=0;ion<numIon;ion++)
     {
@@ -339,8 +270,9 @@ void Run_MD_PW::md_force_virial(
 
 	if(GlobalV::STRESS)
 	{
-		Stress_PW ss;
-		ss.cal_stress(virial);
+		// Stress_PW ss;
+		// ss.cal_stress(virial);
+        p_esolver->cal_Stress(virial);
         virial = 0.5 * virial;
 	}
 

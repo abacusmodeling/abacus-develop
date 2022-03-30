@@ -43,7 +43,6 @@ list(APPEND objects
     gint_k_vl.cpp
     gint_tools.cpp
     global_fp.cpp
-    grid_base.cpp
     grid_base_beta.cpp
     grid_bigcell.cpp
     grid_meshball.cpp
@@ -53,7 +52,7 @@ list(APPEND objects
     local_orbital_charge.cpp
     local_orbital_wfc.cpp
     record_adj.cpp
-    wfc_dm_2d.cpp
+    dm_2d.cpp
     wavefunc_in_pw.cpp
 	H_TDDFT_pw.cpp
     run_md_lcao.cpp

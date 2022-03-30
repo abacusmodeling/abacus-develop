@@ -198,9 +198,6 @@ void Electrons::self_consistent(const int &istep)
 		if (GlobalV::FINAL_SCF && iter == 1)
 		{
 			init_mixstep_final_scf();
-			// GlobalC::CHR.irstep=0;
-			// GlobalC::CHR.idstep=0;
-			// GlobalC::CHR.totstep=0;
 		}
 
 		// mohan move harris functional to here, 2012-06-05
@@ -211,11 +208,10 @@ void Electrons::self_consistent(const int &istep)
 
 		// calculate exact-exchange
 #ifdef __LCAO
-		switch (GlobalC::xcf.iexch_now) // Peize Lin add 2019-03-09
+		if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
+			Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
 		{
-		case 5:
-		case 6:
-		case 9:
 			if (!GlobalC::exx_global.info.separate_loop)
 			{
 				GlobalC::exx_lip.cal_exx();

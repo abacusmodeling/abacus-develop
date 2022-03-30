@@ -3,6 +3,7 @@
 #include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
 #include "../module_base/timer.h"
+#include "../module_base/constants.h"
 
 #ifndef __CELL
 #include "../src_pw/global.h"
@@ -95,7 +96,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			}
 		}	
 		// caoyu add 2021-03-16
-		if(GlobalV::out_descriptor)
+		if(GlobalV::deepks_setorb)
 		{
 			if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
 				ifa >> orb.descriptor_file;
@@ -108,6 +109,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 
 	// Peize Lin add 2016-09-23
 #ifndef __CELL
+#ifdef __MPI 
 	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
 	    Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
 		Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
@@ -122,8 +124,9 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			}
 		}
 	}
-#endif
-#endif
+#endif // __MPI
+#endif // __CELL
+#endif // __LCAO
 	//==========================
 	// read in lattice constant
 	//==========================
@@ -425,6 +428,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 #ifndef __CMD
 
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
+#endif
 
 #ifndef __SYMMETRY
 			//===========================================
@@ -541,7 +545,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			} // end basis type
 #endif
 
-#else
+#ifdef __CMD
 			ifpos.ignore(150, '\n');
 #endif
 

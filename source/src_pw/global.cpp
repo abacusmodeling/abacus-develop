@@ -12,12 +12,13 @@ energy en;
 wavefunc wf;
 Hamilt hm;
 #ifdef __LCAO
+#ifdef __MPI
 Exx_Global exx_global;
 Exx_Lip exx_lip(exx_global.info);
 #endif
+#endif
 pseudopot_cell_vnl ppcell;
 UnitCell_pseudo ucell;
-xcfunc xcf;
 Charge_Broyden CHR;
 Potential pot;
 ModuleSymmetry::Symmetry symm;

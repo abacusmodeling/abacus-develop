@@ -184,16 +184,19 @@ void Electrons::self_consistent(const int &istep)
 		// first_iter_again:					// Peize Lin delete 2019-05-01
 
 		// calculate exact-exchange
+#ifdef __MPI //liyuanbo 2022/2/23
 #ifdef __LCAO
-		switch(GlobalC::xcf.iexch_now)						// Peize Lin add 2019-03-09
-		{
-			case 5:    case 6:   case 9:
-				if( !GlobalC::exx_global.info.separate_loop )
-				{
-					GlobalC::exx_lip.cal_exx();
-				}
-				break;
+		if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
+			Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
+        {
+            if( !GlobalC::exx_global.info.separate_loop )
+            {
+                GlobalC::exx_lip.cal_exx();
+            }
+            break;
 		}
+#endif
 #endif
         //(2) save change density as previous charge,
         // prepared fox mixing.
@@ -229,7 +232,9 @@ void Electrons::self_consistent(const int &istep)
 
 		// add exx
 #ifdef __LCAO
+#ifdef __MPI
 		GlobalC::en.set_exx();		// Peize Lin add 2019-03-09
+#endif
 #endif
 
 		//(6) calculate the delta_harris energy

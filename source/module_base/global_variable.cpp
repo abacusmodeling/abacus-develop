@@ -29,8 +29,7 @@ std::string	CALCULATION = "scf";
 int		EFIELD = 0; // 5: add electric field
 int		DIPOLE = 0; // 7: add dipole field
 
-std::string  DFT_FUNCTIONAL = "none";
-bool	DFT_META = 0;
+std::string  DFT_FUNCTIONAL = "default";
 int 	NSPIN = 1; // LDA
 bool	TWO_EFERMI = 0; // two fermi energy, exist only magnetization is fixed.
 int 	CURRENT_SPIN = 0;
@@ -76,7 +75,6 @@ int T_IN_H = 1; // mohan add 2010-11-28
 int VL_IN_H = 1;
 int VNL_IN_H = 1;
 int VH_IN_H = 1;
-int VXC_IN_H = 1;
 int VION_IN_H = 1;
 int ZEEMAN_IN_H = 1;
 double  STRESS_THR = 1.0e-2; //LiuXh add 20180515
@@ -181,8 +179,12 @@ double soc_lambda = 1.0;
 
 bool FINAL_SCF = false; //LiuXh add 20180619
 
-bool out_descriptor = false; //caoyu add 2021-10-16 for DeePKS
-bool deepks_scf = false; //caoyu add 2021-10-16 for DeePKS
+bool deepks_out_labels = false; //caoyu add 2021-10-16 for DeePKS, wenfei 2022-1-16
+bool deepks_scf = false; //caoyu add 2021-10-16 for DeePKS, wenfei 2022-1-16
+bool deepks_bandgap = false; //for bandgap label. QO added 2021-12-15
+bool deepks_out_unittest = false;
+
+bool deepks_setorb = false;
 
 int vnl_method = 1; //set defauld vnl method as old, added by zhengdy 2021-10-11
 
