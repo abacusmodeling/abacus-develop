@@ -44,6 +44,7 @@ double PRESSURE = 0.0;
 std::string	RELAX_METHOD = "bfgs";
 std::string  OUT_LEVEL = "ie";
 int		RELAX_NMAX = 20;
+int     MD_NSTEP = 20;
 int 	SCF_NMAX = 50;
 
 std::string	BASIS_TYPE = "pw"; //xiaohui add 2013-09-01

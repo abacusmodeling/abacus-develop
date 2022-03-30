@@ -48,6 +48,7 @@ extern std::string	OUT_LEVEL;
 
 extern int		RELAX_NMAX;				// 8.3
 extern int 		SCF_NMAX;				// 8.4
+extern int      MD_NSTEP;
 
 extern std::string	BASIS_TYPE; //xiaohui add 2013-09-01
 extern std::string	KS_SOLVER; //xiaohui add 2013-09-01

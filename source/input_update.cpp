@@ -147,6 +147,15 @@ bool Update_input::Read(const std::string &fn)
     			GlobalV::RELAX_NMAX = this->relax_nmax;
 			}
         }
+        else if (strcmp("md_nstep", word) == 0)
+        {
+            read_value(ifs, md_nstep);
+			if(md_nstep!=GlobalV::MD_NSTEP)
+			{
+				this->change(GlobalV::ofs_warning, "md_nstep", GlobalV::MD_NSTEP, md_nstep);
+    			GlobalV::MD_NSTEP = this->md_nstep;
+			}
+        }
 		// 7
         else if (strcmp("mixing_beta", word) == 0)
         {
@@ -286,7 +295,7 @@ void Update_input::Bcast()
 	Parallel_Common::bcast_int( GlobalC::en.out_dos );
     Parallel_Common::bcast_double( GlobalC::CHR.nelec );
 	
-
+    Parallel_Common::bcast_int( GlobalV::MD_NSTEP );
     return;
 }
 #endif

@@ -10,7 +10,7 @@ gamma_only          1
 calculation         md
 symmetry            0
 
-relax_nmax               10
+md_nstep               10
 out_level           m
 relax_method         cg
 

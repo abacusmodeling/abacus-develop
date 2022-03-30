@@ -17,7 +17,6 @@ gamma_only          1
 calculation         md
 symmetry            0
 
-relax_nmax               10
 out_level           m
 relax_method         cg
 
@@ -33,6 +32,7 @@ basis_type          lcao
 mixing_beta         0.4
 chg_extrap       second-order
 
+md_nstep          10   // md steps
 md_type           1    //choose ensemble
 md_dt               1    //time step
 md_tfirst           700  //the first target temperature

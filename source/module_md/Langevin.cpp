@@ -83,6 +83,6 @@ void Langevin::post_force()
 
 void Langevin::temp_target()
 {
-    double delta = (double)(step_ + step_rst_) / GlobalV::RELAX_NMAX;
+    double delta = (double)(step_ + step_rst_) / GlobalV::MD_NSTEP;
     t_target = mdp.md_tfirst + delta * (mdp.md_tlast - mdp.md_tfirst);
 }

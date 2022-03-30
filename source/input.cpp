@@ -213,7 +213,7 @@ void Input::Default(void)
 //----------------------------------------------------------
     scf_thr_rho = 1.0e-9;
     scf_nmax = 40;
-    this->relax_nmax = 0;
+    relax_nmax = 0;
 	out_stru = 0;
 //----------------------------------------------------------
 // occupation
@@ -1032,6 +1032,10 @@ bool Input::Read(const std::string &fn)
 		else if (strcmp("md_type",word) == 0)
 		{
 			read_value(ifs, mdp.md_type);
+		}
+        else if (strcmp("md_nstep",word) == 0)
+		{
+			read_value(ifs, mdp.md_nstep);
 		}
 		else if (strcmp("md_dt",word) == 0)
 		{
@@ -1894,6 +1898,7 @@ void Input::Bcast()
 */
 	//zheng daye add 2014/5/5
         Parallel_Common::bcast_int(mdp.md_type);
+        Parallel_Common::bcast_int(mdp.md_nstep);
         Parallel_Common::bcast_double(mdp.md_dt);
         Parallel_Common::bcast_int(mdp.md_mnhc);
         Parallel_Common::bcast_double(mdp.msst_qmass);
@@ -2177,9 +2182,10 @@ void Input::Check(void)
 		GlobalV::CALCULATION = "md";
 		symmetry = false;
 		cal_force = 1;
-		if(this->relax_nmax==0){
-			GlobalV::ofs_running<<"relax_nmax should be set. Autoset relax_nmax to 50!"<<endl;
-			this->relax_nmax = 50;
+		if(mdp.md_nstep == 0)
+        {
+			GlobalV::ofs_running<<"md_nstep should be set. Autoset md_nstep to 50!"<<endl;
+			mdp.md_nstep = 50;
 		}
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
 
@@ -2188,23 +2194,23 @@ void Input::Check(void)
         if(mdp.md_dt < 0) ModuleBase::WARNING_QUIT("Input::Check","time interval of MD calculation should be set!");
         if(mdp.md_tfirst < 0) ModuleBase::WARNING_QUIT("Input::Check","temperature of MD calculation should be set!");
         if(mdp.md_tlast  < 0.0) mdp.md_tlast = mdp.md_tfirst;
-        if(mdp.md_tfirst!=mdp.md_tlast)
-        {
-            std::ifstream file1;
-            file1.open("ChangeTemp.dat");
-            if(!file1)                      // Peize Lin fix bug 2016-08-06
-           {
-                std::ofstream file;
-                file.open("ChangeTemp.dat");
-                for(int ii=0;ii<30;ii++)
-                {
-                    file<<mdp.md_tfirst+(mdp.md_tlast-mdp.md_tfirst)/double(30)*double(ii+1)<<" ";
-                }
-                file.close();
-            }
-            else
-                file1.close();
-        }
+        // if(mdp.md_tfirst!=mdp.md_tlast)
+        // {
+        //     std::ifstream file1;
+        //     file1.open("ChangeTemp.dat");
+        //     if(!file1)                      // Peize Lin fix bug 2016-08-06
+        //    {
+        //         std::ofstream file;
+        //         file.open("ChangeTemp.dat");
+        //         for(int ii=0;ii<30;ii++)
+        //         {
+        //             file<<mdp.md_tfirst+(mdp.md_tlast-mdp.md_tfirst)/double(30)*double(ii+1)<<" ";
+        //         }
+        //         file.close();
+        //     }
+        //     else
+        //         file1.close();
+        // }
 
 	}
 	else if(calculation == "cell-relax") // mohan add 2011-11-04

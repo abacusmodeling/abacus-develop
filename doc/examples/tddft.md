@@ -23,7 +23,7 @@ smearing_sigma 0.02
 basis_type lcao
 out_chg 1
 gamma_only 0
-relax_nmax 2000
+md_nstep 2000
 scf_thr_rho 1.0e-6
 md_type 0
 md_dt 0.01

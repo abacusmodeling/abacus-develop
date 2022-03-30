@@ -30,6 +30,7 @@ private:
     double scf_thr_rho;				// \sum |rhog_out - rhog_in |^2
     int scf_nmax;				// number of max elec iter
     int relax_nmax;				// number of max ionic iter
+    int md_nstep;               // number of md steps
     double mixing_beta;		// 0 : no_mixing
 	int printe;
 	//int chg_extrap;	// mohan add 2011-03-13, xiaohui modify 2015-02-01

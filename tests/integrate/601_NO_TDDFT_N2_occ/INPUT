@@ -17,7 +17,7 @@ smearing_sigma			0.02
 basis_type		lcao
 out_chg		1
 gamma_only		0
-relax_nmax			1
+md_nstep			1
 
 cal_stress                  1
 stress_thr              1e-6

@@ -114,7 +114,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
     }
 
     // md cycle
-    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::RELAX_NMAX && !verlet->stop)
+    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::MD_NSTEP && !verlet->stop)
     {
         if(verlet->step_ == 0)
         {

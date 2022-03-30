@@ -11,7 +11,7 @@ scf_nmax			50
 scf_thr_rho             1.0e-6
 
 basis_type		lcao
-relax_nmax           3
+md_nstep           3
 
 cal_stress          1
 stress_thr      1e-6
