@@ -11,11 +11,11 @@ pseudo_type     upf201
 
 #Parameters (2.Iteration)
 ecutwfc			20
-scf_thr				1e-9
+scf_thr_rho				1e-9
 scf_nmax			100
 
 #Parameters (3.Relaxation)
-relax_nstep           2
+relax_nmax           2
 cal_force           1
 force_thr_ev    0.01
 relax_method     cg

@@ -3,10 +3,10 @@
 //#include "../../src_develop/src_wannier/eximport.h"
 
 //qianrui add 2020-10-15
-/*inline int getink(const int &ik,const int &ipool,const int &nktot,const int &pw_kpar)
+/*inline int getink(const int &ik,const int &ipool,const int &nktot,const int &kpar)
 {
-    int nkp=nktot/pw_kpar;
-    int rem=nktot%pw_kpar;
+    int nkp=nktot/kpar;
+    int rem=nktot%kpar;
     if(ipool<rem)
     {
         return ipool*nkp+ipool+ik;
@@ -91,7 +91,7 @@ void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *p
 
 	
     // out put the wave functions in plane wave basis.
-	for(int ip=0; ip<GlobalV::PW_KPAR; ip++)
+	for(int ip=0; ip<GlobalV::KPAR; ip++)
 	{
         if( GlobalV::MY_POOL == ip )
 		{
@@ -108,7 +108,7 @@ void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *p
                 ikstot=ik;
 #endif
 #ifdef __MPI
-                //int ikstot=getink(ik,ip,GlobalC::kv.nkstot,GlobalV::PW_KPAR);
+                //int ikstot=getink(ik,ip,GlobalC::kv.nkstot,GlobalV::KPAR);
 				for( int id=0; id<GlobalV::NPROC_IN_POOL; id++)
 				{
 					MPI_Barrier(POOL_WORLD);

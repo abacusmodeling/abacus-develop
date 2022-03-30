@@ -115,7 +115,7 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 	{
 		for(int m=0;m<3;m++)
 		{
-			Parallel_Reduce::reduce_double_all( s_kin[l][m] ); //qianrui fix a bug for pw_kpar > 1
+			Parallel_Reduce::reduce_double_all( s_kin[l][m] ); //qianrui fix a bug for kpar > 1
 		}
 	}
 

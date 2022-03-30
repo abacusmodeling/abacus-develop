@@ -126,7 +126,7 @@ void Input::Default(void)
 	nche_sto = 0;
 	seed_sto = 0;
 	stotype = "pw";
-	pw_kpar = 1;
+	kpar = 1;
     berry_phase = false;
 	gdir = 3;
 	towannier90 = false;
@@ -163,14 +163,14 @@ void Input::Default(void)
 	cal_stress=false;
 	fixed_axes = "None"; // pengfei 2018-11-9
 	relax_method="cg"; // pengfei  2014-10-13
-    relax_cg_thr=0.5; // pengfei add 2013-08-15
+    relax_cg_thr_e=0.5; // pengfei add 2013-08-15
 	out_level="ie";
     out_md_control = false;
-	bfgs_w1 = 0.01;		// mohan add 2011-03-13
-	bfgs_w2 = 0.5;
-	bfgs_rmax = 0.8; // bohr
-	bfgs_rmin = 1e-5;
-	bfgs_init = 0.5; //bohr
+	relax_bfgs_w1 = 0.01;		// mohan add 2011-03-13
+	relax_bfgs_w2 = 0.5;
+	relax_bfgs_rmax = 0.8; // bohr
+	relax_bfgs_rmin = 1e-5;
+	relax_bfgs_init = 0.5; //bohr
 	nbspline = -1;
 //----------------------------------------------------------
 // ecutwfc
@@ -211,9 +211,9 @@ void Input::Default(void)
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
-    scf_thr = 1.0e-9;
+    scf_thr_rho = 1.0e-9;
     scf_nmax = 40;
-    this->relax_nstep = 0;
+    this->relax_nmax = 0;
 	out_stru = 0;
 //----------------------------------------------------------
 // occupation
@@ -329,7 +329,7 @@ void Input::Default(void)
 // tddft
 //----------------------------------------------------------
 	tddft=0;
-	td_scf_thr = 1e-9;
+	td_scf_thr_rho = 1e-9;
 	td_dt = 0.02;
 	td_force_dt = 0.02;
 	td_val_elec_01=1;
@@ -529,9 +529,9 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, stotype);
         }
-        else if (strcmp("pw_kpar", word) == 0)// number of pools
+        else if (strcmp("kpar", word) == 0)// number of pools
         {
-            read_value(ifs, pw_kpar);
+            read_value(ifs, kpar);
         }
         else if (strcmp("berry_phase", word) == 0)// berry phase calculation
         {
@@ -665,34 +665,34 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, relax_method);
         }
-        else if (strcmp("relax_cg_thr",word) == 0) // pengfei add 2013-08-15
+        else if (strcmp("relax_cg_thr_e",word) == 0) // pengfei add 2013-08-15
         {
-            read_value(ifs, relax_cg_thr);
+            read_value(ifs, relax_cg_thr_e);
         }
         else if (strcmp("out_level", word) == 0)
         {
             read_value(ifs, out_level);
             out_md_control = true;
         }
-        else if (strcmp("bfgs_w1", word) == 0)
+        else if (strcmp("relax_bfgs_w1", word) == 0)
         {
-            read_value(ifs, bfgs_w1);
+            read_value(ifs, relax_bfgs_w1);
         }
-        else if (strcmp("bfgs_w2", word) == 0)
+        else if (strcmp("relax_bfgs_w2", word) == 0)
         {
-            read_value(ifs, bfgs_w2);
+            read_value(ifs, relax_bfgs_w2);
         }
-        else if (strcmp("bfgs_rmax", word) == 0)
+        else if (strcmp("relax_bfgs_rmax", word) == 0)
         {
-            read_value(ifs, bfgs_rmax);
+            read_value(ifs, relax_bfgs_rmax);
         }
-        else if (strcmp("bfgs_rmin", word) == 0)
+        else if (strcmp("relax_bfgs_rmin", word) == 0)
         {
-            read_value(ifs, bfgs_rmin);
+            read_value(ifs, relax_bfgs_rmin);
         }
-        else if (strcmp("bfgs_init", word) == 0)
+        else if (strcmp("relax_bfgs_init", word) == 0)
         {
-            read_value(ifs, bfgs_init);
+            read_value(ifs, relax_bfgs_init);
         }
 //		else if (strcmp("gauss_pao_flag", word) == 0)
 //		else if (strcmp("gauss_pao_flag", word) == 0)
@@ -815,17 +815,17 @@ bool Input::Read(const std::string &fn)
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
-        else if (strcmp("scf_thr", word) == 0)
+        else if (strcmp("scf_thr_rho", word) == 0)
         {
-            read_value(ifs, scf_thr);
+            read_value(ifs, scf_thr_rho);
         }
         else if (strcmp("scf_nmax", word) == 0)
         {
             read_value(ifs, scf_nmax);
         }
-        else if (strcmp("relax_nstep", word) == 0)
+        else if (strcmp("relax_nmax", word) == 0)
         {
-            read_value(ifs, this->relax_nstep);
+            read_value(ifs, this->relax_nmax);
         }
         else if (strcmp("out_stru", word) == 0)
         {
@@ -1118,9 +1118,9 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs,tddft );
 		}
-		else if (strcmp("td_scf_thr", word) == 0)
+		else if (strcmp("td_scf_thr_rho", word) == 0)
 		{
-			read_value(ifs,td_scf_thr );
+			read_value(ifs,td_scf_thr_rho );
 		}
 		else if (strcmp("td_dt", word) == 0)
 		{
@@ -1754,7 +1754,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( emax_sto );
 	Parallel_Common::bcast_double( emin_sto );
 	Parallel_Common::bcast_string( stotype );
-	Parallel_Common::bcast_int( pw_kpar );
+	Parallel_Common::bcast_int( kpar );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );
 	Parallel_Common::bcast_bool(towannier90);
@@ -1787,14 +1787,14 @@ void Input::Bcast()
     Parallel_Common::bcast_bool( cal_stress );
 	Parallel_Common::bcast_string( fixed_axes );
     Parallel_Common::bcast_string( relax_method );
-    Parallel_Common::bcast_double( relax_cg_thr); // pengfei add 2013-08-15
+    Parallel_Common::bcast_double( relax_cg_thr_e); // pengfei add 2013-08-15
 	Parallel_Common::bcast_string( out_level);
     Parallel_Common::bcast_bool( out_md_control);
-    Parallel_Common::bcast_double( bfgs_w1);
-    Parallel_Common::bcast_double( bfgs_w2);
-    Parallel_Common::bcast_double( bfgs_rmax);
-    Parallel_Common::bcast_double( bfgs_rmin);
-    Parallel_Common::bcast_double( bfgs_init);
+    Parallel_Common::bcast_double( relax_bfgs_w1);
+    Parallel_Common::bcast_double( relax_bfgs_w2);
+    Parallel_Common::bcast_double( relax_bfgs_rmax);
+    Parallel_Common::bcast_double( relax_bfgs_rmin);
+    Parallel_Common::bcast_double( relax_bfgs_init);
 
     Parallel_Common::bcast_bool( gamma_only );
     Parallel_Common::bcast_bool( gamma_only_local );
@@ -1828,9 +1828,9 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( test_force );
 	Parallel_Common::bcast_int( test_stress );
 
-    Parallel_Common::bcast_double( scf_thr );
+    Parallel_Common::bcast_double( scf_thr_rho );
     Parallel_Common::bcast_int( scf_nmax );
-    Parallel_Common::bcast_int( this->relax_nstep );
+    Parallel_Common::bcast_int( this->relax_nmax );
 	Parallel_Common::bcast_int( out_stru ); //mohan add 2012-03-23
 
     //Parallel_Common::bcast_string( occupations );
@@ -1951,7 +1951,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int(td_val_elec_01);
 	Parallel_Common::bcast_int(td_val_elec_02);
 	Parallel_Common::bcast_int(td_val_elec_03);
-	Parallel_Common::bcast_double(td_scf_thr);
+	Parallel_Common::bcast_double(td_scf_thr_rho);
 	Parallel_Common::bcast_double(td_dt);
 	Parallel_Common::bcast_double(td_force_dt);
 	Parallel_Common::bcast_int(td_vext);
@@ -2084,7 +2084,7 @@ void Input::Check(void)
 			std::cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<std::endl;
 		}
 */
-                this->relax_nstep = 1;
+                this->relax_nmax = 1;
 
     }
 	else if (calculation == "scf-sto")  // qianrui 2021-2-20
@@ -2094,7 +2094,7 @@ void Input::Check(void)
                         mem_saver = 0;
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
-				this->relax_nstep = 1;
+				this->relax_nmax = 1;
     }
     else if (calculation == "relax")  // pengfei 2014-10-13
     {
@@ -2104,13 +2104,13 @@ void Input::Check(void)
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
                 cal_force = 1;
-				if(! this->relax_nstep) this->relax_nstep = 50;
+				if(! this->relax_nmax) this->relax_nmax = 50;
     }
 
     else if (calculation == "nscf")
     {
 		GlobalV::CALCULATION = "nscf";
-        this->relax_nstep = 1;
+        this->relax_nmax = 1;
 		out_stru = 0;
 
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
@@ -2134,7 +2134,7 @@ void Input::Check(void)
 	else if(calculation == "istate")
 	{
 		GlobalV::CALCULATION = "istate";
-		this->relax_nstep = 1;
+		this->relax_nmax = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2155,7 +2155,7 @@ void Input::Check(void)
 	else if(calculation == "ienvelope")
 	{
 		GlobalV::CALCULATION = "ienvelope"; // mohan fix 2011-11-04
-		this->relax_nstep = 1;
+		this->relax_nmax = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2177,9 +2177,9 @@ void Input::Check(void)
 		GlobalV::CALCULATION = "md";
 		symmetry = false;
 		cal_force = 1;
-		if(this->relax_nstep==0){
-			GlobalV::ofs_running<<"relax_nstep should be set. Autoset relax_nstep to 50!"<<endl;
-			this->relax_nstep = 50;
+		if(this->relax_nmax==0){
+			GlobalV::ofs_running<<"relax_nmax should be set. Autoset relax_nmax to 50!"<<endl;
+			this->relax_nmax = 50;
 		}
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
 
@@ -2211,11 +2211,11 @@ void Input::Check(void)
 	{
 		cal_force = 1;
 		cal_stress = 1;
-		if(! this->relax_nstep) this->relax_nstep = 50;
+		if(! this->relax_nmax) this->relax_nmax = 50;
 	}
 	else if(calculation == "test")
 	{
-		this->relax_nstep = 1;
+		this->relax_nmax = 1;
 	}
     else
     {

@@ -41,7 +41,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 	int stress_step = 1;
 	bool stop= false;
 	
-    while(istep <= GlobalV::RELAX_NSTEP && !stop)
+    while(istep <= GlobalV::RELAX_NMAX && !stop)
     {
 		time_t estart = time(NULL);
 
@@ -211,7 +211,7 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 		this->gather_stress_pw(p_esolver, stress);
 	}
 	//stop in last step
-	if(istep==GlobalV::RELAX_NSTEP)
+	if(istep==GlobalV::RELAX_NMAX)
 	{
 		return 1;
 	}

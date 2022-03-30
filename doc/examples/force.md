@@ -15,17 +15,17 @@ default.
 ```
 calculation relax
 gamma_only 1
-relax_nstep 100
+relax_nmax 100
 force_thr_ev 0.01
 relax_method cg
 out_stru 1
-bfgs_init 0.5
+relax_bfgs_init 0.5
 ```
 
 - `calculation` relax
 
     relax atom positions with fixed lattice vectors.
-- `relax_nstep`
+- `relax_nmax`
 
     the maximal number of ionic iteration steps.
 - `force_thr_ev`
@@ -44,7 +44,7 @@ bfgs_init 0.5
 
 - `cg_bfgs`
 
-    A mixed cg-bfgs method. For detail description, check out the variable relax_cg_thr in the [list of input keywords](../input-main.md#cg-threshold).
+    A mixed cg-bfgs method. For detail description, check out the variable relax_cg_thr_e in the [list of input keywords](../input-main.md#cg-threshold).
 
 - `sd`
 
@@ -54,7 +54,7 @@ bfgs_init 0.5
 
     output the structure of each step or not.
 
-- `bfgs_init`
+- `relax_bfgs_init`
 
     the initial radius of the relaxation. We advise you not to change this parameter, unless you are sure that the initial structure is close to the final structure.
 

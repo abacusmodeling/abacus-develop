@@ -17,7 +17,7 @@ gamma_only          1
 calculation         md
 symmetry            0
 
-relax_nstep               10
+relax_nmax               10
 out_level           m
 relax_method         cg
 
@@ -25,7 +25,7 @@ smearing_method            gaussian
 smearing_sigma               0.02
 #Parameters (3.PW)
 ecutwfc             30
-scf_thr                 1e-5
+scf_thr_rho                 1e-5
 scf_nmax               100
 
 #Parameters (5.LCAO)

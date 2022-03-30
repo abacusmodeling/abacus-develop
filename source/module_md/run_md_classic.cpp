@@ -57,7 +57,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
     }
 
     // md cycle
-    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::RELAX_NSTEP && !verlet->stop )
+    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::RELAX_NMAX && !verlet->stop )
     {
         if(verlet->step_ == 0)
         {

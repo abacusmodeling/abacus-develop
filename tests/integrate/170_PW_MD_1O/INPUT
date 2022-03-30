@@ -8,10 +8,10 @@ calculation 	md
 #Parameters (Accuracy)
 ecutwfc			20
 scf_nmax			50
-scf_thr             1.0e-8
+scf_thr_rho             1.0e-8
 
 basis_type		pw
-relax_nstep           3
+relax_nmax           3
 
 cal_stress          1
 stress_thr      1e-6

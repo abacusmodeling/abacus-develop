@@ -11,7 +11,7 @@ scf_nmax			20
 
 gamma_only      0
 basis_type		lcao
-relax_nstep           1
+relax_nmax           1
 
 ks_solver       genelpa
 mixing_type     pulay

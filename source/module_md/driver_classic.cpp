@@ -60,7 +60,7 @@ void Driver_classic::convert(UnitCell_pseudo &ucell_c)
     GlobalV::OUT_LEVEL = INPUT.out_level;
     GlobalV::SEARCH_RADIUS = max(INPUT.search_radius,(INPUT.mdp.lj_rcut+2)*ModuleBase::ANGSTROM_AU);
 	GlobalV::SEARCH_PBC = INPUT.search_pbc;
-    GlobalV::RELAX_NSTEP = INPUT.relax_nstep;
+    GlobalV::RELAX_NMAX = INPUT.relax_nmax;
 
 	GlobalV::CAL_FORCE = INPUT.cal_force;
     GlobalV::FORCE_THR = INPUT.force_thr;

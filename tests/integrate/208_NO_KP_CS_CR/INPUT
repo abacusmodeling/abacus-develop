@@ -10,7 +10,7 @@ ecutwfc			20
 scf_nmax			20
 
 basis_type		lcao
-relax_nstep           2
+relax_nmax           2
 
 cal_stress          1
 stress_thr      1e-6

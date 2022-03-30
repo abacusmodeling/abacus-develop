@@ -16,9 +16,9 @@ basis_type			lcao
 symmetry			0	
 #Parameters (Accuracy)
 ecutwfc				50
-scf_thr				1.0e-7	// about iteration
+scf_thr_rho				1.0e-7	// about iteration
 
-relax_nstep				50
+relax_nmax				50
 force_thr_ev			1.0e-3
 #Parameters (File)
 out_chg			1

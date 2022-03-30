@@ -51,7 +51,7 @@ class Input
 
     bool symmetry;			// turn on symmetry or not
     double symmetry_prec;   // LiuXh add 2021-08-12, accuracy for symmetry
-	int pw_kpar; 				// ecch pool is for one k point
+	int kpar; 				// ecch pool is for one k point
 
     bool berry_phase;		// berry phase calculation
 	int gdir;               // berry phase calculation
@@ -109,14 +109,14 @@ class Input
 	std::string fixed_axes;      //which axes are fixed
 	std::string relax_method;	// methods to move_ion: sd, bfgs, cg...
 
-    double relax_cg_thr;    // threshold when cg to bfgs, pengfei add 2011-08-15
+    double relax_cg_thr_e;    // threshold when cg to bfgs, pengfei add 2011-08-15
 
-	double bfgs_w1;			// wolfe condition 1
-	double bfgs_w2;			// wolfe condition 2
+	double relax_bfgs_w1;			// wolfe condition 1
+	double relax_bfgs_w2;			// wolfe condition 2
 
-	double bfgs_rmax;	// trust radius max
-	double bfgs_rmin;	// trust radius min
-	double bfgs_init;	// initial move
+	double relax_bfgs_rmax;	// trust radius max
+	double relax_bfgs_rmin;	// trust radius min
+	double relax_bfgs_init;	// initial move
 
 //==========================================================
 // Planewave
@@ -161,9 +161,9 @@ class Input
 //==========================================================
 // iteration
 //==========================================================
-    double scf_thr;				// \sum |rhog_out - rhog_in |^2
+    double scf_thr_rho;				// \sum |rhog_out - rhog_in |^2
     int scf_nmax;				// number of max elec iter
-    int relax_nstep;				// number of max ionic iter
+    int relax_nmax;				// number of max ionic iter
 	int out_stru;			// outut stru file each ion step
 	std::string out_level;		// control the output information.
     bool out_md_control;    // internal parameter , added by zhengdy 2019-04-07
@@ -323,7 +323,7 @@ class Input
 // Fuxiang He add 2016-10-26
 //==========================================================
 	int tddft;			//calculate tddft or not
-	double td_scf_thr;			//threshold for electronic iteration of tddft
+	double td_scf_thr_rho;			//threshold for electronic iteration of tddft
 	double td_dt;			//"fs"
 	double td_force_dt;			//"fs"
 	int td_val_elec_01;			//valence electron 01

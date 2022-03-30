@@ -58,13 +58,13 @@ void Input_Conv::Convert(void)
 #if ((defined __CUDA) || (defined __ROCM))
 	int temp_nproc;
 	MPI_Comm_size(MPI_COMM_WORLD, &temp_nproc);
-	if (temp_nproc != INPUT.pw_kpar)
+	if (temp_nproc != INPUT.kpar)
 	{
-		ModuleBase::WARNING("Input_conv", "None pw_kpar set in INPUT file, auto set pw_kpar value.");
+		ModuleBase::WARNING("Input_conv", "None kpar set in INPUT file, auto set kpar value.");
 	}
-	GlobalV::PW_KPAR = temp_nproc;
+	GlobalV::KPAR = temp_nproc;
 #else
-	GlobalV::PW_KPAR = INPUT.pw_kpar;
+	GlobalV::KPAR = INPUT.kpar;
 #endif
 	GlobalV::CALCULATION = INPUT.calculation;
 
@@ -87,12 +87,12 @@ void Input_Conv::Convert(void)
 	Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 #endif
 
-	BFGS_Basic::w1 = INPUT.bfgs_w1;
-	BFGS_Basic::w2 = INPUT.bfgs_w2;
+	BFGS_Basic::relax_bfgs_w1 = INPUT.relax_bfgs_w1;
+	BFGS_Basic::relax_bfgs_w2 = INPUT.relax_bfgs_w2;
 
-	Ions_Move_Basic::bfgs_rmax = INPUT.bfgs_rmax;
-	Ions_Move_Basic::bfgs_rmin = INPUT.bfgs_rmin;
-	Ions_Move_Basic::bfgs_init = INPUT.bfgs_init;
+	Ions_Move_Basic::relax_bfgs_rmax = INPUT.relax_bfgs_rmax;
+	Ions_Move_Basic::relax_bfgs_rmin = INPUT.relax_bfgs_rmin;
+	Ions_Move_Basic::relax_bfgs_init = INPUT.relax_bfgs_init;
 	Ions_Move_Basic::out_stru = INPUT.out_stru; // mohan add 2012-03-23
 
 	GlobalV::CAL_STRESS = INPUT.cal_stress;
@@ -100,7 +100,7 @@ void Input_Conv::Convert(void)
 
 	GlobalV::RELAX_METHOD = INPUT.relax_method;
 	GlobalV::OUT_LEVEL = INPUT.out_level;
-	Ions_Move_CG::RELAX_CG_THR = INPUT.relax_cg_thr; // pengfei add 2013-09-09
+	Ions_Move_CG::RELAX_CG_THR_E = INPUT.relax_cg_thr_e; // pengfei add 2013-09-09
 
 	ModuleSymmetry::Symmetry::symm_flag = INPUT.symmetry; // 9
 	GlobalC::symm.epsilon = INPUT.symmetry_prec; // LiuXh add 2021-08-12, accuracy for symmetry
@@ -150,7 +150,7 @@ void Input_Conv::Convert(void)
 	//----------------------------------------------------------
 	// iteration (1/3)
 	//----------------------------------------------------------
-	GlobalV::SCF_THR = INPUT.scf_thr;
+	GlobalV::SCF_THR_RHO = INPUT.scf_thr_rho;
 
 	//----------------------------------------------------------
 	// wavefunction / charge / potential / (2/4)
@@ -220,7 +220,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 #ifdef __LCAO
 	ELEC_evolve::tddft = INPUT.tddft;
-	ELEC_evolve::td_scf_thr = INPUT.td_scf_thr;
+	ELEC_evolve::td_scf_thr_rho = INPUT.td_scf_thr_rho;
 	ELEC_evolve::td_dt = INPUT.td_dt;
 	ELEC_evolve::td_force_dt = INPUT.td_force_dt;
 	ELEC_evolve::td_val_elec_01 = INPUT.td_val_elec_01;
@@ -422,7 +422,7 @@ void Input_Conv::Convert(void)
 	// iteration
 	//----------------------------------------------------------
 	GlobalV::SCF_NMAX = INPUT.scf_nmax;
-	GlobalV::RELAX_NSTEP = INPUT.relax_nstep;
+	GlobalV::RELAX_NMAX = INPUT.relax_nmax;
 
 	//----------------------------------------------------------
 	// wavefunction / charge / potential / (2/4)

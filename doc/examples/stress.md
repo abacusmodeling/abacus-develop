@@ -14,11 +14,11 @@ Here is an example for the Si crystal.
 ```
 suffix Si
 calculation cell-relax
-relax_nstep 100
+relax_nmax 100
 force_thr_ev 0.01
 relax_method cg
 out_stru 1
-bfgs_init 0.5
+relax_bfgs_init 0.5
 press1 0
 press2 0
 press3 0

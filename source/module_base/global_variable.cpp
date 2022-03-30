@@ -43,7 +43,7 @@ double PRESS3 = 0.0;
 double PRESSURE = 0.0;
 std::string	RELAX_METHOD = "bfgs";
 std::string  OUT_LEVEL = "ie";
-int		RELAX_NSTEP = 20;
+int		RELAX_NMAX = 20;
 int 	SCF_NMAX = 50;
 
 std::string	BASIS_TYPE = "pw"; //xiaohui add 2013-09-01
@@ -59,7 +59,7 @@ int 	DIAGO_DAVID_NDIM = 4;
 double 	DIAG_THR_E = 1.0e-2;
 int		NB2D = 1;
 
-double 	SCF_THR = 1.0e-9;
+double 	SCF_THR_RHO = 1.0e-9;
 
 std::string	RESTART_MODE = "new";
 
@@ -89,7 +89,7 @@ int  out_mul=0;//qifeng add 2019/9/10
 // EXPLAIN : Parallel information
 // GLOBAL VARIABLES :
 // NAME : NPROC( global number of process )
-// NAME : PW_KPAR( global number of pools )
+// NAME : KPAR( global number of pools )
 // NAME : MY_RANK( global index of process )
 // NAME : MY_POOL( global index of pool (count in pool))
 // NAME : NPROC_IN_POOL( local number of process in a pool.)
@@ -97,13 +97,13 @@ int  out_mul=0;//qifeng add 2019/9/10
 //  		my_rank in each pool)
 //----------------------------------------------------------
 int NPROC = 1;
-int PW_KPAR = 1;
+int KPAR = 1;
 int MY_RANK = 0;
 int MY_POOL = 0;
 int NPROC_IN_POOL = 1;
 int RANK_IN_POOL = 0;
 int DRANK = -1; //mohan add 2012-01-13, must be -1, so we can recognize who didn't in DIAG_WORLD
-int DSIZE = PW_KPAR;
+int DSIZE = KPAR;
 int DCOLOR = -1;
 int GRANK = MY_RANK;
 int GSIZE = DSIZE; 

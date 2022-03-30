@@ -18,7 +18,7 @@ def print_file_pw(info,dis):
 			nbands             	{info["input"]["nbands"]} 
 
 			ecutwfc             {info["input"]["ecut"]}
-			scf_thr                 2.0e-8  // about iteration
+			scf_thr_rho                 2.0e-8  // about iteration
 			scf_nmax               1000
 
 			smearing_method            gauss

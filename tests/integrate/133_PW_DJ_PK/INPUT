@@ -10,7 +10,7 @@ ecutwfc			20
 scf_nmax			20
 
 basis_type		pw
-relax_nstep                   1
+relax_nmax                   1
 
 #init_wfc       random
 

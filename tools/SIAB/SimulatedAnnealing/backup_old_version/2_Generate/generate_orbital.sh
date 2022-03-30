@@ -297,7 +297,7 @@ symmetry            0
 nbands             	$nbands 
 
 ecutwfc             $ecut
-scf_thr                 2.0e-8  // about iteration
+scf_thr_rho                 2.0e-8  // about iteration
 scf_nmax               1000
 
 smearing_method            gauss

@@ -72,7 +72,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
     int force_step = 1;
     int stress_step = 1;
     bool stop = false;
-    while(istep <= GlobalV::RELAX_NSTEP && !stop)
+    while(istep <= GlobalV::RELAX_NMAX && !stop)
     {
         time_t estart = time(NULL);
 
@@ -352,7 +352,7 @@ bool LOOP_ions::force_stress(
         {
             IMM.cal_movement(istep, istep, fcs, GlobalC::en.etot);
 
-            if(IMM.get_converged() || (istep==GlobalV::RELAX_NSTEP))
+            if(IMM.get_converged() || (istep==GlobalV::RELAX_NMAX))
             {
                 ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 1; // 1 means converged

@@ -16,7 +16,7 @@ For this example, the input files are:
     suffix Si2_diamond
     symmetry 1
     scf_nmax 60
-    scf_thr 1.0e-9
+    scf_thr_rho 1.0e-9
     out_chg 1
     ```
 
@@ -50,7 +50,7 @@ For this example, the input files are:
 
     - scf_nmax
         The maximal iteration number for electronic-structure calculations.
-    - scf_thr
+    - scf_thr_rho
         Tolerance of the difference of charge density, below which the self-consistent calculation is considered to be converged.
     - out_chg
         Print out the charge density(=1) or not(=0).
@@ -131,7 +131,7 @@ The following typical output information will be printed to the screen:
  -------------------------------------------
  SELF-CONSISTENT : 
  -------------------------------------------
- ITER   ETOT(eV)       EDIFF(eV)      SCF_THR      CG_ITER    TIME(S)    
+ ITER   ETOT(eV)       EDIFF(eV)      SCF_THR_RHO      CG_ITER    TIME(S)    
  CG1    -2.154524e+02  0.000000e+00   6.855e-02  1.000e+00  1.290e+00  
  CG2    -2.154992e+02  -4.673475e-02  2.378e-03  2.000e+00  8.400e-01  
  CG3    -2.155050e+02  -5.882715e-03  8.220e-05  2.594e+00  9.000e-01  

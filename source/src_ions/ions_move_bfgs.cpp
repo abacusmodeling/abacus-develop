@@ -125,7 +125,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 		Ions_Move_Basic::update_iter = 0;
 
 		// set the trust radius old as the initial trust radius.
-		trust_radius_old = bfgs_init;
+		trust_radius_old = relax_bfgs_init;
 		this->reset_hessian();
 
 		/*	
@@ -240,16 +240,16 @@ void Ions_Move_BFGS::bfgs_routine(void)
 			this->grad[i] = grad_p[i];
 		}
 		
-		if(trust_radius < bfgs_rmin )
+		if(trust_radius < relax_bfgs_rmin )
 		{
 			//we are trapped in this case..., so the algorithim must be restart
 			//the history is reset
 			//xiaohui add 2013-03-17
 			GlobalV::ofs_running<<"trust_radius = "<<trust_radius<<std::endl;
-			GlobalV::ofs_running<<"bfgs_rmin = "<<bfgs_rmin<<std::endl;
-			GlobalV::ofs_running<<"bfgs_rmax = "<<bfgs_rmax<<std::endl;
+			GlobalV::ofs_running<<"relax_bfgs_rmin = "<<relax_bfgs_rmin<<std::endl;
+			GlobalV::ofs_running<<"relax_bfgs_rmax = "<<relax_bfgs_rmax<<std::endl;
 			//xiaohui add 2013-03-17
-			GlobalV::ofs_running<<" trust_radius < bfgs_rmin, reset bfgs history."<<std::endl;
+			GlobalV::ofs_running<<" trust_radius < relax_bfgs_rmin, reset bfgs history."<<std::endl;
 			
 			if(tr_min_hit)
 			{
@@ -265,11 +265,11 @@ void Ions_Move_BFGS::bfgs_routine(void)
 				this->move[i] = -grad[i];
 			}
 			
-			trust_radius = bfgs_rmin;
+			trust_radius = relax_bfgs_rmin;
 			
 			tr_min_hit =true;
 		}
-		else if(trust_radius >= bfgs_rmin)
+		else if(trust_radius >= relax_bfgs_rmin)
 		{
 			//old bfgs direction ( normalized ) is recovered
 			for(int i=0;i<dim;i++)

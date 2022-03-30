@@ -10,7 +10,7 @@ calculation         relax
 
 #Parameters (3.PW)
 ecutwfc             50
-scf_thr                 1e-8
+scf_thr_rho                 1e-8
 scf_nmax		    100
 
 #Parameters (5.LCAO)
@@ -18,7 +18,7 @@ basis_type          lcao
 ks_solver           hpseps
 gamma_only          0
 
-relax_nstep               50
+relax_nmax               50
 force_thr_ev        0.001
 
 #Parameters (6.Smearing) 

@@ -21,7 +21,7 @@ read_file_dir   ./
 #Parameters (Accuracy)
 ecutwfc 60
 scf_nmax 50
-scf_thr 1.0e-9
+scf_thr_rho 1.0e-9
 diag_thr_e 1.0e-7
 
 #Parameters (File)

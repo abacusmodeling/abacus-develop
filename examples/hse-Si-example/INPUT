@@ -6,7 +6,7 @@ calculation				scf
 basis_type 				lcao
 ks_solver  				genelpa
 ecutwfc    				100
-scf_thr        				1e-8
+scf_thr_rho        				1e-8
 scf_nmax      				100
 gamma_only 				0
 smearing_method   				smearing_method

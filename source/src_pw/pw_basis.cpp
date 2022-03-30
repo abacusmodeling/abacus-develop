@@ -422,7 +422,7 @@ void PW_Basis::setup_gg(void)
             const double tmp2 = tmp * tmp ;
             if (this->ggwfc2 < tmp2) this->ggwfc2 = tmp2;
         }
-        //qianrui add 2021-8-13 to make different pw_kpar parameters can get the same results
+        //qianrui add 2021-8-13 to make different kpar parameters can get the same results
 #ifdef __MPI
         if(pw_seed > 0)    MPI_Allreduce(MPI_IN_PLACE, &ggwfc2, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
 #endif

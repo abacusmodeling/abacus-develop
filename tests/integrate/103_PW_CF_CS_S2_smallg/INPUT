@@ -9,7 +9,7 @@ nspin           2
 
 #Parameters (2.Iteration)
 ecutwfc			20
-scf_thr				1e-9
+scf_thr_rho				1e-9
 scf_nmax			100
 
 cal_stress      1

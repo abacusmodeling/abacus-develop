@@ -78,7 +78,7 @@ Charge_Broyden::~Charge_Broyden()
 
 void Charge_Broyden::mix_rho
 (
-    double &scf_thr,
+    double &scf_thr_rho,
     const double &diago_error,
     const double &tr2,
     const int &iter,
@@ -106,41 +106,41 @@ void Charge_Broyden::mix_rho
     }
 
 	ModuleBase::GlobalFunc::NOTE("Calculate the norm of the Residual std::vector: < R[rho] | R[rho_save] >");
-    scf_thr = this->rhog_dot_product( this->rhog, this->rhog);
+    scf_thr_rho = this->rhog_dot_product( this->rhog, this->rhog);
 	
-	if(GlobalV::test_charge)GlobalV::ofs_running << " scf_thr from rhog_dot_product is " << scf_thr << std::endl;
+	if(GlobalV::test_charge)GlobalV::ofs_running << " scf_thr_rho from rhog_dot_product is " << scf_thr_rho << std::endl;
 
-	// scf_thr calculated from real space.
-	double scf_thr2 = 0.0;
+	// scf_thr_rho calculated from real space.
+	double scf_thr_rho2 = 0.0;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			scf_thr2 += abs( rho[is][ir] - rho_save[is][ir] );
+			scf_thr_rho2 += abs( rho[is][ir] - rho_save[is][ir] );
 		}
 	}
 
-	Parallel_Reduce::reduce_double_pool( scf_thr2 );
+	Parallel_Reduce::reduce_double_pool( scf_thr_rho2 );
 	assert( nelec != 0);
 	assert( GlobalC::ucell.omega > 0);
 	assert( GlobalC::pw.ncxyz > 0);
-	scf_thr2 *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-	scf_thr2 /= nelec;
-	if(GlobalV::test_charge)GlobalV::ofs_running << " scf_thr from real space grid is " << scf_thr2 << std::endl;
+	scf_thr_rho2 *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+	scf_thr_rho2 /= nelec;
+	if(GlobalV::test_charge)GlobalV::ofs_running << " scf_thr_rho from real space grid is " << scf_thr_rho2 << std::endl;
 
 	// mohan add 2011-01-22
 	//if(LINEAR_SCALING && LOCAL_BASIS) xiaohui modify 2013-09-01
 	if(GlobalV::BASIS_TYPE=="lcao" )
 	{
-		scf_thr = scf_thr2;	
+		scf_thr_rho = scf_thr_rho2;	
 	}
-    if ( scf_thr < diago_error )
+    if ( scf_thr_rho < diago_error )
     {
-        GlobalV::ofs_warning << " scf_thr < diago_error, keep charge density unchanged." << std::endl;
+        GlobalV::ofs_warning << " scf_thr_rho < diago_error, keep charge density unchanged." << std::endl;
     	ModuleBase::timer::tick("Charge","mix_rho");
         return;
     }
-    else if (scf_thr < tr2)
+    else if (scf_thr_rho < tr2)
     {
         converged = true;
     	ModuleBase::timer::tick("Charge","mix_rho");

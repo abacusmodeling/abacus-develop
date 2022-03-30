@@ -10,7 +10,7 @@ pseudo_type     upf201
 
 #Parameters (2.Iteration)
 ecutwfc			20
-scf_thr				1e-9
+scf_thr_rho				1e-9
 scf_nmax			100
 
 #Parameters (3.Basis)

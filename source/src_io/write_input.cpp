@@ -56,7 +56,7 @@ void Input::Print(const std::string &fn)const
 		ModuleBase::GlobalFunc::OUTP(ofs,"diago_david_ndim",diago_david_ndim,"max dimension for davidson");
 	}
 	ModuleBase::GlobalFunc::OUTP(ofs,"diag_thr_e",diag_thr_e,"threshold for eigenvalues is cg electron iterations");
-	ModuleBase::GlobalFunc::OUTP(ofs,"scf_thr",scf_thr,"charge density error");
+	ModuleBase::GlobalFunc::OUTP(ofs,"scf_thr_rho",scf_thr_rho,"charge density error");
 	ModuleBase::GlobalFunc::OUTP(ofs,"init_wfc",init_wfc,"start wave functions are from 'atomic' or 'file'");
 	ModuleBase::GlobalFunc::OUTP(ofs,"init_chg",init_chg,"start charge is from 'atomic' or file");
 	ModuleBase::GlobalFunc::OUTP(ofs,"chg_extrap",chg_extrap,"atomic; first-order; second-order; dm:coefficients of SIA");
@@ -78,21 +78,21 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"ks_solver",GlobalV::KS_SOLVER,"cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
 	ModuleBase::GlobalFunc::OUTP(ofs,"scf_nmax",scf_nmax,"#number of electron iterations");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_force",out_force,"output the out_force or not"); 
-	ModuleBase::GlobalFunc::OUTP(ofs,"relax_nstep",relax_nstep,"number of ion iteration steps");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_nmax",relax_nmax,"number of ion iteration steps");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_stru",out_stru,"output the structure files after each ion step");
 	ModuleBase::GlobalFunc::OUTP(ofs,"force_thr",force_thr,"force threshold, unit: Ry/Bohr");
 	ModuleBase::GlobalFunc::OUTP(ofs,"force_thr_ev",force_thr*13.6058/0.529177,"force threshold, unit: eV/Angstrom");
 	ModuleBase::GlobalFunc::OUTP(ofs,"force_thr_ev2",force_thr_ev2,"force invalid threshold, unit: eV/Angstrom");
-	ModuleBase::GlobalFunc::OUTP(ofs,"relax_cg_thr",relax_cg_thr,"threshold for switching from cg to bfgs, unit: eV/Angstrom");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_cg_thr_e",relax_cg_thr_e,"threshold for switching from cg to bfgs, unit: eV/Angstrom");
 	ModuleBase::GlobalFunc::OUTP(ofs,"stress_thr",stress_thr,"stress threshold");
 	ModuleBase::GlobalFunc::OUTP(ofs,"press1",press1,"target pressure, unit: KBar");
 	ModuleBase::GlobalFunc::OUTP(ofs,"press2",press2,"target pressure, unit: KBar");
 	ModuleBase::GlobalFunc::OUTP(ofs,"press3",press3,"target pressure, unit: KBar");
-	ModuleBase::GlobalFunc::OUTP(ofs,"bfgs_w1",bfgs_w1,"wolfe condition 1 for bfgs");
-	ModuleBase::GlobalFunc::OUTP(ofs,"bfgs_w2",bfgs_w2,"wolfe condition 2 for bfgs");
-	ModuleBase::GlobalFunc::OUTP(ofs,"bfgs_rmax", bfgs_rmax,"maximal trust radius, unit: Bohr");
-	ModuleBase::GlobalFunc::OUTP(ofs,"bfgs_rmin", bfgs_rmin,"minimal trust radius, unit: Bohr");
-	ModuleBase::GlobalFunc::OUTP(ofs,"bfgs_init", bfgs_init,"initial trust radius, unit: Bohr");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_bfgs_w1",relax_bfgs_w1,"wolfe condition 1 for bfgs");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_bfgs_w2",relax_bfgs_w2,"wolfe condition 2 for bfgs");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_bfgs_rmax", relax_bfgs_rmax,"maximal trust radius, unit: Bohr");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_bfgs_rmin", relax_bfgs_rmin,"minimal trust radius, unit: Bohr");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_bfgs_init", relax_bfgs_init,"initial trust radius, unit: Bohr");
 	ModuleBase::GlobalFunc::OUTP(ofs,"cal_stress",cal_stress,"calculate the stress or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"fixed_axes",fixed_axes,"which axes are fixed");
 	ModuleBase::GlobalFunc::OUTP(ofs,"relax_method",relax_method,"bfgs; sd; cg; cg_bfgs;"); //pengfei add 2013-08-15
@@ -151,7 +151,7 @@ void Input::Print(const std::string &fn)const
 	ofs << "\n#Parameters (8.Technique)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"gamma_only",gamma_only,"gamma only, only used in LCAO basis");
 	ModuleBase::GlobalFunc::OUTP(ofs,"diago_proc",GlobalV::DIAGO_PROC,"number of proc used to diago");
-	ModuleBase::GlobalFunc::OUTP(ofs,"pw_kpar",pw_kpar,"number of pools for k points, pw only");
+	ModuleBase::GlobalFunc::OUTP(ofs,"kpar",kpar,"number of pools for k points, pw only");
 	ModuleBase::GlobalFunc::OUTP(ofs,"mem_saver",mem_saver,"memory saver for many k points used");
 	ModuleBase::GlobalFunc::OUTP(ofs,"printe",printe,"print band energy for selectively ionic steps");
 
@@ -234,7 +234,7 @@ void Input::Print(const std::string &fn)const
 
 	ofs << "\n#Parameters (16.tddft)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"tddft",tddft,"calculate tddft or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"td_scf_thr",td_scf_thr,"threshold for electronic iteration of tddft");
+	ModuleBase::GlobalFunc::OUTP(ofs,"td_scf_thr_rho",td_scf_thr_rho,"threshold for electronic iteration of tddft");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_dt",td_dt,"time of ion step");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_force_dt",td_force_dt,"time of force change");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_val_elec_01",td_val_elec_01,"td_val_elec_01");

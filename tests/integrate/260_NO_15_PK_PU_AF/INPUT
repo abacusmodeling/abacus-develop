@@ -5,7 +5,7 @@ nbands    40
 
 calculation    scf
 ecutwfc    20
-scf_thr    1.0e-4
+scf_thr_rho    1.0e-4
 scf_nmax    2
 out_chg    0
 
@@ -20,7 +20,7 @@ smearing_sigma    0.07
 #cal_force     1
 #force_thr_ev    0.01
 #relax_method    cg
-#bfgs_init    0.5
+#relax_bfgs_init    0.5
 
 mixing_type    pulay
 mixing_beta    0.4

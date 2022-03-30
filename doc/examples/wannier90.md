@@ -44,7 +44,7 @@ nbands 4 ! number of bands
 calculation nscf ! non-self-consistent calculation
 scf_nmax 40
 diag_thr_e 1.0e-8
-scf_thr 1.0e-8
+scf_thr_rho 1.0e-8
 init_chg file ! read charge from files
 #Parameters(wannier90)
 towannier90 1 ! use the ABACUS-wannier90 interface

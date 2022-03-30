@@ -30,17 +30,17 @@ void setupmpi(int argc,char **argv,int &nproc, int &myrank)
 }
 
 
-void divide_pools(const int &nproc, const int &myrank, int &nproc_in_pool, int &pw_kpar, int&mypool, int &rank_in_pool)
+void divide_pools(const int &nproc, const int &myrank, int &nproc_in_pool, int &kpar, int&mypool, int &rank_in_pool)
 {  
-    nproc_in_pool = nproc/pw_kpar;
-    if (myrank < (nproc%pw_kpar)*(nproc_in_pool+1))
+    nproc_in_pool = nproc/kpar;
+    if (myrank < (nproc%kpar)*(nproc_in_pool+1))
     {
         nproc_in_pool++;
     }
 
-    int *nproc_pool = new int[pw_kpar];
-    int *startpro_pool = new int[pw_kpar];
-    for(int ip = 0 ; ip < pw_kpar ; ++ip)
+    int *nproc_pool = new int[kpar];
+    int *startpro_pool = new int[kpar];
+    for(int ip = 0 ; ip < kpar ; ++ip)
     {
         nproc_pool[ip] = 0;
         startpro_pool[ip] = 0;
@@ -48,18 +48,18 @@ void divide_pools(const int &nproc, const int &myrank, int &nproc_in_pool, int &
 
     for (int i=0; i<nproc; i++)
     {
-        int j = i%pw_kpar;
+        int j = i%kpar;
         nproc_pool[j]++;
     }
 
     // (3) To know start proc index in each pool.
-    for (int i=1; i<pw_kpar; i++)
+    for (int i=1; i<kpar; i++)
     {
         startpro_pool[i]=startpro_pool[i-1]+nproc_pool[i-1];
     }
 
     // use 'myrank' to know 'mypool'.
-    for (int i=0; i<pw_kpar; i++)
+    for (int i=0; i<kpar; i++)
     {
         if (myrank >= startpro_pool[i])
         {

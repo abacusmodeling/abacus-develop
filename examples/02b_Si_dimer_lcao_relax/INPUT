@@ -14,5 +14,5 @@ smearing_method		gauss
 smearing_sigma			0.01
 
 calculation		relax
-relax_nstep			50
+relax_nmax			50
 force_thr_ev		1.0e-3

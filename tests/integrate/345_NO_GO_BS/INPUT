@@ -3,7 +3,7 @@ suffix          autotest
 ntype               2
 nbands              6
 ecutwfc             20
-scf_thr                 1e-8
+scf_thr_rho                 1e-8
 scf_nmax               100
 gamma_only          1
 calculation         scf

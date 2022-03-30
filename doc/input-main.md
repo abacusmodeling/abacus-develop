@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [pw_kpar](#pw_kpar) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [init_wfc](#init_wfc) | [pw_seed](#pw_seed) | [init_chg](#init_chg) | [init_vel](#init_vel) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
+        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [kpar](#kpar) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [init_wfc](#init_wfc) | [pw_seed](#pw_seed) | [init_chg](#init_chg) | [init_vel](#init_vel) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
 
     - [Variables related to input files](#variables-related-to-input-files)
 
@@ -19,11 +19,11 @@
 
     - [Electronic structure](#electronic-structure)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap) | [ocp](#ocp) | [ocp_set](#ocp_set)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr_rho](#scf_thr_rho) | [chg_extrap](#chg_extrap) | [ocp](#ocp) | [ocp_set](#ocp_set)
 
     - [Geometry relaxation](#geometry-relaxation)
     
-        [relax_nstep](#relax_nstep) | [cal_force](#cal_force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [out_force](#out_force) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [bfgs_rmax](#bfgs_rmax) | [bfgs_rmin](#bfgs_rmin) | [bfgs_init](#bfgs_init) | [cal_stress](#cal_stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [relax_method](#relax_method) | [relax_cg_thr](#relax_cg_thr) | [cell_factor](#cell-factor)
+        [relax_nmax](#relax_nmax) | [cal_force](#cal_force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [out_force](#out_force) | [relax_bfgs_w1](#bfgs-w1) | [relax_bfgs_w2](#bfgs-w2) | [relax_bfgs_rmax](#relax_bfgs_rmax) | [relax_bfgs_rmin](#relax_bfgs_rmin) | [relax_bfgs_init](#relax_bfgs_init) | [cal_stress](#cal_stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [relax_method](#relax_method) | [relax_cg_thr_e](#relax_cg_thr_e) | [cell_factor](#cell-factor)
 
     - [Variables related to program output](#variables-related-to-program-output)
 
@@ -55,7 +55,7 @@
 
     - [TDDFT: time dependent density functional theory](#TDDFT-doc)
     
-        [tddft](#tddft) | [td_scf_thr](#td_scf_thr) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
+        [tddft](#tddft) | [td_scf_thr_rho](#td_scf_thr_rho) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
@@ -119,7 +119,7 @@ This part of variables are used to control general system parameters.
     - *Type*: String
     - *Description*: Specify the type of calculation.
         - *scf*: do self-consistent electronic structure calculation
-        - *relax*: do structure relaxation calculation, one can ues ‘relax_nstep’ to decide how many ionic relaxations you want.
+        - *relax*: do structure relaxation calculation, one can ues ‘relax_nmax’ to decide how many ionic relaxations you want.
         - *cell-relax*: do cell relaxation calculation.
         - *nscf*: do the non self-consistent electronic structure calculations. For this option, you need a charge density file. For nscf calculations with planewave basis set, diag_thr_e should be <= 1d-3.
         - *istate*: Please see the explanation for variable `nbands_istate`.
@@ -180,9 +180,9 @@ This part of variables are used to control general system parameters.
 
     [back to top](#input-file)
 
-- pw_kpar<a id="pw_kpar"></a>
+- kpar<a id="kpar"></a>
     - *Type*: Integer
-    - *Description*: devide all processors into pw_kpar groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
+    - *Description*: devide all processors into kpar groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
     - *Default*: 1
 
     [back to top](#input-file)
@@ -583,7 +583,7 @@ calculations.
 
     [back to top](#input-file)
 
-- scf_thr<a id="scf_thr"></a>
+- scf_thr_rho<a id="scf_thr_rho"></a>
     - *Type*: Real
     - *Description*: An important parameter in ABACUS. It’s the threshold for electronic iteration. It represents the charge density error between two sequential density from electronic iterations. Usually for local orbitals, usually 1e-6 may be accurate enough.
     - *Default*:1e-06
@@ -619,7 +619,7 @@ calculations.
 ### Geometry relaxation
 This part of variables are used to control the geometry relaxation.
 
-- relax_nstep<a id="relax_nstep"></a>
+- relax_nmax<a id="relax_nmax"></a>
     - *Type*: Integer
     - *Description*: The maximal number of ionic iteration steps, the minimal value is 1.
     - *Default*: 1
@@ -653,37 +653,37 @@ This part of variables are used to control the geometry relaxation.
 
     [back to top](#input-file)
 
-- bfgs_w1<a id="bfgs-w1"></a>
+- relax_bfgs_w1<a id="bfgs-w1"></a>
     - *Type*: Real
     - *Description*: This variable controls the Wolfe condition for BFGS algorithm used in geometry relaxation. You can look into paper Phys.Chem.Chem.Phys.,2000,2,2177 for more information.
     - *Default*: 0.01
 
     [back to top](#input-file)
 
-- bfgs_w2<a id="bfgs-w2"></a>
+- relax_bfgs_w2<a id="bfgs-w2"></a>
     - *Type*: Real
     - *Description*: This variable controls the Wolfe condition for BFGS algorithm used in geometry relaxation. You can look into paper Phys.Chem.Chem.Phys.,2000,2,2177 for more information.
     - *Default*: 0.5
 
     [back to top](#input-file)
 
-- bfgs_rmax<a id="bfgs_rmax"></a>
+- relax_bfgs_rmax<a id="relax_bfgs_rmax"></a>
     - *Type*: Real
-    - *Description*: This variable is for geometry optimization. It indicates the maximal movement of all the atoms. The sum of the movements from all atoms can be increased during the optimization steps. However, it will not be larger than bfgs_rmax Bohr.
+    - *Description*: This variable is for geometry optimization. It indicates the maximal movement of all the atoms. The sum of the movements from all atoms can be increased during the optimization steps. However, it will not be larger than relax_bfgs_rmax Bohr.
     - *Default*: 0.8
 
     [back to top](#input-file)
 
-- bfgs_rmin<a id="bfgs_rmin"></a>
+- relax_bfgs_rmin<a id="relax_bfgs_rmin"></a>
     - *Type*: Real
-    - *Description*: This variable is for geometry optimization. It indicates the minimal movement of all the atoms. When the movement of all the atoms is smaller than bfgs_rmin Bohr , and the force convergence is still not achieved, the calculation will break down.
+    - *Description*: This variable is for geometry optimization. It indicates the minimal movement of all the atoms. When the movement of all the atoms is smaller than relax_bfgs_rmin Bohr , and the force convergence is still not achieved, the calculation will break down.
     - *Default*: 1e-5
 
     [back to top](#input-file)
 
-- bfgs_init<a id="bfgs_init"></a>
+- relax_bfgs_init<a id="relax_bfgs_init"></a>
     - *Type*: Real
-    - *Description*: This variable is for geometry optimization. It indicates the initial movement of all the atoms. The sum of the movements from all atoms is bfgs_init Bohr.
+    - *Description*: This variable is for geometry optimization. It indicates the initial movement of all the atoms. The sum of the movements from all atoms is relax_bfgs_init Bohr.
     - *Default*: 0.5
 
     [back to top](#input-file)
@@ -732,7 +732,7 @@ This part of variables are used to control the geometry relaxation.
 
     [back to top](#input-file)
 
-- relax_cg_thr<a id="relax_cg_thr"></a>
+- relax_cg_thr_e<a id="relax_cg_thr_e"></a>
     - *Type*: Real
     - *Description*: When move-method is set to 'cg-bfgs', a mixed cg-bfgs algorithm is used. The ions first move according to cg method, then switched to bfgs when maximum of force on atoms is reduced below cg-threshold. Unit is eV/Angstrom.
     - *Default*: 0.5
@@ -1402,7 +1402,7 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: 0
 
     [back to top](#input-file)
-- td_scf_thr<a id="td_scf_thr"></a>
+- td_scf_thr_rho<a id="td_scf_thr_rho"></a>
     - *Type*: Double
     - *Description*: Accuracy of electron convergence when doing time-dependent evolution.
     - *Default*: 1e-9

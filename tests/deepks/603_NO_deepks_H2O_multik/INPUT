@@ -3,7 +3,7 @@ calculation scf
 suffix autotest
 ntype 2
 ecutwfc 100.000000
-scf_thr 5.000000e-07
+scf_thr_rho 5.000000e-07
 scf_nmax 35
 basis_type lcao
 dft_functional pbe
@@ -19,4 +19,4 @@ deepks_descriptor_lmax 2
 deepks_scf 1
 deepks_model model.ptg
 
-relax_nstep 20
+relax_nmax 20

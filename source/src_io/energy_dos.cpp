@@ -117,7 +117,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 			std::ofstream ofsi( ss.str().c_str() ); // clear istate.info
 			ofsi.close();
 		}
-		for(int ip=0; ip<GlobalV::PW_KPAR; ip++)
+		for(int ip=0; ip<GlobalV::KPAR; ip++)
 		{
 		#ifdef __MPI
 			MPI_Barrier(MPI_COMM_WORLD);

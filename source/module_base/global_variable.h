@@ -46,7 +46,7 @@ extern double PRESSURE;
 extern std::string	RELAX_METHOD;
 extern std::string	OUT_LEVEL;
 
-extern int		RELAX_NSTEP;				// 8.3
+extern int		RELAX_NMAX;				// 8.3
 extern int 		SCF_NMAX;				// 8.4
 
 extern std::string	BASIS_TYPE; //xiaohui add 2013-09-01
@@ -72,7 +72,7 @@ extern int 		DIAGO_DAVID_NDIM;	// 14
 extern double 	DIAG_THR_E;				// 15 diag_thr_e
 extern int		NB2D;				// 16.5 dividsion of 2D_matrix.
 
-extern double 	SCF_THR;				// 17
+extern double 	SCF_THR_RHO;				// 17
 
 extern std::string	RESTART_MODE;		// 18
 
@@ -101,7 +101,7 @@ extern int  out_mul;//qifeng add 2019/9/10
 // EXPLAIN : Parallel information
 // GLOBAL VARIABLES :
 // NAME : NPROC( global number of process )
-// NAME : PW_KPAR( global number of pools )
+// NAME : KPAR( global number of pools )
 // NAME : MY_RANK( global index of process )
 // NAME : MY_POOL( global index of pool (count in pool))
 // NAME : NPROC_IN_POOL( local number of process in a pool.)
@@ -114,7 +114,7 @@ extern int  out_mul;//qifeng add 2019/9/10
 // NAME : GSIZE( number of processors in each grid world)
 //========================================================================
 extern int NPROC;
-extern int PW_KPAR;
+extern int KPAR;
 extern int MY_RANK;
 extern int MY_POOL;
 extern int NPROC_IN_POOL;

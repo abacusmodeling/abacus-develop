@@ -15,7 +15,7 @@ class Threshold_Elec
 
 	protected:
 
-    double scf_thr;
+    double scf_thr_rho;
 
     bool conv_elec;
 

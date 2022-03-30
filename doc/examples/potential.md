@@ -13,7 +13,7 @@ gamma_only 0
 
 #Parameters (2.Iteration)
 ecutwfc 50
-scf_thr 1e-8
+scf_thr_rho 1e-8
 scf_nmax 200
 
 #Parameters (3.Basis)

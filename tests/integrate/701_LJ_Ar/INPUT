@@ -5,7 +5,7 @@ ntype			1
 calculation     md
 basis_type      pw
 read_file_dir   ./
-relax_nstep           1
+relax_nmax           1
 
 md_ensolver    LJ
 lj_rcut         8.5

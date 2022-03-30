@@ -3,7 +3,7 @@
 
 Threshold_Elec::Threshold_Elec()
 {
-	scf_thr = 0.0;
+	scf_thr_rho = 0.0;
 	conv_elec = false;
 }
 
@@ -23,7 +23,7 @@ void Threshold_Elec::set_diag_thr_e(void) const
     {
         if (abs(GlobalV::DIAG_THR_E - 1.0e-2) < 1.0e-10)
         {
-            GlobalV::DIAG_THR_E = 0.1 * std::min(1.0e-2, GlobalV::SCF_THR / GlobalC::CHR.nelec);
+            GlobalV::DIAG_THR_E = 0.1 * std::min(1.0e-2, GlobalV::SCF_THR_RHO / GlobalC::CHR.nelec);
         }
     }
     //=================
@@ -76,12 +76,12 @@ void Threshold_Elec::update_diag_thr_e(const int &iter)
 		//----------------------------
 		if(GlobalV::BASIS_TYPE=="lcao")
 		{
-			GlobalV::DIAG_THR_E = std::min( GlobalV::DIAG_THR_E, 0.01*scf_thr/ std::max(1.0, GlobalC::CHR.nelec));
+			GlobalV::DIAG_THR_E = std::min( GlobalV::DIAG_THR_E, 0.01*scf_thr_rho/ std::max(1.0, GlobalC::CHR.nelec));
 		}
 		// mohan update 2009-09-04
 		else
 		{
-			GlobalV::DIAG_THR_E = std::min( GlobalV::DIAG_THR_E, 0.1*scf_thr/ std::max(1.0, GlobalC::CHR.nelec));
+			GlobalV::DIAG_THR_E = std::min( GlobalV::DIAG_THR_E, 0.1*scf_thr_rho/ std::max(1.0, GlobalC::CHR.nelec));
 			//std::cout << " new diag_thr_e = " << GlobalV::DIAG_THR_E << std::endl;
 		}
 

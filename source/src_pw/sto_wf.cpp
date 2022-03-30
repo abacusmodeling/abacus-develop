@@ -70,8 +70,8 @@ void Stochastic_WF::init(const int & nchi_in,
         std::cout<<"Using all normal bases: "<<totnpw<<std::endl;
         allbase = true;
     }
-    nchip = int(nchi/GlobalV::PW_KPAR);
-    if(GlobalV::PW_KPAR - GlobalV::MY_POOL - 1 < nchi%GlobalV::PW_KPAR) ++nchip;
+    nchip = int(nchi/GlobalV::KPAR);
+    if(GlobalV::KPAR - GlobalV::MY_POOL - 1 < nchi%GlobalV::KPAR) ++nchip;
 
     std::complex<double> ui(0,1);
 
@@ -87,7 +87,7 @@ void Stochastic_WF::init(const int & nchi_in,
     if(allbase)
     {
         chi0[0].create(nchip,ndim,true);
-        int re = GlobalV::PW_KPAR - nchi % GlobalV::PW_KPAR;
+        int re = GlobalV::KPAR - nchi % GlobalV::KPAR;
         int ip = 0, ig0 = 0;
         int ig;
         for(int i = 0 ; i < nchip ; ++i)

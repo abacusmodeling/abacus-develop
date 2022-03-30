@@ -26,7 +26,7 @@ class ELEC_evolve
 	// fuxiang add 2021-05-25
 
     static int tddft;
-    static double td_scf_thr;
+    static double td_scf_thr_rho;
     static double td_dt;
     static double td_force_dt;
     static int td_val_elec_01;

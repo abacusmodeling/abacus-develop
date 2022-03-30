@@ -118,13 +118,13 @@ bool Update_input::Read(const std::string &fn)
         }
 #endif
 		// 4
-        else if (strcmp("scf_thr", word) == 0)
+        else if (strcmp("scf_thr_rho", word) == 0)
         {
-            read_value(ifs, scf_thr);
-			if(scf_thr!=GlobalV::SCF_THR)
+            read_value(ifs, scf_thr_rho);
+			if(scf_thr_rho!=GlobalV::SCF_THR_RHO)
 			{
-				this->change(GlobalV::ofs_warning,"scf_thr",GlobalV::SCF_THR,scf_thr);
-    			GlobalV::SCF_THR = this->scf_thr;
+				this->change(GlobalV::ofs_warning,"scf_thr_rho",GlobalV::SCF_THR_RHO,scf_thr_rho);
+    			GlobalV::SCF_THR_RHO = this->scf_thr_rho;
 			}
         }
 		// 5
@@ -138,13 +138,13 @@ bool Update_input::Read(const std::string &fn)
 			}
         }
 		// 6
-        else if (strcmp("relax_nstep", word) == 0)
+        else if (strcmp("relax_nmax", word) == 0)
         {
-            read_value(ifs, relax_nstep);
-			if(relax_nstep!=GlobalV::RELAX_NSTEP)
+            read_value(ifs, relax_nmax);
+			if(relax_nmax!=GlobalV::RELAX_NMAX)
 			{
-				this->change(GlobalV::ofs_warning,"relax_nstep",GlobalV::RELAX_NSTEP,relax_nstep);
-    			GlobalV::RELAX_NSTEP = this->relax_nstep;
+				this->change(GlobalV::ofs_warning,"relax_nmax",GlobalV::RELAX_NMAX,relax_nmax);
+    			GlobalV::RELAX_NMAX = this->relax_nmax;
 			}
         }
 		// 7
@@ -276,9 +276,9 @@ void Update_input::Bcast()
     Parallel_Common::bcast_int( Local_Orbital_Charge::out_dm );
     Parallel_Common::bcast_int( Pdiag_Double::out_wfc_lcao );
 #endif
-    Parallel_Common::bcast_double( GlobalV::SCF_THR );
+    Parallel_Common::bcast_double( GlobalV::SCF_THR_RHO );
     Parallel_Common::bcast_int( GlobalV::SCF_NMAX );
-    Parallel_Common::bcast_int( GlobalV::RELAX_NSTEP );
+    Parallel_Common::bcast_int( GlobalV::RELAX_NMAX );
     Parallel_Common::bcast_double( GlobalC::CHR.mixing_beta );
     Parallel_Common::bcast_int( GlobalC::en.printe );
     Parallel_Common::bcast_string( GlobalC::pot.chg_extrap );//xiaohui modify 2015-02-01

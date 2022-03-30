@@ -656,7 +656,7 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
     assert(iat == GlobalC::ucell.nat);
     delete [] rhocg;
 	delete [] psiv; // mohan fix bug 2012-03-22
-    Parallel_Reduce::reduce_double_pool(forcecc.c, forcecc.nr * forcecc.nc); //qianrui fix a bug for pw_kpar > 1
+    Parallel_Reduce::reduce_double_pool(forcecc.c, forcecc.nr * forcecc.nc); //qianrui fix a bug for kpar > 1
 	return;
 }
 
