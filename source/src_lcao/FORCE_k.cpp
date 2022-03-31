@@ -195,7 +195,7 @@ void Force_LCAO_k::allocate_k(const Parallel_Orbitals &pv)
     ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_Rz, nnr);
 	ModuleBase::Memory::record("force_lo", "dS", nnr*3, "double");
     
-	if(GlobalV::STRESS){
+	if(GlobalV::CAL_STRESS){
 		this->UHM->LM->DH_r = new double [3* nnr];
 		ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DH_r, 3 * nnr);
 		this->UHM->LM->stvnl11 = new double [nnr];
@@ -251,7 +251,7 @@ void Force_LCAO_k::finish_k(void)
     delete [] this->UHM->LM->DHloc_fixedR_x;
     delete [] this->UHM->LM->DHloc_fixedR_y;
     delete [] this->UHM->LM->DHloc_fixedR_z;
-	if(GlobalV::STRESS)
+	if(GlobalV::CAL_STRESS)
 	{
 		delete [] this->UHM->LM->DH_r;
 		delete [] this->UHM->LM->stvnl11;

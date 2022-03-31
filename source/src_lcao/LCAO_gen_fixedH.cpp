@@ -199,7 +199,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 								if(GlobalV::GAMMA_ONLY_LOCAL)
 								{
 									this->LM->set_force (iw1_all, iw2_all,	olm[0], olm[1], olm[2], dtype);
-									if(GlobalV::STRESS) this->LM->set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
+									if(GlobalV::CAL_STRESS) this->LM->set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
 								}
 								else // k point algorithm
 								{
@@ -208,7 +208,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 										this->LM->DSloc_Rx[nnr] = olm[0];
 										this->LM->DSloc_Ry[nnr] = olm[1];
 										this->LM->DSloc_Rz[nnr] = olm[2];
-										if(GlobalV::STRESS)
+										if(GlobalV::CAL_STRESS)
 										{
 											this->LM->DH_r[nnr*3] = dtau.x;
 											this->LM->DH_r[nnr*3 + 1] = dtau.y;
@@ -221,7 +221,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 										this->LM->DHloc_fixedR_x[nnr] = olm[0];
 										this->LM->DHloc_fixedR_y[nnr] = olm[1];
 										this->LM->DHloc_fixedR_z[nnr] = olm[2];
-										if(GlobalV::STRESS)
+										if(GlobalV::CAL_STRESS)
 										{
 											this->LM->stvnl11[nnr] = olm[0] * dtau.x;
 											this->LM->stvnl12[nnr] = olm[0] * dtau.y;

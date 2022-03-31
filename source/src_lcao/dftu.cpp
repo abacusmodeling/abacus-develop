@@ -97,14 +97,14 @@ void DFTU::init(
 		
 	this->EU = 0.0;
 
-	if(GlobalV::FORCE)
+	if(GlobalV::CAL_FORCE)
 	{
 		this->force_dftu.resize(cell.nat);
 		for(int ia=0; ia<cell.nat; ia++)
 			this->force_dftu.at(ia).resize(3, 0.0);
 	}
 
-	if(GlobalV::STRESS)
+	if(GlobalV::CAL_STRESS)
 	{
 		this->stress_dftu.resize(3);
 		for(int dim=0; dim<3; dim++)

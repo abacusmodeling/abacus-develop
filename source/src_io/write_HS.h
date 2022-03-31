@@ -8,7 +8,7 @@
 // mohan add this file 2010-09-10
 namespace HS_Matrix
 {
-    void saving_HS(const double *Hloc, const double* Sloc, bool bit, const int &out_hs, const Parallel_Orbitals &pv);
+    void saving_HS(const double *Hloc, const double* Sloc, bool bit, const int &out_mat_hs, const Parallel_Orbitals &pv);
 
     void save_HS(const double *H, const double *S, bool bit,  const Parallel_Orbitals &pv);
 
@@ -38,7 +38,7 @@ namespace HS_Matrix
 // void save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_H, const int *rowind_H, 
 // const double *nzval_H, const double *nzval_S, bool bit);
 
-    void saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_hs, const Parallel_Orbitals &pv); //LiuXh, 2017-03-21
+    void saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_mat_hs, const Parallel_Orbitals &pv); //LiuXh, 2017-03-21
 
     void save_HS_complex(std::complex<double> *H, std::complex<double> *S, bool bit, const Parallel_Orbitals &pv); //LiuXh, 2017-03-21
 }

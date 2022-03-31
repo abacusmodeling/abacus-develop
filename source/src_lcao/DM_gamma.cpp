@@ -255,7 +255,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 	// Peize Lin test 2019-01-16
     this->init_dm_2d();
 
-	if(GlobalC::wf.start_wfc=="file")
+	if(GlobalC::wf.init_wfc=="file")
 	{
 		this->gamma_file(gt, *this->LOWF);
 	}

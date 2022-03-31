@@ -10,7 +10,7 @@ class IState_Envelope
 	IState_Envelope();
 	~IState_Envelope();
 
-    void begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf, int& out_wf_r);
+    void begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wfc_pw, int& out_wfc_r);
 
 private:
 	bool *bands_picked;
