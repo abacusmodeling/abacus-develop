@@ -11,7 +11,7 @@
 
     - [Plane wave related variables](#plane-wave-related-variables)
     
-        [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx) | [diag_thr_e](#diag_thr_e) | [diag_cg_nmax](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim)
+        [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx) | [pw_diag_thr](#pw_diag_thr) | [pw_diag_nmax](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim)
 
     - [Numerical atomic orbitals related variables](#numerical-atomic-orbitals-related-variables)
 
@@ -19,11 +19,11 @@
 
     - [Electronic structure](#electronic-structure)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr_rho](#scf_thr_rho) | [chg_extrap](#chg_extrap) | [ocp](#ocp) | [ocp_set](#ocp_set)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap) | [ocp](#ocp) | [ocp_set](#ocp_set)
 
     - [Geometry relaxation](#geometry-relaxation)
     
-        [relax_nmax](#relax_nmax) | [cal_force](#cal_force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [out_force](#out_force) | [relax_bfgs_w1](#bfgs-w1) | [relax_bfgs_w2](#bfgs-w2) | [relax_bfgs_rmax](#relax_bfgs_rmax) | [relax_bfgs_rmin](#relax_bfgs_rmin) | [relax_bfgs_init](#relax_bfgs_init) | [cal_stress](#cal_stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [relax_method](#relax_method) | [relax_cg_thr_e](#relax_cg_thr_e) | [cell_factor](#cell-factor)
+        [relax_nmax](#relax_nmax) | [cal_force](#cal_force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [out_force](#out_force) | [relax_bfgs_w1](#bfgs-w1) | [relax_bfgs_w2](#bfgs-w2) | [relax_bfgs_rmax](#relax_bfgs_rmax) | [relax_bfgs_rmin](#relax_bfgs_rmin) | [relax_bfgs_init](#relax_bfgs_init) | [cal_stress](#cal_stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [relax_method](#relax_method) | [relax_cg_thr](#relax_cg_thr) | [cell_factor](#cell-factor)
 
     - [Variables related to program output](#variables-related-to-program-output)
 
@@ -55,7 +55,7 @@
 
     - [TDDFT: time dependent density functional theory](#TDDFT-doc)
     
-        [tddft](#tddft) | [td_scf_thr_rho](#td_scf_thr_rho) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
+        [tddft](#tddft) | [td_scf_thr](#td_scf_thr) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
@@ -121,7 +121,7 @@ This part of variables are used to control general system parameters.
         - *scf*: do self-consistent electronic structure calculation
         - *relax*: do structure relaxation calculation, one can ues ‘relax_nmax’ to decide how many ionic relaxations you want.
         - *cell-relax*: do cell relaxation calculation.
-        - *nscf*: do the non self-consistent electronic structure calculations. For this option, you need a charge density file. For nscf calculations with planewave basis set, diag_thr_e should be <= 1d-3.
+        - *nscf*: do the non self-consistent electronic structure calculations. For this option, you need a charge density file. For nscf calculations with planewave basis set, pw_diag_thr should be <= 1d-3.
         - *istate*: Please see the explanation for variable `nbands_istate`.
         - *ienvelope*: Please see the explanation for variable `nbands_istate`.
         - *md*: molecular dynamics
@@ -355,14 +355,14 @@ This part of variables are used to control the plane wave related parameters.
 
     [back to top](#input-file)
 
-- diag_thr_e<a id="diag_thr_e"></a>
+- pw_diag_thr<a id="pw_diag_thr"></a>
     - *Type*: Real
-    - *Description*: Only used when you use diago_type = cg or diago_type = david. It indicates the threshold for the first electronic iteration, from the second iteration the diag_thr_e will be updated automatically. **For nscf calculations with planewave basis set, diag_thr_e should be <= 1d-3.**
+    - *Description*: Only used when you use diago_type = cg or diago_type = david. It indicates the threshold for the first electronic iteration, from the second iteration the pw_diag_thr will be updated automatically. **For nscf calculations with planewave basis set, pw_diag_thr should be <= 1d-3.**
     - *Default*: 0.01
 
     [back to top](#input-file)
 
-- diag_cg_nmax<a id="diago-cg-maxiter"></a>
+- pw_diag_nmax<a id="diago-cg-maxiter"></a>
     - *Type*: Integer
     - *Description*: Only useful when you use ks_solver = cg or ks_solver = dav. It indicates the maximal iteration number for cg/david method.
     - *Default*: 40
@@ -583,7 +583,7 @@ calculations.
 
     [back to top](#input-file)
 
-- scf_thr_rho<a id="scf_thr_rho"></a>
+- scf_thr<a id="scf_thr"></a>
     - *Type*: Real
     - *Description*: An important parameter in ABACUS. It’s the threshold for electronic iteration. It represents the charge density error between two sequential density from electronic iterations. Usually for local orbitals, usually 1e-6 may be accurate enough.
     - *Default*:1e-06
@@ -732,7 +732,7 @@ This part of variables are used to control the geometry relaxation.
 
     [back to top](#input-file)
 
-- relax_cg_thr_e<a id="relax_cg_thr_e"></a>
+- relax_cg_thr<a id="relax_cg_thr"></a>
     - *Type*: Real
     - *Description*: When move-method is set to 'cg-bfgs', a mixed cg-bfgs algorithm is used. The ions first move according to cg method, then switched to bfgs when maximum of force on atoms is reduced below cg-threshold. Unit is eV/Angstrom.
     - *Default*: 0.5
@@ -1409,7 +1409,7 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: 0
 
     [back to top](#input-file)
-- td_scf_thr_rho<a id="td_scf_thr_rho"></a>
+- td_scf_thr<a id="td_scf_thr"></a>
     - *Type*: Double
     - *Description*: Accuracy of electron convergence when doing time-dependent evolution.
     - *Default*: 1e-9

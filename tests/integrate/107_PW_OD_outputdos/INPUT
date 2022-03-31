@@ -10,13 +10,13 @@ read_file_dir   ./
 
 #Parameters (2.Iteration)
 ecutwfc			20
-scf_thr_rho				1e-8
+scf_thr				1e-8
 scf_nmax			100
 
 #out_chg      1
 init_chg        file
 out_dos            1
-diag_thr_e                0.00001
+pw_diag_thr                0.00001
 
 #Parameters (3.Basis)
 basis_type		pw

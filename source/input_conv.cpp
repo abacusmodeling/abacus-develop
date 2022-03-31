@@ -100,7 +100,7 @@ void Input_Conv::Convert(void)
 
 	GlobalV::RELAX_METHOD = INPUT.relax_method;
 	GlobalV::OUT_LEVEL = INPUT.out_level;
-	Ions_Move_CG::RELAX_CG_THR_E = INPUT.relax_cg_thr_e; // pengfei add 2013-09-09
+	Ions_Move_CG::RELAX_CG_THR = INPUT.relax_cg_thr; // pengfei add 2013-09-09
 
 	ModuleSymmetry::Symmetry::symm_flag = INPUT.symmetry; // 9
 	GlobalC::symm.epsilon = INPUT.symmetry_prec; // LiuXh add 2021-08-12, accuracy for symmetry
@@ -132,10 +132,10 @@ void Input_Conv::Convert(void)
 	// diagonalization  (5/5)
 	//----------------------------------------------------------
 	GlobalV::DIAGO_PROC = INPUT.diago_proc;
-	GlobalV::DIAG_CG_NMAX = INPUT.diag_cg_nmax;
+	GlobalV::PW_DIAG_NMAX = INPUT.pw_diag_nmax;
 	GlobalV::DIAGO_CG_PREC = INPUT.diago_cg_prec;
 	GlobalV::DIAGO_DAVID_NDIM = INPUT.diago_david_ndim;
-	GlobalV::DIAG_THR_E = INPUT.diag_thr_e;
+	GlobalV::PW_DIAG_THR = INPUT.pw_diag_thr;
 	GlobalV::NB2D = INPUT.nb2d;
 	GlobalV::NURSE = INPUT.nurse;
 	GlobalV::COLOUR = INPUT.colour;
@@ -150,7 +150,7 @@ void Input_Conv::Convert(void)
 	//----------------------------------------------------------
 	// iteration (1/3)
 	//----------------------------------------------------------
-	GlobalV::SCF_THR_RHO = INPUT.scf_thr_rho;
+	GlobalV::SCF_THR = INPUT.scf_thr;
 
 	//----------------------------------------------------------
 	// wavefunction / charge / potential / (2/4)
@@ -220,7 +220,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 #ifdef __LCAO
 	ELEC_evolve::tddft = INPUT.tddft;
-	ELEC_evolve::td_scf_thr_rho = INPUT.td_scf_thr_rho;
+	ELEC_evolve::td_scf_thr = INPUT.td_scf_thr;
 	ELEC_evolve::td_dt = INPUT.td_dt;
 	ELEC_evolve::td_force_dt = INPUT.td_force_dt;
 	ELEC_evolve::td_val_elec_01 = INPUT.td_val_elec_01;

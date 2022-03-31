@@ -10,7 +10,7 @@ calculation     md
 ecutwfc			20
 scf_nmax			20
 
-scf_thr_rho         1E-7
+scf_thr         1E-7
 basis_type		lcao
 md_nstep           1
 

@@ -8,7 +8,7 @@ calculation 	md
 #Parameters (Accuracy)
 ecutwfc			20
 scf_nmax			50
-scf_thr_rho             1.0e-6
+scf_thr             1.0e-6
 
 basis_type		lcao
 md_nstep           3

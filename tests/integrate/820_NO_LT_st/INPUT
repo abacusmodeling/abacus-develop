@@ -13,7 +13,7 @@ latname			st
 ecutwfc			25.0              # Rydberg
 #Parameters (electronic)
 basis_type		lcao 	
-scf_thr_rho			1e-10
+scf_thr			1e-10
 
 cal_force			1
 cal_stress			1

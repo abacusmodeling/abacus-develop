@@ -48,15 +48,15 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"ecutwfc",ecutwfc,"#energy cutoff for wave functions");
 	if(ks_solver=="cg")
 	{
-		ModuleBase::GlobalFunc::OUTP(ofs,"diag_cg_nmax",diag_cg_nmax,"max iteration number for cg");
+		ModuleBase::GlobalFunc::OUTP(ofs,"pw_diag_nmax",pw_diag_nmax,"max iteration number for cg");
 		ModuleBase::GlobalFunc::OUTP(ofs,"diago_cg_prec",diago_cg_prec,"diago_cg_prec");
 	}
 	else if(ks_solver=="dav")
 	{
 		ModuleBase::GlobalFunc::OUTP(ofs,"diago_david_ndim",diago_david_ndim,"max dimension for davidson");
 	}
-	ModuleBase::GlobalFunc::OUTP(ofs,"diag_thr_e",diag_thr_e,"threshold for eigenvalues is cg electron iterations");
-	ModuleBase::GlobalFunc::OUTP(ofs,"scf_thr_rho",scf_thr_rho,"charge density error");
+	ModuleBase::GlobalFunc::OUTP(ofs,"pw_diag_thr",pw_diag_thr,"threshold for eigenvalues is cg electron iterations");
+	ModuleBase::GlobalFunc::OUTP(ofs,"scf_thr",scf_thr,"charge density error");
 	ModuleBase::GlobalFunc::OUTP(ofs,"init_wfc",init_wfc,"start wave functions are from 'atomic' or 'file'");
 	ModuleBase::GlobalFunc::OUTP(ofs,"init_chg",init_chg,"start charge is from 'atomic' or file");
 	ModuleBase::GlobalFunc::OUTP(ofs,"chg_extrap",chg_extrap,"atomic; first-order; second-order; dm:coefficients of SIA");
@@ -83,7 +83,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"force_thr",force_thr,"force threshold, unit: Ry/Bohr");
 	ModuleBase::GlobalFunc::OUTP(ofs,"force_thr_ev",force_thr*13.6058/0.529177,"force threshold, unit: eV/Angstrom");
 	ModuleBase::GlobalFunc::OUTP(ofs,"force_thr_ev2",force_thr_ev2,"force invalid threshold, unit: eV/Angstrom");
-	ModuleBase::GlobalFunc::OUTP(ofs,"relax_cg_thr_e",relax_cg_thr_e,"threshold for switching from cg to bfgs, unit: eV/Angstrom");
+	ModuleBase::GlobalFunc::OUTP(ofs,"relax_cg_thr",relax_cg_thr,"threshold for switching from cg to bfgs, unit: eV/Angstrom");
 	ModuleBase::GlobalFunc::OUTP(ofs,"stress_thr",stress_thr,"stress threshold");
 	ModuleBase::GlobalFunc::OUTP(ofs,"press1",press1,"target pressure, unit: KBar");
 	ModuleBase::GlobalFunc::OUTP(ofs,"press2",press2,"target pressure, unit: KBar");
@@ -235,7 +235,7 @@ void Input::Print(const std::string &fn)const
 
 	ofs << "\n#Parameters (16.tddft)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"tddft",tddft,"calculate tddft or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"td_scf_thr_rho",td_scf_thr_rho,"threshold for electronic iteration of tddft");
+	ModuleBase::GlobalFunc::OUTP(ofs,"td_scf_thr",td_scf_thr,"threshold for electronic iteration of tddft");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_dt",td_dt,"time of ion step");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_force_dt",td_force_dt,"time of force change");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_val_elec_01",td_val_elec_01,"td_val_elec_01");
