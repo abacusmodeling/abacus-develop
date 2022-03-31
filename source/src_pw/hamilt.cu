@@ -190,10 +190,10 @@ void Hamilt::diagH_pw(
                     // CHECK_CUDA(cudaMemcpy(d_wf_ekb, wf.ekb[ik], NBANDS * sizeof(double), cudaMemcpyHostToDevice));
                     CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_CUDA * sizeof(double), cudaMemcpyHostToDevice));
                     // cout<<"ITER: "<<iter<<endl;
-                    // cout<<"DIAG_THR_E_now: "<<GlobalV::DIAG_THR_E<<endl;
+                    // cout<<"PW_DIAG_THR_now: "<<GlobalV::PW_DIAG_THR<<endl;
                     // cast to float
                     // if(iter < 100)
-                    // if(iter == 1 || GlobalV::DIAG_THR_E > 5e-4)
+                    // if(iter == 1 || GlobalV::PW_DIAG_THR > 5e-4)
                     if(iter < 0)
                     {
                         CHECK_CUDA(cudaMalloc((void**)&f_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(float2)));
@@ -216,8 +216,8 @@ void Hamilt::diagH_pw(
                         // CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C));
                         // cout<<"Do float CG ..."<<endl;
                         f_cg_cuda.diag(f_wf_evc, f_wf_ekb, f_vkb_c, DIM_CG_CUDA, GlobalC::wf.npwx,
-                            GlobalV::NBANDS, f_precondition, GlobalV::DIAG_THR_E,
-                            GlobalV::DIAG_CG_NMAX, reorder, notconv, avg);
+                            GlobalV::NBANDS, f_precondition, GlobalV::PW_DIAG_THR,
+                            GlobalV::PW_DIAG_NMAX, reorder, notconv, avg);
                         hamilt_cast_f2d<<<block, thread>>>(d_wf_evc, f_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx);
                         hamilt_cast_f2d<<<block2, thread>>>(d_wf_ekb, f_wf_ekb, GlobalV::NBANDS);
 
@@ -229,8 +229,8 @@ void Hamilt::diagH_pw(
                         // CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
                         // cout<<"Do double CG ..."<<endl;
                         d_cg_cuda.diag(d_wf_evc, d_wf_ekb, d_vkb_c, DIM_CG_CUDA, GlobalC::wf.npwx,
-                            GlobalV::NBANDS, d_precondition, GlobalV::DIAG_THR_E,
-                            GlobalV::DIAG_CG_NMAX, reorder, notconv, avg);
+                            GlobalV::NBANDS, d_precondition, GlobalV::PW_DIAG_THR,
+                            GlobalV::PW_DIAG_NMAX, reorder, notconv, avg);
                     }
                     // TODO destroy handle
                     // CHECK_CUFFT(cufftDestroy(GlobalC::UFFT.fft_handle));
@@ -259,8 +259,8 @@ void Hamilt::diagH_pw(
                     CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
 
                     d_cg_cuda.diag(d_wf_evc, d_wf_ekb, d_vkb_c, DIM_CG_CUDA2, DIM_CG_CUDA2,
-                        GlobalV::NBANDS, d_precondition, GlobalV::DIAG_THR_E,
-                        GlobalV::DIAG_CG_NMAX, reorder, notconv, avg);
+                        GlobalV::NBANDS, d_precondition, GlobalV::PW_DIAG_THR,
+                        GlobalV::PW_DIAG_NMAX, reorder, notconv, avg);
                     CHECK_CUFFT(cufftDestroy(GlobalC::UFFT.fft_handle));
 
                     // to cpu
@@ -289,13 +289,13 @@ void Hamilt::diagH_pw(
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],
 						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
-				 		GlobalV::DIAG_THR_E, GlobalV::DIAG_CG_NMAX, notconv, avg);
+				 		GlobalV::PW_DIAG_THR, GlobalV::PW_DIAG_NMAX, notconv, avg);
 				}
 				else
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::wf.npwx*GlobalV::NPOL,
 						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
-						GlobalV::DIAG_THR_E, GlobalV::DIAG_CG_NMAX, notconv, avg);
+						GlobalV::PW_DIAG_THR, GlobalV::PW_DIAG_NMAX, notconv, avg);
 				}
         	}
         	else

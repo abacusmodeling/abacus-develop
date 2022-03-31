@@ -23,8 +23,8 @@ read_file_dir   ./
 ecutwfc 60
 symmetry 1
 scf_nmax 50
-scf_thr_rho 1.0e-9
-diag_thr_e 1.0e-7
+scf_thr 1.0e-9
+pw_diag_thr 1.0e-7
 
 #Parameters (File)
 init_chg file
@@ -42,9 +42,9 @@ Some parameters in the INPUT file are explained:
 
     choose which kind of calculation: scf calculation, nscf calculation, structure relaxation or Molecular Dynamics. Now we need to do one step of nscf calculation.
     Attention: This is a main variable of ABACUS, and for its more information please see the [list of input variables](../input-main.md).
-- diag_thr_e
+- pw_diag_thr
 
-    threshold for the CG method which diagonalizes the Hamiltonian to get eigenvalues and eigen wave functions. If one wants to do nscf calculation, diag_thr_e needs to be changed to a smaller account, typically smaller than 1.0e-3. Note that this parameter only apply to plane-wave calculations that employ the CG method to diagonalize the Hamiltonian.
+    threshold for the CG method which diagonalizes the Hamiltonian to get eigenvalues and eigen wave functions. If one wants to do nscf calculation, pw_diag_thr needs to be changed to a smaller account, typically smaller than 1.0e-3. Note that this parameter only apply to plane-wave calculations that employ the CG method to diagonalize the Hamiltonian.
     
     For LCAO calculations, this parameter will be neglected !
 - init_chg

@@ -24,7 +24,7 @@ basis_type lcao
 out_chg 1
 gamma_only 0
 md_nstep 2000
-scf_thr_rho 1.0e-6
+scf_thr 1.0e-6
 md_type 0
 md_dt 0.01
 md_tfirst 30

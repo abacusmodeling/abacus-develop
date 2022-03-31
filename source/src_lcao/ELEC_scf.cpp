@@ -36,7 +36,7 @@ void ELEC_scf::scf(const int& istep,
 	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
 	// mohan add 2012-02-08
-    set_diag_thr_e();
+    set_pw_diag_thr();
 
 	// the electron charge density should be symmetrized,
 	// here is the initialization
@@ -60,7 +60,7 @@ void ELEC_scf::scf(const int& istep,
 				printf( "\e[33m%-10s\e[0m", "TMAG");
 				printf( "\e[33m%-10s\e[0m", "AMAG");
 			}
-			printf( "\e[33m%-14s\e[0m", "SCF_THR_RHO");
+			printf( "\e[33m%-14s\e[0m", "SCF_THR");
 			printf( "\e[33m%-15s\e[0m", "ETOT(eV)");
 			printf( "\e[33m%-11s\e[0m\n", "TIME(s)");
 		}
@@ -76,7 +76,7 @@ void ELEC_scf::scf(const int& istep,
 
 			std::cout << std::setw(15) << "ETOT(eV)";
 			std::cout << std::setw(15) << "EDIFF(eV)";
-			std::cout << std::setw(11) << "SCF_THR_RHO";
+			std::cout << std::setw(11) << "SCF_THR";
 			std::cout << std::setw(11) << "TIME(s)" << std::endl;
 		}
 	}// end GlobalV::OUT_LEVEL
@@ -111,7 +111,7 @@ void ELEC_scf::scf(const int& istep,
 
 		// set converged threshold,
 		// automatically updated during self consistency, only for CG.
-        this->update_diag_thr_e(iter);
+        this->update_pw_diag_thr(iter);
         if(GlobalV::FINAL_SCF && iter==1)
         {
             init_mixstep_final_scf();
@@ -150,7 +150,7 @@ void ELEC_scf::scf(const int& istep,
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				// a puzzle remains here.
 				// if I don't renew potential,
-				// The scf_thr_rho is very small.
+				// The scf_thr is very small.
 				// OneElectron, Hartree and
 				// Exc energy are all correct
 				// except the band energy.
@@ -339,7 +339,7 @@ void ELEC_scf::scf(const int& istep,
 		GlobalC::en.deband = GlobalC::en.delta_e();
 
 		// (8) Mix charge density
-		GlobalC::CHR.mix_rho(scf_thr_rho,0,GlobalV::SCF_THR_RHO,iter,conv_elec);
+		GlobalC::CHR.mix_rho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
 
 		// Peize Lin add 2020.04.04
 		if(GlobalC::restart.info_save.save_charge)
@@ -374,7 +374,7 @@ void ELEC_scf::scf(const int& istep,
 			/*
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho_save, GlobalC::CHR.rho);
 			GlobalC::en.calculate_etot();
-			GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr_rho, 0.0, GlobalV::DIAG_THR_E, avg_iter,0);
+			GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, 0.0, GlobalV::PW_DIAG_THR, avg_iter,0);
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 			*/
@@ -444,7 +444,7 @@ void ELEC_scf::scf(const int& istep,
 		// avg_iter is an useless variable in LCAO,
 		// will fix this interface in future -- mohan 2021-02-10
 		int avg_iter=0;
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr_rho, duration, GlobalV::DIAG_THR_E, avg_iter);
+		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
 
 		GlobalC::en.etot_old = GlobalC::en.etot;
 

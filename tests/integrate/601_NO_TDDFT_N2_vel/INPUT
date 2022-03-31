@@ -24,7 +24,7 @@ stress_thr              1e-6
 cal_force                   1
 force_thr_ev            1.0e-3
 
-scf_thr_rho			1.0e-6
+scf_thr			1.0e-6
 
 tddft			1
 

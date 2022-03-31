@@ -5,7 +5,7 @@ nbands    40
 
 calculation    scf
 ecutwfc    20
-scf_thr_rho    1.0e-4
+scf_thr    1.0e-4
 scf_nmax    2
 out_chg    0
 
