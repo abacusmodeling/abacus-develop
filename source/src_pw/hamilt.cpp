@@ -110,13 +110,13 @@ void Hamilt::diagH_pw(
 				if(GlobalV::NPOL==1)
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],
-						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
+						GlobalV::NBANDS, precondition, GlobalV::PW_DIAG_NDIM,
 				 		GlobalV::PW_DIAG_THR, GlobalV::PW_DIAG_NMAX, notconv, avg);
 				}
 				else
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::wf.npwx*GlobalV::NPOL,
-						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
+						GlobalV::NBANDS, precondition, GlobalV::PW_DIAG_NDIM,
 						GlobalV::PW_DIAG_THR, GlobalV::PW_DIAG_NMAX, notconv, avg);
 				}
         	}

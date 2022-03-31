@@ -134,7 +134,7 @@ void Input_Conv::Convert(void)
 	GlobalV::DIAGO_PROC = INPUT.diago_proc;
 	GlobalV::PW_DIAG_NMAX = INPUT.pw_diag_nmax;
 	GlobalV::DIAGO_CG_PREC = INPUT.diago_cg_prec;
-	GlobalV::DIAGO_DAVID_NDIM = INPUT.diago_david_ndim;
+	GlobalV::PW_DIAG_NDIM = INPUT.pw_diag_ndim;
 	GlobalV::PW_DIAG_THR = INPUT.pw_diag_thr;
 	GlobalV::NB2D = INPUT.nb2d;
 	GlobalV::NURSE = INPUT.nurse;

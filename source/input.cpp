@@ -196,7 +196,7 @@ void Input::Default(void)
 	diago_proc = 0; //if 0, then diago_proc = GlobalV::NPROC
     pw_diag_nmax = 50;
 	diago_cg_prec=1; //mohan add 2012-03-31
-    diago_david_ndim = 4;
+    pw_diag_ndim = 4;
     pw_diag_thr = 1.0e-2;
 	nb2d = 0;
 	nurse = 0;
@@ -758,9 +758,9 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, diago_cg_prec);
         }
-        else if (strcmp("diago_david_ndim", word) == 0)
+        else if (strcmp("pw_diag_ndim", word) == 0)
         {
-            read_value(ifs, diago_david_ndim);
+            read_value(ifs, pw_diag_ndim);
         }
         else if (strcmp("pw_diag_thr", word) == 0)
         {
@@ -1817,7 +1817,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int( diago_proc ); //mohan add 2012-01-03
     Parallel_Common::bcast_int( pw_diag_nmax );
 	Parallel_Common::bcast_int( diago_cg_prec );
-    Parallel_Common::bcast_int( diago_david_ndim );
+    Parallel_Common::bcast_int( pw_diag_ndim );
     Parallel_Common::bcast_double( pw_diag_thr );
 	Parallel_Common::bcast_int( nb2d );
 	Parallel_Common::bcast_int( nurse );

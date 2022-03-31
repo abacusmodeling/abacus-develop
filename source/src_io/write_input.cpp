@@ -53,7 +53,7 @@ void Input::Print(const std::string &fn)const
 	}
 	else if(ks_solver=="dav")
 	{
-		ModuleBase::GlobalFunc::OUTP(ofs,"diago_david_ndim",diago_david_ndim,"max dimension for davidson");
+		ModuleBase::GlobalFunc::OUTP(ofs,"pw_diag_ndim",pw_diag_ndim,"max dimension for davidson");
 	}
 	ModuleBase::GlobalFunc::OUTP(ofs,"pw_diag_thr",pw_diag_thr,"threshold for eigenvalues is cg electron iterations");
 	ModuleBase::GlobalFunc::OUTP(ofs,"scf_thr",scf_thr,"charge density error");
@@ -191,7 +191,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_force", test_force, "test the force");
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_stress", test_stress, "test the force");
 	
-	ofs << "\n#Parameters (13.VdW Correction)" << std::endl;								
+	ofs << "\n#Parameters (13.vdW Correction)" << std::endl;								
 	ModuleBase::GlobalFunc::OUTP(ofs,"vdw_method",vdw_method,"the method of calculating vdw (none ; d2 ; d3_0 ; d3_bj");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vdw_s6",vdw_s6,"scale parameter of d2/d3_0/d3_bj");
     ModuleBase::GlobalFunc::OUTP(ofs,"vdw_s8",vdw_s8,"scale parameter of d3_0/d3_bj");

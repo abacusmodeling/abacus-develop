@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [kpar](#kpar) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [init_wfc](#init_wfc) | [pw_seed](#pw_seed) | [init_chg](#init_chg) | [init_vel](#init_vel) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
+        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
 
     - [Variables related to input files](#variables-related-to-input-files)
 
@@ -11,7 +11,7 @@
 
     - [Plane wave related variables](#plane-wave-related-variables)
     
-        [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx) | [pw_diag_thr](#pw_diag_thr) | [pw_diag_nmax](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim)
+        [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx) | [pw_seed](#pw_seed) | [pw_diag_thr](#pw_diag_thr) | [pw_diag_nmax](#diago-cg-maxiter) | [pw_diag_ndim](#pw_diag_ndim)
 
     - [Numerical atomic orbitals related variables](#numerical-atomic-orbitals-related-variables)
 
@@ -19,21 +19,21 @@
 
     - [Electronic structure](#electronic-structure)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap) | [ocp](#ocp) | [ocp_set](#ocp_set)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap)
 
     - [Geometry relaxation](#geometry-relaxation)
     
-        [relax_nmax](#relax_nmax) | [cal_force](#cal_force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [out_force](#out_force) | [relax_bfgs_w1](#bfgs-w1) | [relax_bfgs_w2](#bfgs-w2) | [relax_bfgs_rmax](#relax_bfgs_rmax) | [relax_bfgs_rmin](#relax_bfgs_rmin) | [relax_bfgs_init](#relax_bfgs_init) | [cal_stress](#cal_stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [relax_method](#relax_method) | [relax_cg_thr](#relax_cg_thr) | [cell_factor](#cell-factor)
+        [relax_nmax](#relax_nmax) | [relax_method](#relax_method) | [relax_cg_thr](#relax_cg_thr) | [relax_bfgs_w1](#bfgs-w1) | [relax_bfgs_w2](#bfgs-w2) | [relax_bfgs_rmax](#relax_bfgs_rmax) | [relax_bfgs_rmin](#relax_bfgs_rmin) | [relax_bfgs_init](#relax_bfgs_init) | [cal_force](#cal_force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [cal_stress](#cal_stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [cell_factor](#cell-factor)
 
-    - [Variables related to program output](#variables-related-to-program-output)
+    - [Variables related to output information](#variables-related-to-output-information)
 
-        [out_mul](#out_mul) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out-dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
+        [out_force](#out_force) | [out_mul](#out_mul) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out-dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
 
     - [Density of states](#density-of-states)
 
         [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale)
     
-    - [Exact exchange](#exact-exchange) (under tests)
+    - [Exact exchange](#exact-exchange) (Under tests)
     
         [exx_hybrid_type](#exx-hybrid-type) | [exx_hybrid_alpha](#exx-hybrid-alpha) | [exx_hse_omega](#exx-hse-omega) | [exx_separate_loop](#exx-separate-loop) | [exx_hybrid_step](#exx-hybrid-step) | [exx_lambda](#exx-lambda) | [exx_pca_threshold](#exx-pca-threshold) | [exx_c_threshold](#exx-c-threshold) | [exx_v_threshold](#exx-v-threshold) | [exx_dm_threshold](#exx-dm-threshold) | [exx_schwarz_threshold](#exx-schwarz-threshold) | [exx_cauchy_threshold](#exx-cauchy-threshold) | [exx_ccp_threshold](#exx-ccp-threshold) | [exx_ccp_rmesh_times](#exx-ccp-rmesh-times) | [exx_distribute_type](#exx-distribute-type) | [exx_opt_orb_lmax](#exx-opt-orb-lmax) | [exx_opt_orb_ecut](#exx-opt-orb-ecut) | [exx_opt_orb_tolerence](#exx-opt-orb-tolerence)
 
@@ -41,11 +41,7 @@
 
         [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
 
-    - [DFT+U correction](#DFT_U-correction)
-
-        [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [hund_j](#hund_j) | [yukawa_potential](#yukawa_potential) | [omc](#omc)
-
-    - [VdW correction](#vdw-correction)
+    - [vdW correction](#vdw-correction)
 
         [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
         
@@ -53,9 +49,13 @@
     
         [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin)
 
-    - [TDDFT: time dependent density functional theory](#TDDFT-doc)
+    - [TDDFT: time dependent density functional theory](#TDDFT-doc) (Under tests)
     
-        [tddft](#tddft) | [td_scf_thr](#td_scf_thr) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
+        [tddft](#tddft) | [td_scf_thr](#td_scf_thr) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout) | [ocp](#ocp) | [ocp_set](#ocp_set)
+
+    - [DFT+U correction](#DFT_U-correction) (Under tests)
+
+        [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [hund_j](#hund_j) | [yukawa_potential](#yukawa_potential) | [omc](#omc)
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
@@ -131,6 +131,83 @@ This part of variables are used to control general system parameters.
     
     [back to top](#input-file)
 
+- symmetry<a id="symmetry"></a>
+    - *Type*: Integer
+    - *Description*: takes value 0 and 1, if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- kpar<a id="kpar"></a>
+    - *Type*: Integer
+    - *Description*: devide all processors into kpar groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- latname<a id="latname"></a>
+    - *Type*: String
+    - *Description*: Specifies the type of Bravias lattice. When set to "test", the three lattice vectors are supplied explicitly in STRU file. When set to certain Bravais lattice type, there is no need to provide lattice vector, but a few lattice parameters might be required. For more information regarding this parameter, consult the [page on STRU file](input-stru.md).
+    Available options are:
+        - "test": free strcture.
+        - "sc": simple cubie.
+        - "fcc": face-centered cubic.
+        - "bcc": body-centered cubic.
+        - "hexagonal": hexagonal.
+        - "trigonal": trigonal.
+        - "st": simple tetragonal.
+        - "bct": body-centered tetragonal.
+        - "so": orthorhombic.
+        - "baco": base-centered orthorhombic.
+        - "fco": face-centered orthorhombic.
+        - "bco": body-centered orthorhombic.
+        - "sm": simple monoclinic.
+        - "bacm": base-centered monoclinic.
+        - "triclinic": triclinic.
+    - *Default*: "test"
+
+    [back to top](#input-file)
+
+- init_wfc<a id="init_wfc"></a>
+    - *Type*: String
+    - *Description*: Only useful for plane wave basis only now. It is the name of the starting wave functions. In the future we should also make this         variable available for localized orbitals set. 
+    Available options are:
+        - "atomic": from atomic pseudo wave functions. If they are not enough, other wave functions are initialized with random numbers.
+        - "atomic+random": add small random numbers on atomic pseudo-wavefunctions
+        - "file": from file
+        - "random": random numbers
+    - *Default*:"atomic"
+
+    [back to top](#input-file)
+
+- init_chg<a id="init_chg"></a>
+    - *Type*: String
+    - *Description*: This variable is used for both plane wave set and localized orbitals set. It indicates the type of starting density. If set this to ‘atomic’, the density is starting from summation of atomic density of single atoms. If set this to ‘file’, the density will be read in from file. Besides, when you do ‘nspin=1’ calculation, you only need the density file SPIN1_CHGCAR. However, if you do ‘nspin=2’ calculation, you also need the density file SPIN2_CHGCAR. The density file should be output with these names if you set out_chg = 1 in INPUT file.
+    - *Default*:atomic
+
+    [back to top](#input-file)
+
+- init_vel<a id="init_vel"></a>
+    - *Type*: Boolean
+    - *Description*: Read the atom velocity from the atom file (STRU) if set to true.
+    - *Default*: false
+
+    [back to top](#input-file)
+
+- nelec<a id="nelec"></a>
+    - *Type*: Real
+    - *Description*: If >0.0, this denotes total number of electrons in the system. Must be less than 2*nbands. If set to 0.0, the total number of electrons will be calculated by the sum of valence electrons (i.e. assuming neutral system).
+    - *Default*: 0.0
+
+    [back to top](#input-file)
+
+- tot_magnetization<a id="tot-magnetization"></a>
+    - *Type*: Real
+    - *Description*: Total magnetization of the system.
+    - *Default*: 0.0
+
+    [back to top](#input-file)
+
 - dft_functional<a id="dft-functional"></a>
     - *Type*: String
     - *Description*: In our package, the XC functional can either be set explicitly using the dft_functional keyword as explained below, or set implicitly according to the XC functional information read from pseudopotential file. The user should ensure that the XC functional set in the INPUT file and the pseudopotential file are consistent. If more than one element is present in the system, make sure all of pseudopotentials have the same XC functional. **Currently only LDA and GGA are supported.**
@@ -180,20 +257,6 @@ This part of variables are used to control general system parameters.
 
     [back to top](#input-file)
 
-- kpar<a id="kpar"></a>
-    - *Type*: Integer
-    - *Description*: devide all processors into kpar groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- symmetry<a id="symmetry"></a>
-    - *Type*: Integer
-    - *Description*: takes value 0 and 1, if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations.
-    - *Default*: 0
-
-    [back to top](#input-file)
-
 - pseudo_rcut<a id="pseudo-rcut"></a>
     - *Type*: Real
     - *Description*: Cut-off of radial integration for pseudopotentials, in Bohr.
@@ -208,80 +271,10 @@ This part of variables are used to control general system parameters.
 
     [back to top](#input-file)
 
-- nelec<a id="nelec"></a>
-    - *Type*: Real
-    - *Description*: If >0.0, this denotes total number of electrons in the system. Must be less than 2*nbands. If set to 0.0, the total number of electrons will be calculated by the sum of valence electrons (i.e. assuming neutral system).
-    - *Default*: 0.0
-
-    [back to top](#input-file)
-
-- tot_magnetization<a id="tot-magnetization"></a>
-    - *Type*: Real
-    - *Description*: Total magnetization of the system.
-    - *Default*: 0.0
-
-    [back to top](#input-file)
-
 - mem_saver<a id="mem-saver"></a>
     - *Type*: Boolean
     - *Description*: Used only for nscf calculations. If set to 1, then a memory saving technique will be used for many k point calculations.
     - *Default*: 0
-
-    [back to top](#input-file)
-
-- latname<a id="latname"></a>
-    - *Type*: String
-    - *Description*: Specifies the type of Bravias lattice. When set to "test", the three lattice vectors are supplied explicitly in STRU file. When set to certain Bravais lattice type, there is no need to provide lattice vector, but a few lattice parameters might be required. For more information regarding this parameter, consult the [page on STRU file](input-stru.md).
-    Available options are:
-        - "test": free strcture.
-        - "sc": simple cubie.
-        - "fcc": face-centered cubic.
-        - "bcc": body-centered cubic.
-        - "hexagonal": hexagonal.
-        - "trigonal": trigonal.
-        - "st": simple tetragonal.
-        - "bct": body-centered tetragonal.
-        - "so": orthorhombic.
-        - "baco": base-centered orthorhombic.
-        - "fco": face-centered orthorhombic.
-        - "bco": body-centered orthorhombic.
-        - "sm": simple monoclinic.
-        - "bacm": base-centered monoclinic.
-        - "triclinic": triclinic.
-    - *Default*: "test"
-
-    [back to top](#input-file)
-
-- init_wfc<a id="init_wfc"></a>
-    - *Type*: String
-    - *Description*: Only useful for plane wave basis only now. It is the name of the starting wave functions. In the future we should also make this         variable available for localized orbitals set. 
-    Available options are:
-        - "atomic": from atomic pseudo wave functions. If they are not enough, other wave functions are initialized with random numbers.
-        - "atomic+random": add small random numbers on atomic pseudo-wavefunctions
-        - "file": from file
-        - "random": random numbers
-    - *Default*:"atomic"
-
-    [back to top](#input-file)
-
-- pw_seed<a id="pw_seed"></a>
-    - *Type*: Integer
-    - *Description*: Only useful for plane wave basis only now. It is the random seed to initialize wave functions. Only positive integers are avilable.
-    - *Default*:0
-
-    [back to top](#input-file)
-
-- init_chg<a id="init_chg"></a>
-    - *Type*: String
-    - *Description*: This variable is used for both plane wave set and localized orbitals set. It indicates the type of starting density. If set this to ‘atomic’, the density is starting from summation of atomic density of single atoms. If set this to ‘file’, the density will be read in from file. Besides, when you do ‘nspin=1’ calculation, you only need the density file SPIN1_CHGCAR. However, if you do ‘nspin=2’ calculation, you also need the density file SPIN2_CHGCAR. The density file should be output with these names if you set out_chg = 1 in INPUT file.
-    - *Default*:atomic
-
-    [back to top](#input-file)
-
-- init_vel<a id="init_vel"></a>
-    - *Type*: Boolean
-    - *Description*: Read the atom velocity from the atom file (STRU) if set to true.
-    - *Default*: false
 
     [back to top](#input-file)
 
@@ -355,6 +348,13 @@ This part of variables are used to control the plane wave related parameters.
 
     [back to top](#input-file)
 
+- pw_seed<a id="pw_seed"></a>
+    - *Type*: Integer
+    - *Description*: Only useful for plane wave basis only now. It is the random seed to initialize wave functions. Only positive integers are avilable.
+    - *Default*:0
+
+    [back to top](#input-file)
+
 - pw_diag_thr<a id="pw_diag_thr"></a>
     - *Type*: Real
     - *Description*: Only used when you use diago_type = cg or diago_type = david. It indicates the threshold for the first electronic iteration, from the second iteration the pw_diag_thr will be updated automatically. **For nscf calculations with planewave basis set, pw_diag_thr should be <= 1d-3.**
@@ -369,7 +369,7 @@ This part of variables are used to control the plane wave related parameters.
 
     [back to top](#input-file)
 
-- diago_david_ndim<a id="diago-david-ndim"></a>
+- pw_diag_ndim<a id="pw_diag_ndim"></a>
     - *Type*: Integer
     - *Description*: Only useful when you use ks_solver = dav. It indicates the maximal dimension for the Davidson method.
     - *Default*: 10
@@ -600,22 +600,6 @@ calculations.
 
     [back to top](#input-file)
 
-
-- ocp<a id="ocp"></a>
-    - *Type*: Boolean
-    - *Description*: option for choose whether calcualting constrained DFT or not.
-    Only used for TDDFT.
-    - *Default*:0
-
-    [back to top](#input-file)
-
-- ocp_set<a id="ocp_set"></a>
-    - *Type*: string
-    - *Description*: If ocp is true, the ocp_set is a string to set the number of occupancy, like 1 10 * 1 0 1 representing the 13 band occupancy, 12th band occupancy 0 and the rest 1, the code is parsing this string into an array through a regular expression.
-    - *Default*:none
-
-    [back to top](#input-file)
-
 ### Geometry relaxation
 This part of variables are used to control the geometry relaxation.
 
@@ -643,13 +627,6 @@ This part of variables are used to control the geometry relaxation.
     - *Type*: Real
     - *Description*: The threshold of the force convergence, has the same function as force_thr, just the unit is different, it is eV=Angstrom, you can choose either one as you like. The recommendation value for using atomic orbitals is 0:04 eV/Angstrom.
     - *Default*: 0.01 eV/Angstrom
-
-    [back to top](#input-file)
-
-- out_force<a id="out_force"></a>
-    - *Type*: Integer
-    - *Description*: Determines whether to output the out_force into a file named `Force.dat` or not. If 1, then force will be written; if 0, then the force will not be written.
-    - *Default*: 0
 
     [back to top](#input-file)
 
@@ -746,9 +723,16 @@ This part of variables are used to control the geometry relaxation.
 
     [back to top](#input-file)
 
-### Variables related to program output
+### Variables related to output information
 This part of variables are used to control the output of properties.
 
+- out_force<a id="out_force"></a>
+    - *Type*: Integer
+    - *Description*: Determines whether to output the out_force into a file named `Force.dat` or not. If 1, then force will be written; if 0, then the force will not be written.
+    - *Default*: 0
+
+    [back to top](#input-file)
+    
 - out_mul<a id="out_mul"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the Mulliken population analysis result. The name of the output file is mulliken.txt
@@ -1255,7 +1239,7 @@ This part of variables are used to control DFT+U correlated parameters
     [back to top](#input-file)
 
 
-### VdW correction
+### vdW correction
 This part of variables are used to control vdW-corrected related parameters.
 
 - vdw_method<a id="vdw-method"></a>
@@ -1473,6 +1457,21 @@ This part of variables are used to control berry phase and wannier90 interfacae 
         - 1: Output dipole.
         - 0: do not Output dipole.
     - *Default*: 0
+
+    [back to top](#input-file)
+
+- ocp<a id="ocp"></a>
+    - *Type*: Boolean
+    - *Description*: option for choose whether calcualting constrained DFT or not.
+    Only used for TDDFT.
+    - *Default*:0
+
+    [back to top](#input-file)
+
+- ocp_set<a id="ocp_set"></a>
+    - *Type*: string
+    - *Description*: If ocp is true, the ocp_set is a string to set the number of occupancy, like 1 10 * 1 0 1 representing the 13 band occupancy, 12th band occupancy 0 and the rest 1, the code is parsing this string into an array through a regular expression.
+    - *Default*:none
 
     [back to top](#input-file)
 
