@@ -53,7 +53,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
     }
 
     // Geometry optimization algorithm setup.
-    if(GlobalV::FORCE)
+    if(GlobalV::CAL_FORCE)
     {
         //Ions_Move_Methods
         IMM.allocate();
@@ -62,7 +62,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
     }
 
     // pengfei Li 2018-05-14
-    if(GlobalV::STRESS)
+    if(GlobalV::CAL_STRESS)
     {
         // allocate arrays related to changes of lattice vectors
         LCM.allocate();
@@ -72,7 +72,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
     int force_step = 1;
     int stress_step = 1;
     bool stop = false;
-    while(istep <= GlobalV::NSTEP && !stop)
+    while(istep <= GlobalV::RELAX_NMAX && !stop)
     {
         time_t estart = time(NULL);
 
@@ -166,7 +166,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 		// not only electrostatic potential but also others
 		// mohan add 2021-03-25
 		// we need to have a proper
-        if(GlobalC::pot.out_potential == 2)
+        if(GlobalC::pot.out_pot == 2)
         {
             std::stringstream ssp;
             std::stringstream ssp_ave;
@@ -184,7 +184,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
         GlobalC::dmft.out_to_dmft(this->LOWF, *this->UHM.LM);
         }
 
-        if(Pdiag_Double::out_hsR)
+        if(Pdiag_Double::out_mat_hsR)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
@@ -254,7 +254,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 		// PLEASE move the details of CE to other places
 		// mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
-        if(GlobalV::FORCE)
+        if(GlobalV::CAL_FORCE)
         {
             CE.save_pos_next(GlobalC::ucell);
         }
@@ -264,7 +264,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
             double etime_min = difftime(eend, estart)/60.0;
             double ftime_min = difftime(fend, fstart)/60.0;
             std::stringstream ss;
-            ss << GlobalV::MOVE_IONS << istep;
+            ss << GlobalV::RELAX_METHOD << istep;
 
             std::cout << std::setiosflags(ios::scientific)
             << " " << std::setw(7) << ss.str()
@@ -317,7 +317,7 @@ bool LOOP_ions::force_stress(
 {
     ModuleBase::TITLE("LOOP_ions","force_stress");
 
-    if(!GlobalV::FORCE && !GlobalV::STRESS)
+    if(!GlobalV::CAL_FORCE && !GlobalV::CAL_STRESS)
     {
         return 1;
     }
@@ -328,14 +328,14 @@ bool LOOP_ions::force_stress(
 	// set stress matrix
 	ModuleBase::matrix scs;
     Force_Stress_LCAO FSL(ra);
-    FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
+    FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         this->LOC, this->LOWF, this->UHM, fcs, scs);
 
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
 	//--------------------------------------------------
-    if(GlobalV::FORCE && !GlobalV::STRESS)
+    if(GlobalV::CAL_FORCE && !GlobalV::CAL_STRESS)
     {
 
 #ifdef __MPI
@@ -352,7 +352,7 @@ bool LOOP_ions::force_stress(
         {
             IMM.cal_movement(istep, istep, fcs, GlobalC::en.etot);
 
-            if(IMM.get_converged() || (istep==GlobalV::NSTEP))
+            if(IMM.get_converged() || (istep==GlobalV::RELAX_NMAX))
             {
                 ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 1; // 1 means converged
@@ -362,7 +362,7 @@ bool LOOP_ions::force_stress(
                 CE.update_istep(istep);
                 CE.extrapolate_charge();
 
-                if(GlobalC::pot.extra_pot=="dm")
+                if(GlobalC::pot.chg_extrap=="dm")
                 {
                 }
                 else
@@ -393,7 +393,7 @@ bool LOOP_ions::force_stress(
         //CE.extrapolate_charge();
 
 /*xiaohui modify 2014-08-09
-        if(GlobalC::pot.extra_pot==4)
+        if(GlobalC::pot.chg_extrap==4)
         {
             // done after grid technique.
         }
@@ -407,7 +407,7 @@ xiaohui modify 2014-08-09*/
 //    static bool converged_force = false;
     static bool converged_stress = false;
 
-    if(!GlobalV::FORCE&&GlobalV::STRESS)
+    if(!GlobalV::CAL_FORCE&&GlobalV::CAL_STRESS)
     {
 
 #ifdef __MPI
@@ -445,7 +445,7 @@ xiaohui modify 2014-08-09*/
         }
 	}
 
-    if(GlobalV::FORCE&&GlobalV::STRESS)
+    if(GlobalV::CAL_FORCE&&GlobalV::CAL_STRESS)
     {
         atom_arrange::delete_vector(
 			GlobalV::ofs_running,
@@ -495,7 +495,7 @@ xiaohui modify 2014-08-09*/
                 CE.update_istep(force_step);
                 CE.extrapolate_charge();
 
-                if(GlobalC::pot.extra_pot=="dm")
+                if(GlobalC::pot.chg_extrap=="dm")
                 {
                 }
                 else

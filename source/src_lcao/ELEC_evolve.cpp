@@ -12,7 +12,7 @@ ELEC_evolve::ELEC_evolve(){};
 ELEC_evolve::~ELEC_evolve(){};
 
 int ELEC_evolve::tddft;
-double ELEC_evolve::td_dr2;
+double ELEC_evolve::td_scf_thr_rho;
 double ELEC_evolve::td_dt;
 double ELEC_evolve::td_force_dt;
 int ELEC_evolve::td_val_elec_01;
@@ -126,7 +126,7 @@ void ELEC_evolve::evolve_psi(
 	} // end k
 
 	// LiuXh modify 2019-07-15*/
-	if(!Pdiag_Double::out_hsR)
+	if(!Pdiag_Double::out_mat_hsR)
 	{
 		uhm.GK.destroy_pvpR();
 	}

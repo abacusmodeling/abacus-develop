@@ -32,7 +32,7 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 
     step_ = 0;
     step_rst_ = 0;
-    if(mdp.md_restart) unit_in.set_vel = 1;
+    if(mdp.md_restart) unit_in.init_vel = 1;
 
     MD_func::InitPos(ucell, pos);
     MD_func::InitVel(ucell, mdp.md_tfirst, allmass, frozen_freedom_, ionmbl, vel);

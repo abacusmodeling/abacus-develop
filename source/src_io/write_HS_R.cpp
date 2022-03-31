@@ -19,7 +19,7 @@ void LOOP_ions::output_HS_R(
     ModuleBase::timer::tick("LOOP_ions","output_HS_R"); 
     
     // add by jingan for out r_R matrix 2019.8.14
-    if(INPUT.out_r_matrix)
+    if(INPUT.out_mat_r)
     {
         cal_r_overlap_R r_matrix;
         r_matrix.init(*this->LOWF.ParaV);

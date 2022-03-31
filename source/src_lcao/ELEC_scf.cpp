@@ -36,7 +36,7 @@ void ELEC_scf::scf(const int& istep,
 	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
 	// mohan add 2012-02-08
-    set_ethr();
+    set_diag_thr_e();
 
 	// the electron charge density should be symmetrized,
 	// here is the initialization
@@ -60,7 +60,7 @@ void ELEC_scf::scf(const int& istep,
 				printf( "\e[33m%-10s\e[0m", "TMAG");
 				printf( "\e[33m%-10s\e[0m", "AMAG");
 			}
-			printf( "\e[33m%-14s\e[0m", "DRHO2");
+			printf( "\e[33m%-14s\e[0m", "SCF_THR_RHO");
 			printf( "\e[33m%-15s\e[0m", "ETOT(eV)");
 			printf( "\e[33m%-11s\e[0m\n", "TIME(s)");
 		}
@@ -76,13 +76,13 @@ void ELEC_scf::scf(const int& istep,
 
 			std::cout << std::setw(15) << "ETOT(eV)";
 			std::cout << std::setw(15) << "EDIFF(eV)";
-			std::cout << std::setw(11) << "DRHO2";
+			std::cout << std::setw(11) << "SCF_THR_RHO";
 			std::cout << std::setw(11) << "TIME(s)" << std::endl;
 		}
 	}// end GlobalV::OUT_LEVEL
 
 
-	for(iter=1; iter<=GlobalV::NITER; iter++)
+	for(iter=1; iter<=GlobalV::SCF_NMAX; iter++)
 	{
         Print_Info::print_scf(istep, iter);
 
@@ -111,7 +111,7 @@ void ELEC_scf::scf(const int& istep,
 
 		// set converged threshold,
 		// automatically updated during self consistency, only for CG.
-        this->update_ethr(iter);
+        this->update_diag_thr_e(iter);
         if(GlobalV::FINAL_SCF && iter==1)
         {
             init_mixstep_final_scf();
@@ -131,7 +131,7 @@ void ELEC_scf::scf(const int& istep,
 		// so the smearing can not be done.
 		if(iter>1)Occupy::calculate_weights();
 
-		if(GlobalC::wf.start_wfc == "file")
+		if(GlobalC::wf.init_wfc == "file")
 		{
 			if(iter==1)
 			{
@@ -150,7 +150,7 @@ void ELEC_scf::scf(const int& istep,
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				// a puzzle remains here.
 				// if I don't renew potential,
-				// The dr2 is very small.
+				// The scf_thr_rho is very small.
 				// OneElectron, Hartree and
 				// Exc energy are all correct
 				// except the band energy.
@@ -339,7 +339,7 @@ void ELEC_scf::scf(const int& istep,
 		GlobalC::en.deband = GlobalC::en.delta_e();
 
 		// (8) Mix charge density
-		GlobalC::CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
+		GlobalC::CHR.mix_rho(scf_thr_rho,0,GlobalV::SCF_THR_RHO,iter,conv_elec);
 
 		// Peize Lin add 2020.04.04
 		if(GlobalC::restart.info_save.save_charge)
@@ -352,11 +352,11 @@ void ELEC_scf::scf(const int& istep,
 
 		// (9) Calculate new potential according to new Charge Density.
 
-		if(conv_elec || iter==GlobalV::NITER)
+		if(conv_elec || iter==GlobalV::SCF_NMAX)
 		{
-			if(GlobalC::pot.out_potential<0) //mohan add 2011-10-10
+			if(GlobalC::pot.out_pot<0) //mohan add 2011-10-10
 			{
-				GlobalC::pot.out_potential = -2;
+				GlobalC::pot.out_pot = -2;
 			}
 		}
 
@@ -374,7 +374,7 @@ void ELEC_scf::scf(const int& istep,
 			/*
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho_save, GlobalC::CHR.rho);
 			GlobalC::en.calculate_etot();
-			GlobalC::en.print_etot(conv_elec, istep, iter, dr2, 0.0, GlobalV::ETHR, avg_iter,0);
+			GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr_rho, 0.0, GlobalV::DIAG_THR_E, avg_iter,0);
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 			*/
@@ -444,11 +444,11 @@ void ELEC_scf::scf(const int& istep,
 		// avg_iter is an useless variable in LCAO,
 		// will fix this interface in future -- mohan 2021-02-10
 		int avg_iter=0;
-		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr_rho, duration, GlobalV::DIAG_THR_E, avg_iter);
 
 		GlobalC::en.etot_old = GlobalC::en.etot;
 
-		if (conv_elec || iter==GlobalV::NITER)
+		if (conv_elec || iter==GlobalV::SCF_NMAX)
 		{
 			//--------------------------------------
 			// output charge density for converged,
@@ -468,7 +468,7 @@ void ELEC_scf::scf(const int& istep,
 			//quxin add for DFT+U for nscf calculation
 			if(INPUT.dft_plus_u)
 			{
-				if(GlobalC::CHR.out_charge)
+				if(GlobalC::CHR.out_chg)
 				{
 					std::stringstream sst;
 					sst << GlobalV::global_out_dir << "onsite.dm";
@@ -495,7 +495,7 @@ void ELEC_scf::scf(const int& istep,
 				}
 				loc.write_dm( is, 0, ssd.str(), precision );
 
-				if(GlobalC::pot.out_potential == 1) //LiuXh add 20200701
+				if(GlobalC::pot.out_pot == 1) //LiuXh add 20200701
 				{
 					std::stringstream ssp;
 					ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT";
@@ -539,7 +539,7 @@ void ELEC_scf::scf(const int& istep,
 				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
 			}
 
-			if(conv_elec || iter==GlobalV::NITER)
+			if(conv_elec || iter==GlobalV::SCF_NMAX)
 			{
 #ifdef __DEEPKS
 				//calculating deepks correction to bandgap

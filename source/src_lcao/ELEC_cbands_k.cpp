@@ -153,7 +153,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 	} // end k
 			
 	// LiuXh modify 2019-07-15*/
-	if(!Pdiag_Double::out_hsR)
+	if(!Pdiag_Double::out_mat_hsR)
 	{
 		uhm.GK.destroy_pvpR();
 	}

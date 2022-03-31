@@ -200,7 +200,7 @@ void MD_func::InitVel(
 	if(frozen.y == 0) ++frozen_freedom;
 	if(frozen.z == 0) ++frozen_freedom;
 
-	if(unit_in.set_vel)
+	if(unit_in.init_vel)
     {
         ReadVel(unit_in, vel);
     }
