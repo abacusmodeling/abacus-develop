@@ -514,7 +514,7 @@ symmetry            0
 nbands             	${nbands[iSTRU]} 
 
 ecutwfc             $ecut
-scf_thr_rho                 1.0e-7  // about iteration
+scf_thr                 1.0e-7  // about iteration
 scf_nmax               1500
 
 smearing_method            gauss
