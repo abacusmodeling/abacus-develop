@@ -13,7 +13,7 @@
 //new
 #include "../src_pw/H_Ewald_pw.h"
 #ifdef __DEEPKS
-    #include "../module_deepks/LCAO_deepks.h"	//caoyu add 2021-06-04
+    #include "LCAO_descriptor.h"	//caoyu add 2021-06-04
 #endif
 
 ELEC_scf::ELEC_scf(){}
@@ -81,16 +81,16 @@ void ELEC_scf::scf(const int &istep)
 	{
         Print_Info::print_scf(istep, iter);
 
+		//time_t time_start, time_finish;
+		clock_t clock_start;
+
 		std::string ufile = "CHANGE";
 		Update_input UI;
 		UI.init(ufile);
 
 		if(INPUT.dft_plus_u) GlobalC::dftu.iter_dftu = iter;
-#ifdef __MPI
-		auto clock_start = MPI_Wtime();
-#else
-		auto clock_start = std::chrono::system_clock::now();
-#endif
+		//time_start= std::time(NULL);
+		clock_start = std::clock();
 		conv_elec = false;//mohan add 2008-05-25
 
 		// mohan add 2010-07-16
@@ -454,11 +454,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		//time_finish=std::time(NULL);
-#ifdef __MPI
-		double duration = (double)(MPI_Wtime() - clock_start);
-#else
-		double duration = (double)(std::chrono::system_clock::now() - clock_start) / CLOCKS_PER_SEC;
-#endif
+		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
 		//double duration_time = difftime(time_finish, time_start);
 		//std::cout<<"Time_clock\t"<<"Time_time"<<std::endl;
 		//std::cout<<duration<<"\t"<<duration_time<<std::endl;
@@ -487,17 +483,6 @@ void ELEC_scf::scf(const int &istep)
 				std::cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<std::endl;
 				//std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
 				GlobalC::chi0_hilbert.Chi();
-			}
-
-			//quxin add for DFT+U for nscf calculation
-			if(INPUT.dft_plus_u)
-			{
-				if(GlobalC::CHR.out_charge)
-				{
-					std::stringstream sst;
-					sst << GlobalV::global_out_dir << "onsite.dm";
-					GlobalC::dftu.write_occup_m( sst.str() );
-				}
 			}
 
 			for(int is=0; is<GlobalV::NSPIN; is++)
@@ -560,7 +545,7 @@ void ELEC_scf::scf(const int &istep)
 				{
                     GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
                     if (GlobalV::deepks_scf) {
-                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta + GlobalC::ld.e_delta_band, "e_base.npy");//ebase :no deepks E_delta including
                     }
                     else
                     {
