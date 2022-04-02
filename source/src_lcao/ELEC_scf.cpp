@@ -489,17 +489,6 @@ void ELEC_scf::scf(const int &istep)
 				GlobalC::chi0_hilbert.Chi();
 			}
 
-			//quxin add for DFT+U for nscf calculation
-			if(INPUT.dft_plus_u)
-			{
-				if(GlobalC::CHR.out_charge)
-				{
-					std::stringstream sst;
-					sst << GlobalV::global_out_dir << "onsite.dm";
-					GlobalC::dftu.write_occup_m( sst.str() );
-				}
-			}
-
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				const int precision = 3;
