@@ -4,9 +4,8 @@
 #include "vdwd3.h"				  
 #include "../module_symmetry/symmetry.h"
 // new
-#include "H_XC_pw.h"
+#include "../module_xc/xc_functional.h"
 #include "../module_base/math_integral.h"
-#include "potential_libxc.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
@@ -182,7 +181,7 @@ void Forces::init(ModuleBase::matrix& force)
 /*
 	Forces::print("   TOTAL-FORCE (Ry/Bohr)", force);
 	
-	if(INPUT.force_set)                                                   // pengfei 2016-12-20
+	if(INPUT.out_force)                                                   // pengfei 2016-12-20
 	{
 		std::ofstream ofs("FORCE.dat");
 		if(!ofs)
@@ -561,27 +560,30 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 	
     ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
-	#ifdef USE_LIBXC
-	if(GlobalV::DFT_META)
+	if(XC_Functional::get_func_type() == 3)
 	{
-    	const auto etxc_vtxc_v = Potential_Libxc::v_xc_meta(GlobalC::CHR.rho, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
-		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
-	    v = std::get<2>(etxc_vtxc_v);
+#ifdef USE_LIBXC
+    	const auto etxc_vtxc_v = XC_Functional::v_xc_meta(
+            GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega,
+            GlobalC::CHR.rho, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+        
+        GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+        GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
+        v = std::get<2>(etxc_vtxc_v);
+#else
+        ModuleBase::WARNING_QUIT("cal_force_cc","to use mGGA, compile with LIBXC");
+#endif
 	}
 	else
 	{	
-    	const auto etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
-		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+    	const auto etxc_vtxc_v = XC_Functional::v_xc(
+            GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega,
+            GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+        
+        GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+        GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 	    v = std::get<2>(etxc_vtxc_v);
 	}
-	#else
-    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
-	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
-	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
-	v = std::get<2>(etxc_vtxc_v);
-	#endif
 
 	const ModuleBase::matrix vxc = v;
     std::complex<double> * psiv = new std::complex<double> [GlobalC::pw.nrxx];
@@ -654,7 +656,7 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
     assert(iat == GlobalC::ucell.nat);
     delete [] rhocg;
 	delete [] psiv; // mohan fix bug 2012-03-22
-    Parallel_Reduce::reduce_double_pool(forcecc.c, forcecc.nr * forcecc.nc); //qianrui fix a bug for npool > 1
+    Parallel_Reduce::reduce_double_pool(forcecc.c, forcecc.nr * forcecc.nc); //qianrui fix a bug for kpar > 1
 	return;
 }
 

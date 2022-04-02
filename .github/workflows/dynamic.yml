@@ -2,7 +2,7 @@ name: Dynamic Analysis
 
 on:
   schedule:
-    - cron: '0 20 * * *'
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       name:
@@ -14,6 +14,7 @@ jobs:
   test:
     name: Do the job on the runner
     runs-on: self-hosted
+    if: github.repository_owner == 'deepmodeling'
     container: ghcr.io/deepmodeling/abacus-development-kit:gnu
     steps:
       - name: Checkout

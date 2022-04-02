@@ -3,14 +3,11 @@
 #include "../module_base/memory.h"
 #include "global.h"
 #include "potential.h"
-#include "xc_functional.h"
-#include "xc_gga_pw.h"
+#include "../module_xc/xc_functional.h"
 #include "efield.h"
 #include "math.h"
-#include "potential_libxc.h"
 // new
 #include "H_Hartree_pw.h"
-#include "H_XC_pw.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
@@ -20,7 +17,7 @@ Potential::Potential()
 {
     vltot = new double[1];
     vr_eff1 = new double[1];
-	this->out_potential = 0;
+	this->out_pot = 0;
 }
 
 Potential::~Potential()
@@ -46,7 +43,7 @@ void Potential::allocate(const int nrxx)
     ModuleBase::Memory::record("Potential","vr",GlobalV::NSPIN*nrxx,"double");
     ModuleBase::Memory::record("Potential","vr_eff",GlobalV::NSPIN*nrxx,"double");
 	
-	if(GlobalV::DFT_META)
+	if(XC_Functional::get_func_type() == 3)
 	{
 		this->vofk.create(GlobalV::NSPIN,nrxx);
     	ModuleBase::Memory::record("Potential","vofk",GlobalV::NSPIN*nrxx,"double");
@@ -84,7 +81,7 @@ void Potential::init_pot(
     // the vltot should and must be zero here.
     ModuleBase::GlobalFunc::ZEROS(this->vltot, GlobalC::pw.nrxx);
 
-	if(GlobalV::DFT_META)
+	if(XC_Functional::get_func_type() == 3)
 	{
 		this->vofk.zero_out();
 	}
@@ -136,15 +133,15 @@ void Potential::init_pot(
 	//--------------------------------------------------------------------
     if(istep==0)
     {
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start_pot",start_pot);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"init_chg",init_chg);
 
-        std::cout << " START POTENTIAL      : " << start_pot << std::endl;
-        if (this->start_pot == "atomic")//mohan add 2007-10-17
+        std::cout << " START POTENTIAL      : " << init_chg << std::endl;
+        if (this->init_chg == "atomic")//mohan add 2007-10-17
         {
             start_from_atomic:
             GlobalC::CHR.atomic_rho(GlobalV::NSPIN, GlobalC::CHR.rho);
         }
-        else if (this->start_pot == "file")
+        else if (this->init_chg == "file")
         {
             GlobalV::ofs_running << " try to start potential from file : ";
             for(int is=0; is<GlobalV::NSPIN; is++)
@@ -205,7 +202,7 @@ void Potential::init_pot(
         }
         else
         {
-            ModuleBase::WARNING_QUIT("potential::init_pot","start_pot is wrong!");
+            ModuleBase::WARNING_QUIT("potential::init_pot","init_chg is wrong!");
         }
 		
 		// Peize Lin add 2020.04.04
@@ -327,29 +324,25 @@ ModuleBase::matrix Potential::v_of_rho(
 //  calculate the exchange-correlation potential
 //----------------------------------------------------------
 	
-	#ifdef USE_LIBXC
-	if(GlobalV::DFT_META)
+	if(XC_Functional::get_func_type() == 3)
 	{
-    	const std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> etxc_vtxc_v = Potential_Libxc::v_xc_meta(rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
-		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+#ifdef USE_LIBXC
+    	const std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc_meta(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);
-		vofk		  = std::get<3>(etxc_vtxc_v);	
+		vofk		  = std::get<3>(etxc_vtxc_v);
+#else
+        ModuleBase::WARNING_QUIT("v_of_rho","to use mGGA, compile with LIBXC");
+#endif
 	}
 	else
 	{	
-    	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, GlobalC::CHR.rho_core);
-		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+    	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
+		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);
 	}
-	#else
-	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
-	
-	H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-	H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
-	v            += std::get<2>(etxc_vtxc_v);
-	#endif
 
 //----------------------------------------------------------
 //  calculate the Hartree potential

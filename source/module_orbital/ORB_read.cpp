@@ -105,8 +105,8 @@ void LCAO_Orbitals::Read_Orbitals(
 	std::ofstream &ofs_in,
 	const int &ntype_in, 
 	const int &lmax_in,
-	const int &out_descriptor,
-	const int &out_r_matrix,
+	const bool &deepks_setorb,
+	const int &out_mat_r,
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
@@ -178,7 +178,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	}
 
 	// jingan add for calculate r(R) matrix
-	if(out_r_matrix) 
+	if(out_mat_r) 
 	{
 		kmesh = kmesh * 4;
 	}
@@ -212,7 +212,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	///>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-	if (out_descriptor>0)	//condition: descriptor in lcao line
+	if (deepks_setorb)	//condition: descriptor in lcao line
 	{
 		
 		delete[] this->Alpha;

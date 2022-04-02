@@ -22,7 +22,7 @@ class pseudo_nc
 	std::string pp_type;		// Pseudo type ( NC or US )
 	bool tvanp;			// .true. if Ultrasoft
 	bool nlcc;			// Non linear core corrections(bool)
-	std::string dft[4];		// Exch-Corr type
+	std::string xc_func;		// Exch-Corr type
 	int  zv;			// z valence
 	double etotps;		// total energy
 	double ecutwfc;		// suggested cut-off for wfc

@@ -4,6 +4,7 @@
 #include "mpi.h"
 #endif
 #include "../module_base/timer.h"
+#include "module_esolver/esolver.h"
 
 Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
@@ -20,21 +21,21 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     stress.create(3,3);
 
     // convert to a.u. unit
-    mdp.dt /= ModuleBase::AU_to_FS;
-    mdp.tfirst /= ModuleBase::Hartree_to_K;
-    mdp.tlast /= ModuleBase::Hartree_to_K;
+    mdp.md_dt /= ModuleBase::AU_to_FS;
+    mdp.md_tfirst /= ModuleBase::Hartree_to_K;
+    mdp.md_tlast /= ModuleBase::Hartree_to_K;
 
     // LJ parameters
-    mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;
-	mdp.epsilon_lj /= ModuleBase::Hartree_to_eV;
-	mdp.sigma_lj *= ModuleBase::ANGSTROM_AU;
+    mdp.lj_rcut *= ModuleBase::ANGSTROM_AU;
+	mdp.lj_epsilon /= ModuleBase::Hartree_to_eV;
+	mdp.lj_sigma *= ModuleBase::ANGSTROM_AU;
 
     step_ = 0;
     step_rst_ = 0;
-    if(mdp.rstMD) unit_in.set_vel = 1;
+    if(mdp.md_restart) unit_in.init_vel = 1;
 
     MD_func::InitPos(ucell, pos);
-    MD_func::InitVel(ucell, mdp.tfirst, allmass, frozen_freedom_, ionmbl, vel);
+    MD_func::InitVel(ucell, mdp.md_tfirst, allmass, frozen_freedom_, ionmbl, vel);
 }
 
 Verlet::~Verlet()
@@ -46,14 +47,14 @@ Verlet::~Verlet()
     delete []force;
 }
 
-void Verlet::setup()
+void Verlet::setup(ModuleESolver::ESolver *p_esolver)
 {
-    if(mdp.rstMD)
+    if(mdp.md_restart)
     {
         restart();
     }
 
-    MD_func::force_virial(step_, mdp, ucell, potential, force, virial);
+    MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 
@@ -68,8 +69,8 @@ void Verlet::first_half()
         {
             if(ionmbl[i][k])
             {
-                vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
-                pos[i][k] += vel[i][k]*mdp.dt;
+                vel[i][k] += 0.5*force[i][k]*mdp.md_dt/allmass[i];
+                pos[i][k] += vel[i][k]*mdp.md_dt;
             }
         }
     }
@@ -87,7 +88,7 @@ void Verlet::second_half()
         {
             if(ionmbl[i][k])
             {
-                vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+                vel[i][k] += 0.5*force[i][k]*mdp.md_dt/allmass[i];
             }
         }
     }
