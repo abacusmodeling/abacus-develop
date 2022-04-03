@@ -528,7 +528,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         double** DGridV_23_thread;
         double** DGridV_33_thread;
 
-        if(GlobalV::STRESS)
+        if(GlobalV::CAL_STRESS)
         {
             DGridV_stress_pool_thread = new double[6*DGridV_Size];
             ModuleBase::GlobalFunc::ZEROS(DGridV_stress_pool_thread, 6*DGridV_Size);
@@ -669,7 +669,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
                     DGridV_y[i][j] += DGridV_y_thread[i][j];
                     DGridV_z[i][j] += DGridV_z_thread[i][j];
 
-                    if(GlobalV::STRESS)
+                    if(GlobalV::CAL_STRESS)
                     {
                         DGridV_11[i][j] += DGridV_11_thread[i][j];
                         DGridV_12[i][j] += DGridV_12_thread[i][j];
@@ -684,7 +684,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
             delete [] DGridV_x_thread;
             delete [] DGridV_y_thread;
             delete [] DGridV_z_thread;
-            if(GlobalV::STRESS)
+            if(GlobalV::CAL_STRESS)
             {
                 delete [] DGridV_11_thread;
                 delete [] DGridV_12_thread;

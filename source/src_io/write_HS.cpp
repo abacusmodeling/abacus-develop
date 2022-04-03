@@ -3,7 +3,7 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
-void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, const bool bit, const int &out_hs, const std::string &file_name, const Parallel_Orbitals &pv)
+void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, const bool bit, const int &out_mat_hs, const std::string &file_name, const Parallel_Orbitals &pv)
 {   
     if(out_mat_hs==1)
     {
@@ -369,7 +369,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, const bool bit, const 
 }
 
 //LiuXh, 2017-03-21
-void HS_Matrix::saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, const bool bit, const int &out_hs, const std::string &file_name, const Parallel_Orbitals &pv)
+void HS_Matrix::saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, const bool bit, const int &out_mat_hs, const std::string &file_name, const Parallel_Orbitals &pv)
 {   
     if(out_mat_hs==1)
     {

@@ -1160,8 +1160,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
     #pragma omp parallel
     {
         double* Nonlocal_thread;
-        Nonlocal_thread = new double[GlobalC::ParaO.nloc];
-        ModuleBase::GlobalFunc::ZEROS(Nonlocal_thread, GlobalC::ParaO.nloc);
+        Nonlocal_thread = new double[pv->nloc];
+        ModuleBase::GlobalFunc::ZEROS(Nonlocal_thread, pv->nloc);
         #pragma omp for schedule(dynamic)
 #endif
         for(int iat=0; iat<GlobalC::ucell.nat; iat++)
@@ -1317,16 +1317,16 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
                             }
                             assert(ib==nlm1.size());
 
-                            const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
-                            const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
+                            const int ir = pv->trace_loc_row[ iw1_all ];
+                            const int ic = pv->trace_loc_col[ iw2_all ];
                             long index=0;
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
                             {
-                                index=ic*GlobalC::ParaO.nrow+ir;
+                                index=ic*pv->nrow+ir;
                             }
                             else
                             {
-                                index=ir*GlobalC::ParaO.ncol+ic;
+                                index=ir*pv->ncol+ic;
                             }
                             #ifdef _OPENMP
                                 Nonlocal_thread[index] += nlm_thread;
@@ -1342,7 +1342,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
         #ifdef _OPENMP
             #pragma omp critical(cal_nonlocal)
             {
-                for(int i=0; i<GlobalC::ParaO.nloc; i++)
+                for(int i=0; i<pv->nloc; i++)
                 {
                     this->LM->Hloc_fixed[i] += Nonlocal_thread[i];
                 }
