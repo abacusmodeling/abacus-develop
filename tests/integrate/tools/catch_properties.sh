@@ -102,9 +102,9 @@ if ! test -z "$has_band"  && [  $has_band -eq 1 ]; then
 fi
 #echo $has_hs
 if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
-        total_h=`sum_file OUT.autotest/data-H`
+        total_h=`sum_file OUT.autotest/data-0-H`
         echo "totalHmatrix $total_h" >>$1
-	total_s=`sum_file OUT.autotest/data-S`
+	total_s=`sum_file OUT.autotest/data-0-S`
 	echo "totalSmatrix $total_s" >>$1
 fi
 

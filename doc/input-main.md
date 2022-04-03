@@ -813,7 +813,7 @@ This part of variables are used to control the output of properties.
 
 - out_mat_hs<a id="out_mat_hs"></a>
     - *Type*: Boolean
-    - *Description*: Only for LCAO calculations. When set to 1, ABACUS will generate two files `data-H` and `data-S` that store the Hamiltonian and S matrix in k space, respectively.
+    - *Description*: Only for LCAO calculations. When set to 1, ABACUS will generate two lists of files `data-$k-H` and `data-$k-S` that store the Hamiltonian and S matrix for each k point in k space, respectively. 
     - *Default*: 0
 
     [back to top](#input-file)
