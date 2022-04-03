@@ -40,16 +40,12 @@ int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
 
     if(pspxc == 2)
     {
-        this->dft[0] = "LDA";
-        this->dft[1] = "LDA";
+        this->xc_func = "LDA";
     }
     else if (pspxc == 11)
     {
-        this->dft[0] = "GGA";
-        this->dft[1] = "GGA";
+        this->xc_func = "GGA";
     }
-    this->dft[2] = "NOGX";
-    this->dft[3] = "NOGC";
 
     ifs.ignore(300, '\n');
     ifs.ignore(300, '\n');
