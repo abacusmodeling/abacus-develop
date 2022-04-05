@@ -126,9 +126,9 @@ void energy::print_etot(
 	const bool converged, 
 	const int &istep, 
 	const int &iter_in, 
-	const double &scf_thr_rho, 
+	const double &scf_thr, 
 	const double &duration, 
-	const double &diag_thr_e, 
+	const double &pw_diag_thr, 
 	const double &avg_iter,
 	bool print)
 {
@@ -138,11 +138,11 @@ void energy::print_etot(
 	GlobalV::ofs_running << std::setprecision(12);
 	GlobalV::ofs_running << std::setiosflags(ios::left);
 
-	GlobalV::ofs_running << "\n Density error is " << scf_thr_rho << std::endl;
+	GlobalV::ofs_running << "\n Density error is " << scf_thr << std::endl;
 
 	if(GlobalV::OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
 	{
-		if(GlobalV::BASIS_TYPE=="pw")ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Error Threshold",diag_thr_e); //xiaohui add 2013-09-02
+		if(GlobalV::BASIS_TYPE=="pw")ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Error Threshold",pw_diag_thr); //xiaohui add 2013-09-02
 
 		if (this->printe > 0 && ((iter + 1) % this->printe == 0 || converged || iter == GlobalV::SCF_NMAX))
 		{
@@ -268,17 +268,17 @@ void energy::print_etot(
 					<<std::setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[2];
 					std::cout<<std::setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
-				if(scf_thr_rho>1.0)
+				if(scf_thr>1.0)
 				{
 					// 31 is red
-					printf( "\e[31m%-14e\e[0m", scf_thr_rho);
-					//printf( "[31m%-14e[0m", scf_thr_rho);
+					printf( "\e[31m%-14e\e[0m", scf_thr);
+					//printf( "[31m%-14e[0m", scf_thr);
 				}
 				else
 				{
 					// 32 is green
-					printf( "\e[32m%-14e\e[0m", scf_thr_rho);
-					//printf( "[32m%-14e[0m", scf_thr_rho);
+					printf( "\e[32m%-14e\e[0m", scf_thr);
+					//printf( "[32m%-14e[0m", scf_thr);
 				}
 				// 34 is blue
 				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);	
@@ -317,7 +317,7 @@ void energy::print_etot(
 			std::cout << std::setw(15) << GlobalC::en.etot*ModuleBase::Ry_to_eV;
                         std::cout << std::setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *ModuleBase::Ry_to_eV;  //pengfei Li added 2015-1-31
                         std::cout << std::setprecision(3);
-                        std::cout << std::setw(11) << scf_thr_rho;
+                        std::cout << std::setw(11) << scf_thr;
 			std::cout << std::setprecision(3);
 	//		std::cout << std::setw(11) << GlobalC::en.eband;
 	//		std::cout << std::setw(11) << H_Hartree_pw::hartree_energy;

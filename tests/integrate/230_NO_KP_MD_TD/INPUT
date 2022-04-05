@@ -17,7 +17,7 @@ basis_type		lcao
 gamma_only		0
 md_nstep			1	
 
-scf_thr_rho			1.0e-6
+scf_thr			1.0e-6
 
 tddft			1
 

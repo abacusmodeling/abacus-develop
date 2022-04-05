@@ -44,7 +44,7 @@ relax_bfgs_init 0.5
 
 - `cg_bfgs`
 
-    A mixed cg-bfgs method. For detail description, check out the variable relax_cg_thr_e in the [list of input keywords](../input-main.md#cg-threshold).
+    A mixed cg-bfgs method. For detail description, check out the variable relax_cg_thr in the [list of input keywords](../input-main.md#cg-threshold).
 
 - `sd`
 

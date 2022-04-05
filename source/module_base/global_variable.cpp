@@ -54,13 +54,13 @@ bool	SEARCH_PBC = true;
 bool	SPARSE_MATRIX = false;
 
 int		DIAGO_PROC = 0;
-int 	DIAG_CG_NMAX = 30;
+int 	PW_DIAG_NMAX = 30;
 int		DIAGO_CG_PREC = 1; //mohan add 2012-03-31
-int 	DIAGO_DAVID_NDIM = 4;
-double 	DIAG_THR_E = 1.0e-2;
+int 	PW_DIAG_NDIM = 4;
+double 	PW_DIAG_THR = 1.0e-2;
 int		NB2D = 1;
 
-double 	SCF_THR_RHO = 1.0e-9;
+double 	SCF_THR = 1.0e-9;
 
 std::string	RESTART_MODE = "new";
 

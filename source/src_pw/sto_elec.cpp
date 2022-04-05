@@ -26,7 +26,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	// mohan update 2021-02-25
 	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
-    set_diag_thr_e();
+    set_pw_diag_thr();
 
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
@@ -39,7 +39,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			std::cout<<std::setw(10)<<"AMAG";
 		}
 
-        std::cout<<std::setw(15)<< "ETOT(eV)"<<std::setw(15)<< "EDIFF(eV)"<<std::setw(11)<< "SCF_THR_RHO"; // pengfei Li added 2015-1-31
+        std::cout<<std::setw(15)<< "ETOT(eV)"<<std::setw(15)<< "EDIFF(eV)"<<std::setw(11)<< "SCF_THR"; // pengfei Li added 2015-1-31
 		if(GlobalV::KS_SOLVER=="cg")
 		{
 			std::cout<<std::setw(11)<<"CG_ITER";
@@ -96,18 +96,18 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		//(1) set converged threshold,
 		// automatically updated during self consistency.
-        //this->update_diag_thr_e(iter);
+        //this->update_pw_diag_thr(iter);
         if(GlobalV::FINAL_SCF && iter==1)
 		{
-			GlobalV::DIAG_THR_E = 1.0e-4/GlobalC::CHR.nelec; //smaller GlobalV::DIAG_THR_E than KS-DFT
+			GlobalV::PW_DIAG_THR = 1.0e-4/GlobalC::CHR.nelec; //smaller GlobalV::PW_DIAG_THR than KS-DFT
 		}
         else
 		{
 			if (iter == 2)
         	{
-            	GlobalV::DIAG_THR_E = 1.0e-4/GlobalC::CHR.nelec;
+            	GlobalV::PW_DIAG_THR = 1.0e-4/GlobalC::CHR.nelec;
         	}
-			GlobalV::DIAG_THR_E = std::min( GlobalV::DIAG_THR_E, 0.1*scf_thr_rho/ std::max(1.0, GlobalC::CHR.nelec));
+			GlobalV::PW_DIAG_THR = std::min( GlobalV::PW_DIAG_THR, 0.1*scf_thr/ std::max(1.0, GlobalC::CHR.nelec));
         }
 
 
@@ -235,13 +235,13 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		double diago_error = 0.0;
 		if(iter==1)
 		{
-			// if 'scf_thr_rho < GlobalV::DIAG_THR_E * nelec' happen,
-			// in other word, 'scf_thr_rho < diago_error'
-			// we update GlobalV::DIAG_THR_E.
-			diago_error = GlobalV::DIAG_THR_E*std::max(1.0, GlobalC::CHR.nelec);
+			// if 'scf_thr < GlobalV::PW_DIAG_THR * nelec' happen,
+			// in other word, 'scf_thr < diago_error'
+			// we update GlobalV::PW_DIAG_THR.
+			diago_error = GlobalV::PW_DIAG_THR*std::max(1.0, GlobalC::CHR.nelec);
 		}
 
-		// if converged is achieved, or the self-consistent error(scf_thr_rho)
+		// if converged is achieved, or the self-consistent error(scf_thr)
 		// is samller than the estimated error due to diagonalization(diago_error)
 		// rhoin and rho are unchanged:
 		// rhoin contain the input charge density and
@@ -250,33 +250,33 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// (the new input density) while rho is unchanged.
 		if(GlobalV::MY_POOL == 0)
 		{
-			GlobalC::CHR.mix_rho(scf_thr_rho,diago_error,GlobalV::SCF_THR_RHO,iter,conv_elec);
+			GlobalC::CHR.mix_rho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
 		}
 
 #ifdef __MPI
-		MPI_Bcast(&scf_thr_rho, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
+		MPI_Bcast(&scf_thr, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
 		MPI_Bcast(&conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
 		MPI_Bcast(GlobalC::CHR.rho[0], GlobalC::pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
 #endif
 
 		//			if(GlobalV::MY_RANK==0)
 		//			{
-		//				ofs_mix << std::setw(5) << iter << std::setw(20) << scf_thr_rho << std::endl;
+		//				ofs_mix << std::setw(5) << iter << std::setw(20) << scf_thr << std::endl;
 		//			}
 
 		if (iter==1)
 		{
-			if (scf_thr_rho < diago_error)
+			if (scf_thr < diago_error)
 			{
 				GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
 				ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
-				GlobalV::ofs_running << " scf_thr_rho=" << scf_thr_rho << " < diago_error=" << diago_error << std::endl;
+				GlobalV::ofs_running << " scf_thr=" << scf_thr << " < diago_error=" << diago_error << std::endl;
 
-				// update GlobalV::DIAG_THR_E.
-				GlobalV::ofs_running << " Origin GlobalV::DIAG_THR_E = " << GlobalV::DIAG_THR_E << std::endl;
-				GlobalV::DIAG_THR_E = scf_thr_rho / GlobalC::CHR.nelec;
-				GlobalV::ofs_running << " New    GlobalV::DIAG_THR_E = " << GlobalV::DIAG_THR_E << std::endl;
+				// update GlobalV::PW_DIAG_THR.
+				GlobalV::ofs_running << " Origin GlobalV::PW_DIAG_THR = " << GlobalV::PW_DIAG_THR << std::endl;
+				GlobalV::PW_DIAG_THR = scf_thr / GlobalC::CHR.nelec;
+				GlobalV::ofs_running << " New    GlobalV::PW_DIAG_THR = " << GlobalV::PW_DIAG_THR << std::endl;
 				//                  goto first_iter_again;
 			}
 		}
@@ -333,7 +333,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr_rho, duration, GlobalV::DIAG_THR_E, avg_iter);
+		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
         if (conv_elec || iter==GlobalV::SCF_NMAX)
         {
 			for(int is=0; is<GlobalV::NSPIN; is++)

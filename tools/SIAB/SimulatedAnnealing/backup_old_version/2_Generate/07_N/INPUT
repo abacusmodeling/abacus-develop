@@ -14,7 +14,7 @@ symmetry            0
 nbands             	8 
 
 ecutwfc             50
-scf_thr_rho                 1.0e-7  // about iteration
+scf_thr                 1.0e-7  // about iteration
 scf_nmax               1000
 
 smearing_method            gauss
