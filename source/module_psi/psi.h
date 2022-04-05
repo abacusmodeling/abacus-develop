@@ -30,7 +30,7 @@ class Psi
         const int &parallel_type 
     );*/
     
-    // allocate the 
+    // allocate psi for three dimensions 
     void resize(
         const int nks_in,
         const int nbands_in,
@@ -38,7 +38,7 @@ class Psi
         
     // get the pointer for current k point or current band
     T* get_pointer(){return psi_current;}
-    T* get_pointer(const int& ibd)
+    T* get_pointer(const int& ibands)
     {
         assert(ibands>=0 && ibands<this->nbands);
         return &psi_current[ibands*this->nbasis];
