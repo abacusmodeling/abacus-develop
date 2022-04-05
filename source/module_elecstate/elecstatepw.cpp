@@ -4,20 +4,21 @@ namespace ModuleElecS
 {
 
 void ElecStatePW::init(
-    Charge_Broyden* chr_in)
+    Charge* chg_in
+    )
 {
-    this->chr = chr_in;
+    this->pchg = chg_in;
 }
 
 const MatrixBlock<double> ElecStatePW::getRho()const
 {
-    MatrixBlock<double> temp{&(this->chr->rho[0][0]), 1,1};//this->chr->get_nspin(), this->chr->get_nrxx()};
+    MatrixBlock<double> temp{&(this->pchg->rho[0][0]), 1,1};//this->chr->get_nspin(), this->chr->get_nrxx()};
     return temp;
 }
 
 void ElecStatePW::updateRhoK(const ModulePsi::Psi<std::complex<double>> &psi)
 {
-    //this->chr->sum_band_k(psi);
+    this->pchg->sum_band_k(/*psi*/);
     return;
 }
 

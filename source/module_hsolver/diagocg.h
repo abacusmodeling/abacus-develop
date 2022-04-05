@@ -6,6 +6,7 @@
 #include "module_psi/psi.h"
 
 #include "src_pw/hamilt_pw.h"
+#include "src_pw/pw_basis.h"
 
 namespace ModuleHSolver
 {
@@ -14,15 +15,20 @@ class DiagoCG : public DiagH
 {
 	public:
 
-    DiagoCG(Hamilt_PW* hpw_in);
+    DiagoCG(
+        Hamilt_PW* hpw_in, 
+        const PW_Basis* pbas_in, 
+        const double *precondition_in);
     ~DiagoCG();
 
-    virtual void init(){};
+    //virtual void init(){};
     virtual int diag (
-        const int &dim_in,
-        const double *precondition_in,
+        ModuleHamilt::Hamilt* phm_in,
         ModulePsi::Psi<std::complex<double>> &phi,
-        double *eigenvalue_in);
+        double *eigenvalue_in) override
+    {
+        return this->diag_mock(phi, eigenvalue_in);
+    }
 
 	private:
     /// static variables, used for passing control variables 
@@ -37,6 +43,7 @@ class DiagoCG : public DiagH
 
     /// temp operator pointer
     Hamilt_PW* hpw;
+    const PW_Basis* pbas;
 
     int test_cg;
 
@@ -75,7 +82,7 @@ class DiagoCG : public DiagH
     void calculate_gradient();
 
     void orthogonal_gradient(
-        const ModuleBase::ComplexMatrix &eigenfunction,
+        const ModulePsi::Psi<std::complex<double>> &eigenfunction,
         const int m);
 
     void calculate_gamma_cg(
@@ -91,15 +98,12 @@ class DiagoCG : public DiagH
 
     void schmit_orth(
         const int &m,
-        const ModuleBase::ComplexMatrix &psi
+        const ModulePsi::Psi<std::complex<double>> &psi
     );
 
-    /// dot between two complex<double> arrays: <psi_L|psi_R>
-    static double ddot_real(
-        const int &dim_,
-        const std::complex<double>* psi_L,
-        const std::complex<double>* psi_R,
-        const bool reduce = true) ;
+    //used in diag() for template replace Hamilt with Hamilt_PW
+    int diag_mock(ModulePsi::Psi<std::complex<double>> &phi,
+        double *eigenvalue_in);
 
 };
 

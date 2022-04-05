@@ -3,14 +3,15 @@
 
 #include "module_psi/psi.h"
 #include "module_hamilt/matrixblock.h"
-#include "src_pw/charge_broyden.h"
+#include "src_pw/charge.h"
 
 namespace ModuleElecS
 {
 
 class ElecState
 {
-    virtual void init(Charge_Broyden* chr_in
+    public:
+    virtual void init(Charge* chg_in
     /*const Basis &basis, const Cell &cell*/) = 0;
     
     //return current electronic density rho, as a input for constructing Hamiltonian
@@ -18,13 +19,11 @@ class ElecState
     
     //calculate electronic charge density on grid points or density matrix in real space
     //the consequence charge density rho saved into rho_out, preparing for charge mixing. 
-    virtual void updateRhoK(const ModulePsi::Psi<std::complex<double>> &psi) = 0;
+    virtual void updateRhoK(const ModulePsi::Psi<std::complex<double>> &psi)=0;
     
     //update charge density for next scf step
     virtual void getNewRho() = 0;
 
-    protected:
-    Charge_Broyden* chr;
 };
 
 }

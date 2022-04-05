@@ -4,13 +4,24 @@ namespace ModulePsi
 {
 
 template<typename T>
+Psi<T>::Psi(PW_Basis* pbasis_in)
+{
+    this->pbasis = pbasis_in;
+    this->nk = pbasis_in->Klist->nks;
+    this->nbands = GlobalV::NBANDS;
+    this->nbasis = pbasis_in->
+}
+
+template<typename T>
 Psi<T>::Psi(
+    PW_Basis* pbasis_in,
     const int& nk_in, 
     const int& nbd_in, 
     const int& nbs_in, 
     const bool spin_method_in
 )
 {
+    this->pbasis = pbasis_in;
     this->resize(nk_in, nbd_in, nbs_in);
     this->spin_method = spin_method_in;
     this->current_b = 0;

@@ -13,17 +13,21 @@ bool DiagoCG::reorder = true;
 double DiagoCG::eps = 1e-2;
 double DiagoCG::avg_iter = 0.0;
 
-DiagoCG::DiagoCG(Hamilt_PW* hpw_in): hpw(hpw_in)
+DiagoCG::DiagoCG(
+    Hamilt_PW* hpw_in, 
+    const PW_Basis* pbas_in,
+    const double *precondition_in)
 {
+    this->hpw = hpw_in; 
+    this->pbas = pbas_in;
+    this->precondition = precondition_in;
     test_cg=0;
 }
 DiagoCG::~DiagoCG() {}
 
 
-int DiagoCG::diag
+int DiagoCG::diag_mock
 (
-    const int &dim_in,
-    const double *precondition_in,
     ModulePsi::Psi<std::complex<double>> &phi,
     double *eigenvalue_in
 )
@@ -35,10 +39,9 @@ int DiagoCG::diag
     int notconv = 0;
 
     ///initialize variables 
-    this->dim = dim_in;
+    this->dim = phi.get_current_nbas();
     this->dmx = phi.get_nbasis();
     this->n_band = phi.get_nbands();
-    this->precondition = precondition_in;
     this->eigenvalue = eigenvalue_in;
 
     ///record for how many loops in cg convergence
@@ -67,11 +70,11 @@ int DiagoCG::diag
         for (int i=0; i<this->dim; i++) phi_m[i] = phi(m, i);
 
         this->hpw->s_1psi(this->dim, this->phi_m.data(), this->sphi.data()); // sphi = S|psi(m)>
- //       this->schmit_orth(m, phi);
+        this->schmit_orth(m, phi);
 
         this->hpw->h_1psi( this->dim, this->phi_m.data(), this->hphi.data(), this->sphi.data());
 
-        this->eigenvalue[m] = DiagoCG::ddot_real(this->dim, this->phi_m.data(), this->hphi.data() );
+        this->eigenvalue[m] = ModuleBase::GlobalFunc::ddot_real(this->dim, this->phi_m.data(), this->hphi.data() );
 
         int iter = 0;
         double gg_last = 0.0;
@@ -81,7 +84,7 @@ int DiagoCG::diag
         for (iter = 0;iter < maxter;iter++)
         {
             this->calculate_gradient();
-//            this->orthogonal_gradient(phi, m);
+            this->orthogonal_gradient(phi, m);
             this->calculate_gamma_cg( iter, gg_last, cg_norm, theta);
             converged = this->update_psi( cg_norm, theta, this->eigenvalue[m]);
             if ( converged ) break;
@@ -167,9 +170,9 @@ void DiagoCG::calculate_gradient()
 
     // Update lambda !
     // (4) <psi|SPH|psi >
-    const double eh = DiagoCG::ddot_real( this->dim, this->sphi.data(), this->gradient.data());
+    const double eh = ModuleBase::GlobalFunc::ddot_real( this->dim, this->sphi.data(), this->gradient.data());
     // (5) <psi|SPS|psi >
-    const double es = DiagoCG::ddot_real( this->dim, this->sphi.data(), this->pphi.data());
+    const double es = ModuleBase::GlobalFunc::ddot_real( this->dim, this->sphi.data(), this->pphi.data());
     const double lambda = eh / es;
 
     // Update g!
@@ -187,7 +190,7 @@ void DiagoCG::calculate_gradient()
 }
 
 
-void DiagoCG::orthogonal_gradient( const ModuleBase::ComplexMatrix &eigenfunction, const int m)
+void DiagoCG::orthogonal_gradient( const ModulePsi::Psi<std::complex<double>> &eigenfunction, const int m)
 {
     if (test_cg==1) ModuleBase::TITLE("DiagoCG","orthogonal_gradient");
     //ModuleBase::timer::tick("DiagoCG","orth_grad");
@@ -197,7 +200,7 @@ void DiagoCG::orthogonal_gradient( const ModuleBase::ComplexMatrix &eigenfunctio
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans='C';
-    zgemv_(&trans,&(this->dim),&m,&ModuleBase::ONE,eigenfunction.c,&(this->dmx),this->scg.data(),&inc,&ModuleBase::ZERO,this->lagrange.data(),&inc);
+    zgemv_(&trans,&(this->dim),&m,&ModuleBase::ONE,eigenfunction.get_pointer(),&(this->dmx),this->scg.data(),&inc,&ModuleBase::ZERO,this->lagrange.data(),&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
@@ -215,8 +218,8 @@ void DiagoCG::orthogonal_gradient( const ModuleBase::ComplexMatrix &eigenfunctio
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans2='N';
-    zgemv_(&trans2,&(this->dim),&m,&ModuleBase::NEG_ONE,eigenfunction.c,&(this->dmx),this->lagrange.data(),&inc,&ModuleBase::ONE,this->gradient.data(),&inc);
-    zgemv_(&trans2,&(this->dim),&m,&ModuleBase::NEG_ONE,eigenfunction.c,&(this->dmx),this->lagrange.data(),&inc,&ModuleBase::ONE,this->scg.data(),&inc);
+    zgemv_(&trans2,&(this->dim),&m,&ModuleBase::NEG_ONE,eigenfunction.get_pointer(),&(this->dmx),this->lagrange.data(),&inc,&ModuleBase::ONE,this->gradient.data(),&inc);
+    zgemv_(&trans2,&(this->dim),&m,&ModuleBase::NEG_ONE,eigenfunction.get_pointer(),&(this->dmx),this->lagrange.data(),&inc,&ModuleBase::ONE,this->scg.data(),&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
@@ -247,7 +250,7 @@ void DiagoCG::calculate_gamma_cg(
         // (1) Update gg_inter!
         // gg_inter = <g|g0>
         // Attention : the 'g' in g0 is getted last time
-        gg_inter = DiagoCG::ddot_real( this->dim, this->gradient.data(), this->g0.data());// b means before
+        gg_inter = ModuleBase::GlobalFunc::ddot_real( this->dim, this->gradient.data(), this->g0.data());// b means before
     }
 
     // (2) Update for g0!
@@ -262,7 +265,7 @@ void DiagoCG::calculate_gamma_cg(
 
     // (3) Update gg_now!
     // gg_now = < g|P|scg > = < g|g0 >
-    const double gg_now = DiagoCG::ddot_real( this->dim, this->gradient.data(), this->g0.data());
+    const double gg_now = ModuleBase::GlobalFunc::ddot_real( this->dim, this->gradient.data(), this->g0.data());
 
     if (iter==0)
     {
@@ -309,12 +312,12 @@ bool DiagoCG::update_psi(
     if (test_cg==1) ModuleBase::TITLE("DiagoCG","update_psi");
     //ModuleBase::timer::tick("DiagoCG","update");
     this->hpw->h_1psi(this->dim, this->cg.data(), this->pphi.data(), this->scg.data());
-    cg_norm = sqrt( DiagoCG::ddot_real(this->dim, this->cg.data(), this->scg.data()) );
+    cg_norm = sqrt( ModuleBase::GlobalFunc::ddot_real(this->dim, this->cg.data(), this->scg.data()) );
 
     if (cg_norm < 1.0e-10 ) return 1;
 
-    const double a0 = DiagoCG::ddot_real(this->dim, this->phi_m.data(), this->pphi.data()) * 2.0 / cg_norm;
-    const double b0 = DiagoCG::ddot_real(this->dim, this->cg.data(), this->pphi.data()) / ( cg_norm * cg_norm ) ;
+    const double a0 = ModuleBase::GlobalFunc::ddot_real(this->dim, this->phi_m.data(), this->pphi.data()) * 2.0 / cg_norm;
+    const double b0 = ModuleBase::GlobalFunc::ddot_real(this->dim, this->cg.data(), this->pphi.data()) / ( cg_norm * cg_norm ) ;
 
     const double e0 = eigenvalue;
 
@@ -368,7 +371,7 @@ bool DiagoCG::update_psi(
 void DiagoCG::schmit_orth
 (
     const int& m,     //end
-    const ModuleBase::ComplexMatrix &psi
+    const ModulePsi::Psi<std::complex<double>> &psi
 )
 {
 //	ModuleBase::TITLE("DiagoCG","schmit_orth");
@@ -379,7 +382,7 @@ void DiagoCG::schmit_orth
     // psi(m) -> psi(m) - \sum_{i < m} < psi(i) | S | psi(m) > psi(i)
     // so the orthogonalize is performed about S.
     assert( m >= 0 );
-    assert( psi.nr >= m );
+    assert( psi.get_nbands() >= m );
 
     std::vector<std::complex<double>> lagrange_so(m+1, ModuleBase::ZERO);
 
@@ -388,7 +391,17 @@ void DiagoCG::schmit_orth
     int inc=1;
     int mp1 = m+1;
     char trans='C';
-    zgemv_(&trans,&(this->dim),&mp1,&ModuleBase::ONE,psi.c,&(this->dmx),this->sphi.data(),&inc,&ModuleBase::ZERO,lagrange_so.data(),&inc);
+    zgemv_(&trans,
+        &(this->dim),
+        &mp1,
+        &ModuleBase::ONE,
+        psi.get_pointer(),
+        &(this->dmx),
+        this->sphi.data(),
+        &inc,
+        &ModuleBase::ZERO,
+        lagrange_so.data(),
+        &inc);
     //======================================================================
     /*for (int j = 0; j <= m; j++)
     {
@@ -407,8 +420,17 @@ void DiagoCG::schmit_orth
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans2='N';
-    zgemv_(&trans2,&(this->dim),&m,&ModuleBase::NEG_ONE,psi.c,&(this->dmx),lagrange_so.data(),&inc,&ModuleBase::ONE,this->phi_m.data(),&inc);
-    psi_norm -= DiagoCG::ddot_real(m,lagrange_so.data(),lagrange_so.data(),false);
+    zgemv_(&trans2,
+        &(this->dim),
+        &m,
+        &ModuleBase::NEG_ONE,
+        psi.get_pointer(),
+        &(this->dmx),
+        lagrange_so.data(),
+        &inc,&ModuleBase::ONE,
+        this->phi_m.data(),
+        &inc);
+    psi_norm -= ModuleBase::GlobalFunc::ddot_real(m,lagrange_so.data(),lagrange_so.data(),false);
     //======================================================================
     /*for (int j = 0; j < m; j++)
     {
@@ -442,36 +464,6 @@ void DiagoCG::schmit_orth
 
     //ModuleBase::timer::tick("DiagoCG","schmit_orth");
     return ;
-}
-
-
-double DiagoCG::ddot_real
-(
-    const int &dim_,
-    const std::complex<double>* psi_L,
-    const std::complex<double>* psi_R,
-    const bool reduce
-)
-{
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    //qianrui modify 2021-3-14
-    //Note that  ddot_(2*dim_,a,1,b,1) = REAL( zdotc_(dim_,a,1,b,1) )
-    int dim2=2*dim_;
-    double *pL,*pR;
-    pL=(double *)psi_L;
-    pR=(double *)psi_R;
-    double result=BlasConnector::dot(dim2,pL,1,pR,1);
-    if(reduce)  Parallel_Reduce::reduce_double_pool( result );
-    return result;
-    //======================================================================
-    /*std::complex<double> result(0,0);
-    for (int i=0;i<dim_;i++)
-    {
-        result += conj( psi_L[i] ) * psi_R[i];
-    }
-    Parallel_Reduce::reduce_complex_double_pool( result );
-    return result.real();*/
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
 
 }//end of namespace

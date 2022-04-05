@@ -10,7 +10,8 @@ namespace ModuleElecS
 
 class ElecStatePW : public ElecState
 {
-    void init(Charge_Broyden* chr_in
+    public:
+    void init(Charge* chg_in
     /*const Basis &basis, const Cell &cell*/) override;
     
     //return current electronic density rho, as a input for constructing Hamiltonian
@@ -22,6 +23,9 @@ class ElecStatePW : public ElecState
     
     //update charge density for next scf step
     void getNewRho() override;
+
+    private:
+    Charge* pchg;
 };
 
 }

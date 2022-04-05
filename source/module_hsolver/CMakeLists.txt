@@ -2,4 +2,6 @@ add_library(
     hsolver
     OBJECT
     diagocg.cpp
+    #diagodavid.cpp
+    hsolverpw.cpp
 )

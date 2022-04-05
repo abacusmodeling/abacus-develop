@@ -1,5 +1,5 @@
-#ifndef HAMILT_H
-#define HAMILT_H
+#ifndef MODULEHAMILT_H
+#define MODULEHAMILT_H
 
 #include<complex>
 #include "module_psi/psi.h"

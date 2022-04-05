@@ -7,6 +7,8 @@
 #include <vector>
 #include <cassert>
 
+#include "src_pw/pw_basis.h"
+
 namespace ModulePsi
 {
 // there is the structure of electric wavefunction coefficient
@@ -15,8 +17,8 @@ template<typename T>
 class Psi
 {
  public:
-    //Psi(const bool spin_method_in=0);
-    Psi(const int& nk_in, const int& nbd_in, const int& nbs_in, const bool spin_method_in=0);
+    Psi(PW_Basis* pbasis_in);
+    Psi(PW_Basis* pbasis_in, const int& nk_in, const int& nbd_in, const int& nbs_in, const bool spin_method_in=0);
     Psi(const Psi& psi_in, const int& nk_in, const int& nbd_in);
     // initialize the wavefunction coefficient
     // only resize and construct function now is used
@@ -41,6 +43,12 @@ class Psi
         assert(ibands>=0 && ibands<this->nbands);
         return &psi_current[ibands*this->nbasis];
     }
+    const T* get_pointer()const{return psi_current;}
+    const T* get_pointer(const int& ibd) const
+    {
+        assert(ibands>=0 && ibands<this->nbands);
+        return &psi_current[ibands*this->nbasis];
+    }
    
     // interface to get three dimension size
     const int& get_nk() const {return nk;}
@@ -60,6 +68,7 @@ class Psi
     {
         assert(ik>=0 && ik<this->nk);
         this->current_k = ik;
+        this->current_nbasis = this->pbasis->ngk[ik];
         this->current_b = 0;
         this->psi_current = &this->psi[ik * this->nbands * this->nbasis];
         return;
@@ -127,6 +136,10 @@ class Psi
     
     // for example : pass Psi from CPU to GPU, would be updated later
     //Psi& operator=(const Psi &p);
+
+    int get_current_k() const {return this->current_k;}
+    int get_current_b() const {return this->current_b;}
+    int get_current_nbas() const {return this->current_nbasis;}
  
  private:   
     std::vector<T> psi;
@@ -142,6 +155,10 @@ class Psi
     mutable int current_b;
     //current pointer for getting the psi
     mutable T* psi_current;
+    //current number of basis of current_k
+    mutable int current_nbasis;
+
+    PW_Basis* pbasis;
 
     //if spin_method set as true, k point with even number is spin-up but with odd number is spin-down
     //only used for NSPIN==2
