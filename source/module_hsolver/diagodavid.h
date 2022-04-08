@@ -26,34 +26,17 @@ public:
     DiagoDavid(Hamilt_PW* hpw_in, const PW_Basis* pbas_in, const double *precondition_in);
     ~DiagoDavid();
 
-    void SchmitOrth(
-        const int& npw,
-        const int n_band,
-        const int m,
-        const ModuleBase::ComplexMatrix &psi,
-        std::complex<double>* psi_m,
-        std::complex<double>* spsi);
-
-    void diag_zhegvx(
-        const int& n,
-        const int& m,
-        const ModuleBase::ComplexMatrix &hc,
-        const ModuleBase::ComplexMatrix &sc,
-        const int& ldh,
-        double* e,
-        ModuleBase::ComplexMatrix &vc);
-
+    //this is the override function diag() for CG method
     void diag(
-        ModuleBase::ComplexMatrix &psi,
-        double *en,
-        const int &npw,
-        const int &nband,
-        const double *precondition,
-        const int order,
-        const double &eps,
-        const int &maxiter,
-        int &notconv,
-        double &avg_iter);
+        ModuleHamilt::Hamilt* phm_in,
+        ModulePsi::Psi<std::complex<double>> &phi,
+        double *eigenvalue_in) override
+    {
+        this->diag_mock(phi, eigenvalue_in);
+        return;
+    }
+
+    static int PW_DIAG_NDIM;
 
 private:
 
@@ -68,7 +51,6 @@ private:
         ModuleBase::ComplexMatrix &sp,
         const ModuleBase::ComplexMatrix &vc,
         const int* unconv,
-        const double* precondition,
         const double* en,
         std::complex<double>* hpsi,
         std::complex<double>* spsi,
@@ -91,7 +73,7 @@ private:
         const int& nband,
         int& nbase,
         const double* en,
-        const ModuleBase::ComplexMatrix &psi,
+        const ModulePsi::Psi<std::complex<double>> &psi,
         ModuleBase::ComplexMatrix &basis,
         ModuleBase::ComplexMatrix &hp,
         ModuleBase::ComplexMatrix &sp,
@@ -108,8 +90,25 @@ private:
         const ModuleBase::ComplexMatrix &basis,
         const double* en,
         std::complex<double>* respsi);
+    
+    void SchmitOrth(
+        const int& npw,
+        const int n_band,
+        const int m,
+        const ModuleBase::ComplexMatrix &psi,
+        std::complex<double>* psi_m,
+        std::complex<double>* spsi);
 
-    int diag_mock(ModulePsi::Psi<std::complex<double>> &phi,
+    void diag_zhegvx(
+        const int& n,
+        const int& m,
+        const ModuleBase::ComplexMatrix &hc,
+        const ModuleBase::ComplexMatrix &sc,
+        const int& ldh,
+        double* e,
+        ModuleBase::ComplexMatrix &vc);
+
+    void diag_mock(ModulePsi::Psi<std::complex<double>> &psi,
         double *eigenvalue_in);
 
     Hamilt_PW* hpw;

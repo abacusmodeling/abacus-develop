@@ -3,10 +3,12 @@
 #include "module_base/timer.h"
 #include "module_base/lapack_connector.h"
 #include "module_base/constants.h"
-
+#include "iterdiagcon.h"
 
 namespace ModuleHSolver
 {
+
+int DiagoDavid::PW_DIAG_NDIM = 4;
 
 DiagoDavid::DiagoDavid(
     Hamilt_PW* hpw_in, 
@@ -29,78 +31,65 @@ DiagoDavid::~DiagoDavid()
 }
 
 
-void DiagoDavid::diag
+void DiagoDavid::diag_mock
 (
-    ModuleBase::ComplexMatrix &psi,
-    double* en,
-    const int& npw,
-    const int& nband,
-    const double* precondition,
-    const int order,
-    const double& eps,
-    const int& maxiter,
-    int& notconv,
-    double& avg_iter
+    ModulePsi::Psi<std::complex<double>> &psi,
+    double *eigenvalue_in
 )
 {
-    if (test_david==1) ModuleBase::TITLE("Diago_David","diag");
-    ModuleBase::timer::tick("Diago_David", "diag");
+    if (test_david==1) ModuleBase::TITLE("DiagoDavid","diag_mock");
+    ModuleBase::timer::tick("DiagoDavid", "diag_mock");
 
-    assert( order > 1 );
-    assert( order*nband < npw * GlobalV::NPROC_IN_POOL ); 
+    const int dim = psi.get_current_nbas();
+    const int nband = psi.get_nbands();
+
+
+    assert( DiagoDavid::PW_DIAG_NDIM > 1 );
+    assert( DiagoDavid::PW_DIAG_NDIM*nband < dim * GlobalV::NPROC_IN_POOL ); 
     //qianrui change it 2021-7-25. 
-    //In strictly speaking, it shoule be order*nband < npw sum of all pools. We roughly estimate it here.
-    //However, in most cases, total number of plane waves should be much larger than nband*order
+    //In strictly speaking, it shoule be PW_DIAG_NDIM*nband < npw sum of all pools. We roughly estimate it here.
+    //However, in most cases, total number of plane waves should be much larger than nband*PW_DIAG_NDIM
 
-    int nbase_x = order * nband ;				// maximum dimension of the reduced basis set
+    int nbase_x = DiagoDavid::PW_DIAG_NDIM * nband ;				// maximum dimension of the reduced basis set
 
-    ModuleBase::ComplexMatrix basis( nbase_x, npw );		// the reduced basis set
-    ModuleBase::ComplexMatrix hp( nbase_x, npw );			// the product of H and psi in the reduced basis set
-    ModuleBase::ComplexMatrix sp( nbase_x, npw );			// the Product of S and psi in the reduced basis set
+    ModuleBase::ComplexMatrix basis( nbase_x, dim );		// the reduced basis set
+    ModuleBase::ComplexMatrix hp( nbase_x, dim );			// the product of H and psi in the reduced basis set
+    ModuleBase::ComplexMatrix sp( nbase_x, dim );			// the Product of S and psi in the reduced basis set
 
     ModuleBase::ComplexMatrix hc( nbase_x, nbase_x );		// Hamiltonian on the reduced basis
     ModuleBase::ComplexMatrix sc( nbase_x, nbase_x );		// Overlap on the reduced basis
     ModuleBase::ComplexMatrix vc( nbase_x, nbase_x );		// Eigenvectors of hc
-    double* e = new double[nbase_x];			// the lowest N eigenvalues of hc
-    assert(e != 0) ;
+    std::vector<double> eigenvalue(nbase_x);			// the lowest N eigenvalues of hc
 
-    std::complex<double>* psi_m = new std::complex<double>[npw] ;
-    assert(psi_m != 0) ;
-    std::complex<double>* hpsi = new std::complex<double>[npw] ;
-    assert(hpsi != 0) ;
-    std::complex<double>* spsi = new std::complex<double>[npw] ;
-    assert(spsi != 0) ;
-    std::complex<double>* ppsi = new std::complex<double>[npw] ;
-    assert(ppsi != 0) ;
-    std::complex<double>* respsi = new std::complex<double>[npw] ;
-    assert(respsi != 0) ;
+    std::vector<std::complex<double>> psi_m(dim);
+    std::vector<std::complex<double>> hpsi(dim);
+    std::vector<std::complex<double>> spsi(dim);
+    std::vector<std::complex<double>> ppsi(dim);
+    std::vector<std::complex<double>> respsi(dim);
 
-    bool* convflag = new bool[nband] ;	// convflag[m] = true if the m th band is convergent
-    assert(convflag != 0) ;
-    int* unconv = new int[nband] ;		// unconv[m] store the number of the m th unconvergent band
-    assert(unconv != 0) ;
+    std::vector<bool> convflag(nband, false);	// convflag[m] = true if the m th band is convergent
+    std::vector<int> unconv(nband);		// unconv[m] store the number of the m th unconvergent band
 
     int nbase = 0;						// the dimension of the reduced basis set
-    notconv = nband;					// the number of the unconvergent bands
-    ModuleBase::GlobalFunc::ZEROS( convflag, nband );
+    IterDiagControl::notconv = nband;					// the number of the unconvergent bands
     for ( int m = 0 ; m < nband; m++ ) unconv[m] = m;
 
-    ModuleBase::timer::tick("Diago_David","first");
+    ModuleBase::timer::tick("DiagoDavid","first");
     // orthogonalise the initial trial psi(0~nband-1)
     for (int m = 0; m < nband; m++)
     {
         // psi_m = psi(m)
-        for ( int ig = 0; ig < npw; ig++ ) 
+        for ( int ig = 0; ig < dim; ig++ ) 
 		{
 			psi_m[ig] = psi(m,ig);
 		}
 
-        this->SchmitOrth(npw, nband, m, basis, psi_m, spsi);
+        this->SchmitOrth(dim, nband, m, basis, psi_m.data(), spsi.data());
 
-        this->hpw->h_1psi(npw, psi_m, hpsi, spsi);
+        this->hpw->h_1psi(dim, psi_m.data(), hpsi.data(), spsi.data());
 
         // basis(m) = psi_m, hp(m) = H |psi_m>, sp(m) = S |psi_m>
-        for ( int ig = 0; ig < npw; ig++ )
+        for ( int ig = 0; ig < dim; ig++ )
         {
             basis(m,ig) = psi_m[ig];
             hp(m,ig) = hpsi[ig];
@@ -111,77 +100,69 @@ void DiagoDavid::diag
     hc.zero_out();
     sc.zero_out();
 
-    this->cal_elem( npw, nbase, notconv, basis, hp, sp, hc, sc );
+    this->cal_elem( dim, nbase, IterDiagControl::notconv, basis, hp, sp, hc, sc );
 
-    this->diag_zhegvx( nbase, nband, hc, sc, nbase_x, e, vc );
+    this->diag_zhegvx( nbase, nband, hc, sc, nbase_x, eigenvalue.data(), vc );
 
     for ( int m = 0; m < nband; m++ ) 
 	{
-		en[m] = e[m];
+		eigenvalue_in[m] = eigenvalue[m];
 	}
 
-    ModuleBase::timer::tick("Diago_David","first");
+    ModuleBase::timer::tick("DiagoDavid","first");
 
     int dav_iter = 0;
     do
     {
         dav_iter++;
 
-        this->cal_grad( npw, nbase, notconv, basis, hp, sp, vc, 
-			unconv, precondition, e, hpsi, spsi, ppsi, respsi );
+        this->cal_grad( dim, nbase, IterDiagControl::notconv, basis, hp, sp, vc, 
+			unconv.data(), eigenvalue.data(), hpsi.data(), spsi.data(), ppsi.data(), respsi.data() );
 
-        this->cal_elem( npw, nbase, notconv, basis, hp, sp, hc, sc );
+        this->cal_elem( dim, nbase, IterDiagControl::notconv, basis, hp, sp, hc, sc );
 
-        this->diag_zhegvx( nbase, nband, hc, sc, nbase_x, e, vc );
+        this->diag_zhegvx( nbase, nband, hc, sc, nbase_x, eigenvalue.data(), vc );
 
         // check convergence and update eigenvalues
-        ModuleBase::timer::tick("Diago_David","check_update");
+        ModuleBase::timer::tick("DiagoDavid","check_update");
 
-        notconv = 0;
+        IterDiagControl::notconv = 0;
         for ( int m = 0 ; m < nband; m++ )
         {
-            convflag[m] = ( abs( e[m] - en[m] ) < eps );
+            convflag[m] = ( abs( eigenvalue[m] - eigenvalue_in[m] ) < IterDiagControl::PW_DIAG_THR );
 
             if ( !convflag[m] ) 
 			{
-                unconv[notconv] = m;
-                notconv++;
+                unconv[IterDiagControl::notconv] = m;
+                IterDiagControl::notconv++;
             }
 
-            en[m] = e[m];
+            eigenvalue_in[m] = eigenvalue[m];
         }
 
-        ModuleBase::timer::tick("Diago_David","check_update");
-        /*
-        		// test_david==2 std::cout info of each iteration
-        		if( test_david==2 )
-        		{
-        			std::cout << "iter = " << dav_iter << " notconv = " << notconv << std::endl;
-        			out.printr1_d( "energy", en, nband );
-        		}
-        */
-        if ( !notconv || ( nbase + notconv > nbase_x) || (dav_iter == maxiter) )
+        ModuleBase::timer::tick("DiagoDavid","check_update");
+        if ( !IterDiagControl::notconv || ( nbase + IterDiagControl::notconv > nbase_x) || (dav_iter == IterDiagControl::PW_DIAG_NMAX) )
         {
-            ModuleBase::timer::tick("Diago_David","last");
+            ModuleBase::timer::tick("DiagoDavid","last");
 
             // updata eigenvectors of Hamiltonian
-            psi.zero_out();
+            ModuleBase::GlobalFunc::ZEROS(psi.get_pointer(), psi.get_nbands()*psi.get_nbasis());
             for ( int m = 0; m < nband; m++ )
             {
                 for ( int j = 0; j < nbase; j++ )
                 {
-                    for ( int ig = 0; ig < npw; ig++ ) 
+                    for ( int ig = 0; ig < dim; ig++ ) 
 					{
 						psi(m,ig) += vc(j,m) * basis(j,ig);
 					}
                 }
             }
 
-            if ( !notconv || (dav_iter == maxiter) )
+            if ( !IterDiagControl::notconv || (dav_iter == IterDiagControl::PW_DIAG_NMAX) )
             {
                 // overall convergence or last iteration: exit the iteration
 
-                ModuleBase::timer::tick("Diago_David","last");
+                ModuleBase::timer::tick("DiagoDavid","last");
                 break;
             }
             else
@@ -190,35 +171,17 @@ void DiagoDavid::diag
                 // then replace the first N (=nband) basis vectors with the current
                 // estimate of the eigenvectors and set the basis dimension to N;
 
-                this->refresh( npw, nband, nbase, en, psi, basis, hp, sp, hc, sc, vc );
-                ModuleBase::timer::tick("Diago_David","last");
+                this->refresh( dim, nband, nbase, eigenvalue_in, psi, basis, hp, sp, hc, sc, vc );
+                ModuleBase::timer::tick("DiagoDavid","last");
             }
 
         }// end of if
 
     } while (1);
 
-    avg_iter = static_cast<double>(dav_iter);
-    /*
-    	// if( test_david==3 ) std::cout info of davidson diag
-    	if( test_david==3 )
-    	{
-    		std::cout << "hamilt davidson diag output " << std::endl ;
-    		std::cout << "dav_iter = " << dav_iter <<" notconv = " << notconv << std::endl;
-    		this->cal_err( npw, nband, nbase, vc, hp, basis, en, respsi );
-        	std::cout << "hamilt davidson diag output  end " << std::endl ;
-    	}
-    */
-    delete[] e;
-    delete[] psi_m;
-    delete[] hpsi;
-    delete[] spsi;
-    delete[] ppsi;
-    delete[] respsi;
-    delete[] convflag;
-    delete[] unconv;
+    IterDiagControl::avg_iter = static_cast<double>(dav_iter);
 
-    ModuleBase::timer::tick("Diago_David", "diag");
+    ModuleBase::timer::tick("DiagoDavid", "diag_mock");
     return;
 }
 
@@ -232,16 +195,15 @@ void DiagoDavid::cal_grad
     ModuleBase::ComplexMatrix &sp,
     const ModuleBase::ComplexMatrix &vc,
     const int* unconv,
-    const double* precondition,
-    const double* e,
+    const double* eigenvalue,
     std::complex<double>* hpsi,
     std::complex<double>* spsi,
     std::complex<double>* ppsi,
     std::complex<double>* respsi
 )
 {
-    if ( test_david ==1 ) ModuleBase::TITLE("DIAGO_DAVID","cal_grad");
-    ModuleBase::timer::tick("Diago_David", "cal_grad"
+    if ( test_david ==1 ) ModuleBase::TITLE("DiagoDavid","cal_grad");
+    ModuleBase::timer::tick("DiagoDavid", "cal_grad"
     );
 
     // expand the reduced basis set with the new basis vectors P|R(psi)>...
@@ -254,20 +216,15 @@ void DiagoDavid::cal_grad
         {
             for ( int ig = 0; ig < npw; ig++ )
             {
-                respsi[ig] += vc( i, unconv[m] ) * ( hp(i,ig) - e[ unconv[m] ] * sp(i,ig) ) ;
+                respsi[ig] += vc( i, unconv[m] ) * ( hp(i,ig) - eigenvalue[ unconv[m] ] * sp(i,ig) ) ;
             }
         }
 
         for ( int ig = 0; ig < npw; ig++ ) 
 		{
-			ppsi[ig] = respsi[ig] / precondition[ig] ;
+			ppsi[ig] = respsi[ig] / this->precondition[ig] ;
 		}
-/*
-		double ppsi_norm = Diago_CG::ddot_real( npw, ppsi, ppsi);
-		double rpsi_norm = Diago_CG::ddot_real( npw, respsi, respsi);
-		assert( rpsi_norm > 0.0 );
-		assert( ppsi_norm > 0.0 );
-*/
+
         this->SchmitOrth(npw, nbase+notconv, nbase+m, basis, ppsi, spsi);
 
         this->hpw->h_1psi(npw, ppsi, hpsi, spsi);
@@ -280,7 +237,7 @@ void DiagoDavid::cal_grad
         }
     }
 
-    ModuleBase::timer::tick("Diago_David","cal_grad");
+    ModuleBase::timer::tick("DiagoDavid","cal_grad");
     return;
 }
 
@@ -296,8 +253,8 @@ void DiagoDavid::cal_elem
     ModuleBase::ComplexMatrix &sc
 )
 {
-    if ( test_david ==1 ) ModuleBase::TITLE("DIAGO_DAVID","cal_elem");
-    ModuleBase::timer::tick("Diago_David","cal_elem");
+    if ( test_david ==1 ) ModuleBase::TITLE("DiagoDavid","cal_elem");
+    ModuleBase::timer::tick("DiagoDavid","cal_elem");
 
     // updat the reduced Hamiltonian
     int offset_h = nbase * hc.nr ;
@@ -332,7 +289,7 @@ void DiagoDavid::cal_elem
     	}
     */
     nbase += notconv;
-    ModuleBase::timer::tick("Diago_David","cal_elem");
+    ModuleBase::timer::tick("DiagoDavid","cal_elem");
     return;
 }
 
@@ -356,12 +313,12 @@ void DiagoDavid::diag_zhegvx
     const ModuleBase::ComplexMatrix &hc,
     const ModuleBase::ComplexMatrix &sc,
     const int& ldh,
-    double* e,
+    double* eigenvalue,
     ModuleBase::ComplexMatrix &vc
 )
 {
-//	ModuleBase::TITLE("DIAGO_DAVID","diag_zhegvx");
-    ModuleBase::timer::tick("Diago_David","diag_zhegvx");
+//	ModuleBase::TITLE("DiagoDavid","diag_zhegvx");
+    ModuleBase::timer::tick("DiagoDavid","diag_zhegvx");
     assert( ldh >= max(1,n) );
     int lwork ;
     int info = 0;
@@ -398,21 +355,14 @@ void DiagoDavid::diag_zhegvx
 	//ModuleBase::WARNING_QUIT("divid","open zhegvx!");
 	
 	LapackConnector::zhegvx(1, 'V', 'I', 'L', n, hc, n, sc, n,
-           0.0, 0.0, 1, m, 0.0, mm, e, vc, n,
+           0.0, 0.0, 1, m, 0.0, mm, eigenvalue, vc, n,
            work, lwork, rwork, iwork, ifail, info);
-/*
-		std::complex<double> vc_norm = 0.0;
-		for(int ib =0; ib < n; ib++)
-		{
-			vc_norm += conj(vc(ib, 0)) * vc(ib, 0);
-		}
-		assert( vc_norm.real() > 0.0);
-*/
+
     delete[] work;
     delete[] rwork;
     delete[] iwork;
     delete[] ifail;
-    ModuleBase::timer::tick("Diago_David","diag_zhegvx");
+    ModuleBase::timer::tick("DiagoDavid","diag_zhegvx");
     return;
 }
 
@@ -421,8 +371,8 @@ void DiagoDavid::refresh
     const int& npw,
     const int& nband,
     int& nbase,
-    const double* en,
-    const ModuleBase::ComplexMatrix &psi,
+    const double* eigenvalue_in,
+    const ModulePsi::Psi<std::complex<double>> &psi,
     ModuleBase::ComplexMatrix &basis,
     ModuleBase::ComplexMatrix &hp,
     ModuleBase::ComplexMatrix &sp,
@@ -431,8 +381,8 @@ void DiagoDavid::refresh
     ModuleBase::ComplexMatrix &vc
 )
 {
-    if ( test_david==1 ) ModuleBase::TITLE("Diago_David","refresh");
-    ModuleBase::timer::tick("Diago_David","refresh");
+    if ( test_david==1 ) ModuleBase::TITLE("DiagoDavid","refresh");
+    ModuleBase::timer::tick("DiagoDavid","refresh");
 
     // update hp,sp
     basis.zero_out();
@@ -470,12 +420,12 @@ void DiagoDavid::refresh
     sc.zero_out();
     for ( int i = 0; i < nbase; i++ )
     {
-        hc(i,i) = en[i];
+        hc(i,i) = eigenvalue_in[i];
         sc(i,i) = ModuleBase::ONE;
         vc(i,i) = ModuleBase::ONE;
     }
 
-    ModuleBase::timer::tick("Diago_David","refresh");
+    ModuleBase::timer::tick("DiagoDavid","refresh");
     return;
 }
 
@@ -487,11 +437,11 @@ void DiagoDavid::cal_err
     const ModuleBase::ComplexMatrix &vc,
     const ModuleBase::ComplexMatrix &hp,
     const ModuleBase::ComplexMatrix &basis,
-    const double* en,
+    const double* eigenvalue_in,
     std::complex<double>* respsi
 )
 {
-    ModuleBase::timer::tick("Diago_David","cal_err");
+    ModuleBase::timer::tick("DiagoDavid","cal_err");
     double *err = new double[nband];
     assert(err != 0);
 
@@ -502,7 +452,7 @@ void DiagoDavid::cal_err
         {
             for ( int ig=0; ig<npw; ig++ )
             {
-                respsi[ig] +=  vc(j,m)*( hp(j,ig) - en[m] * basis(j,ig) );
+                respsi[ig] +=  vc(j,m)*( hp(j,ig) - eigenvalue_in[m] * basis(j,ig) );
             }
         }
 
@@ -514,11 +464,11 @@ void DiagoDavid::cal_err
 
     for (int i = 0; i < nband ; i++)
     {
-        std::cout << i << "\t\t"  << en[i]  << "\t\t" << err[i] << std::endl ;
+        std::cout << i << "\t\t"  << eigenvalue_in[i]  << "\t\t" << err[i] << std::endl ;
     }
 
     delete[] err;
-    ModuleBase::timer::tick("Diago_David","cal_err");
+    ModuleBase::timer::tick("DiagoDavid","cal_err");
     return;
 }
 
@@ -532,8 +482,8 @@ void DiagoDavid::SchmitOrth
     std::complex<double>* spsi
 )
 {
-//	if(test_david == 1) ModuleBase::TITLE("Diago_David","SchmitOrth");
-    ModuleBase::timer::tick("Diago_David","SchmitOrth");
+//	if(test_david == 1) ModuleBase::TITLE("DiagoDavid","SchmitOrth");
+    ModuleBase::timer::tick("DiagoDavid","SchmitOrth");
 
     // orthogonalize starting eigenfunction to those already calculated
     // psi_m orthogonalize to psi(0) ~ psi(m-1)
@@ -587,7 +537,7 @@ void DiagoDavid::SchmitOrth
 
     if (psi_norm < 1.0e-12 ) 
 	{
-        std::cout << "Diago_David::SchmitOrth:aborted for psi_norm <1.0e-12" << std::endl;
+        std::cout << "DiagoDavid::SchmitOrth:aborted for psi_norm <1.0e-12" << std::endl;
         std::cout << "n_band = " << n_band << std::endl;
         std::cout << "m = " << m << std::endl;
         exit(0);
@@ -603,7 +553,7 @@ void DiagoDavid::SchmitOrth
     this->hpw->s_1psi(npw, psi_m, spsi);
 
     delete[] lagrange;
-    ModuleBase::timer::tick("Diago_David","SchmitOrth");
+    ModuleBase::timer::tick("DiagoDavid","SchmitOrth");
     return;
 }
 

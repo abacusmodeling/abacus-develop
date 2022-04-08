@@ -4,14 +4,13 @@
 #include "module_base/constants.h"
 #include "module_base/global_function.h"
 #include "module_base/blas_connector.h"
+#include "iterdiagcon.h"
 
 namespace ModuleHSolver
 {
 
-int DiagoCG::maxter = 1;
 bool DiagoCG::reorder = true;
-double DiagoCG::eps = 1e-2;
-double DiagoCG::avg_iter = 0.0;
+
 
 DiagoCG::DiagoCG(
     Hamilt_PW* hpw_in, 
@@ -26,7 +25,7 @@ DiagoCG::DiagoCG(
 DiagoCG::~DiagoCG() {}
 
 
-int DiagoCG::diag_mock
+void DiagoCG::diag_mock
 (
     ModulePsi::Psi<std::complex<double>> &phi,
     double *eigenvalue_in
@@ -36,7 +35,7 @@ int DiagoCG::diag_mock
     ModuleBase::timer::tick("DiagoCG", "diag");
 
     ///out : record for states of convergence
-    int notconv = 0;
+    IterDiagControl::notconv = 0;
 
     ///initialize variables 
     this->dim = phi.get_current_nbas();
@@ -45,7 +44,7 @@ int DiagoCG::diag_mock
     this->eigenvalue = eigenvalue_in;
 
     ///record for how many loops in cg convergence
-    DiagoCG::avg_iter = 0.0;
+    IterDiagControl::avg_iter = 0.0;
     
     //-------------------------------------------------------------------
     // "poor man" iterative diagonalization of a complex hermitian matrix
@@ -81,7 +80,7 @@ int DiagoCG::diag_mock
         double cg_norm = 0.0;
         double theta = 0.0;
         bool converged = false;
-        for (iter = 0;iter < maxter;iter++)
+        for (iter = 0;iter < IterDiagControl::PW_DIAG_NMAX;iter++)
         {
             this->calculate_gradient();
             this->orthogonal_gradient(phi, m);
@@ -97,9 +96,9 @@ int DiagoCG::diag_mock
 
         if (!converged)
         {
-            ++notconv;
+            ++IterDiagControl::notconv;
         }
-        avg_iter += static_cast<double>(iter) + 1.00;
+        IterDiagControl::avg_iter += static_cast<double>(iter) + 1.00;
 
         // reorder eigenvalues if they are not in the right order
         // (this CAN and WILL happen in not-so-special cases)
@@ -107,13 +106,13 @@ int DiagoCG::diag_mock
         if (m > 0 && reorder)
         {
 		    ModuleBase::GlobalFunc::NOTE("reorder bands!");
-            if (eigenvalue[m]-eigenvalue[m-1]<-2.0*eps)
+            if (eigenvalue[m]-eigenvalue[m-1]<-2.0*IterDiagControl::PW_DIAG_THR)
             {
                 // if the last calculated eigenvalue is not the largest...
                 int i=0;
                 for (i=m-2; i>= 0; i--)
                 {
-                    if (eigenvalue[m]-eigenvalue[i]>2.0*eps) break;
+                    if (eigenvalue[m]-eigenvalue[i]>2.0*IterDiagControl::PW_DIAG_THR) break;
                 }
                 i++;
 
@@ -148,10 +147,10 @@ int DiagoCG::diag_mock
 
     }//end m
 
-    DiagoCG::avg_iter /= this->n_band;
+    IterDiagControl::avg_iter /= this->n_band;
 
     ModuleBase::timer::tick("DiagoCG","diag");
-    return notconv;
+    return;
 } // end subroutine ccgdiagg
 
 
@@ -350,7 +349,7 @@ bool DiagoCG::update_psi(
 
 //	std::cout << "\n overlap2 = "  << this->ddot(dim, phi_m, phi_m);
 
-    if ( abs(eigenvalue-e0)< this->eps)
+    if ( abs(eigenvalue-e0)< IterDiagControl::PW_DIAG_THR)
     {
         //ModuleBase::timer::tick("DiagoCG","update");
         return 1;

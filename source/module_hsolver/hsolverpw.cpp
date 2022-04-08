@@ -56,11 +56,7 @@ void HSolverPW::solve
 
 void HSolverPW::hamiltSolvePsiK(ModuleHamilt::Hamilt* hm, ModulePsi::Psi<std::complex<double>>& psi, double* eigenvalue)
 {
-    int isEigenvalueConverged=0;
-    //while(this->isConverged(isEigenvalueConverged))
-    //{
-        isEigenvalueConverged = pdiagh->diag(hm, psi, eigenvalue);
-    //}
+    pdiagh->diag(hm, psi, eigenvalue);
 }
 
 inline void update_precondition(std::vector<double> h_diag, int npw, const double* g2kin)

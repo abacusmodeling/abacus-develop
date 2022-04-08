@@ -15,6 +15,10 @@ class DiagoCG : public DiagH
 {
 	public:
 
+    //Constructor need:
+    //1. temporary mock of Hamiltonian "Hamilt_PW"
+    //2. temporary use of basis "PW_Basis", we should design Basis module later
+    //3. precondition pointer should point to place of precondition array. 
     DiagoCG(
         Hamilt_PW* hpw_in, 
         const PW_Basis* pbas_in, 
@@ -22,12 +26,15 @@ class DiagoCG : public DiagH
     ~DiagoCG();
 
     //virtual void init(){};
-    virtual int diag (
+
+    //this is the override function diag() for CG method
+    void diag(
         ModuleHamilt::Hamilt* phm_in,
         ModulePsi::Psi<std::complex<double>> &phi,
         double *eigenvalue_in) override
     {
-        return this->diag_mock(phi, eigenvalue_in);
+        this->diag_mock(phi, eigenvalue_in);
+        return;
     }
 
 	private:
@@ -38,8 +45,6 @@ class DiagoCG : public DiagH
     static bool reorder;
     /// threshold used in cg, read int from INPUT file.
     static double eps;
-    /// average steps of last cg diagonalization for each band.
-    static double avg_iter;
 
     /// temp operator pointer
     Hamilt_PW* hpw;
@@ -102,7 +107,7 @@ class DiagoCG : public DiagH
     );
 
     //used in diag() for template replace Hamilt with Hamilt_PW
-    int diag_mock(ModulePsi::Psi<std::complex<double>> &phi,
+    void diag_mock(ModulePsi::Psi<std::complex<double>> &phi,
         double *eigenvalue_in);
 
 };
