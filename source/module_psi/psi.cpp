@@ -9,7 +9,7 @@ Psi<T>::Psi(PW_Basis* pbasis_in)
     this->pbasis = pbasis_in;
     this->nk = pbasis_in->Klist->nks;
     this->nbands = GlobalV::NBANDS;
-    this->nbasis = pbasis_in->
+    this->nbasis = pbasis_in->ngmw;
 }
 
 template<typename T>
