@@ -44,7 +44,7 @@ class Psi
         return &psi_current[ibands*this->nbasis];
     }
     const T* get_pointer()const{return psi_current;}
-    const T* get_pointer(const int& ibd) const
+    const T* get_pointer(const int& ibands) const
     {
         assert(ibands>=0 && ibands<this->nbands);
         return &psi_current[ibands*this->nbasis];
@@ -68,7 +68,7 @@ class Psi
     {
         assert(ik>=0 && ik<this->nk);
         this->current_k = ik;
-        this->current_nbasis = this->pbasis->ngk[ik];
+        this->current_nbasis = this->pbasis->Klist->ngk[ik];
         this->current_b = 0;
         this->psi_current = &this->psi[ik * this->nbands * this->nbasis];
         return;
