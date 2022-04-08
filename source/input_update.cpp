@@ -118,13 +118,13 @@ bool Update_input::Read(const std::string &fn)
         }
 #endif
 		// 4
-        else if (strcmp("scf_thr_rho", word) == 0)
+        else if (strcmp("scf_thr", word) == 0)
         {
-            read_value(ifs, scf_thr_rho);
-			if(scf_thr_rho!=GlobalV::SCF_THR_RHO)
+            read_value(ifs, scf_thr);
+			if(scf_thr!=GlobalV::SCF_THR)
 			{
-				this->change(GlobalV::ofs_warning,"scf_thr_rho",GlobalV::SCF_THR_RHO,scf_thr_rho);
-    			GlobalV::SCF_THR_RHO = this->scf_thr_rho;
+				this->change(GlobalV::ofs_warning,"scf_thr",GlobalV::SCF_THR,scf_thr);
+    			GlobalV::SCF_THR = this->scf_thr;
 			}
         }
 		// 5
@@ -285,7 +285,7 @@ void Update_input::Bcast()
     Parallel_Common::bcast_int( Local_Orbital_Charge::out_dm );
     Parallel_Common::bcast_int( Pdiag_Double::out_wfc_lcao );
 #endif
-    Parallel_Common::bcast_double( GlobalV::SCF_THR_RHO );
+    Parallel_Common::bcast_double( GlobalV::SCF_THR );
     Parallel_Common::bcast_int( GlobalV::SCF_NMAX );
     Parallel_Common::bcast_int( GlobalV::RELAX_NMAX );
     Parallel_Common::bcast_double( GlobalC::CHR.mixing_beta );

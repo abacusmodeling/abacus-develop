@@ -1,4 +1,6 @@
 remove_definitions(-D__MPI)
+remove_definitions(-D__CUDA)
+remove_definitions(-D__ROCM)
 AddTest(
   TARGET hsolver_david
   LIBS ${math_libs} base 

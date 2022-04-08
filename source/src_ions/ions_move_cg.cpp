@@ -3,7 +3,7 @@
 #include "ions_move_basic.h"
 using namespace Ions_Move_Basic;
 
-double Ions_Move_CG::RELAX_CG_THR_E =-1.0;  //default is 0.5
+double Ions_Move_CG::RELAX_CG_THR =-1.0;  //default is 0.5
 //=================== NOTES ========================
 // in vasp, it's like
 // contolled by POTIM.
@@ -158,7 +158,7 @@ void Ions_Move_CG::start(const ModuleBase::matrix& force, const double& etot_in)
 			
 			if(GlobalV::RELAX_METHOD=="cg_bfgs")
 			{
-				if(Ions_Move_Basic::largest_grad * ModuleBase::Ry_to_eV / 0.529177 < RELAX_CG_THR_E )         // cg to bfgs  by pengfei 13-8-8
+				if(Ions_Move_Basic::largest_grad * ModuleBase::Ry_to_eV / 0.529177 < RELAX_CG_THR )         // cg to bfgs  by pengfei 13-8-8
 				{
 					 GlobalV::RELAX_METHOD="bfgs";
 				}

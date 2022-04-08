@@ -6,7 +6,7 @@ ntype     1
 calculation   scf
 nspin         2
 ecutwfc       15
-scf_thr_rho           1.0e-8
+scf_thr           1.0e-8
 scf_nmax         50
 out_chg    0
 

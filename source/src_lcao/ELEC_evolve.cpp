@@ -12,7 +12,7 @@ ELEC_evolve::ELEC_evolve(){};
 ELEC_evolve::~ELEC_evolve(){};
 
 int ELEC_evolve::tddft;
-double ELEC_evolve::td_scf_thr_rho;
+double ELEC_evolve::td_scf_thr;
 double ELEC_evolve::td_dt;
 double ELEC_evolve::td_force_dt;
 int ELEC_evolve::td_val_elec_01;

@@ -4,7 +4,7 @@ nbands		10
 
 calculation	scf
 ecutwfc		100
-scf_thr_rho		1.0e-8
+scf_thr		1.0e-8
 scf_nmax		100
 
 smearing_method	gaussian

@@ -27,7 +27,7 @@ nbands        25 // number of bands
 ecutwfc       50 // Ry
 scf_nmax         20
 symmetry      0 // turn off symmetry
-diag_thr_e          1e-10
+pw_diag_thr          1e-10
 smearing_method      gaussian // gaussian smearing
 smearing_sigma         0.002 // Ry
 calculation   nscf // non-self-consistent calculation
