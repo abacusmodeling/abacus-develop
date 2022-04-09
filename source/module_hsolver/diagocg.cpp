@@ -9,9 +9,6 @@
 namespace ModuleHSolver
 {
 
-bool DiagoCG::reorder = true;
-
-
 DiagoCG::DiagoCG(
     Hamilt_PW* hpw_in, 
     const PW_Basis* pbas_in,
@@ -21,6 +18,7 @@ DiagoCG::DiagoCG(
     this->pbas = pbas_in;
     this->precondition = precondition_in;
     test_cg=0;
+    reorder = false;
 }
 DiagoCG::~DiagoCG() {}
 
@@ -35,7 +33,7 @@ void DiagoCG::diag_mock
     ModuleBase::timer::tick("DiagoCG", "diag");
 
     ///out : record for states of convergence
-    IterDiagControl::notconv = 0;
+    this->notconv = 0;
 
     ///initialize variables 
     this->dim = phi.get_current_nbas();
@@ -44,7 +42,7 @@ void DiagoCG::diag_mock
     this->eigenvalue = eigenvalue_in;
 
     ///record for how many loops in cg convergence
-    IterDiagControl::avg_iter = 0.0;
+    double avg = 0.0;
     
     //-------------------------------------------------------------------
     // "poor man" iterative diagonalization of a complex hermitian matrix
@@ -96,9 +94,9 @@ void DiagoCG::diag_mock
 
         if (!converged)
         {
-            ++IterDiagControl::notconv;
+            ++this->notconv;
         }
-        IterDiagControl::avg_iter += static_cast<double>(iter) + 1.00;
+        avg += static_cast<double>(iter) + 1.00;
 
         // reorder eigenvalues if they are not in the right order
         // (this CAN and WILL happen in not-so-special cases)
@@ -147,7 +145,8 @@ void DiagoCG::diag_mock
 
     }//end m
 
-    IterDiagControl::avg_iter /= this->n_band;
+    avg /= this->n_band;
+    IterDiagControl::avg_iter += avg;
 
     ModuleBase::timer::tick("DiagoCG","diag");
     return;
@@ -464,5 +463,39 @@ void DiagoCG::schmit_orth
     //ModuleBase::timer::tick("DiagoCG","schmit_orth");
     return ;
 }
+
+void DiagoCG::diag(
+        ModuleHamilt::Hamilt* phm_in,
+        ModulePsi::Psi<std::complex<double>> &psi,
+        double *eigenvalue_in)
+{
+    /// record the times of trying iterative diagonalization
+    int ntry = 0;
+    this->notconv = 0;
+    do
+    {
+        IterDiagControl::diagH_subspace(
+            this->hpw,
+            psi,
+            psi,
+            eigenvalue_in);
+
+        IterDiagControl::avg_iter += 1.0;
+        this->reorder = true;
+
+        this->diag_mock(psi, eigenvalue_in);
+
+        ++ntry;
+    }
+    while ( IterDiagControl::test_exit_cond(ntry, this->notconv) );
+
+    if ( notconv > max(5, GlobalV::NBANDS/4) )
+    {
+        std::cout << "\n notconv = " << this->notconv;
+        std::cout << "\n DiagoCG::diag', too many bands are not converged! \n";
+    }
+    return;
+}
+
 
 }//end of namespace

@@ -30,17 +30,16 @@ public:
     void diag(
         ModuleHamilt::Hamilt* phm_in,
         ModulePsi::Psi<std::complex<double>> &phi,
-        double *eigenvalue_in) override
-    {
-        this->diag_mock(phi, eigenvalue_in);
-        return;
-    }
+        double *eigenvalue_in) override;
 
     static int PW_DIAG_NDIM;
 
 private:
 
     int test_david;
+
+    /// record for how many bands not have convergence eigenvalues
+    static int notconv;
 
     void cal_grad(
         const int& npw,

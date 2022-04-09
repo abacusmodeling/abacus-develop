@@ -13,8 +13,6 @@ namespace ModuleHSolver
 double IterDiagControl::avg_iter = 0.0;
 int IterDiagControl::PW_DIAG_NMAX = 30;
 double IterDiagControl::PW_DIAG_THR = 1.0e-2;
-int IterDiagControl::ntry = 0;
-int IterDiagControl::notconv = 0;
 
 //----------------------------------------------------------------------
 // Hamiltonian diagonalization in the subspace spanned
@@ -23,17 +21,20 @@ int IterDiagControl::notconv = 0;
 //----------------------------------------------------------------------
 void IterDiagControl::diagH_subspace(
     Hamilt_PW* phm,
-    const int nstart,
-    const int n_band,
     const ModulePsi::Psi<std::complex<double>> &psi,
     ModulePsi::Psi<std::complex<double>> &evc,
-    double *en)
+    double *en,
+    int n_band)
 {
     ModuleBase::TITLE("IterDiagControl","diagH_subspace");
     ModuleBase::timer::tick("IterDiagControl","diagH_subspace");
 
-	assert(nstart!=0);
-	assert(n_band!=0);
+    //two case:
+    //1. pw base: nstart = n_band, psi(nbands * npwx)
+    //2. lcao_in_pw base: nstart >= n_band, psi(NLOCAL * npwx)
+	const int nstart = psi.get_nbands();
+    if(n_band==0) n_band = nstart;
+    assert(n_band <= nstart);
 
     ModuleBase::ComplexMatrix hc(nstart, nstart);
     ModuleBase::ComplexMatrix sc(nstart, nstart);
@@ -243,6 +244,28 @@ void IterDiagControl::diagH_LAPACK(
 
 	ModuleBase::timer::tick("IterDiagControl","diagH_LAPACK");
     return;
+}
+
+bool IterDiagControl::test_exit_cond(const int &ntry, const int &notconv)
+{
+    //================================================================
+    // If this logical function is true, need to do diagH_subspace
+	// and cg again.
+    //================================================================
+
+	bool scf = true;
+	if(GlobalV::CALCULATION=="nscf") scf=false;
+
+    // If ntry <=5, try to do it better, if ntry > 5, exit.
+    const bool f1 = (ntry <= 5);
+
+    // In non-self consistent calculation, do until totally converged.
+    const bool f2 = ( (!scf && (notconv > 0)) );
+
+    // if self consistent calculation, if not converged > 5,
+    // using diagH_subspace and cg method again. ntry++
+    const bool f3 = ( ( scf && (notconv > 5)) );
+    return  ( f1 && ( f2 || f3 ) );
 }
 
 }

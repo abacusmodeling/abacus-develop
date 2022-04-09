@@ -71,7 +71,7 @@ void DiagoDavid::diag_mock
     std::vector<int> unconv(nband);		// unconv[m] store the number of the m th unconvergent band
 
     int nbase = 0;						// the dimension of the reduced basis set
-    IterDiagControl::notconv = nband;					// the number of the unconvergent bands
+    this->notconv = nband;					// the number of the unconvergent bands
     for ( int m = 0 ; m < nband; m++ ) unconv[m] = m;
 
     ModuleBase::timer::tick("DiagoDavid","first");
@@ -100,7 +100,7 @@ void DiagoDavid::diag_mock
     hc.zero_out();
     sc.zero_out();
 
-    this->cal_elem( dim, nbase, IterDiagControl::notconv, basis, hp, sp, hc, sc );
+    this->cal_elem( dim, nbase, this->notconv, basis, hp, sp, hc, sc );
 
     this->diag_zhegvx( nbase, nband, hc, sc, nbase_x, eigenvalue.data(), vc );
 
@@ -116,32 +116,32 @@ void DiagoDavid::diag_mock
     {
         dav_iter++;
 
-        this->cal_grad( dim, nbase, IterDiagControl::notconv, basis, hp, sp, vc, 
+        this->cal_grad( dim, nbase, this->notconv, basis, hp, sp, vc, 
 			unconv.data(), eigenvalue.data(), hpsi.data(), spsi.data(), ppsi.data(), respsi.data() );
 
-        this->cal_elem( dim, nbase, IterDiagControl::notconv, basis, hp, sp, hc, sc );
+        this->cal_elem( dim, nbase, this->notconv, basis, hp, sp, hc, sc );
 
         this->diag_zhegvx( nbase, nband, hc, sc, nbase_x, eigenvalue.data(), vc );
 
         // check convergence and update eigenvalues
         ModuleBase::timer::tick("DiagoDavid","check_update");
 
-        IterDiagControl::notconv = 0;
+        this->notconv = 0;
         for ( int m = 0 ; m < nband; m++ )
         {
             convflag[m] = ( abs( eigenvalue[m] - eigenvalue_in[m] ) < IterDiagControl::PW_DIAG_THR );
 
             if ( !convflag[m] ) 
 			{
-                unconv[IterDiagControl::notconv] = m;
-                IterDiagControl::notconv++;
+                unconv[this->notconv] = m;
+                this->notconv++;
             }
 
             eigenvalue_in[m] = eigenvalue[m];
         }
 
         ModuleBase::timer::tick("DiagoDavid","check_update");
-        if ( !IterDiagControl::notconv || ( nbase + IterDiagControl::notconv > nbase_x) || (dav_iter == IterDiagControl::PW_DIAG_NMAX) )
+        if ( !this->notconv || ( nbase + this->notconv > nbase_x) || (dav_iter == IterDiagControl::PW_DIAG_NMAX) )
         {
             ModuleBase::timer::tick("DiagoDavid","last");
 
@@ -158,7 +158,7 @@ void DiagoDavid::diag_mock
                 }
             }
 
-            if ( !IterDiagControl::notconv || (dav_iter == IterDiagControl::PW_DIAG_NMAX) )
+            if ( !this->notconv || (dav_iter == IterDiagControl::PW_DIAG_NMAX) )
             {
                 // overall convergence or last iteration: exit the iteration
 
@@ -179,7 +179,7 @@ void DiagoDavid::diag_mock
 
     } while (1);
 
-    IterDiagControl::avg_iter = static_cast<double>(dav_iter);
+    IterDiagControl::avg_iter += static_cast<double>(dav_iter);
 
     ModuleBase::timer::tick("DiagoDavid", "diag_mock");
     return;
@@ -554,6 +554,29 @@ void DiagoDavid::SchmitOrth
 
     delete[] lagrange;
     ModuleBase::timer::tick("DiagoDavid","SchmitOrth");
+    return;
+}
+
+void DiagoDavid::diag(
+        ModuleHamilt::Hamilt* phm_in,
+        ModulePsi::Psi<std::complex<double>> &psi,
+        double *eigenvalue_in)
+{
+    /// record the times of trying iterative diagonalization
+    int ntry = 0;
+    this->notconv = 0;
+    do
+    {
+        this->diag_mock(psi, eigenvalue_in);
+        ++ntry;
+    }
+    while ( IterDiagControl::test_exit_cond(ntry, this->notconv) );
+
+    if ( notconv > max(5, GlobalV::NBANDS/4) )
+    {
+        std::cout << "\n notconv = " << this->notconv;
+        std::cout << "\n DiagoDavid::diag', too many bands are not converged! \n";
+    }
     return;
 }
 

@@ -31,20 +31,14 @@ class DiagoCG : public DiagH
     void diag(
         ModuleHamilt::Hamilt* phm_in,
         ModulePsi::Psi<std::complex<double>> &phi,
-        double *eigenvalue_in) override
-    {
-        this->diag_mock(phi, eigenvalue_in);
-        return;
-    }
+        double *eigenvalue_in) override;
 
 	private:
     /// static variables, used for passing control variables 
-    /// max steps for cg diagonalization iteration, read in from INPUT file.
-    static int maxter;
     /// if eigenvalue and eigenvectors should be reordered after diagonalization, it is always be true.
-    static bool reorder;
-    /// threshold used in cg, read int from INPUT file.
-    static double eps;
+    bool reorder;
+    /// record for how many bands not have convergence eigenvalues
+    int notconv;
 
     /// temp operator pointer
     Hamilt_PW* hpw;
