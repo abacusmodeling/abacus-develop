@@ -30,6 +30,9 @@ class HSolverPW : public HSolver
     void hamiltSolvePsiK(ModuleHamilt::Hamilt* hm, ModulePsi::Psi<std::complex<double>>& psi, double* eigenvalue);
 
     const PW_Basis* pbas;
+
+    //calculate the precondition array for diagonalization in PW base
+    void update_precondition(std::vector<double> h_diag, const int npw, const double* g2kin);
 };
 
 }

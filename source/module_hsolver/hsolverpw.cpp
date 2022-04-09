@@ -9,7 +9,6 @@
 namespace ModuleHSolver
 {
 
-inline void update_precondition(std::vector<double> h_diag, int npw, const double* g2kin);
 
 void HSolverPW::init(const PW_Basis* pbas_in)
 {
@@ -34,7 +33,7 @@ void HSolverPW::solve
 
     // select the method of diagonalization
     if(this->method == "cg") pdiagh = new DiagoCG(&(GlobalC::hm.hpw), pbas, precondition.data());
-    //else if(this->method == "david") pdiagh = new DiagoDavid(&GlobalC::hm.hpw, pbas, precondition.data());
+    else if(this->method == "david") pdiagh = new DiagoDavid(&GlobalC::hm.hpw, pbas, precondition.data());
     else ModuleBase::WARNING_QUIT("HSolverPW::solve", "This method of DiagH is not supported!");
 
     ///Loop over k points for solve Hamiltonian to charge density 
@@ -42,6 +41,8 @@ void HSolverPW::solve
     {
         ///update H(k) for each k point
         pHamilt->updateHk(ik);
+
+        psi.fix_k(ik);
 
         //template add precondition calculating here
         update_precondition(precondition, psi.get_current_nbas(), GlobalC::wf.g2kin);
@@ -59,7 +60,7 @@ void HSolverPW::hamiltSolvePsiK(ModuleHamilt::Hamilt* hm, ModulePsi::Psi<std::co
     pdiagh->diag(hm, psi, eigenvalue);
 }
 
-inline void update_precondition(std::vector<double> h_diag, int npw, const double* g2kin)
+void HSolverPW::update_precondition(std::vector<double> h_diag, const int npw, const double* g2kin)
 {
     int precondition_type=2;
     //===========================================
