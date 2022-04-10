@@ -30,7 +30,7 @@ class DiagoCG : public DiagH
     //this is the override function diag() for CG method
     void diag(
         ModuleHamilt::Hamilt* phm_in,
-        ModulePsi::Psi<std::complex<double>> &phi,
+        ModulePsi::Psi<std::complex<double>> &psi,
         double *eigenvalue_in) override;
 
 	private:

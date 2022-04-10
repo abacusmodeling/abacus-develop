@@ -14,15 +14,15 @@ namespace ModuleHSolver
 class HSolver
 {
     public:
-    //initialization, used in construct function or restruct a new HSolver
+    /*//initialization, used in construct function or restruct a new HSolver
     virtual void init( 
-        const PW_Basis* pbas //We need Basis class here, use global class for this initialization first 
-        /*const Input &in, //We need new Input class here, use global variable for this initialization first */
+        const Basis* pbas //We need Basis class here, use global class for this initialization first 
+        //const Input &in, //We need new Input class here, use global variable for this initialization first 
         //ModuleElecS::ElecState *pes
         )=0;
     //initialization, only be called for change some parameters only
     virtual void update(
-        /*Input &in */)=0;
+        Input &in )=0;*/
         
     //solve Hamiltonian to electronic density in ElecState
     virtual void solve(ModuleHamilt::Hamilt* phm, 

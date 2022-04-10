@@ -10,7 +10,7 @@ namespace ModuleHSolver
 {
 
 
-void HSolverPW::init(const PW_Basis* pbas_in)
+/*void HSolverPW::init(const PW_Basis* pbas_in)
 {
     this->pbas = pbas_in;
     return;
@@ -19,7 +19,7 @@ void HSolverPW::init(const PW_Basis* pbas_in)
 void HSolverPW::update()
 {
     return;
-}
+}*/
 
 void HSolverPW::solve
 (
