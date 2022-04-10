@@ -489,7 +489,7 @@ void DiagoCG::diag(
     }
     while ( IterDiagControl::test_exit_cond(ntry, this->notconv) );
 
-    if ( notconv > max(5, GlobalV::NBANDS/4) )
+    if ( notconv > max(5, psi.get_nbands()/4) )
     {
         std::cout << "\n notconv = " << this->notconv;
         std::cout << "\n DiagoCG::diag', too many bands are not converged! \n";
