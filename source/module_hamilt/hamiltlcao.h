@@ -21,7 +21,7 @@ class LocalMatrix
 
 };
 
-template<typename T>
+template<typename T, typename T1>
 class HamiltLCAO : public Hamilt
 {
     public:
@@ -59,7 +59,12 @@ class HamiltLCAO : public Hamilt
     //specific code for matrix()
     void getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const;
 
-    LocalMatrix<T> localM;
+    //there are H and S matrix for each k point in reciprocal space
+    //type double for gamma_only case, type complex<double> for multi-k-points case
+    LocalMatrix<T> kM;
+    //there are H and S matrix for fixed T+VNL and overlap terms in real space
+    //type double for nspin<4, type complex<double> for nspin==4
+    LocalMatrix<T1> fixedRealM;
 
 };
 
