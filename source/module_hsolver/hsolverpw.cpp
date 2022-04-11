@@ -51,7 +51,7 @@ void HSolverPW::solve
         double *p_eigenvalues = GlobalC::wf.ekb[ik];
         this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
         ///calculate the contribution of Psi for charge density rho
-        dynamic_cast<ModuleElecS::ElecStatePW*>(pes)->updateRhoK(psi);
+        pes->updateRhoK(psi);
     }
 }
 

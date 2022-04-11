@@ -5,4 +5,5 @@ add_library(
     diagodavid.cpp
     hsolverpw.cpp
     iterdiagcon.cpp
+    hsolverlcao.cpp
 )
