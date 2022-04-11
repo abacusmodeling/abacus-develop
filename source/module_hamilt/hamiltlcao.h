@@ -7,6 +7,20 @@
 namespace ModuleHamilt
 {
 
+//memory for storing Hamiltonian matrix and overlap matrix for one k point
+template<typename T>
+class LocalMatrix
+{
+    public:
+    std::vector<T> hloc;
+    std::vector<T> sloc;
+    size_t size=1;
+    void resize(size_t size_in){size = size_in; hloc.resize(size); sloc.resize(size);}
+    T* getH(){return hloc.data();}
+    T* getS(){return sloc.data();}
+
+};
+
 template<typename T>
 class HamiltLCAO : public Hamilt
 {
@@ -35,10 +49,7 @@ class HamiltLCAO : public Hamilt
     
     //core function: return H(k) and S(k) matrixs for direct solving eigenvalues.
     //not used in PW base
-    void matrix(const MatrixBlock<std::complex<double>> hk_in, const MatrixBlock<std::complex<double>> sk_in) override
-    {
-        return;
-    };
+    void matrix(const MatrixBlock<std::complex<double>> hk_in, const MatrixBlock<std::complex<double>> sk_in) override;
 
     private:
     void ch_mock();
@@ -48,18 +59,7 @@ class HamiltLCAO : public Hamilt
 
 };
 
-//memory for storing Hamiltonian matrix and overlap matrix for one k point
-template<typename T>
-class LocalMatrix
-{
-    std::vector<T> Hloc;
-    std::vector<T> Sloc;
-    size_t size;
-    void resize(size_t size_in);
-    T* getH();
-    T* getS();
 
-};
 
 }
 
