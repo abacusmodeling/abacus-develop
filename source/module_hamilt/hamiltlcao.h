@@ -49,11 +49,15 @@ class HamiltLCAO : public Hamilt
     
     //core function: return H(k) and S(k) matrixs for direct solving eigenvalues.
     //not used in PW base
-    void matrix(const MatrixBlock<std::complex<double>> hk_in, const MatrixBlock<std::complex<double>> sk_in) override;
+    void matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const override;
+    void matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)const override;
 
     private:
     void ch_mock();
     void hk_mock();
+
+    //specific code for matrix()
+    void getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const;
 
     LocalMatrix<T> localM;
 

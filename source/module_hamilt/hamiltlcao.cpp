@@ -19,10 +19,22 @@ void HamiltLCAO<T>::hk_mock()
 }
 
 // complex<double> case for matrix
-void HamiltLCAO<std::complex<double>>::matrix(const MatrixBlock<std::complex<double>> hk_in, const MatrixBlock<std::complex<double>> sk_in)
+void HamiltLCAO<std::complex<double>>::matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const
 {
-    hk_in.p[0] = localM.hloc[0];
-    sk_in.p[0] = localM.sloc[0];
+    this->getMatrix(hk_in, sk_in);
+}
+
+// double case for matrix
+void HamiltLCAO<double>::matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)const
+{
+    this->getMatrix(hk_in, sk_in);
+}
+
+template<typename T>
+void HamiltLCAO<T>::getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const
+{
+    hk_in.p = (T*)localM.hloc.data();
+    sk_in.p = (T*)localM.sloc.data();
 }
 
 }

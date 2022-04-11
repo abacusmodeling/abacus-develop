@@ -24,7 +24,8 @@ class Hamilt
     virtual void hPsi(const ModulePsi::Psi<std::complex<double>>& psi, ModulePsi::Psi<std::complex<double>>& hpsi)const=0;
     
     //core function: return H(k) and S(k) matrixs for direct solving eigenvalues.
-    virtual void matrix(const MatrixBlock<std::complex<double>> hk_in, const MatrixBlock<std::complex<double>> sk_in)=0;
+    virtual void matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const=0;
+    virtual void matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)const=0;
     
     protected:
     //array, save operations from each operators
