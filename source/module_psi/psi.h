@@ -198,7 +198,7 @@ class Psi
     //current number of basis of current_k
     mutable int current_nbasis=1;
 
-    int* ngk=nullptr;
+    const int* ngk=nullptr;
 
     //if spin_method set as true, k point with even number is spin-up but with odd number is spin-down
     //only used for NSPIN==2
