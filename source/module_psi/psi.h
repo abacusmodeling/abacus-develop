@@ -125,7 +125,7 @@ class Psi
     //use operator "(ik, iband, ibasis)" to reach target element
     T &operator()(const int ik, const int ibands, const int ibasis)
 	{
-        assert(ik>=0 && ibands<this->nk);
+        assert(ik>=0 && ik<this->nk);
 		assert(ibands>=0 && ibands<this->nbands);	
         assert(ibasis>=0 && ibasis<this->nbasis);
 		return this->psi[(ik*this->nbands + ibands) * this->nbasis + ibasis];
@@ -133,7 +133,7 @@ class Psi
 
 	const T &operator()(const int ik, const int ibands, const int ibasis) const
 	{
-        assert(ik>=0 && ibands<this->nk);
+        assert(ik>=0 && ik<this->nk);
 		assert(ibands>=0 && ibands<this->nbands);	
         assert(ibasis>=0 && ibasis<this->nbasis);
 		return this->psi[(ik*this->nbands + ibands) * this->nbasis + ibasis];
