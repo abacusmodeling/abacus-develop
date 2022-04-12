@@ -35,9 +35,10 @@ class HamiltLCAO : public Hamilt
     };
     
     //for target K point, update consequence of hPsi() and matrix()
-    void updateHk(int ik) override
+    void updateHk(const int ik) override
     {
-        this->hk_mock();
+        this->hk_fixed_mock(ik);
+        this->hk_update_mock(ik);
     };
     
     //core function: for solving eigenvalues of Hamiltonian with iterative method
@@ -54,7 +55,8 @@ class HamiltLCAO : public Hamilt
 
     private:
     void ch_mock();
-    void hk_mock();
+    void hk_fixed_mock(const int ik);
+    void hk_update_mock(const int ik);
 
     //specific code for matrix()
     void getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const;

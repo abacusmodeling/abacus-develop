@@ -17,8 +17,10 @@ template<typename T>
 class Psi
 {
  public:
+    Psi(void){};
     Psi(PW_Basis* pbasis_in);
-    Psi(PW_Basis* pbasis_in, const int& nk_in, const int& nbd_in, const int& nbs_in, const bool spin_method_in=0);
+    Psi(const int* ngk_in){this->ngk = ngk_in;}
+    Psi(const int* ngk_in, int nk_in, int nbd_in, int nbs_in, bool spin_method_in=0);
     Psi(const Psi& psi_in, const int& nk_in, const int& nbd_in);
     // initialize the wavefunction coefficient
     // only resize and construct function now is used
@@ -68,7 +70,7 @@ class Psi
     {
         assert(ik>=0 && ik<this->nk);
         this->current_k = ik;
-        this->current_nbasis = this->pbasis->Klist->ngk[ik];
+        this->current_nbasis = this->ngk[ik];
         this->current_b = 0;
         this->psi_current = const_cast<T*>(&(this->psi[ik * this->nbands * this->nbasis]));
         return;
@@ -145,24 +147,24 @@ class Psi
     std::vector<T> psi;
  
     // dimensions
-    int nk; // number of k points
-    int nbands; // number of bands
-    int nbasis; // number of basis
+    int nk=1; // number of k points
+    int nbands=1; // number of bands
+    int nbasis=1; // number of basis
 
     //current k point
-    mutable int current_k;
+    mutable int current_k=0;
     //current band index
-    mutable int current_b;
+    mutable int current_b=0;
     //current pointer for getting the psi
-    mutable T* psi_current;
+    mutable T* psi_current=nullptr;
     //current number of basis of current_k
-    mutable int current_nbasis;
+    mutable int current_nbasis=1;
 
-    PW_Basis* pbasis;
+    int* ngk=nullptr;
 
     //if spin_method set as true, k point with even number is spin-up but with odd number is spin-down
     //only used for NSPIN==2
-    bool spin_method;  
+    bool spin_method=false;  
 
 /*    // control if the system has only gamma point
     bool gamma_only; 

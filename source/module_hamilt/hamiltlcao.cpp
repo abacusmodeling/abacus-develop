@@ -11,24 +11,31 @@ void HamiltLCAO<T,T1>::ch_mock()
 }
 
 template<typename T, typename T1>
-void HamiltLCAO<T,T1>::hk_mock()
+void HamiltLCAO<T,T1>::hk_fixed_mock(const int ik)
 {
-    this->kM.hloc[0] = (T)0.0;
-    
-    this->kM.sloc[0] = (T)0.0;
+	//folding_fixedH() should be refactored to there, but now deepks code in it
+	return;
 }
 
-// complex<double> case for matrix
+template<typename T, typename T1>
+void HamiltLCAO<T, T1>::hk_update_mock(const int ik)
+{
+    //update_Hk and update_Hgamma should be refactored to there
+    return;
+}
+
+// case for nspin==4
 void HamiltLCAO<std::complex<double>, std::complex<double>>::matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const
 {
     this->getMatrix(hk_in, sk_in);
 }
+// case for nspin<4, multi-k-points 
 void HamiltLCAO<std::complex<double>, double>::matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const
 {
     this->getMatrix(hk_in, sk_in);
 }
 
-// double case for matrix
+// case for nspin<4, gamma_only
 void HamiltLCAO<double, double>::matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)const
 {
     this->getMatrix(hk_in, sk_in);
