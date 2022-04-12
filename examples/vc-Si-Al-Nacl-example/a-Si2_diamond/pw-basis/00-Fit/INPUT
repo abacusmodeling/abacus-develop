@@ -10,7 +10,7 @@ calculation         scf
 
 #Parameters (3.PW)
 ecutwfc             50
-scf_thr_rho                 1e-8
+scf_thr                 1e-8
 scf_nmax		    100
 
 #Parameters (5.LCAO)

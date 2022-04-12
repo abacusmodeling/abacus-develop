@@ -109,7 +109,7 @@ class Input
 	std::string fixed_axes;      //which axes are fixed
 	std::string relax_method;	// methods to move_ion: sd, bfgs, cg...
 
-    double relax_cg_thr_e;    // threshold when cg to bfgs, pengfei add 2011-08-15
+    double relax_cg_thr;    // threshold when cg to bfgs, pengfei add 2011-08-15
 
 	double relax_bfgs_w1;			// wolfe condition 1
 	double relax_bfgs_w2;			// wolfe condition 2
@@ -135,10 +135,10 @@ class Input
 // technique
 //==========================================================
 	int diago_proc;			// the number of procs used to diag. mohan add 2012-01-13
-    int diag_cg_nmax;
+    int pw_diag_nmax;
 	int diago_cg_prec;		// mohan add 2012-03-31
-    int diago_david_ndim;
-    double diag_thr_e;			// used in cg method
+    int pw_diag_ndim;
+    double pw_diag_thr;			// used in cg method
 
 	int nb2d;				// matrix 2d division.
 
@@ -161,7 +161,7 @@ class Input
 //==========================================================
 // iteration
 //==========================================================
-    double scf_thr_rho;				// \sum |rhog_out - rhog_in |^2
+    double scf_thr;				// \sum |rhog_out - rhog_in |^2
     int scf_nmax;				// number of max elec iter
     int relax_nmax;				// number of max ionic iter
 	int out_stru;			// outut stru file each ion step
@@ -323,7 +323,7 @@ class Input
 // Fuxiang He add 2016-10-26
 //==========================================================
 	int tddft;			//calculate tddft or not
-	double td_scf_thr_rho;			//threshold for electronic iteration of tddft
+	double td_scf_thr;			//threshold for electronic iteration of tddft
 	double td_dt;			//"fs"
 	double td_force_dt;			//"fs"
 	int td_val_elec_01;			//valence electron 01

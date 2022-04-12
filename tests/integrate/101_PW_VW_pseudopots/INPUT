@@ -10,7 +10,7 @@ pseudo_type     vwr
 
 #Parameters (2.Iteration)
 ecutwfc			20
-scf_thr_rho				1e-8
+scf_thr				1e-8
 scf_nmax			100
 
 

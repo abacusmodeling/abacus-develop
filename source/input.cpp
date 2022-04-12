@@ -163,7 +163,7 @@ void Input::Default(void)
 	cal_stress=false;
 	fixed_axes = "None"; // pengfei 2018-11-9
 	relax_method="cg"; // pengfei  2014-10-13
-    relax_cg_thr_e=0.5; // pengfei add 2013-08-15
+    relax_cg_thr=0.5; // pengfei add 2013-08-15
 	out_level="ie";
     out_md_control = false;
 	relax_bfgs_w1 = 0.01;		// mohan add 2011-03-13
@@ -194,10 +194,10 @@ void Input::Default(void)
 //----------------------------------------------------------
     //diago_type = "default"; xiaohui modify 2013-09-01 //mohan update 2012-02-06
 	diago_proc = 0; //if 0, then diago_proc = GlobalV::NPROC
-    diag_cg_nmax = 50;
+    pw_diag_nmax = 50;
 	diago_cg_prec=1; //mohan add 2012-03-31
-    diago_david_ndim = 4;
-    diag_thr_e = 1.0e-2;
+    pw_diag_ndim = 4;
+    pw_diag_thr = 1.0e-2;
 	nb2d = 0;
 	nurse = 0;
 	colour = 0;
@@ -211,7 +211,7 @@ void Input::Default(void)
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
-    scf_thr_rho = 1.0e-9;
+    scf_thr = 1.0e-9;
     scf_nmax = 40;
     relax_nmax = 0;
 	out_stru = 0;
@@ -329,7 +329,7 @@ void Input::Default(void)
 // tddft
 //----------------------------------------------------------
 	tddft=0;
-	td_scf_thr_rho = 1e-9;
+	td_scf_thr = 1e-9;
 	td_dt = 0.02;
 	td_force_dt = 0.02;
 	td_val_elec_01=1;
@@ -665,9 +665,9 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, relax_method);
         }
-        else if (strcmp("relax_cg_thr_e",word) == 0) // pengfei add 2013-08-15
+        else if (strcmp("relax_cg_thr",word) == 0) // pengfei add 2013-08-15
         {
-            read_value(ifs, relax_cg_thr_e);
+            read_value(ifs, relax_cg_thr);
         }
         else if (strcmp("out_level", word) == 0)
         {
@@ -750,21 +750,21 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, diago_proc);
         }
-        else if (strcmp("diag_cg_nmax", word) == 0)
+        else if (strcmp("pw_diag_nmax", word) == 0)
         {
-            read_value(ifs, diag_cg_nmax);
+            read_value(ifs, pw_diag_nmax);
         }
         else if (strcmp("diago_cg_prec", word) == 0)//mohan add 2012-03-31
         {
             read_value(ifs, diago_cg_prec);
         }
-        else if (strcmp("diago_david_ndim", word) == 0)
+        else if (strcmp("pw_diag_ndim", word) == 0)
         {
-            read_value(ifs, diago_david_ndim);
+            read_value(ifs, pw_diag_ndim);
         }
-        else if (strcmp("diag_thr_e", word) == 0)
+        else if (strcmp("pw_diag_thr", word) == 0)
         {
-            read_value(ifs, diag_thr_e);
+            read_value(ifs, pw_diag_thr);
         }
         else if (strcmp("nb2d", word) == 0)
         {
@@ -815,9 +815,9 @@ bool Input::Read(const std::string &fn)
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
-        else if (strcmp("scf_thr_rho", word) == 0)
+        else if (strcmp("scf_thr", word) == 0)
         {
-            read_value(ifs, scf_thr_rho);
+            read_value(ifs, scf_thr);
         }
         else if (strcmp("scf_nmax", word) == 0)
         {
@@ -1122,9 +1122,9 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs,tddft );
 		}
-		else if (strcmp("td_scf_thr_rho", word) == 0)
+		else if (strcmp("td_scf_thr", word) == 0)
 		{
-			read_value(ifs,td_scf_thr_rho );
+			read_value(ifs,td_scf_thr );
 		}
 		else if (strcmp("td_dt", word) == 0)
 		{
@@ -1791,7 +1791,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool( cal_stress );
 	Parallel_Common::bcast_string( fixed_axes );
     Parallel_Common::bcast_string( relax_method );
-    Parallel_Common::bcast_double( relax_cg_thr_e); // pengfei add 2013-08-15
+    Parallel_Common::bcast_double( relax_cg_thr); // pengfei add 2013-08-15
 	Parallel_Common::bcast_string( out_level);
     Parallel_Common::bcast_bool( out_md_control);
     Parallel_Common::bcast_double( relax_bfgs_w1);
@@ -1815,10 +1815,10 @@ void Input::Bcast()
     Parallel_Common::bcast_int( bz );
 
     Parallel_Common::bcast_int( diago_proc ); //mohan add 2012-01-03
-    Parallel_Common::bcast_int( diag_cg_nmax );
+    Parallel_Common::bcast_int( pw_diag_nmax );
 	Parallel_Common::bcast_int( diago_cg_prec );
-    Parallel_Common::bcast_int( diago_david_ndim );
-    Parallel_Common::bcast_double( diag_thr_e );
+    Parallel_Common::bcast_int( pw_diag_ndim );
+    Parallel_Common::bcast_double( pw_diag_thr );
 	Parallel_Common::bcast_int( nb2d );
 	Parallel_Common::bcast_int( nurse );
 	Parallel_Common::bcast_bool( colour );
@@ -1832,7 +1832,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( test_force );
 	Parallel_Common::bcast_int( test_stress );
 
-    Parallel_Common::bcast_double( scf_thr_rho );
+    Parallel_Common::bcast_double( scf_thr );
     Parallel_Common::bcast_int( scf_nmax );
     Parallel_Common::bcast_int( this->relax_nmax );
 	Parallel_Common::bcast_int( out_stru ); //mohan add 2012-03-23
@@ -1956,7 +1956,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int(td_val_elec_01);
 	Parallel_Common::bcast_int(td_val_elec_02);
 	Parallel_Common::bcast_int(td_val_elec_03);
-	Parallel_Common::bcast_double(td_scf_thr_rho);
+	Parallel_Common::bcast_double(td_scf_thr);
 	Parallel_Common::bcast_double(td_dt);
 	Parallel_Common::bcast_double(td_force_dt);
 	Parallel_Common::bcast_int(td_vext);
@@ -2121,9 +2121,9 @@ void Input::Check(void)
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
 		if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
 		{
-			if (diag_thr_e>1.0e-3)
+			if (pw_diag_thr>1.0e-3)
         	{
-        	    diag_thr_e = 1.0e-5;
+        	    pw_diag_thr = 1.0e-5;
         	}
 		}
 		if(cal_force) // mohan add 2010-09-07

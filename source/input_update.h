@@ -27,7 +27,7 @@ private:
     int cal_force;
     double force_thr;		// threshold of force in unit (Ry/Bohr)
 	double force_thr_ev2;	// invalid force threshold, mohan add 2011-04-17
-    double scf_thr_rho;				// \sum |rhog_out - rhog_in |^2
+    double scf_thr;				// \sum |rhog_out - rhog_in |^2
     int scf_nmax;				// number of max elec iter
     int relax_nmax;				// number of max ionic iter
     int md_nstep;               // number of md steps
