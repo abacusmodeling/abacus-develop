@@ -6,8 +6,9 @@
 
 #include <vector>
 #include <cassert>
+#include "module_base/global_variable.h"
 
-#include "src_pw/pw_basis.h"
+#include "../src_pw/pw_basis.h"
 
 namespace ModulePsi
 {
@@ -18,14 +19,40 @@ class Psi
 {
  public:
     Psi(void){};
-    Psi(PW_Basis* pbasis_in);
+    Psi(PW_Basis* pbasis_in)
+    {
+        this->ngk = pbasis_in->Klist->ngk->data();
+        this->resize(pbasis_in->Klist->nks, GlobalV::NBANDS, pbasis_in->ngmw);
+    }
     Psi(const int* ngk_in){this->ngk = ngk_in;}
-    Psi(const int* ngk_in, int nk_in, int nbd_in, int nbs_in, bool spin_method_in=0);
-    Psi(const Psi& psi_in, const int& nk_in, const int& nbd_in);
+    Psi(const int* ngk_in, int nk_in, int nbd_in, int nbs_in, bool spin_method_in=0)
+    {
+        this->ngk = ngk_in;
+        this->resize(nk_in, nbd_in, nbs_in);
+        this->spin_method = spin_method_in;
+        this->current_b = 0;
+        this->current_k = 0;
+    }
+    Psi(const Psi& psi_in, const int& nk_in, const int& nbd_in)
+    {
+        assert(nk_in<=psi_in.get_nk() && nbd_in<=psi_in.get_nbd());
+        this->resize(nk_in, nbd_in, psi_in.get_nbasis());
+        //if size of k is 1, copy from Psi in current_k, 
+        //else copy from start of Psi
+        if(nk_in==1) for(size_t index=0; index<this->size();++index)
+        {
+            psi[index] = psi_in.get_pointer()[index];
+            //current_k for this Psi only keep the spin index same as the copied Psi
+            this->current_k = psi_in.get_spin();
+        } 
+        else for(size_t index=0; index<this->size();++index) psi[index] = psi_in[index];
+
+        this->spin_method = psi_in.spin_method;
+    }
     // initialize the wavefunction coefficient
     // only resize and construct function now is used
-    /*void initialize(
-        const bool &gamma_only, 
+    void initialize(void);
+    /*    const bool &gamma_only, 
         const int &basis_type, 
         const int &data_type, 
         const int &hardware_type, 
@@ -36,7 +63,17 @@ class Psi
     void resize(
         const int nks_in,
         const int nbands_in,
-        const int nbasis_in);
+        const int nbasis_in)
+    {
+        assert(nks_in>0 && nbands_in>0 && nbasis_in>0);
+        this->psi.resize(nks_in * nbands_in * nbasis_in);
+        this->nk = nks_in;
+        this->nbands = nbands_in;
+        this->nbasis = nbasis_in;
+        this->current_nbasis = nbasis_in;
+        this->psi_current = psi.data();
+        return;
+    }
         
     // get the pointer for current k point or current band
     T* get_pointer(){return psi_current;}
@@ -70,7 +107,8 @@ class Psi
     {
         assert(ik>=0 && ik<this->nk);
         this->current_k = ik;
-        this->current_nbasis = this->ngk[ik];
+        if(this->ngk!=nullptr&&GlobalV::NSPIN!=4) this->current_nbasis = this->ngk[ik];
+        else this->current_nbasis = this->nbasis;
         this->current_b = 0;
         this->psi_current = const_cast<T*>(&(this->psi[ik * this->nbands * this->nbasis]));
         return;
