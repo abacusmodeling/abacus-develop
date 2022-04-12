@@ -24,6 +24,14 @@ void HamiltLCAO<T, T1>::hk_update_mock(const int ik)
     return;
 }
 
+template<typename T, typename T1>
+void HamiltLCAO<T, T1>::getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const
+{
+    hk_in.p = (T*)kM.hloc.data();
+    sk_in.p = (T*)kM.sloc.data();
+}
+
+
 // case for nspin==4
 void HamiltLCAO<std::complex<double>, std::complex<double>>::matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const
 {
@@ -41,11 +49,33 @@ void HamiltLCAO<double, double>::matrix(MatrixBlock<double> hk_in, MatrixBlock<d
     this->getMatrix(hk_in, sk_in);
 }
 
-template<typename T, typename T1>
-void HamiltLCAO<T, T1>::getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const
+void HamiltLCAO<std::complex<double>, std::complex<double>>::constructHamilt(const int iter, const MatrixBlock<double> rho)
 {
-    hk_in.p = (T*)kM.hloc.data();
-    sk_in.p = (T*)kM.sloc.data();
+    this->ch_mock();
 }
+void HamiltLCAO<std::complex<double>, double>::constructHamilt(const int iter, const MatrixBlock<double> rho)
+{
+    this->ch_mock();
+}
+void HamiltLCAO<double, double>::constructHamilt(const int iter, const MatrixBlock<double> rho)
+{
+    this->ch_mock();
+}
+
+void HamiltLCAO<std::complex<double>, std::complex<double>>::updateHk(const int ik)
+{
+    this->hk_fixed_mock(ik);
+    this->hk_update_mock(ik);
+};
+void HamiltLCAO<double, std::complex<double>>::updateHk(const int ik)
+{
+    this->hk_fixed_mock(ik);
+    this->hk_update_mock(ik);
+};
+void HamiltLCAO<double, double>::updateHk(const int ik)
+{
+    this->hk_fixed_mock(ik);
+    this->hk_update_mock(ik);
+};
 
 }

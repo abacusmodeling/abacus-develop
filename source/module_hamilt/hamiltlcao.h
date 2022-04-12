@@ -29,17 +29,10 @@ class HamiltLCAO : public Hamilt
     //~HamiltLCAO();
 
     //construct Hamiltonian matrix with inputed electonic density 
-    void constructHamilt(const int iter, const MatrixBlock<double> rho) override
-    {
-        this->ch_mock();
-    };
+    void constructHamilt(const int iter, const MatrixBlock<double> rho) override;
     
     //for target K point, update consequence of hPsi() and matrix()
-    void updateHk(const int ik) override
-    {
-        this->hk_fixed_mock(ik);
-        this->hk_update_mock(ik);
-    };
+    void updateHk(const int ik) override;
     
     //core function: for solving eigenvalues of Hamiltonian with iterative method
     virtual void hPsi(const ModulePsi::Psi<std::complex<double>>& psi, ModulePsi::Psi<std::complex<double>>& hpsi) const override
