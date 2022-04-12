@@ -23,7 +23,7 @@ class DiagoDavid : public DiagH
 {
 public:
 
-    DiagoDavid(Hamilt_PW* hpw_in, const PW_Basis* pbas_in, const double *precondition_in);
+    DiagoDavid(Hamilt_PW* hpw_in, const double *precondition_in);
     ~DiagoDavid();
 
     //this is the override function diag() for CG method
@@ -111,7 +111,6 @@ private:
         double *eigenvalue_in);
 
     Hamilt_PW* hpw;
-    const PW_Basis* pbas;
     const double* precondition;
 
 

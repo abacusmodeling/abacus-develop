@@ -11,11 +11,9 @@ namespace ModuleHSolver
 
 DiagoCG::DiagoCG(
     Hamilt_PW* hpw_in, 
-    const PW_Basis* pbas_in,
     const double *precondition_in)
 {
     this->hpw = hpw_in; 
-    this->pbas = pbas_in;
     this->precondition = precondition_in;
     test_cg=0;
     reorder = false;

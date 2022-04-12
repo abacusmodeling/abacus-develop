@@ -17,11 +17,9 @@ class DiagoCG : public DiagH
 
     //Constructor need:
     //1. temporary mock of Hamiltonian "Hamilt_PW"
-    //2. temporary use of basis "PW_Basis", we should design Basis module later
-    //3. precondition pointer should point to place of precondition array. 
+    //2. precondition pointer should point to place of precondition array. 
     DiagoCG(
         Hamilt_PW* hpw_in, 
-        const PW_Basis* pbas_in, 
         const double *precondition_in);
     ~DiagoCG();
 
@@ -42,7 +40,6 @@ class DiagoCG : public DiagH
 
     /// temp operator pointer
     Hamilt_PW* hpw;
-    const PW_Basis* pbas;
 
     int test_cg;
 

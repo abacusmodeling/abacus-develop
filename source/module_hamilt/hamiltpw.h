@@ -10,8 +10,8 @@ namespace ModuleHamilt
 class HamiltPW : public Hamilt
 {
     public:
-    HamiltPW();
-    ~HamiltPW();
+    HamiltPW(){};
+    ~HamiltPW(){};
 
     //construct Hamiltonian matrix with inputed electonic density 
     void constructHamilt(const int iter, const MatrixBlock<double> rho) override

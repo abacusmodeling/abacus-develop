@@ -12,11 +12,9 @@ int DiagoDavid::PW_DIAG_NDIM = 4;
 
 DiagoDavid::DiagoDavid(
     Hamilt_PW* hpw_in, 
-    const PW_Basis* pbas_in,
     const double *precondition_in)
 {
     this->hpw = hpw_in; 
-    this->pbas = pbas_in;
     this->precondition = precondition_in;
 
     test_david = 2;
