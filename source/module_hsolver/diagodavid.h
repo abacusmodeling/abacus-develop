@@ -39,7 +39,7 @@ private:
     int test_david;
 
     /// record for how many bands not have convergence eigenvalues
-    static int notconv;
+    int notconv;
 
     void cal_grad(
         const int& npw,
