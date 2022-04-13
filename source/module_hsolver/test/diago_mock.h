@@ -90,7 +90,7 @@ class HPsi
                 double mincoef = 0.0;
                 double realp= pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
                 //double imagp= pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
-                if (u(e) % 10 > (sparsity-1)) mincoef = 1.0;
+                if (int (u(e) % 10) > int (sparsity-1)) mincoef = 1.0;
                 if(i==j)
                 {
                     hmatrix(i,j) = std::complex<double>{realp,0.0};

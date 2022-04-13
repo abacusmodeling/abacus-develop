@@ -21,7 +21,7 @@
  * Class Diago_CG is an approach for eigenvalue problems
  * This unittest test the function Diago_CG::diag()
  * with different examples.
- *  - the Hermite matrices (npw=500,1000) produced using random numbers and with sparsity of 0%, 60%, 80%
+ *  - the Hermite matrices (npw=50,100,200) produced using random numbers and with sparsity of 0%, 60%, 80%
  *  - the Hamiltonian matrix read from "data-H", produced by using out_hs in INPUT of a LCAO calculation
  *  - a 2x2 Hermite matrix for learning and checking
  *
@@ -53,18 +53,17 @@ void lapackEigen(int &npw, ModuleBase::ComplexMatrix &hm, double *e, bool outtim
 class DiagoCGPrepare
 {
   public:
-    DiagoCGPrepare(int nband, int npw, bool sub, int sparsity, bool reorder, double eps, int maxiter, double threshold)
-        : nband(nband), npw(npw), sub(sub), sparsity(sparsity), reorder(reorder), eps(eps), maxiter(maxiter),
+    DiagoCGPrepare(int nband, int npw, int sparsity, bool reorder, double eps, int maxiter, double threshold)
+        : nband(nband), npw(npw), sparsity(sparsity), reorder(reorder), eps(eps), maxiter(maxiter),
           threshold(threshold)
     {
-	    //ModuleHSolver::IterDiagControl::PW_DIAG_NMAX = maxiter;
-	    //ModuleHSolver::IterDiagControl::PW_DIAG_THR = eps;
+	    ModuleHSolver::IterDiagControl::PW_DIAG_NMAX = maxiter;
+	    ModuleHSolver::IterDiagControl::PW_DIAG_THR = eps;
     }
 
     int nband, npw, sparsity, maxiter, notconv;
     // eps is the convergence threshold within cg_diago
     double eps, avg_iter;
-    bool sub; // do subspace diagonalization if true
     bool reorder;
     double threshold;
     // threshold is the comparison standard between cg and lapack
@@ -85,12 +84,10 @@ class DiagoCGPrepare
             {
 		double rand = static_cast<double>(u(p))/10.;
                 // psiguess(i,j) = ev(j,i)*(1+rand);
-                psiguess(i, j) = ev(j, i);// * rand;
+                psiguess(i, j) = ev(j, i) * rand;
             }
         }
         // run cg
-        clock_t start, end;
-        start = clock();
 	//======================================================================
         double *en = new double[npw];
         int ik = 1;
@@ -112,13 +109,8 @@ class DiagoCGPrepare
 	ModuleHSolver::DiagoCG cg(hpw,precondition);
         cg.diag(ha,psi,en); 
 	//======================================================================
-        end = clock();
-        // std::cout<<"diag Run time: "<<(double)(end - start) / CLOCKS_PER_SEC<<" S, notconv="
-        //				   << notconv <<", avg_iter=" << avg_iter << std::endl;
-        // std::cout << " ntry " << ntry << std::endl;
         for (int i = 0; i < nband; i++)
         {
-            // std::cout << " en " << en[i] << " e_lapack " << e_lapack[i] << std::endl;
             EXPECT_NEAR(en[i], e_lapack[i], threshold);
         }
 
@@ -134,11 +126,11 @@ class DiagoCGTest : public ::testing::TestWithParam<DiagoCGPrepare>
 TEST_P(DiagoCGTest, RandomHamilt)
 {
     DiagoCGPrepare dcp = GetParam();
-    // std::cout << "npw=" << dcp.npw << ", nband=" << dcp.nband << ", sparsity="
+    //std::cout << "npw=" << dcp.npw << ", nband=" << dcp.nband << ", sparsity="
     //		  << dcp.sparsity << ", eps=" << dcp.eps << std::endl;
-
     HPsi hpsi(dcp.nband, dcp.npw, dcp.sparsity);
     DIAGOTEST::hmatrix = hpsi.hamilt();
+
     DIAGOTEST::npw = dcp.npw;
     // ModuleBase::ComplexMatrix psi = hpsi.psi();
     dcp.CompareEigen(hpsi.precond());
@@ -147,11 +139,11 @@ TEST_P(DiagoCGTest, RandomHamilt)
 INSTANTIATE_TEST_SUITE_P(VerifyCG,
                          DiagoCGTest,
                          ::testing::Values(
-                             // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
-                             DiagoCGPrepare(10, 500, true, 0, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(20, 500, true, 6, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(20, 1000, true, 8, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(40, 1000, true, 8, true, 1e-5, 50, 1e-3)));
+                             // nband, npw, sparsity, reorder, eps, maxiter, threshold
+                             DiagoCGPrepare(10, 50, 0, true, 1e-5, 50, 1e-3),
+                             DiagoCGPrepare(20, 50, 6, true, 1e-5, 50, 1e-3),
+                             DiagoCGPrepare(20, 100, 8, true, 1e-5, 50, 1e-3),
+                             DiagoCGPrepare(40, 200, 8, true, 1e-5, 50, 1e-2)));
 
 // check that the mock class HPsi work well
 // in generating a Hermite matrix
@@ -201,7 +193,7 @@ TEST(DiagoCGTest, TwoByTwo)
     hm(1, 0) = std::complex<double>{1.0, 0.0};
     hm(1, 1) = std::complex<double>{3.0, 0.0};
     // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
-    DiagoCGPrepare dcp(nband, dim, false, 0, true, 1e-4, 50, 1e-10);
+    DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 50, 1e-10);
     HPsi hpsi;
     hpsi.create(nband, dim);
     DIAGOTEST::hmatrix = hm;
@@ -209,7 +201,6 @@ TEST(DiagoCGTest, TwoByTwo)
     dcp.CompareEigen(hpsi.precond());
 }
 
-/*
 TEST(DiagoCGTest, readH)
 {
     // read Hamilt matrix from file data-H
@@ -221,14 +212,13 @@ TEST(DiagoCGTest, readH)
     int dim = hm.nr;
     int nband = 10; // not nband < dim, here dim = 26 in data-H
     // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
-    DiagoCGPrepare dcp(nband, dim, true, 0, true, 1e-4, 50, 1e-3);
+    DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 50, 1e-3);
     HPsi hpsi;
     hpsi.create(nband, dim);
     DIAGOTEST::hmatrix = hpsi.hamilt();
     DIAGOTEST::npw = dim;
     dcp.CompareEigen(hpsi.precond());
 }
-*/
 
 int main(int argc, char **argv)
 {
