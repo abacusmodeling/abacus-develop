@@ -326,7 +326,6 @@ namespace ModuleDMFT
     const int soc = GlobalV::NSPIN==4 ? 1 : 0;
     const int nks_tot = GlobalV::NSPIN==2 ? (int)GlobalC::kv.nks/2 : GlobalC::kv.nks;
     const int nspin_tmp = GlobalV::NSPIN==2 ? 2 : 1;
-    double norm = GlobalV::NSPIN==1 ? 2.0 : 1.0;
 
     std::string file = this->out_path + "bands.dat";
     std::ofstream ofs(file.c_str(), std::ios::out);
