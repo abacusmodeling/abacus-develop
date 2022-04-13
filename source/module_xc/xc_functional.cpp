@@ -102,6 +102,7 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         func_id.push_back(XC_MGGA_X_SCAN);
         func_id.push_back(XC_MGGA_C_SCAN);
         func_type = 3;
+        use_libxc = true;
 	}
 #endif
    	else if( xc_func == "PBE0")
@@ -120,6 +121,7 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
     {
         func_id.push_back(XC_HYB_GGA_XC_HSE06);
         func_type = 4;
+        use_libxc = true;
     }
 #endif
     else
@@ -127,6 +129,7 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
 #ifdef USE_LIBXC
         //see if it matches libxc functionals
         set_xc_type_libxc(xc_func);
+        use_libxc = true;
 #else
         std::cout << "functional name not recognized!" << std::endl;
 #endif
