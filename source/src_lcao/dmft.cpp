@@ -326,6 +326,7 @@ namespace ModuleDMFT
     const int soc = GlobalV::NSPIN==4 ? 1 : 0;
     const int nks_tot = GlobalV::NSPIN==2 ? (int)GlobalC::kv.nks/2 : GlobalC::kv.nks;
     const int nspin_tmp = GlobalV::NSPIN==2 ? 2 : 1;
+    double norm = GlobalV::NSPIN==1 ? 2.0 : 1.0;
 
     std::string file = this->out_path + "bands.dat";
     std::ofstream ofs(file.c_str(), std::ios::out);
@@ -352,7 +353,10 @@ namespace ModuleDMFT
               << std::setw(6) << iband
               << std::setw(6) << ik
               << std::setw(25) << std::fixed << std::setprecision(15) 
-              << ekb[ik+is*nks_tot][iband]/2.0 << std::endl;          //Rydberg to Hartree
+              << ekb[ik+is*nks_tot][iband]/2.0 
+              << std::setw(17) << std::fixed << std::setprecision(12)
+              << GlobalC::wf.wg(ik,iband)/GlobalC::kv.wk[ik]
+              << std::endl;          //Rydberg to Hartree
         }
       }
     }
