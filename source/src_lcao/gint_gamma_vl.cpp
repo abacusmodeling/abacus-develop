@@ -489,7 +489,7 @@ void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal,
         //     OUT(GlobalV::ofs_running, "g_col:", g_col);
         //     OUT(GlobalV::ofs_running, "g_col:", g_col);
         // }
-        lm.set_HSgamma(g_row,g_col,this->receiver_buffer[i/2],'L');
+        lm.set_HSgamma(g_row,g_col,this->receiver_buffer[i/2],'L', lm.Hloc.data());
     }
 
     ModuleBase::timer::tick("Gint_Gamma","distri_vl_value");

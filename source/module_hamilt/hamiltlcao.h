@@ -3,6 +3,11 @@
 
 #include "hamilt.h"
 
+#include "src_lcao/LCAO_gen_fixedH.h"
+#include "src_lcao/gint_gamma.h"
+#include "src_lcao/gint_k.h"
+#include "src_lcao/LCAO_matrix.h"
+
 
 namespace ModuleHamilt
 {
@@ -15,7 +20,7 @@ class LocalMatrix
     std::vector<T> hloc;
     std::vector<T> sloc;
     size_t size=1;
-    void resize(size_t size_in){size = size_in; hloc.resize(size); sloc.resize(size);}
+    void resize(size_t size_in, T value){size = size_in; hloc.resize(size, value); sloc.resize(size, value);}
     T* getH(){return hloc.data();}
     T* getS(){return sloc.data();}
 
@@ -61,7 +66,27 @@ class HamiltLCAO : public Hamilt
     //type double for nspin<4, type complex<double> for nspin==4
     LocalMatrix<T1> fixedRealM;
 
+    //control if fixed Matrix should be construct
+    static bool isFixedDone;
+
+    void constructFixedReal();
+    void constructUpdateReal();
+
+    // temporary class members
+    // used for gamma only algorithms.
+    Gint_Gamma GG;
+
+    // used for k-dependent grid integration.
+    Gint_k GK;
+
+    // use overlap matrix to generate fixed Hamiltonian
+    LCAO_gen_fixedH genH;
+
+    LCAO_Matrix* LM;
+
 };
+template<typename T, typename T1>
+bool HamiltLCAO<T, T1>::isFixedDone = false;
 
 
 
