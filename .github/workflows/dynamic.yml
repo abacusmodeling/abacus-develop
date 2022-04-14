@@ -27,6 +27,6 @@ jobs:
         if: ${{ ! cancelled() }}
         with:
           target_branch: dashboard
-          build_dir: html
+          build_dir: tests/html
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
