@@ -71,9 +71,20 @@ class HPsi
     }
 
     //return the matrix
-    ModuleBase::ComplexMatrix hamilt() {return hmatrix;}
-    ModuleBase::ComplexMatrix psi() {return psimatrix;}
     double* precond() {return precondition;}
+    ModuleBase::ComplexMatrix hamilt() {return hmatrix;}
+    //ModuleBase::ComplexMatrix psi() {return psimatrix;}
+    ModulePsi::Psi<std::complex<double>> psi()
+    {
+        PW_Basis* pbas;
+        int* ngk = nullptr;
+        ModulePsi::Psi<std::complex<double>> psitmp(ngk,1,nband,npw);
+        for(int i=0;i<nband;i++)
+	    {
+		    for(int j=0;j<npw;j++) psitmp(0,i,j) = psimatrix(i,j);
+	    }   
+        return psitmp;
+    };
 
     //generate the Hermite matrix
     void genhmatrix()
