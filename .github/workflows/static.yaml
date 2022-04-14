@@ -10,7 +10,7 @@ jobs:
     container: ghcr.io/deepmodeling/abacus-development-kit:gnu
     steps:
       - name: Checkout Pull Request
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Setup clang-tidy
