@@ -15,7 +15,7 @@ class ElecState
     /*const Basis &basis, const Cell &cell*/) = 0;
     
     //return current electronic density rho, as a input for constructing Hamiltonian
-    virtual const MatrixBlock<double> getRho()const = 0;
+    virtual const ModuleHamilt::MatrixBlock<double> getRho()const = 0;
     
     //calculate electronic charge density on grid points or density matrix in real space
     //the consequence charge density rho saved into rho_out, preparing for charge mixing. 

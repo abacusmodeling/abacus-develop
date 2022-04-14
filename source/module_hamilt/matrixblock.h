@@ -1,6 +1,9 @@
 #ifndef MATRIXBLOCK
 #define MATRIXBLOCK
 
+namespace ModuleHamilt
+{
+
 template<typename T>
 struct MatrixBlock
 {
@@ -11,4 +14,5 @@ struct MatrixBlock
     size_t col;
 };
 
+}
 #endif
