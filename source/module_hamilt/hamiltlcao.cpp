@@ -12,7 +12,8 @@ void HamiltLCAO<T,T1>::constructFixedReal()
     if(HamiltLCAO<T,T1>::isFixedDone)return;
     else HamiltLCAO<T,T1>::isFixedDone=true;
 
-    this->fixedRealM.resize(1, T1(0));
+    if(GlobalV::GAMMA_ONLY_LOCAL) this->fixedRealM.resize(this->LM->ParaV->nloc, T1(0));
+    else this->fixedRealM.resize(this->LM->ParaV->nnr, T1(0));
 
     ModuleBase::TITLE("HamiltLCAO","constructFixedReal"); 
     ModuleBase::timer::tick("HamiltLCAO","constructFixedReal"); 
@@ -73,8 +74,11 @@ void HamiltLCAO<T,T1>::constructUpdateReal()
 template<typename T, typename T1>
 void HamiltLCAO<T,T1>::hk_fixed_mock(const int ik)
 {
-    this->kM.resize(1, T(0));
-	//folding_fixedH() should be refactored to there, but now deepks code in it
+    if(GlobalV::GAMMA_ONLY_LOCAL) this->kM.resize(this->LM->ParaV->nloc, T1(0));
+    else this->kM.resize(this->LM->ParaV->nnr, T1(0));
+
+	// folding_fixedH() should be refactored to there, 
+    // but now deepks code in this function, should be moved to another place
 	return;
 }
 
