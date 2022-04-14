@@ -2,6 +2,9 @@
 #include "module_base/global_variable.h"
 #include "module_base/timer.h"
 
+#include "src_lcao/global_fp.h"
+#include "src_pw/global.h"
+
 namespace ModuleHamilt
 {
 
@@ -31,34 +34,6 @@ void HamiltLCAO<T,T1>::constructFixedReal()
         this->genH.calculate_T_no(this->fixedRealM.getH());
     }
 
-#ifdef __DEEPKS
-    //for each ionic step, the overlap <psi|alpha> must be rebuilt
-    //since it depends on ionic positions
-    if (GlobalV::deepks_setorb)
-    {
-        const Parallel_Orbitals* pv = this->UHM->LM->ParaV;
-        //build and save <psi(0)|alpha(R)> at beginning
-        GlobalC::ld.build_psialpha(GlobalV::CAL_FORCE,
-			GlobalC::ucell,
-			GlobalC::ORB,
-			GlobalC::GridD,
-			pv->trace_loc_row,
-			pv->trace_loc_col,
-			GlobalC::UOT);
-
-		if(GlobalV::deepks_out_unittest)
-		{
-			GlobalC::ld.check_psialpha(GlobalV::CAL_FORCE,
-					GlobalC::ucell,
-					GlobalC::ORB,
-					GlobalC::GridD,
-					pv->trace_loc_row,
-					pv->trace_loc_col,
-					GlobalC::UOT);
-		}
-    }
-#endif
-
     ModuleBase::timer::tick("HamiltLCAO","constructFixedReal"); 
 	return;
 
@@ -74,8 +49,8 @@ void HamiltLCAO<T,T1>::constructUpdateReal()
 template<typename T, typename T1>
 void HamiltLCAO<T,T1>::hk_fixed_mock(const int ik)
 {
-    if(GlobalV::GAMMA_ONLY_LOCAL) this->kM.resize(this->LM->ParaV->nloc, T1(0));
-    else this->kM.resize(this->LM->ParaV->nnr, T1(0));
+    if(GlobalV::GAMMA_ONLY_LOCAL) this->kM.resize(this->LM->ParaV->nloc, T(0));
+    else this->kM.resize(this->LM->ParaV->nnr, T(0));
 
 	// folding_fixedH() should be refactored to there, 
     // but now deepks code in this function, should be moved to another place
