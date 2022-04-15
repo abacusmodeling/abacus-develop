@@ -5,7 +5,17 @@
 #include "module_base/complexmatrix.h"
 #include "module_psi/psi.h"
 
+#if ((defined __CUDA) || (defined __ROCM))
+
+#ifdef __CUDA
+#include "src_pw/hamilt_pw.cuh"
+#else
+#include "src_pw/hamilt_pw_hip.h"
+#endif
+
+#else
 #include "src_pw/hamilt_pw.h"
+#endif
 #include "src_pw/pw_basis.h"
 
 namespace ModuleHSolver
