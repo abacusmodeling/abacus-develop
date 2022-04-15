@@ -28,6 +28,9 @@ class HSolver
     virtual void solve(ModuleHamilt::Hamilt* phm, 
                 ModulePsi::Psi<std::complex<double>>& ppsi,
                 ModuleElecS::ElecState* pes) =0;
+    virtual void solve(ModuleHamilt::Hamilt* phm, 
+                ModulePsi::Psi<double>& ppsi,
+                ModuleElecS::ElecState* pes){return;}
     
     protected:
     
@@ -40,7 +43,7 @@ class HSolver
 
 };
 
-std::string HSolver::method = 0;
+std::string HSolver::method = "none";
 
 }
 #endif

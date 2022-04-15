@@ -11,6 +11,7 @@
 #include "module_base/scalapack_connector.h"
 #include "module_base/global_function.h"
 #include <cstring>
+#include <cassert>
 
 typedef ModuleHamilt::MatrixBlock<double> matd;
 typedef ModuleHamilt::MatrixBlock<std::complex<double>> matcd;
@@ -25,7 +26,8 @@ void DiagoSca::diag(
 {
     matd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
-    this->pdsygvx_diag(this->ParaV->desc, this->ParaV->ncol, this->ParaV->nrow, h_mat.p, s_mat.p, eigenvalue_in, psi);
+	assert(h_mat.col == s_mat.col && h_mat.row == s_mat.row && h_mat.desc == s_mat.desc);
+    this->pdsygvx_diag(h_mat.desc, h_mat.col, h_mat.row, h_mat.p, s_mat.p, eigenvalue_in, psi);
 }
 
 void DiagoSca::diag(
@@ -35,7 +37,8 @@ void DiagoSca::diag(
 {
     matcd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
-    this->pzhegvx_diag(this->ParaV->desc, this->ParaV->ncol, this->ParaV->nrow, h_mat.p, s_mat.p, eigenvalue_in, psi);
+	assert(h_mat.col == s_mat.col && h_mat.row == s_mat.row && h_mat.desc == s_mat.desc);
+    this->pzhegvx_diag(h_mat.desc, h_mat.col, h_mat.row, h_mat.p, s_mat.p, eigenvalue_in, psi);
 }
 
 std::pair<int,std::vector<int>> DiagoSca::pdsygvx_once(

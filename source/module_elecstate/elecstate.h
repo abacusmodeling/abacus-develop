@@ -20,6 +20,7 @@ class ElecState
     //calculate electronic charge density on grid points or density matrix in real space
     //the consequence charge density rho saved into rho_out, preparing for charge mixing. 
     virtual void updateRhoK(const ModulePsi::Psi<std::complex<double>> &psi)=0;
+    virtual void updateRhoK(const ModulePsi::Psi<double> &psi){return;}
     
     //update charge density for next scf step
     virtual void getNewRho() = 0;

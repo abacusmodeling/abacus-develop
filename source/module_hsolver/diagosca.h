@@ -21,7 +21,6 @@ namespace ModuleHSolver
 
 class DiagoSca : public DiagH
 {
-    DiagoSca(const Parallel_Orbitals* ParaV_in){this->ParaV = ParaV_in;}
 
 public:
     void diag(
@@ -72,8 +71,6 @@ private:
 	int degeneracy_max = 12;			// For reorthogonalized memory. 12 followes siesta.
 
 	void post_processing(const int info, const std::vector<int> &vec);
-
-    const Parallel_Orbitals* ParaV;
 };
 
 }

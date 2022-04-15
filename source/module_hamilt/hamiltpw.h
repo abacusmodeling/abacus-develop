@@ -33,8 +33,8 @@ class HamiltPW : public Hamilt
     
     //core function: return H(k) and S(k) matrixs for direct solving eigenvalues.
     //not used in PW base
-    void matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const override{return;}
-    void matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)const override{return;}
+    void matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)override{return;}
+    void matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)override{return;}
 
     private:
     void ch_mock();

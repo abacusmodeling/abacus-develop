@@ -7,6 +7,7 @@ add_library(
     iterdiagcon.cpp
     hsolverlcao.cpp
     diagosca.cpp
+    diagoelpa.cpp
 )
 
 IF (BUILD_TESTING)

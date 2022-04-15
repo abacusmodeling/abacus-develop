@@ -30,7 +30,17 @@ template<typename T, typename T1>
 class HamiltLCAO : public Hamilt
 {
     public:
-    //HamiltLCAO();
+    HamiltLCAO(
+        Gint_Gamma* GG_in,
+        Gint_k* GK_in,
+        LCAO_gen_fixedH* genH_in,
+        LCAO_Matrix* LM_in)
+    {
+        this->GG = GG_in;
+        this->GK = GK_in;
+        this->genH = genH_in;
+        this->LM = LM_in;
+    }
     //~HamiltLCAO();
 
     //construct Hamiltonian matrix with inputed electonic density 
@@ -48,8 +58,8 @@ class HamiltLCAO : public Hamilt
     
     //core function: return H(k) and S(k) matrixs for direct solving eigenvalues.
     //not used in PW base
-    void matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const override;
-    void matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)const override;
+    void matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in) override;
+    void matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in) override;
 
     private:
     void ch_mock();
@@ -57,7 +67,7 @@ class HamiltLCAO : public Hamilt
     void hk_update_mock(const int ik);
 
     //specific code for matrix()
-    void getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const;
+    void getMatrix(MatrixBlock<T> &hk_in, MatrixBlock<T> &sk_in);
 
     //there are H and S matrix for each k point in reciprocal space
     //type double for gamma_only case, type complex<double> for multi-k-points case
@@ -74,13 +84,13 @@ class HamiltLCAO : public Hamilt
 
     // temporary class members
     // used for gamma only algorithms.
-    Gint_Gamma GG;
+    Gint_Gamma* GG;
 
     // used for k-dependent grid integration.
-    Gint_k GK;
+    Gint_k* GK;
 
     // use overlap matrix to generate fixed Hamiltonian
-    LCAO_gen_fixedH genH;
+    LCAO_gen_fixedH* genH;
 
     LCAO_Matrix* LM;
 

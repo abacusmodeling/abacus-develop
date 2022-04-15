@@ -22,16 +22,16 @@ void HamiltLCAO<T,T1>::constructFixedReal()
     ModuleBase::timer::tick("HamiltLCAO","constructFixedReal"); 
 
 	// (9) compute S, T, Vnl, Vna matrix.
-    this->genH.calculate_S_no(this->fixedRealM.getS());
+    this->genH->calculate_S_no(this->fixedRealM.getS());
 
     if(GlobalV::VNL_IN_H)
     {
-        this->genH.calculate_NL_no(this->fixedRealM.getH());
+        this->genH->calculate_NL_no(this->fixedRealM.getH());
     }
 
     if(GlobalV::T_IN_H)
     {
-        this->genH.calculate_T_no(this->fixedRealM.getH());
+        this->genH->calculate_T_no(this->fixedRealM.getH());
     }
 
     ModuleBase::timer::tick("HamiltLCAO","constructFixedReal"); 
@@ -65,10 +65,10 @@ void HamiltLCAO<T, T1>::hk_update_mock(const int ik)
 }
 
 template<typename T, typename T1>
-void HamiltLCAO<T, T1>::getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)const
+void HamiltLCAO<T, T1>::getMatrix(MatrixBlock<T> &hk_in, MatrixBlock<T> &sk_in)
 {
-    hk_in.p = (T*)kM.hloc.data();
-    sk_in.p = (T*)kM.sloc.data();
+    hk_in = MatrixBlock<T>{kM.hloc.data(), this->LM->ParaV->nrow, this->LM->ParaV->ncol, this->LM->ParaV->desc};
+    sk_in = MatrixBlock<T>{kM.sloc.data(), this->LM->ParaV->nrow, this->LM->ParaV->ncol, this->LM->ParaV->desc};
 }
 
 
@@ -78,13 +78,13 @@ void HamiltLCAO<T, T1>::getMatrix(MatrixBlock<T> hk_in, MatrixBlock<T> sk_in)con
     this->getMatrix(hk_in, sk_in);
 }*/
 // case for nspin<4, multi-k-points 
-void HamiltLCAO<std::complex<double>, double>::matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)const
+void HamiltLCAO<std::complex<double>, double>::matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in)
 {
     this->getMatrix(hk_in, sk_in);
 }
 
 // case for nspin<4, gamma_only
-void HamiltLCAO<double, double>::matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)const
+void HamiltLCAO<double, double>::matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)
 {
     this->getMatrix(hk_in, sk_in);
 }
