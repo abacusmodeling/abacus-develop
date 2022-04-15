@@ -136,6 +136,32 @@ template <class T> inline void print_matrix(std::ofstream &fp, T *matrix, int &n
     }
 }
 
+template <class T> bool read_hs(std::string fname, T &matrix)
+{
+    int ndim;
+    std::ifstream inf(fname);
+    if(! inf.is_open())
+    {
+        std::cout << "Error: open file " << fname << " failed, skip!" << std::endl;
+        return false;
+    }
+    inf >> ndim;
+    matrix.resize(ndim*ndim);
+    for (int i = 0; i < ndim; i++)
+    {
+        for (int j = i; j < ndim; j++)
+        {
+            inf >> matrix[i * ndim + j];
+            if (i != j)
+            {
+                matrix[j * ndim + i] = matrix[i * ndim + j];
+            }
+        }
+    }
+    inf.close();
+    return true;
+}
+
 int elpa_sethandle(elpa_t &handle,
                    int nFull,
                    int nev,
@@ -322,7 +348,6 @@ void lapack_diago(double *hmatrix, double *smatrix, double *e, int &nFull)
     }
 
     dsygv_(&itype, &jobz, &uplo, &nFull, a, &nFull, b, &nFull, e, ev, &lwork, &info);
-    std::cout << "lapack solver over: e[0]=" << e[0] << std::endl;
     if (info != 0)
     {
         std::cout << "ERROR: solvered by LAPACK error, info=" << info << std::endl;
@@ -364,12 +389,12 @@ void lapack_diago(std::complex<double> *hmatrix, std::complex<double> *smatrix, 
     delete[] rwork;
 }
 
-// produce the random H/S matrix
 double conj(double &a)
 {
     return a;
 }
 
+// produce the random H/S matrix
 template <class T> void random_hs(T *hmatrix, T *smatrix, int &n, int &sparsity)
 {
     int min = 0;

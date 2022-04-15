@@ -7,7 +7,8 @@
 
 #define DETAILINFO       true
 #define PASSTHRESHOLD    1e-4
-#define PRINT_NEW_MATRIX false // print out the H matrix after doing block-cycle distribution
+#define PRINT_NEW_MATRIX true // print out the H matrix after doing block-cycle distribution
+#define PRINT_HS    false
 
 /************************************************
  *  unit test of ELPA
@@ -42,10 +43,10 @@ template <class T> class ElpaPrepare
     int n = 10; // dimension of H/S matrix
     int nblk = 1; // dimension of sub-matrix
     int sparsity = 100; // sparsity of H matrix;
-    T *hmatrix = 0;
-    T *smatrix = 0;
-    double *e_lapack = 0; // eigenvalues solvered by LAPACK
-    double *e_elpa = 0;
+    T *hmatrix = nullptr;
+    T *smatrix = nullptr;
+    double *e_lapack = nullptr; // eigenvalues solved by LAPACK
+    double *e_elpa = nullptr;
     double lapack_time = 0.0, elpa_time = 0.0;
     int mypnum = 0;
 
@@ -54,59 +55,45 @@ template <class T> class ElpaPrepare
         LCAO_DIAGO_TEST::random_hs<T>(hmatrix, smatrix, n, sparsity);
     }
 
-    inline void readmatrix(std::ifstream &inf, T *&matrix, int &npw)
+    bool read_HS()
     {
-        inf >> npw;
-        matrix = new T[npw * npw];
-        for (int i = 0; i < npw; i++)
-        {
-            for (int j = i; j < npw; j++)
-            {
-                inf >> matrix[i * npw + j];
-                if (i != j)
-                {
-                    matrix[j * npw + i] = matrix[i * npw + j];
-                }
-            }
-        }
-    }
-
-    void read_HS()
-    {
+        bool readhfile = false;
+        bool readsfile = false;
         if (mypnum == 0)
         {
-            int hdim = 1;
-            int sdim = 1;
-
-            std::ifstream ifs;
+            std::vector<T> htmp,stmp;
             if (std::is_same<T, double>::value)
             {
-                ifs.open("H-GammaOnly.dat");
+                readhfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("H-GammaOnly.dat"),htmp);
+                readsfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("S-GammaOnly.dat"),stmp);
             }
             else if ((std::is_same<T, std::complex<double>>::value))
-                ifs.open("H-KPonts.dat");
-            readmatrix(ifs, hmatrix, hdim);
-            ifs.close();
-
-            if (std::is_same<T, double>::value)
             {
-                ifs.open("S-GammaOnly.dat");
+                readhfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("H-KPoints.dat"),htmp);
+                readsfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("S-KPoints.dat"),stmp);
             }
-            else if ((std::is_same<T, std::complex<double>>::value))
-                ifs.open("S-KPoints.dat");
-            readmatrix(ifs, smatrix, sdim);
-            ifs.close();
-
-            if (hdim != sdim)
+            if (htmp.size() != stmp.size())
             {
-                printf("Error: dimensions of H and S are not equal, %d, %d", hdim, sdim);
-                exit(1);
+                printf("Error: dimensions of H and S are not equal, %d, %d", htmp.size(), stmp.size());
+                readhfile = readsfile = false;
             }
-            n = hdim;
+
+            hmatrix = new T[htmp.size()];
+            smatrix = new T[stmp.size()];
+
+            for(int i=0;i<htmp.size();i++)
+            {
+                hmatrix[i] = htmp[i];
+                smatrix[i] = stmp[i];
+            }
+            
+            n = sqrt(stmp.size());
             nblk = 1;
         }
         MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
         MPI_Bcast(&nblk, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&readhfile, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&readsfile, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
         e_lapack = new double[n];
         e_elpa = new double[n];
         for (int i = 0; i < n; i++)
@@ -114,6 +101,8 @@ template <class T> class ElpaPrepare
             e_lapack[i] = 0.0;
             e_elpa[i] = 1.0;
         }
+        if (readhfile && readsfile) return true;
+        else return false;
     }
 
     void new_matrix()
@@ -131,6 +120,7 @@ template <class T> class ElpaPrepare
 
     void print_hs()
     {
+        if(! PRINT_HS) {return;}
         if (mypnum == 0)
         {
             std::ofstream fp("hmatrix.dat");
@@ -207,16 +197,16 @@ class ElpaComplexDoubleTest : public ::testing::TestWithParam<ElpaPrepare<std::c
 TEST(VerifyElpaDiaoDouble, ReadHS)
 {
     ElpaPrepare<double> edp;
-    edp.read_HS();
-    // edp.print_hs();
+    ASSERT_TRUE(edp.read_HS());
+    edp.print_hs();
     edp.run_diago();
 }
 
 TEST(VerifyElpaDiaoComplexDouble, ReadHS)
 {
     ElpaPrepare<std::complex<double>> edp;
-    edp.read_HS();
-    // edp.print_hs();
+    ASSERT_TRUE(edp.read_HS());
+    edp.print_hs();
     edp.run_diago();
 }
 
