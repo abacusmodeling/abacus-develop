@@ -1,7 +1,7 @@
 name: Static Analysis
 
 on:
-  workflow_dispatch:
+  pull_request:
 
 jobs:
   clang-tidy:
@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Pull Request
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
       - name: Setup clang-tidy
         run: |
           apt-get update && apt-get install -y --no-install-recommends clang-format clang-tidy
@@ -30,7 +30,7 @@ jobs:
           clang_tidy_fixes: fixes.yml
           # Optionally set to true if you want the Action to request
           # changes in case warnings are found
-          request_changes: true
+          request_changes: false
           # Optionally set the number of comments per review
           # to avoid GitHub API timeouts for heavily loaded
           # pull requests
