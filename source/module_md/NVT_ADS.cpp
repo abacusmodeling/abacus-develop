@@ -7,9 +7,6 @@
 
 NVT_ADS::NVT_ADS(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
-    // convert to a.u. unit
-    mdp.md_tfreq *= ModuleBase::AU_to_FS;
-
     nraise = mdp.md_tfreq * mdp.md_dt;
 }
 
@@ -47,7 +44,7 @@ void NVT_ADS::second_half()
         double deviation;
         for(int i=0; i<ucell.nat; ++i)
         {
-            if(rand()/double(RAND_MAX) <= 1.0/nraise)
+            if(rand()/double(RAND_MAX) <= nraise)
             {
                 deviation = sqrt(mdp.md_tlast / allmass[i]);
                 for(int k=0; k<3; ++k)

@@ -25,6 +25,15 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp.md_tfirst /= ModuleBase::Hartree_to_K;
     mdp.md_tlast /= ModuleBase::Hartree_to_K;
 
+    if(mdp.md_tfreq == 0)
+    {
+        mdp.md_tfreq = 1.0/40.0/mdp.md_dt;
+    }
+    else
+    {
+        mdp.md_tfreq *= ModuleBase::AU_to_FS;
+    }
+
     // LJ parameters
     mdp.lj_rcut *= ModuleBase::ANGSTROM_AU;
 	mdp.lj_epsilon /= ModuleBase::Hartree_to_eV;

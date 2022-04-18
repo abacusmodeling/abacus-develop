@@ -7,9 +7,6 @@
 
 NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
-    // convert to a.u. unit
-    mdp.md_tfreq *= ModuleBase::AU_to_FS;
-
     if(mdp.md_tfirst == 0)
     {
         std::cout << " md_tfirst must be larger than 0 in NHC !!! " << std::endl;
@@ -197,6 +194,12 @@ void NVT_NHC::integrate()
             }
 
             scale *= exp(-veta[0]*delta/2.0);
+            if(!isfinite(scale))
+            {
+                std::cout << " Please set a proper md_tfreq !!! " << std::endl;
+                ModuleBase::WARNING_QUIT("NVT_NHC", " Please set a proper md_tfreq !!! ");
+            }
+            
             KE = kinetic * scale * scale;
 
             // update force

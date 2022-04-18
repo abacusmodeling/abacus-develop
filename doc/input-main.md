@@ -1028,9 +1028,11 @@ This part of variables are used to control the molecular dynamics calculations.
 
 - **Type**: Real
 - **Description**:
-  - Oscillation frequency, used to determine Qmass of NHC;
-  - 1/(md_tfreq*md_dt) is collision probability in Anderson method.
-- **Default**: 1.0
+  - When md_type = 1, md_tfreq controls the frequency of the temperature oscillations during the simulation. If it is too large, the
+temperature will fluctuate violently; if it is too small, the temperature will take a very long time to equilibrate with the atomic system. 
+  - When md_type = 3, md_tfreq*md_dt is the collision probability in Anderson method.
+  - If md_tfreq is not set in INPUT, md_tfreq will be autoset to be 1/40/md_dt.
+- **Default**: 1/40/md_dt
 
 #### md_mnhc
 
