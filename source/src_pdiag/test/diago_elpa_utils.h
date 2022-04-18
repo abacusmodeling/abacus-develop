@@ -460,10 +460,6 @@ template <class T> void random_hs(T *hmatrix, T *smatrix, int &n, int &sparsity)
                 smatrix[i * n + j] += conj(psi[i * n + k]) * psi[j * n + k];
             smatrix[i * n + j] = smatrix[i * n + j] / norm[i] / norm[j];
             smatrix[j * n + i] = conj(smatrix[i * n + j]);
-            if (i != j)
-            {
-                smatrix[j * n + i] = smatrix[i * n + j] = 0.0;
-            }
         }
     }
     delete[] psi;
