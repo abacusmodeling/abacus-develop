@@ -5,9 +5,9 @@
 #include "gtest/gtest.h"
 #include <type_traits>
 
-#define DETAILINFO       true
+#define DETAILINFO       false
 #define PASSTHRESHOLD    1e-4
-#define PRINT_NEW_MATRIX true // print out the H matrix after doing block-cycle distribution
+#define PRINT_NEW_MATRIX false // print out the H matrix after doing block-cycle distribution
 #define PRINT_HS    false
 
 /************************************************

@@ -214,6 +214,10 @@ int elpa_sethandle(elpa_t &handle,
     if (error != 0)
         printf("ERROR: set blacs_context error=%d!\n", error);
 
+    elpa_set_integer(handle, "cannon_for_generalized", 0, &error);
+    if (error != 0)
+        printf("ERROR: set blacs_context error=%d!\n", error);
+
     /* Setup */
     elpa_setup(handle); /* Set tunables */
     return 0;
@@ -416,7 +420,7 @@ template <class T> void random_hs(T *hmatrix, T *smatrix, int &n, int &sparsity)
             double mincoef = 0.0;
             if (int(u(e) % 10) > int(sparsity - 1))
                 mincoef = 1.0;
-            double realp = i + 1; // pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
+            double realp = pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
 
             hmatrix[i * n + j] = realp;
             if (std::is_same<T, std::complex<double>>::value)
