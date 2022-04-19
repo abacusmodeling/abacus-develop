@@ -65,9 +65,9 @@ void NVT_ADS::second_half()
     ModuleBase::timer::tick("NVT_ADS", "second_half");
 }
 
-void NVT_ADS::outputMD()
+void NVT_ADS::outputMD(std::ofstream &ofs)
 {
-    Verlet::outputMD();
+    Verlet::outputMD(ofs);
 }
 
 void NVT_ADS::write_restart()

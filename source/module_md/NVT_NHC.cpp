@@ -89,9 +89,9 @@ void NVT_NHC::second_half()
     ModuleBase::timer::tick("NVT_NHC", "second_half");
 }
 
-void NVT_NHC::outputMD()
+void NVT_NHC::outputMD(std::ofstream &ofs)
 {
-    Verlet::outputMD();
+    Verlet::outputMD(ofs);
 }
 
 void NVT_NHC::write_restart()
