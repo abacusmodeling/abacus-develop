@@ -12,7 +12,6 @@ install(FILES H-KPoints-large.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(FILES H-GammaOnly-large.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(FILES S-KPoints-large.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(FILES S-GammaOnly-large.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-install(FILES diago_parallel_test.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(FILES diago_elpa_parallel_test.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 find_program(BASH bash)
