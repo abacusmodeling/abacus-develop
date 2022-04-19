@@ -969,7 +969,7 @@ This part of variables are used to control the molecular dynamics calculations.
   - 3: NVT ensemble with Anderson thermostat;
   - 4: MSST method;
   
-  ***Note: when md_type is set to 1, md_tfreq is required to stablize temperature. It is an empifical parameter whose value is system-dependent, ranging from 1/(40\*md_dt) to 1/(100\*md_dt). An improper choice of its value might lead to failure of job.***
+  ***Note: when md_type is set to 1, md_tfreq is required to stablize temperature. It is an empirical parameter whose value is system-dependent, ranging from 1/(40\*md_dt) to 1/(100\*md_dt). An improper choice of its value might lead to failure of job.***
 - **Default**: 1
 
 #### md_nstep
