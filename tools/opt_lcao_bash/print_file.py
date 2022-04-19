@@ -123,7 +123,7 @@ def print_file_pw(info,dis):
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
 				#SBATCH -J {info["input"]["element"]}_{dis}
-				#SBATCH -p regular
+				#SBATCH -p 640
 				#SBATCH -N {info["exe"]["qsub"][0]}
 				#SBATCH -o test.out
 				EXEC={info["exe"]["exe_pw"]}
@@ -202,7 +202,7 @@ def print_file_opt(info,dis):
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
 				#SBATCH -J {info["input"]["element"]}_opt-orb
-				#SBATCH -p regular
+				#SBATCH -p 640
 				#SBATCH -N 1
 				#SBATCH -o test.out
 				export OMP_NUM_THREADS={core}
