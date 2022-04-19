@@ -19,15 +19,18 @@ int XC_Functional::get_func_type()
 // for detail, refer to https://www.tddft.org/programs/libxc/functionals/
 void XC_Functional::set_xc_type(const std::string xc_func_in)
 {
+    //Note : due to the separation of gcx_spin and gcc_spin,
+    //when you are adding new GGA functionals,
+    //please put exchange first, followed by correlation,
+    //such as for PBE we have:
+    //        func_id.push_back(XC_GGA_X_PBE);
+    //        func_id.push_back(XC_GGA_C_PBE);
+    
     func_id.clear();
     std::string xc_func = xc_func_in;
     std::transform(xc_func.begin(), xc_func.end(), xc_func.begin(), (::toupper));
 	if( xc_func == "LDA" || xc_func == "PZ" || xc_func == "SLAPZNOGXNOGC") //SLA+PZ
 	{
-        // I should use XC_LDA_X and XC_LDA_C_PZ here,
-        // but since we are not compiling with libxc as default,
-        // I chose to set it manually instead.
-        // Same for the rest.
         func_id.push_back(XC_LDA_X);
         func_id.push_back(XC_LDA_C_PZ);
         func_type = 1;
