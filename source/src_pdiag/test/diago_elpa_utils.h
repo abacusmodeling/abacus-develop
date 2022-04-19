@@ -216,7 +216,7 @@ int elpa_sethandle(elpa_t &handle,
 
     elpa_set_integer(handle, "cannon_for_generalized", 0, &error);
     if (error != 0)
-        printf("ERROR: set blacs_context error=%d!\n", error);
+        printf("ERROR: set cannon_for_generalized error=%d!\n", error);
 
     /* Setup */
     elpa_setup(handle); /* Set tunables */

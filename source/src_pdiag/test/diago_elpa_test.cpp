@@ -6,9 +6,9 @@
 #include <type_traits>
 
 #define DETAILINFO       false
-#define PASSTHRESHOLD    1e-4
+#define PASSTHRESHOLD    1e-12
 #define PRINT_NEW_MATRIX false // print out the H matrix after doing block-cycle distribution
-#define PRINT_HS    false
+#define PRINT_HS         false
 
 /************************************************
  *  unit test of ELPA
@@ -49,6 +49,7 @@ template <class T> class ElpaPrepare
     double *e_elpa = nullptr;
     double lapack_time = 0.0, elpa_time = 0.0;
     int mypnum = 0;
+    std::string sfname, hfname;
 
     void random_HS()
     {
@@ -61,17 +62,9 @@ template <class T> class ElpaPrepare
         bool readsfile = false;
         if (mypnum == 0)
         {
-            std::vector<T> htmp,stmp;
-            if (std::is_same<T, double>::value)
-            {
-                readhfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("H-GammaOnly.dat"),htmp);
-                readsfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("S-GammaOnly.dat"),stmp);
-            }
-            else if ((std::is_same<T, std::complex<double>>::value))
-            {
-                readhfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("H-KPoints.dat"),htmp);
-                readsfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(std::string("S-KPoints.dat"),stmp);
-            }
+            std::vector<T> htmp, stmp;
+            readhfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(hfname, htmp);
+            readsfile = LCAO_DIAGO_TEST::read_hs<std::vector<T>>(sfname, stmp);
             if (htmp.size() != stmp.size())
             {
                 printf("Error: dimensions of H and S are not equal, %d, %d", htmp.size(), stmp.size());
@@ -81,12 +74,12 @@ template <class T> class ElpaPrepare
             hmatrix = new T[htmp.size()];
             smatrix = new T[stmp.size()];
 
-            for(int i=0;i<htmp.size();i++)
+            for (int i = 0; i < htmp.size(); i++)
             {
                 hmatrix[i] = htmp[i];
                 smatrix[i] = stmp[i];
             }
-            
+
             n = sqrt(stmp.size());
             nblk = 1;
         }
@@ -101,8 +94,10 @@ template <class T> class ElpaPrepare
             e_lapack[i] = 0.0;
             e_elpa[i] = 1.0;
         }
-        if (readhfile && readsfile) return true;
-        else return false;
+        if (readhfile && readsfile)
+            return true;
+        else
+            return false;
     }
 
     void new_matrix()
@@ -120,7 +115,10 @@ template <class T> class ElpaPrepare
 
     void print_hs()
     {
-        if(! PRINT_HS) {return;}
+        if (!PRINT_HS)
+        {
+            return;
+        }
         if (mypnum == 0)
         {
             std::ofstream fp("hmatrix.dat");
@@ -197,6 +195,18 @@ class ElpaComplexDoubleTest : public ::testing::TestWithParam<ElpaPrepare<std::c
 TEST(VerifyElpaDiaoDouble, ReadHS)
 {
     ElpaPrepare<double> edp;
+    edp.hfname = "H-GammaOnly.dat";
+    edp.sfname = "S-GammaOnly.dat";
+    ASSERT_TRUE(edp.read_HS());
+    edp.print_hs();
+    edp.run_diago();
+}
+
+TEST(VerifyElpaDiaoDouble, ReadLargeHS)
+{
+    ElpaPrepare<double> edp;
+    edp.hfname = "H-GammaOnly-large.dat";
+    edp.sfname = "S-GammaOnly-large.dat";
     ASSERT_TRUE(edp.read_HS());
     edp.print_hs();
     edp.run_diago();
@@ -205,11 +215,24 @@ TEST(VerifyElpaDiaoDouble, ReadHS)
 TEST(VerifyElpaDiaoComplexDouble, ReadHS)
 {
     ElpaPrepare<std::complex<double>> edp;
+    edp.hfname = "H-KPoints.dat";
+    edp.sfname = "S-KPoints.dat";
     ASSERT_TRUE(edp.read_HS());
     edp.print_hs();
     edp.run_diago();
 }
 
+TEST(VerifyElpaDiaoComplexDouble, ReadLargeHS)
+{
+    ElpaPrepare<std::complex<double>> edp;
+    edp.hfname = "H-KPoints-large.dat";
+    edp.sfname = "S-KPoints-large.dat";
+    ASSERT_TRUE(edp.read_HS());
+    edp.print_hs();
+    edp.run_diago();
+}
+
+/**
 TEST_P(ElpaDoubleTest, RandomHS)
 {
     ElpaPrepare<double> edp = GetParam();
@@ -219,16 +242,17 @@ TEST_P(ElpaDoubleTest, RandomHS)
     edp.run_diago();
 }
 
-INSTANTIATE_TEST_SUITE_P(VerifyElpaB2DDiag,
-                         ElpaDoubleTest,
-                         ::testing::Values(ElpaPrepare<double>(5, 1, 0),
-                                           // ElpaPrepare<double>(100,1,7),
-                                           // ElpaPrepare<double>(500,1,0),
-                                           ElpaPrepare<double>(500, 1, 7),
-                                           ElpaPrepare<double>(500, 32, 7)
-                                           // ElpaPrepare<double>(1000,64,10)
-                                           // ElpaDoublePrepare<double>(2000,128,7)
-                                           ));
+INSTANTIATE_TEST_SUITE_P(
+    VerifyElpaB2DDiag,
+    ElpaDoubleTest,
+    ::testing::Values(ElpaPrepare<double>(5, 1, 0),
+                      // ElpaPrepare<double>(100,1,7),
+                      // ElpaPrepare<double>(500,1,0),
+                      ElpaPrepare<double>(500, 1, 7),
+                      ElpaPrepare<double>(500, 32, 7)
+                      // ElpaPrepare<double>(1000,64,10)
+                      // ElpaDoublePrepare<double>(2000,128,7)
+                      ));
 
 TEST_P(ElpaComplexDoubleTest, RandomHS)
 {
@@ -239,17 +263,18 @@ TEST_P(ElpaComplexDoubleTest, RandomHS)
     edp.run_diago();
 }
 
-INSTANTIATE_TEST_SUITE_P(VerifyElpaB2DDiag,
-                         ElpaComplexDoubleTest,
-                         ::testing::Values(ElpaPrepare<std::complex<double>>(5, 1, 0),
-                                           // ElpaPrepare<std::complex<double>>(100,1,7),
-                                           // ElpaPrepare<std::complex<double>>(500,1,0),
-                                           ElpaPrepare<std::complex<double>>(500, 1, 7),
-                                           ElpaPrepare<std::complex<double>>(500, 32, 7)
-                                           // ElpaPrepare<std::complex<double>>(800,64,9)
-                                           // ElpaDoublePrepare<double>(2000,128,7)
-                                           ));
-
+INSTANTIATE_TEST_SUITE_P(
+    VerifyElpaB2DDiag,
+    ElpaComplexDoubleTest,
+    ::testing::Values(ElpaPrepare<std::complex<double>>(5, 1, 0),
+                      // ElpaPrepare<std::complex<double>>(100,1,7),
+                      // ElpaPrepare<std::complex<double>>(500,1,0),
+                      ElpaPrepare<std::complex<double>>(500, 1, 7),
+                      ElpaPrepare<std::complex<double>>(500, 32, 7)
+                      // ElpaPrepare<std::complex<double>>(800,64,9)
+                      // ElpaDoublePrepare<double>(2000,128,7)
+                      ));
+*/
 int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
