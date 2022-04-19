@@ -12,7 +12,7 @@
 #include "../module_base/element_basis_index.h"
 #include "../src_pw/xc_type.h"
 #include "../src_pw/exx_global.h"
-
+#include "../src_lcao/rpa.h"
 #if EXX_DM==1
 #include "exx_abfs-parallel-communicate-dm.h"
 #elif EXX_DM==2
@@ -115,6 +115,7 @@ public:
 	
 	friend class Local_Orbital_Charge;
 	friend class LCAO_Hamilt;
+	friend class ModuleRPA::DFT_RPA_interface;
 };
 
 #endif	// EXX_LCAO_H

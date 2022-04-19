@@ -18,6 +18,7 @@
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
 #include "dmft.h"
+#include "rpa.h"
 #ifdef __DEEPKS
 #include "LCAO_descriptor.h"    //caoyu add 2021-07-26
 #endif
@@ -179,6 +180,8 @@ void LOOP_ions::opt_ions(void)
       // Output wave functions, bands, k-points information, and etc.
       GlobalC::dmft.out_to_dmft();
     }
+    
+    GlobalC::rpa.out_for_RPA();
 
         if(GlobalC::ParaO.out_hsR)
 		{
