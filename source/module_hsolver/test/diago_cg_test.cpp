@@ -218,7 +218,7 @@ TEST(DiagoCGTest, readH)
     int dim = hm.nr;
     int nband = 10; // not nband < dim, here dim = 26 in data-H
     // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
-    DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 50, 1e-3);
+    DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 300, 1e-3);
     hsolver::DiagoIterAssist::PW_DIAG_NMAX = dcp.maxiter;
     hsolver::DiagoIterAssist::PW_DIAG_THR = dcp.eps;
     HPsi hpsi;
