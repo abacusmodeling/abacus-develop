@@ -154,10 +154,12 @@ static void READ_VALUE(std::ifstream &ifs, T &v)
 }
 
 bool SCAN_BEGIN(std::ifstream &ifs, const std::string &TargetName, const bool restart=1, const bool ifwarn=true);
+// ifwarn: whether to call GlobalV::ofs_warning when the TargetName is not found, used to avoid invalid warning.
 // Mohan warning : the last term can't be written as const bool &restart,
 // I don't know why.
 
 void SCAN_END(std::ifstream &ifs, const std::string &TargetName, const bool ifwarn=true);
+// ifwarn: whether to call GlobalV::ofs_warning when the TargetName is not found, used to avoid invalid warning.
 
 template<class T>
 static inline void DCOPY( const T &a, T &b, const int &dim)
