@@ -21,7 +21,7 @@
  * Class Diago_CG is an approach for eigenvalue problems
  * This unittest test the function Diago_CG::diag()
  * with different examples.
- *  - the Hermite matrices (npw=50,100,200) produced using random numbers and with sparsity of 0%, 60%, 80%
+ *  - the Hermite matrices (npw=500,1000) produced using random numbers and with sparsity of 0%, 60%, 80%
  *  - the Hamiltonian matrix read from "data-H", produced by using out_hs in INPUT of a LCAO calculation
  *  - a 2x2 Hermite matrix for learning and checking
  *
@@ -57,8 +57,6 @@ class DiagoCGPrepare
         : nband(nband), npw(npw), sparsity(sparsity), reorder(reorder), eps(eps), maxiter(maxiter),
           threshold(threshold)
     {
-	    hsolver::DiagoIterAssist::PW_DIAG_NMAX = maxiter;
-	    hsolver::DiagoIterAssist::PW_DIAG_THR = eps;
     }
 
     int nband, npw, sparsity, maxiter, notconv;
@@ -128,6 +126,10 @@ TEST_P(DiagoCGTest, RandomHamilt)
     DiagoCGPrepare dcp = GetParam();
     //std::cout << "npw=" << dcp.npw << ", nband=" << dcp.nband << ", sparsity="
     //		  << dcp.sparsity << ", eps=" << dcp.eps << std::endl;
+    hsolver::DiagoIterAssist::PW_DIAG_NMAX = dcp.maxiter;
+    hsolver::DiagoIterAssist::PW_DIAG_THR = dcp.eps;
+    //std::cout<<"maxiter "<<hsolver::DiagoIterAssist::PW_DIAG_NMAX<<std::endl;
+    //std::cout<<"eps "<<hsolver::DiagoIterAssist::PW_DIAG_THR<<std::endl;
     HPsi hpsi(dcp.nband, dcp.npw, dcp.sparsity);
     DIAGOTEST::hmatrix = hpsi.hamilt();
 
@@ -140,10 +142,12 @@ INSTANTIATE_TEST_SUITE_P(VerifyCG,
                          DiagoCGTest,
                          ::testing::Values(
                              // nband, npw, sparsity, reorder, eps, maxiter, threshold
-                             DiagoCGPrepare(10, 50, 0, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(20, 50, 6, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(20, 100, 8, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(40, 200, 8, true, 1e-5, 50, 1e-2)));
+                             DiagoCGPrepare(10, 500, 0, true, 1e-5, 100, 1e-3),
+                             DiagoCGPrepare(20, 500, 6, true, 1e-5, 300, 1e-3),
+                             DiagoCGPrepare(20, 1000, 8, true, 1e-5, 300, 1e-3),
+                             DiagoCGPrepare(40, 1000, 8, true, 1e-6, 300, 1e-3))); 
+                            // DiagoCGPrepare(40, 2000, 8, true, 1e-5, 500, 1e-2))); 
+			    // the last one is passed but time-consumming.
 
 // check that the mock class HPsi work well
 // in generating a Hermite matrix
@@ -194,6 +198,8 @@ TEST(DiagoCGTest, TwoByTwo)
     hm(1, 1) = std::complex<double>{3.0, 0.0};
     // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
     DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 50, 1e-10);
+    hsolver::DiagoIterAssist::PW_DIAG_NMAX = dcp.maxiter;
+    hsolver::DiagoIterAssist::PW_DIAG_THR = dcp.eps;
     HPsi hpsi;
     hpsi.create(nband, dim);
     DIAGOTEST::hmatrix = hm;
@@ -213,6 +219,8 @@ TEST(DiagoCGTest, readH)
     int nband = 10; // not nband < dim, here dim = 26 in data-H
     // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
     DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 50, 1e-3);
+    hsolver::DiagoIterAssist::PW_DIAG_NMAX = dcp.maxiter;
+    hsolver::DiagoIterAssist::PW_DIAG_THR = dcp.eps;
     HPsi hpsi;
     hpsi.create(nband, dim);
     DIAGOTEST::hmatrix = hpsi.hamilt();
