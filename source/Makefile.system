@@ -3,9 +3,6 @@ include Makefile.vars
 #==========================
 # LIB and INCLUDE
 #==========================
-BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
-#BOOST_LIB_DIR     = ${BOOST_DIR}/lib
-#BOOST_LIB         = -L${BOOST_LIB_DIR} -lboost_serialization -lboost_mpi -Wl,-rpath=${BOOST_LIB_DIR}
 
 HONG_LAPACK        = -D__MKL -DMKL_ILP64
 LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
@@ -20,7 +17,7 @@ FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 #FFTW_LIB_DIR     = $(MKLROOT)/lib/intel64
 FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
-ELPA_INCLUDE_DIR = ${ELPA_DIR}/include
+ELPA_INCLUDE_DIR = ${ELPA_DIR}/include/elpa_openmp-2021.11.002
 ELPA_LIB_DIR = ${ELPA_DIR}/lib
 # comment out by mohan 2021-02-06
 ELPA_LIB     = -L${ELPA_LIB_DIR} -lelpa_openmp -Wl,-rpath=${ELPA_LIB_DIR}
@@ -44,9 +41,9 @@ CNPY_INCLUDE_DIR = ${LIBNPY_DIR}
 # LIBS and INCLUDES
 #==========================
 # comment out by mohan 2021-02-06
-LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
+#LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
 #LIBS = -lifcore -lm -lpthread ${LIBTORCH_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}	#for DeePKS
-#LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}
+LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
 #LIBS = -liomp5 -lpthread -lm -ldl ${BOOST_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${LPA_LIB} ${LIBXC_LIB}
 
 INCLUDES = -I. -Icommands -I${ELPA_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFTW_INCLUDE_DIR} -I${LIBXC_INCLUDE_DIR} -I${CEREAL_INCLUDE_DIR} ${LIBTORCH_INCLUDE_DIR} -I${CNPY_INCLUDE_DIR}

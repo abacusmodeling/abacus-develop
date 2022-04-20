@@ -8,7 +8,7 @@
 #include<vector>
 
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 
 #ifdef _OPENMP
@@ -158,12 +158,13 @@ void timer::print_all(std::ofstream &ofs)
 		if(timer_one.cpu_second < small)
 			continue;
 
+		ofs << std::resetiosflags(std::ios::scientific);
 		ofs  << " "
 			// << std::setw(2)  << timer_one.level
 			 << std::setw(2)  << " "
 			 << std::setw(20) << class_name
 			 << std::setw(20) << name
-			 << std::setw(15) << timer_one.cpu_second
+			 << std::setw(15) << std::setprecision(5) << timer_one.cpu_second
 			 << std::setw(10) << timer_one.calls
 			 << std::setw(10) << std::setprecision(2) << timer_one.cpu_second/timer_one.calls
 			 << std::setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << std::endl;

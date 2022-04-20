@@ -5,7 +5,13 @@
 //==========================================================
 #ifndef NUMERICAL_BASIS_H
 #define NUMERICAL_BASIS_H
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
+#include "../module_base/vector3.h"
+#include "../module_base/intarray.h"
+#include "../module_base/complexarray.h"
+#include "../module_base/complexmatrix.h"
 #include "bessel_basis.h"
 #include <vector>
 //==========================================================

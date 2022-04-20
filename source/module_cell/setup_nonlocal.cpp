@@ -1,4 +1,5 @@
 #include "setup_nonlocal.h"
+#include "../src_parallel/parallel_common.h"
 
 #ifdef __LCAO
 //#include "../src_pw/global.h"
@@ -18,13 +19,15 @@ InfoNonlocal::~InfoNonlocal()
 	delete[] nproj;
 }
 
+#include "../module_base/complexmatrix.h"
 void InfoNonlocal::Set_NonLocal(
     const int &it, 
     Atom* atom, 
     int &n_projectors,
     const int& kmesh,
     const double& dk,
-    const double& dr_uniform)
+    const double& dr_uniform,
+	std::ofstream &log)
 {
 	ModuleBase::TITLE("InfoNonlocal","Set_NonLocal");
 
@@ -211,7 +214,7 @@ void InfoNonlocal::Set_NonLocal(
 
 	delete[] tmpBeta_lm;
 
-	std::cout << " SET NONLOCAL PSEUDOPOTENTIAL PROJECTORS" << std::endl;
+	log << " SET NONLOCAL PSEUDOPOTENTIAL PROJECTORS" << std::endl;
 	return;
 }
 
@@ -525,7 +528,8 @@ void InfoNonlocal::setupNonlocal(
 					this->nproj[it],
 					orb.get_kmesh(),
 					orb.get_dk(),
-					orb.get_dr_uniform() );
+					orb.get_dr_uniform(),
+					log);
 			}
 			this->nprojmax = std::max(this->nprojmax, this->nproj[it]);
 			//caoyu add 2021-05-24 to reconstruct atom_arrange::set_sr_NL

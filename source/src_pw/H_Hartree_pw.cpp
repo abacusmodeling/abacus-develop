@@ -1,4 +1,7 @@
 #include "H_Hartree_pw.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/constants.h"
+#include "../module_base/timer.h"
 
 double H_Hartree_pw::hartree_energy=0.0;
 
@@ -79,14 +82,14 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(
     }
 
 //-----------------------------------------------------------
-// we need to add this out_potential funciton back 
+// we need to add this out_pot funciton back 
 // in near future, 2021-02-25
 //-----------------------------------------------------------
 	//-------------------------------------------
 	// output the Hartree potential into a file.
 	//-------------------------------------------
 /*
-	if(out_potential==-2)
+	if(out_pot==-2)
 	{
 		std::cout << " output VH" << std::endl;
 		int is = 0;

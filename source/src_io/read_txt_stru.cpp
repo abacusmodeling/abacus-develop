@@ -79,7 +79,6 @@ namespace Read_Txt_Stru
                     atoms_info.push_back(std::move(atom0));
                     atoms_info.insert(atoms_info.end(), stru_one.begin()+1, stru_one.end());
                 }
-                
             }
             else
             {

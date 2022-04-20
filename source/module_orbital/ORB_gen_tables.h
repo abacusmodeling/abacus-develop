@@ -9,6 +9,8 @@
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
 #include "../module_cell/setup_nonlocal.h"
+#include "../module_base/intarray.h"
+#include "../module_base/complexarray.h"
 
 /// used to be 'Use_Overlap_Table',
 /// now the name is 'ORB_gen_tables'
@@ -26,7 +28,7 @@ class ORB_gen_tables
 		const int &job0,
 		LCAO_Orbitals &orb,
 		const int &Lmax_exx,
-		const int& out_descriptor,///<[in] whether to generate descriptors
+		const bool& deepks_setorb,///<[in] whether to generate descriptors
 		const int &nprojmax,
 		const int* nproj,
 		const Numerical_Nonlocal* beta_
@@ -93,7 +95,21 @@ class ORB_gen_tables
 		const bool &calc_deri)const; // mohan add 2021-04-25);
 	/// set as public because in hamilt_linear,
 #ifdef __DEEPKS
-    void snap_psialpha(
+    void snap_psialpha_half(
+			const LCAO_Orbitals& orb,
+			std::vector<std::vector<double>> &nlm,
+			const int& job,
+			const ModuleBase::Vector3<double>& R1,
+			const int& T1,
+			const int& L1,
+			const int& m1,
+			const int& N1,
+			const ModuleBase::Vector3<double>& R0, // The projector.
+			const int& T0,
+			const int& I0
+        ) const;
+
+		void snap_psialpha(
         double nlm[],
         const int& job,
         const ModuleBase::Vector3<double>& R1,

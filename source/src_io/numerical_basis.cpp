@@ -3,9 +3,11 @@
 #include "../module_symmetry/symmetry.h"
 #include "winput.h"
 #include "../module_base/math_ylmreal.h"
+#include "../src_parallel/parallel_reduce.h"
 #include <cstring>
 #include <functional>
 #include <algorithm>
+#include "../module_base/timer.h"
 
 Numerical_Basis::Numerical_Basis() {}
 Numerical_Basis::~Numerical_Basis() {}
@@ -311,7 +313,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
                                             for(int ie2=0; ie2<enumber; ++ie2)
                                                 std::transform( &flq(l2,ie2,0), &flq(l2,ie2,0)+np, about_ig2.data(), about_ig3_2.c+ie2*np, std::multiplies<std::complex<double>>() );
 
-                                            LapackConnector::gemm('N', 'T', enumber, enumber, np,
+                                            BlasConnector::gemm('N', 'T', enumber, enumber, np,
                                                 1.0, about_ig3_1.c, np, about_ig3_2.c, np, 
                                                 1.0, &overlap_Sq(iwt1,iwt2,0,0), enumber);
                                         }

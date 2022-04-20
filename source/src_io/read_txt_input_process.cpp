@@ -8,12 +8,8 @@
 #include "src_io/read_txt_tools.h"
 #include "module_base/global_variable.h"
 
-#include <mpi.h>
-#include <sstream>
-
 #ifdef USE_CEREAL_SERIALIZATION
 #include "src_lcao/serialization_cereal.h"
-#include <cereal/archives/binary.hpp>
 #endif
 
 namespace Read_Txt_Input
@@ -27,7 +23,9 @@ namespace Read_Txt_Input
 			this->default_2();
 			this->out(GlobalV::global_out_dir + file_name);
 		}
+	#ifdef __MPI
 		this->bcast();
+	#endif
 		this->convert();
 	}
 
@@ -120,44 +118,23 @@ namespace Read_Txt_Input
 							ofs<<"false"<<" ";
 					}
 					else
-						throw invalid_argument("Input_Process::out() value_type["+std::to_string(i)+"]="+item.values_type[i]);
+						throw std::invalid_argument("Input_Process::out() value_type["+std::to_string(i)+"]="+item.values_type[i]);
 				}
 				ofs<<"\t# "<<item.annotation<<std::endl;
 			}
 		}
 	}
 
+#ifdef __MPI
 	void Input_Process::bcast()
 	{
 #ifdef USE_CEREAL_SERIALIZATION
-		if(GlobalV::MY_RANK==0)
-		{
-			std::stringstream ss;
-			{
-				cereal::BinaryOutputArchive ar(ss);
-				ar(this->input.list);
-			}
-			const int size = ss.str().size();
-			MPI_Bcast( const_cast<int*>(&size), 1, MPI_INT, 0, MPI_COMM_WORLD );
-			MPI_Bcast( const_cast<char*>(ss.str().c_str()), size, MPI_CHAR, 0, MPI_COMM_WORLD ); 
-		}
-		else
-		{
-			int size;
-			MPI_Bcast( &size, 1, MPI_INT, 0, MPI_COMM_WORLD );
-			std::vector<char> c(size);
-			MPI_Bcast( c.data(), size, MPI_CHAR, 0, MPI_COMM_WORLD );   
-			std::stringstream ss;  
-			ss.rdbuf()->pubsetbuf(c.data(),size);
-			{
-				cereal::BinaryInputArchive ar(ss);
-				ar(this->input.list);
-			}
-		}
+		ModuleBase::bcast_data_cereal(this->input.list, MPI_COMM_WORLD, 0);
 #else
 #error Input_Process::bcast() needs cereal
 #endif
 	}
+#endif
 
 	void Input_Process::convert()
 	{

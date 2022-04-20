@@ -1,7 +1,9 @@
 #ifndef H_HARTREE_PW_H
 #define H_HARTREE_PW_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
 #include "../module_cell/unitcell.h"
 #include "pw_basis.h"
 #include "use_fft.h"
