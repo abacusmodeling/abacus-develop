@@ -577,7 +577,7 @@ void LOOP_ions::final_scf(void)
     // this information is used to calculate
     // the force.
 
-	this->LOC.allocate_dm_wfc(GlobalC::GridT, this->LOWF);
+	this->LOC.allocate_dm_wfc(GlobalC::GridT.lgd, this->LOWF);
 
     this->UHM.set_lcao_matrices();
 	//------------------------------------------------------------------

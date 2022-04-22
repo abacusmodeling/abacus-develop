@@ -20,7 +20,7 @@ class Local_Orbital_Charge
 	~Local_Orbital_Charge();
 
 	// mohan added 2021-02-08
-    void allocate_dm_wfc(const Grid_Technique& gt,
+    void allocate_dm_wfc(const int& lgd,
         Local_Orbital_wfc &lowf);
     // sum bands to compute the electron charge density
 	void sum_bands(LCAO_Hamilt &UHM);
@@ -28,10 +28,9 @@ class Local_Orbital_Charge
 	//-----------------
 	// in DM_gamma.cpp
 	//-----------------
-	void allocate_gamma(const Grid_Technique &gt);
+	void allocate_gamma(const int &lgd);
 
-    void gamma_file(const Grid_Technique& gt,
-        Local_Orbital_wfc &lowf);
+    void gamma_file(Local_Orbital_wfc &lowf);
     void cal_dk_gamma_from_2D_pub(void);
 
 

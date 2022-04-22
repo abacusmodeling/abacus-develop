@@ -113,7 +113,7 @@ void LOOP_elec::before_solver(const int& istep,
 	// the force.
 
 	// init density kernel and wave functions.
-	loc.allocate_dm_wfc(GlobalC::GridT, lowf);
+	loc.allocate_dm_wfc(GlobalC::GridT.lgd, lowf);
 
 	//======================================
 	// do the charge extrapolation before the density matrix is regenerated.
