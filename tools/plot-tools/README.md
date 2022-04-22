@@ -19,6 +19,10 @@ python setup.py install
 ```
 
 ## Usage
+There are two ways to use this tool:
+1. Specify parameters in `band.py` or `dos.py` directly, and then `python band.py` or `python dos.py`. And you can also import module in your own script e.g. `from abacus_plot.band import BandPlot`
+2. Command-line tools are also supported in this tool. In this way, you need prepare an input file and execute some commands as follows
+
 ### Band Structure
 First, prepare a json file e.g. band-input.json:
 ```json
@@ -39,7 +43,7 @@ First, prepare a json file e.g. band-input.json:
 |    *label*     |   `str` or `List[str]`   |                    Label of band structure                     |
 |    *color*     |   `str` or `List[str]`   |                    Color of band structure                     |
 
-If you want to plot band structure of `nspin=2` or compare to band structure on same k-path, you can set *filename*, *efermi*, *label*, *color* in `list` type. 
+If you want to plot band structure of `nspin=2` or compare two band structure on same k-path, you can set *filename*, *efermi*, *label*, *color* in `list` type. 
 
 The *kptfile* should be as follows, and notes after `#` will be set as k-points label automatically.
 ```shell
@@ -75,10 +79,10 @@ First, prepare a json file e.g. dos-input.json:
 	],
 	"species": {
 			"C": {
-				"0": [
+				0: [
 					0
 				],
-				"1": [
+				1: [
 					0,
 					1
 				]
@@ -88,7 +92,7 @@ First, prepare a json file e.g. dos-input.json:
 				1
 			]
 		},
-	"pdosfig": "pdos.png",
+	"pdosfig": "pdos.png"
 }
 ```
 If you only want to plot total DOS, you can modify `pdosfile` to `tdosfile` and do not set `species` and `pdosfig`.
@@ -99,7 +103,9 @@ If you only want to plot total DOS, you can modify `pdosfile` to `tdosfile` and 
 |    *efermi*    |                                   `float`                                   |                                              Fermi level in eV                                              |
 | *energy_range* |                                   `list`                                    |                                            Range of energy in eV                                            |
 |    *shift*     |                                   `bool`                                    |                       If set `'true'`, it will evaluate band gap. Default: `'false'`                        |
-|   *species*    | `List[str]` or `Dict[str, List[int]]` or `Dict[str, Dict[str, List[int]]]]` | Three ways to plot partial DOS e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{"0":[0]}, "Si":{"1":[0, 1]}] |
+|   *index*    | `List[int]` or `Dict[int, List[int]]` or `Dict[int, Dict[int, List[int]]]]` | Extract PDOS of each atom e.g. [0, 1], {0:[0, 1], 1:[0]}, [0:{0:[0]}, 1:{1:[0, 1]}] |
+|   *atom_index*    | `List[int]` or `Dict[int, List[int]]` or `Dict[int, Dict[int, List[int]]]]` | Extract PDOS of each atom with same atom_index e.g. [0, 1], {0:[0, 1], 1:[0]}, [0:{0:[0]}, 1:{1:[0, 1]}] |
+|   *species*    | `List[str]` or `Dict[str, List[int]]` or `Dict[str, Dict[int, List[int]]]]` | Extract PDOS of each atom with same species e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{0:[0]}, "Si":{1:[0, 1]}] |
 |   *tdosfig*    |                                    `str`                                    |                                         Output picture of total DOS                                         |
 |   *pdosfig*    |                                    `str`                                    |                                        Output picture of partial DOS                                        |
 

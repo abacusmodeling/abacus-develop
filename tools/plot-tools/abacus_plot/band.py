@@ -240,12 +240,38 @@ class BandPlot:
         self._set_figure(index, energy_range)
 
     @classmethod
+    def direct_bandgap(cls, vb: namedtuple, cb: namedtuple, klength: int):
+        """Calculate direct band gap"""
+
+        gap_list = []
+        i_index = []
+        for i in range(klength):
+            gap_list.append(np.min(cb.band[:, i])-np.max(vb.band[:, i]))
+            i_index.append(i)
+        dgap = np.min(gap_list)
+
+        return dgap, i_index[np.argmin(gap_list)]
+
+    @classmethod
     def bandgap(cls, vb: namedtuple, cb: namedtuple):
         """Calculate band gap"""
 
         gap = cb.value-vb.value
 
         return gap
+
+    @classmethod
+    def band_type(cls, vb: namedtuple, cb: namedtuple):
+        vbm_x, cbm_x = vb.k_index, cb.k_index
+        longone, shortone = (vbm_x, cbm_x) if len(
+                vbm_x) >= len(cbm_x) else (cbm_x, vbm_x)
+        for i in shortone:
+            if i in longone:
+                btype = "Direct"
+            else:
+                btype = "Indirect"
+
+        return btype
 
     @classmethod
     def info(cls, kpath: Sequence, vb: namedtuple, cb: namedtuple):
@@ -255,22 +281,18 @@ class BandPlot:
         :params energy: band energy after subtracting the Fermi level
         """
 
-        def band_type(vbm_x, cbm_x):
-            longone, shortone = (vbm_x, cbm_x) if len(
-                vbm_x) >= len(cbm_x) else (cbm_x, vbm_x)
-            for i in shortone:
-                if i in longone:
-                    btype = "Direct"
-                else:
-                    btype = "Indirect"
-            return btype
-
         gap = cls.bandgap(vb, cb)
+        dgap, d_i = cls.direct_bandgap(vb, cb, len(kpath))
+        btype = cls.band_type(vb, cb)
         print(
             "--------------------------Band Structure--------------------------", flush=True)
         print(
-            f"{'Band character:'.ljust(30)}{band_type(vb.k_index, cb.k_index)}", flush=True)
-        print(f"{'Band gap(eV):'.ljust(30)}{gap: .4f}", flush=True)
+            f"{'Band character:'.ljust(30)}{btype}", flush=True)
+        if btype == "Indirect":
+            print(f"{'Direct Band gap(eV):'.ljust(30)}{dgap: .4f}", flush=True)
+            print(f"{'Indirect Band gap(eV):'.ljust(30)}{gap: .4f}", flush=True)
+        elif btype == "Direct":
+            print(f"{'Band gap(eV):'.ljust(30)}{gap: .4f}", flush=True)
         print(f"{'Band index:'.ljust(30)}{'HOMO'.ljust(10)}{'LUMO'}", flush=True)
         print(
             f"{''.ljust(30)}{str(vb.band_index[-1]).ljust(10)}{str(cb.band_index[0])}", flush=True)
