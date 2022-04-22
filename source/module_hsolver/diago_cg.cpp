@@ -35,6 +35,7 @@ void DiagoCG::diag_mock(psi::Psi<std::complex<double>> &phi, double *eigenvalue_
     this->dmx = phi.get_nbasis();
     this->n_band = phi.get_nbands();
     this->eigenvalue = eigenvalue_in;
+    ModuleBase::GlobalFunc::ZEROS(this->eigenvalue, this->n_band);
 
     /// record for how many loops in cg convergence
     double avg = 0.0;
