@@ -255,7 +255,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 	// Peize Lin test 2019-01-16
     this->init_dm_2d();
 
-	if(GlobalC::wf.start_wfc=="file")
+	if(GlobalC::wf.init_wfc=="file")
 	{
 		this->gamma_file(gt, *this->LOWF);
 	}
@@ -330,7 +330,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
         //     GlobalV::ofs_running<<"DM(1,0)"<<wfc_dm_2d.dm_gamma[is](0,1)<<" ";
         //     GlobalV::ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<std::endl;
         // }
-        GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<this->ParaV->nb<<std::endl;
+        /*GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<this->ParaV->nb<<std::endl;
         GlobalV::ofs_running<<"DM in 2D format:\n_________________________________________\n";
         for(int i=0; i<this->dm_gamma[is].nr; ++i)
         {
@@ -340,7 +340,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             }
             GlobalV::ofs_running<<std::endl;
         }
-        GlobalV::ofs_running<<"=========================================\n";
+        GlobalV::ofs_running<<"=========================================\n";*/
 
         // put data from dm_gamma[is] to sender index
         int nNONZERO=0;
@@ -406,7 +406,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
         // }
         //GlobalV::ofs_running<<DM[0][0][0]<<" "<<DM[0][0][1]<<std::endl;
         //GlobalV::ofs_running<<DM[0][1][0]<<" "<<DM[0][1][1]<<std::endl;
-        GlobalV::ofs_running<<"DM in local grid:\n_________________________________________\n";
+        /*GlobalV::ofs_running<<"DM in local grid:\n_________________________________________\n";
         for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
             int ii=GlobalC::GridT.trace_lo[i];
@@ -419,7 +419,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             }
             GlobalV::ofs_running<<std::endl;
         }
-        GlobalV::ofs_running<<"=========================================\n";
+        GlobalV::ofs_running<<"=========================================\n";*/
 
     }
     ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
@@ -589,7 +589,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 			}  // end for col_count
 		}  // end for row_count
 
-		GlobalV::ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<std::endl;
+		/*GlobalV::ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<std::endl;
 
 		int idx0=GlobalC::GridT.trace_lo[0];
 		int idx1=GlobalC::GridT.trace_lo[1];
@@ -606,7 +606,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 		if(idx1>=0)
 		{
 			GlobalV::ofs_running<<"DM(1,1)"<<DM[is][idx1][idx1]<<std::endl;
-		}
+		}*/
 	}  // end for is    
 #endif //2015-09-06, xiaohui
 

@@ -42,8 +42,8 @@ public:
     double *rho_core;
 	std::complex<double> *rhog_core;
 
-	//  output charge if out_charge > 0, and output every "out_charge" elec step.
-    int out_charge;
+	//  output charge if out_chg > 0, and output every "out_chg" elec step.
+    int out_chg;
 
     double *start_mag_type;
     double *start_mag_atom;
@@ -92,6 +92,7 @@ public:
     bool read_rho(const int &is, const std::string &fn, double* rho);//mohan add 2007-10-17
     void rho_mpi(void);
 
+    void sum_band_k();
 
 	private:
 
@@ -100,7 +101,6 @@ public:
 	int ngmc; // number of g vectors in this processor
 	int nspin; // number of spins
 
-    void sum_band_k();
 
     double sum_rho(void) const;
 

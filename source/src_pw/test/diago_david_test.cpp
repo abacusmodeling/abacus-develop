@@ -1,5 +1,4 @@
 #include"../diago_david.h"
-#include"../diago_cg.h"
 #include"./diago_mock.h"
 #include"gtest/gtest.h"
 #include"mpi.h"
@@ -27,9 +26,6 @@
  * The test is passed when the eignvalues are closed to these calculated by LAPACK.
  *  
  */
-
-//mock the ddot_real function
-double Diago_CG::ddot_real(int const&, std::complex<double> const*, std::complex<double> const*, bool) {};
 
 //use lapack to calcualte eigenvalue of matrix hm
 //NOTE: after finish this function, hm stores the eigen vectors.
@@ -126,6 +122,7 @@ TEST(DiagoDavRealSystemTest,dataH)
 	ModuleBase::ComplexMatrix hmatrix;
 	std::ifstream ifs("data-H");
 	DIAGOTEST::readh(ifs,hmatrix);
+	ifs.close();
 	DIAGOTEST::hmatrix = hmatrix;
 	DIAGOTEST::npw = hmatrix.nc;
 

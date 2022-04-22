@@ -126,7 +126,7 @@ void LOOP_elec::before_solver(const int& istep,
 	// REALLOCATE DENSITY MATRIX FIRST, THEN READ IN DENSITY MATRIX,
 	// AND USE DENSITY MATRIX TO DO RHO GlobalV::CALCULATION.-- mohan 2013-03-31
 	//======================================
-	if(GlobalC::pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
+	if(GlobalC::pot.chg_extrap=="dm" && istep>1)//xiaohui modify 2015-02-01
 	{
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
@@ -165,7 +165,7 @@ void LOOP_elec::before_solver(const int& istep,
     {
         const Parallel_Orbitals* pv = this->UHM->LM->ParaV;
         //build and save <psi(0)|alpha(R)> at beginning
-        GlobalC::ld.build_psialpha(GlobalV::FORCE,
+        GlobalC::ld.build_psialpha(GlobalV::CAL_FORCE,
 			GlobalC::ucell,
 			GlobalC::ORB,
 			GlobalC::GridD,
@@ -175,7 +175,7 @@ void LOOP_elec::before_solver(const int& istep,
 
 		if(GlobalV::deepks_out_unittest)
 		{
-			GlobalC::ld.check_psialpha(GlobalV::FORCE,
+			GlobalC::ld.check_psialpha(GlobalV::CAL_FORCE,
 					GlobalC::ucell,
 					GlobalC::ORB,
 					GlobalC::GridD,
@@ -227,7 +227,7 @@ void LOOP_elec::solver(const int& istep,
 			ELEC_scf es;
             es.scf(istep - 1, loc, lowf, *this->UHM);
 		#ifdef __MPI
-            if (GlobalC::exx_global.info.separate_loop, lowf.wfc_k_grid)
+            if (GlobalC::exx_global.info.separate_loop)
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
@@ -264,9 +264,9 @@ void LOOP_elec::solver(const int& istep,
 	{
         IState_Envelope IEP;
         if (GlobalV::GAMMA_ONLY_LOCAL)
-            IEP.begin(lowf, this->UHM->GG, INPUT.out_wf, GlobalC::wf.out_wf_r);
+            IEP.begin(lowf, this->UHM->GG, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
         else
-            IEP.begin(lowf, this->UHM->GK, INPUT.out_wf, GlobalC::wf.out_wf_r);
+            IEP.begin(lowf, this->UHM->GK, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
     }
 	else
 	{
