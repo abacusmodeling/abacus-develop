@@ -115,7 +115,7 @@ private:
     void mpi_creat_cart(MPI_Comm* comm_2D,
         int prow, int pcol, std::ofstream& ofs_running);
 
-    void mat_2d(MPI_Comm vu,
+    int mat_2d(MPI_Comm vu,
         const int& M_A, const int& N_A,
         const int& NB, LocalMatrix& loc_A,
         std::ofstream& ofs_running,
