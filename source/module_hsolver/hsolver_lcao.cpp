@@ -26,11 +26,10 @@ void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecs
         psi.fix_k(ik);
 
         /// solve eigenvector and eigenvalue for H(k)
-        double* p_eigenvalues = this->ekb[ik];
+        double* p_eigenvalues = &(pes->ekb(ik, 0));
         this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
-        /// calculate the contribution of Psi for charge density rho
-        pes->updateRhoK(psi);
     }
+    pes->psiToRho(psi);
 }
 
 int HSolverLCAO::out_mat_hs = 0;

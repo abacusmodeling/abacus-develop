@@ -25,10 +25,13 @@ class HSolver
         Input &in )=0;*/
 
     // solve Hamiltonian to electronic density in ElecState
-    virtual void solve(hamilt::Hamilt* phm, psi::Psi<std::complex<double>>& ppsi, elecstate::ElecState* pes) = 0;
+    virtual void solve(hamilt::Hamilt* phm, psi::Psi<std::complex<double>>& ppsi, elecstate::ElecState* pes)
+    {
+      return;
+    }
     virtual void solve(hamilt::Hamilt* phm, psi::Psi<double>& ppsi, elecstate::ElecState* pes)
     {
-        return;
+      return;
     }
 
   protected:
