@@ -10,6 +10,8 @@
 namespace hsolver
 {
 
+bool DiagoCG::no_subspace = false;
+
 DiagoCG::DiagoCG(Hamilt_PW *hpw_in, const double *precondition_in)
 {
     this->hpw = hpw_in;
@@ -496,7 +498,10 @@ void DiagoCG::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, 
     this->notconv = 0;
     do
     {
-        DiagoIterAssist::diagH_subspace(this->hpw, psi, psi, eigenvalue_in);
+        if(!DiagoCG::no_subspace)
+        {
+            DiagoIterAssist::diagH_subspace(this->hpw, psi, psi, eigenvalue_in);
+        }
 
         DiagoIterAssist::avg_iter += 1.0;
         this->reorder = true;
@@ -511,6 +516,9 @@ void DiagoCG::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, 
         std::cout << "\n notconv = " << this->notconv;
         std::cout << "\n DiagoCG::diag', too many bands are not converged! \n";
     }
+
+    if(DiagoCG::no_subspace) DiagoCG::no_subspace = false;
+
     return;
 }
 
