@@ -52,17 +52,6 @@ void ElecStatePW::parallelK()
     return;
 }
 
-double ElecStatePW::eBandK(const int& ik)
-{
-    ModuleBase::TITLE("ElecStatePW","eBandK");
-    double eband_k = 0.0;
-    for (int ibnd = 0;ibnd < this->ekb.nc; ibnd++)
-	{
-        eband_k += this->ekb(ik, ibnd) * this->wg(ik, ibnd);
-    }
-    return eband_k;
-}
-
 void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
 {
 	ModuleBase::TITLE("ElecStatePW","rhoBandK");

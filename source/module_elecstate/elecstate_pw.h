@@ -2,8 +2,6 @@
 #define ELECSTATEPW_H
 
 #include "elecstate.h"
-#include "module_hamilt/hamilt.h"
-#include "module_psi/psi.h"
 #include "src_pw/pw_basis.h"
 
 namespace elecstate
@@ -31,8 +29,6 @@ class ElecStatePW : public ElecState
     void updateRhoK(const psi::Psi<std::complex<double>>& psi) ;//override;
     //sum over all pools for rho and ebands
     void parallelK();
-    // calculate ebands for each k point
-    double eBandK(const int& ik);
     // calcualte rho for each k
     void rhoBandK(const psi::Psi<std::complex<double>>& psi);
 };

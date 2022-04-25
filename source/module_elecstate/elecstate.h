@@ -1,7 +1,6 @@
 #ifndef ELECSTATE_H
 #define ELECSTATE_H
 
-#include "module_hamilt/matrixblock.h"
 #include "module_psi/psi.h"
 #include "src_pw/charge.h"
 
@@ -52,6 +51,13 @@ class ElecState
     ModuleBase::matrix ekb;		   
     // occupation weight for each k-point and band
     ModuleBase::matrix wg;  
+
+  protected:
+    // calculate ebands for each k point
+    double eBandK(const int& ik);
+
+    //print and check for band energy and occupations
+    void print_band(const int &ik, const int &printe, const int &iter);
 };
 
 } // namespace elecstate

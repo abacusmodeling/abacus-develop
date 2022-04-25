@@ -27,6 +27,7 @@ void ElecState::calculate_weights(void)
     {
         ekb_tmp[i] = &(this->ekb(i, 0));
     }
+    int nbands = this->ekb.nc;
 
     if (GlobalV::KS_SOLVER == "selinv")
     {
@@ -40,7 +41,7 @@ void ElecState::calculate_weights(void)
         {
             Occupy::iweights(GlobalC::kv.nks,
                      GlobalC::kv.wk,
-                     GlobalV::NBANDS,
+                     nbands,
                      GlobalC::ucell.magnet.get_nelup(),
                      ekb_tmp,
                      GlobalC::en.ef_up,
@@ -49,7 +50,7 @@ void ElecState::calculate_weights(void)
                      GlobalC::kv.isk);
             Occupy::iweights(GlobalC::kv.nks,
                      GlobalC::kv.wk,
-                     GlobalV::NBANDS,
+                     nbands,
                      GlobalC::ucell.magnet.get_neldw(),
                      ekb_tmp,
                      GlobalC::en.ef_dw,
@@ -63,7 +64,7 @@ void ElecState::calculate_weights(void)
             // -1 means don't need to consider spin.
             Occupy::iweights(GlobalC::kv.nks,
                      GlobalC::kv.wk,
-                     GlobalV::NBANDS,
+                     nbands,
                      GlobalC::CHR.nelec,
                      ekb_tmp,
                      this->ef,
@@ -77,7 +78,7 @@ void ElecState::calculate_weights(void)
         ModuleBase::WARNING_QUIT("calculate_weights", "not implemented yet,coming soon!");
         //		if(my_rank == 0)
         //		{
-        //			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, GlobalC::CHR.nelec, ntetra,tetra, GlobalC::wf.et,
+        //			tweights(GlobalC::kv.nkstot, nspin, nbands, GlobalC::CHR.nelec, ntetra,tetra, GlobalC::wf.et,
         //this->ef, this->wg);
         //		}
     }
@@ -89,7 +90,7 @@ void ElecState::calculate_weights(void)
             double demet_dw = 0.0;
             Occupy::gweights(GlobalC::kv.nks,
                              GlobalC::kv.wk,
-                             GlobalV::NBANDS,
+                             nbands,
                              GlobalC::ucell.magnet.get_nelup(),
                              Occupy::gaussian_parameter,
                              Occupy::gaussian_type,
@@ -101,7 +102,7 @@ void ElecState::calculate_weights(void)
                              GlobalC::kv.isk);
             Occupy::gweights(GlobalC::kv.nks,
                              GlobalC::kv.wk,
-                             GlobalV::NBANDS,
+                             nbands,
                              GlobalC::ucell.magnet.get_neldw(),
                              Occupy::gaussian_parameter,
                              Occupy::gaussian_type,
@@ -118,7 +119,7 @@ void ElecState::calculate_weights(void)
             // -1 means is no related to spin.
             Occupy::gweights(GlobalC::kv.nks,
                              GlobalC::kv.wk,
-                             GlobalV::NBANDS,
+                             nbands,
                              GlobalC::CHR.nelec,
                              Occupy::gaussian_parameter,
                              Occupy::gaussian_type,
@@ -140,7 +141,7 @@ void ElecState::calculate_weights(void)
         this->ef = -1.0e+20;
         for (int ik = 0; ik < GlobalC::kv.nks; ik++)
         {
-            for (int ibnd = 0; ibnd < GlobalV::NBANDS; ibnd++)
+            for (int ibnd = 0; ibnd < nbands; ibnd++)
             {
                 if (this->wg(ik, ibnd) > 0.0)
                 {
@@ -161,7 +162,7 @@ void ElecState::calculate_weights(void)
         double etop = ekb_tmp[0][0];
         for (int ik = 0; ik < GlobalC::kv.nks; ik++)
         {
-            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+            for (int ib = 0; ib < nbands; ib++)
             {
                 ebotom = min(ebotom, ekb_tmp[ik][ib]);
                 etop = max(etop, ekb_tmp[ik][ib]);
@@ -183,6 +184,67 @@ void ElecState::calculate_weights(void)
     delete[] ekb_tmp;
 
     return;
+}
+
+double ElecState::eBandK(const int& ik)
+{
+    ModuleBase::TITLE("ElecStatePW","eBandK");
+    double eband_k = 0.0;
+    for (int ibnd = 0;ibnd < this->ekb.nc; ibnd++)
+	{
+        eband_k += this->ekb(ik, ibnd) * this->wg(ik, ibnd);
+    }
+    return eband_k;
+}
+
+void ElecState::print_band(const int &ik, const int &printe, const int &iter)
+{
+	//check the band energy.
+    bool wrong = false;
+    int nbands = this->ekb.nc;
+	for(int ib=0; ib<nbands; ++ib)
+	{
+		if( abs( this->ekb(ik, ib) ) > 1.0e10)
+		{
+			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << this->ekb(ik, ib) << " Ry" << std::endl;
+			wrong = true;
+		}
+	}
+	if(wrong)
+    {
+        ModuleBase::WARNING_QUIT("Threshold_Elec::print_eigenvalue","Eigenvalues are too large!");
+    }
+
+
+
+	if(GlobalV::MY_RANK==0)
+	{
+		//if( GlobalV::DIAGO_TYPE == "selinv" ) xiaohui modify 2013-09-02
+		if(GlobalV::KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+		{
+			GlobalV::ofs_running << " No eigenvalues are available for selected inversion methods." << std::endl;	
+		}
+		else
+		{
+			if( printe>0 && ((iter+1) % printe == 0))
+			{
+				//	NEW_PART("ENERGY BANDS (Rydberg), (eV)");
+				GlobalV::ofs_running << std::setprecision(6);
+				GlobalV::ofs_running << " Energy (eV) & Occupations  for spin=" << GlobalV::CURRENT_SPIN+1 << " K-point=" << ik+1 << std::endl;
+				GlobalV::ofs_running << std::setiosflags(ios::showpoint);
+				for(int ib=0;ib<nbands;ib++)
+				{
+					GlobalV::ofs_running << " "<< std::setw(6) << ib+1  
+						<< std::setw(15) << this->ekb(ik, ib) * ModuleBase::Ry_to_eV;
+					// for the first electron iteration, we don't have the energy
+					// spectrum, so we can't get the occupations. 
+					GlobalV::ofs_running << std::setw(15) << this->wg(ik,ib);
+					GlobalV::ofs_running << std::endl;
+				}
+			}
+		}
+	}
+	return;
 }
 
 } // namespace elecstate
