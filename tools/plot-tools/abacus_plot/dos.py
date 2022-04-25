@@ -5,7 +5,7 @@ LastEditTime: 2022-01-03 17:18:21
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import OrderedDict, namedtuple
 import numpy as np
 from os import PathLike
 from pathlib import Path
@@ -14,7 +14,7 @@ from matplotlib.figure import Figure
 from matplotlib import axes
 
 from abacus_plot.utils import (energy_minus_efermi, get_angular_momentum_label,
-                               get_angular_momentum_name, remove_empty)
+                               get_angular_momentum_name, remove_empty, handle_data, parse_projected_data)
 
 
 class DOS:
@@ -92,7 +92,7 @@ class DOS:
 class DOSPlot:
     """Plot density of state(DOS)"""
 
-    def __init__(self, fig: Figure, ax: axes.Axes, **kwargs) -> None:
+    def __init__(self, fig: Figure = None, ax: axes.Axes = None, **kwargs) -> None:
         self.fig = fig
         self.ax = ax
         self._lw = kwargs.pop('lw', 2)
@@ -154,7 +154,7 @@ class DOSPlot:
 class TDOS(DOS):
     """Parse total DOS data"""
 
-    def __init__(self, tdosfile: PathLike) -> None:
+    def __init__(self, tdosfile: PathLike=None) -> None:
         super().__init__()
         self.tdosfile = tdosfile
         self._read()
@@ -202,7 +202,7 @@ class TDOS(DOS):
 class PDOS(DOS):
     """Parse partial DOS data"""
 
-    def __init__(self, pdosfile: PathLike) -> None:
+    def __init__(self, pdosfile: PathLike=None) -> None:
         super().__init__()
         self.pdosfile = pdosfile
         self._read()
@@ -212,15 +212,6 @@ class PDOS(DOS):
 
         :params pdosfile: string of PDOS data file
         """
-
-        def handle_data(data):
-            data.remove('')
-
-            def handle_elem(elem):
-                elist = elem.split(' ')
-                remove_empty(elist)  # `list` will be modified in function
-                return elist
-            return list(map(handle_elem, data))
 
         from lxml import etree
         pdosdata = etree.parse(self.pdosfile)
@@ -257,76 +248,15 @@ class PDOS(DOS):
             res = res + orb['data']
         return res
 
-    def parse(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[Any, List[int]]]], keyname=''):
-        """Extract partial dos from file
-
-        Args:
-            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[str, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
-            keyname (str): the keyword that extracts the PDOS
-        """
-
-        if isinstance(species, (list, tuple)):
-            dos = {}
-            elements = species
-            for elem in elements:
-                count = 0
-                dos_temp = np.zeros_like(self.orbitals[0]["data"], dtype=float)
-                for orb in self.orbitals:
-                    if orb[keyname] == elem:
-                        dos_temp += orb["data"]
-                        count += 1
-                if count:
-                    dos[elem] = dos_temp
-
-            return dos
-
-        elif isinstance(species, dict):
-            dos = defaultdict(dict)
-            elements = list(species.keys())
-            l = list(species.values())
-            for i, elem in enumerate(elements):
-                if isinstance(l[i], dict):
-                    for ang, mag in l[i].items():
-                        l_count = 0
-                        l_index = int(ang)
-                        l_dos = {}
-                        for m_index in mag:
-                            m_count = 0
-                            dos_temp = np.zeros_like(
-                                self.orbitals[0]["data"], dtype=float)
-                            for orb in self.orbitals:
-                                if orb[keyname] == elem and orb["l"] == l_index and orb["m"] == m_index:
-                                    dos_temp += orb["data"]
-                                    m_count += 1
-                                    l_count += 1
-                            if m_count:
-                                l_dos[m_index] = dos_temp
-                        if l_count:
-                            dos[elem][l_index] = l_dos
-
-                elif isinstance(l[i], list):
-                    for l_index in l[i]:
-                        count = 0
-                        dos_temp = np.zeros_like(
-                            self.orbitals[0]["data"], dtype=float)
-                        for orb in self.orbitals:
-                            if orb[keyname] == elem and orb["l"] == l_index:
-                                dos_temp += orb["data"]
-                                count += 1
-                        if count:
-                            dos[elem][l_index] = dos_temp
-
-            return dos
-
     def _write(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], keyname='', outdir: PathLike = './'):
         """Write parsed partial dos data to files
 
         Args:
             species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
-            keyname (str): the keyword that extracts the PDOS
+            keyname (str): the keyword that extracts the PDOS. Allowed values: 'index', 'atom_index', 'species'
         """
 
-        dos = self.parse(species, keyname)
+        dos = parse_projected_data(self.orbitals, species, keyname)
         fmt = ['%13.7f', '%15.8f'] if self._nsplit == 1 else [
             '%13.7f', '%15.8f', '%15.8f']
         file_dir = Path(f"{outdir}", "PDOS_FILE")
@@ -462,7 +392,7 @@ class PDOS(DOS):
             DOSPlot object: for manually plotting picture with dosplot.ax 
         """
 
-        dos = self.parse(species, keyname)
+        dos = parse_projected_data(self.orbitals, species, keyname)
         energy_f, tdos = self._shift_energy(efermi, shift, prec)
 
         if not species:
@@ -579,7 +509,7 @@ if __name__ == "__main__":
     pdosfile = r"C:\Users\YY.Ji\Desktop\PDOS"
     pdos = PDOS(pdosfile)
     #species = {"Ag": [2], "Cl": [1], "In": [0]}
-    atom_index = {8: {2:[1, 2]}, 4: {2:[1, 2]}, 10: [1, 2]}
+    atom_index = {8: {2: [1, 2]}, 4: {2: [1, 2]}, 10: [1, 2]}
     fig, ax = plt.subplots(3, 1, sharex=True)
     energy_range = [-1.5, 6]
     dos_range = [0, 5]

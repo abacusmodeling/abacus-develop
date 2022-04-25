@@ -8,25 +8,111 @@ Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 from collections import OrderedDict, namedtuple
 import numpy as np
 from os import PathLike
-from typing import Sequence, Tuple
+from typing import Sequence, Tuple, Union, Any, List, Dict
 from matplotlib.figure import Figure
 from matplotlib import axes
 
-from abacus_plot.utils import energy_minus_efermi, list_elem2str, read_kpt
+from abacus_plot.utils import energy_minus_efermi, list_elem2str, read_kpt, remove_empty, parse_projected_data, handle_data
 
 
-class BandPlot:
-    """Plot band structure"""
+class Band:
+    """Parse Bands data"""
 
-    def __init__(self, fig: Figure, ax: axes.Axes, **kwargs) -> None:
-        self.fig = fig
-        self.ax = ax
-        self._lw = kwargs.pop('lw', 2)
-        self._bwidth = kwargs.pop('bwdith', 3)
-        self._label = kwargs.pop('label', None)
-        self._color = kwargs.pop('color', None)
-        self._linestyle = kwargs.pop('linestyle', 'solid')
-        self.plot_params = kwargs
+    def __init__(self, bandfile: Union[PathLike, Sequence[PathLike]] = None, kptfile: str = '') -> None:
+        self.bandfile = bandfile
+        self.read()
+        self.kptfile = kptfile
+        self.kpt = None
+        if self.kptfile:
+            self.kpt = read_kpt(kptfile)
+        self.nspin = None
+        self.norbitals = None
+        self.orbitals = []
+
+    def read(self):
+        """Read band data file and return k-points and energy
+
+        :params filename: string of band data file
+        """
+
+        data = np.loadtxt(self.bandfile)
+        X, self.k_index = np.split(data, (1, ), axis=1)
+        self.nkpoints = len(self.k_index)
+        self.energy = X.flatten()
+        self.nbands = self.energy.shape[-1]
+        self.eunit = 'eV'
+
+    @classmethod
+    def direct_bandgap(cls, vb: namedtuple, cb: namedtuple, klength: int):
+        """Calculate direct band gap"""
+
+        gap_list = []
+        i_index = []
+        for i in range(klength):
+            gap_list.append(np.min(cb.band[:, i])-np.max(vb.band[:, i]))
+            i_index.append(i)
+        dgap = np.min(gap_list)
+
+        return dgap, i_index[np.argmin(gap_list)]
+
+    @classmethod
+    def bandgap(cls, vb: namedtuple, cb: namedtuple):
+        """Calculate band gap"""
+
+        gap = cb.value-vb.value
+
+        return gap
+
+    @classmethod
+    def band_type(cls, vb: namedtuple, cb: namedtuple):
+        vbm_x, cbm_x = vb.k_index, cb.k_index
+        longone, shortone = (vbm_x, cbm_x) if len(
+            vbm_x) >= len(cbm_x) else (cbm_x, vbm_x)
+        for i in shortone:
+            if i in longone:
+                btype = "Direct"
+            else:
+                btype = "Indirect"
+
+        return btype
+
+    @classmethod
+    def info(cls, kpath: Sequence, vb: namedtuple, cb: namedtuple):
+        """Output the information of band structure
+
+        :params kpath: k-points path 
+        :params energy: band energy after subtracting the Fermi level
+        """
+
+        gap = cls.bandgap(vb, cb)
+        dgap, d_i = cls.direct_bandgap(vb, cb, len(kpath))
+        btype = cls.band_type(vb, cb)
+        print(
+            "--------------------------Band Structure--------------------------", flush=True)
+        print(
+            f"{'Band character:'.ljust(30)}{btype}", flush=True)
+        if btype == "Indirect":
+            print(f"{'Direct Band gap(eV):'.ljust(30)}{dgap: .4f}", flush=True)
+            print(f"{'Indirect Band gap(eV):'.ljust(30)}{gap: .4f}", flush=True)
+        elif btype == "Direct":
+            print(f"{'Band gap(eV):'.ljust(30)}{gap: .4f}", flush=True)
+        print(f"{'Band index:'.ljust(30)}{'HOMO'.ljust(10)}{'LUMO'}", flush=True)
+        print(
+            f"{''.ljust(30)}{str(vb.band_index[-1]).ljust(10)}{str(cb.band_index[0])}", flush=True)
+        print(f"{'Eigenvalue of VBM(eV):'.ljust(30)}{vb.value: .4f}", flush=True)
+        print(f"{'Eigenvalue of CBM(eV):'.ljust(30)}{cb.value: .4f}", flush=True)
+        vbm_k = np.unique(kpath[vb.k_index], axis=0)
+        cbm_k = np.unique(kpath[cb.k_index], axis=0)
+        print(
+            f"{'Location of VBM'.ljust(30)}{' '.join(list_elem2str(vbm_k[0]))}", flush=True)
+        for i, j in enumerate(vbm_k):
+            if i != 0:
+                print(f"{''.ljust(30)}{' '.join(list_elem2str(j))}", flush=True)
+        print(
+            f"{'Location of CBM'.ljust(30)}{' '.join(list_elem2str(cbm_k[0]))}", flush=True)
+        for i, j in enumerate(cbm_k):
+            if i != 0:
+                print(f"{''.ljust(30)}{' '.join(list_elem2str(j))}", flush=True)
 
     @classmethod
     def set_vcband(cls, energy: Sequence) -> Tuple[namedtuple, namedtuple]:
@@ -56,18 +142,101 @@ class BandPlot:
 
         return vb, cb
 
-    @classmethod
-    def read(cls, filename: PathLike) -> Tuple[np.ndarray, np.ndarray]:
-        """Read band data file and return k-points and energy
+    def plot(self, x: Sequence, y: Sequence, index: Sequence, efermi: float = 0, energy_range: Sequence[float] = []):
+        """Plot band structure
 
-        :params filename: string of band data file
+        :params x, y: x-axis and y-axis coordinates
+        :params index: special k-points label and its index in data file
+        :params efermi: Fermi level in unit eV
+        :params energy_range: range of energy to plot, its length equals to two
         """
 
-        data = np.loadtxt(filename)
-        X, y = np.split(data, (1, ), axis=1)
-        x = X.flatten()
+        if not self._color:
+            self._color = 'black'
 
-        return x, y
+        kpoints, energy = x, y
+        energy = energy_minus_efermi(energy, efermi)
+
+        self.ax.plot(kpoints, energy, lw=self._lw, color=self._color,
+                     label=self._label, linestyle=self._linestyle)
+        self._set_figure(index, energy_range)
+
+    def singleplot(self, efermi: float = 0, energy_range: Sequence[float] = [], shift: bool = False):
+        """Plot band structure using data file
+
+        :params efermi: Fermi level in unit eV
+        :params energy_range: range of energy to plot, its length equals to two
+        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
+        """
+
+        if not self._color:
+            self._color = 'black'
+
+        energy = energy_minus_efermi(self.energy, efermi)
+        if shift:
+            vb, cb = self.set_vcband(energy)
+            self.ax.plot(self.k_index, np.vstack((vb.band, cb.band)).T,
+                         lw=self._lw, color=self._color, label=self._label, linestyle=self._linestyle)
+            self.info(self.kpt.full_kpath, vb, cb)
+        else:
+            self.ax.plot(self.k_index, energy,
+                         lw=self._lw, color=self._color, label=self._label, linestyle=self._linestyle)
+        index = self.kpt.label_special_k
+        self._set_figure(index, energy_range)
+
+    def multiplot(self, efermi: Sequence[float] = [], energy_range: Sequence[float] = [], shift: bool = True):
+        """Plot more than two band structures using data file
+
+        :params efermi: list of Fermi levels in unit eV, its length equals to `filename`
+        :params energy_range: range of energy to plot, its length equals to two
+        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
+        """
+
+        if not efermi:
+            efermi = [0.0 for i in range(len(self.bandfile))]
+        if not self._label:
+            self._label = ['' for i in range(len(self.bandfile))]
+        if not self._color:
+            self._color = ['black' for i in range(len(self.bandfile))]
+        if not self._linestyle:
+            self._linestyle = ['solid' for i in range(len(self.bandfile))]
+
+        emin = -np.inf
+        emax = np.inf
+        for i, file in enumerate(self.bandfile):
+            if shift:
+                vb, cb = self.set_vcband(
+                    energy_minus_efermi(self.energy, efermi[i]))
+                energy_min = np.min(vb.band)
+                energy_max = np.max(cb.band)
+                if energy_min > emin:
+                    emin = energy_min
+                if energy_max < emax:
+                    emax = energy_max
+
+                self.ax.plot(self.k_index, np.vstack((vb.band, cb.band)).T,
+                             lw=self._lw, color=self._color[i], label=self._label[i], linestyle=self._linestyle[i])
+                self.info(self.kpt.full_kpath, vb, cb)
+            else:
+                self.ax.plot(self.k_index, energy_minus_efermi(self.energy, efermi[i]),
+                             lw=self._lw, color=self._color[i], label=self._label[i], linestyle=self._linestyle[i])
+
+        index = self.kpt.label_special_k
+        self._set_figure(index, energy_range)
+
+
+class BandPlot:
+    """Plot band structure"""
+
+    def __init__(self, fig: Figure, ax: axes.Axes, **kwargs) -> None:
+        self.fig = fig
+        self.ax = ax
+        self._lw = kwargs.pop('lw', 2)
+        self._bwidth = kwargs.pop('bwdith', 3)
+        self._label = kwargs.pop('label', None)
+        self._color = kwargs.pop('color', None)
+        self._linestyle = kwargs.pop('linestyle', 'solid')
+        self.plot_params = kwargs
 
     def _set_figure(self, index: dict, range: Sequence):
         """set figure and axes for plotting
@@ -147,188 +316,103 @@ class BandPlot:
                 self.ax.legend(by_label.values(),
                                by_label.keys(), prop={'size': 15})
 
-    def plot(self, x: Sequence, y: Sequence, index: Sequence, efermi: float = 0, energy_range: Sequence[float] = []):
-        """Plot band structure
 
-        :params x, y: x-axis and y-axis coordinates
-        :params index: special k-points label and its index in data file
-        :params efermi: Fermi level in unit eV
-        :params energy_range: range of energy to plot, its length equals to two
+class PBand(Band):
+    def __init__(self, bandfile: PathLike = None) -> None:
+        self.bandfile = bandfile
+        self.read()
+
+    def _check_energy(self):
+        assert self.energy.shape[0] == self.nkpoints, "The dimension of band structure dismatches with the number of k-points."
+        assert self.energy.shape[1] == self.nbands, "The dimension of band structure dismatches with the number of bands."
+
+    def _check_weights(self, weights:np.ndarray, prec=1e-5):
+        assert weights.shape[0] == self.norbitals, "The dimension of weights dismatches with the number of orbitals."
+        assert weights.shape[1] == self.nkpoints, "The dimension of weights dismatches with the number of k-points."
+        assert weights.shape[2] == self.nbands, "The dimension of weights dismatches with the number of bands."
+        one_mat = np.ones((self.nkpoints, self.nbands))
+        assert (np.abs(weights.sum(axis=0)-one_mat) < prec).all(), f"np.abs(weights.sum(axis=0)-np.ones(({self.nkpoints}, {self.nbands}))) < {prec}"
+
+    @property
+    def weights(self):
+        data = np.empty((self.norbitals, self.nkpoints, self.nbands))
+        for i, orb in enumerate(self.orbitals):
+            data[i] = orb['data']
+        self._check_weights(data)
+        return data
+
+    def read(self):
+        """Read projected band data file and return k-points, energy and Mulliken weights
+
+        :params filename: string of projected band data file
         """
 
-        if not self._color:
-            self._color = 'black'
+        from lxml import etree
+        pbanddata = etree.parse(self.bandfile)
+        root = pbanddata.getroot()
+        self.nspin = int(root.xpath('//nspin')[0].text.replace(' ', ''))
+        self.norbitals = int(root.xpath('//norbitals')
+                             [0].text.replace(' ', ''))
+        self.eunit = root.xpath('//band_structure/@units')[0].replace(' ', '')
+        self.nbands = int(root.xpath('//band_structure/@nbands')
+                          [0].replace(' ', ''))
+        self.nkpoints = int(root.xpath('//band_structure/@nkpoints')
+                            [0].replace(' ', ''))
+        self.k_index = np.arange(self.nkpoints)
+        self.energy = root.xpath('//band_structure')[0].text.split('\n')
+        self.energy = handle_data(self.energy)
+        remove_empty(self.energy)
+        self.energy = np.asarray(self.energy, dtype=float)
+        self._check_energy()
 
-        kpoints, energy = x, y
-        energy = energy_minus_efermi(energy, efermi)
+        self.orbitals = []
+        for i in range(self.norbitals):
+            orb = OrderedDict()
+            o_index_str = root.xpath(
+                '//orbital/@index')[i]
+            orb['index'] = int(o_index_str.replace(' ', ''))
+            orb['atom_index'] = int(root.xpath(
+                '//orbital/@atom_index')[i].replace(' ', ''))
+            orb['species'] = root.xpath(
+                '//orbital/@species')[i].replace(' ', '')
+            orb['l'] = int(root.xpath('//orbital/@l')[i].replace(' ', ''))
+            orb['m'] = int(root.xpath('//orbital/@m')[i].replace(' ', ''))
+            orb['z'] = int(root.xpath('//orbital/@z')[i].replace(' ', ''))
+            data = root.xpath('//data')[i].text.split('\n')
+            data = handle_data(data)
+            remove_empty(data)
+            orb['data'] = np.asarray(data, dtype=float)
+            self.orbitals.append(orb)
 
-        self.ax.plot(kpoints, energy, lw=self._lw, color=self._color,
-                     label=self._label, linestyle=self._linestyle)
-        self._set_figure(index, energy_range)
+    def _write(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], keyname='', outdir: PathLike = './'):
+        """Write parsed partial dos data to files
 
-    def singleplot(self, datafile: PathLike, kptfile: str = '', efermi: float = 0, energy_range: Sequence[float] = [], shift: bool = False):
-        """Plot band structure using data file
-
-        :params datafile: string of band date file
-        :params kptfile: k-point file
-        :params efermi: Fermi level in unit eV
-        :params energy_range: range of energy to plot, its length equals to two
-        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
+        Args:
+            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
+            keyname (str): the keyword that extracts the PDOS. Allowed values: 'index', 'atom_index', 'species'
         """
 
-        kpt = read_kpt(kptfile)
-
-        if not self._color:
-            self._color = 'black'
-
-        kpoints, energy = self.read(datafile)
-        energy = energy_minus_efermi(energy, efermi)
-        if shift:
-            vb, cb = self.set_vcband(energy)
-            self.ax.plot(kpoints, np.vstack((vb.band, cb.band)).T,
-                         lw=self._lw, color=self._color, label=self._label, linestyle=self._linestyle)
-            self.info(kpt.full_kpath, vb, cb)
-        else:
-            self.ax.plot(kpoints, energy,
-                         lw=self._lw, color=self._color, label=self._label, linestyle=self._linestyle)
-        index = kpt.label_special_k
-        self._set_figure(index, energy_range)
-
-    def multiplot(self, datafile: Sequence[PathLike], kptfile: str = '', efermi: Sequence[float] = [], energy_range: Sequence[float] = [], shift: bool = True):
-        """Plot more than two band structures using data file
-
-        :params datafile: list of path of band date file 
-        :params kptfile: k-point file
-        :params efermi: list of Fermi levels in unit eV, its length equals to `filename`
-        :params energy_range: range of energy to plot, its length equals to two
-        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
-        """
-
-        kpt = read_kpt(kptfile)
-
-        if not efermi:
-            efermi = [0.0 for i in range(len(datafile))]
-        if not self._label:
-            self._label = ['' for i in range(len(datafile))]
-        if not self._color:
-            self._color = ['black' for i in range(len(datafile))]
-        if not self._linestyle:
-            self._linestyle = ['solid' for i in range(len(datafile))]
-
-        emin = -np.inf
-        emax = np.inf
-        for i, file in enumerate(datafile):
-            kpoints, energy = self.read(file)
-            if shift:
-                vb, cb = self.set_vcband(
-                    energy_minus_efermi(energy, efermi[i]))
-                energy_min = np.min(vb.band)
-                energy_max = np.max(cb.band)
-                if energy_min > emin:
-                    emin = energy_min
-                if energy_max < emax:
-                    emax = energy_max
-
-                self.ax.plot(kpoints, np.vstack((vb.band, cb.band)).T,
-                             lw=self._lw, color=self._color[i], label=self._label[i], linestyle=self._linestyle[i])
-                self.info(kpt.full_kpath, vb, cb)
-            else:
-                self.ax.plot(kpoints, energy_minus_efermi(energy, efermi[i]),
-                             lw=self._lw, color=self._color[i], label=self._label[i], linestyle=self._linestyle[i])
-
-        index = kpt.label_special_k
-        self._set_figure(index, energy_range)
-
-    @classmethod
-    def direct_bandgap(cls, vb: namedtuple, cb: namedtuple, klength: int):
-        """Calculate direct band gap"""
-
-        gap_list = []
-        i_index = []
-        for i in range(klength):
-            gap_list.append(np.min(cb.band[:, i])-np.max(vb.band[:, i]))
-            i_index.append(i)
-        dgap = np.min(gap_list)
-
-        return dgap, i_index[np.argmin(gap_list)]
-
-    @classmethod
-    def bandgap(cls, vb: namedtuple, cb: namedtuple):
-        """Calculate band gap"""
-
-        gap = cb.value-vb.value
-
-        return gap
-
-    @classmethod
-    def band_type(cls, vb: namedtuple, cb: namedtuple):
-        vbm_x, cbm_x = vb.k_index, cb.k_index
-        longone, shortone = (vbm_x, cbm_x) if len(
-                vbm_x) >= len(cbm_x) else (cbm_x, vbm_x)
-        for i in shortone:
-            if i in longone:
-                btype = "Direct"
-            else:
-                btype = "Indirect"
-
-        return btype
-
-    @classmethod
-    def info(cls, kpath: Sequence, vb: namedtuple, cb: namedtuple):
-        """Output the information of band structure
-
-        :params kpath: k-points path 
-        :params energy: band energy after subtracting the Fermi level
-        """
-
-        gap = cls.bandgap(vb, cb)
-        dgap, d_i = cls.direct_bandgap(vb, cb, len(kpath))
-        btype = cls.band_type(vb, cb)
-        print(
-            "--------------------------Band Structure--------------------------", flush=True)
-        print(
-            f"{'Band character:'.ljust(30)}{btype}", flush=True)
-        if btype == "Indirect":
-            print(f"{'Direct Band gap(eV):'.ljust(30)}{dgap: .4f}", flush=True)
-            print(f"{'Indirect Band gap(eV):'.ljust(30)}{gap: .4f}", flush=True)
-        elif btype == "Direct":
-            print(f"{'Band gap(eV):'.ljust(30)}{gap: .4f}", flush=True)
-        print(f"{'Band index:'.ljust(30)}{'HOMO'.ljust(10)}{'LUMO'}", flush=True)
-        print(
-            f"{''.ljust(30)}{str(vb.band_index[-1]).ljust(10)}{str(cb.band_index[0])}", flush=True)
-        print(f"{'Eigenvalue of VBM(eV):'.ljust(30)}{vb.value: .4f}", flush=True)
-        print(f"{'Eigenvalue of CBM(eV):'.ljust(30)}{cb.value: .4f}", flush=True)
-        vbm_k = np.unique(kpath[vb.k_index], axis=0)
-        cbm_k = np.unique(kpath[cb.k_index], axis=0)
-        print(
-            f"{'Location of VBM'.ljust(30)}{' '.join(list_elem2str(vbm_k[0]))}", flush=True)
-        for i, j in enumerate(vbm_k):
-            if i != 0:
-                print(f"{''.ljust(30)}{' '.join(list_elem2str(j))}", flush=True)
-        print(
-            f"{'Location of CBM'.ljust(30)}{' '.join(list_elem2str(cbm_k[0]))}", flush=True)
-        for i, j in enumerate(cbm_k):
-            if i != 0:
-                print(f"{''.ljust(30)}{' '.join(list_elem2str(j))}", flush=True)
+        return 
 
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from pathlib import Path
-    parent = Path(r"D:\ustc\TEST\HOIP\double HOIP\result\bond")
-    name = "CsAgBiBr"
+    parent = Path(r"C:\Users\YY.Ji\Desktop")
+    name = "PBANDS_1"
     path = parent/name
-    notes = {'s': '(b)'}
-    datafile = [path/"soc.dat", path/"non-soc.dat"]
-    kptfile = path/"KPT"
-    fig, ax = plt.subplots(figsize=(12, 12))
-    label = ["with SOC", "without SOC"]
-    color = ["r", "g"]
-    linestyle = ["solid", "dashed"]
-    band = BandPlot(fig, ax, notes=notes, label=label,
-                    color=color, linestyle=linestyle)
-    energy_range = [-5, 6]
-    efermi = [4.417301755850272, 4.920435541999894]
-    shift = True
-    band.multiplot(datafile, kptfile, efermi, energy_range, shift)
-    fig.savefig("band.png")
+    # notes = {'s': '(b)'}
+    # datafile = [path/"soc.dat", path/"non-soc.dat"]
+    # kptfile = path/"KPT"
+    #fig, ax = plt.subplots(figsize=(12, 12))
+    # label = ["with SOC", "without SOC"]
+    # color = ["r", "g"]
+    # linestyle = ["solid", "dashed"]
+    # band = BandPlot(fig, ax, notes=notes, label=label,
+    #                 color=color, linestyle=linestyle)
+    # energy_range = [-5, 6]
+    # efermi = [4.417301755850272, 4.920435541999894]
+    # shift = True
+    # band.multiplot(datafile, kptfile, efermi, energy_range, shift)
+    # fig.savefig("band.png")
+    pband = PBand(str(path))

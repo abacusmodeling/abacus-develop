@@ -9,7 +9,8 @@ import json
 import re
 import string
 from os import PathLike
-from typing import List, Sequence, Union
+from typing import List, Sequence, Union, Any, Dict
+from collections import defaultdict
 
 import numpy as np
 
@@ -21,6 +22,14 @@ def remove_empty(a: list) -> list:
     while [] in a:
         a.remove([])
 
+def handle_data(data):
+    data.remove('')
+
+    def handle_elem(elem):
+        elist = elem.split(' ')
+        remove_empty(elist)  # `list` will be modified in function
+        return elist
+    return list(map(handle_elem, data))
 
 def skip_notes(line: str) -> str:
     """Delete comments lines with '#' or '//'
@@ -257,3 +266,65 @@ def get_angular_momentum_name(l_index: int, m_index: int) -> str:
     """
 
     return angular_momentum_name[l_index][m_index]
+
+
+def parse_projected_data(orbitals, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[Any, List[int]]]], keyname=''):
+    """Extract projected data from file
+
+    Args:
+        species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[str, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
+        keyname (str): the keyword that extracts the projected data. Allowed values: 'index', 'atom_index', 'species'
+    """
+
+    if isinstance(species, (list, tuple)):
+        data = {}
+        elements = species
+        for elem in elements:
+            count = 0
+            data_temp = np.zeros_like(orbitals[0]["data"], dtype=float)
+            for orb in orbitals:
+                if orb[keyname] == elem:
+                    data_temp += orb["data"]
+                    count += 1
+            if count:
+                data[elem] = data_temp
+
+        return data
+
+    elif isinstance(species, dict):
+        data = defaultdict(dict)
+        elements = list(species.keys())
+        l = list(species.values())
+        for i, elem in enumerate(elements):
+            if isinstance(l[i], dict):
+                for ang, mag in l[i].items():
+                    l_count = 0
+                    l_index = int(ang)
+                    l_data = {}
+                    for m_index in mag:
+                        m_count = 0
+                        data_temp = np.zeros_like(
+                            orbitals[0]["data"], dtype=float)
+                        for orb in orbitals:
+                            if orb[keyname] == elem and orb["l"] == l_index and orb["m"] == m_index:
+                                data_temp += orb["data"]
+                                m_count += 1
+                                l_count += 1
+                        if m_count:
+                            l_data[m_index] = data_temp
+                    if l_count:
+                        data[elem][l_index] = l_data
+
+            elif isinstance(l[i], list):
+                for l_index in l[i]:
+                    count = 0
+                    data_temp = np.zeros_like(
+                        orbitals[0]["data"], dtype=float)
+                    for orb in orbitals:
+                        if orb[keyname] == elem and orb["l"] == l_index:
+                            data_temp += orb["data"]
+                            count += 1
+                    if count:
+                        data[elem][l_index] = data_temp
+
+        return data
