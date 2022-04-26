@@ -288,6 +288,12 @@ void Run_MD_LCAO::md_force_virial(
                  LOWF_md.wfc_k_laststep[ik].create(GlobalV::NBANDS, GlobalV::NLOCAL);
                  LOWF_md.wfc_k_laststep[ik]=LOWF_md.wfc_k[ik];
              }
+	     /*
+             for (int i =0 ; i< GlobalV::NLOCAL*GlobalV::NLOCAL;++i)
+                {
+                    this->LM_md.Hloc2_laststep[i]=this->LM_md.Hloc2[i];
+                }*/
+            //this->cal_edm_tddft(LOWF_md, LOC_md, UHM_md);
          #endif
      }
 
@@ -406,4 +412,39 @@ void Run_MD_LCAO::md_force_virial(
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 #endif //2015-10-01, xiaohui
+}
+
+// use the original formula (Hamiltonian matrix) to calculate energy density matrix	
+void Run_MD_LCAO::cal_edm_tddft(Local_Orbital_wfc& LOWF_md,
+        Local_Orbital_Charge& LOC_md,
+    LCAO_Hamilt& UHM_md)
+{
+    LOC_md.edm_k_tddft.resize(GlobalC::kv.nks);
+    for(int ik=0; ik<GlobalC::kv.nks; ++ik)
+    {
+        LOC_md.edm_k_tddft[ik].create( LOC_md.ParaV->ncol, LOC_md.ParaV->nrow );
+        ModuleBase::ComplexMatrix Sinv(GlobalV::NLOCAL,GlobalV::NLOCAL);
+        ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+        for(int i=0; i<GlobalV::NLOCAL; i++)
+        {
+                for(int j=0; j<GlobalV::NLOCAL; j++)
+                {
+                    Htmp(i,j) = UHM_md.LM->Hloc2[i*GlobalV::NLOCAL+j];
+                        Sinv(i,j) = UHM_md.LM->Sloc2[i*GlobalV::NLOCAL+j];
+                }
+        }
+        int INFO;
+
+        int LWORK=3*GlobalV::NLOCAL-1; //tmp
+        std::complex<double> * WORK = new std::complex<double>[LWORK];
+        ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
+        int IPIV[GlobalV::NLOCAL];
+
+        LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Sinv, GlobalV::NLOCAL, IPIV, &INFO);
+        LapackConnector::zgetri( GlobalV::NLOCAL, Sinv, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
+
+        LOC_md.edm_k_tddft[ik]=0.5*(Sinv*Htmp*LOC_md.dm_k[ik]+LOC_md.dm_k[ik]*Htmp*Sinv);
+
+    }
+    return;
 }

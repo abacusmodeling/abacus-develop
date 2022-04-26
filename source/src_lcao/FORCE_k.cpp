@@ -307,6 +307,16 @@ void Force_LCAO_k::cal_foverlap_k(
     loc.cal_dm(wgEkb,
         wfc_k,
         edm_k);
+	
+	// use the original formula (Hamiltonian matrix) to calculate energy density matrix	
+	if (loc.edm_k_tddft.size())
+    {
+        for(int ik=0; ik<GlobalC::kv.nks; ++ik)
+        {
+                edm_k[ik]=loc.edm_k_tddft[ik];
+        }
+    }
+
     loc.cal_dm_R(edm_k,
         ra, edm2d);
     ModuleBase::timer::tick("Force_LCAO_k", "cal_edm_2d");
