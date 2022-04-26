@@ -339,7 +339,7 @@ void ELEC_scf::scf(const int& istep,
 		GlobalC::en.deband = GlobalC::en.delta_e();
 
 		// (8) Mix charge density
-		GlobalC::CHR.mix_rho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
+		GlobalC::CHR.tmp_mixrho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
 
 		// Peize Lin add 2020.04.04
 		if(GlobalC::restart.info_save.save_charge)

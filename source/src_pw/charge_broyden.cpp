@@ -76,19 +76,10 @@ Charge_Broyden::~Charge_Broyden()
 	}
 }
 
-void Charge_Broyden::mix_rho
-(
-    double &scf_thr,
-    const double &diago_error,
-    const double &tr2,
-    const int &iter,
-    bool &converged
-)
+double Charge_Broyden::get_drho()
 {
-    ModuleBase::TITLE("Charge_Broyden","mix_rho");
-	ModuleBase::timer::tick("Charge", "mix_rho");
-
-    for (int is=0; is<GlobalV::NSPIN; is++)
+	double scf_thr;
+	for (int is=0; is<GlobalV::NSPIN; is++)
     {
 		ModuleBase::GlobalFunc::NOTE("Perform FFT on rho(r) to obtain rho(G).");
         this->set_rhog(rho[is], rhog[is]);
@@ -134,19 +125,16 @@ void Charge_Broyden::mix_rho
 	{
 		scf_thr = scf_thr2;	
 	}
-    if ( scf_thr < diago_error )
-    {
-        GlobalV::ofs_warning << " scf_thr < diago_error, keep charge density unchanged." << std::endl;
-    	ModuleBase::timer::tick("Charge","mix_rho");
-        return;
-    }
-    else if (scf_thr < tr2)
-    {
-        converged = true;
-    	ModuleBase::timer::tick("Charge","mix_rho");
-		return;
-    }
+	return scf_thr;
+}
 
+void Charge_Broyden::mix_rho
+(
+    const int &iter
+)
+{
+    ModuleBase::TITLE("Charge_Broyden","mix_rho");
+	ModuleBase::timer::tick("Charge", "mix_rho");
 
 	// the charge before mixing.
 	double **rho123 = new double*[GlobalV::NSPIN];
@@ -218,6 +206,31 @@ void Charge_Broyden::mix_rho
 
     ModuleBase::timer::tick("Charge","mix_rho");
     return;
+}
+
+void Charge_Broyden::tmp_mixrho
+(
+    double &scf_thr,
+    const double &diago_error,
+    const double &tr2,
+    const int &iter,
+    bool &converged
+)
+{
+	scf_thr = get_drho();
+	if ( scf_thr < diago_error )
+    {
+        GlobalV::ofs_warning << " scf_thr < diago_error, keep charge density unchanged." << std::endl;
+    	ModuleBase::timer::tick("Charge","mix_rho");
+        return;
+    }
+    else if (scf_thr < tr2)
+    {
+        converged = true;
+    	ModuleBase::timer::tick("Charge","mix_rho");
+		return;
+    }
+	mix_rho(iter);
 }
 
 void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)

@@ -7,9 +7,9 @@
 
 namespace ModuleESolver
 {
-void ESolver:: printag()
+void ESolver:: printname()
 {
-    std::cout<<tag<<std::endl;
+    std::cout<<classname<<std::endl;
 }
 
 

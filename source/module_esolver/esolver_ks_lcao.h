@@ -12,7 +12,7 @@ class ESolver_KS_LCAO: public ESolver_KS
 public:
     ESolver_KS_LCAO()
     {
-        tag = "ESolver_KS_LCAO";
+        classname = "ESolver_KS_LCAO";
     }
     void Init(Input& inp, UnitCell_pseudo& cell) override;
     

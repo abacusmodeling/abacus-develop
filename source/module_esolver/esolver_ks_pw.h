@@ -16,7 +16,7 @@ class ESolver_KS_PW: public ESolver_KS
 public:
     ESolver_KS_PW()
     {
-        tag = "ESolver_KS_PW";
+        classname = "ESolver_KS_PW";
     }
     void Init(Input &inp, UnitCell_pseudo &cell) override;
     void Run(int istep, UnitCell_pseudo& cell) override;

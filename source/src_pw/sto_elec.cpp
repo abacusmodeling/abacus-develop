@@ -250,7 +250,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// (the new input density) while rho is unchanged.
 		if(GlobalV::MY_POOL == 0)
 		{
-			GlobalC::CHR.mix_rho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
+			GlobalC::CHR.tmp_mixrho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
 		}
 
 #ifdef __MPI

@@ -299,7 +299,7 @@ void Electrons::self_consistent(const int &istep)
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
         {
-            GlobalC::CHR.mix_rho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
+            GlobalC::CHR.tmp_mixrho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
         }
         else
         {
@@ -320,7 +320,7 @@ void Electrons::self_consistent(const int &istep)
             // rho contain the output charge density.
             // in other cases rhoin contains the mixed charge density
             // (the new input density) while rho is unchanged.
-            GlobalC::CHR.mix_rho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
+            GlobalC::CHR.tmp_mixrho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
 
             //if(GlobalV::MY_RANK==0)
             //{
