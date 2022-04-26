@@ -134,7 +134,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>
 		GlobalC::wf.ekb[ik][ib] = en[ib];
 	}
 
-	if (Pdiag_Double::out_lowf)
+	if (Pdiag_Double::out_wfc_lcao)
 	{
 		std::stringstream ss;
         ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";
