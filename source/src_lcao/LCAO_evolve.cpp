@@ -53,7 +53,8 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         	for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
                 	Htmp(i,j) = this->LM->Hloc2[i*GlobalV::NLOCAL+j];
-                        Stmp(i,j) = this->LM->Sloc2[i*GlobalV::NLOCAL+j];
+					//Htmp(i,j) = (this->LM->Hloc2[i*GlobalV::NLOCAL+j] +this->LM->Hloc2_laststep[i*GlobalV::NLOCAL+j])/2.0;
+                    Stmp(i,j) = this->LM->Sloc2[i*GlobalV::NLOCAL+j];
                 }
         }
 
@@ -80,7 +81,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         }
         std::cout <<std::endl;
 */
-				
+/*				
 	int INFO;
 
         int LWORK=3*GlobalV::NLOCAL-1; //tmp
@@ -90,7 +91,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 
         LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
         LapackConnector::zgetri( GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
-
+*/
 /*
         std::cout << " S^-1: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -103,10 +104,10 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         }
         std::cout <<std::endl;
 */
-
+/*
 	ModuleBase::ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	S_plus_H = Stmp*Htmp;
-
+*/
 /*
         std::cout << " S^-1*H: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -121,12 +122,11 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 */
 
 	ModuleBase::ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+/*
 	for (int i=0; i<GlobalV::NLOCAL; i++)
        	{
                	for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                     /*   real(Denominator(i,j)) = -imag(S_plus_H(i,j));
-                        imag(Denominator(i,j)) = real(S_plus_H(i,j));*/
                           Denominator(i,j) = std::complex<double>( -S_plus_H(i,j).imag(), S_plus_H(i,j).real() );
                 }
         }
@@ -140,13 +140,17 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
                        	else Idmat(i,j) = std::complex<double>(0.0, 0.0);
                 }
         }
-        //double delta_t;
-//      delta_t = 0.2;	//identity: fs;
+*/
         ModuleBase::ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
-        Numerator = Idmat - 0.5*INPUT.mdp.md_dt*41.34*Denominator;
-        Denominator = Idmat + 0.5*INPUT.mdp.md_dt*41.34*Denominator;
+//        Numerator = Idmat - 0.5*INPUT.mdp.md_dt*41.34*Denominator;
+//        Denominator = Idmat + 0.5*INPUT.mdp.md_dt*41.34*Denominator;
 
-	int info;
+		complex<double> para={0.0,1.0};
+        para=para*0.25*INPUT.mdp.md_dt;
+		Numerator=Stmp-para*Htmp;
+        Denominator=Stmp+para*Htmp;
+
+		int info;
         int lwork=3*GlobalV::NLOCAL-1; //tmp
         std::complex<double> * work = new std::complex<double>[lwork];
         ModuleBase::GlobalFunc::ZEROS(work, lwork);
@@ -180,7 +184,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         std::cout <<std::endl;
 */
 
-        U_operator = Numerator*Denominator;
+        U_operator = Denominator*Numerator;
 /*
 	std::cout << "U_operator Success!!!" <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -220,8 +224,20 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 	std::cout <<std::endl;
 */
 
-	const bool conjugate=false;
+		const bool conjugate=false;
         wfc_k=wfc_k_laststep*transpose(U_operator,conjugate);
+
+		ModuleBase::ComplexMatrix cmatrix(GlobalV::NBANDS,GlobalV::NBANDS);
+    	cmatrix=conj(wfc_k)*Stmp*transpose(wfc_k,conjugate);
+    	for (int i=0;i<GlobalV::NBANDS; i++)
+    	{
+                double factor;
+        		factor=1.0/sqrt(cmatrix.c[i*GlobalV::NBANDS+i].real());
+                for (int j=0;j<GlobalV::NLOCAL;j++)
+                {
+                    wfc_k.c[i*GlobalV::NLOCAL+j]*=factor;
+                }
+    	}
 
         for(int i=0; i<GlobalV::NBANDS; i++)
         {
@@ -231,7 +247,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
                 }
         }
 
-///*
+/*
         //calculate energy level
         ModuleBase::ComplexMatrix Ematrix(GlobalV::NLOCAL,GlobalV::NLOCAL);
         Ematrix=conj(wfc_k)*Htmp*transpose(wfc_k,conjugate);
@@ -239,7 +255,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         {
                 ekb[i]=Ematrix.c[i*GlobalV::NBANDS+i].real();
         }
-//*/
+*/
 
 /*
         GlobalV::ofs_running<<endl;

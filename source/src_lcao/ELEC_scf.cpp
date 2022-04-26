@@ -129,7 +129,7 @@ void ELEC_scf::scf(const int& istep,
 		// mohan add iter > 1 on 2011-04-02
 		// because the GlobalC::en.ekb has not value now.
 		// so the smearing can not be done.
-		if(iter>1)Occupy::calculate_weights();
+		if(iter>1 && !GlobalV::ocp )Occupy::calculate_weights();
 
 		if(GlobalC::wf.init_wfc == "file")
 		{
@@ -194,6 +194,22 @@ void ELEC_scf::scf(const int& istep,
 			GlobalC::dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
 		}
 
+		if (GlobalV::ocp == 1 && ELEC_evolve::tddft && istep >= 2)
+        {
+            for (int ik=0; ik<GlobalC::kv.nks; ik++)
+            {
+                for (int ib=0; ib<GlobalV::NBANDS; ib++)
+                {
+                    GlobalC::wf.wg(ik,ib)=GlobalV::ocp_kb[ik*GlobalV::NBANDS+ib];
+                }
+            }
+        }
+
+        if (ELEC_evolve::tddft && istep >= 3 && iter>1)
+        {
+            //hopping
+        }
+
 		// (1) calculate the bands.
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -202,7 +218,7 @@ void ELEC_scf::scf(const int& istep,
 		}
 		else
 		{
-			if(ELEC_evolve::tddft && istep >= 2 && iter > 1)
+			if(ELEC_evolve::tddft && istep >= 2)
 			{
 				ELEC_evolve::evolve_psi(istep, uhm, lowf);
 			}
@@ -246,19 +262,7 @@ void ELEC_scf::scf(const int& istep,
 		GlobalC::CHR.save_rho_before_sum_band();
 
 		// (3) sum bands to calculate charge density
-		Occupy::calculate_weights();
-
-		if (GlobalV::ocp == 1 && ELEC_evolve::tddft && istep >= 2  && iter > 1)
-		{
-			for (int ik=0; ik<GlobalC::kv.nks; ik++)
-			{
-				for (int ib=0; ib<GlobalV::NBANDS; ib++)
-				{
-					GlobalC::wf.wg(ik,ib)=GlobalV::ocp_kb[ik*GlobalV::NBANDS+ib];
-				}
-			}
-		}
-
+		if(!GlobalV::ocp || istep<=1 ) Occupy::calculate_weights();
 
 		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
@@ -319,10 +323,13 @@ void ELEC_scf::scf(const int& istep,
 		GlobalC::en.calculate_harris(2);
 
 		// (5) symmetrize the charge density
-		Symmetry_rho srho;
-		for(int is=0; is<GlobalV::NSPIN; is++)
+		if( iter<=1 || !ELEC_evolve::tddft )
 		{
-			srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+			Symmetry_rho srho;
+			for(int is=0; is<GlobalV::NSPIN; is++)
+			{
+				srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+			}
 		}
 
 		// (6) compute magnetization, only for spin==2
@@ -498,6 +505,28 @@ void ELEC_scf::scf(const int& istep,
 				sse << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
 				GlobalC::CHR.write_rho_dipole(GlobalC::CHR.rho_save, is, 0, sse.str());
 				*/
+			}
+
+			if (conv_elec && ELEC_evolve::tddft && istep >= 2)
+        	{
+            	const bool conjugate=false;
+            	for(int ik=0; ik<GlobalC::kv.nks; ik++)
+            	{
+               		ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+                	for(int i=0; i<GlobalV::NLOCAL; i++)
+                	{
+                    	for(int j=0; j<GlobalV::NLOCAL; j++)
+                    	{
+                        	Htmp(i,j) = uhm.LM->Hloc2[i*GlobalV::NLOCAL+j];
+                		}
+					}
+            		ModuleBase::ComplexMatrix Ematrix(GlobalV::NBANDS,GlobalV::NBANDS);
+            		Ematrix=conj(lowf.wfc_k[ik])*Htmp*transpose(lowf.wfc_k[ik],conjugate);
+            		for (int i=0;i<GlobalV::NBANDS; i++)
+            		{
+                		GlobalC::wf.ekb[ik][i]=Ematrix.c[i*GlobalV::NBANDS+i].real();
+            		}
+				}
 			}
 
 			if(conv_elec)
