@@ -87,6 +87,7 @@ sph_bessel_recursive-d1.o \
 sph_bessel_recursive-d2.o \
 global_variable.o \
 global_function.o \
+global_function_ddotreal.o \
 tool_title.o\
 tool_quit.o\
 tool_check.o\
@@ -121,7 +122,6 @@ gint_k_init.o\
 gint_k_vl.o\
 gint_k_rho.o\
 gint_k_fvl.o\
-grid_base.o\
 grid_base_beta.o\
 ORB_control.o\
 ORB_read.o\
@@ -158,6 +158,7 @@ LCAO_diago.o\
 LCAO_evolve.o\
 LCAO_deepks.o\
 LCAO_deepks_fdelta.o\
+LCAO_deepks_odelta.o\
 LCAO_deepks_io.o\
 LCAO_deepks_mpi.o\
 LCAO_deepks_pdm.o\
@@ -365,6 +366,15 @@ pdt2s.o\
 pzt2s.o\
 pdtrsm.o\
 pzhtrsm.o\
+
+OBJS_SURCHEM=cal_epsilon.o\
+cal_pseudo.o\
+cal_totn.o\
+cal_vcav.o\
+cal_vel.o\
+corrected_energy.o\
+H_correction_pw.o\
+minimize_cg.o\
 
 PDIAG_MR_0=dcopy.o\
 dlae2.o\

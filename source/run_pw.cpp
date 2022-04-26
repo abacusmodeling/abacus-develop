@@ -21,9 +21,9 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
 #ifdef __LCAO
-    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
 #else
-    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
 #endif
 
     // mohan add 2010-10-10, just to test the symmetry of a variety
@@ -56,10 +56,10 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
-    if(GlobalV::BASIS_TYPE=="pw" && GlobalV::out_descriptor==1)
+    if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
     {
         Numerical_Descriptor nc;
-        nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);
+        nc.output_descriptor(GlobalC::wf.evc, INPUT.deepks_descriptor_lmax);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 

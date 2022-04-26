@@ -90,11 +90,11 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 		}
 	}
 
-	if(GlobalC::wf.start_wfc == "atomic" )
+	if(GlobalC::wf.init_wfc == "atomic" )
 	{
 		
 	}
-	else if(GlobalC::wf.start_wfc == "file")
+	else if(GlobalC::wf.init_wfc == "file")
 	{
 		int error;
 		std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
@@ -126,7 +126,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 	}
 	else
 	{
-		ModuleBase::WARNING_QUIT("Local_Orbital_wfc","check the parameter: start_wfc");
+		ModuleBase::WARNING_QUIT("Local_Orbital_wfc","check the parameter: init_wfc");
 	}
 
 	return;
@@ -147,7 +147,7 @@ int Local_Orbital_wfc::localIndex(int globalindex, int nblk, int nprocs, int& my
 }
 
 #ifdef __MPI
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wfc_grid)
+void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, double* wfc_2d, double** wfc_grid)
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
     ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
@@ -165,7 +165,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wf
     double *work=new double[maxnloc]; // work/buffer matrix
 
     double** ctot;
-    if (out_lowf && myid == 0)
+    if (out_wfc_lcao && myid == 0)
     {
         ctot = new double* [GlobalV::NBANDS];
         for (int i=0; i<GlobalV::NBANDS; i++)
@@ -193,7 +193,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wf
             info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
             info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
 
-            if (out_lowf)
+            if (out_wfc_lcao)
                 info = this->set_wfc_grid(naroc, pv->nb,
                     pv->dim0, pv->dim1, iprow, ipcol,
                     work, wfc_grid, myid, ctot);
@@ -204,7 +204,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wf
 
         }//loop ipcol
     }//loop iprow
-    if(out_lowf && myid == 0)
+    if(out_wfc_lcao && myid == 0)
     {
         std::stringstream ss;
         ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
@@ -221,7 +221,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(int out_lowf, double* wfc_2d, double** wf
 
 
 void Local_Orbital_wfc::wfc_2d_to_grid(
-    int out_lowf,
+    int out_wfc_lcao,
     std::complex<double>* wfc_2d,
     std::complex<double>** wfc_grid,
     int ik)
@@ -242,7 +242,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
     std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
 
     std::complex<double> **ctot;
-    if (out_lowf && myid == 0)
+    if (out_wfc_lcao && myid == 0)
     {
         ctot = new std::complex<double>*[GlobalV::NBANDS];
         for (int i=0; i<GlobalV::NBANDS; i++)
@@ -270,7 +270,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
             info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
             info = MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
             
-            if (out_lowf)
+            if (out_wfc_lcao)
                 info = this->set_wfc_grid(naroc, pv->nb,
                     pv->dim0, pv->dim1, iprow, ipcol,
                     work, wfc_grid, myid, ctot);
@@ -282,7 +282,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
         }//loop ipcol
     }//loop iprow
 
-    if (out_lowf && myid == 0)
+    if (out_wfc_lcao && myid == 0)
     {
         std::stringstream ss;
         ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";

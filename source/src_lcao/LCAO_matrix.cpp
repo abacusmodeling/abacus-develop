@@ -1,5 +1,6 @@
 #include "LCAO_matrix.h"
 #include "global_fp.h"
+#include "../src_pw/global.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif
@@ -33,7 +34,7 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &pv)
 	//wenfei 2021-12-19
     //preparation for DeePKS
 
-	if (GlobalV::out_descriptor)
+	if (GlobalV::deepks_out_labels || GlobalV::deepks_scf)
 	{
         //allocate relevant data structures for calculating descriptors
         std::vector<int> na;
@@ -50,11 +51,11 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &pv)
         {
             if(isGamma)
             {
-                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,this->ParaV->nloc);
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat, pv.nloc);
             }
             else
             {
-                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,this->ParaV->nloc,GlobalC::kv.nks);
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat, pv.nloc,GlobalC::kv.nks);
             }
         }
 	}
@@ -142,7 +143,8 @@ void LCAO_Matrix::set_HSgamma(
     const int &iw1_all, // index i for atomic orbital (row)
     const int &iw2_all, // index j for atomic orbital (column)
     const double &v, // value for matrix element (i,j) 
-    const char &dtype) // type of the matrix
+    const char &dtype, // type of the matrix
+    double* HSloc) //input pointer for store the matrix
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may be < 0 !!!
@@ -180,7 +182,7 @@ void LCAO_Matrix::set_HSgamma(
     // N : nonlocal H matrix element.
     // L : local H matrix element.
     //-----------------------------------
-    if (dtype=='S')
+    /*if (dtype=='S')
     {
         this->Sloc[index] += v;
     }
@@ -191,7 +193,9 @@ void LCAO_Matrix::set_HSgamma(
     else if (dtype=='L')
     {
         this->Hloc[index] += v;
-    }
+    }*/
+    //using input pointer HSloc
+    HSloc[index] += v;
 
     return;
 }

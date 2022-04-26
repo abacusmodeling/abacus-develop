@@ -286,18 +286,13 @@ void Force_Stress_LCAO::getForceStress(
 
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
-		if (GlobalV::out_descriptor) //not parallelized yet
-		{
-			if(GlobalV::MY_RANK==0)
-			{
-            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy", GlobalC::ucell.nat); //Ty/Bohr, F_tot
-			}
+		if (GlobalV::deepks_out_labels) //not parallelized yet
+        {
+            const Parallel_Orbitals* pv = loc.ParaV;
+            GlobalC::ld.save_npy_f(fcs, "f_tot.npy", GlobalC::ucell.nat); //Ty/Bohr, F_tot
             if (GlobalV::deepks_scf)
             {
-				if(GlobalV::MY_RANK==0)
-				{
-                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy", GlobalC::ucell.nat); //Ry/Bohr, F_base
-				}
+                GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy", GlobalC::ucell.nat); //Ry/Bohr, F_base
 
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
@@ -305,7 +300,8 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						*loc.ParaV);
+						pv->trace_loc_row,
+    					pv->trace_loc_col);
 				}
 				else
 				{			
@@ -313,21 +309,20 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						*loc.ParaV,
-						GlobalC::kv);	
+						pv->trace_loc_row,
+    					pv->trace_loc_col,
+						GlobalC::kv.nks,
+						GlobalC::kv.kvec_d);	
 				}
+				if(GlobalV::deepks_out_unittest) GlobalC::ld.check_gdmx(GlobalC::ucell.nat);
 				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);
-				if(GlobalV::MY_RANK==0)
-				{
-					GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
-				}
+				
+				if(GlobalV::deepks_out_unittest) GlobalC::ld.check_gvx(GlobalC::ucell.nat);
+				GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
             }
             else
             {
-				if(GlobalV::MY_RANK==0)
-				{
-                	GlobalC::ld.save_npy_f(fcs, "f_base.npy", GlobalC::ucell.nat); //no scf, F_base=F_tot
-				}
+                GlobalC::ld.save_npy_f(fcs, "f_base.npy", GlobalC::ucell.nat); //no scf, F_base=F_tot
             }
 
         }
@@ -615,7 +610,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, Mod
 	ModuleBase::GlobalFunc::NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
 	// print out forces
-	if(INPUT.force_set == 1)
+	if(INPUT.out_force == 1)
 	{
 		std::ofstream ofs("FORCE.dat");
 		if(!ofs)

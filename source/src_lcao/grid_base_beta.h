@@ -33,12 +33,9 @@ protected:
 // EXPLAIN : ModuleBase::Integral On 3D Real Space For Local Potential
 // MEMBER FUNCTION :
 //===========================================================
-	double* rho1; // about charge
-	double **density_kernel;
 	double vfactor;
 	ModuleBase::Matrix3 latvec;
 	ModuleBase::Matrix3 latvec0;
-	int* nnn;
 	double lat0;
 	enum cal_type{ cal_charge, cal_local, cal_vnlb } job;
 };

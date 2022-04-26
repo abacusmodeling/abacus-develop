@@ -18,6 +18,8 @@
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
+#include "../src_lcao/global_fp.h"
+#include "../src_pw/global.h"
 
 namespace GlobalC
 {
@@ -31,6 +33,7 @@ LCAO_Deepks::LCAO_Deepks()
     inl_index = new ModuleBase::IntArray[1];
     inl_l = new int[1];
     H_V_delta = new double[1];
+    H_V_deltaR = new double[1];
 }
 
 //Desctructor of the class
@@ -41,7 +44,7 @@ LCAO_Deepks::~LCAO_Deepks()
     delete[] inl_l;
     delete[] H_V_delta;
 
-    //=======1. "out_descriptor" part==========
+    //=======1. to use deepks, pdm is required==========
     //delete pdm**
     for (int inl = 0;inl < this->inlmax;inl++)
     {
@@ -249,11 +252,12 @@ void LCAO_Deepks::allocate_V_delta(const int nat, const int nloc, const int nks)
         this->gedm[inl] = new double[pdm_size];
         ModuleBase::GlobalFunc::ZEROS(this->gedm[inl], pdm_size);
     }
-    if (GlobalV::FORCE)
+    if (GlobalV::CAL_FORCE)
     {
         //init F_delta
         F_delta.create(nat, 3);
-        this->init_gdmx(nat);
+        if(GlobalV::deepks_out_labels) this->init_gdmx(nat);
+        //gdmx is used only in calculating gvx
     }
 
     return;
@@ -261,9 +265,47 @@ void LCAO_Deepks::allocate_V_delta(const int nat, const int nloc, const int nks)
 
 void LCAO_Deepks::allocate_V_deltaR(const int nnr)
 {
+    ModuleBase::TITLE("LCAO_Deepks", "allocate_V_deltaR");
+    GlobalV::ofs_running << nnr << std::endl;
     delete[] H_V_deltaR;
     H_V_deltaR = new double[nnr];
     ModuleBase::GlobalFunc::ZEROS(H_V_deltaR, nnr);
+}
+
+void LCAO_Deepks::init_orbital_pdm_shell(void)
+{
+    
+    this->orbital_pdm_shell = new double** [1];
+
+    for (int hl=0; hl<1; hl++)
+    {
+        this->orbital_pdm_shell[hl] = new double* [this->inlmax];
+
+        for(int inl = 0; inl < this->inlmax; inl++)
+        {
+            this->orbital_pdm_shell[hl][inl] = new double [(2 * this->lmaxd + 1) * (2 * this->lmaxd + 1)];
+            ModuleBase::GlobalFunc::ZEROS(orbital_pdm_shell[hl][inl], (2 * this->lmaxd + 1) * (2 * this->lmaxd + 1));
+        }
+
+    }
+
+    return;
+}
+
+
+void LCAO_Deepks::del_orbital_pdm_shell(void)
+{
+    for (int hl=0; hl<1; hl++)
+    {
+        for (int inl = 0;inl < this->inlmax; inl++)
+        {
+            delete[] this->orbital_pdm_shell[hl][inl];
+        }
+        delete[] this->orbital_pdm_shell[hl];
+    }
+    delete[] this->orbital_pdm_shell;
+
+    return;
 }
 
 #endif

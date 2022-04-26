@@ -69,8 +69,10 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
     }
 
     // md cycle
-    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::NSTEP && !verlet->stop)
+    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::MD_NSTEP && !verlet->stop)
     {
+        Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
+
         if(verlet->step_ == 0)
         {
             verlet->setup(p_esolver);
@@ -102,7 +104,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
             GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
             
             // new wave functions
-            GlobalC::wf.wfcinit();
+            //GlobalC::wf.wfcinit();
 
             // update force and virial due to the update of atom positions
             MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
@@ -116,8 +118,8 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
 
         if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
-            Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-            verlet->outputMD();
+            // Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
+            verlet->outputMD(GlobalV::ofs_running);
 
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
@@ -138,7 +140,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         verlet->step_++;
     }
 
-    if (GlobalC::pot.out_potential == 2)
+    if (GlobalC::pot.out_pot == 2)
     {
         std::stringstream ssp;
         std::stringstream ssp_ave;
@@ -268,7 +270,7 @@ void Run_MD_PW::md_force_virial(
 		force[ion].z =fcs(ion, 2)/2.0;
 	}
 
-	if(GlobalV::STRESS)
+	if(GlobalV::CAL_STRESS)
 	{
 		// Stress_PW ss;
 		// ss.cal_stress(virial);

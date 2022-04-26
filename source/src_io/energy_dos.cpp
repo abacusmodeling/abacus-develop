@@ -117,7 +117,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 			std::ofstream ofsi( ss.str().c_str() ); // clear istate.info
 			ofsi.close();
 		}
-		for(int ip=0; ip<GlobalV::NPOOL; ip++)
+		for(int ip=0; ip<GlobalV::KPAR; ip++)
 		{
 		#ifdef __MPI
 			MPI_Barrier(MPI_COMM_WORLD);
@@ -177,7 +177,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 	// GlobalV::mulliken charge analysis
 #ifdef __LCAO
-	if(GlobalV::mulliken == 1)
+	if(GlobalV::out_mul == 1)
 	{
 		Mulliken_Charge   MC(&lowf.wfc_gamma, &lowf.wfc_k);
 		MC.stdout_mulliken(uhm);			
@@ -331,8 +331,8 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 				uhm.LM->allocate_HS_R(pv->nnr);
 				uhm.LM->zeros_HSR('S');
-				uhm.genH.calculate_S_no();
-				uhm.genH.build_ST_new('S', false, GlobalC::ucell);
+				uhm.genH.calculate_S_no(uhm.LM->SlocR.data());
+				uhm.genH.build_ST_new('S', false, GlobalC::ucell, uhm.LM->SlocR.data());
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(pv->ncol,pv->nrow);
@@ -600,106 +600,18 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 	 {
 		 std::stringstream ss;
 		 ss << GlobalV::global_out_dir << "DOS" << is+1;
+		 std::stringstream ss1;
+		 ss1 << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing.dat";
 
 		 Dos::calculate_dos(
 				 is,
 				 GlobalC::kv.isk,
-				 ss.str(), 
+				 ss.str(),
+				 ss1.str(),
 				 this->dos_edelta_ev, 
 				 emax, 
 				 emin, 
 				 GlobalC::kv.nks, GlobalC::kv.nkstot, GlobalC::kv.wk, GlobalC::wf.wg, GlobalV::NBANDS, GlobalC::wf.ekb );
-		 std::ifstream in(ss.str().c_str());
-		 if(!in)
-		 {
-			 //      std::cout<<"\n Can't find file : "<< name << std::endl;
-			 //      return 0;
-		 }
-
-		 //----------------------------------------------------------
-		 // FOUND LOCAL VARIABLES :
-		 // NAME : number(number of DOS points)
-		 // NAME : nk(number of k point used)
-		 // NAME : energy(energy range,from emin_ev to emax_ev)
-		 // NAME : dos(old,count k points in the energy range)
-		 // NAME : dos2(new,count k points in the energy range)
-		 //----------------------------------------------------------
-		 int number=0;
-		 int nk=0;
-		 in >> number;
-		 in >> nk;
-		 double *energy = new double[number];
-		 double *dos = new double[number];
-		 double *dos2 = new double[number];
-		 for(int i=0 ;i<number; i++)
-		 {
-			 energy[i] = 0.0;
-			 dos[i] = 0.0;
-			 dos2[i] =0.0;
-		 }
-
-		 for(int i=0;i<number;i++)
-		 {
-			 in >> energy[i] >> dos[i];
-		 }
-		 if(!in.eof())
-		 {
-			 //std::cout<<"\n Read Over!"<<std::endl;
-		 }
-		 in.close();
-
-		 //----------------------------------------------------------
-		 // EXPLAIN : b is an empirical value.
-		 // please DIY b!!
-		 //----------------------------------------------------------
-
-		 //double b = INPUT.b_coef;
-		 double b = sqrt(2.0)*bcoeff;
-		 for(int i=0;i<number;i++)
-		 {
-			 double Gauss=0.0;
-
-			 for(int j=0;j<number;j++)
-			 {
-				 double de = energy[j] - energy[i];
-				 double de2 = de * de;
-				 //----------------------------------------------------------
-				 // EXPLAIN : if en
-				 //----------------------------------------------------------
-				 Gauss = exp(-de2/b/b)/sqrt(3.1415926)/b;
-				 dos2[j] += dos[i]*Gauss;
-			 }
-		 }
-
-		 //----------------------------------------------------------
-		 // EXPLAIN : output DOS2.txt
-		 //----------------------------------------------------------
-		 std::stringstream sss;
-		 sss << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
-		 std::ofstream out(sss.str().c_str());
-		 double sum2=0.0;
-		 for(int i=0;i<number;i++)
-		 {
-			 sum2 += dos2[i];
-			 //            if(dos2[i]<1e-5)
-			 //            {
-			 //                    dos2[i] = 0.00;
-			 //            }
-			 out <<std::setw(20)<<energy[i]
-				 <<std::setw(20)<<dos2[i]
-				 <<std::setw(20)<<sum2<<"\n";
-		 }
-		 out.close();
-
-		 //----------------------------------------------------------
-		 // DELETE
-		 //----------------------------------------------------------
-		 delete[] dos;
-		 delete[] dos2;
-		 delete[] energy;
-
-		 //std::cout<<" broden spectrum over, success : ) "<<std::endl;
-
 	 }
 
 

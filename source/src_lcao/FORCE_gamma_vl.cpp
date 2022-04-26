@@ -158,7 +158,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_x, this->ParaV->nloc);
     ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_y, this->ParaV->nloc);
     ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_z, this->ParaV->nloc);
-    if(GlobalV::STRESS)
+    if(GlobalV::CAL_STRESS)
     {
         ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_11, this->ParaV->nloc);
         ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_12, this->ParaV->nloc);

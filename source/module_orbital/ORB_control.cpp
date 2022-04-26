@@ -51,8 +51,8 @@ void ORB_control::read_orb_first(
 	const double &lcao_dk_in, // mohan add 2021-04-16
 	const double &lcao_dr_in, // mohan add 2021-04-16
 	const double &lcao_rmax_in, // mohan add 2021-04-16
-	const int &out_descriptor,
-	const int &out_r_matrix,
+	const bool &deepks_setorb,
+	const int &out_mat_r,
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank // mohan add 2021-04-26
 ) 
@@ -84,8 +84,8 @@ void ORB_control::read_orb_first(
 		ofs_in,
 		ntype, 
 		lmax, 
-		out_descriptor, 
-		out_r_matrix, 
+		deepks_setorb, 
+		out_mat_r, 
 		force_flag,
 		my_rank);
 
@@ -98,7 +98,7 @@ void ORB_control::set_orb_tables(
 	ORB_gen_tables &OGT, 
 	LCAO_Orbitals &orb,
 	const double &lat0,
-	const int &out_descriptor,
+	const bool &deepks_setorb,
 	const int &Lmax_exx,
 	const int &nprojmax, 
 	const int* nproj,
@@ -130,7 +130,7 @@ void ORB_control::set_orb_tables(
     /// 1. generate overlap table
     /// 2. generate kinetic table
     /// 3. generate overlap & kinetic table
-    OGT.gen_tables(ofs_in, job0, orb, Lmax_exx, out_descriptor, nprojmax, nproj, beta_);
+    OGT.gen_tables(ofs_in, job0, orb, Lmax_exx, deepks_setorb, nprojmax, nproj, beta_);
     // init lat0, in order to interpolated value from this table.
 
 	assert(lat0>0.0);
@@ -143,7 +143,7 @@ void ORB_control::set_orb_tables(
 void ORB_control::clear_after_ions(
 	ORB_gen_tables &OGT, 
 	LCAO_Orbitals &orb,
-	const int &out_descriptor,
+	const bool &deepks_setorb,
 	const int* nproj_)
 {
     ModuleBase::TITLE("ORB_control","clear_after_ions");
@@ -151,7 +151,7 @@ void ORB_control::clear_after_ions(
     OGT.tbeta.Destroy_Table_Beta(orb.get_ntype(), orb.Phi, nproj_);
     
 	//caoyu add 2021-03-18
-    if (out_descriptor>0) 
+    if (deepks_setorb) 
 	{
         OGT.talpha.Destroy_Table_Alpha(orb);
     }
@@ -325,7 +325,7 @@ void ORB_control::mpi_creat_cart(MPI_Comm* comm_2D,
 #endif
 
 #ifdef __MPI
-void ORB_control::mat_2d(MPI_Comm vu,
+int ORB_control::mat_2d(MPI_Comm vu,
     const int &M_A,
     const int &N_A,
     const int &nb,
@@ -365,7 +365,14 @@ void ORB_control::mat_2d(MPI_Comm vu,
 	{
 		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		ofs_warning << " but, the number of row blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
+        if(nb>1) 
+        {
+            return 1;
+        }
+        else
+        {
+		    ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
+        }
 	}
 
     // (2.1) row_b : how many blocks for this processor. (at least)
@@ -428,7 +435,14 @@ void ORB_control::mat_2d(MPI_Comm vu,
 	{
 		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		ofs_warning << " but, the number of column blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no column blocks.");
+        if(nb>1) 
+        {
+            return 1;
+        }
+        else
+        {
+		    ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no column blocks.");
+        }
 	}
 
     LM.col_b=block/dim[1];
@@ -485,7 +499,14 @@ void ORB_control::mat_2d(MPI_Comm vu,
 	{
 		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		ofs_warning << " but, the number of bands-row-block is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no bands-row-blocks.");
+        if(nb>1) 
+        {
+            return 1;
+        }
+        else
+        {
+		    ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no bands-row-blocks.");
+        }
     }
     int col_b_bands = block / dim[1];
     if (coord[1] < block % dim[1])
@@ -510,7 +531,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
     }
     pv->nloc_wfc = pv->ncol_bands * LM.row_num;
 
-    return;
+    return 0;
 }
 #endif
 

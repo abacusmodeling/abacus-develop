@@ -36,8 +36,9 @@ void Force_LCAO_gamma::ftable_gamma (
     LCAO_Hamilt &uhm)
 {
     ModuleBase::TITLE("Force_LCAO_gamma", "ftable");
-    ModuleBase::timer::tick("Force_LCAO_gamma","ftable_gamma");
+    ModuleBase::timer::tick("Force_LCAO_gamma", "ftable_gamma");
 
+    const Parallel_Orbitals* pv = loc.ParaV;
     this->UHM = &uhm;
     
     // allocate DSloc_x, DSloc_y, DSloc_z
@@ -59,14 +60,16 @@ void Force_LCAO_gamma::ftable_gamma (
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *loc.ParaV);
+            pv->trace_loc_row,
+            pv->trace_loc_col);
     	GlobalC::ld.cal_descriptor();
         GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
         GlobalC::ld.cal_f_delta_gamma(loc.dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *loc.ParaV,
+            pv->trace_loc_row,
+            pv->trace_loc_col,
             isstress, svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
@@ -75,7 +78,31 @@ void Force_LCAO_gamma::ftable_gamma (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
+        if(GlobalV::deepks_out_unittest)
+        {
+            GlobalC::ld.print_dm(loc.dm_gamma[0]);
+            GlobalC::ld.check_projected_dm();
+            GlobalC::ld.check_descriptor(GlobalC::ucell);
+            GlobalC::ld.check_gedm();
+            GlobalC::ld.add_v_delta(GlobalC::ucell,
+                        GlobalC::ORB,
+                        GlobalC::GridD,
+                        pv->trace_loc_row,
+                        pv->trace_loc_col,
+                        pv->nrow,
+                        pv->ncol);
+            GlobalC::ld.check_v_delta(pv->nrow,pv->ncol);
+
+            GlobalC::ld.cal_e_delta_band(loc.dm_gamma,
+                pv->trace_loc_row,
+                pv->trace_loc_col,
+                pv->nrow);
+			ofstream ofs("E_delta_bands.dat");
+			ofs <<std::setprecision(10)<< GlobalC::ld.e_delta_band;
+			ofstream ofs1("E_delta.dat");
+			ofs1 <<std::setprecision(10)<< GlobalC::ld.E_delta;
+            GlobalC::ld.check_f_delta(GlobalC::ucell.nat, svnl_dalpha);
+        }
     }
 #endif
     
@@ -122,7 +149,7 @@ void Force_LCAO_gamma::allocate_gamma(const Parallel_Orbitals &pv)
     ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_y, pv.nloc);
     ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_z, pv.nloc);
     //allocate stress part in gamma_only-line, added by zhengdy-stress
-    if(GlobalV::STRESS)
+    if(GlobalV::CAL_STRESS)
     {
         this->UHM->LM->DSloc_11 = new double [pv.nloc];
         this->UHM->LM->DSloc_12 = new double [pv.nloc];
@@ -151,7 +178,7 @@ void Force_LCAO_gamma::allocate_gamma(const Parallel_Orbitals &pv)
     }
     //calculate dS in LCAO basis
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
-    this->UHM->genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
+    this->UHM->genH.build_ST_new ('S', cal_deri, GlobalC::ucell, this->UHM->LM->Sloc.data());
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
 
     ModuleBase::Memory::record("force_lo", "dS", pv.nloc*3, "double");
@@ -169,7 +196,7 @@ void Force_LCAO_gamma::allocate_gamma(const Parallel_Orbitals &pv)
     //calculate dT
     //calculate T + VNL(P1) in LCAO basis
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
-    this->UHM->genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
+    this->UHM->genH.build_ST_new ('T', cal_deri, GlobalC::ucell, this->UHM->LM->Hloc_fixed.data());
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
     //test_gamma(this->UHM->LM->DHloc_fixed_x, "dHloc_fixed_x T part");
     
@@ -193,7 +220,7 @@ void Force_LCAO_gamma::finish_ftable_gamma(void)
     delete [] this->UHM->LM->DHloc_fixed_x;
     delete [] this->UHM->LM->DHloc_fixed_y;
     delete [] this->UHM->LM->DHloc_fixed_z;
-    if(GlobalV::STRESS)//added by zhengdy-stress
+    if(GlobalV::CAL_STRESS)//added by zhengdy-stress
     {
         delete [] this->UHM->LM->DSloc_11;
         delete [] this->UHM->LM->DSloc_12;
@@ -265,11 +292,11 @@ void Force_LCAO_gamma::NonlocalDphi(const int& nspin, const int& vnl_method, con
 	ModuleBase::TITLE("Force_LCAO_gamma", "NonlocalDphi");
 	if(nspin==4 || vnl_method == 0)
 	{
-		genH.build_Nonlocal_mu (cal_deri);
+		genH.build_Nonlocal_mu (genH.LM->Hloc_fixed.data(), cal_deri);
 	}
 	else if(vnl_method == 1)
 	{
-		genH.build_Nonlocal_mu_new (cal_deri);
+		genH.build_Nonlocal_mu_new (genH.LM->Hloc_fixed.data(), cal_deri);
 	}
 	else
 	{

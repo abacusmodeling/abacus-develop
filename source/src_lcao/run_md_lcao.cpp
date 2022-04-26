@@ -60,7 +60,7 @@ void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleESolver::ESolver *p_esolv
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
     opt_ions(p_esolver);
-    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::deepks_setorb, GlobalC::ucell.infoNL.nproj);
     
     return;
 }
@@ -126,8 +126,10 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
     }
 
     // md cycle
-    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::NSTEP && !verlet->stop)
+    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::MD_NSTEP && !verlet->stop)
     {
+        Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
+
         if(verlet->step_ == 0)
         {
             MD_func::ParaV = this->LM_md.ParaV;
@@ -178,8 +180,8 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
 
         if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
-            Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-            verlet->outputMD();
+            // Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
+            verlet->outputMD(GlobalV::ofs_running);
 
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
@@ -200,7 +202,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
         verlet->step_++;
     }
 
-    if (GlobalC::pot.out_potential == 2)
+    if (GlobalC::pot.out_pot == 2)
     {
         std::stringstream ssp;
         std::stringstream ssp_ave;
@@ -380,7 +382,7 @@ void Run_MD_LCAO::md_force_virial(
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL(RA_md);
-    FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
+    FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         LOC_md, LOWF_md, UHM_md, fcs, virial);
     RA_md.delete_grid();
