@@ -1,7 +1,7 @@
 '''
 Date: 2021-12-29 10:27:01
 LastEditors: jiyuyang
-LastEditTime: 2022-01-03 17:06:14
+LastEditTime: 2022-04-26 00:00:41
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
@@ -10,9 +10,13 @@ import numpy as np
 from os import PathLike
 from typing import Sequence, Tuple, Union, Any, List, Dict
 from matplotlib.figure import Figure
+from matplotlib.colors import Normalize
+from matplotlib.collections import LineCollection
 from matplotlib import axes
+import matplotlib.pyplot as plt
+from pathlib import Path
 
-from abacus_plot.utils import energy_minus_efermi, list_elem2str, read_kpt, remove_empty, parse_projected_data, handle_data
+from abacus_plot.utils import energy_minus_efermi, list_elem2str, read_kpt, remove_empty, parse_projected_data, handle_data, get_angular_momentum_name, get_angular_momentum_label
 
 
 class Band:
@@ -20,27 +24,32 @@ class Band:
 
     def __init__(self, bandfile: Union[PathLike, Sequence[PathLike]] = None, kptfile: str = '') -> None:
         self.bandfile = bandfile
-        self.read()
+        if isinstance(bandfile, list) or isinstance(bandfile, tuple):
+            self.energy = []
+            for file in self.bandfile:
+                self.k_index, e = self.read(file)
+                self.energy.append(e)
+        else:
+            self.k_index, self.energy = self.read(self.bandfile)
+        self.energy = np.asarray(self.energy)
         self.kptfile = kptfile
         self.kpt = None
         if self.kptfile:
             self.kpt = read_kpt(kptfile)
-        self.nspin = None
-        self.norbitals = None
-        self.orbitals = []
+        self.k_index = list(map(int, self.k_index))
 
-    def read(self):
+    @classmethod
+    def read(cls, filename: PathLike):
         """Read band data file and return k-points and energy
 
         :params filename: string of band data file
         """
 
-        data = np.loadtxt(self.bandfile)
-        X, self.k_index = np.split(data, (1, ), axis=1)
-        self.nkpoints = len(self.k_index)
-        self.energy = X.flatten()
-        self.nbands = self.energy.shape[-1]
-        self.eunit = 'eV'
+        data = np.loadtxt(filename, dtype=float)
+        X, y = np.split(data, (1, ), axis=1)
+        x = X.flatten()
+
+        return x, y
 
     @classmethod
     def direct_bandgap(cls, vb: namedtuple, cb: namedtuple, klength: int):
@@ -80,7 +89,7 @@ class Band:
     def info(cls, kpath: Sequence, vb: namedtuple, cb: namedtuple):
         """Output the information of band structure
 
-        :params kpath: k-points path 
+        :params kpath: k-points path
         :params energy: band energy after subtracting the Fermi level
         """
 
@@ -142,7 +151,27 @@ class Band:
 
         return vb, cb
 
-    def plot(self, x: Sequence, y: Sequence, index: Sequence, efermi: float = 0, energy_range: Sequence[float] = []):
+    def _shift_energy(self, energy, efermi: float = 0, shift: bool = False):
+        energy = energy_minus_efermi(energy, efermi)
+        if shift:
+            vb, cb = self.set_vcband(energy)
+            refine_E = np.vstack((vb.band, cb.band)).T
+            self.info(self.kpt.full_kpath, vb, cb)
+        else:
+            refine_E = energy
+
+        return refine_E
+
+    @classmethod
+    def plot_data(cls,
+                  fig: Figure,
+                  ax: axes.Axes,
+                  x: Sequence,
+                  y: Sequence,
+                  index: Sequence,
+                  efermi: float = 0,
+                  energy_range: Sequence[float] = [],
+                  **kwargs):
         """Plot band structure
 
         :params x, y: x-axis and y-axis coordinates
@@ -151,78 +180,64 @@ class Band:
         :params energy_range: range of energy to plot, its length equals to two
         """
 
-        if not self._color:
-            self._color = 'black'
+        bandplot = BandPlot(fig, ax, **kwargs)
+        if not bandplot._color:
+            bandplot._color = 'black'
 
         kpoints, energy = x, y
         energy = energy_minus_efermi(energy, efermi)
 
-        self.ax.plot(kpoints, energy, lw=self._lw, color=self._color,
-                     label=self._label, linestyle=self._linestyle)
-        self._set_figure(index, energy_range)
+        bandplot.ax.plot(kpoints, energy, lw=bandplot._lw, color=bandplot._color,
+                         label=bandplot._label, linestyle=bandplot._linestyle)
+        bandplot._set_figure(index, energy_range)
 
-    def singleplot(self, efermi: float = 0, energy_range: Sequence[float] = [], shift: bool = False):
-        """Plot band structure using data file
-
-        :params efermi: Fermi level in unit eV
-        :params energy_range: range of energy to plot, its length equals to two
-        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
-        """
-
-        if not self._color:
-            self._color = 'black'
-
-        energy = energy_minus_efermi(self.energy, efermi)
-        if shift:
-            vb, cb = self.set_vcband(energy)
-            self.ax.plot(self.k_index, np.vstack((vb.band, cb.band)).T,
-                         lw=self._lw, color=self._color, label=self._label, linestyle=self._linestyle)
-            self.info(self.kpt.full_kpath, vb, cb)
-        else:
-            self.ax.plot(self.k_index, energy,
-                         lw=self._lw, color=self._color, label=self._label, linestyle=self._linestyle)
-        index = self.kpt.label_special_k
-        self._set_figure(index, energy_range)
-
-    def multiplot(self, efermi: Sequence[float] = [], energy_range: Sequence[float] = [], shift: bool = True):
+    def plot(self,
+             fig: Figure,
+             ax: axes.Axes,
+             efermi: Union[float, Sequence[float]] = [],
+             energy_range: Sequence[float] = [],
+             shift: bool = True,
+             **kwargs):
         """Plot more than two band structures using data file
 
-        :params efermi: list of Fermi levels in unit eV, its length equals to `filename`
+        :params efermi: Fermi levels in unit eV, its length equals to `filename`
         :params energy_range: range of energy to plot, its length equals to two
         :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
         """
 
-        if not efermi:
-            efermi = [0.0 for i in range(len(self.bandfile))]
-        if not self._label:
-            self._label = ['' for i in range(len(self.bandfile))]
-        if not self._color:
-            self._color = ['black' for i in range(len(self.bandfile))]
-        if not self._linestyle:
-            self._linestyle = ['solid' for i in range(len(self.bandfile))]
+        bandplot = BandPlot(fig, ax, **kwargs)
+        nums = len(self.bandfile)
 
-        emin = -np.inf
-        emax = np.inf
-        for i, file in enumerate(self.bandfile):
-            if shift:
-                vb, cb = self.set_vcband(
-                    energy_minus_efermi(self.energy, efermi[i]))
-                energy_min = np.min(vb.band)
-                energy_max = np.max(cb.band)
-                if energy_min > emin:
-                    emin = energy_min
-                if energy_max < emax:
-                    emax = energy_max
+        if isinstance(self.bandfile, list):
+            if not efermi:
+                efermi = [0.0 for i in range(nums)]
+            if not kwargs.pop('label', None):
+                bandplot._label = ['' for i in range(nums)]
+            if not kwargs.pop('color', None):
+                bandplot._color = ['black' for i in range(nums)]
+            if not kwargs.pop('linestyle', None):
+                bandplot._linestyle = ['solid' for i in range(nums)]
 
-                self.ax.plot(self.k_index, np.vstack((vb.band, cb.band)).T,
-                             lw=self._lw, color=self._color[i], label=self._label[i], linestyle=self._linestyle[i])
-                self.info(self.kpt.full_kpath, vb, cb)
-            else:
-                self.ax.plot(self.k_index, energy_minus_efermi(self.energy, efermi[i]),
-                             lw=self._lw, color=self._color[i], label=self._label[i], linestyle=self._linestyle[i])
+            for i, band in enumerate(self.energy):
+                band = self._shift_energy(band, efermi[i], shift)
+                bandplot.ax.plot(self.k_index, band,
+                                 lw=bandplot._lw, color=bandplot._color[i], label=bandplot._label[i], linestyle=bandplot._linestyle[i])
 
-        index = self.kpt.label_special_k
-        self._set_figure(index, energy_range)
+        else:
+            if not efermi:
+                efermi = 0.0
+
+            band = self._shift_energy(self.energy, efermi, shift)
+            bandplot.ax.plot(self.k_index, band,
+                             lw=bandplot._lw, color=bandplot._color, label=bandplot._label, linestyle=bandplot._linestyle)
+
+        if self.kpt:
+            index = self.kpt.label_special_k
+        else:
+            index = self.k_index
+        bandplot._set_figure(index, energy_range)
+
+        return bandplot
 
 
 class BandPlot:
@@ -234,11 +249,11 @@ class BandPlot:
         self._lw = kwargs.pop('lw', 2)
         self._bwidth = kwargs.pop('bwdith', 3)
         self._label = kwargs.pop('label', None)
-        self._color = kwargs.pop('color', None)
+        self._color = kwargs.pop('color', 'black')
         self._linestyle = kwargs.pop('linestyle', 'solid')
         self.plot_params = kwargs
 
-    def _set_figure(self, index: dict, range: Sequence):
+    def _set_figure(self, index, range: Sequence):
         """set figure and axes for plotting
 
         :params index: dict of label of points of x-axis and its index in data file. Range of x-axis based on index.value()
@@ -251,7 +266,7 @@ class BandPlot:
             if isinstance(t, tuple):
                 keys.append(t[0])
                 values.append(t[1])
-            elif isinstance(t, (int, float)):
+            elif isinstance(t, int):
                 keys.append('')
                 values.append(t)
 
@@ -297,10 +312,11 @@ class BandPlot:
         self.ax.spines['bottom'].set_linewidth(bwidth)
 
         # guides
-        if "grid_params" in self.plot_params.keys():
-            self.ax.grid(axis='x', **self.plot_params["grid_params"])
-        else:
-            self.ax.grid(axis='x', lw=1.2)
+        if '' not in keys:
+            if "grid_params" in self.plot_params.keys():
+                self.ax.grid(axis='x', **self.plot_params["grid_params"])
+            else:
+                self.ax.grid(axis='x', lw=1.2)
         if "hline_params" in self.plot_params.keys():
             self.ax.axhline(0, **self.plot_params["hline_params"])
         else:
@@ -318,20 +334,39 @@ class BandPlot:
 
 
 class PBand(Band):
-    def __init__(self, bandfile: PathLike = None) -> None:
+    def __init__(self, bandfile: Union[PathLike, Sequence[PathLike]] = None, kptfile: str = '') -> None:
         self.bandfile = bandfile
-        self.read()
+        if isinstance(bandfile, list) or isinstance(bandfile, tuple):
+            self.energy = []
+            self.orbitals = []
+            for file in self.bandfile:
+                self.nspin, self.norbitals, self.eunit, self.nbands, self.nkpoints, self.k_index, e, orb = self.read(
+                    file)
+                self._check_energy(e)
+                self.energy.append(e)
+                self.orbitals.append(orb)
+        else:
+            self.nspin, self.norbitals, self.eunit, self.nbands, self.nkpoints, self.k_index, self.energy, self.orbitals = self.read(
+                self.bandfile)
+            self._check_energy(self.energy)
+        self.energy = np.asarray(self.energy)
+        self.kptfile = kptfile
+        self.kpt = None
+        if self.kptfile:
+            self.kpt = read_kpt(kptfile)
+        self.k_index = list(map(int, self.k_index))
 
-    def _check_energy(self):
-        assert self.energy.shape[0] == self.nkpoints, "The dimension of band structure dismatches with the number of k-points."
-        assert self.energy.shape[1] == self.nbands, "The dimension of band structure dismatches with the number of bands."
+    def _check_energy(self, energy):
+        assert energy.shape[0] == self.nkpoints, "The dimension of band structure dismatches with the number of k-points."
+        assert energy.shape[1] == self.nbands, "The dimension of band structure dismatches with the number of bands."
 
-    def _check_weights(self, weights:np.ndarray, prec=1e-5):
+    def _check_weights(self, weights: np.ndarray, prec=1e-5):
         assert weights.shape[0] == self.norbitals, "The dimension of weights dismatches with the number of orbitals."
         assert weights.shape[1] == self.nkpoints, "The dimension of weights dismatches with the number of k-points."
         assert weights.shape[2] == self.nbands, "The dimension of weights dismatches with the number of bands."
         one_mat = np.ones((self.nkpoints, self.nbands))
-        assert (np.abs(weights.sum(axis=0)-one_mat) < prec).all(), f"np.abs(weights.sum(axis=0)-np.ones(({self.nkpoints}, {self.nbands}))) < {prec}"
+        assert (np.abs(weights.sum(axis=0)-one_mat) < prec).all(
+        ), f"np.abs(weights.sum(axis=0)-np.ones(({self.nkpoints}, {self.nbands}))) < {prec}"
 
     @property
     def weights(self):
@@ -341,32 +376,32 @@ class PBand(Band):
         self._check_weights(data)
         return data
 
-    def read(self):
+    @classmethod
+    def read(cls, filename: PathLike):
         """Read projected band data file and return k-points, energy and Mulliken weights
 
-        :params filename: string of projected band data file
+        :params bandfile: string of projected band data file
         """
 
         from lxml import etree
-        pbanddata = etree.parse(self.bandfile)
+        pbanddata = etree.parse(filename)
         root = pbanddata.getroot()
-        self.nspin = int(root.xpath('//nspin')[0].text.replace(' ', ''))
-        self.norbitals = int(root.xpath('//norbitals')
-                             [0].text.replace(' ', ''))
-        self.eunit = root.xpath('//band_structure/@units')[0].replace(' ', '')
-        self.nbands = int(root.xpath('//band_structure/@nbands')
-                          [0].replace(' ', ''))
-        self.nkpoints = int(root.xpath('//band_structure/@nkpoints')
-                            [0].replace(' ', ''))
-        self.k_index = np.arange(self.nkpoints)
-        self.energy = root.xpath('//band_structure')[0].text.split('\n')
-        self.energy = handle_data(self.energy)
-        remove_empty(self.energy)
-        self.energy = np.asarray(self.energy, dtype=float)
-        self._check_energy()
+        nspin = int(root.xpath('//nspin')[0].text.replace(' ', ''))
+        norbitals = int(root.xpath('//norbitals')
+                        [0].text.replace(' ', ''))
+        eunit = root.xpath('//band_structure/@units')[0].replace(' ', '')
+        nbands = int(root.xpath('//band_structure/@nbands')
+                     [0].replace(' ', ''))
+        nkpoints = int(root.xpath('//band_structure/@nkpoints')
+                       [0].replace(' ', ''))
+        k_index = np.arange(nkpoints)
+        energy = root.xpath('//band_structure')[0].text.split('\n')
+        energy = handle_data(energy)
+        remove_empty(energy)
+        energy = np.asarray(energy, dtype=float)
 
-        self.orbitals = []
-        for i in range(self.norbitals):
+        orbitals = []
+        for i in range(norbitals):
             orb = OrderedDict()
             o_index_str = root.xpath(
                 '//orbital/@index')[i]
@@ -382,17 +417,324 @@ class PBand(Band):
             data = handle_data(data)
             remove_empty(data)
             orb['data'] = np.asarray(data, dtype=float)
-            self.orbitals.append(orb)
+            orbitals.append(orb)
 
-    def _write(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], keyname='', outdir: PathLike = './'):
+        return nspin, norbitals, eunit, nbands, nkpoints, k_index, energy, orbitals
+
+    def _write(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], keyname='', file_dir:PathLike=''):
+        """Write parsed projected bands data to files
+
+        Args:
+            orbital (dict): parsed data
+            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
+            keyname (str): the keyword that extracts the PBAND. Allowed values: 'index', 'atom_index', 'species'
+        """
+
+        band, totnum = parse_projected_data(self.orbitals, species, keyname)
+
+        if isinstance(species, (list, tuple)):
+            for elem in band.keys():
+                header_list = ['']
+                with open(file_dir/f"{keyname}-{elem}.dat", 'w') as f:
+                    header_list.append(
+                        f"Projected band structure for {keyname}: {elem}")
+                    header_list.append('')
+                    header_list.append(
+                        f'\tNumber of k-points: {self.nkpoints}')
+                    header_list.append(f'\tNumber of bands: {self.nbands}')
+                    header_list.append('')
+                    for orb in self.orbitals:
+                        if orb[keyname] == elem:
+                            header_list.append(
+                                f"\tAdd data for index ={orb['index']:4d}, atom_index ={orb['atom_index']:4d}, element ={orb['species']:4s},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
+                    header_list.append('')
+                    header_list.append(
+                        f'Data shape: ({self.nkpoints}, {self.nbands})')
+                    header_list.append('')
+                    header = '\n'.join(header_list)
+                    np.savetxt(f, band[elem], header=header)
+
+        elif isinstance(species, dict):
+            for elem in band.keys():
+                elem_file_dir = file_dir/f"{keyname}-{elem}"
+                elem_file_dir.mkdir(exist_ok=True)
+                for ang in band[elem].keys():
+                    l_index = int(ang)
+                    if isinstance(band[elem][ang], dict):
+                        for mag in band[elem][ang].keys():
+                            header_list = ['']
+                            m_index = int(mag)
+                            with open(elem_file_dir/f"{keyname}-{elem}_{ang}_{mag}.dat", 'w') as f:
+                                header_list.append(
+                                    f"Projected band structure for {keyname}: {elem}")
+                                header_list.append('')
+                                header_list.append(
+                                    f'\tNumber of k-points: {self.nkpoints}')
+                                header_list.append(
+                                    f'\tNumber of bands: {self.nbands}')
+                                header_list.append('')
+                                for orb in self.orbitals:
+                                    if orb[keyname] == elem and orb["l"] == l_index and orb["m"] == m_index:
+                                        header_list.append(
+                                            f"\tAdd data for index ={orb['index']:4d}, atom_index ={orb['atom_index']:4d}, element ={orb['species']:4s},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
+                                header_list.append('')
+                                header_list.append(
+                                    f'Data shape: ({self.nkpoints}, {self.nbands})')
+                                header_list.append('')
+                                header = '\n'.join(header_list)
+                                np.savetxt(f, band[elem][ang]
+                                           [mag], header=header)
+
+                    else:
+                        header_list = ['']
+                        with open(elem_file_dir/f"{keyname}-{elem}_{ang}.dat", 'w') as f:
+                            header_list.append(
+                                f"Projected band structure for {keyname}: {elem}")
+                            header_list.append('')
+                            header_list.append(
+                                f'\tNumber of k-points: {self.nkpoints}')
+                            header_list.append(
+                                f'\tNumber of bands: {self.nbands}')
+                            header_list.append('')
+                            for orb in self.orbitals:
+                                if orb[keyname] == elem and orb["l"] == l_index:
+                                    header_list.append(
+                                        f"\tAdd data for index ={orb['index']:4d}, atom_index ={orb['atom_index']:4d}, element ={orb['species']:4s},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
+                            header_list.append('')
+                            header_list.append(
+                                f'Data shape: ({self.nkpoints}, {self.nbands})')
+                            header_list.append('')
+                            header = '\n'.join(header_list)
+                            np.savetxt(f, band[elem][ang], header=header)
+
+    def write(self,
+              index: Union[Sequence[int], Dict[int, List[int]],
+                           Dict[int, Dict[int, List[int]]]] = [],
+              atom_index: Union[Sequence[int], Dict[int, List[int]],
+                                Dict[int, Dict[int, List[int]]]] = [],
+              species: Union[Sequence[str], Dict[str, List[int]],
+                             Dict[str, Dict[int, List[int]]]] = [],
+              outdir: PathLike = './'
+              ):
         """Write parsed partial dos data to files
 
         Args:
-            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
-            keyname (str): the keyword that extracts the PDOS. Allowed values: 'index', 'atom_index', 'species'
+            index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom. Defaults to [].
+            atom_index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom with same atom_index. Defaults to [].
+            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[int, List[int]]]], optional): extract PDOS of each atom with same species. Defaults to [].
+            outdir (PathLike, optional): directory of parsed PDOS files. Defaults to './'.
         """
 
-        return 
+        if isinstance(self.bandfile, list):
+            for i in range(len(self.bandfile)):
+                file_dir = Path(f"{outdir}", f"PBAND{i}_FILE")
+                file_dir.mkdir(exist_ok=True)
+                if index:
+                    self._write(index, keyname='index',
+                                file_dir=file_dir)
+                if atom_index:
+                    self._write(atom_index, keyname='atom_index',
+                                file_dir=file_dir)
+                if species:
+                    self._write(species, keyname='species',
+                                file_dir=file_dir)
+
+        else:
+            file_dir = Path(f"{outdir}", f"PBAND{1}_FILE")
+            file_dir.mkdir(exist_ok=True)
+            if index:
+                self._write(index, keyname='index',
+                            file_dir=file_dir)
+            if atom_index:
+                self._write(atom_index, keyname='atom_index',
+                            file_dir=file_dir)
+            if species:
+                self._write(species, keyname='species',
+                            file_dir=file_dir)
+
+    def _plot(self,
+              fig: Figure,
+              ax: axes.Axes,
+              energy: np.ndarray,
+              species: Union[Sequence[Any], Dict[Any, List[int]],
+                             Dict[Any, Dict[int, List[int]]]] = [],
+              efermi: float = 0,
+              energy_range: Sequence[float] = [],
+              shift: bool = False,
+              keyname: str = '',
+              outdir: PathLike = './',
+              out_index: int = 1,
+              cmap='jet',
+              **kwargs):
+        """Plot parsed projected bands data
+
+        Args:
+            fig (Figure): object of matplotlib.figure.Figure
+            ax (Union[axes.Axes, Sequence[axes.Axes]]): object of matplotlib.axes.Axes or a list of this objects
+            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
+            efermi (float, optional): fermi level in unit eV. Defaults to 0.
+            energy_range (Sequence[float], optional): energy range in unit eV for plotting. Defaults to [].
+            shift (bool, optional): if shift energy by fermi level and set the VBM to zero, or not. Defaults to False.
+            keyname (str, optional): the keyword that extracts the PBANDS. Defaults to ''.
+
+        Returns:
+            BandPlot object: for manually plotting picture with bandplot.ax 
+        """
+
+        def _seg_plot(bandplot, lc, index, file_dir, name):
+            cbar = bandplot.fig.colorbar(lc, ax=bandplot.ax)
+            bandplot._set_figure(index, energy_range)
+            bandplot.fig.savefig(file_dir/f'{keyname}-{bandplot._label}.pdf', dpi=400)
+            cbar.remove()
+            plt.cla()
+
+            return bandplot
+
+        wei, totnum = parse_projected_data(self.orbitals, species, keyname)
+        energy = self._shift_energy(energy, efermi, shift)
+        file_dir = Path(f"{outdir}", f"PBAND{out_index}_FIG")
+        file_dir.mkdir(exist_ok=True)
+
+        if self.kpt:
+            index = self.kpt.label_special_k
+        else:
+            index = self.k_index
+
+        if not species:
+            bandplot = BandPlot(fig, ax, **kwargs)
+            bandplot = super().plot(fig, ax, efermi, energy_range, shift, **kwargs)
+            bandplot._set_figure(index, energy_range)
+
+            return bandplot
+
+        if isinstance(species, (list, tuple)):
+            bandplots = []
+            for i, elem in enumerate(wei.keys()):
+                bandplot = BandPlot(fig, ax, **kwargs)
+                bandplot._label = elem
+                for ib in range(self.nbands):
+                    points = np.array((self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
+                    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+                    norm = Normalize(vmin=wei[elem][0:, ib].min(), vmax=wei[elem][0:, ib].max())
+                    lc = LineCollection(segments, cmap=plt.get_cmap(cmap), norm=norm)
+                    lc.set_array(wei[elem][0:, ib])
+                    lc.set_label(bandplot._label)
+                    bandplot.ax.add_collection(lc)
+                
+                _seg_plot(bandplot, lc, index, file_dir, name=f'{elem}')
+                bandplots.append(bandplot)
+            return bandplots
+
+        elif isinstance(species, dict):
+            bandplots = []
+            for i, elem in enumerate(wei.keys()):
+                elem_file_dir = file_dir/f"{keyname}-{elem}"
+                elem_file_dir.mkdir(exist_ok=True)
+                for ang in wei[elem].keys():
+                    l_index = int(ang)
+                    if isinstance(wei[elem][ang], dict):
+                        for mag in wei[elem][ang].keys():
+                            bandplot = BandPlot(fig, ax, **kwargs)
+                            m_index = int(mag)
+                            bandplot._label = f"{elem}-{get_angular_momentum_name(l_index, m_index)}"
+                            for ib in range(self.nbands):
+                                points = np.array((self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
+                                segments = np.concatenate([points[:-1], points[1:]], axis=1)
+                                norm = Normalize(vmin=wei[elem][ang][mag][0:, ib].min(), vmax=wei[elem][ang][mag][0:, ib].max())
+                                lc = LineCollection(segments, cmap=plt.get_cmap(cmap), norm=norm)
+                                lc.set_array(wei[elem][ang][mag][0:, ib])
+                                lc.set_label(bandplot._label)
+                                bandplot.ax.add_collection(lc)
+                
+                            _seg_plot(bandplot, lc, index, elem_file_dir, name=f'{elem}_{ang}_{mag}')
+                            bandplots.append(bandplot)
+
+                    else:
+                        bandplot = BandPlot(fig, ax, **kwargs)
+                        bandplot._label = f"{elem}-{get_angular_momentum_label(l_index)}"
+                        for ib in range(self.nbands):
+                            points = np.array((self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
+                            segments = np.concatenate([points[:-1], points[1:]], axis=1)
+                            norm = Normalize(vmin=wei[elem][ang][0:, ib].min(), vmax=wei[elem][ang][0:, ib].max())
+                            lc = LineCollection(segments, cmap=plt.get_cmap(cmap), norm=norm)
+                            lc.set_array(wei[elem][ang][0:, ib])
+                            lc.set_label(bandplot._label)
+                            bandplot.ax.add_collection(lc)
+                
+                        _seg_plot(bandplot, lc, index, elem_file_dir, name=f'{elem}_{ang}')
+                        bandplots.append(bandplot)
+
+            return bandplots
+
+        plt.clf()
+
+    def plot(self,
+             fig: Figure,
+             ax: Union[axes.Axes, Sequence[axes.Axes]],
+             index: Union[Sequence[int], Dict[int, List[int]],
+                          Dict[int, Dict[int, List[int]]]] = [],
+             atom_index: Union[Sequence[int], Dict[int, List[int]],
+                               Dict[int, Dict[int, List[int]]]] = [],
+             species: Union[Sequence[str], Dict[str, List[int]],
+                            Dict[str, Dict[int, List[int]]]] = [],
+             efermi: Union[float, Sequence[float]] = [],
+             energy_range: Sequence[float] = [],
+             shift: bool = False,
+             outdir: PathLike = './',
+             cmapname='jet',
+             **kwargs):
+        """Plot parsed partial dos data
+
+        Args:
+            fig (Figure): object of matplotlib.figure.Figure
+            ax (Union[axes.Axes, Sequence[axes.Axes]]): object of matplotlib.axes.Axes or a list of this objects
+            index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom. Defaults to [].
+            atom_index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom with same atom_index. Defaults to [].
+            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[int, List[int]]]], optional): extract PDOS of each atom with same species. Defaults to [].
+            efermi (float, optional): fermi level in unit eV. Defaults to 0.
+            energy_range (Sequence[float], optional): energy range in unit eV for plotting. Defaults to [].
+            shift (bool, optional): if shift energy by fermi level and set the VBM to zero, or not. Defaults to False.
+
+        Returns:
+            BandPlot object: for manually plotting picture with bandplot.ax 
+        """
+        nums = len(self.bandfile)
+
+        if isinstance(self.bandfile, list):
+            if not efermi:
+                efermi = [0.0 for i in range(nums)]
+            _linestyle = kwargs.pop(
+                'linestyle', ['solid' for i in range(nums)])
+
+            for i, band in enumerate(self.energy):
+                if not index and not atom_index and not species:
+                    bandplot = self._plot(fig=fig, ax=ax, energy=band, species=[
+                    ], efermi=efermi[i], energy_range=energy_range, shift=shift, keyname='', linestyle=_linestyle[i], outdir=outdir, out_index=i, cmapname=cmapname, **kwargs)
+                if index:
+                    bandplot = self._plot(fig=fig, ax=ax, energy=band, species=index, efermi=efermi[i],
+                                          energy_range=energy_range, shift=shift, keyname='index', linestyle=_linestyle[i], outdir=outdir, out_index=i, cmapname=cmapname, **kwargs)
+                if atom_index:
+                    bandplot = self._plot(fig=fig, ax=ax, energy=band, species=atom_index, efermi=efermi[i],
+                                          energy_range=energy_range, shift=shift, keyname='atom_index', linestyle=_linestyle[i], outdir=outdir, out_index=i, cmapname=cmapname, **kwargs)
+                if species:
+                    bandplot = self._plot(fig=fig, ax=ax, energy=band, species=species, efermi=efermi[i],
+                                          energy_range=energy_range, shift=shift, keyname='species', linestyle=_linestyle[i], outdir=outdir, out_index=i, cmapname=cmapname, **kwargs)
+
+        else:
+            if not index and not atom_index and not species:
+                bandplot = self._plot(fig=fig, ax=ax, energy=self.energy, species=[
+                ], efermi=efermi, energy_range=energy_range, shift=shift, keyname='', outdir=outdir, out_index=1, **kwargs)
+            if index:
+                bandplot = self._plot(fig=fig, ax=ax, energy=self.energy, species=index, efermi=efermi,
+                                      energy_range=energy_range, shift=shift, keyname='index', outdir=outdir, out_index=1, **kwargs)
+            if atom_index:
+                bandplot = self._plot(fig=fig, ax=ax, energy=self.energy, species=atom_index, efermi=efermi,
+                                      energy_range=energy_range, shift=shift, keyname='atom_index', outdir=outdir, out_index=1, **kwargs)
+            if species:
+                bandplot = self._plot(fig=fig, ax=ax, energy=self.energy, species=species, efermi=efermi,
+                                      energy_range=energy_range, shift=shift, keyname='species', outdir=outdir, out_index=1, **kwargs)
+
+        return bandplot
 
 
 if __name__ == "__main__":
@@ -404,15 +746,16 @@ if __name__ == "__main__":
     # notes = {'s': '(b)'}
     # datafile = [path/"soc.dat", path/"non-soc.dat"]
     # kptfile = path/"KPT"
-    #fig, ax = plt.subplots(figsize=(12, 12))
+    fig, ax = plt.subplots(figsize=(12, 6))
     # label = ["with SOC", "without SOC"]
     # color = ["r", "g"]
     # linestyle = ["solid", "dashed"]
-    # band = BandPlot(fig, ax, notes=notes, label=label,
-    #                 color=color, linestyle=linestyle)
-    # energy_range = [-5, 6]
-    # efermi = [4.417301755850272, 4.920435541999894]
-    # shift = True
-    # band.multiplot(datafile, kptfile, efermi, energy_range, shift)
-    # fig.savefig("band.png")
+    energy_range = [-5, 6]
+    efermi = 4.417301755850272
+    shift = False
+    #species = {"Ag": [2], "Cl": [1], "In": [0]}
+    atom_index = {8: {2: [1, 2]}, 4: {2: [1, 2]}, 10: [1, 2]}
     pband = PBand(str(path))
+    pband.plot(fig, ax, atom_index=atom_index, efermi=efermi,
+               energy_range=energy_range, shift=shift)
+    pband.write(atom_index=atom_index)

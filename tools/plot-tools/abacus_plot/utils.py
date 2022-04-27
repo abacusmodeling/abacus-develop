@@ -289,12 +289,13 @@ def parse_projected_data(orbitals, species: Union[Sequence[Any], Dict[Any, List[
             if count:
                 data[elem] = data_temp
 
-        return data
+        return data, len(elements)
 
     elif isinstance(species, dict):
         data = defaultdict(dict)
         elements = list(species.keys())
         l = list(species.values())
+        totnum = 0
         for i, elem in enumerate(elements):
             if isinstance(l[i], dict):
                 for ang, mag in l[i].items():
@@ -312,6 +313,7 @@ def parse_projected_data(orbitals, species: Union[Sequence[Any], Dict[Any, List[
                                 l_count += 1
                         if m_count:
                             l_data[m_index] = data_temp
+                            totnum += 1
                     if l_count:
                         data[elem][l_index] = l_data
 
@@ -326,5 +328,6 @@ def parse_projected_data(orbitals, species: Union[Sequence[Any], Dict[Any, List[
                             count += 1
                     if count:
                         data[elem][l_index] = data_temp
+                        totnum += 1
 
-        return data
+        return data, totnum

@@ -256,7 +256,7 @@ class PDOS(DOS):
             keyname (str): the keyword that extracts the PDOS. Allowed values: 'index', 'atom_index', 'species'
         """
 
-        dos = parse_projected_data(self.orbitals, species, keyname)
+        dos, totnum = parse_projected_data(self.orbitals, species, keyname)
         fmt = ['%13.7f', '%15.8f'] if self._nsplit == 1 else [
             '%13.7f', '%15.8f', '%15.8f']
         file_dir = Path(f"{outdir}", "PDOS_FILE")
@@ -268,7 +268,7 @@ class PDOS(DOS):
                 data = np.hstack((self.energy.reshape(-1, 1), dos[elem]))
                 with open(file_dir/f"{keyname}-{elem}.dat", 'w') as f:
                     header_list.append(
-                        f"\tpartial DOS for atom species: {elem}")
+                        f"Partial DOS for {keyname}: {elem}")
                     header_list.append('')
                     for orb in self.orbitals:
                         if orb[keyname] == elem:
@@ -295,7 +295,7 @@ class PDOS(DOS):
                             m_index = int(mag)
                             with open(elem_file_dir/f"{keyname}-{elem}_{ang}_{mag}.dat", 'w') as f:
                                 header_list.append(
-                                    f"\tpartial DOS for atom species: {elem}")
+                                    f"Partial DOS for {keyname}: {elem}")
                                 header_list.append('')
                                 for orb in self.orbitals:
                                     if orb[keyname] == elem and orb["l"] == l_index and orb["m"] == m_index:
@@ -314,7 +314,7 @@ class PDOS(DOS):
                             (self.energy.reshape(-1, 1), dos[elem][ang]))
                         with open(elem_file_dir/f"{keyname}-{elem}_{ang}.dat", 'w') as f:
                             header_list.append(
-                                f"\tpartial DOS for atom species: {elem}")
+                                f"Partial DOS for {keyname}: {elem}")
                             header_list.append('')
                             for orb in self.orbitals:
                                 if orb[keyname] == elem and orb["l"] == l_index:
@@ -392,7 +392,7 @@ class PDOS(DOS):
             DOSPlot object: for manually plotting picture with dosplot.ax 
         """
 
-        dos = parse_projected_data(self.orbitals, species, keyname)
+        dos, totnum = parse_projected_data(self.orbitals, species, keyname)
         energy_f, tdos = self._shift_energy(efermi, shift, prec)
 
         if not species:
@@ -403,7 +403,7 @@ class PDOS(DOS):
                                     notes=dosplot.plot_params["notes"])
             else:
                 dosplot._set_figure(energy_range, dos_range)
-
+        
             return dosplot
 
         if isinstance(species, (list, tuple)):
