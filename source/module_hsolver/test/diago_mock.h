@@ -78,7 +78,7 @@ class HPsi
     {
         PW_Basis* pbas;
         int* ngk = nullptr;
-        psi::Psi<std::complex<double>> psitmp(ngk,1,nband,npw);
+        psi::Psi<std::complex<double>> psitmp(1,nband,npw,ngk);
         for(int i=0;i<nband;i++)
 	    {
 		    for(int j=0;j<npw;j++) psitmp(0,i,j) = psimatrix(i,j);

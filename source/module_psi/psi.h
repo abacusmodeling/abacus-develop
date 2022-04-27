@@ -25,26 +25,27 @@ class Psi
         this->resize(pbasis_in->Klist->nks, GlobalV::NBANDS, pbasis_in->ngmw);
     }
     Psi(const int* ngk_in){this->ngk = ngk_in;}
-    Psi(const int* ngk_in, int nk_in, int nbd_in, int nbs_in)
+    Psi(int nk_in, int nbd_in, int nbs_in, const int* ngk_in=nullptr)
     {
         this->ngk = ngk_in;
         this->resize(nk_in, nbd_in, nbs_in);
         this->current_b = 0;
         this->current_k = 0;
     }
-    Psi(const Psi& psi_in, const int& nk_in, const int& nband_in)
+    Psi(const Psi& psi_in, const int& nk_in)
     {
-        assert(nk_in<=psi_in.get_nk() && nband_in<=psi_in.get_nbands());
-        this->resize(nk_in, nband_in, psi_in.get_nbasis());
+        assert(nk_in<=psi_in.get_nk());
+        this->resize(nk_in, psi_in.get_nbands(), psi_in.get_nbasis());
         //if size of k is 1, copy from Psi in current_k, 
         //else copy from start of Psi
+        const T* tmp = psi_in.get_pointer();
         if(nk_in==1) for(size_t index=0; index<this->size();++index)
         {
-            psi[index] = psi_in.get_pointer()[index];
+            psi[index] = tmp[index];
             //current_k for this Psi only keep the spin index same as the copied Psi
             this->current_k = psi_in.get_current_k();
         } 
-        else for(size_t index=0; index<this->size();++index) psi[index] = psi_in.get_pointer()[index];
+        else for(size_t index=0; index<this->size();++index) psi[index] = tmp[index];
     }
     // initialize the wavefunction coefficient
     // only resize and construct function now is used

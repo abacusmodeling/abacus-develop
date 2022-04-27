@@ -1,6 +1,7 @@
 add_library(
     elecstate
     OBJECT
-    elecstate_pw.cpp
     elecstate.cpp
+    elecstate_pw.cpp
+    elecstate_lcao.cpp
 )
