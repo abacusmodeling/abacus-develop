@@ -333,7 +333,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
         if (conv_elec || iter==GlobalV::SCF_NMAX)
         {
 			for(int is=0; is<GlobalV::NSPIN; is++)

@@ -50,8 +50,9 @@ public:
     //Print current classname.
     void printname();
 
-    //get elec.iter
-    virtual int getiter(){return 0;}
+    //temporarily
+    //get iterstep used in current scf
+    virtual int getniter(){return 0;}
     string classname;
 };
 

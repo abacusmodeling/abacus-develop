@@ -1,6 +1,7 @@
 #include "esolver_ks.h"
 #include <iostream>
 #include <algorithm>
+#include "time.h"
 
 //--------------Temporary----------------
 #include "../module_base/global_variable.h"
@@ -15,16 +16,16 @@ namespace ModuleESolver
 ESolver_KS::ESolver_KS()
 {
     basisname = "PLEASE ADD BASISNAME FOR CURRENT ESOLVER.";
-    diagname = "PLEASE ADD DIAGNAME FOR CURRENT ESOLVER.";
-    diag_ethr = this->diag_ethr; 
+    diag_ethr = GlobalV::PW_DIAG_THR; 
     scf_thr = GlobalV::SCF_THR; 
     drho = 0.0;
-    niter = GlobalV::SCF_NMAX;
+    maxniter = GlobalV::SCF_NMAX;
+    niter = maxniter;
 
 
 }
 
-void ESolver_KS:: hamilt2density(int istep, double ethr)
+void ESolver_KS:: hamilt2density(int istep, int iter, double ethr)
 {
     //Temporarily, before HSolver is constructed, it should be overrided by
     //LCAO, PW, SDFT and TDDFT.
@@ -44,14 +45,16 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
     
     bool firstscf = true;
     bool conv_elec = false;
-
-    for(int iter=1; iter <= niter ; ++iter)
+    this->niter = this->maxniter;
+    for(int iter=1; iter <= this->maxniter ; ++iter)
     {
         writehead(GlobalV::ofs_running, istep, iter); 
+        clock_t iterstart,iterend;
+        iterstart = std::clock();
         set_ethr(istep,iter);
-        eachiterinit(); 
+        eachiterinit(iter); 
         
-        this->hamilt2density(istep, this->diag_ethr);
+        this->hamilt2density(istep, iter, this->diag_ethr);
         
         // double drho = this->estate.caldr2(); 
         // EState should be used after it is constructed.
@@ -64,9 +67,15 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
             // The error of HSolver is larger than drho, so a more precise HSolver should be excuted.
             if(hsover_error > drho)  
             {
-                GlobalV::ofs_warning << " drho < diago_error, keep charge density unchanged." << std::endl;
-                this->diag_ethr = drho / GlobalC::CHR.nelec; 
-                this->hamilt2density(istep, this->diag_ethr);
+                GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
+                ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
+                GlobalV::ofs_running << " scf_thr=" << scf_thr << " < hsover_error=" << hsover_error << std::endl;
+
+                GlobalV::ofs_running << " Origin diag_ethr = " << this->diag_ethr << std::endl;
+                this->diag_ethr =0.1 *  drho / GlobalC::CHR.nelec; 
+                GlobalV::ofs_running << " New    diag_ethr = " << this->diag_ethr << std::endl;
+                
+                this->hamilt2density(istep, iter, this->diag_ethr);
                 drho = GlobalC::CHR.get_drho();
             }   
         }
@@ -83,8 +92,15 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
         // Hamilt should be used after it is constructed.
         // this->phamilt->update(conv_elec);
         updatepot(conv_elec);
-        eachiterfinish(conv_elec);  
-        if (conv_elec) break;  
+        eachiterfinish(iter);  
+        iterend = std::clock();
+        double duration = double(iterend-iterstart) / CLOCKS_PER_SEC;
+        printiter(conv_elec, iter, drho, duration, diag_ethr);
+        if (conv_elec) 
+        {
+            this->niter = iter;
+            break;
+        }  
     }
     afteriter(conv_elec); 
     
@@ -157,9 +173,12 @@ void ESolver_KS:: printhead()
     std::cout << std::setw(15) << "ETOT(eV)";
     std::cout << std::setw(15) << "EDIFF(eV)";
     std::cout << std::setw(11) << "SCF_THR";
-
-    std::cout << std::setw(11) << this->diagname;
 	std::cout << std::setw(11) << "TIME(s)" << std::endl;
+}
+
+void ESolver_KS::printiter(bool conv_elec, int iter, double drho, double duration, double ethr)
+{
+    GlobalC::en.print_etot(conv_elec, iter, drho, duration, ethr);
 }
 
 void ESolver_KS:: writehead(std::ofstream &ofs_running, int istep, int iter)
@@ -170,6 +189,11 @@ void ESolver_KS:: writehead(std::ofstream &ofs_running, int istep, int iter)
         << " ALGORITHM --------------- ION=" << std::setw(4) << istep + 1
         << "  ELEC=" << std::setw(4) << iter
         << "--------------------------------\n";
+}
+
+int ESolver_KS:: getniter()
+{
+    return this->niter;
 }
 
 

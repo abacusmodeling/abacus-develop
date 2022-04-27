@@ -372,12 +372,6 @@ void Electrons::self_consistent(const int &istep)
             GlobalC::en.descf = 0.0;
         }
 
-        std::stringstream ssw;
-        ssw << GlobalV::global_out_dir << "WAVEFUNC";
-
-		//qianrui add 2020-10-12
-		std::stringstream ssgk;
-		ssgk << GlobalV::global_out_dir << "GKK.dat";
 
         // output for tmp.
         for(int is=0; is<GlobalV::NSPIN; is++)
@@ -392,6 +386,8 @@ void Electrons::self_consistent(const int &istep)
 
         if(GlobalC::wf.out_wfc_pw == 1 || GlobalC::wf.out_wfc_pw == 2)
         {
+            std::stringstream ssw;
+            ssw << GlobalV::global_out_dir << "WAVEFUNC";
             //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
@@ -408,7 +404,7 @@ void Electrons::self_consistent(const int &istep)
         clock_t finish=clock();
         double duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
 
         if (conv_elec || iter==GlobalV::SCF_NMAX)
         {

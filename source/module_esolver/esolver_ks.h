@@ -13,42 +13,50 @@ class ESolver_KS: public ESolver_FP
     public:
         ESolver_KS();
         // HSolver* phsol;
-        double diag_ethr; //diag threshold
-        double scf_thr; //scf threshold
-        double drho;
-        double niter;
+        double diag_ethr; // diag threshold
+        double scf_thr;   // scf threshold
+        double drho;      // the difference between rho_in (before HSolver) and rho_out (After HSolver)
+        int maxniter;     // maximum iter steps for scf
+        int niter;        // iter steps actually used in scf
+        
         virtual void Run(int istep, UnitCell_pseudo& cell) override;
-        virtual void hamilt2density(int istep, double ethr);
+
+        // calculate electron density from a specific Hamiltonian
+        virtual void hamilt2density(int istep, int iter, double ethr);
+        // get
+        virtual int getniter() override;
 
     protected:
-        //Something to do before iter loop
+        // Something to do before iter loop
         virtual void beforeiter(){}; 
-        //Something to do before hamilt2density function in each iter loop.
-        virtual void eachiterinit(){}; 
-        //Something to do after hamilt2density function in each iter loop.
-        virtual void eachiterfinish(bool){}; 
-        //Something to do after the iter loop when scf is converged or comes to the max iter step.
+        // Something to do before hamilt2density function in each iter loop.
+        virtual void eachiterinit(int iter){}; 
+        // Something to do after hamilt2density function in each iter loop.
+        virtual void eachiterfinish(int iter){}; 
+        // Something to do after the iter loop when scf is converged or comes to the max iter step.
         virtual void afteriter(bool){};
-        //temporary----------------------------------------------------------
+        // <Temporary> It should be replaced by a function in Hamilt Class
         virtual void updatepot(bool conv){};
         
 
     //TOOLS:
     protected:
-        //Set ethr for hsolver
+        // Set ethr for hsolver
         void set_ethr(int istep, int iter);
-        //print the headline on the screen:
-        //ITER   ETOT(eV)       EDIFF(eV)      SCF_THR    "ITERTAG"    TIME(s) 
+        // Print the headline on the screen:
+        // ITER   ETOT(eV)       EDIFF(eV)      SCF_THR    TIME(s) 
         void printhead();
-        //write the headline in the running_log file
-        //"basisname" ALGORITHM --------------- ION=   1  ELEC=   1--------------------------------
+        // Print inforamtion in each iter
+        // G1    -3.435545e+03  0.000000e+00   3.607e-01  2.862e-01
+        void printiter(bool conv, int iter, double drho, double duration, double ethr);
+        // Write the headline in the running_log file
+        // "PW/LCAO" ALGORITHM --------------- ION=   1  ELEC=   1--------------------------------
         void writehead(std::ofstream &ofs_running,int istep, int iter);
 
 
 
     protected:
-        std::string basisname;
-        std::string diagname;
+        std::string basisname; //PW or LCAO
 
 };
 }

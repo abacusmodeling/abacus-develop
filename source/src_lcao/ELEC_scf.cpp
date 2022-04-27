@@ -374,7 +374,7 @@ void ELEC_scf::scf(const int& istep,
 			/*
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho_save, GlobalC::CHR.rho);
 			GlobalC::en.calculate_etot();
-			GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, 0.0, GlobalV::PW_DIAG_THR, avg_iter,0);
+			GlobalC::en.print_etot(conv_elec, iter, scf_thr, 0.0, GlobalV::PW_DIAG_THR, avg_iter,0);
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 			*/
@@ -444,7 +444,7 @@ void ELEC_scf::scf(const int& istep,
 		// avg_iter is an useless variable in LCAO,
 		// will fix this interface in future -- mohan 2021-02-10
 		int avg_iter=0;
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
 
 		GlobalC::en.etot_old = GlobalC::en.etot;
 

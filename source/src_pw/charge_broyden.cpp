@@ -147,7 +147,7 @@ void Charge_Broyden::mix_rho
 			rho123[is][ir] = this->rho[is][ir];
 		}
 	}
-
+	
 	
 	if ( this->mixing_mode == "plain")
     {
