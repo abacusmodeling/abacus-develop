@@ -26,7 +26,10 @@ void DiagoBlas::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eige
     matd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
     assert(h_mat.col == s_mat.col && h_mat.row == s_mat.row && h_mat.desc == s_mat.desc);
-    this->pdsygvx_diag(h_mat.desc, h_mat.col, h_mat.row, h_mat.p, s_mat.p, eigenvalue_in, psi);
+    std::vector<double> eigen(GlobalV::NLOCAL, 0.0);
+    this->pdsygvx_diag(h_mat.desc, h_mat.col, h_mat.row, h_mat.p, s_mat.p, eigen.data(), psi);
+    const int inc = 1;
+    BlasConnector::copy(GlobalV::NBANDS, eigen.data(), inc, eigenvalue_in, inc);
 }
 
 void DiagoBlas::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, double *eigenvalue_in)
@@ -34,7 +37,10 @@ void DiagoBlas::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi
     matcd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
     assert(h_mat.col == s_mat.col && h_mat.row == s_mat.row && h_mat.desc == s_mat.desc);
-    this->pzhegvx_diag(h_mat.desc, h_mat.col, h_mat.row, h_mat.p, s_mat.p, eigenvalue_in, psi);
+    std::vector<double> eigen(GlobalV::NLOCAL, 0.0);
+    this->pzhegvx_diag(h_mat.desc, h_mat.col, h_mat.row, h_mat.p, s_mat.p, eigen.data(), psi);
+    const int inc = 1;
+    BlasConnector::copy(GlobalV::NBANDS, eigen.data(), inc, eigenvalue_in, inc);
 }
 
 std::pair<int, std::vector<int>> DiagoBlas::pdsygvx_once(const int *const desc,
