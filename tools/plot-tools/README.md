@@ -20,14 +20,14 @@ python setup.py install
 
 ## Usage
 There are two ways to use this tool:
-1. Specify parameters in `band.py` or `dos.py` directly, and then `python band.py` or `python dos.py`. And you can also import module in your own script e.g. `from abacus_plot.band import BandPlot`
+1. Specify parameters in `band.py` or `dos.py` directly, and then `python band.py` or `python dos.py`. And you can also import module in your own script e.g. `from abacus_plot.band import Band`
 2. Command-line tools are also supported in this tool. In this way, you need prepare an input file and execute some commands as follows
 
 ### Band Structure
 First, prepare a json file e.g. band-input.json:
 ```json
 {
-	"filename" : "BANDS_1.dat",
+	"bandfile" : "BANDS_1.dat",
 	"efermi" : 10.39537843955395,
 	"energy_range"	: [-1.5, 6],
 	"kptfile" : "KPT"
@@ -39,11 +39,14 @@ First, prepare a json file e.g. band-input.json:
 |    *efermi*    | `float` or `List[float]` |                       Fermi level in eV                        |
 | *energy_range* |          `list`          |                     Range of energy in eV                      |
 |    *shift*     |          `bool`          | If set `'true'`, it will evaluate band gap. Default: `'false'` |
+|   *index*    | `List[int]` or `Dict[int, List[int]]` or `Dict[int, Dict[int, List[int]]]]` | Extract PDOS of each atom e.g. [0, 1], {0:[0, 1], 1:[0]}, [0:{0:[0]}, 1:{1:[0, 1]}] |
+|   *atom_index*    | `List[int]` or `Dict[int, List[int]]` or `Dict[int, Dict[int, List[int]]]]` | Extract PDOS of each atom with same atom_index e.g. [0, 1], {0:[0, 1], 1:[0]}, [0:{0:[0]}, 1:{1:[0, 1]}] |
+|   *species*    | `List[str]` or `Dict[str, List[int]]` or `Dict[str, Dict[int, List[int]]]]` | Extract PDOS of each atom with same species e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{0:[0]}, "Si":{1:[0, 1]}] |
 |   *kptfile*    |          `str`           |                 K-points file in ABACUS format                 |
 |    *label*     |   `str` or `List[str]`   |                    Label of band structure                     |
 |    *color*     |   `str` or `List[str]`   |                    Color of band structure                     |
 
-If you want to plot band structure of `nspin=2` or compare two band structure on same k-path, you can set *filename*, *efermi*, *label*, *color* in `list` type. 
+If you want to plot band structure of `nspin=2` or compare two band structure on same k-path, you can set *bandfile*, *efermi*, *label*, *color* in `list` type. 
 
 The *kptfile* should be as follows, and notes after `#` will be set as k-points label automatically.
 ```shell
@@ -60,7 +63,7 @@ Line
 ```
 Then, use the following command to plot band structure:
 ```shell
-abacus-plot -b band-input.json
+abacus-plot -b -f band-input.json
 ```
 
 ### DOS

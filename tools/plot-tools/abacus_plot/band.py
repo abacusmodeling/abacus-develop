@@ -22,7 +22,7 @@ from abacus_plot.utils import energy_minus_efermi, list_elem2str, read_kpt, remo
 class Band:
     """Parse Bands data"""
 
-    def __init__(self, bandfile: Union[PathLike, Sequence[PathLike]] = None, kptfile: str = '') -> None:
+    def __init__(self, bandfile: Union[PathLike, Sequence[PathLike]] = None, kptfile: PathLike = '') -> None:
         self.bandfile = bandfile
         if isinstance(bandfile, list) or isinstance(bandfile, tuple):
             self.energy = []
@@ -683,17 +683,19 @@ class PBand(Band):
              outdir: PathLike = './',
              cmapname='jet',
              **kwargs):
-        """Plot parsed partial dos data
+        """Plot parsed projected band data
 
         Args:
             fig (Figure): object of matplotlib.figure.Figure
             ax (Union[axes.Axes, Sequence[axes.Axes]]): object of matplotlib.axes.Axes or a list of this objects
-            index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom. Defaults to [].
-            atom_index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom with same atom_index. Defaults to [].
-            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[int, List[int]]]], optional): extract PDOS of each atom with same species. Defaults to [].
+            index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PBAND of each atom. Defaults to [].
+            atom_index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PBAND of each atom with same atom_index. Defaults to [].
+            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[int, List[int]]]], optional): extract PBAND of each atom with same species. Defaults to [].
             efermi (float, optional): fermi level in unit eV. Defaults to 0.
             energy_range (Sequence[float], optional): energy range in unit eV for plotting. Defaults to [].
             shift (bool, optional): if shift energy by fermi level and set the VBM to zero, or not. Defaults to False.
+            outdir (PathLike): Default: './'
+            cmapname (str): Default: 'jet'
 
         Returns:
             BandPlot object: for manually plotting picture with bandplot.ax 
