@@ -86,6 +86,13 @@ void Threshold_Elec::update_pw_diag_thr(const int &iter)
 		}
 
     }
+    else
+    {
+        if(GlobalV::CALCULATION=="md"||GlobalV::CALCULATION=="relax"||GlobalV::CALCULATION=="cell-relax")
+        {
+            GlobalV::PW_DIAG_THR = std::max(GlobalV::PW_DIAG_THR, INPUT.pw_diag_thr);
+        }
+    }
     return;
 }
 

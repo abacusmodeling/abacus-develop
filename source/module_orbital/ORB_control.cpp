@@ -325,7 +325,7 @@ void ORB_control::mpi_creat_cart(MPI_Comm* comm_2D,
 #endif
 
 #ifdef __MPI
-void ORB_control::mat_2d(MPI_Comm vu,
+int ORB_control::mat_2d(MPI_Comm vu,
     const int &M_A,
     const int &N_A,
     const int &nb,
@@ -365,7 +365,14 @@ void ORB_control::mat_2d(MPI_Comm vu,
 	{
 		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		ofs_warning << " but, the number of row blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
+        if(nb>1) 
+        {
+            return 1;
+        }
+        else
+        {
+		    ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
+        }
 	}
 
     // (2.1) row_b : how many blocks for this processor. (at least)
@@ -428,7 +435,14 @@ void ORB_control::mat_2d(MPI_Comm vu,
 	{
 		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		ofs_warning << " but, the number of column blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no column blocks.");
+        if(nb>1) 
+        {
+            return 1;
+        }
+        else
+        {
+		    ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no column blocks.");
+        }
 	}
 
     LM.col_b=block/dim[1];
@@ -485,7 +499,14 @@ void ORB_control::mat_2d(MPI_Comm vu,
 	{
 		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		ofs_warning << " but, the number of bands-row-block is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no bands-row-blocks.");
+        if(nb>1) 
+        {
+            return 1;
+        }
+        else
+        {
+		    ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no bands-row-blocks.");
+        }
     }
     int col_b_bands = block / dim[1];
     if (coord[1] < block % dim[1])
@@ -510,7 +531,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
     }
     pv->nloc_wfc = pv->ncol_bands * LM.row_num;
 
-    return;
+    return 0;
 }
 #endif
 
