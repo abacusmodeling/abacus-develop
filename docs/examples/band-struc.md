@@ -85,6 +85,8 @@ The rest of the files arranged in sections, each section with a header such as b
 ...
 </data>
 
+```
+
 The shape of text contents of element <data> is (Number of k-points, Number of bands) 
  
 [back to top](#band-structure)
