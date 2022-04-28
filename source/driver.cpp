@@ -12,6 +12,7 @@
 #include "src_io/print_info.h"
 #include "module_base/timer.h"
 #include "module_base/memory.h"
+#include "module_esolver/esolver.h"
 
 Driver::Driver(){}
 
@@ -65,7 +66,7 @@ void Driver::reading(void)
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GSIZE",GlobalV::GSIZE);
 
 #ifdef __MPI
-    // (4)  divide the GlobalV::NPROC processors into GlobalV::NPOOL for k-points parallelization.
+    // (4)  divide the GlobalV::NPROC processors into GlobalV::KPAR for k-points parallelization.
     GlobalC::Pkpoints.init_pools();
 #endif
 

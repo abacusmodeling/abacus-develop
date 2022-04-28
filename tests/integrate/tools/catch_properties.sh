@@ -26,14 +26,15 @@ file=$1
 calculation=`grep calculation INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 running_path=`echo "OUT.autotest/running_$calculation"".log"`
 natom=`grep -En '(^|[[:space:]])TOTAL ATOM NUMBER($|[[:space:]])' $running_path | awk '{print $6}'`
-has_force=`grep -En '(^|[[:space:]])force($|[[:space:]])' INPUT | awk '{print $2}'`
-has_stress=`grep -En '(^|[[:space:]])stress($|[[:space:]])' INPUT | awk '{print $2}'`
+has_force=`grep -En '(^|[[:space:]])cal_force($|[[:space:]])' INPUT | awk '{print $2}'`
+has_stress=`grep -En '(^|[[:space:]])cal_stress($|[[:space:]])' INPUT | awk '{print $2}'`
 has_dftu=`grep -En '(^|[[:space:]])dft_plus_u($|[[:space:]])' INPUT | awk '{print $2}'`
 has_band=`grep -En '(^|[[:space:]])out_band($|[[:space:]])' INPUT | awk '{print $2}'`
 has_dos=`grep -En '(^|[[:space:]])out_dos($|[[:space:]])' INPUT | awk '{print $2}'`
-has_hs=`grep -En '(^|[[:space:]])out_hs($|[[:space:]])' INPUT | awk '{print $2}'`
-has_r=`grep -En '(^|[[:space:]])out_r($|[[:space:]])' INPUT | awk '{print $2}'`
-out_descriptor=`grep out_descriptor INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+has_hs=`grep -En '(^|[[:space:]])out_mat_hs($|[[:space:]])' INPUT | awk '{print $2}'`
+has_r=`grep -En '(^|[[:space:]])out_mat_r($|[[:space:]])' INPUT | awk '{print $2}'`
+deepks_out_labels=`grep deepks_out_labels INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+deepks_bandgap=`grep deepks_bandgap INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 if [ $base == "pw" ]; then word="plane_wave_line" 
@@ -101,9 +102,9 @@ if ! test -z "$has_band"  && [  $has_band -eq 1 ]; then
 fi
 #echo $has_hs
 if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
-        total_h=`sum_file OUT.autotest/data-H`
+        total_h=`sum_file OUT.autotest/data-0-H`
         echo "totalHmatrix $total_h" >>$1
-	total_s=`sum_file OUT.autotest/data-S`
+	total_s=`sum_file OUT.autotest/data-0-S`
 	echo "totalSmatrix $total_s" >>$1
 fi
 
@@ -111,9 +112,17 @@ fi
 ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1
 
-if ! test -z "$out_descriptor" && [ $out_descriptor -eq 1 ]; then
+if ! test -z "$deepks_out_labels" && [ $deepks_out_labels -eq 1 ]; then
 	sed '/n_des/d' descriptor.dat > des_tmp.txt
 	total_des=`sum_file des_tmp.txt 5`
 	rm des_tmp.txt
 	echo "totaldes $total_des" >>$1
 fi
+
+if ! test -z "$deepks_bandgap" && [ $deepks_bandgap -eq 1 ]; then
+	odelta=`python get_odelta.py`
+	echo "odelta $odelta" >>$1
+	oprec=`python get_oprec.py`
+	echo "oprec $oprec" >> $1
+fi
+

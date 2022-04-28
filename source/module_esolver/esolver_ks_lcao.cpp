@@ -36,7 +36,7 @@ void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 		XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 	}
 
-    //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
+    //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::stru_file , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
@@ -96,13 +96,10 @@ void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 #ifdef __DEEPKS
 	//wenfei 2021-12-19
 	//if we are performing DeePKS calculations, we need to load a model
-	if (GlobalV::out_descriptor)
+	if (GlobalV::deepks_scf)
 	{
-		if (GlobalV::deepks_scf)
-		{
-			// load the DeePKS model from deep neural network
-    		GlobalC::ld.load_model(INPUT.model_file);
-		}
+		// load the DeePKS model from deep neural network
+		GlobalC::ld.load_model(INPUT.deepks_model);
 	}
 #endif
 

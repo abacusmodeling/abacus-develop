@@ -60,7 +60,7 @@ void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleESolver::ESolver *p_esolv
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
     opt_ions(p_esolver);
-    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::deepks_setorb, GlobalC::ucell.infoNL.nproj);
     
     return;
 }
@@ -126,8 +126,10 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
     }
 
     // md cycle
-    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::NSTEP && !verlet->stop)
+    while ((verlet->step_ + verlet->step_rst_) <= GlobalV::MD_NSTEP && !verlet->stop)
     {
+        Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
+
         if(verlet->step_ == 0)
         {
             MD_func::ParaV = this->LM_md.ParaV;
@@ -178,8 +180,8 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
 
         if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
-            Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-            verlet->outputMD();
+            // Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
+            verlet->outputMD(GlobalV::ofs_running);
 
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
@@ -200,7 +202,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
         verlet->step_++;
     }
 
-    if (GlobalC::pot.out_potential == 2)
+    if (GlobalC::pot.out_pot == 2)
     {
         std::stringstream ssp;
         std::stringstream ssp_ave;
@@ -286,13 +288,19 @@ void Run_MD_LCAO::md_force_virial(
                  LOWF_md.wfc_k_laststep[ik].create(GlobalV::NBANDS, GlobalV::NLOCAL);
                  LOWF_md.wfc_k_laststep[ik]=LOWF_md.wfc_k[ik];
              }
+	     /*
+             for (int i =0 ; i< GlobalV::NLOCAL*GlobalV::NLOCAL;++i)
+                {
+                    this->LM_md.Hloc2_laststep[i]=this->LM_md.Hloc2[i];
+                }*/
+            //this->cal_edm_tddft(LOWF_md, LOC_md, UHM_md);
          #endif
      }
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL(RA_md);
-    FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
+    FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         LOC_md, LOWF_md, UHM_md, fcs, virial);
     RA_md.delete_grid();
@@ -380,7 +388,7 @@ void Run_MD_LCAO::md_force_virial(
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL(RA_md);
-    FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
+    FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         LOC_md, LOWF_md, UHM_md, fcs, virial);
     RA_md.delete_grid();
@@ -404,4 +412,39 @@ void Run_MD_LCAO::md_force_virial(
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 #endif //2015-10-01, xiaohui
+}
+
+// use the original formula (Hamiltonian matrix) to calculate energy density matrix	
+void Run_MD_LCAO::cal_edm_tddft(Local_Orbital_wfc& LOWF_md,
+        Local_Orbital_Charge& LOC_md,
+    LCAO_Hamilt& UHM_md)
+{
+    LOC_md.edm_k_tddft.resize(GlobalC::kv.nks);
+    for(int ik=0; ik<GlobalC::kv.nks; ++ik)
+    {
+        LOC_md.edm_k_tddft[ik].create( LOC_md.ParaV->ncol, LOC_md.ParaV->nrow );
+        ModuleBase::ComplexMatrix Sinv(GlobalV::NLOCAL,GlobalV::NLOCAL);
+        ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+        for(int i=0; i<GlobalV::NLOCAL; i++)
+        {
+                for(int j=0; j<GlobalV::NLOCAL; j++)
+                {
+                    Htmp(i,j) = UHM_md.LM->Hloc2[i*GlobalV::NLOCAL+j];
+                        Sinv(i,j) = UHM_md.LM->Sloc2[i*GlobalV::NLOCAL+j];
+                }
+        }
+        int INFO;
+
+        int LWORK=3*GlobalV::NLOCAL-1; //tmp
+        std::complex<double> * WORK = new std::complex<double>[LWORK];
+        ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
+        int IPIV[GlobalV::NLOCAL];
+
+        LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Sinv, GlobalV::NLOCAL, IPIV, &INFO);
+        LapackConnector::zgetri( GlobalV::NLOCAL, Sinv, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
+
+        LOC_md.edm_k_tddft[ik]=0.5*(Sinv*Htmp*LOC_md.dm_k[ik]+LOC_md.dm_k[ik]*Htmp*Sinv);
+
+    }
+    return;
 }

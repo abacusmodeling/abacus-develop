@@ -23,9 +23,9 @@ void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
 #ifdef __LCAO
-    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
 #else
-    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
 #endif
 	if(INPUT.test_just_neighbor)
 	{
@@ -109,9 +109,9 @@ void Run_lcao::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell_pseudo
         inp.lcao_dk,
         inp.lcao_dr,
         inp.lcao_rmax,
-        GlobalV::out_descriptor,
-        inp.out_r_matrix,
-        GlobalV::FORCE,
+        GlobalV::deepks_setorb,
+        inp.out_mat_r,
+        GlobalV::CAL_FORCE,
         GlobalV::MY_RANK);
 
     ucell.infoNL.setupNonlocal(
@@ -126,7 +126,7 @@ void Run_lcao::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell_pseudo
 		GlobalC::UOT,
 		GlobalC::ORB,
 		ucell.lat0,
-		GlobalV::out_descriptor,
+		GlobalV::deepks_setorb,
 		Exx_Abfs::Lmax,
 		ucell.infoNL.nprojmax,
 		ucell.infoNL.nproj,
@@ -138,7 +138,7 @@ void Run_lcao::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell_pseudo
 		GlobalC::UOT,
 		GlobalC::ORB,
 		ucell.lat0,
-		GlobalV::out_descriptor,
+		GlobalV::deepks_setorb,
 		Lmax,
 		ucell.infoNL.nprojmax,
 	    ucell.infoNL.nproj,

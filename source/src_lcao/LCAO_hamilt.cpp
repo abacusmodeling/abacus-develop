@@ -117,18 +117,23 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
 
 	if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_projected_DM(dm_gamma[0],
+        const Parallel_Orbitals* pv = this->LM->ParaV;
+        GlobalC::ld.cal_projected_DM(dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *this->LM->ParaV);
+            pv->trace_loc_row,
+            pv->trace_loc_col);
     	GlobalC::ld.cal_descriptor();        
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 		GlobalC::ld.add_v_delta(GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *this->LM->ParaV);
-        for(int iic=0;iic<this->LM->ParaV->nloc;iic++)
+            pv->trace_loc_row,
+            pv->trace_loc_col,
+            pv->nrow,
+            pv->ncol);
+        for(int iic=0;iic<pv->nloc;iic++)
         {
             this->LM->Hloc[iic] += GlobalC::ld.H_V_delta[iic];
         }
@@ -168,7 +173,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 
     this->LM->zeros_HSgamma('S');    	
 
-    this->genH.calculate_S_no();	
+    this->genH.calculate_S_no(this->LM->Sloc.data());	
 
     //this->LM->print_HSgamma('S');
 
@@ -189,7 +194,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
     time_t time_vnl_start = time(NULL);
     if(GlobalV::VNL_IN_H)
     {
-        genH.calculate_NL_no();
+        genH.calculate_NL_no(this->LM->Hloc_fixed.data());
     }
     time_t time_vnl_end = time(NULL);
 
@@ -199,7 +204,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
     time_t time_t_start = time(NULL);
     if(GlobalV::T_IN_H)
     {
-        genH.calculate_T_no();
+        genH.calculate_T_no(this->LM->Hloc_fixed.data());
 //		this->LM->print_HSgamma('T');
     }
     time_t time_t_end = time(NULL);
@@ -310,7 +315,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     // and store in this->LM->SlocR.
     //--------------------------------------------
     this->LM->zeros_HSR('S');
-    this->genH.calculate_S_no();	
+    this->genH.calculate_S_no(this->LM->SlocR.data());	
 
     //------------------------------
     // set T(R) and Vnl(R) to zero.
@@ -323,13 +328,13 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 
     if(GlobalV::T_IN_H)
     {
-        this->genH.calculate_T_no();	
+        this->genH.calculate_T_no(this->LM->Hloc_fixedR.data());	
     }
 
 
     if(GlobalV::VNL_IN_H)
     {
-        this->genH.calculate_NL_no();
+        this->genH.calculate_NL_no(this->LM->Hloc_fixedR.data());
     }
 
 

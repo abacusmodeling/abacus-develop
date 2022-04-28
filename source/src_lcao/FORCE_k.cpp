@@ -76,12 +76,14 @@ void Force_LCAO_k::ftable_k (
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_projected_DM_k(loc.dm_k,
+        GlobalC::ld.cal_projected_DM_k(loc.dm_k,
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *pv,
-			GlobalC::kv);
+            pv->trace_loc_row,
+			pv->trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d);
     	GlobalC::ld.cal_descriptor();
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
@@ -89,8 +91,10 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            *pv,
-			GlobalC::kv,
+            pv->trace_loc_row,
+			pv->trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d,
 			isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
@@ -99,7 +103,35 @@ void Force_LCAO_k::ftable_k (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
+        if(GlobalV::deepks_out_unittest)
+        {
+			GlobalC::ld.print_dm_k(GlobalC::kv.nks, loc.dm_k);
+			GlobalC::ld.check_projected_dm();
+			GlobalC::ld.check_descriptor(GlobalC::ucell);
+			GlobalC::ld.check_gedm();
+			GlobalC::ld.add_v_delta_k(GlobalC::ucell,
+				GlobalC::ORB,
+				GlobalC::GridD,
+				pv->trace_loc_row,
+				pv->trace_loc_col,
+				pv->nnr);
+			GlobalC::ld.check_v_delta_k(pv->nnr);
+			for(int ik=0;ik<GlobalC::kv.nks;ik++)
+			{
+				uhm.LM->folding_fixedH(ik);
+			}
+			GlobalC::ld.cal_e_delta_band_k(loc.dm_k,
+				pv->trace_loc_row,
+				pv->trace_loc_col,
+				GlobalC::kv.nks,
+				pv->nrow,
+				pv->ncol);
+			ofstream ofs("E_delta_bands.dat");
+			ofs <<std::setprecision(10)<< GlobalC::ld.e_delta_band;
+			ofstream ofs1("E_delta.dat");
+			ofs1 <<std::setprecision(10)<< GlobalC::ld.E_delta;
+			GlobalC::ld.check_f_delta(GlobalC::ucell.nat, svnl_dalpha);
+        }
     }
 #endif
 
@@ -163,7 +195,7 @@ void Force_LCAO_k::allocate_k(const Parallel_Orbitals &pv)
     ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_Rz, nnr);
 	ModuleBase::Memory::record("force_lo", "dS", nnr*3, "double");
     
-	if(GlobalV::STRESS){
+	if(GlobalV::CAL_STRESS){
 		this->UHM->LM->DH_r = new double [3* nnr];
 		ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DH_r, 3 * nnr);
 		this->UHM->LM->stvnl11 = new double [nnr];
@@ -185,7 +217,7 @@ void Force_LCAO_k::allocate_k(const Parallel_Orbitals &pv)
 	// calculate dS = <phi | dphi> 
 	//-----------------------------
 	bool cal_deri = true;
-	this->UHM->genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
+	this->UHM->genH.build_ST_new ('S', cal_deri, GlobalC::ucell, this->UHM->genH.LM->SlocR.data());
 
 	//-----------------------------------------
 	// (2) allocate for <phi | T + Vnl | dphi>
@@ -200,7 +232,7 @@ void Force_LCAO_k::allocate_k(const Parallel_Orbitals &pv)
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
-    this->UHM->genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
+    this->UHM->genH.build_ST_new ('T', cal_deri, GlobalC::ucell, this->UHM->genH.LM->Hloc_fixedR.data());
 	//test(this->UHM->LM->DHloc_fixedR_x,"this->UHM->LM->DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
@@ -219,7 +251,7 @@ void Force_LCAO_k::finish_k(void)
     delete [] this->UHM->LM->DHloc_fixedR_x;
     delete [] this->UHM->LM->DHloc_fixedR_y;
     delete [] this->UHM->LM->DHloc_fixedR_z;
-	if(GlobalV::STRESS)
+	if(GlobalV::CAL_STRESS)
 	{
 		delete [] this->UHM->LM->DH_r;
 		delete [] this->UHM->LM->stvnl11;
@@ -275,6 +307,16 @@ void Force_LCAO_k::cal_foverlap_k(
     loc.cal_dm(wgEkb,
         wfc_k,
         edm_k);
+	
+	// use the original formula (Hamiltonian matrix) to calculate energy density matrix	
+	if (loc.edm_k_tddft.size())
+    {
+        for(int ik=0; ik<GlobalC::kv.nks; ++ik)
+        {
+                edm_k[ik]=loc.edm_k_tddft[ik];
+        }
+    }
+
     loc.cal_dm_R(edm_k,
         ra, edm2d);
     ModuleBase::timer::tick("Force_LCAO_k", "cal_edm_2d");

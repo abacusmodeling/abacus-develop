@@ -96,7 +96,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			}
 		}	
 		// caoyu add 2021-03-16
-		if(GlobalV::out_descriptor)
+		if(GlobalV::deepks_setorb)
 		{
 			if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
 				ifa >> orb.descriptor_file;
@@ -428,6 +428,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 #ifndef __CMD
 
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
+#endif
 
 #ifndef __SYMMETRY
 			//===========================================
@@ -544,7 +545,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			} // end basis type
 #endif
 
-#else
+#ifdef __CMD
 			ifpos.ignore(150, '\n');
 #endif
 
@@ -588,7 +589,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
 #ifndef __CMD
-										//atoms[it].mag[ia]=magnet.start_magnetization[it];//if this line is used, default startmag_type would be 2
+										atoms[it].mag[ia]=magnet.start_magnetization[it];//if this line is used, default startmag_type would be 2
 #endif										
 										atoms[it].angle1[ia]=0;
 										atoms[it].angle2[ia]=0;
@@ -632,7 +633,6 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 														tmp=ifpos.get();
 													}
 													
-													cout<<"tmp"<<tmp<<'\n';
 													if((tmp >= 48 && tmp <= 57) or tmp=='-')
 													{
 														ifpos.putback(tmp);

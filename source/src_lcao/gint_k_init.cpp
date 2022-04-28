@@ -6,12 +6,10 @@ Gint_k_init::Gint_k_init()
 	nbx = nby = nbz =0;
 	ncxyz = 0;
 	nbz_start = 0;
-	nnn = new int[1];
 }
 
 Gint_k_init::~Gint_k_init()
 {
-	delete[] nnn;
 }
 
 void Gint_k_init::init(
@@ -36,15 +34,6 @@ void Gint_k_init::init(
 	assert(nby>0);
 	assert(nbz>0);
 	assert(ncxyz>0);
-
-	// claculate the maximal orbital numbers 
-	// for each type of atom.
-	delete[] this->nnn;
-	this->nnn = new int[GlobalC::ucell.ntype];
-	for(int it=0; it<GlobalC::ucell.ntype; it++)
-	{
-		this->nnn[it] = (GlobalC::ucell.atoms[it].nwl+1) * (GlobalC::ucell.atoms[it].nwl+1);
-	}
 
 	assert( GlobalC::ucell.omega > 0.0);
 

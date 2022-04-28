@@ -143,7 +143,8 @@ bool Dos::calculate_dos
 (
 	const int &is,
 	const std::vector<int> &isk,
-	const std::string &fa, //file address
+	const std::string &fa, //file address for DOS
+	const std::string &fa1, //file address for DOS_smearing
 	const double &de_ev, // delta energy in ev
 	const double &emax_ev,
 	const double &emin_ev,// minimal energy in ev.
@@ -157,10 +158,15 @@ bool Dos::calculate_dos
 {
 	ModuleBase::TITLE("Dos","calculae_dos");
 	std::ofstream ofs;
+	std::ofstream ofs1;
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(fa.c_str());//make the file clear!!
+		ofs1.open(fa1.c_str());//make the file clear!!
 	}
+	std::vector<double> dos;
+	std::vector<double> ene;
+	std::vector<double> dos_smearing; //dos_smearing
 
 #ifdef __MPI
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -179,6 +185,8 @@ bool Dos::calculate_dos
 
 	// mohan fixed bug 2010-1-18
 	const int npoints = static_cast<int>(std::floor ( ( emax_ev - emin_ev ) / de_ev )) ;
+	dos.clear();
+	ene.clear();
 	if(npoints <= 0)
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npoints",npoints);
@@ -233,12 +241,53 @@ bool Dos::calculate_dos
 		if(GlobalV::MY_RANK==0)
 		{
 			ofs << e_new << " " << count << std::endl;
+			dos.push_back(count);
+			ene.push_back(e_new);
 		}
 
 	}
+
+	//now use Gaussian smearing to smooth the dos and write to DOS_is_smearing
+	if(GlobalV::MY_RANK==0)
+	{
+		dos_smearing.resize(dos.size()-1);
+
+		//double b = INPUT.b_coef;
+		double b = sqrt(2.0)*GlobalC::en.bcoeff;
+		for(int i=0;i<dos.size()-1;i++)
+		{
+			double Gauss=0.0;
+
+			for(int j=0;j<dos.size()-1;j++)
+			{
+				double de = ene[j] - ene[i];
+				double de2 = de * de;
+				//----------------------------------------------------------
+				// EXPLAIN : if en
+				//----------------------------------------------------------
+				Gauss = exp(-de2/b/b)/sqrt(3.1415926)/b;
+				dos_smearing[j] += dos[i]*Gauss;
+			}
+		}
+
+		//----------------------------------------------------------
+		// EXPLAIN : output DOS_smearing.dat
+		//----------------------------------------------------------
+		double sum2=0.0;
+		for(int i=0;i<dos.size()-1;i++)
+		{
+			sum2 += dos_smearing[i];
+			ofs1 <<std::setw(20)<<ene[i]
+				<<std::setw(20)<<dos_smearing[i]
+				<<std::setw(20)<<sum2<<"\n";
+		}
+	}
+
+
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs.close();
+		ofs1.close();
 	}
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of bands",nbands);
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"sum up the states", sum);
@@ -384,7 +433,7 @@ void Dos::nscf_band(
 	
 	// old version
 	/*
-	for(int ip=0;ip<GlobalV::NPOOL;ip++)
+	for(int ip=0;ip<GlobalV::KPAR;ip++)
 	{
 		if(GlobalV::MY_POOL == ip && GlobalV::RANK_IN_POOL == 0)
 		{
