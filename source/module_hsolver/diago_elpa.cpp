@@ -15,7 +15,7 @@ typedef hamilt::MatrixBlock<std::complex<double>> matcd;
 
 namespace hsolver
 {
-
+bool DiagoElpa::is_already_decomposed = false;
 #ifdef __MPI
 inline int set_elpahandle(elpa_t &handle,
                           const int *desc,
