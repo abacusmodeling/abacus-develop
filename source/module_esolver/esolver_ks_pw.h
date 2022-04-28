@@ -20,12 +20,12 @@ public:
     void cal_Stress(ModuleBase::matrix &stress) override;
 
 protected:
-    virtual void beforeiter() override; 
+    virtual void beforescf() override; 
     virtual void eachiterinit(int iter) override; 
     virtual void hamilt2density(int istep, int iter, double ethr) override;
     virtual void updatepot(bool conv) override;
     virtual void eachiterfinish(int iter, bool conv) override; 
-    virtual void afteriter(bool) override;
+    virtual void afterscf(bool) override;
 
     // <Temporary> Get wavefunctions and eigen energies. 
     // It should be replaced by diag class in HSolver module in the future

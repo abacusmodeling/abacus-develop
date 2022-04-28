@@ -180,7 +180,7 @@ void ESolver_KS_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 
 }
 
-void ESolver_KS_PW:: beforeiter()
+void ESolver_KS_PW:: beforescf()
 {
     //calculate ewald energy
     H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
@@ -352,7 +352,7 @@ void ESolver_KS_PW:: eachiterfinish(int iter, bool conv_elec)
 }
 
 
-void ESolver_KS_PW::afteriter(bool conv_elec)
+void ESolver_KS_PW::afterscf(bool conv_elec)
 {
 #ifdef __LCAO
     if(GlobalC::chi0_hilbert.epsilon)                 // pengfei 2016-11-23

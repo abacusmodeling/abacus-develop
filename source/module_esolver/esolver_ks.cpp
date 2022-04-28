@@ -42,7 +42,7 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
     ModuleBase::timer:: tick(this->classname,"Run");
     
     this->printhead(); //print the headline on the screen.
-    this->beforeiter(); //Something else to do before the iter loop
+    this->beforescf(); //Something else to do before the iter loop
     
     bool firstscf = true;
     bool conv_elec = false;
@@ -96,7 +96,7 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
             break;
         }  
     }
-    afteriter(conv_elec); 
+    afterscf(conv_elec); 
     
     ModuleBase::timer:: tick(this->classname,"Run");
     return;

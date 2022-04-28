@@ -28,14 +28,14 @@ class ESolver_KS: public ESolver_FP
         virtual int getniter() override;
 
     protected:
-        // Something to do before iter loop
-        virtual void beforeiter(){}; 
+        // Something to do before SCF iterations.
+        virtual void beforescf(){}; 
         // Something to do before hamilt2density function in each iter loop.
         virtual void eachiterinit(int iter){}; 
         // Something to do after hamilt2density function in each iter loop.
         virtual void eachiterfinish(int iter, bool conv){}; 
-        // Something to do after the iter loop when scf is converged or comes to the max iter step.
-        virtual void afteriter(bool){};
+        // Something to do after SCF iterations when SCF is converged or comes to the max iter step.
+        virtual void afterscf(bool conv){};
         // <Temporary> It should be replaced by a function in Hamilt Class
         virtual void updatepot(bool conv){};
         
