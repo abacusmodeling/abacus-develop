@@ -15,30 +15,31 @@ namespace ModuleESolver
 
 ESolver_KS::ESolver_KS()
 {
+    classname = "ESolver_KS";
     basisname = "PLEASE ADD BASISNAME FOR CURRENT ESOLVER.";
     diag_ethr = GlobalV::PW_DIAG_THR; 
     scf_thr = GlobalV::SCF_THR; 
     drho = 0.0;
     maxniter = GlobalV::SCF_NMAX;
     niter = maxniter;
-
-
+    out_freq_elec = GlobalV::OUT_FREQ_ELEC;
 }
 
 void ESolver_KS:: hamilt2density(int istep, int iter, double ethr)
 {
+    ModuleBase::timer:: tick(this->classname,"hamilt2density");
     //Temporarily, before HSolver is constructed, it should be overrided by
     //LCAO, PW, SDFT and TDDFT.
     //After HSolver is constructed, LCAO, PW, SDFT should delete their own
     //hamilt2density() and use:
     //this->phsol->solve(this->phamilt, this->pes, this->wf, ETHR);
-    
+    ModuleBase::timer:: tick(this->classname,"hamilt2density");
 }
 
 
 void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
 {
-    ModuleBase::timer:: tick("ESolver_KS","run");
+    ModuleBase::timer:: tick(this->classname,"Run");
     
     this->printhead(); //print the headline on the screen.
     this->beforeiter(); //Something else to do before the iter loop
@@ -67,14 +68,7 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
             // The error of HSolver is larger than drho, so a more precise HSolver should be excuted.
             if(hsover_error > drho)  
             {
-                GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
-                ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
-                GlobalV::ofs_running << " hsover_error=" << hsover_error << " > drho=" << drho << std::endl;
-
-                GlobalV::ofs_running << " Origin diag_ethr = " << this->diag_ethr << std::endl;
-                this->diag_ethr =0.1 *  drho / GlobalC::CHR.nelec; 
-                GlobalV::ofs_running << " New    diag_ethr = " << this->diag_ethr << std::endl;
-                
+                reset_diagethr(GlobalV::ofs_running, hsover_error);
                 this->hamilt2density(istep, iter, this->diag_ethr);
                 drho = GlobalC::CHR.get_drho();
             }   
@@ -92,7 +86,7 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
         // Hamilt should be used after it is constructed.
         // this->phamilt->update(conv_elec);
         updatepot(conv_elec);
-        eachiterfinish(iter);  
+        eachiterfinish(iter,conv_elec);  
         iterend = std::clock();
         double duration = double(iterend-iterstart) / CLOCKS_PER_SEC;
         printiter(conv_elec, iter, drho, duration, diag_ethr);
@@ -104,11 +98,11 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
     }
     afteriter(conv_elec); 
     
-    ModuleBase::timer:: tick("ESolver_KS","run");
+    ModuleBase::timer:: tick(this->classname,"Run");
     return;
 };
 
-
+//<Temporary> It should be a function of Diag_H class in the future.
 void ESolver_KS:: set_ethr(int istep, int iter)
 {
 //It is too complex now and should be modified.
@@ -189,6 +183,16 @@ void ESolver_KS:: writehead(std::ofstream &ofs_running, int istep, int iter)
         << " ALGORITHM --------------- ION=" << std::setw(4) << istep + 1
         << "  ELEC=" << std::setw(4) << iter
         << "--------------------------------\n";
+}
+
+void ESolver_KS:: reset_diagethr(std::ofstream &ofs_running, double hsover_error)
+{
+    ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
+    ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
+    ofs_running << " hsover_error=" << hsover_error << " > DRHO=" << drho << std::endl;
+    ofs_running << " Origin diag_ethr = " << this->diag_ethr << std::endl;
+    this->diag_ethr =0.1 *  drho / GlobalC::CHR.nelec; 
+    ofs_running << " New    diag_ethr = " << this->diag_ethr << std::endl;
 }
 
 int ESolver_KS:: getniter()

@@ -24,7 +24,7 @@ protected:
     virtual void eachiterinit(int iter) override; 
     virtual void hamilt2density(int istep, int iter, double ethr) override;
     virtual void updatepot(bool conv) override;
-    virtual void eachiterfinish(int iter) override; 
+    virtual void eachiterfinish(int iter, bool conv) override; 
     virtual void afteriter(bool) override;
 
     // <Temporary> Get wavefunctions and eigen energies. 

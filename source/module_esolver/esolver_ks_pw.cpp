@@ -305,45 +305,55 @@ void ESolver_KS_PW:: updatepot(bool conv_elec)
     GlobalC::pot.set_vr_eff();
 }
 
-void ESolver_KS_PW:: eachiterfinish(int iter)
+void ESolver_KS_PW:: eachiterfinish(int iter, bool conv_elec)
 {
     //print_eigenvalue(GlobalV::ofs_running);
     GlobalC::en.calculate_etot();
-    if(GlobalC::CHR.out_chg != 0 && iter % GlobalC::CHR.out_chg == 0)
+    //We output it for restarting the scf.
+    bool print = false;
+    if(this->out_freq_elec == 0 )
     {
-        for(int is=0; is<GlobalV::NSPIN; is++)
-        {
-            std::stringstream ssc;
-            std::stringstream ss1;
-            ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-            GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
-	    	ss1 << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG.cube";
-	    	GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ssc.str(), 3);
-        }
+        if(conv_elec) print = true;
     }
+    else
+    {
+        if(iter % this->out_freq_elec == 0 || conv_elec) print = true;
+    }
+    
+    if(print)
+    {
+        if(GlobalC::CHR.out_chg > 0)
+        {
+            for(int is=0; is<GlobalV::NSPIN; is++)
+            {
+                std::stringstream ssc;
+                std::stringstream ss1;
+                ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
+                GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
+	        	ss1 << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG.cube";
+	        	GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ssc.str(), 3);
+            }
+        }
+        //output wavefunctions
+        if(GlobalC::wf.out_wfc_pw == 1 || GlobalC::wf.out_wfc_pw == 2)
+        {
+            std::stringstream ssw;
+            ssw << GlobalV::global_out_dir << "WAVEFUNC";
+            //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
+            // mohan update 2011-02-21
+	    	//qianrui update 2020-10-17
+            WF_io::write_wfc2( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+            //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
+        }
+        
+    }
+    
     
 }
 
 
 void ESolver_KS_PW::afteriter(bool conv_elec)
 {
-    //output wavefunctions
-    if(GlobalC::wf.out_wfc_pw == 1 || GlobalC::wf.out_wfc_pw == 2)
-    {
-        std::stringstream ssw;
-        ssw << GlobalV::global_out_dir << "WAVEFUNC";
-        //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
-        // mohan update 2011-02-21
-		//qianrui update 2020-10-17
-        WF_io::write_wfc2( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
-        //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
-    }
-
-
-    //--------------------------------------
-    // output charge density for converged,
-    // 0 means don't need to consider iter,
-    //--------------------------------------
 #ifdef __LCAO
     if(GlobalC::chi0_hilbert.epsilon)                 // pengfei 2016-11-23
     {

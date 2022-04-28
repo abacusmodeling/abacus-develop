@@ -18,6 +18,7 @@ class ESolver_KS: public ESolver_FP
         double drho;      // the difference between rho_in (before HSolver) and rho_out (After HSolver)
         int maxniter;     // maximum iter steps for scf
         int niter;        // iter steps actually used in scf
+        int out_freq_elec;// frequency for output
         
         virtual void Run(int istep, UnitCell_pseudo& cell) override;
 
@@ -32,7 +33,7 @@ class ESolver_KS: public ESolver_FP
         // Something to do before hamilt2density function in each iter loop.
         virtual void eachiterinit(int iter){}; 
         // Something to do after hamilt2density function in each iter loop.
-        virtual void eachiterfinish(int iter){}; 
+        virtual void eachiterfinish(int iter, bool conv){}; 
         // Something to do after the iter loop when scf is converged or comes to the max iter step.
         virtual void afteriter(bool){};
         // <Temporary> It should be replaced by a function in Hamilt Class
@@ -44,7 +45,7 @@ class ESolver_KS: public ESolver_FP
         // Set ethr for hsolver
         void set_ethr(int istep, int iter);
         // Print the headline on the screen:
-        // ITER   ETOT(eV)       EDIFF(eV)      SCF_THR    TIME(s) 
+        // ITER   ETOT(eV)       EDIFF(eV)      DRHO    TIME(s) 
         void printhead();
         // Print inforamtion in each iter
         // G1    -3.435545e+03  0.000000e+00   3.607e-01  2.862e-01
@@ -52,6 +53,7 @@ class ESolver_KS: public ESolver_FP
         // Write the headline in the running_log file
         // "PW/LCAO" ALGORITHM --------------- ION=   1  ELEC=   1--------------------------------
         void writehead(std::ofstream &ofs_running,int istep, int iter);
+        void reset_diagethr(std::ofstream &ofs_running, double hsover_error);
 
 
 
