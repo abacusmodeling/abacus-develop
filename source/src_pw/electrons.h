@@ -34,10 +34,9 @@ public:
 
     void non_self_consistent(const int &istep);
 
-private:
-
     void c_bands(const int &istep);
 
+private:
     bool check_stop_now(void);
 
     void init_mixstep_final_scf(void);
