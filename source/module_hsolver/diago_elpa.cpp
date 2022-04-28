@@ -63,7 +63,7 @@ void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi
     static bool has_set_elpa_handle = false;
     if (!has_set_elpa_handle)
     {
-        set_elpahandle(handle, h_mat.desc, h_mat.col, h_mat.row, GlobalV::NBANDS);
+        set_elpahandle(handle, h_mat.desc, h_mat.row, h_mat.col, GlobalV::NBANDS);
         has_set_elpa_handle = true;
     }
 
