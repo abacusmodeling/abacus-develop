@@ -182,8 +182,7 @@ void ESolver_KS_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 
 void ESolver_KS_PW:: beforeiter()
 {
-    //temporary 
-    //compute_ewald should be moved to cal_Energy
+    //calculate ewald energy
     H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
     //Symmetry_rho should be moved to Init()
     Symmetry_rho srho;

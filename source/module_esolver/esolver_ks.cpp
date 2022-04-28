@@ -69,7 +69,7 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
             {
                 GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
                 ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
-                GlobalV::ofs_running << " scf_thr=" << scf_thr << " < hsover_error=" << hsover_error << std::endl;
+                GlobalV::ofs_running << " hsover_error=" << hsover_error << " > drho=" << drho << std::endl;
 
                 GlobalV::ofs_running << " Origin diag_ethr = " << this->diag_ethr << std::endl;
                 this->diag_ethr =0.1 *  drho / GlobalC::CHR.nelec; 
@@ -172,7 +172,7 @@ void ESolver_KS:: printhead()
     }
     std::cout << std::setw(15) << "ETOT(eV)";
     std::cout << std::setw(15) << "EDIFF(eV)";
-    std::cout << std::setw(11) << "SCF_THR";
+    std::cout << std::setw(11) << "DRHO";
 	std::cout << std::setw(11) << "TIME(s)" << std::endl;
 }
 
