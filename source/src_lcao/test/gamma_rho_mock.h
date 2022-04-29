@@ -1101,54 +1101,6 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,
 	return;
 }
 
-void Local_Orbital_Charge::cal_dk_gamma_from_2D_pub(void)
-{
-	cal_dk_gamma_from_2D();
-}
-
-void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
-{
-    for(int is=0; is<GlobalV::NSPIN; ++is)
-    {
-        // put data from dm_gamma[is] to sender index
-        int nNONZERO=0;
-        for(int i=0; i<sender_size; ++i)
-        {
-            const int idx=sender_2D_index[i];
-            const int icol=idx%GlobalV::NLOCAL;
-            const int irow=(idx-icol)/GlobalV::NLOCAL;
-            // sender_buffer[i]=wfc_dm_2d.dm_gamma[is](irow,icol);
-            sender_buffer[i]=this->dm_gamma[is](icol,irow); // sender_buffer is clomun major, 
-                                                                // so the row and column index should be switched
-            if(sender_buffer[i]!=0) ++nNONZERO;
-        }
-
-        // put data from receiver buffer to this->DM[is]
-        nNONZERO=0;
-        // init DM[is]
-        /*for(int i=0; i<lgd_now; ++i)
-        {
-            for(int j=0; j<lgd_now; ++j)
-            {
-                DM[is][i][j]=0;
-            }
-        }*/
-        for(int i=0; i<receiver_size; ++i)
-        {
-            const int idx=receiver_local_index[i];
-            const int icol=idx%lgd_now;
-            const int irow=(idx-icol)/lgd_now;
-            DM[is][irow][icol]=receiver_buffer[i];
-            //DM[is][icol][irow]=receiver_buffer[i];
-            if(receiver_buffer[i]!=0) ++nNONZERO;
-        }
-
-
-
-    }
-	return;
-}
-
 void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
 {
     std::ifstream ifs;
@@ -2469,10 +2421,6 @@ int Pseudopot_upf::average_p(const double& lambda)
 		}
 
 		this->dion = dion_new;
-	//	this->dion.create(this->nbeta, this->nbeta);
-	//	for(int i=0;i<this->nbeta; i++)
-	//		for(int j=0;j<this->nbeta;j++)
-	//			this->dion(i,j) = dion_new(i,j);
 		
 		int new_nwfc = 0;
 		for(int nb=0; nb<this->nwfc; nb++)
@@ -2645,9 +2593,6 @@ void Pseudopot_upf::set_empty_element(void)
 //====================================================
 //mock of module_cell/read_pp_upf201_mock.cpp
 #include "module_cell/read_pp.h"
-//int Number[2]; // added by zhangwenshuai
-
-//qianrui rewrite it 2021-5-10
 int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 {
 
@@ -3020,7 +2965,6 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 		else if(round==0)
 		{
 			this->has_so = 0;
-			//	std::cout<<"ignore SPIN_ORB part!"<<std::endl;
 			break;
 		}
 	}
@@ -3089,7 +3033,6 @@ void Pseudopot_upf:: getnameval(std::ifstream& ifs,int &n, std::string * name, s
 		}
 		ll=pos2-pos;
 		name[i] = txt.substr(pos,ll);
-		//std::cout<<i<<" "<<name[i]<<std::endl;
 		std::string mark;
 		bool findmark=false;
 		for(int j = 0; j < 100; ++j)//The mark can be ' or " or .
@@ -3118,32 +3061,10 @@ void Pseudopot_upf:: getnameval(std::ifstream& ifs,int &n, std::string * name, s
 			else
 				break;
 		}
-		//std::cout<<name[i]<<"=\""<<val[i]<<"\""<<std::endl;
 	}
 	return;
 }
 
-/*void Pseudopot_upf::get_char( std::string ss)
-{
-    int i, q;
-    //char b[1]; //LiuXh 20171109
-    char b='\"'; //LiuXh 20171109
-    q =0;
-    //strcpy(b,"\""); //LiuXh 20171109
-
-    for(i=0;i<200;i++)
-    {
-        //if(ss[i]== b[0]) //LiuXh 20171109
-        if(ss[i]== b) //LiuXh 20171109
-        {
-           Number[q] = i;
-           q++;
-        }
-
-    }
-
-    return;
-}*/
 void Pseudopot_upf::read_pseudo_upf201_r(std::ifstream &ifs)
 {
 	delete[] r;
