@@ -104,7 +104,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
             GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
             
             // new wave functions
-            GlobalC::wf.wfcinit();
+            //GlobalC::wf.wfcinit();
 
             // update force and virial due to the update of atom positions
             MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
