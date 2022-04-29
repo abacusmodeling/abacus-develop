@@ -12,12 +12,10 @@ class HSolverLCAO : public HSolver
     public:
 
     HSolverLCAO(
-        Local_Orbital_wfc* lowf_in,
-        double** ekb_in
+        Local_Orbital_wfc* lowf_in
     )
     {
         this->lowf = lowf_in;
-        this->ekb = ekb_in;
     }
 
     /*void init(
@@ -59,7 +57,6 @@ class HSolverLCAO : public HSolver
     );*/
 
     Local_Orbital_wfc* lowf = nullptr;
-    double** ekb = nullptr;
 };
 
 }//namespace hsolver
