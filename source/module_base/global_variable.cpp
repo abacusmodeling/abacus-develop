@@ -120,8 +120,9 @@ std::string global_wannier_card;
 std::string global_pseudo_dir = "";
 std::string global_orbital_dir = ""; // liuyu add 2021-08-14
 
+// tqzhao modify it to the same value as in Input::Default() 2022-04-19
 std::string global_pseudo_type
-    = "upf"; // mohan add 2013-05-20, default is UPF, we can also use VWR (xiaohui add 2013-06-23)
+    = "auto"; // mohan add 2013-05-20, default is UPF, we can also use VWR (xiaohui add 2013-06-23) 
 std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified
