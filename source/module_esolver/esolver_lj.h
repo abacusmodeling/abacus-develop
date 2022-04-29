@@ -14,7 +14,7 @@ class ESolver_LJ: public ESolver
 public:
     ESolver_LJ() : grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid)
     {
-        tag = "ESolver_LJ";
+        classname = "ESolver_LJ";
     }
     
     void Init(Input &inp, UnitCell_pseudo &cell) override;

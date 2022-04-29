@@ -252,6 +252,8 @@ void Input::Default(void)
     printe = 100; // must > 0
     init_chg = "atomic";
     chg_extrap = "atomic"; // xiaohui modify 2015-02-01
+    out_freq_elec = 0;
+    out_freq_ion = 0;
     out_chg = 0;
     out_dm = 0;
 
@@ -931,6 +933,14 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("chg_extrap", word) == 0) // xiaohui modify 2015-02-01
         {
             read_value(ifs, chg_extrap); // xiaohui modify 2015-02-01
+        }
+        else if (strcmp("out_freq_elec", word) == 0)
+        {
+            read_value(ifs, out_freq_elec);
+        }
+        else if (strcmp("out_freq_ion", word) == 0)
+        {
+            read_value(ifs, out_freq_ion);
         }
         else if (strcmp("out_chg", word) == 0)
         {
@@ -1914,6 +1924,8 @@ void Input::Bcast()
     Parallel_Common::bcast_int(printe);
     Parallel_Common::bcast_string(init_chg);
     Parallel_Common::bcast_string(chg_extrap); // xiaohui modify 2015-02-01
+    Parallel_Common::bcast_int(out_freq_elec);
+    Parallel_Common::bcast_int(out_freq_ion);
     Parallel_Common::bcast_int(out_chg);
     Parallel_Common::bcast_int(out_dm);
 

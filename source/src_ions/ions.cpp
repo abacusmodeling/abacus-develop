@@ -87,9 +87,9 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			{	
 #endif
 #endif		
-				p_esolver->Run(istep,GlobalC::ucell);
+				p_esolver->Run(istep-1,GlobalC::ucell);
 				p_esolver->cal_Energy(GlobalC::en);
-				eiter = p_esolver->getiter();
+				eiter = p_esolver->getniter();
 #ifdef __LCAO
 #ifdef __MPI
 			}

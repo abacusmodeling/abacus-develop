@@ -6,7 +6,6 @@
 // #include "Hamilton_PW.h"
 // #include "H2E_pw.h"
 
-#include "../src_pw/electrons.h"
 
 namespace ModuleESolver
 {
@@ -14,25 +13,28 @@ namespace ModuleESolver
 class ESolver_KS_PW: public ESolver_KS
 {
 public:
-    ESolver_KS_PW()
-    {
-        tag = "ESolver_KS_PW";
-    }
+    ESolver_KS_PW();
     void Init(Input &inp, UnitCell_pseudo &cell) override;
-    void Run(int istep, UnitCell_pseudo& cell) override;
-    void Run(int istep,
-        Record_adj& ra,
-        Local_Orbital_Charge& loc,
-        Local_Orbital_wfc& lowf,
-        LCAO_Hamilt& uhm) override {};
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;
     void cal_Stress(ModuleBase::matrix &stress) override;
 
-//--------------temporary----------------------------
-    Electrons elec;
-//---------------------------------------------------
-    int getiter();
+protected:
+    virtual void beforescf() override; 
+    virtual void eachiterinit(int iter) override; 
+    virtual void hamilt2density(int istep, int iter, double ethr) override;
+    virtual void updatepot(bool conv) override;
+    virtual void eachiterfinish(int iter, bool conv) override; 
+    virtual void afterscf(bool) override;
+
+    // <Temporary> Get wavefunctions and eigen energies. 
+    // It should be replaced by diag class in HSolver module in the future
+    void c_bands(int istep, int iter);
+
+    // It copies the function in Threshold_Elec class.
+    // After all ESolver, HSolver are constructed, Class Electrons and Threshold_Elec should be deleted.
+    void print_eigenvalue(std::ofstream &ofs);
+
 
     // ESolver_KS_PW(bool use_sdft)
     // {

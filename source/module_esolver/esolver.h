@@ -22,7 +22,7 @@ class ESolver
 //     ModuleBase::matrix lattice_v;
 public:
     ESolver(){
-        tag = "ESolver";
+        classname = "ESolver";
     }
     virtual ~ESolver(){};
 
@@ -48,10 +48,12 @@ public:
     virtual void cal_Stress(ModuleBase::matrix &stress) = 0;
     
     //Print current classname.
-    virtual void printag();
-    //get elec.iter
-    virtual int getiter(){return 0;}
-    string tag;
+    void printname();
+
+    //temporarily
+    //get iterstep used in current scf
+    virtual int getniter(){return 0;}
+    string classname;
 };
 
 void init_esolver(ESolver* &p_esolver, const string use_esol);
