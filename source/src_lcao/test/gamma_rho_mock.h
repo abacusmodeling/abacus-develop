@@ -990,7 +990,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt, Local_Orbital_wf
         lowf.wfc_gamma[is].create(this->ParaV->ncol, this->ParaV->nrow);
         lowf.wfc_gamma[is].zero_out();
         std::stringstream ss;
-        ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << is + 1 << ".dat";
+        ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << is + 1;
         // std::cout << " name is = " << ss.str() << std::endl;
         std::ifstream ifs;
         if (GlobalV::DRANK == 0)
@@ -1024,7 +1024,6 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt, Local_Orbital_wf
             ModuleBase::GlobalFunc::READ_VALUE(ifs, ib);
             ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::wf.ekb[GlobalV::CURRENT_SPIN][i]);
             ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::wf.wg(GlobalV::CURRENT_SPIN, i));
-            // std::cout << " ib=" << ib << std::endl;
             assert((i + 1) == ib);
             for (int j = 0; j < GlobalV::NLOCAL; j++)
             {
