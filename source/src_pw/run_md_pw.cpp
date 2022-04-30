@@ -250,13 +250,6 @@ void Run_MD_PW::md_force_virial(
 #endif // __MPI
 #endif // __LCAO
     }
-    // mohan added 2021-01-28, perform stochastic calculations
-    else if (GlobalV::CALCULATION == "md-sto")
-    {
-        Stochastic_Elec elec_sto;
-        elec_sto.scf_stochastic(istep);
-        eiter = elec_sto.iter;
-    }
 
     ModuleBase::matrix fcs;
 	// Forces ff;
