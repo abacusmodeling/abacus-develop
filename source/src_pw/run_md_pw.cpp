@@ -215,8 +215,8 @@ void Run_MD_PW::md_force_virial(
         {
 #endif
 #endif
-            elec.self_consistent(istep);
-            eiter = elec.iter;
+            p_esolver->Run(istep-1,GlobalC::ucell);
+			eiter = p_esolver->getniter();
 #ifdef __LCAO
 #ifdef __MPI
         }
@@ -230,8 +230,8 @@ void Run_MD_PW::md_force_virial(
             {
                 for (size_t hybrid_step = 0; hybrid_step != GlobalC::exx_global.info.hybrid_step; ++hybrid_step)
                 {
-                    elec.self_consistent(istep);
-                    eiter += elec.iter;
+                    p_esolver->Run(istep-1,GlobalC::ucell);
+					eiter += p_esolver->getniter();
                     if (elec.iter == 1 || hybrid_step == GlobalC::exx_global.info.hybrid_step - 1) // exx converge
                         break;
                     XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
@@ -240,11 +240,11 @@ void Run_MD_PW::md_force_virial(
             }
             else
             {
-                elec.self_consistent(istep);
-                eiter += elec.iter;
+                p_esolver->Run(istep-1,GlobalC::ucell);
+				eiter += p_esolver->getniter();
                 XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-                elec.self_consistent(istep);
-                eiter += elec.iter;
+                p_esolver->Run(istep-1,GlobalC::ucell);
+				eiter += p_esolver->getniter();
             }
         }
 #endif // __MPI
