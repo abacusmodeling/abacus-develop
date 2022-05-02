@@ -45,7 +45,7 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
         update_precondition(precondition, psi.get_current_nbas(), GlobalC::wf.g2kin);
 
         /// solve eigenvector and eigenvalue for H(k)
-        double* p_eigenvalues = &(pes->ekb(ik,0));
+        double* p_eigenvalues = &(pes->ekb(ik, 0));
         this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
         /// calculate the contribution of Psi for charge density rho
     }
