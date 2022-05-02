@@ -2,7 +2,6 @@
 #define HSOLVERLCAO_H
 
 #include "hsolver.h"
-#include "src_lcao/local_orbital_wfc.h"
 
 namespace hsolver
 {
@@ -10,13 +9,6 @@ namespace hsolver
 class HSolverLCAO : public HSolver
 {
     public:
-
-    HSolverLCAO(
-        Local_Orbital_wfc* lowf_in
-    )
-    {
-        this->lowf = lowf_in;
-    }
 
     /*void init(
         const Basis* pbas
@@ -35,7 +27,6 @@ class HSolverLCAO : public HSolver
         psi::Psi<double>& psi, 
         elecstate::ElecState* pes) override;
 
-    static int out_wfc_lcao;
     static int out_mat_hs; // mohan add 2010-09-02
     static int out_mat_hsR; // LiuXh add 2019-07-16
     
@@ -55,8 +46,6 @@ class HSolverLCAO : public HSolver
         psi::Psi<std::complex<double>>& psi, 
         elecstate::ElecState* pes
     );*/
-
-    Local_Orbital_wfc* lowf = nullptr;
 };
 
 }//namespace hsolver

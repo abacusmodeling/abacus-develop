@@ -5,6 +5,7 @@
 
 namespace elecstate
 {
+int ElecStateLCAO::out_wfc_lcao = 0;
 
 //for gamma_only(double case) and multi-k(complex<double> case)
 template<typename T> void ElecStateLCAO::cal_dm(const ModuleBase::matrix& wg,
@@ -53,21 +54,37 @@ template<typename T> void ElecStateLCAO::cal_dm(const ModuleBase::matrix& wg,
 	return;
 }
 
+// multi-k case
 void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
 {
     ModuleBase::TITLE("ElecStateLCAO", "psiToRho");
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
 
+    ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
+
+    //this part for calculating dm_k in 2d-block format, not used for charge now
     psi::Psi<std::complex<double>> dm_k_2d(psi.get_nk(), psi.get_nbasis(), psi.get_nbasis());
 
-    ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
-    //this->loc->cal_dk_k(GlobalC::GridT);
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx"
         || GlobalV::KS_SOLVER == "lapack") // Peize Lin test 2019-05-15
     {
         this->cal_dm(this->wg, psi, dm_k_2d);
     }
 
+    //this part for steps:
+    //1. psi_k transform from 2d-block to grid format
+    //2. psi_k_grid -> DM_R
+    //3. DM_R -> rho(r)
+    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
+    {
+        for(int ik = 0; ik<psi.get_nk(); ik++)
+        {    
+            psi.fix_k(ik);
+            this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), this->lowf->wfc_k_grid[ik], ik);
+        }
+    }
+    
+    this->loc->cal_dk_k(GlobalC::GridT);
     for (int is = 0; is < GlobalV::NSPIN; is++)
     {
         ModuleBase::GlobalFunc::ZEROS(this->charge->rho[is], this->charge->nrxx); // mohan 2009-11-10
@@ -78,7 +95,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     //------------------------------------------------------------
 
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    //uhm.GK.cal_rho_k(this->loc->DM_R);
+    this->uhm->GK.cal_rho_k(this->loc->DM_R);
 
     this->charge->renormalize_rho();
 
@@ -91,12 +108,12 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
 {
     ModuleBase::TITLE("ElecStateLCAO", "psiToRho");
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
+    
+    this->calculate_weights();
 
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx"
                 || GlobalV::KS_SOLVER == "lapack")
     {
-        // LiuXh modify 2021-09-06, clear memory, cal_dk_gamma() not used for genelpa solver.
-        // density matrix has already been calculated.
         ModuleBase::timer::tick("ElecStateLCAO", "cal_dm_2d");
 
         psi::Psi<double> dm_gamma_2d(psi.get_nk(), psi.get_nbasis(), psi.get_nbasis());
@@ -105,7 +122,17 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
 
         ModuleBase::timer::tick("ElecStateLCAO", "cal_dm_2d");
 
-        //this->loc->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->loc->DM[is]
+        for(int ik = 0;  ik< psi.get_nk(); ++ik)
+        {
+            // for gamma_only case, no convertion occured, just for print.
+            if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
+            {
+                psi.fix_k(ik);
+                double** wfc_grid = nullptr; // output but not do "2d-to-grid" conversion
+                this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), wfc_grid);
+            }
+            this->loc->dm2dToGrid(dm_gamma_2d, this->loc->DM[ik]); // transform dm_gamma[is].c to this->loc->DM[is]
+        }
     }
 
     for (int is = 0; is < GlobalV::NSPIN; is++)
@@ -117,7 +144,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     // calculate the charge density on real space grid.
     //------------------------------------------------------------
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    //uhm.GG.cal_rho(this->loc->DM);
+    this->uhm->GG.cal_rho(this->loc->DM);
 
     this->charge->renormalize_rho();
 
