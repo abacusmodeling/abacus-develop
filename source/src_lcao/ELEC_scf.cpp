@@ -602,7 +602,7 @@ void ELEC_scf::scf(const int& istep,
 					ModuleBase::ComplexMatrix tmp4 = conj(lowf.wfc_k[ik]);
 					//complex<double>* Eij = new complex<double> [uhm.LM->ParaV->nloc_Eij];
 					complex<double>* Eij = new complex<double> [uhm.LM->ParaV->nloc];
-					cout<<"nloc_Eij="<<uhm.LM->ParaV->nloc_Eij<<endl;
+					//cout<<"nloc_Eij="<<uhm.LM->ParaV->nloc_Eij<<endl;
 					ModuleBase::GlobalFunc::ZEROS(Eij,uhm.LM->ParaV->nloc);
 					///*
 					pzgemm_(
@@ -615,7 +615,7 @@ void ELEC_scf::scf(const int& istep,
 						Eij,&one_int,&one_int,uhm.LM->ParaV->desc);
 						//Eij,&one_int,&one_int,uhm.LM->ParaV->desc_Eij);
 						//*/
-					///*
+					/*
 					GlobalV::ofs_running<<endl;
 					GlobalV::ofs_running<<" Eij:"<<endl;
                 	for(int i=0; i<uhm.LM->ParaV->ncol; i++)
@@ -628,7 +628,7 @@ void ELEC_scf::scf(const int& istep,
                         GlobalV::ofs_running<<endl;
                	 	}
         			GlobalV::ofs_running<<endl;
-					//*/
+					*/
 					///*
 					double* Eii = new double[GlobalV::NBANDS];
 					for (int i=0;i<GlobalV::NBANDS;i++) Eii[i]=0.0;
@@ -671,7 +671,7 @@ void ELEC_scf::scf(const int& istep,
     				}//loop iprow
 					info=MPI_Allreduce(Eii,GlobalC::wf.ekb[ik],GlobalV::NBANDS,MPI_DOUBLE,MPI_SUM,uhm.LM->ParaV->comm_2D);
 					//*/
-					///*
+					/*
 					GlobalV::ofs_running<<endl;
 					GlobalV::ofs_running<<" ekb: ";
                 	for(int i=0; i<GlobalV::NBANDS; i++)
@@ -680,7 +680,7 @@ void ELEC_scf::scf(const int& istep,
                         GlobalV::ofs_running<<GlobalC::wf.ekb[ik][i]*13.605693<<" ";
                	 	}
         			GlobalV::ofs_running<<endl;
-					//*/
+					*/
 				}
 				//*/
 			#else
@@ -701,6 +701,7 @@ void ELEC_scf::scf(const int& istep,
             		{
                 		GlobalC::wf.ekb[ik][i]=Ematrix.c[i*GlobalV::NBANDS+i].real();
             		}
+					/*
 					GlobalV::ofs_running<<endl;
 					GlobalV::ofs_running<<" Eij:"<<endl;
                 	for(int i=0; i<GlobalV::NBANDS; i++)
@@ -713,7 +714,6 @@ void ELEC_scf::scf(const int& istep,
                         GlobalV::ofs_running<<endl;
                	 	}
         			GlobalV::ofs_running<<endl;
-					///*
 					GlobalV::ofs_running<<endl;
 					GlobalV::ofs_running<<" ekb: ";
                 	for(int i=0; i<GlobalV::NBANDS; i++)
@@ -722,7 +722,7 @@ void ELEC_scf::scf(const int& istep,
                         GlobalV::ofs_running<<GlobalC::wf.ekb[ik][i]*13.605693<<" ";
                	 	}
         			GlobalV::ofs_running<<endl;
-					//*/
+					*/
 				}
 			#endif
 			}

@@ -400,7 +400,7 @@ void Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int& ik, std::complex<dou
 	int nrow=this->LM->ParaV->nrow;
 	int ncol=this->LM->ParaV->ncol;
         int ncol_bands=this->LM->ParaV->ncol_bands;
-        cout<<"ncol_bands="<<ncol_bands<<" ncol="<<ncol<<" nrow="<<nrow<<endl;
+        //cout<<"ncol_bands="<<ncol_bands<<" ncol="<<ncol<<" nrow="<<nrow<<endl;
 	//int nprocs, myid;
 	//MPI_status status;
 	//MPI_Comm_size(comm_2D, &nprocs);
