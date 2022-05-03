@@ -156,7 +156,9 @@ inline int cart2blacs(
     int nblk,
 	int lld,
     int* desc,
-    int* desc_wfc)
+    int* desc_wfc,
+    int* desc_wfc1,
+    int* desc_Eij)
 {
     int my_blacs_ctxt;
     int myprow, mypcol;
@@ -178,6 +180,8 @@ inline int cart2blacs(
     int ISRC=0;
     descinit_(desc, &Nlocal, &Nlocal, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
     descinit_(desc_wfc, &Nlocal, &Nbands, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
+    descinit_(desc_wfc1, &Nbands, &Nlocal, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
+    descinit_(desc_Eij, &Nbands, &Nbands, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
 
     return my_blacs_ctxt;
 }
@@ -255,7 +259,7 @@ void ORB_control::divide_HS_2d
     if(ks_solver=="genelpa" || ks_solver=="scalapack_gvx")
     {
         pv->blacs_ctxt = cart2blacs(pv->comm_2D, pv->dim0, pv->dim1,
-            nlocal, nbands, pv->nb, pv->nrow, pv->desc, pv->desc_wfc);
+            nlocal, nbands, pv->nb, pv->nrow, pv->desc, pv->desc_wfc,pv->desc_wfc1, pv->desc_Eij);
     }
 #else // single processor used.
 	pv->nb = nlocal;
