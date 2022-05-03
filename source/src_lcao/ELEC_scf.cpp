@@ -12,6 +12,8 @@
 #include "../src_pw/occupy.h"
 #include "../module_base/timer.h"
 #include "chrono"
+#include "../module_base/blas_connector.h"
+#include "../module_base/scalapack_connector.h"
 //new
 #include "../src_pw/H_Ewald_pw.h"
 #ifdef __DEEPKS
@@ -22,6 +24,14 @@ ELEC_scf::ELEC_scf(){}
 ELEC_scf::~ELEC_scf(){}
 
 int ELEC_scf::iter=0;
+
+inline int globalIndex(int localindex, int nblk, int nprocs, int myproc)
+{
+    int iblock, gIndex;
+    iblock=localindex/nblk;
+    gIndex=(iblock*nprocs+myproc)*nblk+localindex%nblk;
+    return gIndex;
+}
 
 void ELEC_scf::scf(const int& istep,
     Local_Orbital_Charge &loc,
@@ -509,6 +519,171 @@ void ELEC_scf::scf(const int& istep,
 
 			if (conv_elec && ELEC_evolve::tddft && istep >= 2)
         	{
+			#ifdef __MPI
+			//#else
+			///*
+				for(int ik=0; ik<GlobalC::kv.nks; ik++)
+				{
+					/*
+					cout<<"nbands="<<GlobalV::NBANDS<<" nlocal="<<GlobalV::NLOCAL<<endl;
+					cout<<"ncol="<<uhm.LM->ParaV->ncol<<"ncol_bands="<<uhm.LM->ParaV->ncol_bands<<" nrow="<<uhm.LM->ParaV->nrow<<endl;;
+					cout<<"nloc_wfc="<<uhm.LM->ParaV->nloc_wfc<<" nloc="<<uhm.LM->ParaV->nloc<<endl;
+					*/
+					complex<double>* tmp1 = new complex<double> [uhm.LM->ParaV->nloc];
+					complex<double>* tmp2 = new complex<double> [uhm.LM->ParaV->nloc];
+					complex<double>* tmp3 = new complex<double> [uhm.LM->ParaV->nloc_wfc];
+					complex<double>* Htmp = new complex<double> [uhm.LM->ParaV->nloc];
+					ModuleBase::GlobalFunc::ZEROS(tmp1,uhm.LM->ParaV->nloc);
+					ModuleBase::GlobalFunc::ZEROS(tmp2,uhm.LM->ParaV->nloc);
+					ModuleBase::GlobalFunc::ZEROS(tmp3,uhm.LM->ParaV->nloc_wfc);
+					ModuleBase::GlobalFunc::ZEROS(Htmp,uhm.LM->ParaV->nloc);
+					//ModuleBase::ComplexMatrix tmp1;
+					//tmp1.create(uhm.LM->ParaV->nrow,uhm.LM->ParaV->ncol_bands);
+					const char N_char='N', T_char='T';
+					const double one_float[2]={1.0,0.0},zero_float[2]={0.0,0.0};
+					const int one_int=1;
+					zcopy_(&uhm.LM->ParaV->nloc, uhm.LM->Hloc2.data(),&one_int,Htmp,&one_int);
+					///*
+					pzgemm_(
+						&T_char, &N_char,
+						&GlobalV::NBANDS, &GlobalV::NLOCAL,&GlobalV::NLOCAL,
+						&one_float[0],
+						lowf.wfc_k[ik].c,&one_int,&one_int,uhm.LM->ParaV->desc_wfc,
+						Htmp,&one_int,&one_int,uhm.LM->ParaV->desc,
+						&zero_float[0],
+						tmp1,&one_int,&one_int,uhm.LM->ParaV->desc); // desc_wfc ?
+						//*/
+					
+					pztranu_(
+                		&GlobalV::NLOCAL, &GlobalV::NLOCAL,
+                		&one_float[0],
+                		tmp1, &one_int, &one_int, uhm.LM->ParaV->desc,
+                		&zero_float[0],
+                		tmp2, &one_int, &one_int, uhm.LM->ParaV->desc);
+					const int inc=1;
+					zcopy_(&uhm.LM->ParaV->nloc_wfc, tmp2, &inc, tmp3, &inc);
+
+					/*
+					GlobalV::ofs_running<<" wfc_k:"<<endl;
+                	for(int i=0; i<GlobalV::NBANDS; i++)
+                	{
+                        for(int j=0; j<GlobalV::NLOCAL; j++)
+                        {
+                                GlobalV::ofs_running<<lowf.wfc_k[ik].c[i*GlobalV::NLOCAL+j].real()<<"+"
+                                <<lowf.wfc_k[ik].c[i*GlobalV::NLOCAL+j].imag()<<"i ";
+                        }
+                        GlobalV::ofs_running<<endl;
+               	 	}
+        			GlobalV::ofs_running<<endl;
+					GlobalV::ofs_running<<" H:"<<endl;
+                	for(int i=0; i<GlobalV::NLOCAL; i++)
+                	{
+                        for(int j=0; j<GlobalV::NLOCAL; j++)
+                        {
+                                GlobalV::ofs_running<<Htmp[i*GlobalV::NLOCAL+j].real()<<"+"
+                                <<Htmp[i*GlobalV::NLOCAL+j].imag()<<"i ";
+                        }
+                        GlobalV::ofs_running<<endl;
+               	 	}
+        			GlobalV::ofs_running<<endl;
+					GlobalV::ofs_running<<" tmp1:"<<endl;
+                	for(int i=0; i<GlobalV::NLOCAL; i++)
+                	{
+                        for(int j=0; j<GlobalV::NLOCAL; j++)
+                        {
+                                GlobalV::ofs_running<<tmp1[i*GlobalV::NLOCAL+j].real()<<"+"
+                                <<tmp1[i*GlobalV::NLOCAL+j].imag()<<"i ";
+                        }
+                        GlobalV::ofs_running<<endl;
+               	 	}
+        			GlobalV::ofs_running<<endl;
+					*/
+
+					ModuleBase::ComplexMatrix tmp4 = conj(lowf.wfc_k[ik]);
+					//complex<double>* Eij = new complex<double> [uhm.LM->ParaV->nloc_Eij];
+					complex<double>* Eij = new complex<double> [uhm.LM->ParaV->nloc];
+					cout<<"nloc_Eij="<<uhm.LM->ParaV->nloc_Eij<<endl;
+					ModuleBase::GlobalFunc::ZEROS(Eij,uhm.LM->ParaV->nloc);
+					///*
+					pzgemm_(
+						&T_char, &N_char,
+						&GlobalV::NBANDS, &GlobalV::NBANDS,&GlobalV::NLOCAL,
+						&one_float[0],
+						tmp4.c,&one_int,&one_int,uhm.LM->ParaV->desc_wfc,
+						tmp3,&one_int,&one_int,uhm.LM->ParaV->desc_wfc,
+						&zero_float[0],
+						Eij,&one_int,&one_int,uhm.LM->ParaV->desc);
+						//Eij,&one_int,&one_int,uhm.LM->ParaV->desc_Eij);
+						//*/
+					///*
+					GlobalV::ofs_running<<endl;
+					GlobalV::ofs_running<<" Eij:"<<endl;
+                	for(int i=0; i<uhm.LM->ParaV->ncol; i++)
+                	{
+                        for(int j=0; j<uhm.LM->ParaV->nrow; j++)
+                        {
+                                GlobalV::ofs_running<<Eij[i*uhm.LM->ParaV->nrow+j].real()<<"+"
+                                <<Eij[i*uhm.LM->ParaV->nrow+j].imag()<<"i ";
+                        }
+                        GlobalV::ofs_running<<endl;
+               	 	}
+        			GlobalV::ofs_running<<endl;
+					//*/
+					///*
+					double* Eii = new double[GlobalV::NBANDS];
+					for (int i=0;i<GlobalV::NBANDS;i++) Eii[i]=0.0;
+					int myid;
+    				MPI_Comm_rank(uhm.LM->ParaV->comm_2D, &myid);
+    				int info;
+					int naroc[2]; // maximum number of row or column
+    				for(int iprow=0; iprow<uhm.LM->ParaV->dim0; ++iprow)
+    				{
+        				for(int ipcol=0; ipcol<uhm.LM->ParaV->dim1; ++ipcol)
+        				{
+            				const int coord[2]={iprow, ipcol};
+            				int src_rank;
+            				info=MPI_Cart_rank(uhm.LM->ParaV->comm_2D, coord, &src_rank);
+            				if(myid==src_rank)
+            				{
+                				naroc[0]=uhm.LM->ParaV->nrow;
+                				naroc[1]=uhm.LM->ParaV->ncol;
+            				//}
+            				//info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, uhm.LM->ParaV->comm_2D);
+            				//info = MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, uhm.LM->ParaV->comm_2D);
+							for (int j = 0; j < naroc[1]; ++j)
+    						{
+     							int igcol=globalIndex(j, uhm.LM->ParaV->nb, uhm.LM->ParaV->dim1, ipcol);
+    							if(igcol>=GlobalV::NBANDS) continue;
+        						for(int i=0; i<naroc[0]; ++i)
+        						{
+            						int igrow=globalIndex(i, uhm.LM->ParaV->nb, uhm.LM->ParaV->dim0, iprow);
+									if(igrow>=GlobalV::NBANDS) continue;
+									if (igcol==igrow) 
+									{
+										Eii[igcol]=Eij[j * naroc[0] + i].real();
+										//GlobalC::wf.ekb[ik][igcol]=Eij[j * naroc[0] + i].real();
+										//info = MPI_Bcast(&GlobalC::wf.ekb[ik][igcol], 1, MPI_DOUBLE, src_rank, uhm.LM->ParaV->comm_2D);
+									}
+								}
+   							}
+							}
+       					}//loop ipcol
+    				}//loop iprow
+					info=MPI_Allreduce(Eii,GlobalC::wf.ekb[ik],GlobalV::NBANDS,MPI_DOUBLE,MPI_SUM,uhm.LM->ParaV->comm_2D);
+					//*/
+					///*
+					GlobalV::ofs_running<<endl;
+					GlobalV::ofs_running<<" ekb: ";
+                	for(int i=0; i<GlobalV::NBANDS; i++)
+                	{
+						//GlobalV::ofs_running<<GlobalC::wf.ekb[ik][i]<<" ";
+                        GlobalV::ofs_running<<GlobalC::wf.ekb[ik][i]*13.605693<<" ";
+               	 	}
+        			GlobalV::ofs_running<<endl;
+					//*/
+				}
+				//*/
+			#else
             	const bool conjugate=false;
             	for(int ik=0; ik<GlobalC::kv.nks; ik++)
             	{
@@ -526,7 +701,30 @@ void ELEC_scf::scf(const int& istep,
             		{
                 		GlobalC::wf.ekb[ik][i]=Ematrix.c[i*GlobalV::NBANDS+i].real();
             		}
+					GlobalV::ofs_running<<endl;
+					GlobalV::ofs_running<<" Eij:"<<endl;
+                	for(int i=0; i<GlobalV::NBANDS; i++)
+                	{
+                        for(int j=0; j<GlobalV::NBANDS; j++)
+                        {
+                                GlobalV::ofs_running<<Ematrix.c[i*GlobalV::NBANDS+j].real()<<"+"
+                                <<Ematrix.c[i*GlobalV::NBANDS+j].imag()<<"i ";
+                        }
+                        GlobalV::ofs_running<<endl;
+               	 	}
+        			GlobalV::ofs_running<<endl;
+					///*
+					GlobalV::ofs_running<<endl;
+					GlobalV::ofs_running<<" ekb: ";
+                	for(int i=0; i<GlobalV::NBANDS; i++)
+                	{
+						//GlobalV::ofs_running<<GlobalC::wf.ekb[ik][i]<<" ";
+                        GlobalV::ofs_running<<GlobalC::wf.ekb[ik][i]*13.605693<<" ";
+               	 	}
+        			GlobalV::ofs_running<<endl;
+					//*/
 				}
+			#endif
 			}
 
 			if(conv_elec)
@@ -652,4 +850,3 @@ void ELEC_scf::init_mixstep_final_scf(void)
 
     return;
 }
-

@@ -118,9 +118,9 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
     if (GlobalV::GAMMA_ONLY_LOCAL)
     {
         LOWF_td.wfc_gamma.resize(GlobalV::NSPIN);
-        }
-        else
-        {
+    }
+    else
+    {
         LOWF_td.wfc_k.resize(GlobalC::kv.nks);
         LOWF_td.wfc_k_laststep.resize(GlobalC::kv.nks);
     }
@@ -162,7 +162,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
             GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
 
             // update force and virial due to the update of atom positions
-            if (verlet->mdp.md_ensolver == "FP" && GlobalV::BASIS_TYPE=="lcao" && ELEC_evolve::tddft)
+            if (verlet->mdp.md_ensolver == "FP" && GlobalV::BASIS_TYPE=="lcao" && ELEC_evolve::tddft )
             {
                 this->md_force_virial(p_esolver,verlet->step_, verlet->ucell.nat, verlet->potential, verlet->force, verlet->virial, LOWF_td);
             }
@@ -260,7 +260,7 @@ void Run_MD_LCAO::md_force_virial(
     }
 
     Local_Orbital_Charge LOC_md;
-    LOC_md.ParaV = this->LM_md.ParaV;
+    LOC_md.ParaV = LOWF_md.ParaV = this->LM_md.ParaV;
 
     LOC_md.init_dm_2d();
 
