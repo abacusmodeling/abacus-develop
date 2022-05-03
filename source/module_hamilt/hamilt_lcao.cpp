@@ -90,14 +90,14 @@ MatrixBlock<std::complex<double>> sk_in)const
 }*/
 // case for nspin<4, multi-k-points
 template <>
-void HamiltLCAO<std::complex<double>, double>::matrix(MatrixBlock<std::complex<double>> hk_in,
-                                                      MatrixBlock<std::complex<double>> sk_in)
+void HamiltLCAO<std::complex<double>, double>::matrix(MatrixBlock<std::complex<double>> &hk_in,
+                                                      MatrixBlock<std::complex<double>> &sk_in)
 {
     this->getMatrix(hk_in, sk_in);
 }
 
 // case for nspin<4, gamma_only
-template <> void HamiltLCAO<double, double>::matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in)
+template <> void HamiltLCAO<double, double>::matrix(MatrixBlock<double> &hk_in, MatrixBlock<double> &sk_in)
 {
     this->getMatrix(hk_in, sk_in);
 }

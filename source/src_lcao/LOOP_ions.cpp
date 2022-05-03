@@ -563,7 +563,7 @@ void LOOP_ions::final_scf(void)
 
 		// need to first calculae lgd.
         // using GlobalC::GridT.init.
-        GlobalC::GridT.cal_nnrg();
+        GlobalC::GridT.cal_nnrg(pv);
     }
 	//------------------------------------------------------------------
 
