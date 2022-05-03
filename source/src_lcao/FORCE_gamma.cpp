@@ -52,6 +52,8 @@ void Force_LCAO_gamma::ftable_gamma (
     this->calFvnlDbeta(loc.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
     this->cal_fvl_dphi(loc.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
     
+    //this->cal_fvl_dphi_new(loc.DM, isforce, isstress, fvl_dphi, svl_dphi);
+  
     //caoyu add for DeePKS
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
