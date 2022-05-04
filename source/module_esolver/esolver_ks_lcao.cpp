@@ -30,20 +30,7 @@ ESolver_KS_LCAO::~ESolver_KS_LCAO()
 }
 
 void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
-{
-    //------------------init Basis_lcao----------------------
-    // Init Basis should be put outside of Ensolver.
-    // * reading the localized orbitals/projectors
-    // * construct the interpolation tables.
-    this->Init_Basis_lcao(this->orb_con, inp, ucell);
-    //------------------init Basis_lcao----------------------
-
-    //------------------init Hamilt_lcao----------------------
-    // * allocate H and S matrices according to computational resources
-    // * set the 'trace' between local H/S and global H/S
-    this->LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, orb_con.ParaV);
-    //------------------init Hamilt_lcao----------------------
-    
+{    
     // setup GlobalV::NBANDS
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
@@ -178,8 +165,20 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
 		GlobalC::dftu.init(ucell, this->LM);
 	}
 
-    if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, ucell);
+    if (INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, ucell);
+    
+    //------------------init Basis_lcao----------------------
+    // Init Basis should be put outside of Ensolver.
+    // * reading the localized orbitals/projectors
+    // * construct the interpolation tables.
+    this->Init_Basis_lcao(this->orb_con, inp, ucell);
+    //------------------init Basis_lcao----------------------
 
+    //------------------init Hamilt_lcao----------------------
+    // * allocate H and S matrices according to computational resources
+    // * set the 'trace' between local H/S and global H/S
+    this->LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, orb_con.ParaV);
+    //------------------init Hamilt_lcao----------------------
   //init Psi
     if (GlobalV::GAMMA_ONLY_LOCAL)
         this->LOWF.wfc_gamma.resize(GlobalV::NSPIN);
