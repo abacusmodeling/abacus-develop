@@ -17,43 +17,45 @@ class surchem
     surchem();
     ~surchem();
 
-    static atom_in GetAtom;
+    atom_in GetAtom;
 
-    static void cal_epsilon(PW_Basis &pwb, const double *PS_TOTN_real, double *epsilon, double *epsilon0);
+    void cal_epsilon(PW_Basis &pwb, const double *PS_TOTN_real, double *epsilon, double *epsilon0);
 
-    static void cal_pseudo(const UnitCell &cell,
+    void cal_pseudo(const UnitCell &cell,
                            PW_Basis &pwb,
                            const complex<double> *Porter_g,
                            complex<double> *PS_TOTN);
 
-    static void gauss_charge(const UnitCell &cell, PW_Basis &pwb, complex<double> *N);
+    void gauss_charge(const UnitCell &cell, PW_Basis &pwb, complex<double> *N);
 
-    static void cal_totn(const UnitCell &cell,
+    void cal_totn(const UnitCell &cell,
                          PW_Basis &pwb,
                          const complex<double> *Porter_g,
                          complex<double> *N,
                          complex<double> *TOTN);
 
-    static ModuleBase::matrix cal_vcav(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *PS_TOTN, int nspin);
+    void createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *PS_TOTN, double *vwork);
 
-    static ModuleBase::matrix cal_vel(const UnitCell &cell,
+    ModuleBase::matrix cal_vcav(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *PS_TOTN, int nspin);
+
+    ModuleBase::matrix cal_vel(const UnitCell &cell,
                                       PW_Basis &pwb,
                                       const complex<double> *TOTN,
                                       const complex<double> *PS_TOTN,
                                       int nspin);
 
-    static double cal_Ael(const UnitCell &cell, PW_Basis &pwb, const double *TOTN_real, const double *delta_phi_R);
+    double cal_Ael(const UnitCell &cell, PW_Basis &pwb, const double *TOTN_real, const double *delta_phi_R);
 
-    static double cal_Acav(const UnitCell &cell, PW_Basis &pwb, double qs);
+    double cal_Acav(const UnitCell &cell, PW_Basis &pwb, double qs);
 
-    static void minimize_cg(const UnitCell &ucell,
+    void minimize_cg(const UnitCell &ucell,
                             PW_Basis &pwb,
                             double *d_eps,
                             const complex<double> *tot_N,
                             complex<double> *phi,
                             int &ncgsol);
 
-    static void Leps2(const UnitCell &ucell,
+    void Leps2(const UnitCell &ucell,
                       PW_Basis &pwb,
                       complex<double> *phi,
                       double *epsilon, // epsilon from shapefunc, dim=nrxx
@@ -63,7 +65,7 @@ class surchem
                       complex<double> *phi_work,
                       complex<double> *lp);
 
-    static ModuleBase::matrix v_correction(const UnitCell &cell,
+    ModuleBase::matrix v_correction(const UnitCell &cell,
                                            PW_Basis &pwb,
                                            const int &nspin,
                                            const double *const *const rho);

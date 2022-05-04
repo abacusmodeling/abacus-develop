@@ -73,7 +73,7 @@ void shape_gradn(const complex<double> *PS_TOTN, PW_Basis &pw, double *eprime)
     delete[] PS_TOTN_real;
 }
 
-void createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *PS_TOTN, double *vwork)
+void surchem::createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *PS_TOTN, double *vwork)
 {
     ModuleBase::Vector3<double> *nablan = new ModuleBase::Vector3<double>[pwb.nrxx];
     ModuleBase::GlobalFunc::ZEROS(nablan, pwb.nrxx);
