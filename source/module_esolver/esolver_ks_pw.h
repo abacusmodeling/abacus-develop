@@ -18,7 +18,7 @@ public:
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;
     void cal_Stress(ModuleBase::matrix& stress) override;
-    void cal_DOS() override;
+    void postprocess() override;
 
 protected:
     virtual void beforescf(int istep) override; 

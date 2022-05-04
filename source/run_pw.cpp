@@ -108,7 +108,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
 		opt.cal_epsilon2(GlobalV::NBANDS);
 	}
 
-    p_esolver->cal_DOS();
+    p_esolver->postprocess();
 
 	ModuleBase::timer::tick("Run_pw","plane_wave_line");
     return;

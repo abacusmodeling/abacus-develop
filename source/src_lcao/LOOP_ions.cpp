@@ -224,7 +224,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 
     }
 
-    p_esolver->cal_DOS();
+    p_esolver->postprocess();
 
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
     return;

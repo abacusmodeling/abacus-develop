@@ -218,7 +218,7 @@ void ESolver_KS_LCAO::cal_Stress(ModuleBase::matrix &stress)
     //copy the stress
     stress = this->scs;
 }
-void ESolver_KS_LCAO::cal_DOS()
+void ESolver_KS_LCAO::postprocess()
 {
     GlobalC::en.perform_dos(this->LOWF,this->UHM);
 }

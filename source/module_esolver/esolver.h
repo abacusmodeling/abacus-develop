@@ -39,7 +39,7 @@ public:
     virtual void cal_Energy(energy& en) = 0;
     virtual void cal_Force(ModuleBase::matrix &force) = 0;
     virtual void cal_Stress(ModuleBase::matrix& stress) = 0;
-    virtual void cal_DOS() = 0;
+    virtual void postprocess() {};
 
     //Print current classname.
     void printname();
