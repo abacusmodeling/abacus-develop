@@ -180,7 +180,7 @@ void ESolver_KS_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 
 }
 
-void ESolver_KS_PW:: beforescf()
+void ESolver_KS_PW:: beforescf(int istep)
 {
     //calculate ewald energy
     H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);

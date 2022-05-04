@@ -21,7 +21,7 @@ public:
     void cal_DOS() override;
 
 protected:
-    virtual void beforescf() override; 
+    virtual void beforescf(int istep) override; 
     virtual void eachiterinit(int iter) override; 
     virtual void hamilt2density(int istep, int iter, double ethr) override;
     virtual void updatepot(bool conv) override;

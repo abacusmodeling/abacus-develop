@@ -29,7 +29,7 @@ class ESolver_KS: public ESolver_FP
 
     protected:
         // Something to do before SCF iterations.
-        virtual void beforescf(){}; 
+        virtual void beforescf(int istep){}; 
         // Something to do before hamilt2density function in each iter loop.
         virtual void eachiterinit(int iter){}; 
         // Something to do after hamilt2density function in each iter loop.

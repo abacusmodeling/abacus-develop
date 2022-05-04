@@ -2,7 +2,6 @@
 #define ESOLVER_KS_LCAO_H
 #include "./esolver_ks.h"
 
-#include "../src_lcao/LOOP_elec.h"
 #include "src_lcao/record_adj.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/local_orbital_wfc.h"
@@ -28,14 +27,13 @@ public:
     void cal_DOS() override;
 
 protected:
-    virtual void beforescf() override; 
+    virtual void beforescf(int istep) override; 
     virtual void eachiterinit(int iter) override; 
     virtual void hamilt2density(int istep, int iter, double ethr) override;
     virtual void updatepot(bool conv) override;
     virtual void eachiterfinish(int iter, bool conv) override; 
     virtual void afterscf(bool conv) override;
-    LOOP_elec LOE;
-    
+
     ORB_control orb_con;    //Basis_LCAO
     Record_adj RA;
     Local_Orbital_wfc LOWF;
@@ -62,6 +60,12 @@ protected:
     ); //LiuXh add 2019-07-15, modify in 2021-12-3
     void output_SR(const std::string &SR_filename, const bool &binary=false, const double &sparse_threshold=1e-10);
 
+    // set matrix and grid integral
+	void set_matrix_grid(Record_adj &ra);
+
+    void solver(const int& istep,
+        Local_Orbital_Charge& loc,
+        Local_Orbital_wfc& lowf);
 };
 
 

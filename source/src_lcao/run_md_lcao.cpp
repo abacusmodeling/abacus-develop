@@ -1,5 +1,4 @@
 #include "run_md_lcao.h"
-#include "LOOP_elec.h"
 #include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
 #include "../src_pw/vdwd2.h"

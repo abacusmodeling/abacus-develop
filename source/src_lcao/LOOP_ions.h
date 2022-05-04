@@ -1,7 +1,6 @@
 #ifndef LOOP_IONS_H
 #define LOOP_IONS_H
 
-#include "LOOP_elec.h"
 #include "../src_ions/ions_move_methods.h"
 #include "../src_pw/charge_extra.h"
 #include "../src_ions/lattice_change_methods.h"

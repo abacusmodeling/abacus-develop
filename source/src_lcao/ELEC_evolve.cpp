@@ -1,5 +1,4 @@
 #include "ELEC_evolve.h"
-#include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
 #include "../src_pw/symmetry_rho.h"

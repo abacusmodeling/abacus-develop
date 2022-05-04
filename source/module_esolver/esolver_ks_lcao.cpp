@@ -192,7 +192,8 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
 
 void ESolver_KS_LCAO::Run(int istep, UnitCell_pseudo& cell)
 {
-    this->LOE.solve_elec_stru(istep, this->RA, this->LOC, this->LOWF, this->UHM);
+    this->beforescf(istep);
+    this->solver(istep, this->LOC, this->LOWF);
     this->afterscf(1);
     return;
 }
@@ -290,10 +291,6 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
 }
 
 
-void ESolver_KS_LCAO::beforescf()
-{
-    
-}
 void ESolver_KS_LCAO::eachiterinit(int iter)
 {
     

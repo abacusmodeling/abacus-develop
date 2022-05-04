@@ -1,4 +1,4 @@
-#include "LOOP_elec.h"
+#include "module_esolver/esolver_ks_lcao.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
 #include "../src_pw/symmetry_rho.h"
@@ -25,33 +25,13 @@
 #include "../module_deepks/LCAO_deepks.h"
 #endif
 
-void LOOP_elec::solve_elec_stru(const int& istep,
-    Record_adj &ra,
-    Local_Orbital_Charge& loc,
-    Local_Orbital_wfc& lowf,
-    LCAO_Hamilt& uhm_in)
+namespace ModuleESolver
 {
-    ModuleBase::TITLE("LOOP_elec","solve_elec_stru"); 
-    ModuleBase::timer::tick("LOOP_elec", "solve_elec_stru");
 
-    this->UHM = &uhm_in;
-
-	// prepare HS matrices, prepare grid integral
-	this->set_matrix_grid(ra);
-	// density matrix extrapolation and prepare S,T,VNL matrices 
-	this->before_solver(istep, loc, lowf);
-	// do self-interaction calculations / nscf/ tddft, etc. 
-	this->solver(istep, loc, lowf);
-
-    ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
-	return;
-}
-
-
-void LOOP_elec::set_matrix_grid(Record_adj &ra)
+void ESolver_KS_LCAO::set_matrix_grid(Record_adj &ra)
 {
-    ModuleBase::TITLE("LOOP_elec","set_matrix_grid"); 
-    ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 
+    ModuleBase::TITLE("ESolver_KS_LCAO","set_matrix_grid"); 
+    ModuleBase::timer::tick("ESolver_KS_LCAO","set_matrix_grid"); 
 
 	// (1) Find adjacent atoms for each atom.
 	GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
@@ -81,11 +61,11 @@ void LOOP_elec::set_matrix_grid(Record_adj &ra)
     // (2)For each atom, calculate the adjacent atoms in different cells
     // and allocate the space for H(R) and S(R).
     // If k point is used here, allocate HlocR after atom_arrange.
-    Parallel_Orbitals* pv = this->UHM->LM->ParaV;
+    Parallel_Orbitals* pv = this->UHM.LM->ParaV;
     ra.for_2d(*pv, GlobalV::GAMMA_ONLY_LOCAL);
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		this->UHM->LM->allocate_HS_R(pv->nnr);
+		this->UHM.LM->allocate_HS_R(pv->nnr);
 #ifdef __DEEPKS
 		GlobalC::ld.allocate_V_deltaR(pv->nnr);
 #endif
@@ -95,25 +75,28 @@ void LOOP_elec::set_matrix_grid(Record_adj &ra)
 		GlobalC::GridT.cal_nnrg(pv);
 	}
 
-    ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 
+    ModuleBase::timer::tick("ESolver_KS_LCAO","set_matrix_grid"); 
 	return;
 }
 
 
-void LOOP_elec::before_solver(const int& istep,
-    Local_Orbital_Charge& loc,
-    Local_Orbital_wfc& lowf)
+void ESolver_KS_LCAO::beforescf(int istep)
 {
-    ModuleBase::TITLE("LOOP_elec","before_solver"); 
-    ModuleBase::timer::tick("LOOP_elec","before_solver"); 
+    ModuleBase::TITLE("ESolver_KS_LCAO","beforescf"); 
+    ModuleBase::timer::tick("ESolver_KS_LCAO","beforescf"); 
 
-	// set the augmented orbitals index.
+	// 1. prepare HS matrices, prepare grid integral
+    this->set_matrix_grid(this->RA);
+    
+    // 2. density matrix extrapolation and prepare S,T,VNL matrices 
+
+    // set the augmented orbitals index.
 	// after ParaO and GridT, 
 	// this information is used to calculate
 	// the force.
 
 	// init density kernel and wave functions.
-	loc.allocate_dm_wfc(GlobalC::GridT.lgd, lowf);
+	this->LOC.allocate_dm_wfc(GlobalC::GridT.lgd, this->LOWF);
 
 	//======================================
 	// do the charge extrapolation before the density matrix is regenerated.
@@ -134,17 +117,17 @@ void LOOP_elec::before_solver(const int& istep,
 			std::stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
-			loc.read_dm(is, ssd.str() );
+			this->LOC.read_dm(is, ssd.str() );
 		}
 
 		// calculate the charge density
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			this->UHM->GG.cal_rho(loc.DM);
+			this->UHM.GG.cal_rho(this->LOC.DM);
 		}
 		else
 		{
-			this->UHM->GK.cal_rho_k(loc.DM_R);
+			this->UHM.GK.cal_rho_k(this->LOC.DM_R);
 		}
 
 		// renormalize the charge density
@@ -156,14 +139,14 @@ void LOOP_elec::before_solver(const int& istep,
 
 
 	// (9) compute S, T, Vnl, Vna matrix.
-    this->UHM->set_lcao_matrices();
+    this->UHM.set_lcao_matrices();
 
 #ifdef __DEEPKS
     //for each ionic step, the overlap <psi|alpha> must be rebuilt
     //since it depends on ionic positions
     if (GlobalV::deepks_setorb)
     {
-        const Parallel_Orbitals* pv = this->UHM->LM->ParaV;
+        const Parallel_Orbitals* pv = this->UHM.LM->ParaV;
         //build and save <psi(0)|alpha(R)> at beginning
         GlobalC::ld.build_psialpha(GlobalV::CAL_FORCE,
 			GlobalC::ucell,
@@ -186,16 +169,16 @@ void LOOP_elec::before_solver(const int& istep,
     }
 #endif
 
-    ModuleBase::timer::tick("LOOP_elec","before_solver"); 
+    ModuleBase::timer::tick("ESolver_KS_LCAO","beforescf"); 
 	return;
 }
 
-void LOOP_elec::solver(const int& istep,
+void ESolver_KS_LCAO::solver(const int& istep,
     Local_Orbital_Charge& loc,
     Local_Orbital_wfc& lowf)
 {
-    ModuleBase::TITLE("LOOP_elec","solver"); 
-    ModuleBase::timer::tick("LOOP_elec","solver"); 
+    ModuleBase::TITLE("ESolver_KS_LCAO","solver"); 
+    ModuleBase::timer::tick("ESolver_KS_LCAO","solver"); 
 
 	// self consistent calculations for electronic ground state
 	if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md"
@@ -214,7 +197,7 @@ void LOOP_elec::solver(const int& istep,
 		if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 		{
 			ELEC_scf es;
-            es.scf(istep - 1, loc, lowf, *this->UHM);
+            es.scf(istep - 1, loc, lowf, this->UHM);
         }
 		else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 		{
@@ -225,7 +208,7 @@ void LOOP_elec::solver(const int& istep,
 		{
 		#endif // __MPI
 			ELEC_scf es;
-            es.scf(istep - 1, loc, lowf, *this->UHM);
+            es.scf(istep - 1, loc, lowf, this->UHM);
 		#ifdef __MPI
             if (GlobalC::exx_global.info.separate_loop)
 			{
@@ -235,7 +218,7 @@ void LOOP_elec::solver(const int& istep,
 					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
 					
 					ELEC_scf es;
-					es.scf(istep-1, loc, lowf, *this->UHM);
+					es.scf(istep-1, loc, lowf, this->UHM);
 					if(ELEC_scf::iter==1)     // exx converge
 					{
 						break;
@@ -246,34 +229,35 @@ void LOOP_elec::solver(const int& istep,
 			{
 				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				ELEC_scf es;
-				es.scf(istep-1, loc, lowf, *this->UHM);
+				es.scf(istep-1, loc, lowf, this->UHM);
 			}
 		}
 		#endif // __MPI
 	}
 	else if (GlobalV::CALCULATION=="nscf")
 	{
-		ELEC_nscf::nscf(*this->UHM, loc.dm_gamma, loc.dm_k, lowf);
+		ELEC_nscf::nscf(this->UHM, loc.dm_gamma, loc.dm_k, lowf);
 	}
 	else if (GlobalV::CALCULATION=="istate")
 	{
 		IState_Charge ISC(lowf.wfc_gamma, loc);
-		ISC.begin(this->UHM->GG);
+		ISC.begin(this->UHM.GG);
 	}
 	else if (GlobalV::CALCULATION=="ienvelope")
 	{
         IState_Envelope IEP;
         if (GlobalV::GAMMA_ONLY_LOCAL)
-            IEP.begin(lowf, this->UHM->GG, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
+            IEP.begin(lowf, this->UHM.GG, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
         else
-            IEP.begin(lowf, this->UHM->GK, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
+            IEP.begin(lowf, this->UHM.GK, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
     }
 	else
 	{
-		ModuleBase::WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
+		ModuleBase::WARNING_QUIT("ESolver_KS_LCAO::solver","CALCULATION type not supported");
 	}
 
-    ModuleBase::timer::tick("LOOP_elec","solver"); 
+    ModuleBase::timer::tick("ESolver_KS_LCAO","solver"); 
 	return;
 }
 
+}
