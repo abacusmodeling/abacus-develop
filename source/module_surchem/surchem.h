@@ -19,10 +19,13 @@ class surchem
 
     double *TOTN_real;
     double *delta_phi;
+    ModuleBase::matrix Vcav;
+    ModuleBase::matrix Vel;
+    double qs;
 
     atom_in GetAtom;
 
-    void allocate(const int &nrxx);
+    void allocate(const int &nrxx, const int &nspin);
 
     void cal_epsilon(PW_Basis &pwb, const double *PS_TOTN_real, double *epsilon, double *epsilon0);
 

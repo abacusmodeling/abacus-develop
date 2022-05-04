@@ -63,7 +63,7 @@ void Potential::allocate(const int nrxx)
 
     if (GlobalV::imp_sol)
     {
-        GlobalC::solvent_model.allocate(nrxx);
+        GlobalC::solvent_model.allocate(nrxx, GlobalV::NSPIN);
     }
 
     return;
