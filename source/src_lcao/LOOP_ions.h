@@ -17,23 +17,10 @@ class LOOP_ions
 
 	public:
 
-	LOOP_ions(LCAO_Matrix &lm);
+	LOOP_ions();
 	~LOOP_ions();
 
-    LOOP_elec LOE;
-    Local_Orbital_wfc LOWF;
-    Local_Orbital_Charge LOC;
-    LCAO_Hamilt UHM;
-
 	void opt_ions(ModuleESolver::ESolver *p_esolver); //output for dos
-	void output_HS_R(
-        const std::string &SR_filename="data-SR-sparse_SPIN0.csr",
-        const std::string &HR_filename_up="data-HR-sparse_SPIN0.csr",
-        const std::string HR_filename_down="data-HR-sparse_SPIN1.csr",
-        const bool &binary=false, 
-        const double &sparse_threshold=1e-10
-    ); //LiuXh add 2019-07-15, modify in 2021-12-3
-    void output_SR(const std::string &SR_filename, const bool &binary=false, const double &sparse_threshold=1e-10);
 
 	private:
 
@@ -47,17 +34,13 @@ class LOOP_ions
 	// the renew of structure factors, etc. should be ran in other places
 	// the 'IMM' and 'LCM' objects should be passed to force_stress() via parameters list
 	// mohan note 2021-03-23
-	bool force_stress(const int &istep, int &force_step, int &stress_step, Record_adj &ra);
+	bool force_stress(const int &istep, int &force_step, int &stress_step,  ModuleESolver::ESolver* p_esolver);
 
 	int istep;
 
 	// electron charge density extropolation method
 	Charge_Extra CE;
 
-	// PLEASE move final_scf to other places, for example, now it can be put 
-	// in 'src_ions/variable_cell.cpp'
-	// mohan note 2021-03-23
-	void final_scf(void);
 };
 
 #endif

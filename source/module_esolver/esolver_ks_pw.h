@@ -17,7 +17,8 @@ public:
     void Init(Input &inp, UnitCell_pseudo &cell) override;
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;
-    void cal_Stress(ModuleBase::matrix &stress) override;
+    void cal_Stress(ModuleBase::matrix& stress) override;
+    void cal_DOS() override;
 
 protected:
     virtual void beforescf() override; 
@@ -25,7 +26,7 @@ protected:
     virtual void hamilt2density(int istep, int iter, double ethr) override;
     virtual void updatepot(bool conv) override;
     virtual void eachiterfinish(int iter, bool conv) override; 
-    virtual void afterscf(bool) override;
+    virtual void afterscf(bool conv) override;
 
     // <Temporary> Get wavefunctions and eigen energies. 
     // It should be replaced by diag class in HSolver module in the future

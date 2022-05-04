@@ -34,19 +34,13 @@ public:
     // virtual void UpdateLat(ModuleBase::matrix &lat_in);
     // virtual void UpdateAtom(Atom &atom_in);
    
-    /// These two virtual `Run` will be merged in the future.
-    //virtual void Run(int istep, Atom &atom) = 0;
     virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
-    virtual void Run(int istep,
-        Record_adj& ra /**< would be a 2nd-module of Cell*/,
-        Local_Orbital_Charge& loc /**< EState*/,
-        Local_Orbital_wfc& lowf /**< Psi*/,
-        LCAO_Hamilt& uhm /**< Hamilt*/) {};
     
-    virtual void cal_Energy(energy &en) = 0; 
+    virtual void cal_Energy(energy& en) = 0;
     virtual void cal_Force(ModuleBase::matrix &force) = 0;
-    virtual void cal_Stress(ModuleBase::matrix &stress) = 0;
-    
+    virtual void cal_Stress(ModuleBase::matrix& stress) = 0;
+    virtual void cal_DOS() = 0;
+
     //Print current classname.
     void printname();
 

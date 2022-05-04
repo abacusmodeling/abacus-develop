@@ -531,5 +531,10 @@ void ESolver_KS_PW::cal_Stress(ModuleBase::matrix &stress)
 	Stress_PW ss;
 	ss.cal_stress(stress);
 }
+void ESolver_KS_PW::cal_DOS()
+{
+	// compute density of states
+    GlobalC::en.perform_dos_pw();
+}
 
 }

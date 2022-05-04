@@ -21,7 +21,8 @@ public:
     void Run(int istep, UnitCell_pseudo& cell) override;
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;
-    void cal_Stress(ModuleBase::matrix &stress) override;
+    void cal_Stress(ModuleBase::matrix& stress) override;
+    void cal_DOS() override {};
 
 
     double LJ_energy(const double d);
