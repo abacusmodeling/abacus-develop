@@ -106,7 +106,7 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     }
 
     // calculate Ael
-    double Ael = cal_Ael(cell, pwb, TOTN_real, delta_phi);
+    double Ael = cal_Ael(cell, pwb);
 
     // the 2nd item of tmp_Vel
     double *Vel2 = new double[pwb.nrxx];

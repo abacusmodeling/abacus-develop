@@ -122,7 +122,7 @@ void surchem::createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<d
     // quantum surface area, integral of (gamma*A / n) * |\nabla n|
     //=term1 * sqrt_nablan_2
     //-------------------------------------------------------------
-    double qs = 0;
+    qs = 0;
 
     for (int ir = 0; ir < pwb.nrxx; ir++)
     {
@@ -136,7 +136,7 @@ void surchem::createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<d
     // cavitation energy
     //-------------------------------------------------------------
 
-    double Ael = surchem::cal_Acav(ucell, pwb, qs);
+    double Ael = cal_Acav(ucell, pwb);
 
     //  packs the real array into a complex one
     //  to G space
@@ -199,6 +199,7 @@ ModuleBase::matrix surchem::cal_vcav(const UnitCell &ucell, PW_Basis &pwb, const
             }
         }
     }
+
     delete[] tmp_Vcav;
     ModuleBase::timer::tick("surchem", "cal_vcav");
     return Vcav;

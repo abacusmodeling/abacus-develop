@@ -52,9 +52,9 @@ class surchem
                                       const complex<double> *PS_TOTN,
                                       int nspin);
 
-    double cal_Ael(const UnitCell &cell, PW_Basis &pwb, const double *TOTN_real, const double *delta_phi_R);
+    double cal_Ael(const UnitCell &cell, PW_Basis &pwb);
 
-    double cal_Acav(const UnitCell &cell, PW_Basis &pwb, double qs);
+    double cal_Acav(const UnitCell &cell, PW_Basis &pwb);
 
     void minimize_cg(const UnitCell &ucell,
                             PW_Basis &pwb,
