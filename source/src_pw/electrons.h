@@ -30,7 +30,7 @@ public:
 
     double delta_total_energy;
 
-    void self_consistent(const int &istep);
+    // void self_consistent(const int &istep); // It is replaced by ESolver_KS::Run
 
     void non_self_consistent(const int &istep);
 
