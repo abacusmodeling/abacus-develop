@@ -92,7 +92,7 @@ void LOOP_elec::set_matrix_grid(Record_adj &ra)
 
 		// need to first calculae lgd.
 		// using GlobalC::GridT.init.
-		GlobalC::GridT.cal_nnrg();
+		GlobalC::GridT.cal_nnrg(pv);
 	}
 
     ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 

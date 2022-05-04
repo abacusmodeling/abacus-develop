@@ -60,22 +60,28 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
         // double drho = this->estate.caldr2(); 
         // EState should be used after it is constructed.
         drho = GlobalC::CHR.get_drho();
-
+        double hsolver_error = 0.0;
         if(firstscf)
         {
             firstscf = false;
-            double hsover_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
+            hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
             // The error of HSolver is larger than drho, so a more precise HSolver should be excuted.
-            if(hsover_error > drho)  
+            if(hsolver_error > drho)  
             {
-                reset_diagethr(GlobalV::ofs_running, hsover_error);
+                reset_diagethr(GlobalV::ofs_running, hsolver_error);
                 this->hamilt2density(istep, iter, this->diag_ethr);
                 drho = GlobalC::CHR.get_drho();
+                hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
             }   
         }
         
-        if(drho < this->scf_thr)   
-            conv_elec = true;
+        conv_elec = (drho < this->scf_thr);
+
+        // If drho < hsolver_error in the first iter or drho < scf_thr, we do not change rho.
+        if( drho < hsolver_error || conv_elec)
+        {
+            if(drho < hsolver_error)    GlobalV::ofs_warning << " drho < hsolver_error, keep charge density unchanged." << std::endl;
+        }
         else
         {
             //charge mixing
@@ -129,6 +135,12 @@ void ESolver_KS:: set_ethr(int istep, int iter)
             }
         }
         if(GlobalV::FINAL_SCF) this->diag_ethr = 1.0e-2;
+        
+        if(GlobalV::CALCULATION=="md"||GlobalV::CALCULATION=="relax"||GlobalV::CALCULATION=="cell-relax")
+        {
+            this->diag_ethr = std::max(this->diag_ethr, INPUT.pw_diag_thr);
+        }
+        
     }
     else
     {

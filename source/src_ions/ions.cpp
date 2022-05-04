@@ -342,7 +342,7 @@ void Ions::reset_after_relax(const int& istep)
 	GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
 
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
-	GlobalC::wf.wfcinit();
+	//GlobalC::wf.wfcinit();
 }
 void Ions::reset_after_cellrelax(int& f_step, int& s_step)
 {
