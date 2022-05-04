@@ -215,7 +215,7 @@ void Run_MD_PW::md_force_virial(
         {
 #endif
 #endif
-            p_esolver->Run(istep-1,GlobalC::ucell);
+            p_esolver->Run(istep,GlobalC::ucell);
 			eiter = p_esolver->getniter();
 #ifdef __LCAO
 #ifdef __MPI
@@ -230,7 +230,7 @@ void Run_MD_PW::md_force_virial(
             {
                 for (size_t hybrid_step = 0; hybrid_step != GlobalC::exx_global.info.hybrid_step; ++hybrid_step)
                 {
-                    p_esolver->Run(istep-1,GlobalC::ucell);
+                    p_esolver->Run(istep,GlobalC::ucell);
 					eiter += p_esolver->getniter();
                     if (elec.iter == 1 || hybrid_step == GlobalC::exx_global.info.hybrid_step - 1) // exx converge
                         break;
@@ -240,10 +240,10 @@ void Run_MD_PW::md_force_virial(
             }
             else
             {
-                p_esolver->Run(istep-1,GlobalC::ucell);
+                p_esolver->Run(istep,GlobalC::ucell);
 				eiter += p_esolver->getniter();
                 XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-                p_esolver->Run(istep-1,GlobalC::ucell);
+                p_esolver->Run(istep,GlobalC::ucell);
 				eiter += p_esolver->getniter();
             }
         }
