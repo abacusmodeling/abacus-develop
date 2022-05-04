@@ -57,7 +57,7 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     ModuleBase::TITLE("surchem", "cal_vel");
     ModuleBase::timer::tick("surchem", "cal_vel");
 
-    double *TOTN_real = new double[pwb.nrxx];
+    // double *TOTN_real = new double[pwb.nrxx];
     GlobalC::UFFT.ToRealSpace(TOTN, TOTN_real);
 
     // -4pi * TOTN(G)
@@ -93,7 +93,7 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
 
     double *phi_tilda_R = new double[pwb.nrxx];
     double *phi_tilda_R0 = new double[pwb.nrxx];
-    double *delta_phi_R = new double[pwb.nrxx];
+    // double *delta_phi_R = new double[pwb.nrxx];
 
     GlobalC::UFFT.ToRealSpace(Sol_phi, phi_tilda_R);
     GlobalC::UFFT.ToRealSpace(Sol_phi0, phi_tilda_R0);
@@ -101,12 +101,12 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     // the 1st item of Vel
     for (int i = 0; i < pwb.nrxx; i++)
     {
-        delta_phi_R[i] = phi_tilda_R[i] - phi_tilda_R0[i];
-        Vel[i] += delta_phi_R[i];
+        delta_phi[i] = phi_tilda_R[i] - phi_tilda_R0[i];
+        Vel[i] += delta_phi[i];
     }
 
     // calculate Ael
-    double Ael = cal_Ael(cell, pwb, TOTN_real, delta_phi_R);
+    double Ael = cal_Ael(cell, pwb, TOTN_real, delta_phi);
 
     // the 2nd item of Vel
     double *Vel2 = new double[pwb.nrxx];
@@ -147,10 +147,10 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     delete[] epsilon0;
     delete[] Vel;
     delete[] Vel2;
-    delete[] TOTN_real;
+    // delete[] TOTN_real;
     delete[] phi_tilda_R;
     delete[] phi_tilda_R0;
-    delete[] delta_phi_R;
+    // delete[] delta_phi_R;
 
     ModuleBase::timer::tick("surchem", "cal_vel");
     return v;

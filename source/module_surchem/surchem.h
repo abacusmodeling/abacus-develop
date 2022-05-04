@@ -17,7 +17,12 @@ class surchem
     surchem();
     ~surchem();
 
+    double *TOTN_real;
+    double *delta_phi;
+
     atom_in GetAtom;
+
+    void allocate(const int &nrxx);
 
     void cal_epsilon(PW_Basis &pwb, const double *PS_TOTN_real, double *epsilon, double *epsilon0);
 
@@ -72,5 +77,10 @@ class surchem
 
   private:
 };
+
+namespace GlobalC
+{
+  extern surchem solvent_model;
+}
 
 #endif
