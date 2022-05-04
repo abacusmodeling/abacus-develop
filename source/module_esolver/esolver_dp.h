@@ -11,7 +11,7 @@ class ESolver_DP: public ESolver
 public:
     ESolver_DP()
     {
-        tag = "ESolver_DP";
+        classname = "ESolver_DP";
     }
     
     void Init(Input &inp, UnitCell_pseudo &cell) override;
