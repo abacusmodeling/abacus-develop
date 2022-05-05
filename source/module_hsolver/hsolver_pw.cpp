@@ -27,11 +27,43 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
 
     // select the method of diagonalization
     if (this->method == "cg")
-        pdiagh = new DiagoCG(&(GlobalC::hm.hpw), precondition.data());
+    {
+        if(pdiagh!=nullptr)
+        {
+            if(pdiagh->method != this->method)
+            {
+                delete[] pdiagh;
+                pdiagh = new DiagoCG(&(GlobalC::hm.hpw), precondition.data());
+                pdiagh->method = this->method;
+            }
+        }
+        else
+        {
+            pdiagh = new DiagoCG(&(GlobalC::hm.hpw), precondition.data());
+            pdiagh->method = this->method;
+        }
+    }
     else if (this->method == "david")
-        pdiagh = new DiagoDavid(&(GlobalC::hm.hpw), precondition.data());
+    {
+        if (pdiagh != nullptr)
+        {
+            if (pdiagh->method != this->method)
+            {
+                delete[] pdiagh;
+                pdiagh = new DiagoDavid(&(GlobalC::hm.hpw), precondition.data());
+                pdiagh->method = this->method;
+            }
+        }
+        else
+        {
+            pdiagh = new DiagoDavid(&(GlobalC::hm.hpw), precondition.data());
+            pdiagh->method = this->method;
+        }
+    }
     else
+    {
         ModuleBase::WARNING_QUIT("HSolverPW::solve", "This method of DiagH is not supported!");
+    }
 
     /// Loop over k points for solve Hamiltonian to charge density
     for (int ik = 0; ik < psi.get_nk(); ++ik)
