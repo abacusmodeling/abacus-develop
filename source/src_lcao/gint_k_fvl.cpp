@@ -196,7 +196,7 @@ void Gint_k::fvl_k_RealSpace(
 	//---------------------------------------
 
 	//this->LM->DHloc_fixedR_x
-	this->folding_stress(isforce, isstress, fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
+	this->folding_force(isforce, isstress, fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
 			pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23);
 
 	if(isforce)

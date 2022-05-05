@@ -69,15 +69,9 @@ class Gint_k : public Gint_k_init
 
     // folding the < dphi_0 | V | phi_R> matrix to 
     // < dphi_0i | V | phi_0j>
-    void folding_force(
-        ModuleBase::matrix& fvl_dphi,
-        double* pvdpx, 
-        double* pvdpy, 
-        double* pvdpz);//mohan add 2012-1-6
-
     // folding the < dphi_0 | V * R_beta | phi_R> matrix
     // < dphi_0i | V | phi_0j>
-    void folding_stress(
+    void folding_force(
         const bool isforce,
         const bool isstress,
         ModuleBase::matrix& fvl_dphi, 
@@ -90,7 +84,9 @@ class Gint_k : public Gint_k_init
         double* pvdp33, 
         double* pvdp12, 
         double* pvdp13, 
-        double* pvdp23);//zhengdy add 2016-10-18
+        double* pvdp23);
+        //mohan add 2012-1-6
+        //zhengdy add 2016-10-18
 
     //------------------------------------------------------
     // in gint_k_rho.cpp 
