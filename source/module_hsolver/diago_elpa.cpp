@@ -3,6 +3,7 @@
 #include "module_base/global_variable.h"
 #include "module_base/lapack_connector.h"
 #include "module_base/timer.h"
+#include "module_base/tool_quit.h"
 extern "C"
 {
 #include "module_base/blacs_connector.h"
@@ -54,6 +55,7 @@ inline int set_elpahandle(elpa_t &handle,
 
 void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, double *eigenvalue_in)
 {
+#ifdef __MPI
     matcd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
 
@@ -86,10 +88,14 @@ void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi
     // the eigenvalues.
     const int inc = 1;
     BlasConnector::copy(GlobalV::NBANDS, eigen.data(), inc, eigenvalue_in, inc);
+#elif
+    ModuleBase::WARNING_QUIT("DiagoElpa", "DiagoElpa only can be used with macro __MPI");
+#endif
 }
 
 void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eigenvalue_in)
 {
+#ifdef __MPI
     matd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
 
@@ -134,8 +140,12 @@ void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eige
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "K-S equation was solved by genelpa2");
     BlasConnector::copy(GlobalV::NBANDS, eigen.data(), inc, eigenvalue_in, inc);
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "eigenvalues were copied to ekb");
+#elif
+    ModuleBase::WARNING_QUIT("DiagoElpa", "DiagoElpa only can be used with macro __MPI");
+#endif
 }
 
+#ifdef __MPI
 bool DiagoElpa::ifElpaHandle(const bool &newIteration, const bool &ifNSCF)
 {
     int doHandle = false;
@@ -145,5 +155,6 @@ bool DiagoElpa::ifElpaHandle(const bool &newIteration, const bool &ifNSCF)
         doHandle = true;
     return doHandle;
 }
+#endif
 
 } // namespace hsolver
