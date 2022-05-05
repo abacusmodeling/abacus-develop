@@ -151,10 +151,10 @@ void ESolver_KS:: set_ethr(const int istep, const int iter)
 		this->diag_ethr = std::min( this->diag_ethr, 0.1*this->drho/ std::max(1.0, GlobalC::CHR.nelec));
 
     }
-    // if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") 
-    // {
-    //     this->diag_ethr = 0.0;
-    // }
+    if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") 
+    {
+        this->diag_ethr = 0.0;
+    }
 }
 
 void ESolver_KS:: printhead()
