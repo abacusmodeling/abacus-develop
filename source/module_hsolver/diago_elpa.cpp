@@ -88,7 +88,7 @@ void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi
     // the eigenvalues.
     const int inc = 1;
     BlasConnector::copy(GlobalV::NBANDS, eigen.data(), inc, eigenvalue_in, inc);
-#elif
+#else
     ModuleBase::WARNING_QUIT("DiagoElpa", "DiagoElpa only can be used with macro __MPI");
 #endif
 }
@@ -140,7 +140,7 @@ void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eige
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "K-S equation was solved by genelpa2");
     BlasConnector::copy(GlobalV::NBANDS, eigen.data(), inc, eigenvalue_in, inc);
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "eigenvalues were copied to ekb");
-#elif
+#else
     ModuleBase::WARNING_QUIT("DiagoElpa", "DiagoElpa only can be used with macro __MPI");
 #endif
 }
