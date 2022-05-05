@@ -101,17 +101,16 @@ class Gint_k : public Gint_k_init
     //------------------------------------------------------
     // in gint_k_fvl.cpp 
     //------------------------------------------------------
-    // calculate the force (many k-points).
-    void fvl_k_RealSpace(
-        ModuleBase::matrix& fvl_dphi, 
-        const double* vl);//mohan add 2011-06-19
+    // calculate force & stress (many k-points).
 
-    void svl_k_RealSpace(
+    void fvl_k_RealSpace(
         const bool isforce,
         const bool isstress,
         ModuleBase::matrix& fvl_dphi, 
         ModuleBase::matrix& svl_dphi, 
-        const double* vl);//zhengdy add 2016-10-18
+        const double* vl);
+        //mohan add 2011-06-19
+        //zhengdy add 2016-10-18
 
     private:
     
