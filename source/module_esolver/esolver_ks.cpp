@@ -25,7 +25,7 @@ ESolver_KS::ESolver_KS()
     out_freq_elec = GlobalV::OUT_FREQ_ELEC;
 }
 
-void ESolver_KS:: hamilt2density(int istep, int iter, double ethr)
+void ESolver_KS:: hamilt2density(const int istep, const int iter, const double ethr)
 {
     ModuleBase::timer:: tick(this->classname,"hamilt2density");
     //Temporarily, before HSolver is constructed, it should be overrided by
@@ -37,7 +37,7 @@ void ESolver_KS:: hamilt2density(int istep, int iter, double ethr)
 }
 
 
-void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
+void ESolver_KS:: Run(const int istep, UnitCell_pseudo& cell)
 {
     ModuleBase::timer:: tick(this->classname,"Run");
     
@@ -109,7 +109,7 @@ void ESolver_KS:: Run(int istep, UnitCell_pseudo& cell)
 };
 
 //<Temporary> It should be a function of Diag_H class in the future.
-void ESolver_KS:: set_ethr(int istep, int iter)
+void ESolver_KS:: set_ethr(const int istep, const int iter)
 {
 //It is too complex now and should be modified.
     if(iter == 1)
@@ -148,24 +148,13 @@ void ESolver_KS:: set_ethr(int istep, int iter)
         {
             this->diag_ethr = 1.e-2;
         }
-
-		//----------------------------
-		// this->diag_ethr changes in CG Method.
-		// mohan update 2012-03-26
-		// mohan update 2012-02-08
-		//----------------------------
-		if(GlobalV::BASIS_TYPE=="lcao")
-		{
-			this->diag_ethr = std::min( this->diag_ethr, 0.01*this->drho/ std::max(1.0, GlobalC::CHR.nelec));
-		}
-		// mohan update 2009-09-04
-		else
-		{
-			this->diag_ethr = std::min( this->diag_ethr, 0.1*this->drho/ std::max(1.0, GlobalC::CHR.nelec));
-			//std::cout << " new this->diag_ethr = " << this->diag_ethr << std::endl;
-		}
+		this->diag_ethr = std::min( this->diag_ethr, 0.1*this->drho/ std::max(1.0, GlobalC::CHR.nelec));
 
     }
+    // if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") 
+    // {
+    //     this->diag_ethr = 0.0;
+    // }
 }
 
 void ESolver_KS:: printhead()
@@ -182,12 +171,12 @@ void ESolver_KS:: printhead()
 	std::cout << std::setw(11) << "TIME(s)" << std::endl;
 }
 
-void ESolver_KS::printiter(bool conv_elec, int iter, double drho, double duration, double ethr)
+void ESolver_KS::printiter(const bool conv_elec, const int iter, const double drho, const double duration, const double ethr)
 {
     GlobalC::en.print_etot(conv_elec, iter, drho, duration, ethr);
 }
 
-void ESolver_KS:: writehead(std::ofstream &ofs_running, int istep, int iter)
+void ESolver_KS:: writehead(std::ofstream &ofs_running, const int istep, const int iter)
 {
     ofs_running
         << "\n "
@@ -197,7 +186,7 @@ void ESolver_KS:: writehead(std::ofstream &ofs_running, int istep, int iter)
         << "--------------------------------\n";
 }
 
-void ESolver_KS:: reset_diagethr(std::ofstream &ofs_running, double hsover_error)
+void ESolver_KS:: reset_diagethr(std::ofstream &ofs_running, const double hsover_error)
 {
     ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
     ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");

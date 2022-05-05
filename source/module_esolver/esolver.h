@@ -36,7 +36,7 @@ public:
    
     /// These two virtual `Run` will be merged in the future.
     //virtual void Run(int istep, Atom &atom) = 0;
-    virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
+    virtual void Run(const int istep, UnitCell_pseudo& cell) = 0;
     virtual void Run(int istep,
         Record_adj& ra /**< would be a 2nd-module of Cell*/,
         Local_Orbital_Charge& loc /**< EState*/,

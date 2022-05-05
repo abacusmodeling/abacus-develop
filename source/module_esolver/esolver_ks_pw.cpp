@@ -192,7 +192,7 @@ void ESolver_KS_PW:: beforescf()
     }
 } 
 
-void ESolver_KS_PW:: eachiterinit(int iter)
+void ESolver_KS_PW:: eachiterinit(const int iter)
 {
     // mohan add 2010-07-16
     if(iter==1) GlobalC::CHR.set_new_e_iteration(true);
@@ -215,15 +215,11 @@ void ESolver_KS_PW:: eachiterinit(int iter)
 }
 
 //Temporary, it should be replaced by hsolver later.
-void ESolver_KS_PW:: hamilt2density(int istep, int iter, double ethr)
+void ESolver_KS_PW:: hamilt2density(const int istep, const int iter, const double ethr)
 {
     GlobalV::PW_DIAG_THR = ethr;
     this->c_bands(istep,iter);
-    ethr = GlobalV::PW_DIAG_THR;
-    if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") 
-    {
-        ethr = 0.0;
-    }
+    
     GlobalC::en.eband  = 0.0;
     GlobalC::en.demet  = 0.0;
     GlobalC::en.ef     = 0.0;
@@ -265,7 +261,7 @@ void ESolver_KS_PW:: hamilt2density(int istep, int iter, double ethr)
 }
 
 //Temporary:
-void ESolver_KS_PW:: c_bands(int istep, int iter)
+void ESolver_KS_PW:: c_bands(const int istep, const int iter)
 {
     Electrons elec;
     elec.iter = iter;
@@ -273,7 +269,7 @@ void ESolver_KS_PW:: c_bands(int istep, int iter)
 }
 
 //Temporary, it should be rewritten with Hamilt class. 
-void ESolver_KS_PW:: updatepot(bool conv_elec)
+void ESolver_KS_PW:: updatepot(const bool conv_elec)
 {
     if (!conv_elec)
     {
@@ -305,7 +301,7 @@ void ESolver_KS_PW:: updatepot(bool conv_elec)
     GlobalC::pot.set_vr_eff();
 }
 
-void ESolver_KS_PW:: eachiterfinish(int iter, bool conv_elec)
+void ESolver_KS_PW:: eachiterfinish(const int iter, const bool conv_elec)
 {
     //print_eigenvalue(GlobalV::ofs_running);
     GlobalC::en.calculate_etot();
@@ -352,7 +348,7 @@ void ESolver_KS_PW:: eachiterfinish(int iter, bool conv_elec)
 }
 
 
-void ESolver_KS_PW::afterscf(bool conv_elec)
+void ESolver_KS_PW::afterscf(const bool conv_elec)
 {
 #ifdef __LCAO
     if(GlobalC::chi0_hilbert.epsilon)                 // pengfei 2016-11-23
