@@ -217,7 +217,7 @@ inline void cal_band_rho(
 					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
                     std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
-					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","cal_band_rho wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::GridT.nad[iat1]);
@@ -256,7 +256,7 @@ inline void cal_band_rho(
 					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
                     std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
-					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","cal_band_rho wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::GridT.nad[iat1]);
@@ -320,7 +320,7 @@ inline void cal_band_rho(
                         std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                         std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                         std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					ModuleBase::WARNING_QUIT("gint_k","cal_band_rho wrong");
     				}				
     				assert(offset < GlobalC::GridT.nad[iat1]);
 
@@ -369,7 +369,7 @@ inline void cal_band_rho(
                         std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                         std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                         std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					ModuleBase::WARNING_QUIT("gint_k","cal_band_rho wrong");
     				}				
     				assert(offset < GlobalC::GridT.nad[iat1]);
 
@@ -546,228 +546,6 @@ void Gint_k::cal_rho_k(double** DM_R_in)
 #endif
 
 	ModuleBase::timer::tick("Gint_k","cal_rho_k");
-	return;
-}
-
-void Gint_k::evaluate_pDMp(
-	const int &grid_index, 
-	const int &size,
-	bool** cal_flag, 
-	double*** psir_ylm, 
-	int* vindex)
-{
-	//-----------------------------------------------------
-	// in order to calculate <i,alpha,R1 | DM_R | j,beta,R2>
-	//-----------------------------------------------------
-	double **tchg = new double*[GlobalV::NSPIN];
-	for(int is=0; is<GlobalV::NSPIN; is++)
-	{
-		tchg[is] = new double[GlobalC::pw.bxyz];
-		ModuleBase::GlobalFunc::ZEROS(tchg[is], GlobalC::pw.bxyz);
-	}
-
-	bool *all_out_of_range = new bool[size];
-	for(int ia=0; ia<size; ia++)
-	{
-		all_out_of_range[ia] = true;
-		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
-		{
-			if(cal_flag[ib][ia])
-			{
-				all_out_of_range[ia] = false;
-			}
-		}
-	}
-
-	double *psi1, *psi2;
-	double *iw1p, *iw2p;
-	double *end1, *end2;
-	double *dm, *tchgs;
-	int ixxx, ixxx2;
-	int iw1_lo, iw2_lo;
-	double psi1_2;			
-	
-	// get (i,alpha,R1)
-	// size: how many atoms in this big cell.
-	for (int ia1=0; ia1<size; ia1++)
-	{
-		if(all_out_of_range[ia1]) continue;
-		const int mcell_index1 = GlobalC::GridT.bcell_start[grid_index] + ia1;
-		const int iat = GlobalC::GridT.which_atom[mcell_index1];
-		const int T1 = GlobalC::ucell.iat2it[iat];
-		const int I1 = GlobalC::ucell.iat2ia[iat];
-		const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-		Atom *atom1 = &GlobalC::ucell.atoms[T1];
-		const int nw1 = atom1->nw;
-
-		//~~~~~~~~~~~~~~~~
-		// get cell R1.
-		//~~~~~~~~~~~~~~~~
-		const int id1 = GlobalC::GridT.which_unitcell[mcell_index1];	
-		const int R1x = GlobalC::GridT.ucell_index2x[id1];
-		const int R1y = GlobalC::GridT.ucell_index2y[id1];
-		const int R1z = GlobalC::GridT.ucell_index2z[id1];
-		const int DM_start = GlobalC::GridT.nlocstartg[iat];
-
-		// get (j,beta,R2)
-		for (int ia2=0; ia2<size; ia2++)
-		{
-			if(all_out_of_range[ia2]) continue;
-		
-			
-			bool same_flag = false;
-			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
-			{
-				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-				{
-					same_flag = true;
-					break;
-				}
-			}
-			
-			// only go on if the two atoms are in the same meshcell! 
-			if(!same_flag)continue;
-
-			const int mcell_index2 = GlobalC::GridT.bcell_start[grid_index] + ia2;
-			const int iat2 = GlobalC::GridT.which_atom[mcell_index2];
-			const int T2 = GlobalC::ucell.iat2it[iat2];
-
-			if (T2 >= T1)
-			{
-				Atom *atom2 = &GlobalC::ucell.atoms[T2];
-				const int nw2 = atom2->nw;
-				const int I2 = GlobalC::ucell.iat2ia[iat2];
-				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-
-				//~~~~~~~~~~~~~~~~
-				// get cell R2.
-				//~~~~~~~~~~~~~~~~
-				const int id2 = GlobalC::GridT.which_unitcell[mcell_index2];	
-				const int R2x = GlobalC::GridT.ucell_index2x[id2];
-				const int R2y = GlobalC::GridT.ucell_index2y[id2];
-				const int R2z = GlobalC::GridT.ucell_index2z[id2];
-
-				const int dRx = R1x - R2x;
-				const int dRy = R1y - R2y;
-				const int dRz = R1z - R2z;
-
-// get the index from dRx, dRy, dRz.				
-// in fact I can calculate this once, and update only when meshcell is changed.
-				const int index = GlobalC::GridT.cal_RindexAtom(dRx, dRy, dRz, iat2);
-
-				int offset = -1;
-				int* find_start = GlobalC::GridT.find_R2[iat];
-				int* find_end = GlobalC::GridT.find_R2[iat] + GlobalC::GridT.nad[iat];
-
-				for(int* find=find_start; find < find_end; find++)
-				{
-					//--------------------------------------------------------------
-					// start positions of adjacent atom of 'iat'
-					//--------------------------------------------------------------
-					if( find[0] == index ) 
-					{
-						offset = find - find_start;
-						break;
-					}
-				}
-
-				if(offset == -1)
-				{					
-					std::cout << "== charge ==========================" << std::endl;
-					std::cout << " grid_index = " << grid_index << std::endl;
-                    std::cout << " index = " << index << std::endl;
-					std::cout << " size1=" << ia1 << " size2=" << ia2 << std::endl;
-                    std::cout << " iat=" << iat << " iat2=" << iat2 << std::endl;
-                    std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
-                    std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
-                    std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
-				}
-				assert(offset < GlobalC::GridT.nad[iat]);
-
-
-				// key variable:
-				ixxx = DM_start + GlobalC::GridT.find_R2st[iat][offset];	
-				
-				for(int is=0; is<GlobalV::NSPIN; is++)
-				{
-					dm = this->DM_R[is];
-					tchgs = tchg[is];
-					for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
-					{
-						if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-						{
-							psi1 = psir_ylm[ib][ia1];
-							psi2 = psir_ylm[ib][ia2];
-							end1 = psi1 + nw1;
-							end2 = psi2 + nw2;
-							
-							iw1_lo = GlobalC::GridT.trace_lo[start1]/GlobalV::NPOL;
-							ixxx2 = ixxx;
-							//------------------------------------
-							// circle for wave functions of atom 1.
-							//------------------------------------
-							for (iw1p=psi1; iw1p<end1; ++iw1p)
-							{
-								iw2_lo = GlobalC::GridT.trace_lo[start2]/GlobalV::NPOL;
-								// 2.0 counts for the undiagonalized part
-								psi1_2 = 2.0 * iw1p[0];
-								//------------------------------------
-								// circle for wave functions of atom 2.
-								// dmt: temperary density matrix
-								//------------------------------------
-								double* dmt = &dm[ixxx2];
-								for (iw2p=psi2; iw2p<end2; ++iw2p)
-								{
-									if ( iw1_lo > iw2_lo)
-									{
-										++iw2_lo;
-										++dmt;
-										continue;
-									}
-									else if ( iw1_lo < iw2_lo)
-									{
-										tchgs[ib] += 
-											psi1_2
-											* iw2p[0] 
-											* dmt[0];
-									}
-									else// means iw1_lo == iw2_lo
-									{
-										tchgs[ib] += 
-											iw1p[0]
-											* iw2p[0] 
-											* dmt[0];
-									}
-									++iw2_lo;
-									++dmt;
-								}// iw2
-								++iw1_lo;
-								ixxx2 += nw2;
-							}// iw
-						}//end cal_flag
-					}// end ib
-				}// end is
-			}// T
-		}// ia2
-	}// ia1
-
-	for(int is=0; is<GlobalV::NSPIN; is++)
-	{
-		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
-		{
-			GlobalC::CHR.rho[is][vindex[ib]] += tchg[is][ib];
-		}
-	}
-
-	delete[] all_out_of_range;
-
-	for(int is=0; is<GlobalV::NSPIN; is++)
-	{
-		delete[] tchg[is];
-	}
-	delete[] tchg;
-
 	return;
 }
 

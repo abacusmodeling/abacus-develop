@@ -124,16 +124,6 @@ class Gint_k : public Gint_k_init
         double** distance, 
         const double &delta_r);
 
-    //------------------------------------------------------
-    // in gint_k_rho.cpp 
-    //------------------------------------------------------
-    // evaluate the <phi0 | Density Matrix | phiR> to get the charge density.
-    void evaluate_pDMp(
-        const int &grid_index, 
-        const int &size,
-        bool** cal_flag, 
-        double*** psir_ylm, 
-        int* vindex);
 
     //------------------------------------------------------
     // in gint_k_fvl.cpp 
