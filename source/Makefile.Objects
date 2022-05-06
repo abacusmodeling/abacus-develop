@@ -237,6 +237,15 @@ OBJS_ESOLVER=esolver.o\
     esolver_lj.o\
     esolver_dp.o\
 
+OBJS_SURCHEM=H_correction_pw.o\
+    cal_epsilon.o\
+    cal_pseudo.o\
+    cal_totn.o\
+    cal_vcav.o\
+    cal_vel.o\
+    corrected_energy.o\
+    minimize_cg.o\
+
 OBJS_XC=xc_funct_corr_gga.o \
 xc_funct_corr_lda.o \
 xc_funct_exch_gga.o \
@@ -254,6 +263,7 @@ $(OBJS_PW)\
 $(OBJS_LCAO)\
 $(OBJS_ESOLVER)\
 $(OBJS_XC)\
+$(OBJS_SURCHEM)\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
