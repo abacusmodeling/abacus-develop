@@ -285,6 +285,7 @@ write_HS_R.o\
 write_dm.o\
 write_wfc_realspace.o\
 efield.o \
+dipole.o\
 magnetism.o\
 optical.o\
 Cell_PW.o\

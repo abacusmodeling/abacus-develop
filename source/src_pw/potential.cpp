@@ -10,6 +10,7 @@
 // new
 #include "../module_surchem/surchem.h"
 #include "H_Hartree_pw.h"
+#include "dipole.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
@@ -360,6 +361,11 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
         {
             v += surchem::v_correction(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
         }
+    }
+
+    if (!GlobalV::EFIELD && GlobalV::DIPOLE)
+    {
+        v += Dipole::v_dipole(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
     }
 
     // mohan add 2011-06-20

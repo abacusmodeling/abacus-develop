@@ -16,6 +16,7 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
+#include "dipole.h"    // liuyu add 2022-05-06
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif
@@ -60,7 +61,9 @@ void energy::calculate_harris(const int &flag)
 		+ demet
 		+ exx
 		+ Efield::etotefield
-		+ evdw;							// Peize Lin add evdw 2021.03.09
+		+ evdw  						// Peize Lin add evdw 2021.03.09
+        + Dipole::dipole_energy;        // liuyu add 2022-05-06
+
 #ifdef __LCAO
         if(INPUT.dft_plus_u) 
 		{
@@ -90,7 +93,8 @@ void energy::calculate_etot(void)
 	+ descf
 	+ exx
 	+ Efield::etotefield
-	+ evdw;							// Peize Lin add evdw 2021.03.09
+	+ evdw							// Peize Lin add evdw 2021.03.09
+    + Dipole::dipole_energy;        // liuyu add 2022-05-06
 
     //Quxin adds for DFT+U energy correction on 20201029
 /*
