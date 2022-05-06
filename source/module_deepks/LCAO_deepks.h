@@ -67,6 +67,12 @@ public:
     ///(Unit: Ry/Bohr) Total Force due to the DeePKS correction term \f$E_{\delta}\f$
     ModuleBase::matrix	F_delta;
 
+    //k index of HOMO for multi-k bandgap label. QO added 2022-01-24
+    int h_ind = 0;
+    
+    //k index of LUMO for multi-k bandgap label. QO added 2022-01-24
+    int l_ind = 0;
+
 //-------------------
 // private variables
 //-------------------
@@ -409,6 +415,9 @@ public:
 //9. cal_orbital_precalc : orbital_precalc is usted for training with orbital label, 
 //                         which equals gvdm * orbital_pdm_shell, 
 //                         orbital_pdm_shells[1,Inl,nm*nm] = dm_hl * overlap * overlap
+//10. cal_orbital_precalc_k : orbital_precalc is usted for training with orbital label, 
+//                         for multi-k case, which equals gvdm * orbital_pdm_shell, 
+//                         orbital_pdm_shells[1,Inl,nm*nm] = dm_hl_k * overlap * overlap
 
 public:
 
@@ -444,6 +453,17 @@ public:
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
         const Parallel_Orbitals &ParaO);
+    
+    //calculates orbital_precalc for multi-k case
+    void cal_orbital_precalc_k(const std::vector<ModuleBase::ComplexMatrix>& dm_hl/**<[in] density matrix*/,
+        const int nat,
+        const int nks,
+        const std::vector<ModuleBase::Vector3<double>> &kvec_d,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO);
+
 
 private:
     void cal_gvdm(const int nat);

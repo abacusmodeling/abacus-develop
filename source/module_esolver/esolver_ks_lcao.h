@@ -21,7 +21,7 @@ public:
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc& lowf,
         LCAO_Hamilt& uhm) override;
-    void Run(int istep, UnitCell_pseudo& cell) override {};
+    void Run(const int istep, UnitCell_pseudo& cell) override {};
     
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;
