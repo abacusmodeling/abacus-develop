@@ -86,7 +86,7 @@ void Electrons::non_self_consistent(const int &istep)
     return;
 }
 
-
+/*
 #include "occupy.h"
 void Electrons::self_consistent(const int &istep)
 {
@@ -462,7 +462,7 @@ void Electrons::self_consistent(const int &istep)
     ModuleBase::timer::tick("Electrons","self_consistent");
     return;
 } // end Electrons
-
+*/
 
 bool Electrons::check_stop_now(void)
 {

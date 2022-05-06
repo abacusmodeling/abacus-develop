@@ -63,15 +63,6 @@ sto_iter.o\
 sto_hchi.o\
 sto_che.o\
 
-OBJS_SURCHEM=cal_epsilon.o\
-cal_pseudo.o\
-cal_totn.o\
-cal_vcav.o\
-cal_vel.o\
-corrected_energy.o\
-H_correction_pw.o\
-minimize_cg.o
-
 OBJS_TOOLS=complexarray.o\
 complexmatrix.o \
 realarray.o \
@@ -241,6 +232,7 @@ OBJS_ESOLVER=esolver.o\
     esolver_ks.o\
     esolver_fp.o\
     esolver_ks_pw.o\
+    esolver_sdft_pw.o\
     esolver_ks_lcao.o\
     esolver_lj.o\
     esolver_dp.o\
@@ -261,7 +253,6 @@ OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\
 $(OBJS_LCAO)\
 $(OBJS_ESOLVER)\
-$(OBJS_SURCHEM)\
 $(OBJS_XC)\
 charge.o \
 charge_mixing.o \

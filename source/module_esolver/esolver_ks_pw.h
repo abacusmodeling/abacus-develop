@@ -21,16 +21,16 @@ public:
     void postprocess() override;
 
 protected:
-    virtual void beforescf(int istep) override; 
-    virtual void eachiterinit(int iter) override; 
-    virtual void hamilt2density(int istep, int iter, double ethr) override;
-    virtual void updatepot(bool conv) override;
-    virtual void eachiterfinish(int iter, bool conv) override; 
-    virtual void afterscf(bool conv) override;
+    virtual void beforescf(const int istep) override; 
+    virtual void eachiterinit(const int iter) override; 
+    virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
+    virtual void updatepot(const bool conv) override;
+    virtual void eachiterfinish(const int iter, const bool conv) override; 
+    virtual void afterscf(const bool conv) override;
 
     // <Temporary> Get wavefunctions and eigen energies. 
     // It should be replaced by diag class in HSolver module in the future
-    void c_bands(int istep, int iter);
+    void c_bands(const int istep, const int iter);
 
     // It copies the function in Threshold_Elec class.
     // After all ESolver, HSolver are constructed, Class Electrons and Threshold_Elec should be deleted.
