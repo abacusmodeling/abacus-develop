@@ -58,4 +58,35 @@ points.
 Run the program, and you will see a file named BANDS_1.dat in the output directory. Plot it
 to get energy band structure.
 
+Along with the BANDS_1.dat file, we also produce the projected band structure in a file called PBAND_1 in xml format.
+
+The PDOS file starts with number of atomic orbitals in the system, the text contents of element <band structure> is the same as data in the BANDS_1.dat file, such as:
+```
+<pband>
+<nspin>1</nspin>
+<norbitals>153</norbitals>
+<band_structure nkpoints="96" nbands="50" units="eV">
+...
+
+```
+
+The rest of the files arranged in sections, each section with a header such as below:
+    
+```
+<orbital
+ index="                                       1"
+ atom_index="                                       1"
+ species="Si"
+ l="                                       0"
+ m="                                       0"
+ z="                                       1"
+>
+<data>
+...
+</data>
+
+```
+
+The shape of text contents of element <data> is (Number of k-points, Number of bands) 
+ 
 [back to top](#band-structure)
