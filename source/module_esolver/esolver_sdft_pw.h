@@ -12,7 +12,7 @@ public:
     void cal_Stress(ModuleBase::matrix &stress) override;
 
 protected:
-    virtual void beforescf() override; 
+    virtual void beforescf(const int istep) override;
     // virtual void eachiterinit(int iter) override; 
     virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
     virtual void eachiterfinish(const int iter, const bool conv) override; 

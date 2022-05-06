@@ -16,9 +16,9 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
 	// stoiter.alloc( wf.npwx );
 }
 
-void ESolver_SDFT_PW::beforescf()
+void ESolver_SDFT_PW::beforescf(const int istep)
 {
-    ESolver_KS_PW::beforescf();
+    ESolver_KS_PW::beforescf(istep);
     // STO_WF.init();
 	// stoiter.init( wf.npwx );
 	// if(NITER==0)
