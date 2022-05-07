@@ -258,7 +258,7 @@ TEST_F(LCAOTest,GammaRho)
 
 	// read gamma wavefunction
 	LOWF.wfc_gamma.resize(GlobalV::NSPIN);
-	LOC.gamma_file(GlobalC::GridT,LOWF);
+	LOC.gamma_file(LOWF);
 	// allocate space for DM
 	GlobalC::GridT.lgd = GlobalV::NLOCAL;
 	LOC.allocate_gamma(GlobalC::GridT.lgd);
