@@ -146,7 +146,7 @@ namespace Gint_Tools
 			// number of grids in each big cell (bxyz)
 			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 			{
-				double *p=psir_ylm[ib][block_index[id]];
+				double *p=&psir_ylm[ib][block_index[id]];
 				if(!cal_flag[ib][id]) 
 				{
 					ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);

@@ -301,11 +301,9 @@ double Gint_Gamma::cal_rho(double*** DM_in)
     ModuleBase::TITLE("Gint_Gamma","cal_rho");
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
-    this->DM = DM_in;
-    this->job = cal_charge;
     this->save_atoms_on_grid(GlobalC::GridT);
 
-	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(this->DM);
+	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(DM_in);
     const double ne = sum_up_rho(rho);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");

@@ -28,14 +28,13 @@ class Gint_Gamma : public Grid_Base_Beta
 	~Gint_Gamma();
 
 	// (1) calculate the H matrix in terms of effective potentials
-	void cal_vlocal( const double*const vlocal);
+	void cal_vlocal( const double*const vlocal, LCAO_Matrix &lm);
 
 	// (2) calculate charge density
 	double cal_rho(double*** DM_in);
 
 	// (3) calcualte the forces related to grid
-	void cal_force( const double*const vlocal);
-	void cal_force_new(double** DM_in, const double*const vlocal,
+	void cal_force(double** DM_in, const double*const vlocal,
 			ModuleBase::matrix& force, ModuleBase::matrix& stress,
 			const bool is_force, const bool is_stress);
 

@@ -20,24 +20,20 @@ public:
 
 	void prepare( 
 		const ModuleBase::Matrix3 &latvec_in, 
-        const double& lat0_in,
-        LCAO_Matrix* lm);
+        const double& lat0_in);
 
 protected:
 
 	Grid_Base_Beta();
 	~Grid_Base_Beta();
 	
-    LCAO_Matrix* LM;
 //==========================================================
 // EXPLAIN : ModuleBase::Integral On 3D Real Space For Local Potential
 // MEMBER FUNCTION :
 //===========================================================
 	double vfactor;
-	ModuleBase::Matrix3 latvec;
 	ModuleBase::Matrix3 latvec0;
 	double lat0;
-	enum cal_type{ cal_charge, cal_local, cal_vnlb } job;
 };
 
 #endif

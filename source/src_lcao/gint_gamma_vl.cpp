@@ -461,17 +461,17 @@ void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal,
 
 // calculate the H matrix in terms of effective potentials
 void Gint_Gamma::cal_vlocal(
-    const double*const vlocal)
+    const double*const vlocal,
+    LCAO_Matrix &lm)
 {
     ModuleBase::TITLE("Gint_Gamma","cal_vlocal");
     ModuleBase::timer::tick("Gint_Gamma", "cal_vlocal"
     );
 
-    this->job=cal_local;
     this->save_atoms_on_grid(GlobalC::GridT);
 
     const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
-	vl_grid_to_2D(GridVlocal, *LM);
+	vl_grid_to_2D(GridVlocal, lm);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_vlocal");
 }

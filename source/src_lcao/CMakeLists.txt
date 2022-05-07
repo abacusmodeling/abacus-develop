@@ -12,7 +12,6 @@ list(APPEND objects
     FORCE_gamma_edm.cpp
     FORCE_gamma_tvnl.cpp
     FORCE_gamma_vl.cpp
-    FORCE_gamma_vl_new.cpp
     FORCE_k.cpp
     LCAO_diago.cpp
     LCAO_evolve.cpp
@@ -34,7 +33,6 @@ list(APPEND objects
     gint_gamma_common.cpp
     gint_gamma_env.cpp
     gint_gamma_fvl.cpp
-    gint_gamma_fvl_new.cpp
     gint_gamma_mull.cpp
     gint_gamma_rho.cpp
     gint_gamma_vl.cpp
