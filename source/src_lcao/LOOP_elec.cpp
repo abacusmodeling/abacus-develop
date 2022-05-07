@@ -218,7 +218,7 @@ void ESolver_KS_LCAO::othercalculation(const int istep)
 		{
 		#endif // __MPI
 			ELEC_scf es;
-            es.scf(istep - 1, this->LOC, this->LOWF, this->UHM);
+            es.scf(istep, this->LOC, this->LOWF, this->UHM);
 		#ifdef __MPI
             if (GlobalC::exx_global.info.separate_loop)
 			{
@@ -228,7 +228,7 @@ void ESolver_KS_LCAO::othercalculation(const int istep)
 					GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
 					
 					ELEC_scf es;
-					es.scf(istep-1, this->LOC, this->LOWF, this->UHM);
+					es.scf(istep, this->LOC, this->LOWF, this->UHM);
 					if(ELEC_scf::iter==1)     // exx converge
 					{
 						break;
@@ -239,7 +239,7 @@ void ESolver_KS_LCAO::othercalculation(const int istep)
 			{
 				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				ELEC_scf es;
-				es.scf(istep-1, this->LOC, this->LOWF, this->UHM);
+				es.scf(istep, this->LOC, this->LOWF, this->UHM);
 			}
 		}
 		#endif // __MPI

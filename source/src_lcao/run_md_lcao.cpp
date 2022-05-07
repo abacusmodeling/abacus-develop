@@ -213,7 +213,7 @@ void Run_MD_LCAO::md_force_virial(
 
     // solve electronic structures in terms of LCAO
     // mohan add 2021-02-09
-    p_esolver->Run(istep + 1, GlobalC::ucell);
+    p_esolver->Run(istep, GlobalC::ucell);
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix

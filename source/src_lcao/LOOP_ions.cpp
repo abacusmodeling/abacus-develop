@@ -143,7 +143,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 
 		// solve electronic structures in terms of LCAO
         // mohan add 2021-02-09
-        p_esolver->Run(this->istep, GlobalC::ucell);
+        p_esolver->Run(this->istep-1, GlobalC::ucell);
 
 		time_t eend = time(NULL);
 
