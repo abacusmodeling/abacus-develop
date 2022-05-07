@@ -60,7 +60,6 @@ namespace Gint_Tools
 
 	void cal_dpsir_ylm(
 		const int na_grid, 					// number of atoms on this grid 
-		const int LD_pool,
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
 		const double delta_r, 				// delta_r of the uniform FFT grid
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
@@ -71,6 +70,22 @@ namespace Gint_Tools
 		double*const*const dpsir_ylm_y,
 		double*const*const dpsir_ylm_z);
 
+	void cal_dpsirr_ylm(
+		const int na_grid, 					// number of atoms on this grid 
+		const int grid_index, 				// 1d index of FFT index (i,j,k) 
+		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
+		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
+		const bool*const*const cal_flag,    // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		double*const*const dpsir_ylm_x,
+		double*const*const dpsir_ylm_y,
+		double*const*const dpsir_ylm_z,
+		double*const*const dpsir_ylm_xx,
+		double*const*const dpsir_ylm_xy,
+		double*const*const dpsir_ylm_xz,
+		double*const*const dpsir_ylm_yy,
+		double*const*const dpsir_ylm_yz,
+		double*const*const dpsir_ylm_zz);
+
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -78,6 +93,16 @@ namespace Gint_Tools
 		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 		const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
 		const double*const*const psir_ylm);		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
+
+	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DM(
+		const int na_grid,  					    // how many atoms on this (i,j,k) grid
+		const int LD_pool,
+		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
+		const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
+		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		const double*const*const DM);
 }
 
 

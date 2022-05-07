@@ -174,7 +174,15 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_x, this->ParaV->nloc);
         ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_y, this->ParaV->nloc);
         ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_z, this->ParaV->nloc);
-
+        if(GlobalV::CAL_STRESS)
+        {
+            ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_11, this->ParaV->nloc);
+            ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_12, this->ParaV->nloc);
+            ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_13, this->ParaV->nloc);
+            ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_22, this->ParaV->nloc);
+            ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_23, this->ParaV->nloc);
+            ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_33, this->ParaV->nloc);
+        }
         for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);

@@ -35,7 +35,9 @@ class Gint_Gamma : public Grid_Base_Beta
 
 	// (3) calcualte the forces related to grid
 	void cal_force( const double*const vlocal);
-	void cal_force_new(double** DM_in, const double*const vlocal, ModuleBase::matrix& force);
+	void cal_force_new(double** DM_in, const double*const vlocal,
+			ModuleBase::matrix& force, ModuleBase::matrix& stress,
+			const bool is_force, const bool is_stress);
 
 	// (4) calcualte the envelope function
 	void cal_env(const double* wfc, double* rho);
@@ -107,7 +109,9 @@ private:
 	// for calculatin of < dphi_i | Vlocal | phi_j > for foce calculation
 	// on regular FFT real space grid.
 	void gamma_force(const double*const vlocal) const;
-	void gamma_force_new(const double*const*const DM, const double*const vlocal, ModuleBase::matrix& force);
+	void gamma_force_new(const double*const*const DM, const double*const vlocal,
+			ModuleBase::matrix& force, ModuleBase::matrix& stress,
+			const bool is_force, const bool is_stress);
 
 	void cal_meshball_vlocal(
 		const int na_grid,  						// how many atoms on this (i,j,k) grid
@@ -137,17 +141,28 @@ private:
 	void cal_meshball_force(
 		const int grid_index,
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
-		const int LD_pool,
-		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
 		const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
 		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		const double*const*const psir_vlbr3_DM,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const DM,
-		ModuleBase::matrix &force);
+		ModuleBase::matrix &force
+	);
+
+	void cal_meshball_stress(
+		const int na_grid,  					    // how many atoms on this (i,j,k) grid
+		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+		const double*const*const psir_vlbr3_DM,
+		const double*const*const dpsir_xx,
+		const double*const*const dpsir_xy,
+		const double*const*const dpsir_xz,
+		const double*const*const dpsir_yy,
+		const double*const*const dpsir_yz,
+		const double*const*const dpsir_zz,
+		ModuleBase::matrix &stress
+	);
+
 
 	// extract the local potentials.
 	// vldr3[GlobalC::pw.bxyz]

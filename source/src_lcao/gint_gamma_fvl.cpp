@@ -186,56 +186,18 @@ inline void cal_psir_ylm_dphi(
                 const int ll = atom->iw2l[iw];
                 const int idx_lm = atom->iw2_ylm[iw];
 
-                //special case for distance -> 0
-                //Problems Remained
-                //You have to add this two lines
-                /*if (distance < 1e-9)
-                {
-                    // if l==0 for localized orbital,
-                    // here is how we choose the 3D wave function psir_ylm,
-                    // and the derivative at r=0 point.
-                    if (ll == 0)
-                    {
-                        // psir_ylm is the three dimensional localized wave functions
-                        // (n,l,m), which is the multiply between 1D wave function 'tmp' and
-                        // spherical harmonic function rly.
-                        p_psir_ylm[iw] = tmp * rly[idx_lm];
-                        // the derivative of psir_ylm with respect to atom position R,
-                        // it's a std::vector, so it has x,y,z components.
-                        p_dphix[iw] = 0.0;
-                        p_dphiy[iw] = 0.0;
-                        p_dphiz[iw] = 0.0;
-                    }
-                    // if l>0, how do we choose 3D localized wave function
-                    // and the derivative.
-                    else
-                    {
-                        const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
+                const double rl = pow(distance, ll);
 
-                        double Zty = philn.zty;
-                        p_psir_ylm[iw] = Zty * rly[idx_lm];
-                        p_dphix[iw] = Zty * grly[idx_lm][0];
-                        p_dphiy[iw] = Zty * grly[idx_lm][1];
-                        p_dphiz[iw] = Zty * grly[idx_lm][2];
-                    } // if (ll == 0)
-                }*/ 
-                // if r >0, here is how we choose the 3D wave function psir_ylm,
-                // and the derivative at r=0 point.
-                //else
-                //{
-                    const double rl = pow(distance, ll);
+                // 3D wave functions
+                p_psir_ylm[iw] = tmp * rly[idx_lm] / rl;
 
-                    // 3D wave functions
-                    p_psir_ylm[iw] = tmp * rly[idx_lm] / rl;
+                // derivative of wave functions with respect to atom positions.
+                const double tmpdphi_rly = (dtmp  - tmp * ll / distance) / rl * rly[idx_lm] / distance;
+                const double tmprl = tmp/rl;
 
-                    // derivative of wave functions with respect to atom positions.
-                    const double tmpdphi_rly = (dtmp  - tmp * ll / distance) / rl * rly[idx_lm] / distance;
-                    const double tmprl = tmp/rl;
-
-                    p_dphix[iw] = tmpdphi_rly * dr[0]  + tmprl * grly[idx_lm][0];
-                    p_dphiy[iw] = tmpdphi_rly * dr[1]  + tmprl * grly[idx_lm][1];
-                    p_dphiz[iw] = tmpdphi_rly * dr[2]  + tmprl * grly[idx_lm][2];
-                //}// if  (distance < 1e-9)
+                p_dphix[iw] = tmpdphi_rly * dr[0]  + tmprl * grly[idx_lm][0];
+                p_dphiy[iw] = tmpdphi_rly * dr[1]  + tmprl * grly[idx_lm][1];
+                p_dphiz[iw] = tmpdphi_rly * dr[2]  + tmprl * grly[idx_lm][2];
             } // iw            
         }// ib
     }//!id //finish loop of calc pre-info for each adjacent atom

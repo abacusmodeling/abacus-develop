@@ -209,7 +209,6 @@ namespace Gint_Tools
 
 	void cal_dpsir_ylm(
 		const int na_grid, 					// number of atoms on this grid 
-		const int LD_pool,
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
 		const double delta_r, 				// delta_r of the uniform FFT grid
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
@@ -330,6 +329,80 @@ namespace Gint_Tools
 		return;
 	}
 
+	void cal_dpsirr_ylm(
+		const int na_grid, 					// number of atoms on this grid 
+		const int grid_index, 				// 1d index of FFT index (i,j,k) 
+		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
+		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
+		const bool*const*const cal_flag,    // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		double*const*const dpsir_ylm_x,
+		double*const*const dpsir_ylm_y,
+		double*const*const dpsir_ylm_z,
+		double*const*const dpsir_ylm_xx,
+		double*const*const dpsir_ylm_xy,
+		double*const*const dpsir_ylm_xz,
+		double*const*const dpsir_ylm_yy,
+		double*const*const dpsir_ylm_yz,
+		double*const*const dpsir_ylm_zz)
+	{
+		for (int id=0; id<na_grid; id++)
+		{
+			const int mcell_index = GlobalC::GridT.bcell_start[grid_index] + id;
+			const int imcell = GlobalC::GridT.which_bigcell[mcell_index];
+			int iat = GlobalC::GridT.which_atom[mcell_index];
+			const int it = GlobalC::ucell.iat2it[iat];
+			Atom *atom = &GlobalC::ucell.atoms[it];
+
+			const double mt[3]={
+				GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0],
+				GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1],
+				GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2]};
+
+			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+			{
+				double*const p_dpsi_x=&dpsir_ylm_x[ib][block_index[id]];
+				double*const p_dpsi_y=&dpsir_ylm_y[ib][block_index[id]];
+				double*const p_dpsi_z=&dpsir_ylm_z[ib][block_index[id]];
+				double*const p_dpsi_xx=&dpsir_ylm_xx[ib][block_index[id]];
+				double*const p_dpsi_xy=&dpsir_ylm_xy[ib][block_index[id]];
+				double*const p_dpsi_xz=&dpsir_ylm_xz[ib][block_index[id]];
+				double*const p_dpsi_yy=&dpsir_ylm_yy[ib][block_index[id]];
+				double*const p_dpsi_yz=&dpsir_ylm_yz[ib][block_index[id]];
+				double*const p_dpsi_zz=&dpsir_ylm_zz[ib][block_index[id]];
+				if(!cal_flag[ib][id]) 
+				{
+					ModuleBase::GlobalFunc::ZEROS(p_dpsi_xx, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_dpsi_xy, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_dpsi_xz, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_dpsi_yy, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_dpsi_yz, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_dpsi_zz, block_size[id]);
+				}
+				else
+				{
+					const double dr[3]={						// vectors between atom and grid
+						GlobalC::GridT.meshcell_pos[ib][0] + mt[0],
+						GlobalC::GridT.meshcell_pos[ib][1] + mt[1],
+						GlobalC::GridT.meshcell_pos[ib][2] + mt[2]};
+
+					for (int iw=0; iw< atom->nw; ++iw)
+					{
+
+						p_dpsi_xx[iw] = p_dpsi_x[iw]*dr[0];
+						p_dpsi_xy[iw] = p_dpsi_x[iw]*dr[1];
+						p_dpsi_xz[iw] = p_dpsi_x[iw]*dr[2];
+						p_dpsi_yy[iw] = p_dpsi_y[iw]*dr[1];
+						p_dpsi_yz[iw] = p_dpsi_y[iw]*dr[2];
+						p_dpsi_zz[iw] = p_dpsi_z[iw]*dr[2];
+
+					}//iw
+				}//else
+			}	
+		}
+
+		return;
+	}
+
 	// atomic basis sets
 	// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
@@ -363,5 +436,80 @@ namespace Gint_Tools
 			}
 		}
 		return psir_vlbr3;
+	}
+
+	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DM(
+		const int na_grid,  					    // how many atoms on this (i,j,k) grid
+		const int LD_pool,
+		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
+		const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
+		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		const double*const*const DM)
+	{
+		constexpr char side='L', uplo='U';
+		constexpr char transa='N', transb='N';
+		constexpr double alpha_symm=1, alpha_gemm=1, beta=1;    
+		constexpr int inc=1;
+
+		Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::pw.bxyz, LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+
+		for (int ia1=0; ia1<na_grid; ia1++)
+		{
+			const int iw1_lo=block_iw[ia1];
+			for (int ia2=0; ia2<na_grid; ia2++)
+			{
+				int first_ib=0, last_ib=0;
+				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+				{
+					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+					{
+						first_ib=ib;
+						break;
+					}
+				}
+				for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
+				{
+					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+					{
+						last_ib=ib+1;
+						break;
+					}
+				}
+				const int ib_length=last_ib-first_ib;
+				if(ib_length<=0) continue;
+
+				int cal_pair_num=0;
+				for(int ib=first_ib; ib<last_ib; ++ib)
+				{
+					cal_pair_num += cal_flag[ib][ia1] && cal_flag[ib][ia2];
+				}
+				const int iw2_lo=block_iw[ia2];
+				if(cal_pair_num>ib_length/4)
+				{
+					dgemm_(&transa, &transb, &block_size[ia2], &ib_length, &block_size[ia1], 
+						&alpha_gemm, &DM[iw1_lo][iw2_lo], &GlobalC::GridT.lgd, 
+						&psir_vlbr3[first_ib][block_index[ia1]], &LD_pool, 
+						&beta, &psir_vlbr3_DM.ptr_2D[first_ib][block_index[ia2]], &LD_pool);
+				}
+				else
+				{
+					for(int ib=first_ib; ib<last_ib; ++ib)
+					{
+						if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+						{
+							dgemv_(&transa, &block_size[ia2], &block_size[ia1], 
+								&alpha_gemm, &DM[iw1_lo][iw2_lo], &GlobalC::GridT.lgd,
+								&psir_vlbr3[ib][block_index[ia1]], &inc,
+								&beta, &psir_vlbr3_DM.ptr_2D[ib][block_index[ia2]], &inc);
+						}
+					}
+				}
+			}// ia2       
+		} // ia1  
+		
+		return psir_vlbr3_DM;
 	}
 }
