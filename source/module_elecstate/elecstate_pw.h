@@ -12,7 +12,7 @@ class ElecStatePW : public ElecState
   public:
     ElecStatePW(const PW_Basis* basis_in, Charge* chg_in, int nbands_in) : basis(basis_in)
     {
-        init(chg_in, basis_in->Klist->nks, nbands_in);
+        init(chg_in, basis_in->Klist, basis_in->Klist->nks, nbands_in);
     }
     // void init(Charge* chg_in):charge(chg_in){} override;
 
