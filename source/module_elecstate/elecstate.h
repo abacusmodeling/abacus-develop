@@ -61,8 +61,8 @@ class ElecState
     ModuleBase::matrix wg;
 
   protected:
-    // calculate ebands for each k point
-    double eBandK(const int &ik);
+    // calculate ebands for all k points and all occupied bands
+    void calEBand();
 
     // print and check for band energy and occupations
     void print_band(const int &ik, const int &printe, const int &iter);

@@ -10,6 +10,7 @@ namespace elecstate
 void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 {
     this->calculate_weights();
+    this->calEBand();
     for (int ik = 0; ik < psi.get_nk(); ++ik)
     {
         psi.fix_k(ik);
@@ -20,13 +21,6 @@ void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 
 void ElecStatePW::updateRhoK(const psi::Psi<std::complex<double>>& psi)
 {
-    const int current_k = psi.get_current_k();
-    if (current_k == 0)
-    {
-        this->eband = 0.0;
-    }
-    this->eband += this->eBandK(current_k);
-
     this->rhoBandK(psi);
 
     return;
@@ -41,15 +35,6 @@ void ElecStatePW::parallelK()
 {
 #ifdef __MPI
     charge->rho_mpi();
-    if (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto"
-        && GlobalV::CALCULATION != "md-sto") // qinarui add it temporarily.
-    {
-        //==================================
-        // Reduce all the Energy in each cpu
-        //==================================
-        this->eband /= GlobalV::NPROC_IN_POOL;
-        Parallel_Reduce::reduce_double_all(this->eband);
-    }
 #endif
     return;
 }

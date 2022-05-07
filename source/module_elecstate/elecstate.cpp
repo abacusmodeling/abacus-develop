@@ -188,15 +188,27 @@ void ElecState::calculate_weights(void)
     return;
 }
 
-double ElecState::eBandK(const int& ik)
+void ElecState::calEBand()
 {
-    ModuleBase::TITLE("ElecStatePW", "eBandK");
-    double eband_k = 0.0;
-    for (int ibnd = 0; ibnd < this->ekb.nc; ibnd++)
+    ModuleBase::TITLE("ElecStatePW", "calEBand");
+    //calculate ebands using wg and ekb
+    this->eband = 0.0;
+    for (int ik = 0; ik < this->ekb.nr; ++ik)
     {
-        eband_k += this->ekb(ik, ibnd) * this->wg(ik, ibnd);
+        for (int ibnd = 0; ibnd < this->ekb.nc; ibnd++)
+        {
+            this->eband += this->ekb(ik, ibnd) * this->wg(ik, ibnd);
+        }
     }
-    return eband_k;
+    if(GlobalV::KPAR != 1)
+    {
+        //==================================
+        // Reduce all the Energy in each cpu
+        //==================================
+        this->eband /= GlobalV::NPROC_IN_POOL;
+        Parallel_Reduce::reduce_double_all(this->eband);
+    }
+    return;
 }
 
 void ElecState::print_band(const int& ik, const int& printe, const int& iter)
