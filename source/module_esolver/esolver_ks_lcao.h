@@ -19,21 +19,20 @@ public:
   
     void Init(Input& inp, UnitCell_pseudo& cell) override;
     
-    void Run(int istep, UnitCell_pseudo& cell) override;
-    
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;
     void cal_Stress(ModuleBase::matrix& stress) override;
     void postprocess() override;
 
 protected:
-    virtual void beforescf(int istep) override; 
-    virtual void eachiterinit(int iter) override; 
-    virtual void hamilt2density(int istep, int iter, double ethr) override;
-    virtual void updatepot(bool conv) override;
-    virtual void eachiterfinish(int iter, bool conv) override; 
-    virtual void afterscf(bool conv) override;
+    virtual void beforescf(const int istep) override; 
+    virtual void eachiterinit(const int istep, const int iter) override; 
+    virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
+    virtual void updatepot(const int istep, const int iter, const bool conv) override;
+    virtual void eachiterfinish(const int iter, const bool conv) override; 
+    virtual void afterscf(const int iter, const bool conv) override;
 
+    virtual void othercalculation(const int istep)override;
     ORB_control orb_con;    //Basis_LCAO
     Record_adj RA;
     Local_Orbital_wfc LOWF;
@@ -60,12 +59,11 @@ protected:
     ); //LiuXh add 2019-07-15, modify in 2021-12-3
     void output_SR(const std::string &SR_filename, const bool &binary=false, const double &sparse_threshold=1e-10);
 
+    //--------------common for all calculation, not only scf-------------
     // set matrix and grid integral
 	void set_matrix_grid(Record_adj &ra);
-
-    void solver(const int& istep,
-        Local_Orbital_Charge& loc,
-        Local_Orbital_wfc& lowf);
+    void beforesolver(const int istep);
+    //----------------------------------------------------------------------
 };
 
 

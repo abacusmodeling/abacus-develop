@@ -22,11 +22,11 @@ public:
 
 protected:
     virtual void beforescf(const int istep) override; 
-    virtual void eachiterinit(const int iter) override; 
+    virtual void eachiterinit(const int istep, const int iter) override; 
     virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
-    virtual void updatepot(const bool conv) override;
+    virtual void updatepot(const int istep, const int iter, const bool conv) override;
     virtual void eachiterfinish(const int iter, const bool conv) override; 
-    virtual void afterscf(const bool conv) override;
+    virtual void afterscf(const int iter, const bool conv) override;
 
     // <Temporary> Get wavefunctions and eigen energies. 
     // It should be replaced by diag class in HSolver module in the future

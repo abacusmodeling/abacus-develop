@@ -36,6 +36,10 @@ public:
    
     virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
     
+    //Deal with exx and other calculation than scf/md/relax: 
+    // such as nscf, istate-charge or envelope
+    virtual void othercalculation(const int istep) {};
+
     virtual void cal_Energy(energy& en) = 0;
     virtual void cal_Force(ModuleBase::matrix &force) = 0;
     virtual void cal_Stress(ModuleBase::matrix& stress) = 0;

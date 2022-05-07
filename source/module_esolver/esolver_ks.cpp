@@ -39,72 +39,86 @@ void ESolver_KS:: hamilt2density(const int istep, const int iter, const double e
 
 void ESolver_KS:: Run(const int istep, UnitCell_pseudo& cell)
 {
-    ModuleBase::timer:: tick(this->classname,"Run");
-    
-    this->printhead(); //print the headline on the screen.
-    this->beforescf(istep); //Something else to do before the iter loop
-    
-    bool firstscf = true;
-    bool conv_elec = false;
-    this->niter = this->maxniter;
-    for(int iter=1; iter <= this->maxniter ; ++iter)
+    if (!(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md"
+        || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
+#ifdef __MPI
+        || Exx_Global::Hybrid_Type::No!=GlobalC::exx_global.info.hybrid_type 
+#endif
+        )
     {
-        writehead(GlobalV::ofs_running, istep, iter); 
-        clock_t iterstart,iterend;
-        iterstart = std::clock();
-        set_ethr(istep,iter);
-        eachiterinit(iter); 
-        
-        this->hamilt2density(istep, iter, this->diag_ethr);
-        
-        // double drho = this->estate.caldr2(); 
-        // EState should be used after it is constructed.
-        drho = GlobalC::CHR.get_drho();
-        double hsolver_error = 0.0;
-        if(firstscf)
-        {
-            firstscf = false;
-            hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
-            // The error of HSolver is larger than drho, so a more precise HSolver should be excuted.
-            if(hsolver_error > drho)  
-            {
-                reset_diagethr(GlobalV::ofs_running, hsolver_error);
-                this->hamilt2density(istep, iter, this->diag_ethr);
-                drho = GlobalC::CHR.get_drho();
-                hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
-            }   
-        }
-        
-        conv_elec = (drho < this->scf_thr);
-
-        // If drho < hsolver_error in the first iter or drho < scf_thr, we do not change rho.
-        if( drho < hsolver_error || conv_elec)
-        {
-            if(drho < hsolver_error)    GlobalV::ofs_warning << " drho < hsolver_error, keep charge density unchanged." << std::endl;
-        }
-        else
-        {
-            //charge mixing
-            //conv_elec = this->estate.mix_rho();
-            GlobalC::CHR.mix_rho(iter);
-        }
-
-        // Hamilt should be used after it is constructed.
-        // this->phamilt->update(conv_elec);
-        updatepot(conv_elec);
-        eachiterfinish(iter,conv_elec);  
-        iterend = std::clock();
-        double duration = double(iterend-iterstart) / CLOCKS_PER_SEC;
-        printiter(conv_elec, iter, drho, duration, diag_ethr);
-        if (conv_elec) 
-        {
-            this->niter = iter;
-            break;
-        }  
+        this->othercalculation(istep);
     }
-    afterscf(conv_elec); 
-    
-    ModuleBase::timer:: tick(this->classname,"Run");
+    else
+    {
+        ModuleBase::timer::tick(this->classname, "Run");
+
+        this->printhead(); //print the headline on the screen.
+        this->beforescf(istep); //Something else to do before the iter loop
+
+        bool firstscf = true;
+        bool conv_elec = false;
+        this->niter = this->maxniter;
+        int iter = 1;
+        for (iter = 1; iter <= this->maxniter; ++iter)
+        {
+            writehead(GlobalV::ofs_running, istep, iter);
+            clock_t iterstart, iterend;
+            iterstart = std::clock();
+            set_ethr(istep, iter);
+            eachiterinit(istep, iter);
+
+            this->hamilt2density(istep, iter, this->diag_ethr);
+
+            // double drho = this->estate.caldr2(); 
+            // EState should be used after it is constructed.
+            drho = GlobalC::CHR.get_drho();
+            double hsolver_error = 0.0;
+            if (firstscf)
+            {
+                firstscf = false;
+                hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
+                // The error of HSolver is larger than drho, so a more precise HSolver should be excuconv_elected.
+                if (hsolver_error > drho)
+                {
+                    reset_diagethr(GlobalV::ofs_running, hsolver_error);
+                    this->hamilt2density(istep, iter, this->diag_ethr);
+                    drho = GlobalC::CHR.get_drho();
+                    hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
+                }
+            }
+
+            conv_elec = (drho < this->scf_thr);
+
+            // If drho < hsolver_error in the first iter or drho < scf_thr, we do not change rho.
+            if (drho < hsolver_error || conv_elec)
+            {
+                if (drho < hsolver_error)    GlobalV::ofs_warning << " drho < hsolver_error, keep charge density unchanged." << std::endl;
+            }
+            else
+            {
+                //charge mixing
+                //conv_elec = this->estate.mix_rho();
+                GlobalC::CHR.mix_rho(iter);
+            }
+
+            // Hamilt should be used after it is constructed.
+            // this->phamilt->update(conv_elec);
+            updatepot(istep, iter, conv_elec);
+            eachiterfinish(iter, conv_elec);
+            iterend = std::clock();
+            double duration = double(iterend - iterstart) / CLOCKS_PER_SEC;
+            printiter(conv_elec, iter, drho, duration, diag_ethr);
+            if (conv_elec)
+            {
+                this->niter = iter;
+                break;
+            }
+        }
+        afterscf(iter, conv_elec);
+
+        ModuleBase::timer::tick(this->classname, "Run");
+    }
+
     return;
 };
 

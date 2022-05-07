@@ -31,13 +31,13 @@ class ESolver_KS: public ESolver_FP
         // Something to do before SCF iterations.
         virtual void beforescf(int istep){}; 
         // Something to do before hamilt2density function in each iter loop.
-        virtual void eachiterinit(const int iter){}; 
+        virtual void eachiterinit(const int istep, const int iter){}; 
         // Something to do after hamilt2density function in each iter loop.
         virtual void eachiterfinish(const int iter, const bool conv){}; 
         // Something to do after SCF iterations when SCF is converged or comes to the max iter step.
-        virtual void afterscf(const bool conv){};
+        virtual void afterscf(const int iter, const bool conv){};
         // <Temporary> It should be replaced by a function in Hamilt Class
-        virtual void updatepot(const bool conv){};
+        virtual void updatepot(const int istep, const int iter, const bool conv){};
         
 
     //TOOLS:

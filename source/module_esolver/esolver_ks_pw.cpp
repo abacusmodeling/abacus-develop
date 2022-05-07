@@ -192,7 +192,7 @@ void ESolver_KS_PW:: beforescf(int istep)
     }
 } 
 
-void ESolver_KS_PW:: eachiterinit(const int iter)
+void ESolver_KS_PW:: eachiterinit(const int istep, const int iter)
 {
     // mohan add 2010-07-16
     if(iter==1) GlobalC::CHR.set_new_e_iteration(true);
@@ -269,7 +269,7 @@ void ESolver_KS_PW:: c_bands(const int istep, const int iter)
 }
 
 //Temporary, it should be rewritten with Hamilt class. 
-void ESolver_KS_PW:: updatepot(const bool conv_elec)
+void ESolver_KS_PW:: updatepot(const int istep, const int iter, const bool conv_elec)
 {
     if (!conv_elec)
     {
@@ -348,7 +348,7 @@ void ESolver_KS_PW:: eachiterfinish(const int iter, const bool conv_elec)
 }
 
 
-void ESolver_KS_PW::afterscf(const bool conv_elec)
+void ESolver_KS_PW::afterscf(const int iter, const bool conv_elec)
 {
 #ifdef __LCAO
     if(GlobalC::chi0_hilbert.epsilon)                 // pengfei 2016-11-23

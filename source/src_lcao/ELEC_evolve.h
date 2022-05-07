@@ -5,6 +5,7 @@
 #include "../module_base/global_variable.h"
 #include "LCAO_hamilt.h"
 #include "src_lcao/local_orbital_wfc.h"
+#include "module_esolver/esolver_ks_lcao.h"
 
 //-----------------------------------------------------------
 // mohan add 2021-02-09
@@ -16,7 +17,8 @@
 class ELEC_evolve
 {
 
-	friend class ELEC_scf;
+    friend class ELEC_scf;
+    friend class ModuleESolver::ESolver_KS_LCAO;
 
 	public:
 

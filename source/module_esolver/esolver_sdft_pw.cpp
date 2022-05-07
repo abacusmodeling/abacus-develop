@@ -78,7 +78,7 @@ void ESolver_SDFT_PW::eachiterfinish(int iter, bool conv_elec)
 {
 
 }
-void ESolver_SDFT_PW::afterscf(bool conv_elec)
+void ESolver_SDFT_PW::afterscf(const int iter, bool conv_elec)
 {
 
 }

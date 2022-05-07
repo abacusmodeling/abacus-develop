@@ -16,7 +16,7 @@ protected:
     // virtual void eachiterinit(int iter) override; 
     virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
     virtual void eachiterfinish(const int iter, const bool conv) override; 
-    virtual void afterscf(const bool) override;
+    virtual void afterscf(const int iter, const bool conv) override;
 };
 
 }
