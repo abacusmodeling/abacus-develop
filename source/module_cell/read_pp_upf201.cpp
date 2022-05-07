@@ -197,9 +197,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 		for(int ip = 0 ; ip < nparameter; ++ip)
 		{
 			if(name[ip]=="type"){}
-			else if(name[ip]=="size"){
-				kkbeta[ib] = atoi (val[ip].c_str());
-			}
+			else if(name[ip]=="size"){}
 			else if(name[ip]=="columns"){}
 			else if(name[ip]=="index"){}
 			else if(name[ip]=="label"){}
