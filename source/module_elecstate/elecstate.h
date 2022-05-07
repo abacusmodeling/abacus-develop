@@ -47,7 +47,7 @@ class ElecState
     }
 
     // calculate wg from ekb
-    void calculate_weights(void);
+    virtual void calculate_weights(void);
 
     Charge *charge;
     // energy for sum of electrons
