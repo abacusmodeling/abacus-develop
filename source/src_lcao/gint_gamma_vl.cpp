@@ -329,9 +329,12 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						// compute atomic basis phi(r) with both radial and angular parts
 						//------------------------------------------------------------------
-						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
-							na_grid, LD_pool, grid_index, delta_r,
-							block_index, block_size, cal_flag);
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+                        Gint_Tools::cal_psir_ylm(
+							na_grid, grid_index, delta_r,
+							block_index, block_size, 
+							cal_flag,
+                            psir_ylm.ptr_2D);
 
 						//------------------------------------------------------------------
 						// extract the local potentials.

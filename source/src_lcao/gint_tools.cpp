@@ -111,16 +111,15 @@ namespace Gint_Tools
 		return cal_flag;
 	}
 
-	Array_Pool<double> cal_psir_ylm(
+	void cal_psir_ylm(
 		const int na_grid, 					// number of atoms on this grid 
-		const int LD_pool,
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
 		const double delta_r, 				// delta_r of the uniform FFT grid
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
-		const bool*const*const cal_flag) 	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const bool*const*const cal_flag,
+		double*const*const psir_ylm) 	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 	{
-		Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
 		for (int id=0; id<na_grid; id++)
 		{
 			// there are two parameters we want to know here:
@@ -147,7 +146,7 @@ namespace Gint_Tools
 			// number of grids in each big cell (bxyz)
 			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 			{
-				double *p=&psir_ylm.ptr_2D[ib][block_index[id]];
+				double *p=psir_ylm[ib][block_index[id]];
 				if(!cal_flag[ib][id]) 
 				{
 					ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);
@@ -204,7 +203,7 @@ namespace Gint_Tools
 				}// end distance<=(GlobalC::ORB.Phi[it].getRcut()-1.0e-15)
 			}// end ib
 		}// end id
-		return psir_ylm;
+		return;
 	}
 
 	void cal_dpsir_ylm(

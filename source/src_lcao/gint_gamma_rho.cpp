@@ -226,10 +226,12 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 						// set up band matrix psir_ylm and psir_DM
 						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 						
-						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
-							na_grid, LD_pool, grid_index, delta_r,
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+                        Gint_Tools::cal_psir_ylm(
+							na_grid, grid_index, delta_r,
 							block_index, block_size, 
-							cal_flag);
+							cal_flag,
+                            psir_ylm.ptr_2D);
 						
 						this->cal_band_rho(na_grid, LD_pool, block_iw, block_size, block_index,
 							cal_flag, psir_ylm.ptr_2D, vindex, DM, rho);

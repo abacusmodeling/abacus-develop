@@ -49,14 +49,14 @@ namespace Gint_Tools
 		const int grid_index);		
 
 	// psir_ylm[pw.bxyz][LD_pool]
-	Array_Pool<double> cal_psir_ylm(
+	void cal_psir_ylm(
 		const int na_grid, // number of atoms on this grid 
-		const int LD_pool,
 		const int grid_index, // 1d index of FFT index (i,j,k) 
 		const double delta_r, // delta_r of the uniform FFT grid
 		const int*const block_index,  // count total number of atomis orbitals
 		const int*const block_size, 
-		const bool*const*const cal_flag); // whether the atom-grid distance is larger than cutoff
+		const bool*const*const cal_flag,
+		double*const*const psir_ylm); // whether the atom-grid distance is larger than cutoff
 
 	void cal_dpsir_ylm(
 		const int na_grid, 					// number of atoms on this grid 
