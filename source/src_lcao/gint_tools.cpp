@@ -37,6 +37,26 @@ namespace Gint_Tools
 		return vindex;
 	}
 
+	// extract the local potentials.
+	double* get_vldr3(
+		const double*const vlocal,		// vlocal[ir]
+		const int ncyz,
+		const int ibx,
+		const int jby,
+		const int kbz,
+		const double vfactor)
+	{
+		// set the index for obtaining local potentials
+		int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
+		double *vldr3 = (double*)malloc(GlobalC::pw.bxyz*sizeof(double));					
+		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+		{
+			vldr3[ib]=vlocal[vindex[ib]] * vfactor;
+		}
+		free(vindex);	vindex=nullptr;
+		return vldr3;
+	}
+
 	void get_block_info(
 		const int na_grid,
 		const int grid_index,
@@ -543,4 +563,5 @@ namespace Gint_Tools
 		
 		return psir_vlbr3_DM;
 	}
+
 }

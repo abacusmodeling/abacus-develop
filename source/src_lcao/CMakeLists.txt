@@ -30,7 +30,6 @@ list(APPEND objects
     dftu_relax.cpp
     dftu_yukawa.cpp
     gint_gamma.cpp
-    gint_gamma_common.cpp
     gint_gamma_env.cpp
     gint_gamma_fvl.cpp
     gint_gamma_mull.cpp

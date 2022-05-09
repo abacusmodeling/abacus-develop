@@ -167,10 +167,6 @@ private:
 		ModuleBase::matrix &stress
 	);
 
-
-	// extract the local potentials.
-	// vldr3[GlobalC::pw.bxyz]
-    double* get_vldr3(const double* const vlocal, const int ncyz, const int ibx, const int jby, const int kbz) const;
     void vl_grid_to_2D(const Gint_Tools::Array_Pool<double>& GridVlocal, LCAO_Matrix& lm);
 };
 

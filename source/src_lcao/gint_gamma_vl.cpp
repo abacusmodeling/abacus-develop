@@ -339,7 +339,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						// extract the local potentials.
 						//------------------------------------------------------------------
-						double *vldr3 = this->get_vldr3(vlocal, ncyz, ibx, jby, kbz);
+						double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, this->vfactor);
 
                         const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
                                 na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);

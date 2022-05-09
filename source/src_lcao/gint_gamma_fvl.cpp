@@ -86,7 +86,7 @@ void Gint_Gamma::gamma_force_new(const double*const*const DM, const double*const
                         dpsir_ylm_z.ptr_2D
                     );
 
-                    double *vldr3 = this->get_vldr3(vlocal, ncyz, ibx, jby, kbz);
+                    double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, this->vfactor);
                     const Gint_Tools::Array_Pool<double> psir_vlbr3    = Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
                     const Gint_Tools::Array_Pool<double> psir_vlbr3_DM = Gint_Tools::get_psir_vlbr3_DM(na_grid, LD_pool, block_iw, block_size, block_index, cal_flag, psir_vlbr3.ptr_2D, DM);
 

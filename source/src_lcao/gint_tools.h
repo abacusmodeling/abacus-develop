@@ -28,6 +28,16 @@ namespace Gint_Tools
 		const int jby,
 		const int kbz);
 
+	// extract the local potentials.
+	// vldr3[GlobalC::pw.bxyz]
+    double* get_vldr3(
+		const double* const vlocal,
+		const int ncyz,
+		const int ibx,
+		const int jby,
+		const int kbz,
+		const double vfactor);
+
 	//------------------------------------------------------
 	// na_grid : #. atoms for this group of grids
 	// block_iw : size na_grid, index of the first orbital on this atom
