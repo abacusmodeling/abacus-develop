@@ -250,7 +250,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// (the new input density) while rho is unchanged.
 		if(GlobalV::MY_POOL == 0)
 		{
-			GlobalC::CHR.mix_rho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
+			GlobalC::CHR.tmp_mixrho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
 		}
 
 #ifdef __MPI
@@ -333,7 +333,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
         if (conv_elec || iter==GlobalV::SCF_NMAX)
         {
 			for(int is=0; is<GlobalV::NSPIN; is++)

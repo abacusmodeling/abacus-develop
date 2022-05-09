@@ -8,6 +8,7 @@
 #include "../diago_iter_assist.h"
 #include "diago_mock.h"
 #include "mpi.h"
+#include "module_pw/unittest/test_tool.h"
 #include <complex>
 
 #include "gtest/gtest.h"
@@ -21,7 +22,7 @@
  * Class Diago_CG is an approach for eigenvalue problems
  * This unittest test the function Diago_CG::diag()
  * with different examples.
- *  - the Hermite matrices (npw=50,100,200) produced using random numbers and with sparsity of 0%, 60%, 80%
+ *  - the Hermite matrices (npw=500,1000) produced using random numbers and with sparsity of 0%, 60%, 80%
  *  - the Hamiltonian matrix read from "data-H", produced by using out_hs in INPUT of a LCAO calculation
  *  - a 2x2 Hermite matrix for learning and checking
  *
@@ -57,8 +58,10 @@ class DiagoCGPrepare
         : nband(nband), npw(npw), sparsity(sparsity), reorder(reorder), eps(eps), maxiter(maxiter),
           threshold(threshold)
     {
-	    hsolver::DiagoIterAssist::PW_DIAG_NMAX = maxiter;
-	    hsolver::DiagoIterAssist::PW_DIAG_THR = eps;
+#ifdef __MPI	
+		MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+        MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
+#endif	
     }
 
     int nband, npw, sparsity, maxiter, notconv;
@@ -66,6 +69,7 @@ class DiagoCGPrepare
     double eps, avg_iter;
     bool reorder;
     double threshold;
+    int nprocs=1, mypnum=0;
     // threshold is the comparison standard between cg and lapack
 
     void CompareEigen(double *precondition)
@@ -73,7 +77,7 @@ class DiagoCGPrepare
         // calculate eigenvalues by LAPACK;
         double *e_lapack = new double[npw];
         ModuleBase::ComplexMatrix ev = DIAGOTEST::hmatrix;
-        lapackEigen(npw, ev, e_lapack, false);
+        if(mypnum == 0)  lapackEigen(npw, ev, e_lapack, false);
         // initial guess of psi by perturbing lapack psi
         ModuleBase::ComplexMatrix psiguess(nband, npw);
         std::default_random_engine p(1);
@@ -82,7 +86,7 @@ class DiagoCGPrepare
         {
             for (int j = 0; j < npw; j++)
             {
-		double rand = static_cast<double>(u(p))/10.;
+		        double rand = static_cast<double>(u(p))/10.;
                 // psiguess(i,j) = ev(j,i)*(1+rand);
                 psiguess(i, j) = ev(j, i) * rand;
             }
@@ -91,24 +95,47 @@ class DiagoCGPrepare
 	//======================================================================
         double *en = new double[npw];
         int ik = 1;
-	hamilt::Hamilt* ha;
-	ha =new hamilt::HamiltPW;
-	Hamilt_PW* hpw;
-	int* ngk = new int [1];
-	//psi::Psi<std::complex<double>> psi(ngk,ik,nband,npw);
-	psi::Psi<std::complex<double>> psi;
-	psi.resize(ik,nband,npw);
-	//psi.fix_k(0);
+	    hamilt::Hamilt* ha;
+	    ha =new hamilt::HamiltPW;
+	    Hamilt_PW* hpw;
+	    int* ngk = new int [1];
+	    //psi::Psi<std::complex<double>> psi(ngk,ik,nband,npw);
+	    psi::Psi<std::complex<double>> psi;
+	    psi.resize(ik,nband,npw);
+	    //psi.fix_k(0);
         for (int i = 0; i < nband; i++)
         {
             for (int j = 0; j < npw; j++)
             {
-	        psi(i,j)=psiguess(i,j);
-	    }
-	}
-	hsolver::DiagoCG cg(hpw,precondition);
-        cg.diag(ha,psi,en); 
-	//======================================================================
+	            psi(i,j)=psiguess(i,j);
+	        }
+	    }	
+
+        psi::Psi<std::complex<double>> psi_local;
+        double* precondition_local;
+        DIAGOTEST::npw_local = new int[nprocs];
+#ifdef __MPI				
+	    DIAGOTEST::cal_division(DIAGOTEST::npw);
+	    DIAGOTEST::divide_hpsi(psi,psi_local); //will distribute psi and Hmatrix to each process
+	    precondition_local = new double[DIAGOTEST::npw_local[mypnum]];
+	    DIAGOTEST::divide_psi<double>(precondition,precondition_local);	
+#else
+	    DIAGOTEST::hmatrix_local = DIAGOTEST::hmatrix;
+	    DIAGOTEST::npw_local[0] = DIAGOTEST::npw;
+	    psi_local = psi;
+	    precondition_local = new double[DIAGOTEST::npw];
+	    for(int i=0;i<DIAGOTEST::npw;i++) precondition_local[i] = precondition[i];
+#endif
+        hsolver::DiagoCG cg(hpw,precondition_local);
+        psi_local.fix_k(0);
+        double start, end;
+        start = MPI_Wtime();
+        cg.diag(ha,psi_local,en); 
+        end = MPI_Wtime();
+        //if(mypnum == 0) printf("diago time:%7.3f\n",end-start);
+        delete [] DIAGOTEST::npw_local;
+	    delete [] precondition_local;
+	    //======================================================================
         for (int i = 0; i < nband; i++)
         {
             EXPECT_NEAR(en[i], e_lapack[i], threshold);
@@ -128,6 +155,10 @@ TEST_P(DiagoCGTest, RandomHamilt)
     DiagoCGPrepare dcp = GetParam();
     //std::cout << "npw=" << dcp.npw << ", nband=" << dcp.nband << ", sparsity="
     //		  << dcp.sparsity << ", eps=" << dcp.eps << std::endl;
+    hsolver::DiagoIterAssist::PW_DIAG_NMAX = dcp.maxiter;
+    hsolver::DiagoIterAssist::PW_DIAG_THR = dcp.eps;
+    //std::cout<<"maxiter "<<hsolver::DiagoIterAssist::PW_DIAG_NMAX<<std::endl;
+    //std::cout<<"eps "<<hsolver::DiagoIterAssist::PW_DIAG_THR<<std::endl;
     HPsi hpsi(dcp.nband, dcp.npw, dcp.sparsity);
     DIAGOTEST::hmatrix = hpsi.hamilt();
 
@@ -140,10 +171,12 @@ INSTANTIATE_TEST_SUITE_P(VerifyCG,
                          DiagoCGTest,
                          ::testing::Values(
                              // nband, npw, sparsity, reorder, eps, maxiter, threshold
-                             DiagoCGPrepare(10, 50, 0, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(20, 50, 6, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(20, 100, 8, true, 1e-5, 50, 1e-3),
-                             DiagoCGPrepare(40, 200, 8, true, 1e-5, 50, 1e-2)));
+                             DiagoCGPrepare(10, 500, 0, true, 1e-5, 300, 1e-3),
+                             DiagoCGPrepare(20, 500, 6, true, 1e-5, 300, 1e-3),
+                             DiagoCGPrepare(20, 1000, 8, true, 1e-5, 300, 1e-3),
+                             DiagoCGPrepare(40, 1000, 8, true, 1e-6, 300, 1e-3))); 
+                            //DiagoCGPrepare(40, 2000, 8, true, 1e-5, 500, 1e-2))); 
+			    // the last one is passed but time-consumming.
 
 // check that the mock class HPsi work well
 // in generating a Hermite matrix
@@ -183,6 +216,8 @@ TEST(DiagoCGTest, ZHEEV)
 }
 
 // cg for a 2x2 matrix
+#ifdef __MPI
+#else
 TEST(DiagoCGTest, TwoByTwo)
 {
     int dim = 2;
@@ -194,25 +229,30 @@ TEST(DiagoCGTest, TwoByTwo)
     hm(1, 1) = std::complex<double>{3.0, 0.0};
     // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
     DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 50, 1e-10);
+    hsolver::DiagoIterAssist::PW_DIAG_NMAX = dcp.maxiter;
+    hsolver::DiagoIterAssist::PW_DIAG_THR = dcp.eps;
     HPsi hpsi;
     hpsi.create(nband, dim);
     DIAGOTEST::hmatrix = hm;
     DIAGOTEST::npw = dim;
     dcp.CompareEigen(hpsi.precond());
 }
+#endif
 
 TEST(DiagoCGTest, readH)
 {
     // read Hamilt matrix from file data-H
     ModuleBase::ComplexMatrix hm;
     std::ifstream ifs;
-    ifs.open("data-H");
+    ifs.open("H-KPoints-Si64.dat");
     DIAGOTEST::readh(ifs, hm);
     ifs.close();
     int dim = hm.nr;
     int nband = 10; // not nband < dim, here dim = 26 in data-H
     // nband, npw, sub, sparsity, reorder, eps, maxiter, threshold
-    DiagoCGPrepare dcp(nband, dim, 0, true, 1e-4, 50, 1e-3);
+    DiagoCGPrepare dcp(nband, dim, 0, true, 1e-5, 500, 1e-3);
+    hsolver::DiagoIterAssist::PW_DIAG_NMAX = dcp.maxiter;
+    hsolver::DiagoIterAssist::PW_DIAG_THR = dcp.eps;
     HPsi hpsi;
     hpsi.create(nband, dim);
     DIAGOTEST::hmatrix = hpsi.hamilt();
@@ -222,13 +262,28 @@ TEST(DiagoCGTest, readH)
 
 int main(int argc, char **argv)
 {
+	int nproc = 1, myrank = 0;
 
-    MPI_Init(&argc, &argv);
+#ifdef __MPI
+	int nproc_in_pool, kpar=1, mypool, rank_in_pool;
+    setupmpi(argc,argv,nproc, myrank);
+    divide_pools(nproc, myrank, nproc_in_pool, kpar, mypool, rank_in_pool);
+    GlobalV::NPROC_IN_POOL = nproc;
+#else
+	MPI_Init(&argc, &argv);	
+#endif
 
     testing::InitGoogleTest(&argc, argv);
+    ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
+    if (myrank != 0) delete listeners.Release(listeners.default_result_printer());
+
     int result = RUN_ALL_TESTS();
+    if (myrank == 0 && result != 0)
+    {
+        std::cout << "ERROR:some tests are not passed" << std::endl;
+        return result;
+	}
 
     MPI_Finalize();
-
-    return result;
+	return 0;
 }

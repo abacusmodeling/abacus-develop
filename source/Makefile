@@ -14,9 +14,11 @@ VPATH=./src_global\
 :./module_cell\
 :./module_base\
 :./module_md\
+:./module_surchem\
 :./module_deepks\
 :./module_xc\
 :./module_esolver\
+:./module_surchem\
 :./src_pw\
 :./src_lcao\
 :./src_ions\
@@ -68,6 +70,7 @@ FP_OBJS_0=$(OBJS_FIRST_PRINCIPLES)\
 $(OBJS_PARALLEL)\
 $(OBJS_TOOLS) \
 $(OBJS_COMMON)\
+$(OBJS_SURCHEM)\
 main.o\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})

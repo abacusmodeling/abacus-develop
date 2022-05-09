@@ -339,7 +339,7 @@ void ELEC_scf::scf(const int& istep,
 		GlobalC::en.deband = GlobalC::en.delta_e();
 
 		// (8) Mix charge density
-		GlobalC::CHR.mix_rho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
+		GlobalC::CHR.tmp_mixrho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
 
 		// Peize Lin add 2020.04.04
 		if(GlobalC::restart.info_save.save_charge)
@@ -374,7 +374,7 @@ void ELEC_scf::scf(const int& istep,
 			/*
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho_save, GlobalC::CHR.rho);
 			GlobalC::en.calculate_etot();
-			GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, 0.0, GlobalV::PW_DIAG_THR, avg_iter,0);
+			GlobalC::en.print_etot(conv_elec, iter, scf_thr, 0.0, GlobalV::PW_DIAG_THR, avg_iter,0);
 			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 			*/
@@ -444,7 +444,7 @@ void ELEC_scf::scf(const int& istep,
 		// avg_iter is an useless variable in LCAO,
 		// will fix this interface in future -- mohan 2021-02-10
 		int avg_iter=0;
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
 
 		GlobalC::en.etot_old = GlobalC::en.etot;
 
@@ -533,71 +533,132 @@ void ELEC_scf::scf(const int& istep,
 #ifdef __DEEPKS
 				//calculating deepks correction to bandgap
 				//and save the results
-				if (GlobalV::deepks_bandgap)
-				{
-					int nocc = GlobalC::CHR.nelec/2;
-					ModuleBase::matrix wg_hl;
-					wg_hl.create(GlobalV::NSPIN, GlobalV::NBANDS);
-		
-					for(int is=0; is<GlobalV::NSPIN; is++)
-					{
-						for(int ib=0; ib<GlobalV::NBANDS; ib++)
-						{
-							wg_hl(is,ib) = 0.0;
-						
-							if(ib == nocc-1)
-								wg_hl(is,ib) = -1.0;
-							else if(ib == nocc)
-								wg_hl(is,ib) = 1.0;
-						}
-					}
-
-                    std::vector<ModuleBase::matrix> dm_bandgap_gamma;
-                    std::vector<ModuleBase::ComplexMatrix> dm_bandgap_k;
-				
-					if(GlobalV::GAMMA_ONLY_LOCAL)
-                    {
-                        dm_bandgap_gamma.resize(GlobalV::NSPIN);
-                        loc.cal_dm(wg_hl, lowf.wfc_gamma, dm_bandgap_gamma);
-                        GlobalC::ld.cal_o_delta(dm_bandgap_gamma, *lowf.ParaV);
-					}			
-					else
-                    {
-                        dm_bandgap_k.resize(GlobalC::kv.nks);
-                        loc.cal_dm(wg_hl, lowf.wfc_k, dm_bandgap_k);
-                        GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *lowf.ParaV, GlobalC::kv.nks);
-					}
-					if(GlobalV::deepks_out_labels)
-					{
-						GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1] - GlobalC::ld.o_delta, "o_base.npy");
-						GlobalC::ld.cal_orbital_precalc(dm_bandgap_gamma,
-							GlobalC::ucell.nat,
-							GlobalC::ucell,
-							GlobalC::ORB,
-							GlobalC::GridD,
-							*lowf.ParaV);
-						GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
-					}	
-				}
 
 				if (GlobalV::deepks_out_labels)	//caoyu add 2021-06-04
 				{
 					int nocc = GlobalC::CHR.nelec/2;
-					GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_tot.npy");
-					if (!GlobalV::deepks_bandgap)
+					if (GlobalV::deepks_bandgap)
 					{
-						GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_base.npy");  // no scf, o_tot=o_base	
+						if(GlobalV::GAMMA_ONLY_LOCAL)
+						{
+							GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_tot.npy"); 
+						}
+						else
+						{
+							double homo = GlobalC::wf.ekb[0][nocc-1];
+							double lumo = GlobalC::wf.ekb[0][nocc];
+							for(int ik=1; ik<GlobalC::kv.nks; ik++)
+							{
+								if (homo < GlobalC::wf.ekb[ik][nocc-1])
+								{
+									homo = GlobalC::wf.ekb[ik][nocc-1];
+									GlobalC::ld.h_ind = ik;
+								}
+								if (lumo > GlobalC::wf.ekb[ik][nocc])
+								{
+									lumo = GlobalC::wf.ekb[ik][nocc];
+									GlobalC::ld.l_ind = ik;
+								}
+							}
+							GlobalC::ld.save_npy_o(lumo - homo - GlobalC::ld.o_delta, "o_tot.npy");
+							GlobalV::ofs_running << " HOMO index is " << GlobalC::ld.h_ind << std::endl;
+							GlobalV::ofs_running << " HOMO energy " << homo << std::endl;
+							GlobalV::ofs_running << " LUMO index is " << GlobalC::ld.l_ind << std::endl;
+							GlobalV::ofs_running << " LUMO energy " << lumo << std::endl;
+						}
 					}
 
 					GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
                     if (GlobalV::deepks_scf)
 					{
                         GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
+						if (GlobalV::deepks_bandgap)
+            			{
+			    			int nocc = GlobalC::CHR.nelec/2;
+				
+							ModuleBase::matrix wg_hl;
+							if(GlobalV::GAMMA_ONLY_LOCAL)
+							{
+                				wg_hl.create(GlobalV::NSPIN, GlobalV::NBANDS);
+				
+			    				for(int is=0; is<GlobalV::NSPIN; is++)
+								{
+        		    				for(int ib=0; ib<GlobalV::NBANDS; ib++)
+									{
+        			    				wg_hl(is,ib) = 0.0;
+					    				if(ib == nocc-1)
+						  					wg_hl(is,ib) = -1.0;
+					    				else if(ib == nocc)
+						    				wg_hl(is,ib) = 1.0;
+        		    				}
+        	    				}
+
+								std::vector<ModuleBase::matrix> dm_bandgap_gamma;
+        	    				dm_bandgap_gamma.resize(GlobalV::NSPIN);
+                        		loc.cal_dm(wg_hl, lowf.wfc_gamma, dm_bandgap_gamma);
+                        		
+							
+            	    			GlobalC::ld.cal_orbital_precalc(dm_bandgap_gamma,
+									GlobalC::ucell.nat,
+									GlobalC::ucell,
+									GlobalC::ORB,
+									GlobalC::GridD,
+									*lowf.ParaV);
+								
+								GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
+							
+								GlobalC::ld.cal_o_delta(dm_bandgap_gamma, *lowf.ParaV);
+								GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1] - GlobalC::ld.o_delta, "o_base.npy");
+                			
+							}
+                			else //multi-k bandgap label
+							{
+								wg_hl.create(GlobalC::kv.nks, GlobalV::NBANDS);
+				
+			    				for(int ik=0; ik<GlobalC::kv.nks; ik++){
+        		    				for(int ib=0; ib<GlobalV::NBANDS; ib++){
+        			    				wg_hl(ik,ib) = 0.0;
+								
+					    				if(ik == GlobalC::ld.h_ind && ib == nocc-1)
+						  					wg_hl(ik,ib) = -1.0;
+					    				else if(ik == GlobalC::ld.l_ind && ib == nocc)
+						    				wg_hl(ik,ib) = 1.0;
+        		    				}
+        	    				}
+								std::vector<ModuleBase::ComplexMatrix> dm_bandgap_k;
+								dm_bandgap_k.resize(GlobalC::kv.nks);
+                        		loc.cal_dm(wg_hl, lowf.wfc_k, dm_bandgap_k);
+                        		GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *lowf.ParaV, GlobalC::kv.nks);
+			    				
+								GlobalC::ld.cal_orbital_precalc_k(dm_bandgap_k,
+									GlobalC::ucell.nat,
+									GlobalC::kv.nks,
+									GlobalC::kv.kvec_d,
+									GlobalC::ucell,
+            						GlobalC::ORB,
+            						GlobalC::GridD,
+            						*lowf.ParaV);
+								GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
+							
+								GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *lowf.ParaV, GlobalC::kv.nks);
+								GlobalC::ld.save_npy_o(GlobalC::wf.ekb[GlobalC::ld.l_ind][nocc] - GlobalC::wf.ekb[GlobalC::ld.h_ind][nocc-1]- GlobalC::ld.o_delta, "o_base.npy");
+                			}	
+        				}					
 					}
-                    else
+                    else //deepks_scf = 0; base calculation
                     {
                         GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
-												
+						if (GlobalV::deepks_bandgap)
+						{
+							if(GlobalV::GAMMA_ONLY_LOCAL)
+							{
+								GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_base.npy");  // no scf, o_tot=o_base
+							}	
+							else
+							{
+								GlobalC::ld.save_npy_o(GlobalC::wf.ekb[GlobalC::ld.l_ind][nocc] - GlobalC::wf.ekb[GlobalC::ld.h_ind][nocc-1], "o_base.npy");
+							}
+						}							
                     }
 				}
 #endif
