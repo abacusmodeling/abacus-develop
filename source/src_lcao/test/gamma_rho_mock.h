@@ -44,7 +44,6 @@
 #include "src_io/wf_local.h"
 #include "src_lcao/gint_gamma.h"
 #include "src_lcao/gint_tools.h"
-#include "src_lcao/grid_base_beta.h"
 #include "src_lcao/grid_bigcell.h"
 #include "src_lcao/grid_meshball.h"
 #include "src_lcao/grid_meshcell.h"
