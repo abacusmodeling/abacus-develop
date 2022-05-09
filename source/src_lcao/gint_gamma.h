@@ -9,7 +9,6 @@
 #include "gint_tools.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
-#include "grid_base_beta.h"
 #include "grid_technique.h"
 #include "LCAO_matrix.h"
 #include <omp.h>
@@ -20,7 +19,7 @@
 // Numerical Orbitals
 //=========================================================
 
-class Gint_Gamma : public Grid_Base_Beta
+class Gint_Gamma
 {
 	public:
 
@@ -43,10 +42,16 @@ class Gint_Gamma : public Grid_Base_Beta
 
 	// (5) calculate the Mulliken charge
 	void cal_mulliken(double** mulliken);
-
+	
+	void prepare( 
+		const ModuleBase::Matrix3 &latvec_in, 
+        const double& lat0_in);
 
 private:
 
+	double vfactor;
+	ModuleBase::Matrix3 latvec0;
+	double lat0;
     double***  DM;   //pointer to LOC.DM
     double* transformer;
 	double psiv1;

@@ -43,7 +43,6 @@ list(APPEND objects
     gint_k_vl.cpp
     gint_tools.cpp
     global_fp.cpp
-    grid_base_beta.cpp
     grid_bigcell.cpp
     grid_meshball.cpp
     grid_meshcell.cpp
