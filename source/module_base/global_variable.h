@@ -44,6 +44,8 @@ extern double PRESS3;
 extern double PRESSURE;
 extern std::string RELAX_METHOD;
 extern std::string OUT_LEVEL;
+extern int OUT_FREQ_ELEC;
+extern int OUT_FREQ_ION;
 
 extern int RELAX_NMAX; // 8.3
 extern int SCF_NMAX; // 8.4

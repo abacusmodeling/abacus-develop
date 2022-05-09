@@ -269,7 +269,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 		{
 			const int iat2=at[ia2];
 			const int T2 = GlobalC::ucell.iat2it[iat2];
-			if (T1 <= T2)
+			if (iat1 <= iat2)
 			{
     			int cal_num=0;
     			for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
