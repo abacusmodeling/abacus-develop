@@ -22,7 +22,7 @@ class ESolver
 //     ModuleBase::matrix lattice_v;
 public:
     ESolver(){
-        tag = "ESolver";
+        classname = "ESolver";
     }
     virtual ~ESolver(){};
 
@@ -36,7 +36,7 @@ public:
    
     /// These two virtual `Run` will be merged in the future.
     //virtual void Run(int istep, Atom &atom) = 0;
-    virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
+    virtual void Run(const int istep, UnitCell_pseudo& cell) = 0;
     virtual void Run(int istep,
         Record_adj& ra /**< would be a 2nd-module of Cell*/,
         Local_Orbital_Charge& loc /**< EState*/,
@@ -48,10 +48,12 @@ public:
     virtual void cal_Stress(ModuleBase::matrix &stress) = 0;
     
     //Print current classname.
-    virtual void printag();
-    //get elec.iter
-    virtual int getiter(){return 0;}
-    string tag;
+    void printname();
+
+    //temporarily
+    //get iterstep used in current scf
+    virtual int getniter(){return 0;}
+    string classname;
 };
 
 void init_esolver(ESolver* &p_esolver, const string use_esol);

@@ -43,6 +43,8 @@ double PRESS3 = 0.0;
 double PRESSURE = 0.0;
 std::string RELAX_METHOD = "bfgs";
 std::string OUT_LEVEL = "ie";
+int OUT_FREQ_ELEC = 0;
+int OUT_FREQ_ION = 0;
 int RELAX_NMAX = 20;
 int MD_NSTEP = 20;
 int SCF_NMAX = 50;
@@ -120,8 +122,7 @@ std::string global_wannier_card;
 std::string global_pseudo_dir = "";
 std::string global_orbital_dir = ""; // liuyu add 2021-08-14
 
-std::string global_pseudo_type
-    = "upf"; // mohan add 2013-05-20, default is UPF, we can also use VWR (xiaohui add 2013-06-23)
+std::string global_pseudo_type = "auto"; 
 std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified

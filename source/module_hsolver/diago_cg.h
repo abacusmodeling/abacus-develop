@@ -35,6 +35,8 @@ class DiagoCG : public DiagH
     // this is the override function diag() for CG method
     void diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, double *eigenvalue_in) override;
 
+    static bool no_subspace;
+
   private:
     /// static variables, used for passing control variables
     /// if eigenvalue and eigenvectors should be reordered after diagonalization, it is always be true.
