@@ -42,6 +42,16 @@ namespace Gint_Tools
 		int * &block_size
 	);
 
+	void get_block_info(
+		const int na_grid,
+		const int grid_index,
+		int * &block_iw,
+		int * &block_index,
+		int * &block_size,
+		int * &at,
+		int * &uc
+	);
+
 	// whether the atom-grid distance is larger than cutoff
 	// cal_flag[pw.bxyz][na_grid]
 	bool** get_cal_flag(

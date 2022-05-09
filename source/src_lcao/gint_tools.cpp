@@ -62,7 +62,39 @@ namespace Gint_Tools
 			block_size[id]=GlobalC::ucell.atoms[it].nw;	
 		}
 	}
-	
+
+	void get_block_info(
+		const int na_grid,
+		const int grid_index,
+		int * &block_iw,
+		int * &block_index,
+		int * &block_size,
+		int * &at,
+		int * &uc
+	)
+	{
+		block_iw = new int[na_grid];
+		block_index = new int[na_grid+1];
+		block_size = new int[na_grid];
+		at = new int[na_grid];
+		uc = new int[na_grid];
+
+		block_index[0] = 0;
+		for (int id=0; id<na_grid; id++)
+		{
+			const int mcell_index=GlobalC::GridT.bcell_start[grid_index] + id;
+			const int iat=GlobalC::GridT.which_atom[mcell_index]; // index of atom
+			const int it=GlobalC::ucell.iat2it[ iat ]; // index of atom type
+			const int ia=GlobalC::ucell.iat2ia[ iat ]; // index of atoms within each type
+			const int start=GlobalC::ucell.itiaiw2iwt(it, ia, 0); // the index of the first wave function for atom (it,ia)
+			block_iw[id]=GlobalC::GridT.trace_lo[start];
+			block_index[id+1] = block_index[id]+GlobalC::ucell.atoms[it].nw;
+			block_size[id]=GlobalC::ucell.atoms[it].nw;	
+			at[id] = iat;
+			uc[id] = GlobalC::GridT.which_unitcell[mcell_index];
+		}
+	}
+
 	// whether the atom-grid distance is larger than cutoff
 	bool** get_cal_flag(
 		const int na_grid, 			// number of atoms on this grid 

@@ -189,7 +189,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 			const int nbz = GlobalC::GridT.nbzp;
 		
 			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
-
+            
+            // it's a uniform grid to save orbital values, so the delta_r is a constant.
+            const double delta_r = GlobalC::ORB.dr_uniform;		
 #ifdef _OPENMP
 			#pragma omp for
 #endif
@@ -207,10 +209,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 		
 						// get the value: how many atoms has orbital value on this grid.
 						const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
-						if(na_grid==0) continue;
-
-						// it's a uniform grid to save orbital values, so the delta_r is a constant.
-						const double delta_r = GlobalC::ORB.dr_uniform;						
+						if(na_grid==0) continue;				
 						
 						// here vindex refers to local potentials
 						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
