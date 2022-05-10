@@ -109,14 +109,11 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     double Ael = cal_Ael(cell, pwb);
 
     // the 2nd item of tmp_Vel
-    double *Vel2 = new double[pwb.nrxx];
-    ModuleBase::GlobalFunc::ZEROS(Vel2, pwb.nrxx);
-
-    eps_pot(PS_TOTN_real, Sol_phi, pwb, epsilon, Vel2);
+    eps_pot(PS_TOTN_real, Sol_phi, pwb, epsilon, epspot);
 
     for (int i = 0; i < pwb.nrxx; i++)
     {
-        tmp_Vel[i] += Vel2[i];
+        tmp_Vel[i] += epspot[i];
     }
 
     // ModuleBase::matrix v(nspin, pwb.nrxx);
@@ -147,7 +144,7 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     delete[] epsilon;
     delete[] epsilon0;
     delete[] tmp_Vel;
-    delete[] Vel2;
+    // delete[] Vel2;
     // delete[] TOTN_real;
     delete[] phi_tilda_R;
     delete[] phi_tilda_R0;

@@ -19,6 +19,7 @@ class surchem
 
     double *TOTN_real;
     double *delta_phi;
+    double *epspot;
     ModuleBase::matrix Vcav;
     ModuleBase::matrix Vel;
     double qs;
