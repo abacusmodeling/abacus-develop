@@ -8,8 +8,8 @@
 namespace ModuleESolver
 {
 
-class ESolver_KS: public ESolver_FP
-{
+    class ESolver_KS : public ESolver_FP
+    {
     public:
         ESolver_KS();
         // HSolver* phsol;
@@ -19,7 +19,7 @@ class ESolver_KS: public ESolver_FP
         int maxniter;     // maximum iter steps for scf
         int niter;        // iter steps actually used in scf
         int out_freq_elec;// frequency for output
-        
+
         virtual void Run(const int istep, UnitCell_pseudo& cell) override;
 
         // calculate electron density from a specific Hamiltonian
@@ -29,18 +29,18 @@ class ESolver_KS: public ESolver_FP
 
     protected:
         // Something to do before SCF iterations.
-        virtual void beforescf(int istep){}; 
+        virtual void beforescf(int istep) {};
         // Something to do before hamilt2density function in each iter loop.
-        virtual void eachiterinit(const int istep, const int iter){}; 
+        virtual void eachiterinit(const int istep, const int iter) {};
         // Something to do after hamilt2density function in each iter loop.
-        virtual void eachiterfinish(const int iter, const bool conv){}; 
+        virtual void eachiterfinish(const int iter, const bool conv) {};
         // Something to do after SCF iterations when SCF is converged or comes to the max iter step.
-        virtual void afterscf(const int iter, const bool conv){};
+        virtual void afterscf(const int iter, const bool conv) {};
         // <Temporary> It should be replaced by a function in Hamilt Class
-        virtual void updatepot(const int istep, const int iter, const bool conv){};
-        
+        virtual void updatepot(const int istep, const int iter, const bool conv) {};
 
-    //TOOLS:
+
+        //TOOLS:
     protected:
         // Set ethr for hsolver
         void set_ethr(const int istep, const int iter);
@@ -52,14 +52,14 @@ class ESolver_KS: public ESolver_FP
         void printiter(const bool conv, const int iter, const double drho, const double duration, const double ethr);
         // Write the headline in the running_log file
         // "PW/LCAO" ALGORITHM --------------- ION=   1  ELEC=   1--------------------------------
-        void writehead(std::ofstream &ofs_running, const int istep, const int iter);
-        void reset_diagethr(std::ofstream &ofs_running, const double hsover_error);
+        void writehead(std::ofstream& ofs_running, const int istep, const int iter);
+        void reset_diagethr(std::ofstream& ofs_running, const double hsover_error);
 
 
 
     protected:
         std::string basisname; //PW or LCAO
 
-};
+    };
 }
 #endif
