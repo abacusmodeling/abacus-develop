@@ -12,7 +12,7 @@
  ***********************************************/
 
 /**
- * The testes functions are wrappers of MPI_Bcast
+ * The tested functions are wrappers of MPI_Bcast
  * in ABACUS, as defined in src_parallel/parallel_common.h.
  * The source is process 0 in all MPI_Bcast 
  * wrappers.
