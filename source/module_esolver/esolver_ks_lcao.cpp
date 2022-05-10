@@ -225,6 +225,7 @@ namespace ModuleESolver
             this->cal_Force(fcs);
         }
         stress = this->scs; //copy the stress
+        this->have_force = false;
     }
 
     void ESolver_KS_LCAO::postprocess()
