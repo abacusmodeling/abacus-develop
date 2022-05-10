@@ -17,20 +17,20 @@
 class ELEC_cbands_gamma
 {
 
-	friend class ELEC_scf; 
+    friend class ELEC_scf;
     friend class ELEC_nscf;
     friend class ModuleESolver::ESolver_KS_LCAO;
 
-	public:
+public:
 
-	ELEC_cbands_gamma();
-	~ELEC_cbands_gamma();
+    ELEC_cbands_gamma();
+    ~ELEC_cbands_gamma();
 
 
-	private:
+private:
 
     static void cal_bands(const int& istep, LCAO_Hamilt& uhm,
-        Local_Orbital_wfc &lowf,
+        Local_Orbital_wfc& lowf,
         std::vector<ModuleBase::matrix>& dm_gamma);
 
 

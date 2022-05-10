@@ -17,21 +17,21 @@
 class ELEC_cbands_k
 {
 
-	friend class ELEC_scf;
+    friend class ELEC_scf;
     friend class ELEC_nscf;
     friend class ModuleESolver::ESolver_KS_LCAO;
 
 
-	public:
+public:
 
-	ELEC_cbands_k();
-	~ELEC_cbands_k();
+    ELEC_cbands_k();
+    ~ELEC_cbands_k();
 
 
-	private:
+private:
 
     static void cal_bands(const int& istep, LCAO_Hamilt& uhm,
-        Local_Orbital_wfc &lowf,
+        Local_Orbital_wfc& lowf,
         std::vector<ModuleBase::ComplexMatrix>& dm_k);
 
 
