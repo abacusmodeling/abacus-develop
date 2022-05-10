@@ -79,7 +79,12 @@ public:
 
     bool setup_2d = false;
 
-
+    // -------------------------------------------------------------------------
+    // note: ORB_control orb_con is now a member in ESolver_KS_LCAO
+    // ("friend class ESolver_KS_LCAO;" will cause not-defined problem).
+    // These variables is set in in ESolver_KS_LCAO 
+    // and can only be visited in ESolver_KS_LCAO.
+    // -------------------------------------------------------------------------
     bool gamma_only = 1;
     int nlocal = 0;
     int nbands = 0;
