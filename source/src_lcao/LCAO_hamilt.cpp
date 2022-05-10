@@ -37,7 +37,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
     {
         // mohan add 2012-03-29
         // calculate the grid integration of 'Vl' matrix for gamma algorithms.
-        this->GG.prepare(GlobalC::ucell.latvec, GlobalC::ucell.lat0, this->LM);
+        this->GG.prepare(GlobalC::ucell.latvec, GlobalC::ucell.lat0);
     
         // calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
         this->calculate_STNR_gamma();	
@@ -87,7 +87,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
         // calculate the 'Vl' matrix using gamma-algorithms.
         if(GlobalV::VL_IN_H)
         {	
-            this->GG.cal_vlocal(GlobalC::pot.vr_eff1);
+            this->GG.cal_vlocal(GlobalC::pot.vr_eff1, *this->LM);
 
         #ifdef __MPI //liyuanbo 2022/2/23
             // Peize Lin add 2016-12-03
