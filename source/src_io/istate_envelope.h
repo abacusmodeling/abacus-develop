@@ -7,9 +7,9 @@
 
 class IState_Envelope
 {
-	public:
-	IState_Envelope();
-	~IState_Envelope();
+public:
+    IState_Envelope();
+    ~IState_Envelope();
 
     /// for gamma_only
     void begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wfc_pw, int& out_wfc_r);
@@ -17,13 +17,13 @@ class IState_Envelope
     void begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wfc_pw, int& out_wfc_r);
 
 private:
-	bool *bands_picked;
+    bool* bands_picked;
 
     void set_pw_wfc(PW_Basis& pwb,
         const int& ik, const int& ib,
         const int& nspin, const int& ngk,
         const double* const* const rho,
-        ModuleBase::ComplexMatrix &wfc_g);
+        ModuleBase::ComplexMatrix& wfc_g);
 
 };
 #endif

@@ -14,13 +14,13 @@
 class Run_lcao
 {
 
-	public:
+public:
 
     Run_lcao();
     ~Run_lcao();
 
-	// perform Linear Combination of Atomic Orbitals (LCAO) calculations
-    static void lcao_line(ModuleESolver::ESolver *p_esolver);
+    // perform Linear Combination of Atomic Orbitals (LCAO) calculations
+    static void lcao_line(ModuleESolver::ESolver* p_esolver);
 
 };
 
