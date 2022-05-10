@@ -18,6 +18,7 @@ VPATH=./src_global\
 :./module_deepks\
 :./module_xc\
 :./module_esolver\
+:./module_surchem\
 :./src_pw\
 :./src_lcao\
 :./src_ions\

@@ -7,7 +7,7 @@
 #endif
 
 // This is for cell R dependent part. 
-void Grid_Technique::cal_nnrg()
+void Grid_Technique::cal_nnrg(Parallel_Orbitals* pv)
 {
 	ModuleBase::TITLE("LCAO_nnr","cal_nnrg");
 
@@ -18,6 +18,7 @@ void Grid_Technique::cal_nnrg()
 	delete[] nlocdimg;
 	delete[] nlocstartg;
 	delete[] nad;
+	this->nnrg_index.resize(0);
 	
 	this->nad = new int[GlobalC::ucell.nat];
 	this->nlocdimg = new int[GlobalC::ucell.nat];	
@@ -81,7 +82,12 @@ void Grid_Technique::cal_nnrg()
 						// GlobalC::ORB.Phi[it].getRcut = 7.0000000000000008
 						if(distance < rcut - 1.0e-15)
 						{
-							const int nelement = atom1->nw * atom2->nw;//modified by zhengdy-soc, no need to double
+							//storing the indexed for nnrg
+							const int mu = pv->trace_loc_row[iat];
+							const int nu = pv->trace_loc_col[iat2];
+							this->nnrg_index.push_back(gridIntegral::gridIndex{this->nnrg, mu, nu, GlobalC::GridD.getBox(ad), atom1->nw, atom2->nw});
+							
+							const int nelement = atom1->nw * atom2->nw;
 							this->nnrg += nelement;
 							this->nlocdimg[iat] += nelement; 
 							this->nad[iat]++;
