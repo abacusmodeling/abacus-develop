@@ -143,7 +143,6 @@ ELEC_evolve.o\
 ELEC_scf.o\
 ELEC_nscf.o\
 LOOP_cell.o\
-LOOP_elec.o\
 LOOP_ions.o\
 run_md_lcao.o\
 DM_gamma.o\
@@ -234,6 +233,7 @@ OBJS_ESOLVER=esolver.o\
     esolver_ks_pw.o\
     esolver_sdft_pw.o\
     esolver_ks_lcao.o\
+    esolver_ks_lcao_elec.o\
     esolver_lj.o\
     esolver_dp.o\
 
