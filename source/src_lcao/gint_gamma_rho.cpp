@@ -254,46 +254,15 @@ void Gint_Gamma::gamma_charge(const double*const*const*const DM, Charge* chr) co
 	return;
 }
 
-
-
-double sum_up_rho(Charge* chr)
-{
-    double sum = 0.0;//LiuXh 2016-01-10
-	for(int is=0; is<GlobalV::NSPIN; is++)
-	{
-		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		{
-			sum += chr->rho[is][ir];
-		}
-	}
-    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "sum", sum);
-
-    ModuleBase::timer::tick("Gint_Gamma","reduce_charge");
-#ifdef __MPI
-    Parallel_Reduce::reduce_double_pool( sum );
-#endif
-    ModuleBase::timer::tick("Gint_Gamma","reduce_charge");
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * GlobalC::ucell.omega/ GlobalC::pw.ncxyz);
-
-    const double ne = sum * GlobalC::ucell.omega / GlobalC::pw.ncxyz;
-    //xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "ne", ne);
-    ModuleBase::timer::tick("Gint_Gamma","gamma_charge");
-	return ne;
-}
-
-
-
 // calculate charge density
-double Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
+void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 {
     ModuleBase::TITLE("Gint_Gamma","cal_rho");
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
     this->max_size = GlobalC::GridT.max_atom;
 	this->gamma_charge(DM_in, chr);
-    const double ne = sum_up_rho(chr);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
-    return ne;
+    return;
 }

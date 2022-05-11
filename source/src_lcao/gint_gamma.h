@@ -31,7 +31,7 @@ class Gint_Gamma
 	void cal_vlocal( const double*const vlocal, LCAO_Matrix &lm);
 
 	// (2) calculate charge density
-	double cal_rho(double*** DM_in, Charge* chr);
+	void cal_rho(double*** DM_in, Charge* chr);
 
 	// (3) calcualte the forces related to grid
 	void cal_force(double*** DM_in, const double*const vlocal,
