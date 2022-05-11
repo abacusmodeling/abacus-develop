@@ -11,6 +11,7 @@
 #include "../module_base/global_variable.h"
 #include "grid_technique.h"
 #include "LCAO_matrix.h"
+#include "../src_pw/charge.h"
 #include <omp.h>
 
 //=========================================================
@@ -30,7 +31,7 @@ class Gint_Gamma
 	void cal_vlocal( const double*const vlocal, LCAO_Matrix &lm);
 
 	// (2) calculate charge density
-	double cal_rho(double*** DM_in);
+	double cal_rho(double*** DM_in, Charge* chr);
 
 	// (3) calcualte the forces related to grid
 	void cal_force(double*** DM_in, const double*const vlocal,
@@ -101,7 +102,7 @@ private:
 	// for calculation of charege 
 	// Input:	DM[is][iw1_lo][iw2_lo]
 	// Output:	rho.ptr_2D[is][ir]
-	Gint_Tools::Array_Pool<double> gamma_charge(const double*const*const*const DM) const;
+	void gamma_charge(const double*const*const*const DM, Charge* chr) const;
 
 	// for calculation of Mulliken charge.
 	void gamma_mulliken(double** mulliken);
@@ -139,7 +140,7 @@ private:
 		const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
 		const int*const vindex,							// vindex[GlobalC::pw.bxyz]
 		const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-		Gint_Tools::Array_Pool<double> &rho) const;		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
+		Charge* chr) const;		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
 
 	void cal_meshball_force(
 		const int grid_index,

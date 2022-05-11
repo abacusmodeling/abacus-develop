@@ -140,11 +140,11 @@ void LOOP_elec::before_solver(const int& istep,
 		// calculate the charge density
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			this->UHM->GG.cal_rho(loc.DM);
+			this->UHM->GG.cal_rho(loc.DM, (Charge*)(&GlobalC::CHR));
 		}
 		else
 		{
-			this->UHM->GK.cal_rho_k(loc.DM_R);
+			this->UHM->GK.cal_rho_k(loc.DM_R, (Charge*)(&GlobalC::CHR));
 		}
 
 		// renormalize the charge density

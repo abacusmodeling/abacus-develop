@@ -29,7 +29,8 @@ inline void cal_band_rho(
 	double** psir_ylm,
 	int* vindex, 
     bool** cal_flag,
-    double** DM_R)
+    double** DM_R,
+	Charge* chr)
 {
 	char trans='N';
 	double alpha_diag=1;
@@ -265,7 +266,7 @@ inline void cal_band_rho(
 		} // ia1
 		
 		// calculate rho
-		double *rhop = GlobalC::CHR.rho[is];
+		double *rhop = chr->rho[is];
 		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
 			double r=ddot_(&block_index[size], psir_ylm[ib], &inc, psir_DM.ptr_2D[ib], &inc);
@@ -276,7 +277,7 @@ inline void cal_band_rho(
 }
 
 
-void Gint_k::cal_rho_k(double** DM_R_in)
+void Gint_k::cal_rho_k(double** DM_R_in, Charge* chr)
 {
 	ModuleBase::TITLE("Gint_k","cal_rho_k");
     ModuleBase::timer::tick("Gint_k", "cal_rho_k");
@@ -358,7 +359,8 @@ void Gint_k::cal_rho_k(double** DM_R_in)
 							psir_ylm.ptr_2D,
 							vindex, 
 							cal_flag,
-							DM_R);
+							DM_R,
+							chr);
 						
 						free(vindex);			vindex=nullptr;
                         delete[] block_iw;
