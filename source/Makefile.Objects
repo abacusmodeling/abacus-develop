@@ -110,7 +110,6 @@ grid_bigcell.o\
 grid_meshball.o\
 gint_tools.o\
 gint_gamma.o\
-gint_gamma_common.o\
 gint_gamma_fvl.o\
 gint_gamma_vl.o\
 gint_gamma_rho.o\
@@ -121,7 +120,6 @@ gint_k_init.o\
 gint_k_vl.o\
 gint_k_rho.o\
 gint_k_fvl.o\
-grid_base_beta.o\
 ORB_control.o\
 ORB_read.o\
 ORB_atomic.o\
