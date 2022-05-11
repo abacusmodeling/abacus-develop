@@ -101,10 +101,14 @@ int out_mul = 0; // qifeng add 2019/9/10
 //----------------------------------------------------------
 int NPROC = 1;
 int KPAR = 1;
+int NSTOGROUP = 1;
 int MY_RANK = 0;
 int MY_POOL = 0;
+int MY_STOGROUP = 0;
 int NPROC_IN_POOL = 1;
+int NPROC_IN_STOGROUP = 1;
 int RANK_IN_POOL = 0;
+int RANK_IN_STOGROUP = 0;
 int DRANK = -1; // mohan add 2012-01-13, must be -1, so we can recognize who didn't in DIAG_WORLD
 int DSIZE = KPAR;
 int DCOLOR = -1;

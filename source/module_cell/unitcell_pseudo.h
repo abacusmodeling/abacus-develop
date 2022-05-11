@@ -31,7 +31,7 @@ public: // member variables
 	int lmax_ppwf;
 	int lmaxmax; // liuyu 2021-07-04
 	bool init_vel; // liuyu 2021-07-15
-	//double nelec;
+	double nelec;
 
 public: // member functions
 	UnitCell_pseudo();

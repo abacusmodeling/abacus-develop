@@ -23,9 +23,8 @@ list(APPEND objects
     pw_complement.cpp
     soc.cpp
     sto_che.cpp
-    sto_elec.cpp
-    sto_hchi.cpp
     sto_iter.cpp
+    sto_hchi.cpp
     sto_wf.cpp
     stress_func_cc.cpp
     stress_func_ewa.cpp

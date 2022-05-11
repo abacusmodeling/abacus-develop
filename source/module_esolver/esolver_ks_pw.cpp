@@ -211,7 +211,10 @@ void ESolver_KS_PW:: eachiterinit(const int iter)
 
     //(2) save change density as previous charge,
     // prepared fox mixing.
-    GlobalC::CHR.save_rho_before_sum_band();
+    if(GlobalV::MY_STOGROUP == 0)
+	{
+        GlobalC::CHR.save_rho_before_sum_band();
+    }
 }
 
 //Temporary, it should be replaced by hsolver later.

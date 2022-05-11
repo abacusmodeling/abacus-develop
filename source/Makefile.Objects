@@ -57,9 +57,8 @@ soc.o\
 to_wannier90.o \
 unk_overlap_pw.o \
 berryphase.o \
-sto_elec.o\
-sto_wf.o\
 sto_iter.o\
+sto_wf.o\
 sto_hchi.o\
 sto_che.o\
 
@@ -226,6 +225,7 @@ parallel_reduce.o\
 parallel_pw.o\
 ft.o\
 parallel_grid.o\
+parallel_stochi.o\
 
 OBJS_ESOLVER=esolver.o\
     esolver_ks.o\

@@ -17,7 +17,7 @@ option(USE_CUDA "Enable support to CUDA." OFF)
 option(USE_ROCM "Enable support to ROCm." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
-option(BUILD_TESTING "Build ABACUS unit tests" OFF)
+option(BUILD_TESTING "Build ABACUS unit tests" ON)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
 set(ABACUS_BIN_NAME abacus)
