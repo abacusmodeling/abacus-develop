@@ -47,11 +47,6 @@ class Gint_Gamma
 private:
 
     double***  DM;   //pointer to LOC.DM
-    double* transformer;
-	double psiv1;
-	double psiv2;
-	double* ylm1;
-	double* ylm2;
 
 	int grid_index;			// may delete?
 	int max_size;
