@@ -58,6 +58,7 @@ class energy
 
 	int out_dos;			// control dos calculation
 	int out_band;                    // control band calculation  pengfei 2014-10-13
+	int out_proj_band;                    // control projected band calculation  jiyy add 2022-05-11
 	const std::string Name_Angular[5][11] = 
 	{
     	{"s"},
@@ -88,6 +89,8 @@ class energy
 	void print_band(const int &ik);
 
 	void print_format(const std::string &name, const double &value);
+
+	void print_orbital_file();
 
 	void calculate_harris(const int &flag); //mohan add 2012-06-05
 

@@ -27,6 +27,7 @@ pw_diag_thr 1.0e-7
 #Parameters (File)
 init_chg file
 out_band 1
+out_proj_band 1
 
 #Parameters (Smearing)
 smearing_method gaussian
@@ -58,9 +59,9 @@ points.
 Run the program, and you will see a file named BANDS_1.dat in the output directory. Plot it
 to get energy band structure.
 
-Along with the BANDS_1.dat file, we also produce the projected band structure in a file called PBAND_1 in xml format.
+If "out_proj_band" set 1, it will also produce the projected band structure in a file called PBAND_1 in xml format.
 
-The PDOS file starts with number of atomic orbitals in the system, the text contents of element <band structure> is the same as data in the BANDS_1.dat file, such as:
+The PBAND_1 file starts with number of atomic orbitals in the system, the text contents of element <band structure> is the same as data in the BANDS_1.dat file, such as:
 ```
 <pband>
 <nspin>1</nspin>

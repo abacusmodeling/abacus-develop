@@ -29,7 +29,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
     const Parallel_Orbitals* pv = uhm.LM->ParaV;
 
-    if(out_dos !=0 || out_band !=0)
+    if(out_dos !=0 || out_band !=0 || out_proj_band !=0)
     {
         GlobalV::ofs_running << "\n\n\n\n";
         GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
@@ -536,34 +536,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 			 out << "<"<<"/"<<"pdos"<<">" <<std::endl;
 			 out.close();}
-		 {  std::stringstream os;
-			 os<<GlobalV::global_out_dir<<"Orbital";
-			 std::ofstream out(os.str().c_str());
-			 out<< std::setw(5)<<"io"<< std::setw(8) <<"spec" <<std::setw(5)<<"l"<<std::setw(5)<<"m"<<std::setw(5)<<"z"<<std::setw(5)<<"sym"<<std::endl;
-
-
-			 for (int i=0; i<GlobalC::ucell.nat; i++)
-			 {
-				 int   t = GlobalC::ucell.iat2it[i];
-				 Atom* atom1 = &GlobalC::ucell.atoms[t];  
-				 for(int j=0; j<atom1->nw; ++j)
-				 {
-					 const int L1 = atom1->iw2l[j];
-					 const int N1 = atom1->iw2n[j];
-					 const int m1 = atom1->iw2m[j];
-					 out <<std::setw(5) << i << std::setw(8) 
-						<< GlobalC::ucell.atoms[t].label <<std::setw(5)
-							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< GlobalC::en.Name_Angular[L1][m1] << std::endl;
-				 }
-			 }
-			 out <<std::endl<<std::endl;
-			 out <<std::setw(5)<< "io"<<std::setw(2)<<"="<<std::setw(2)<<"Orbital index in supercell"<<std::endl;
-			 out <<std::setw(5)<< "spec"<<std::setw(2)<<"="<<std::setw(2)<<"Atomic species label"<<std::endl;
-			 out <<std::setw(5)<< "l"<<std::setw(2)<<"="<<std::setw(2)<<"Angular mumentum quantum number"<<std::endl;
-			 out <<std::setw(5)<< "m"<<std::setw(2)<<"="<<std::setw(2)<<"Magnetic quantum number"<<std::endl;
-			 out <<std::setw(5)<< "z"<<std::setw(2)<<"="<<std::setw(2)<<"Zeta index of orbital"<<std::endl;
-			 out <<std::setw(5)<< "sym"<<std::setw(2)<<"="<<std::setw(2)<<"Symmetry name of real orbital"<<std::endl;
-			 out.close();}
+		this->print_orbital_file();
 
 	 }       
 	 delete[] pdos;
@@ -642,6 +615,28 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 			nks = GlobalC::kv.nkstot/2;
 		}
 
+		for(int is=0; is<nspin0; is++)
+		{
+			std::stringstream ss2;
+			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
+			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
+			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);
+
+		}
+	}//out_band
+
+	if(this->out_proj_band) // Projeced band structure added by jiyy-2022-4-20
+	{
+		int nks=0;
+		if(nspin0==1) 
+		{
+			nks = GlobalC::kv.nkstot;
+		}
+		else if(nspin0==2) 
+		{
+			nks = GlobalC::kv.nkstot/2;
+		}
+
 		ModuleBase::ComplexMatrix weightk;
 		ModuleBase::matrix weight;
 		int NUM = 0;
@@ -660,12 +655,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 		for(int is=0; is<nspin0; is++)
 		{
-			std::stringstream ss2;
-			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
-			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
-			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);
 
-			// Projeced band structure added by jiyy-2022-4-20
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
 				std::vector<ModuleBase::matrix>   Mulk;
@@ -893,35 +883,41 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 			out << "<"<<"/"<<"pband"<<">" <<std::endl;
 			out.close();}
 		}//is
-		{  std::stringstream os;
-			 os<<GlobalV::global_out_dir<<"Orbital";
-			 std::ofstream out(os.str().c_str());
-			 out<< std::setw(5)<<"io"<< std::setw(8) <<"spec" <<std::setw(5)<<"l"<<std::setw(5)<<"m"<<std::setw(5)<<"z"<<std::setw(5)<<"sym"<<std::endl;
-
-
-			 for (int i=0; i<GlobalC::ucell.nat; i++)
-			 {
-				 int   t = GlobalC::ucell.iat2it[i];
-				 Atom* atom1 = &GlobalC::ucell.atoms[t];  
-				 for(int j=0; j<atom1->nw; ++j)
-				 {
-					 const int L1 = atom1->iw2l[j];
-					 const int N1 = atom1->iw2n[j];
-					 const int m1 = atom1->iw2m[j];
-					 out <<std::setw(5) << i << std::setw(8) 
-						<< GlobalC::ucell.atoms[t].label <<std::setw(5)
-							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< GlobalC::en.Name_Angular[L1][m1] << std::endl;
-				 }
-			 }
-			 out <<std::endl<<std::endl;
-			 out <<std::setw(5)<< "io"<<std::setw(2)<<"="<<std::setw(2)<<"Orbital index in supercell"<<std::endl;
-			 out <<std::setw(5)<< "spec"<<std::setw(2)<<"="<<std::setw(2)<<"Atomic species label"<<std::endl;
-			 out <<std::setw(5)<< "l"<<std::setw(2)<<"="<<std::setw(2)<<"Angular mumentum quantum number"<<std::endl;
-			 out <<std::setw(5)<< "m"<<std::setw(2)<<"="<<std::setw(2)<<"Magnetic quantum number"<<std::endl;
-			 out <<std::setw(5)<< "z"<<std::setw(2)<<"="<<std::setw(2)<<"Zeta index of orbital"<<std::endl;
-			 out <<std::setw(5)<< "sym"<<std::setw(2)<<"="<<std::setw(2)<<"Symmetry name of real orbital"<<std::endl;
-			 out.close();}
-		}//out_band
+		this->print_orbital_file();
+	}//out_proj_band
 	return;
 }
 
+void energy::print_orbital_file(void)
+{  
+	std::stringstream os;
+	os<<GlobalV::global_out_dir<<"Orbital";
+	std::ofstream out(os.str().c_str());
+	out<< std::setw(5)<<"io"<< std::setw(8) <<"spec" <<std::setw(5)<<"l"<<std::setw(5)<<"m"<<std::setw(5)<<"z"<<std::setw(5)<<"sym"<<std::endl;
+
+
+	for (int i=0; i<GlobalC::ucell.nat; i++)
+	{
+		int   t = GlobalC::ucell.iat2it[i];
+		Atom* atom1 = &GlobalC::ucell.atoms[t];  
+		for(int j=0; j<atom1->nw; ++j)
+		{
+			const int L1 = atom1->iw2l[j];
+			const int N1 = atom1->iw2n[j];
+			const int m1 = atom1->iw2m[j];
+			out <<std::setw(5) << i << std::setw(8) 
+				<< GlobalC::ucell.atoms[t].label <<std::setw(5)
+					<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< GlobalC::en.Name_Angular[L1][m1] << std::endl;
+		}
+	}
+	out <<std::endl<<std::endl;
+	out <<std::setw(5)<< "io"<<std::setw(2)<<"="<<std::setw(2)<<"Orbital index in supercell"<<std::endl;
+	out <<std::setw(5)<< "spec"<<std::setw(2)<<"="<<std::setw(2)<<"Atomic species label"<<std::endl;
+	out <<std::setw(5)<< "l"<<std::setw(2)<<"="<<std::setw(2)<<"Angular mumentum quantum number"<<std::endl;
+	out <<std::setw(5)<< "m"<<std::setw(2)<<"="<<std::setw(2)<<"Magnetic quantum number"<<std::endl;
+	out <<std::setw(5)<< "z"<<std::setw(2)<<"="<<std::setw(2)<<"Zeta index of orbital"<<std::endl;
+	out <<std::setw(5)<< "sym"<<std::setw(2)<<"="<<std::setw(2)<<"Symmetry name of real orbital"<<std::endl;
+	out.close();
+
+	return;
+}
