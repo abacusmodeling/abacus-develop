@@ -125,6 +125,18 @@ class Gint_k : public Gint_k_init
         double** distance, 
         const double &delta_r);
 
+    void cal_meshball_vlocal(
+        int na_grid,
+        int LD_pool,
+        int grid_index, 
+        int* block_size,
+        int* block_index,
+        int* block_iw,
+        bool** cal_flag, 
+        int* at, 
+        double** psir_ylm,
+        double** psir_vlbr3,
+        double* pvpR);
 
     //------------------------------------------------------
     // in gint_k_fvl.cpp 
