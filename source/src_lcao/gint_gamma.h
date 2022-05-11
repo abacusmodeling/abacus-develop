@@ -43,16 +43,9 @@ class Gint_Gamma
 
 	// (5) calculate the Mulliken charge
 	void cal_mulliken(double** mulliken);
-	
-	void prepare( 
-		const ModuleBase::Matrix3 &latvec_in, 
-        const double& lat0_in);
 
 private:
 
-	double vfactor;
-	ModuleBase::Matrix3 latvec0;
-	double lat0;
     double***  DM;   //pointer to LOC.DM
     double* transformer;
 	double psiv1;
@@ -62,17 +55,6 @@ private:
 
 	int grid_index;			// may delete?
 	int max_size;
-	
-	// these parameters are for interpolation.
-	// we store these parameters at first to speed
-	// up the calculation.
-	double *x0;
-	double *x1;
-	double *x2;
-	double *x3;
-	double* x12;
-	double* x03;
-	int *iq;
 
     ///===============================
     /// Use MPI_Alltoallv to convert a grid distributed matrix
@@ -91,8 +73,6 @@ private:
     int *receiver_size_process;
     int *receiver_displacement_process;
     double* receiver_buffer;
-    
-    void save_atoms_on_grid(const Grid_Technique& gt);
 
 	// for calculation of < phi_i | Vlocal | phi_j >
 	// Input:	vlocal[ir]

@@ -290,8 +290,7 @@ double Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
     ModuleBase::TITLE("Gint_Gamma","cal_rho");
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
-    this->save_atoms_on_grid(GlobalC::GridT);
-
+    this->max_size = GlobalC::GridT.max_atom;
 	this->gamma_charge(DM_in, chr);
     const double ne = sum_up_rho(chr);
 

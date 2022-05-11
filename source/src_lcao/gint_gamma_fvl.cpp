@@ -16,7 +16,7 @@ void Gint_Gamma::cal_force(double*** DM_in, const double*const vlocal,
     ModuleBase::TITLE("Grid_Integral","cal_force_new");
     ModuleBase::timer::tick("Gint_Gamma","cal_force_new");
     if(!is_force && !is_stress) return;
-    this->save_atoms_on_grid(GlobalC::GridT);
+    this->max_size = GlobalC::GridT.max_atom;
     this->gamma_force(DM_in, vlocal, force, stress, is_force, is_stress);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_force_new");
@@ -35,6 +35,7 @@ void Gint_Gamma::gamma_force(const double*const*const*const DM, const double*con
         const int nby = GlobalC::GridT.nby;
         const int nbz_start = GlobalC::GridT.nbzp_start;
         const int nbz = GlobalC::GridT.nbzp;
+        const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
     
         const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
 
@@ -86,7 +87,7 @@ void Gint_Gamma::gamma_force(const double*const*const*const DM, const double*con
                         dpsir_ylm_z.ptr_2D
                     );
 
-                    double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, this->vfactor);
+                    double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, dv);
                     const Gint_Tools::Array_Pool<double> psir_vlbr3    = Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
                     const Gint_Tools::Array_Pool<double> psir_vlbr3_DM = Gint_Tools::get_psir_vlbr3_DM(na_grid, LD_pool, block_iw, block_size, block_index, cal_flag, psir_vlbr3.ptr_2D, DM[GlobalV::CURRENT_SPIN]);
 
