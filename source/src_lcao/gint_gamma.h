@@ -33,7 +33,7 @@ class Gint_Gamma
 	double cal_rho(double*** DM_in);
 
 	// (3) calcualte the forces related to grid
-	void cal_force(double** DM_in, const double*const vlocal,
+	void cal_force(double*** DM_in, const double*const vlocal,
 			ModuleBase::matrix& force, ModuleBase::matrix& stress,
 			const bool is_force, const bool is_stress);
 
@@ -112,8 +112,7 @@ private:
 
 	// for calculatin of < dphi_i | Vlocal | phi_j > for foce calculation
 	// on regular FFT real space grid.
-	void gamma_force(const double*const vlocal) const;
-	void gamma_force_new(const double*const*const DM, const double*const vlocal,
+	void gamma_force(const double*const*const*const DM, const double*const vlocal,
 			ModuleBase::matrix& force, ModuleBase::matrix& stress,
 			const bool is_force, const bool is_stress);
 
