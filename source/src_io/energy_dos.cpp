@@ -553,7 +553,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 					 const int m1 = atom1->iw2m[j];
 					 out <<std::setw(5) << i << std::setw(8) 
 						<< GlobalC::ucell.atoms[t].label <<std::setw(5)
-							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< ModuleBase::Name_Angular[L1][m1] << std::endl;
+							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< GlobalC::en.Name_Angular[L1][m1] << std::endl;
 				 }
 			 }
 			 out <<std::endl<<std::endl;
@@ -910,7 +910,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 					 const int m1 = atom1->iw2m[j];
 					 out <<std::setw(5) << i << std::setw(8) 
 						<< GlobalC::ucell.atoms[t].label <<std::setw(5)
-							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< ModuleBase::Name_Angular[L1][m1] << std::endl;
+							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< GlobalC::en.Name_Angular[L1][m1] << std::endl;
 				 }
 			 }
 			 out <<std::endl<<std::endl;
