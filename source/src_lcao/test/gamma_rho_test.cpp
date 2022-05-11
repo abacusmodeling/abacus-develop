@@ -314,7 +314,7 @@ TEST_F(LCAOTest,GammaRho)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		double nelec;
-		nelec = GG.cal_rho(LOC.DM);
+		nelec = GG.cal_rho(LOC.DM, GlobalC::CHR);
 		//std::cout<<"number of elec: "<<nelec<<std::endl;
 	}
 	//std::cout<<"rho in test "<<GlobalC::CHR.rho[0][0]<<std::endl;
