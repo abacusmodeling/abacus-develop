@@ -63,65 +63,47 @@ void Parallel_Kpoints::init_pools(void)
 #ifdef __MPI
 void Parallel_Kpoints::divide_pools(void)
 {
-    //std::cout<<"\n ==> mpi_split()"<<std::endl;
-    int i=0;
-    int j=0;
-    if (GlobalV::NPROC<GlobalV::KPAR)
+    if (GlobalV::NPROC < GlobalV::KPAR)
     {
-        std::cout<<"\n GlobalV::NPROC=" << GlobalV::NPROC << " KPAR=" << GlobalV::KPAR;
-        std::cout<<"Error : Too many pools !"<<std::endl;
+        std::cout<<"\n NPROC=" << GlobalV::NPROC << " KPAR=" << GlobalV::KPAR;
+        std::cout<<"Error : Too many stogroups !"<<std::endl;
         exit(0);
     }
-    //if(GlobalC::kv.nkstot<GlobalV::KPAR) std::cout<<"Error !"<<std::endl;
 
-    // (1) per process in each pool
-    GlobalV::NPROC_IN_POOL = GlobalV::NPROC/GlobalV::KPAR;
-    if (GlobalV::MY_RANK < (GlobalV::NPROC%GlobalV::KPAR)*(GlobalV::NPROC_IN_POOL+1))
+    // (1) per process in each stogroup
+    assert(GlobalV::NPROC%GlobalV::NSTOGROUP==0);
+    GlobalV::NPROC_IN_STOGROUP = GlobalV::NPROC/GlobalV::NSTOGROUP;
+    GlobalV::MY_STOGROUP = int(GlobalV::MY_RANK / GlobalV::NPROC_IN_STOGROUP);
+    GlobalV::RANK_IN_STOGROUP = GlobalV::MY_RANK%GlobalV::NPROC_IN_STOGROUP;
+
+    // (2) per process in each pool
+    GlobalV::NPROC_IN_POOL = GlobalV::NPROC_IN_STOGROUP/GlobalV::KPAR;
+    if (GlobalV::RANK_IN_STOGROUP < (GlobalV::NPROC_IN_STOGROUP%GlobalV::KPAR)*(GlobalV::NPROC_IN_POOL+1))
     {
         GlobalV::NPROC_IN_POOL++;
+        GlobalV::MY_POOL = int(GlobalV::RANK_IN_STOGROUP / GlobalV::NPROC_IN_POOL);
+        GlobalV::RANK_IN_POOL = GlobalV::RANK_IN_STOGROUP%GlobalV::NPROC_IN_POOL;
     }
-
-    // (2) To know how many process in pool j.
-    nproc_pool = new int[GlobalV::KPAR];
-    ModuleBase::GlobalFunc::ZEROS(nproc_pool, GlobalV::KPAR);
-    for (i=0; i<GlobalV::NPROC; i++)
+    else
     {
-        j = i%GlobalV::KPAR;
-        nproc_pool[j]++;
+        GlobalV::MY_POOL = int( (GlobalV::RANK_IN_STOGROUP-GlobalV::NPROC_IN_STOGROUP%GlobalV::KPAR) / GlobalV::NPROC_IN_POOL);
+        GlobalV::RANK_IN_POOL = (GlobalV::RANK_IN_STOGROUP-GlobalV::NPROC_IN_STOGROUP%GlobalV::KPAR)%GlobalV::NPROC_IN_POOL;
     }
+    
 
-    // (3) To know start proc index in each pool.
-    startpro_pool = new int[GlobalV::KPAR];
-    ModuleBase::GlobalFunc::ZEROS(startpro_pool, GlobalV::KPAR);
-    for (i=1; i<GlobalV::KPAR; i++)
-    {
-        startpro_pool[i]=startpro_pool[i-1]+nproc_pool[i-1];
-    }
 
-    // use 'GlobalV::MY_RANK' to know 'GlobalV::MY_POOL'.
-    for (i=0; i<GlobalV::KPAR; i++)
-    {
-        if (GlobalV::MY_RANK >= startpro_pool[i])
-        {
-            GlobalV::MY_POOL=i;
-        }
-    }
 
     int key = 1;
-    GlobalV::RANK_IN_POOL = GlobalV::MY_RANK-startpro_pool[GlobalV::MY_POOL];
+    MPI_Comm_split(MPI_COMM_WORLD,GlobalV::MY_STOGROUP,key,&STO_WORLD);
 
     //========================================================
     // MPI_Comm_Split: Creates new communicators based on
     // colors(2nd parameter) and keys(3rd parameter)
     // Note: The color must be non-negative or MPI_UNDEFINED.
     //========================================================
-    MPI_Comm_split(MPI_COMM_WORLD,GlobalV::MY_POOL,key,&POOL_WORLD);
-    if(GlobalV::CALCULATION == "scf-sto")
-    {
-        assert(GlobalV::NPROC%GlobalV::KPAR == 0);
-	    int color = GlobalV::MY_RANK % GlobalV::NPROC_IN_POOL;
-	    MPI_Comm_split(MPI_COMM_WORLD, color, key, &PARAPW_WORLD);
-    }
+    MPI_Comm_split(STO_WORLD,GlobalV::MY_POOL,key,&POOL_WORLD);
+	int color = GlobalV::MY_RANK % GlobalV::NPROC_IN_STOGROUP;
+	MPI_Comm_split(MPI_COMM_WORLD, color, key, &PARAPW_WORLD);
 
     return;
 }

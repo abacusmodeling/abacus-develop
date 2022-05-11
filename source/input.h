@@ -68,7 +68,7 @@ class Input
     int seed_sto; // random seed for sDFT
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
-    std::string stotype;
+    int nstogroup;
 
     //==========================================================
     // electrons / spin

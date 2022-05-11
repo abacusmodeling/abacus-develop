@@ -151,7 +151,8 @@ void ESolver_KS_PW::Init(Input &inp, UnitCell_pseudo &ucell)
     //================================
     // Initial start wave functions
     //================================
-    if (GlobalV::NBANDS != 0 || (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto" && GlobalV::CALCULATION != "md-sto")) //qianrui add
+    if (GlobalV::NBANDS != 0 || GlobalV::CALCULATION.substr(0,3) != "sto")
+    // qianrui add temporarily. In the future, wfcinit() should be compatible with cases when NBANDS=0
     {
         GlobalC::wf.wfcinit();
     }

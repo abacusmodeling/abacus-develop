@@ -205,6 +205,12 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 		{
 			if(ModuleSymmetry::Symmetry::symm_flag)	MPI_Barrier(MPI_COMM_WORLD);
 		}
+
+		if(GlobalV::MY_STOGROUP == 0)
+		{
+        	GlobalC::en.deband = GlobalC::en.delta_e();
+		}
+
 }
 
 void ESolver_SDFT_PW:: c_bands_k(const int ik, double* h_diag, const int istep, const int iter)

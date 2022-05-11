@@ -6,7 +6,6 @@ list(APPEND objects
     parallel_kpoints.cpp
     parallel_pw.cpp
     parallel_reduce.cpp
-    parallel_stochi.cpp
     subgrid_oper.cpp
 )
 
