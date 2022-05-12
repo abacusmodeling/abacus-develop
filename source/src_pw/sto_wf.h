@@ -22,7 +22,7 @@ class Stochastic_WF
     ModuleBase::ComplexMatrix* chi0;  	// origin stochastic wavefunctions in real space
 	ModuleBase::ComplexMatrix* chiortho;	// stochastic wavefunctions after in reciprocal space orthogonalized with KS wavefunctions
 	ModuleBase::ComplexMatrix* shchi;     // sqrt(f(H))|chi>
-	int nchi; 				// Total number of stochatic obitals; unit in a_0^(3/2)
+	int nchi; 				// Total number of stochatic obitals
 	int *nchip; 				// The number of stochatic obitals in current process of each k point.
 
 	int nbands_diag; // number of bands obtained from diagonalization

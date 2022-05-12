@@ -140,6 +140,7 @@ void Input::Default(void)
     pw_seed = 1;
     nche_sto = 0;
     seed_sto = 0;
+    nstogroup = 1;
     kpar = 1;
     berry_phase = false;
     gdir = 3;
@@ -517,8 +518,8 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("nbands", word) == 0) // number of atom bands
         {
             read_value(ifs, nbands);
-            if (nbands <= 0)
-                ModuleBase::WARNING_QUIT("Input", "NBANDS must > 0");
+            if (nbands < 0)
+                ModuleBase::WARNING_QUIT("Input", "NBANDS must >= 0");
         }
         else if (strcmp("nbands_sto", word) == 0) // number of stochastic bands
         {
@@ -2118,7 +2119,7 @@ void Input::Check(void)
     ModuleBase::TITLE("Input", "Check");
 
     if (nbands < 0)
-        ModuleBase::WARNING_QUIT("Input", "NBANDS must > 0");
+        ModuleBase::WARNING_QUIT("Input", "NBANDS must >= 0");
     //	if(nbands_istate < 0) ModuleBase::WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
     if (nb2d < 0)
         ModuleBase::WARNING_QUIT("Input", "nb2d must > 0");

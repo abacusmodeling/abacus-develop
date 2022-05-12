@@ -29,6 +29,14 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
 	stowf.init(GlobalC::kv.nks);
 	if(INPUT.nbands_sto != 0)	Init_Sto_Orbitals(this->stowf, INPUT.seed_sto);
 	else						Init_Com_Orbitals(this->stowf, GlobalC::kv);
+	for (int ik =0 ; ik < GlobalC::kv.nks; ++ik)
+    {
+        this->stowf.shchi[ik].create(this->stowf.nchip[ik],GlobalC::wf.npwx,false);
+        if(GlobalV::NBANDS > 0)
+        {
+            this->stowf.chiortho[ik].create(this->stowf.nchip[ik],GlobalC::wf.npwx,false);
+        }
+    }
 	stoiter.init(GlobalC::wf.npwx, this->stowf.nchip);
 }
 
@@ -38,7 +46,7 @@ void ESolver_SDFT_PW::beforescf()
 	// if(NITER==0)
 	// {
 	// 	int iter = 1;
-	// 	ETHR = 0.1*DRHO2/ std::max(1.0, ucell.nelec);
+	// 	ETHR = 0.1*DRHO2/ std::max(1.0, CHR.nelec);
 	// 	double *h_diag = new double[wf.npwx * NPOL];
 	// 	for (int ik = 0;ik < kv.nks;ik++)
 	// 	{

@@ -12,6 +12,7 @@ Stochastic_WF::Stochastic_WF()
     chiortho  = NULL;
 	chi0  = NULL;
     shchi = NULL;
+    nchip = NULL;
 }
 
 Stochastic_WF::~Stochastic_WF()
@@ -19,7 +20,7 @@ Stochastic_WF::~Stochastic_WF()
     if(chi0 != NULL)        delete[] chi0;
     if(shchi != NULL)       delete[] shchi;
     if(chiortho != NULL)    delete[] chiortho;
-    
+    if(nchip != NULL)     delete[] nchip;
 }
 
 void Stochastic_WF::init(const int nks)
@@ -27,9 +28,10 @@ void Stochastic_WF::init(const int nks)
     chi0 = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
     shchi = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
     chiortho = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
+    nchip = new int [GlobalC::kv.nks];
 }
 
-void Init_Sto_Orbitals(Stochastic_WF& sto_wf, const int seed_in)
+void Init_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in)
 {
     if(seed_in == 0 || seed_in == -1)
         srand((unsigned)time(NULL)+GlobalV::MY_RANK*10000);
@@ -46,7 +48,7 @@ void Init_Sto_Orbitals(Stochastic_WF& sto_wf, const int seed_in)
     //latter processor calculate more bands
     else                    igroup = GlobalV::NSTOGROUP - GlobalV::MY_STOGROUP - 1;
     
-    const int nchi = sto_wf.nchi;
+    const int nchi = INPUT.nbands_sto;
     const int ndim = GlobalC::wf.npwx;
     const int ngroup = GlobalV::NSTOGROUP;
     const int nks = GlobalC::kv.nks;
@@ -55,27 +57,27 @@ void Init_Sto_Orbitals(Stochastic_WF& sto_wf, const int seed_in)
     if(igroup < nchi%ngroup) ++tmpnchip;
     for(int ik = 0 ; ik < nks ; ++ik)
     {
-        sto_wf.nchip[ik] = tmpnchip; 
-        sto_wf.chi0[ik].create(tmpnchip,ndim,false);
+        stowf.nchip[ik] = tmpnchip; 
+        stowf.chi0[ik].create(tmpnchip,ndim,false);
         if(seed_in >= 0)
-            for(int i = 0 ; i < ndim ; ++i)
+            for(int i = 0 ; i < stowf.chi0[ik].size ; ++i)
             {
                 const double phi = 2 * ModuleBase::PI * rand()/double(RAND_MAX);
-                sto_wf.chi0[ik].c[i] = complex<double>(cos(phi), sin(phi)) / sqrt(double(nchi));
+                stowf.chi0[ik].c[i] = complex<double>(cos(phi), sin(phi)) / sqrt(double(nchi));
             }
         else
-            for(int i = 0; i < ndim ; ++i)
+            for(int i = 0; i < stowf.chi0[ik].size ; ++i)
             {
                 if(rand()/double(RAND_MAX) < 0.5)
-                    sto_wf.chi0[ik].c[i]=-1.0 / sqrt(double(nchi));
+                    stowf.chi0[ik].c[i]=-1.0 / sqrt(double(nchi));
                 else
-                    sto_wf.chi0[ik].c[i]=1.0 / sqrt(double(nchi));
+                    stowf.chi0[ik].c[i]=1.0 / sqrt(double(nchi));
             }
     }
 }
 
 #ifdef __MPI
-void Init_Com_Orbitals(Stochastic_WF& sto_wf, K_Vectors& kv)
+void Init_Com_Orbitals(Stochastic_WF& stowf, K_Vectors& kv)
 {
     const bool firstrankmore = false; 
     int igroup;
@@ -99,6 +101,7 @@ void Init_Com_Orbitals(Stochastic_WF& sto_wf, K_Vectors& kv)
         int* rec = new int [n_in_pool];
         int* displ = new int [n_in_pool];
         const int npw = kv.ngk[ik];
+        totnpw[ik]=0;
 
         for(int i_in_p = 0 ; i_in_p < n_in_pool ;++i_in_p)
         {
@@ -106,15 +109,15 @@ void Init_Com_Orbitals(Stochastic_WF& sto_wf, K_Vectors& kv)
             displ[i_in_p] = i_in_p;
         }
         MPI_Allgatherv(&npw, 1, MPI_INT, npwip, rec, displ, MPI_INT, POOL_WORLD);
-        for(int ip = 0; ip < npool; ++ip)
+        for(int i_in_p = 0; i_in_p < n_in_pool; ++i_in_p)
         {
-            totnpw[ik] += npwip[ip];
+            totnpw[ik] += npwip[i_in_p];
         }
 
         int tmpnchip = int(totnpw[ik]/ngroup);
         if(igroup < totnpw[ik] % ngroup)     ++tmpnchip;
-        sto_wf.nchip[ik] = tmpnchip;
-        sto_wf.chi0[ik].create(tmpnchip,ndim,true);
+        stowf.nchip[ik] = tmpnchip;
+        stowf.chi0[ik].create(tmpnchip,ndim,true);
 
         const int re = totnpw[ik] % ngroup;
         int ip = 0, ig0 = 0;
@@ -141,7 +144,7 @@ void Init_Com_Orbitals(Stochastic_WF& sto_wf, K_Vectors& kv)
             }
             if(i_in_pool == ip)
 			{
-                sto_wf.chi0[ik](ichi , ig) = 1;
+                stowf.chi0[ik](ichi , ig) = 1;
 			}
         }
         
@@ -150,29 +153,10 @@ void Init_Com_Orbitals(Stochastic_WF& sto_wf, K_Vectors& kv)
         delete[] displ;
     }
     delete[] totnpw;
-
-    // int iktot = Pkpoints.startk_pool[MY_POOL]+1;
-    // if(MY_STOGROUP==0)
-    // {
-    //     for(int ip = 0 ; ip < NPOOL ; ++ip)
-    //     {
-    //         if(MY_POOL == ip)
-    //         {   
-    //             if(ip!=0 && RANK_IN_POOL==0) cout.clear();
-    //             for(int ik = 0; ik < kv.nks ; ++ik)
-    //             {
-    //                 cout<<setw(7)<<"Kpoint "<<iktot<<" uses a compelete basis including "<<totnpw[ik]<<" plane waves"<<endl;
-    //                 iktot++;
-    //             }
-    //             if(ip!=0 && RANK_IN_POOL==0) cout.setstate(ios::failbit);
-    //         }
-    //         MPI_Barrier(STO_WORLD);
-    //     }
-    // }
     
 }
 #else
-void Init_Com_Orbitals(Stochastic_WF& sto_wf, K_Vectors& kv)
+void Init_Com_Orbitals(Stochastic_WF& stowf, K_Vectors& kv)
 {
     const int ndim = GlobalC::wf.npwx;
     for(int ik = 0 ; ik < kv.nks ; ++ik)
@@ -181,7 +165,7 @@ void Init_Com_Orbitals(Stochastic_WF& sto_wf, K_Vectors& kv)
         chi0[ik].create(nchip[ik],ndim,true);
         for(int ichi = 0 ; ichi < kv.ngk[ik] ; ++ichi)
         {
-            sto_wf.chi0[ik](ichi, ichi) = 1;
+            stowf.chi0[ik](ichi, ichi) = 1;
         }
     }
 }

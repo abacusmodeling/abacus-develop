@@ -28,7 +28,7 @@ Stochastic_Iter::~Stochastic_Iter()
 void Stochastic_Iter::init(const int dim, int* nchip_in)
 {
     nchip = nchip_in;
-    targetne = GlobalC::ucell.nelec;
+    targetne = GlobalC::CHR.nelec;
     stoche.init( dim, INPUT.nche_sto );
     stohchi.init();
     delete [] spolyv;
@@ -145,13 +145,13 @@ void Stochastic_Iter::itermu(int &iter)
     if(iter == 1)
     {
         dmu = 2;
-        th_ne = 0.1 * GlobalV::SCF_THR * GlobalC::ucell.nelec;
-        std::cout<<"th_ne "<<th_ne<<std::endl;
+        th_ne = 0.1 * GlobalV::SCF_THR * GlobalC::CHR.nelec;
+        // std::cout<<"th_ne "<<th_ne<<std::endl;
     }
     else
     {
         dmu = 0.1;
-        th_ne = GlobalV::SCF_THR * 1e-2 * GlobalC::ucell.nelec;
+        th_ne = GlobalV::SCF_THR * 1e-2 * GlobalC::CHR.nelec;
     }
     mu = mu0 - dmu;
     double ne1 = calne();
@@ -188,7 +188,7 @@ void Stochastic_Iter::itermu(int &iter)
         mu2 += dmu;
         mu = mu2;
         ne2 = calne();
-        cout<<"Reset mu2 form "<<mu2-dmu<<" to "<<mu2<<endl;
+        // cout<<"Reset mu2 from "<<mu2-dmu<<" to "<<mu2<<endl;
         dmu *= 2;
     }
     int count = 0;
@@ -219,12 +219,12 @@ void Stochastic_Iter::itermu(int &iter)
                                          "Cannot converge feimi energy. Please retry with different random number");
         }
     }
-    std::cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<std::endl;
+    GlobalV::ofs_running<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<std::endl;
     //precision check
     double tmpre;
     tmpre = stoche.coef[stoche.norder-1] * spolyv[stoche.norder-1];
     MPI_Allreduce(MPI_IN_PLACE, &tmpre, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
-    std::cout<<"Chebyshev Precision: "<<abs(tmpre/targetne)<<std::endl;
+    GlobalV::ofs_running<<"Chebyshev Precision: "<<abs(tmpre/targetne)<<std::endl;
     if(tmpre/targetne > GlobalV::SCF_THR )
     {
         stringstream ss;
@@ -458,7 +458,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     GlobalC::en.demet *= Occupy::gaussian_parameter;
 
     cout.precision(12);
-    cout<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
+    GlobalV::ofs_running<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
 
     double factor;
     if(abs(sto_ne) > 1e-20)

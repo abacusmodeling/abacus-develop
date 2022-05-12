@@ -179,9 +179,9 @@ class Input
     //==========================================================
     // charge mixing
     //==========================================================
-    std::string mixing_mode; // "plain","broden",...
+    std::string mixing_mode; // "plain","broyden",...
     double mixing_beta; // 0 : no_mixing
-    int mixing_ndim; // used in Broden method
+    int mixing_ndim; // used in Broyden method
     double mixing_gg0; // used in kerker method. mohan add 2014-09-27
 
     //==========================================================
