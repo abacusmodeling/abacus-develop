@@ -109,6 +109,13 @@ class Gint_k : public Gint_k_init
         //mohan add 2011-06-19
         //zhengdy add 2016-10-18
 
+    void cal_force_k(
+        const bool isforce,
+        const bool isstress,
+        ModuleBase::matrix& fvl_dphi, 
+        ModuleBase::matrix& svl_dphi, 
+        const double* vl);
+
     private:
     
     //------------------------------------------------------
