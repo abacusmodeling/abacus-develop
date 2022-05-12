@@ -36,7 +36,7 @@ public:
     const Parallel_Orbitals *ParaV;
 
 
-    void allocate_k(const Grid_Technique& gt,
+    void allocate_k(const int& lgd,
         Local_Orbital_wfc &lowf);
 
     //=========================================

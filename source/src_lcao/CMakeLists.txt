@@ -20,7 +20,6 @@ list(APPEND objects
     LCAO_matrix.cpp
     LCAO_nnr.cpp
     LOOP_cell.cpp
-    LOOP_elec.cpp
     LOOP_ions.cpp
     build_st_pw.cpp
     center2_orb-orb11.cpp
@@ -41,6 +40,7 @@ list(APPEND objects
     gint_k_init.cpp
     gint_k_rho.cpp
     gint_k_vl.cpp
+    gint_k_env.cpp
     gint_tools.cpp
     global_fp.cpp
     grid_bigcell.cpp

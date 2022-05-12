@@ -14,29 +14,30 @@
 // to solve the Kohn-Sham equation 
 //-----------------------------------------------------------
 
-class ELEC_scf: private Threshold_Elec
+class ELEC_scf : private Threshold_Elec
 {
 
-	friend class LOOP_elec;
-	friend class LOOP_ions;
-	friend class Run_MD_LCAO;
+    friend class LOOP_elec;
+    friend class LOOP_ions;
+    friend class Run_MD_LCAO;
 
 
-	public:
+public:
 
-	ELEC_scf();
-	~ELEC_scf();
+    ELEC_scf();
+    ~ELEC_scf();
 
-	private:
 
     void scf(const int& istep,
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc& lowf,
         LCAO_Hamilt& uhm);
 
-	static int iter;
+    static int iter;
 
-	void init_mixstep_final_scf(void);
+private:
+
+    void init_mixstep_final_scf(void);
 
 };
 
