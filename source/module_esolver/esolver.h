@@ -16,48 +16,46 @@
 namespace ModuleESolver
 {
 
-class ESolver
-{
-// protected:
-//     ModuleBase::matrix lattice_v;
-public:
-    ESolver(){
-        classname = "ESolver";
-    }
-    virtual ~ESolver(){};
+    class ESolver
+    {
+        // protected:
+        //     ModuleBase::matrix lattice_v;
+    public:
+        ESolver() {
+            classname = "ESolver";
+        }
+        virtual ~ESolver() {};
 
-    //virtual void Init(Input_EnSolver &inp, matrix &lattice_v)=0
-    virtual void Init(Input &inp, UnitCell_pseudo &cell)=0;
+        //virtual void Init(Input_EnSolver &inp, matrix &lattice_v)=0
+        virtual void Init(Input& inp, UnitCell_pseudo& cell) = 0;
 
-    // They shoud be add after atom class is refactored
-    // virtual void UpdateLatAtom(ModuleBase::matrix &lat_in, Atom &atom_in);
-    // virtual void UpdateLat(ModuleBase::matrix &lat_in);
-    // virtual void UpdateAtom(Atom &atom_in);
-   
-    /// These two virtual `Run` will be merged in the future.
-    //virtual void Run(int istep, Atom &atom) = 0;
-    virtual void Run(const int istep, UnitCell_pseudo& cell) = 0;
-    virtual void Run(int istep,
-        Record_adj& ra /**< would be a 2nd-module of Cell*/,
-        Local_Orbital_Charge& loc /**< EState*/,
-        Local_Orbital_wfc& lowf /**< Psi*/,
-        LCAO_Hamilt& uhm /**< Hamilt*/) {};
-    
-    virtual void cal_Energy(energy &en) = 0; 
-    virtual void cal_Force(ModuleBase::matrix &force) = 0;
-    virtual void cal_Stress(ModuleBase::matrix &stress) = 0;
-    
-    //Print current classname.
-    void printname();
+        // They shoud be add after atom class is refactored
+        // virtual void UpdateLatAtom(ModuleBase::matrix &lat_in, Atom &atom_in);
+        // virtual void UpdateLat(ModuleBase::matrix &lat_in);
+        // virtual void UpdateAtom(Atom &atom_in);
 
-    //temporarily
-    //get iterstep used in current scf
-    virtual int getniter(){return 0;}
-    string classname;
-};
+        virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
 
-void init_esolver(ESolver* &p_esolver, const string use_esol);
-void clean_esolver(ESolver* &pesolver);
+        //Deal with exx and other calculation than scf/md/relax: 
+        // such as nscf, istate-charge or envelope
+        virtual void othercalculation(const int istep) {};
+
+        virtual void cal_Energy(energy& en) = 0;
+        virtual void cal_Force(ModuleBase::matrix& force) = 0;
+        virtual void cal_Stress(ModuleBase::matrix& stress) = 0;
+        virtual void postprocess() {};
+
+        //Print current classname.
+        void printname();
+
+        //temporarily
+        //get iterstep used in current scf
+        virtual int getniter() { return 0; }
+        string classname;
+    };
+
+    void init_esolver(ESolver*& p_esolver, const string use_esol);
+    void clean_esolver(ESolver*& pesolver);
 
 }
 
