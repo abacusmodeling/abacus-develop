@@ -693,73 +693,134 @@ namespace ModuleESolver
             }
 
 #ifdef __DEEPKS
-            // 2. calculating deepks correction to bandgap
+            //calculating deepks correction to bandgap
             //and save the results
-            if (GlobalV::deepks_bandgap)
-            {
-                int nocc = GlobalC::CHR.nelec / 2;
-                ModuleBase::matrix wg_hl;
-                wg_hl.create(GlobalV::NSPIN, GlobalV::NBANDS);
-
-                for (int is = 0; is < GlobalV::NSPIN; is++)
-                {
-                    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-                    {
-                        wg_hl(is, ib) = 0.0;
-
-                        if (ib == nocc - 1)
-                            wg_hl(is, ib) = -1.0;
-                        else if (ib == nocc)
-                            wg_hl(is, ib) = 1.0;
-                    }
-                }
-
-                std::vector<ModuleBase::matrix> dm_bandgap_gamma;
-                std::vector<ModuleBase::ComplexMatrix> dm_bandgap_k;
-
-                if (GlobalV::GAMMA_ONLY_LOCAL)
-                {
-                    dm_bandgap_gamma.resize(GlobalV::NSPIN);
-                    this->LOC.cal_dm(wg_hl, this->LOWF.wfc_gamma, dm_bandgap_gamma);
-                    GlobalC::ld.cal_o_delta(dm_bandgap_gamma, *this->LOWF.ParaV);
-                }
-                else
-                {
-                    dm_bandgap_k.resize(GlobalC::kv.nks);
-                    this->LOC.cal_dm(wg_hl, this->LOWF.wfc_k, dm_bandgap_k);
-                    GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *this->LOWF.ParaV, GlobalC::kv.nks);
-                }
-                if (GlobalV::deepks_out_labels)
-                {
-                    GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc - 1] - GlobalC::ld.o_delta, "o_base.npy");
-                    GlobalC::ld.cal_orbital_precalc(dm_bandgap_gamma,
-                        GlobalC::ucell.nat,
-                        GlobalC::ucell,
-                        GlobalC::ORB,
-                        GlobalC::GridD,
-                        *this->LOWF.ParaV);
-                    GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
-                }
-            }
 
             if (GlobalV::deepks_out_labels)	//caoyu add 2021-06-04
             {
                 int nocc = GlobalC::CHR.nelec / 2;
-                GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc - 1], "o_tot.npy");
-                if (!GlobalV::deepks_bandgap)
+                if (GlobalV::deepks_bandgap)
                 {
-                    GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc - 1], "o_base.npy");  // no scf, o_tot=o_base	
+                    if (GlobalV::GAMMA_ONLY_LOCAL)
+                    {
+                        GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc - 1], "o_tot.npy");
+                    }
+                    else
+                    {
+                        double homo = GlobalC::wf.ekb[0][nocc - 1];
+                        double lumo = GlobalC::wf.ekb[0][nocc];
+                        for (int ik = 1; ik < GlobalC::kv.nks; ik++)
+                        {
+                            if (homo < GlobalC::wf.ekb[ik][nocc - 1])
+                            {
+                                homo = GlobalC::wf.ekb[ik][nocc - 1];
+                                GlobalC::ld.h_ind = ik;
+                            }
+                            if (lumo > GlobalC::wf.ekb[ik][nocc])
+                            {
+                                lumo = GlobalC::wf.ekb[ik][nocc];
+                                GlobalC::ld.l_ind = ik;
+                            }
+                        }
+                        GlobalC::ld.save_npy_o(lumo - homo - GlobalC::ld.o_delta, "o_tot.npy");
+                        GlobalV::ofs_running << " HOMO index is " << GlobalC::ld.h_ind << std::endl;
+                        GlobalV::ofs_running << " HOMO energy " << homo << std::endl;
+                        GlobalV::ofs_running << " LUMO index is " << GlobalC::ld.l_ind << std::endl;
+                        GlobalV::ofs_running << " LUMO energy " << lumo << std::endl;
+                    }
                 }
 
                 GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
                 if (GlobalV::deepks_scf)
                 {
                     GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
+                    if (GlobalV::deepks_bandgap)
+                    {
+                        int nocc = GlobalC::CHR.nelec / 2;
+
+                        ModuleBase::matrix wg_hl;
+                        if (GlobalV::GAMMA_ONLY_LOCAL)
+                        {
+                            wg_hl.create(GlobalV::NSPIN, GlobalV::NBANDS);
+
+                            for (int is = 0; is < GlobalV::NSPIN; is++)
+                            {
+                                for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+                                {
+                                    wg_hl(is, ib) = 0.0;
+                                    if (ib == nocc - 1)
+                                        wg_hl(is, ib) = -1.0;
+                                    else if (ib == nocc)
+                                        wg_hl(is, ib) = 1.0;
+                                }
+                            }
+
+                            std::vector<ModuleBase::matrix> dm_bandgap_gamma;
+                            dm_bandgap_gamma.resize(GlobalV::NSPIN);
+                            this->LOC.cal_dm(wg_hl, this->LOWF.wfc_gamma, dm_bandgap_gamma);
+
+
+                            GlobalC::ld.cal_orbital_precalc(dm_bandgap_gamma,
+                                GlobalC::ucell.nat,
+                                GlobalC::ucell,
+                                GlobalC::ORB,
+                                GlobalC::GridD,
+                                *this->LOWF.ParaV);
+
+                            GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
+
+                            GlobalC::ld.cal_o_delta(dm_bandgap_gamma, *this->LOWF.ParaV);
+                            GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc - 1] - GlobalC::ld.o_delta, "o_base.npy");
+
+                        }
+                        else //multi-k bandgap label
+                        {
+                            wg_hl.create(GlobalC::kv.nks, GlobalV::NBANDS);
+
+                            for (int ik = 0; ik < GlobalC::kv.nks; ik++) {
+                                for (int ib = 0; ib < GlobalV::NBANDS; ib++) {
+                                    wg_hl(ik, ib) = 0.0;
+
+                                    if (ik == GlobalC::ld.h_ind && ib == nocc - 1)
+                                        wg_hl(ik, ib) = -1.0;
+                                    else if (ik == GlobalC::ld.l_ind && ib == nocc)
+                                        wg_hl(ik, ib) = 1.0;
+                                }
+                            }
+                            std::vector<ModuleBase::ComplexMatrix> dm_bandgap_k;
+                            dm_bandgap_k.resize(GlobalC::kv.nks);
+                            this->LOC.cal_dm(wg_hl, this->LOWF.wfc_k, dm_bandgap_k);
+                            GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *this->LOWF.ParaV, GlobalC::kv.nks);
+
+                            GlobalC::ld.cal_orbital_precalc_k(dm_bandgap_k,
+                                GlobalC::ucell.nat,
+                                GlobalC::kv.nks,
+                                GlobalC::kv.kvec_d,
+                                GlobalC::ucell,
+                                GlobalC::ORB,
+                                GlobalC::GridD,
+                                *this->LOWF.ParaV);
+                            GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
+
+                            GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *this->LOWF.ParaV, GlobalC::kv.nks);
+                            GlobalC::ld.save_npy_o(GlobalC::wf.ekb[GlobalC::ld.l_ind][nocc] - GlobalC::wf.ekb[GlobalC::ld.h_ind][nocc - 1] - GlobalC::ld.o_delta, "o_base.npy");
+                        }
+                    }
                 }
-                else
+                else //deepks_scf = 0; base calculation
                 {
                     GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
-
+                    if (GlobalV::deepks_bandgap)
+                    {
+                        if (GlobalV::GAMMA_ONLY_LOCAL)
+                        {
+                            GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc - 1], "o_base.npy");  // no scf, o_tot=o_base
+                        }
+                        else
+                        {
+                            GlobalC::ld.save_npy_o(GlobalC::wf.ekb[GlobalC::ld.l_ind][nocc] - GlobalC::wf.ekb[GlobalC::ld.h_ind][nocc - 1], "o_base.npy");
+                        }
+                    }
                 }
             }
 #endif
