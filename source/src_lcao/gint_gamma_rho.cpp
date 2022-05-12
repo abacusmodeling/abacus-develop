@@ -161,14 +161,13 @@ void Gint_Gamma::cal_band_rho(
     } // end is
 }
 
-
-// for calculation of charege 
-// Input:	DM[is][iw1_lo][iw2_lo]
-// Output:	rho.ptr_2D[is][ir]
-void Gint_Gamma::gamma_charge(const double*const*const*const DM, Charge* chr) const					// Peize Lin update OpenMP 2020.09.28
+// calculate charge density
+void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 {
-    ModuleBase::TITLE("Gint_Gamma","gamma_charge");
-    ModuleBase::timer::tick("Gint_Gamma","gamma_charge");   
+    ModuleBase::TITLE("Gint_Gamma","cal_rho");
+    ModuleBase::timer::tick("Gint_Gamma","cal_rho");
+
+    max_size = GlobalC::GridT.max_atom;
 
 	if(max_size)
     {
@@ -231,7 +230,7 @@ void Gint_Gamma::gamma_charge(const double*const*const*const DM, Charge* chr) co
                             psir_ylm.ptr_2D);
 						
 						this->cal_band_rho(na_grid, LD_pool, block_iw, block_size, block_index,
-							cal_flag, psir_ylm.ptr_2D, vindex, DM, chr);
+							cal_flag, psir_ylm.ptr_2D, vindex, DM_in, chr);
 
 						free(vindex);			vindex=nullptr;
                         delete[] block_iw;
@@ -250,18 +249,6 @@ void Gint_Gamma::gamma_charge(const double*const*const*const DM, Charge* chr) co
    		mkl_set_num_threads(mkl_threads);
 #endif
     } // end of if(max_size)
-
-	return;
-}
-
-// calculate charge density
-void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
-{
-    ModuleBase::TITLE("Gint_Gamma","cal_rho");
-    ModuleBase::timer::tick("Gint_Gamma","cal_rho");
-
-    this->max_size = GlobalC::GridT.max_atom;
-	this->gamma_charge(DM_in, chr);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
     return;

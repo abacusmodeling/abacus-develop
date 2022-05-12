@@ -73,24 +73,11 @@ private:
 	// Input:	vlocal[ir]
 	// Output:	GridVlocal.ptr_2D[iw1_lo][iw2_lo]
 	Gint_Tools::Array_Pool<double> gamma_vlocal(const double*const vlocal) const;  
-
-	// for calculation of charege 
-	// Input:	DM[is][iw1_lo][iw2_lo]
-	// Output:	rho.ptr_2D[is][ir]
-	void gamma_charge(const double*const*const*const DM, Charge* chr) const;
-
 	// for calculation of Mulliken charge.
 	void gamma_mulliken(double** mulliken);
 
 	// for calculation of envelope functions.
 	void gamma_envelope(const double* wfc, double* rho);// mohan add 2011-07-01
-
-
-	// for calculatin of < dphi_i | Vlocal | phi_j > for foce calculation
-	// on regular FFT real space grid.
-	void gamma_force(const double*const*const*const DM, const double*const vlocal,
-			ModuleBase::matrix& force, ModuleBase::matrix& stress,
-			const bool is_force, const bool is_stress);
 
 	void cal_meshball_vlocal(
 		const int na_grid,  						// how many atoms on this (i,j,k) grid
