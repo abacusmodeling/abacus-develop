@@ -18,7 +18,7 @@
  *      to call another three functions: get_nks_pool(), 
  *      get_startk_pool(), get_whichpool(), which divide all kpoints
  *      into KPAR groups.
- * The default number of processes is set to 6 in parallel_kpoints_test.sh. 
+ * The default number of processes is set to 4 in parallel_kpoints_test.sh. 
  * One may modify it to do more tests, or adapt this unittest to local 
  * environment.
  */
