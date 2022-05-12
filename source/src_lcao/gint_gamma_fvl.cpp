@@ -13,9 +13,13 @@ void Gint_Gamma::cal_force(double*** DM_in, const double*const vlocal,
         ModuleBase::matrix& force, ModuleBase::matrix& stress, 
         const bool is_force, const bool is_stress)
 {
-    ModuleBase::TITLE("Grid_Integral","cal_force_new");
-    ModuleBase::timer::tick("Gint_Gamma","cal_force_new");
-    if(!is_force && !is_stress) return;
+    ModuleBase::TITLE("Grid_Integral","cal_force");
+    ModuleBase::timer::tick("Gint_Gamma","cal_force");
+    if(!is_force && !is_stress)
+    {
+        ModuleBase::timer::tick("Gint_Gamma","cal_force");
+        return;
+    }
     this->max_size = GlobalC::GridT.max_atom;
 
 	if(max_size)
@@ -137,7 +141,7 @@ void Gint_Gamma::cal_force(double*** DM_in, const double*const vlocal,
     }//max_size
 
 
-    ModuleBase::timer::tick("Gint_Gamma","cal_force_new");
+    ModuleBase::timer::tick("Gint_Gamma","cal_force");
 }
 
 void Gint_Gamma::cal_meshball_force(
