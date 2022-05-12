@@ -517,7 +517,7 @@ bool Stochastic_Chebychev::checkconverge(
         }
         for(int i = 0; i < ndmin; ++i)
         {
-            arraynp1[i]=2*arraynp1[i]-arrayn_1[i];
+            arraynp1[i]=2.0*arraynp1[i]-arrayn_1[i];
         }
         complex<double>* tem = arrayn_1;
         arrayn_1 = arrayn;

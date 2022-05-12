@@ -114,7 +114,7 @@ void Stochastic_Chebychev::recurs(
 	{
     	for(int i = 0; i < ndmin; ++i)
     	{
-        	arraynp1[i+ib*ndmax]=2*arraynp1[i+ib*ndmax]-arrayn_1[i+ib*ndmax];
+        	arraynp1[i+ib*ndmax]=2.0*arraynp1[i+ib*ndmax]-arrayn_1[i+ib*ndmax];
     	}
 	}
 }
