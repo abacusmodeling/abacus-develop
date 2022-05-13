@@ -23,7 +23,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
-        this->UHM->GG.cal_force(DM_in[is], GlobalC::pot.vr_eff1, fvl_dphi, svl_dphi, isforce, isstress);
+        this->UHM->GG.cal_force(DM_in, GlobalC::pot.vr_eff1, fvl_dphi, svl_dphi, isforce, isstress);
     }
 
     if(isstress)

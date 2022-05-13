@@ -1,19 +1,20 @@
-#include "../src_lcao/LOOP_ions.h"
 #include "cal_r_overlap_R.h"
 #include "../src_pw/global.h"
 #include "write_HS.h"
 #include "../module_base/timer.h"
+#include "module_esolver/esolver_ks_lcao.h"
 
+namespace ModuleESolver
+{
 // if 'binary=true', output binary file.
 // The 'sparse_threshold' is the accuracy of the sparse matrix. 
 // If the absolute value of the matrix element is less than or equal to the 'sparse_threshold', it will be ignored.
-void LOOP_ions::output_HS_R(
+void ESolver_KS_LCAO::output_HS_R(
     const std::string &SR_filename,
     const std::string &HR_filename_up,
     const std::string HR_filename_down,
     const bool &binary, 
-    const double &sparse_threshold
-)
+    const double &sparse_threshold)
 {
     ModuleBase::TITLE("LOOP_ions","output_HS_R"); 
     ModuleBase::timer::tick("LOOP_ions","output_HS_R"); 
@@ -76,7 +77,7 @@ void LOOP_ions::output_HS_R(
 }
 
 
-void LOOP_ions::output_SR(const std::string &SR_filename, const bool &binary, const double &sparse_threshold)
+void ESolver_KS_LCAO::output_SR(const std::string &SR_filename, const bool &binary, const double &sparse_threshold)
 {
     ModuleBase::TITLE("LOOP_ions","output_SR");
     ModuleBase::timer::tick("LOOP_ions","output_SR"); 
@@ -87,4 +88,5 @@ void LOOP_ions::output_SR(const std::string &SR_filename, const bool &binary, co
 
     ModuleBase::timer::tick("LOOP_ions","output_SR");
     return;
+}
 }

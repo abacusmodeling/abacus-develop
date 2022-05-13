@@ -40,9 +40,9 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
 	stoiter.init(GlobalC::wf.npwx, this->stowf.nchip);
 }
 
-void ESolver_SDFT_PW::beforescf()
+void ESolver_SDFT_PW::beforescf(const int istep)
 {
-    ESolver_KS_PW::beforescf();
+    ESolver_KS_PW::beforescf(istep);
 	// if(NITER==0)
 	// {
 	// 	int iter = 1;
@@ -96,12 +96,12 @@ void ESolver_SDFT_PW::beforescf()
 	// }
 }
 
-void ESolver_SDFT_PW::eachiterfinish(int iter, bool conv_elec)
+void ESolver_SDFT_PW::eachiterfinish(int iter)
 {
 	//print_eigenvalue(GlobalV::ofs_running);
     GlobalC::en.calculate_etot();
 }
-void ESolver_SDFT_PW::afterscf(bool conv_elec)
+void ESolver_SDFT_PW::afterscf()
 {
 	for(int is=0; is<GlobalV::NSPIN; is++)
     {
@@ -112,7 +112,7 @@ void ESolver_SDFT_PW::afterscf(bool conv_elec)
         GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 	    GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
     }
-    if(conv_elec)
+    if(this->conv_elec)
     {
         //GlobalV::ofs_running << " convergence is achieved" << std::endl;			
         //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
@@ -153,12 +153,12 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 			stoiter.orthog(ik,this->stowf);
 			stoiter.checkemm(ik,iter,this->stowf);	//check and reset emax & emin
 		}
+
 		for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 		{
 			//init k
 			if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
 			stoiter.stoche.ndmin = GlobalC::wf.npw;
-
 			stoiter.sumpolyval_k(ik, this->stowf);
 		}
 		delete [] h_diag;

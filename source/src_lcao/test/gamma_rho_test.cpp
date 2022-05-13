@@ -258,10 +258,10 @@ TEST_F(LCAOTest,GammaRho)
 
 	// read gamma wavefunction
 	LOWF.wfc_gamma.resize(GlobalV::NSPIN);
-	LOC.gamma_file(GlobalC::GridT,LOWF);
+	LOC.gamma_file(LOWF);
 	// allocate space for DM
 	GlobalC::GridT.lgd = GlobalV::NLOCAL;
-	LOC.allocate_gamma(GlobalC::GridT);
+	LOC.allocate_gamma(GlobalC::GridT.lgd);
 	// dm_gamma is another way to save density matrix
 	LOC.dm_gamma.resize(GlobalV::NSPIN); // originally inside allocate_gamma
 	// calculate density matrix from wavefunction
@@ -313,8 +313,7 @@ TEST_F(LCAOTest,GammaRho)
 	// calculate the charge density
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		double nelec;
-		nelec = GG.cal_rho(LOC.DM);
+		GG.cal_rho(LOC.DM, (Charge*)(&GlobalC::CHR));
 		//std::cout<<"number of elec: "<<nelec<<std::endl;
 	}
 	//std::cout<<"rho in test "<<GlobalC::CHR.rho[0][0]<<std::endl;
