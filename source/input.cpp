@@ -140,7 +140,7 @@ void Input::Default(void)
     pw_seed = 1;
     nche_sto = 0;
     seed_sto = 0;
-    stotype = "pw";
+    nstogroup = 1;
     kpar = 1;
     berry_phase = false;
     gdir = 3;
@@ -518,8 +518,8 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("nbands", word) == 0) // number of atom bands
         {
             read_value(ifs, nbands);
-            if (nbands <= 0)
-                ModuleBase::WARNING_QUIT("Input", "NBANDS must > 0");
+            if (nbands < 0)
+                ModuleBase::WARNING_QUIT("Input", "NBANDS must >= 0");
         }
         else if (strcmp("nbands_sto", word) == 0) // number of stochastic bands
         {
@@ -552,9 +552,9 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, emin_sto);
         }
-        else if (strcmp("stotype", word) == 0)
+        else if (strcmp("nstogroup", word) == 0)
         {
-            read_value(ifs, stotype);
+            read_value(ifs, nstogroup);
         }
         else if (strcmp("kpar", word) == 0) // number of pools
         {
@@ -1798,6 +1798,7 @@ void Input::Default_2(void) // jiyy add 2019-08-04
             vdw_radius = "95";
         }
     }
+    if(calculation.substr(0,3) != "sto")    nstogroup = 1;
 }
 #ifdef __MPI
 void Input::Bcast()
@@ -1828,7 +1829,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(pw_seed);
     Parallel_Common::bcast_double(emax_sto);
     Parallel_Common::bcast_double(emin_sto);
-    Parallel_Common::bcast_string(stotype);
+    Parallel_Common::bcast_int(nstogroup);
     Parallel_Common::bcast_int(kpar);
     Parallel_Common::bcast_bool(berry_phase);
     Parallel_Common::bcast_int(gdir);
@@ -2118,7 +2119,7 @@ void Input::Check(void)
     ModuleBase::TITLE("Input", "Check");
 
     if (nbands < 0)
-        ModuleBase::WARNING_QUIT("Input", "NBANDS must > 0");
+        ModuleBase::WARNING_QUIT("Input", "NBANDS must >= 0");
     //	if(nbands_istate < 0) ModuleBase::WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
     if (nb2d < 0)
         ModuleBase::WARNING_QUIT("Input", "nb2d must > 0");
@@ -2174,7 +2175,7 @@ void Input::Check(void)
         */
         this->relax_nmax = 1;
     }
-    else if (calculation == "scf-sto") // qianrui 2021-2-20
+    else if (calculation == "sto-scf") // qianrui 2021-2-20
     {
         if (mem_saver == 1)
         {

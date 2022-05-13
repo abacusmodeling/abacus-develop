@@ -116,10 +116,14 @@ extern int out_mul; // qifeng add 2019/9/10
 //========================================================================
 extern int NPROC;
 extern int KPAR;
+extern int NSTOGROUP;
 extern int MY_RANK;
 extern int MY_POOL;
+extern int MY_STOGROUP;
 extern int NPROC_IN_POOL;
+extern int NPROC_IN_STOGROUP;
 extern int RANK_IN_POOL;
+extern int RANK_IN_STOGROUP;
 extern int DRANK;
 extern int DSIZE;
 extern int DCOLOR;

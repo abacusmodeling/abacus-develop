@@ -151,7 +151,8 @@ void ESolver_KS_PW::Init(Input &inp, UnitCell_pseudo &ucell)
     //================================
     // Initial start wave functions
     //================================
-    if (GlobalV::NBANDS != 0 || (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto" && GlobalV::CALCULATION != "md-sto")) //qianrui add
+    if (GlobalV::NBANDS != 0 || GlobalV::CALCULATION.substr(0,3) != "sto")
+    // qianrui add temporarily. In the future, wfcinit() should be compatible with cases when NBANDS=0
     {
         GlobalC::wf.wfcinit();
     }
@@ -211,7 +212,10 @@ void ESolver_KS_PW:: eachiterinit(const int iter)
 
     //(2) save change density as previous charge,
     // prepared fox mixing.
-    GlobalC::CHR.save_rho_before_sum_band();
+    if(GlobalV::MY_STOGROUP == 0)
+	{
+        GlobalC::CHR.save_rho_before_sum_band();
+    }
 }
 
 //Temporary, it should be replaced by hsolver later.
