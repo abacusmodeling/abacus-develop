@@ -44,7 +44,6 @@
 #include "src_io/wf_local.h"
 #include "src_lcao/gint_gamma.h"
 #include "src_lcao/gint_tools.h"
-#include "src_lcao/grid_base_beta.h"
 #include "src_lcao/grid_bigcell.h"
 #include "src_lcao/grid_meshball.h"
 #include "src_lcao/grid_meshcell.h"
@@ -983,7 +982,7 @@ void UnitCell::set_iat2itia(void)
  * because of lack of codes without mpi
  * in WF_Local::distri_lowf_new() called by WF_Local::read_lowf()
  ******************************/
-void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt, Local_Orbital_wfc &lowf)
+void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
 {
     for (int is = 0; is < GlobalV::NSPIN; ++is)
     {
@@ -1035,9 +1034,8 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt, Local_Orbital_wf
     }
 }
 
-void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
+void Local_Orbital_Charge::allocate_gamma(const int& lgd)
 {
-    int lgd = gt.lgd;
     this->DM = new double **[GlobalV::NSPIN];
     this->DM_pool = new double *[GlobalV::NSPIN];
     for (int is = 0; is < GlobalV::NSPIN; is++)
