@@ -115,14 +115,7 @@ private:
 	// forces related to local pseudopotentials
 	//-------------------------------------------
 	void cal_fvl_dphi(
-		ModuleBase::matrix& dm2d, 
-		const bool isforce, 
-        const bool isstress,
-        ModuleBase::matrix& fvl_dphi,
-		ModuleBase::matrix& svl_dphi);
-
-	void cal_fvl_dphi(
-		const std::vector<ModuleBase::matrix> &dm2d, 
+		double*** DM_in,
 		const bool isforce, 
         const bool isstress,
         ModuleBase::matrix& fvl_dphi,

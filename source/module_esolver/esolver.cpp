@@ -1,5 +1,6 @@
 #include "esolver.h"
 #include "esolver_ks_pw.h"
+#include "esolver_sdft_pw.h"
 #include "esolver_ks_lcao.h"
 #include "esolver_of.h"
 #include "esolver_lj.h"
@@ -7,47 +8,47 @@
 
 namespace ModuleESolver
 {
-void ESolver:: printag()
-{
-    std::cout<<tag<<std::endl;
-}
+    void ESolver::printname()
+    {
+        std::cout << classname << std::endl;
+    }
 
 
-//Some API to operate E_Solver
-void init_esolver(ESolver *&p_esolver, const string use_esol)
-{
-    if(use_esol == "ksdft_pw")
+    //Some API to operate E_Solver
+    void init_esolver(ESolver*& p_esolver, const string use_esol)
     {
-        p_esolver = new ESolver_KS_PW();
+        if (use_esol == "ksdft_pw")
+        {
+            p_esolver = new ESolver_KS_PW();
+        }
+        else if (use_esol == "ksdft_lcao")
+        {
+            p_esolver = new ESolver_KS_LCAO();
+        }
+        else if (use_esol == "sdft_pw")
+        {
+            p_esolver = new ESolver_SDFT_PW();
+        }
+        //  else if(use_esol == "ofdft")
+        //  {
+        //      p_esolver = new OFDFT();
+        //  }
+        else if (use_esol == "lj_pot")
+        {
+            p_esolver = new ESolver_LJ();
+        }
+        else if (use_esol == "dp_pot")
+        {
+            p_esolver = new ESolver_DP();
+        }
     }
-    else if(use_esol == "ksdft_lcao")
-    {
-        p_esolver = new ESolver_KS_LCAO();
-    }
-    //  else if(use_esol == "sdft_pw")
-    //  {
-    //      p_esolver = new ESolver_KS_PW(true);
-    //  }
-    //  else if(use_esol == "ofdft")
-    //  {
-    //      p_esolver = new OFDFT();
-    //  }
-    else if(use_esol == "lj_pot")
-    {
-        p_esolver = new ESolver_LJ();
-    }
-    else if(use_esol == "dp_pot")
-    {
-        p_esolver = new ESolver_DP();
-    }
-}
 
-void clean_esolver(ESolver *&pesolver)
-{
-    if(pesolver!=NULL) 
+    void clean_esolver(ESolver*& pesolver)
     {
-        delete pesolver;
+        if (pesolver != NULL)
+        {
+            delete pesolver;
+        }
     }
-}
 
 }

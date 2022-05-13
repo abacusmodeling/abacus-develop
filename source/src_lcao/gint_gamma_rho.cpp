@@ -31,7 +31,7 @@ void Gint_Gamma::cal_band_rho(
     const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
     const int*const vindex,							// vindex[GlobalC::pw.bxyz]
     const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-    Gint_Tools::Array_Pool<double> &rho) const		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
+    Charge* chr) const		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
 {
     //parameters for dsymm, dgemm and ddot
     constexpr char side='L', uplo='U';
@@ -151,26 +151,23 @@ void Gint_Gamma::cal_band_rho(
             }// ia2
         } // ia1
     
+        double *rhop = chr->rho[is];
         for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
         {
             const double r = ddot_(&block_index[na_grid], psir_ylm[ib], &inc, psir_DM.ptr_2D[ib], &inc);
             const int grid = vindex[ib];
-            rho.ptr_2D[is][grid] += r;
+            rhop[grid] += r;
         }
     } // end is
 }
 
-
-// for calculation of charege 
-// Input:	DM[is][iw1_lo][iw2_lo]
-// Output:	rho.ptr_2D[is][ir]
-Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const*const DM) const					// Peize Lin update OpenMP 2020.09.28
+// calculate charge density
+void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 {
-    ModuleBase::TITLE("Gint_Gamma","gamma_charge");
-    ModuleBase::timer::tick("Gint_Gamma","gamma_charge");   
+    ModuleBase::TITLE("Gint_Gamma","cal_rho");
+    ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
-	Gint_Tools::Array_Pool<double> rho(GlobalV::NSPIN, GlobalC::pw.nrxx);
-	ModuleBase::GlobalFunc::ZEROS(rho.ptr_1D, GlobalV::NSPIN*GlobalC::pw.nrxx);
+    max_size = GlobalC::GridT.max_atom;
 
 	if(max_size)
     {
@@ -189,7 +186,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 			const int nbz = GlobalC::GridT.nbzp;
 		
 			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
-
+            
+            // it's a uniform grid to save orbital values, so the delta_r is a constant.
+            const double delta_r = GlobalC::ORB.dr_uniform;		
 #ifdef _OPENMP
 			#pragma omp for
 #endif
@@ -207,10 +206,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 		
 						// get the value: how many atoms has orbital value on this grid.
 						const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
-						if(na_grid==0) continue;
-
-						// it's a uniform grid to save orbital values, so the delta_r is a constant.
-						const double delta_r = GlobalC::ORB.dr_uniform;						
+						if(na_grid==0) continue;				
 						
 						// here vindex refers to local potentials
 						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
@@ -226,13 +222,15 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 						// set up band matrix psir_ylm and psir_DM
 						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 						
-						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
-							na_grid, LD_pool, grid_index, delta_r,
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+                        Gint_Tools::cal_psir_ylm(
+							na_grid, grid_index, delta_r,
 							block_index, block_size, 
-							cal_flag);
+							cal_flag,
+                            psir_ylm.ptr_2D);
 						
 						this->cal_band_rho(na_grid, LD_pool, block_iw, block_size, block_index,
-							cal_flag, psir_ylm.ptr_2D, vindex, DM, rho);
+							cal_flag, psir_ylm.ptr_2D, vindex, DM_in, chr);
 
 						free(vindex);			vindex=nullptr;
                         delete[] block_iw;
@@ -252,60 +250,6 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 #endif
     } // end of if(max_size)
 
-	return rho;
-}
-
-
-
-double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
-{
-	for(int is=0; is<GlobalV::NSPIN; is++)
-	{
-		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		{
-			GlobalC::CHR.rho[is][ir] += rho.ptr_2D[is][ir];
-		}
-	}
-
-    double sum = 0.0;//LiuXh 2016-01-10
-	for(int is=0; is<GlobalV::NSPIN; is++)
-	{
-		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		{
-			sum += GlobalC::CHR.rho[is][ir];
-		}
-	}
-    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "sum", sum);
-
-    ModuleBase::timer::tick("Gint_Gamma","reduce_charge");
-#ifdef __MPI
-    Parallel_Reduce::reduce_double_pool( sum );
-#endif
-    ModuleBase::timer::tick("Gint_Gamma","reduce_charge");
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * GlobalC::ucell.omega/ GlobalC::pw.ncxyz);
-
-    const double ne = sum * GlobalC::ucell.omega / GlobalC::pw.ncxyz;
-    //xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "ne", ne);
-    ModuleBase::timer::tick("Gint_Gamma","gamma_charge");
-	return ne;
-}
-
-
-
-// calculate charge density
-double Gint_Gamma::cal_rho(double*** DM_in)
-{
-    ModuleBase::TITLE("Gint_Gamma","cal_rho");
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
-
-    this->DM = DM_in;
-    this->job = cal_charge;
-    this->save_atoms_on_grid(GlobalC::GridT);
-
-	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(this->DM);
-    const double ne = sum_up_rho(rho);
-
-    ModuleBase::timer::tick("Gint_Gamma","cal_rho");
-    return ne;
+    return;
 }

@@ -32,7 +32,7 @@
 
 - [Variables related to output information](#variables-related-to-output-information)
 
-    [out_force](#out_force) | [out_mul](#out_mul) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out-dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out-dos) | [out_band](#out-band) | [out_proj_band](#out-proj-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
+    [out_force](#out_force) | [out_mul](#out_mul) | [out_freq_elec](#out_freq_elec) | [out_freq_ion](#out_freq_ion) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out-dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out-dos) | [out_band](#out-band) | [out_proj_band](#out-proj-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
 
 - [Density of states](#density-of-states)
 
@@ -673,6 +673,18 @@ This part of variables are used to control the output of properties.
 
 - **Type**: Integer
 - **Description**: If set to 1, ABACUS will output the Mulliken population analysis result. The name of the output file is mulliken.txt
+- **Default**: 0
+
+#### out_freq_elec
+
+- **Type**: Integer
+- **Description**: If set to >1, it represents the frequency of electronic iters to output charge density (if [out_chg](#out_chg) is turned on) and wavefunction (if [out_wfc_pw](#out_wf_pw) or [out_wfc_r](#out_wfc_r) is turned on). If set to 0, ABACUS will output them only when converged in SCF. Used for the restart of SCF.
+- **Default**: 0
+
+#### out_freq_ion
+
+- **Type**: Integer
+- **Description**: If set to >1, it represents the frequency of ionic steps to output charge density (if [out_chg](#out_chg) is turned on) and wavefunction (if [out_wfc_pw](#out_wf_pw) or [out_wfc_r](#out_wfc_r) is turned on). If set to 0, ABACUS will output them only when ionic steps reach its maximum step. Used for the restart of MD or Relax.
 - **Default**: 0
 
 #### out_chg

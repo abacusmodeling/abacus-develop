@@ -1,0 +1,11 @@
+1. Modify the setting in run.sh
+2. Then execute run.sh: bash run.sh > log
+3. After finish the running, check critical timing results in "sum.dat", "sum.dat.ncpu", ...
+4. Execute "clean.sh" will delete all outputs in each example and the created files during running  
+5. catch_properties.sh is used to catch the energy/force/stress information and write them to a 
+   new file. 
+   usage: cd EXAMPLE_FOLDER ; bash ../catch_properties.sh result.out
+6. sumdat.sh is used to summarize the timing informations of examples in 'allcase' to a new file 'sum.dat'.
+   usage: bash sumdat.sh allcase sum.dat
+
+

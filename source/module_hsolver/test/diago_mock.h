@@ -3,6 +3,9 @@
 #include<random>
 #include "../../module_base/lapack_connector.h"
 #include "../../module_base/blas_connector.h"
+#include "mpi.h"
+#include "src_parallel/parallel_reduce.h"
+
 
 Hamilt_PW::Hamilt_PW() {};
 Hamilt_PW::~Hamilt_PW() {};
@@ -12,7 +15,9 @@ Hamilt::~Hamilt() {};
 namespace DIAGOTEST
 {
     ModuleBase::ComplexMatrix hmatrix;
+    ModuleBase::ComplexMatrix hmatrix_local;
     int npw;
+    int* npw_local; //number of plane wave distributed to each process
 
     void readh(std::ifstream &inf, ModuleBase::ComplexMatrix &hm)
     {
@@ -30,6 +35,82 @@ namespace DIAGOTEST
             hm(i,i) = std::complex<double> {real,0.0};
         }
     }
+
+    template<class T>
+    void divide_psi(T *psi, T *psi_local)
+    {
+        int nprocs=1, mypnum=0;
+#ifdef __MPI        
+        MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+        MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
+#endif                
+
+        if(mypnum == 0)
+        {                
+            for(int j=0;j<npw_local[0];j++) psi_local[j] = psi[j];
+#ifdef __MPI                                        
+            int start_point = npw_local[0];
+            for(int j=1;j<nprocs;j++)
+            {
+                if (std::is_same<T, double>::value) 
+                    MPI_Send(&(psi[start_point]),npw_local[j],MPI_DOUBLE,j,0,MPI_COMM_WORLD);
+                else if(std::is_same<T, std::complex<double>>::value) 
+                    MPI_Send(&(psi[start_point]),npw_local[j],MPI_DOUBLE_COMPLEX,j,0,MPI_COMM_WORLD);
+                start_point += npw_local[j];
+            }  
+        }
+        else
+        {
+            int recv_len = mypnum < (npw%nprocs) ? npw/nprocs + 1  : npw/nprocs;
+            if (std::is_same<T, double>::value) 
+                MPI_Recv(psi_local, npw_local[mypnum],MPI_DOUBLE,0,0,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            else if(std::is_same<T, std::complex<double>>::value)
+                MPI_Recv(psi_local, npw_local[mypnum],MPI_DOUBLE_COMPLEX,0,0,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+#endif                 
+        }     
+    }
+ 
+
+#ifdef __MPI
+    void cal_division(int &npw)
+    {
+        int nprocs, mypnum;
+        MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+        MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
+        for(int i=0;i<nprocs;i++)
+        {
+            if(i<npw%nprocs) npw_local[i] = npw/nprocs + 1;
+            else npw_local[i] = npw/nprocs;
+        }
+    }
+
+    void divide_hpsi(psi::Psi<std::complex<double>> &psi, psi::Psi<std::complex<double>> &psi_local)
+    {
+        int nprocs, mypnum;
+        MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+        MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
+
+        int npw = psi.get_nbasis();
+        int nbands = psi.get_nbands();
+        int nk = psi.get_nk();
+
+        hmatrix_local.create(npw,npw_local[mypnum]);
+        psi_local.resize(nk,nbands,npw_local[mypnum]);
+        for(int i=0;i<npw;i++)
+        {
+            divide_psi<std::complex<double>>(&(hmatrix.c[i*npw]),&(hmatrix_local.c[i*npw_local[mypnum]]));
+            if(i<nbands) 
+            {
+                for(int k=0;k<nk;k++)
+                {
+                    psi.fix_k(k);
+                    psi_local.fix_k(k);
+                    divide_psi<std::complex<double>>(psi.get_pointer(i),psi_local.get_pointer(i));
+                }
+            }
+        }
+    } 
+#endif
 
 }
 
@@ -78,7 +159,7 @@ class HPsi
     {
         PW_Basis* pbas;
         int* ngk = nullptr;
-        psi::Psi<std::complex<double>> psitmp(ngk,1,nband,npw);
+        psi::Psi<std::complex<double>> psitmp(1,nband,npw,ngk);
         for(int i=0;i<nband;i++)
 	    {
 		    for(int j=0;j<npw;j++) psitmp(0,i,j) = psimatrix(i,j);
@@ -127,7 +208,8 @@ class HPsi
             for(int j=0;j<npw;j++)
             {
                 double realp=pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
-                double imagp=pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
+                //double imagp=pow(-1.0,u(e)%2) * static_cast<double>(u(e))/max;
+                double imagp = 0.0;
                 psimatrix(i,j) = std::complex<double>{realp,imagp};
             }
         }
@@ -185,14 +267,25 @@ void Hamilt_PW::s_1psi
 }
 
 //Mock function h_psi
-void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const int m)
+void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *hpsi_local, const int m)
 {
-    for(int i=0;i<DIAGOTEST::npw;i++){
+    int nprocs=1, mypnum=0;
+#ifdef __MPI    
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
+#endif        
+
+    std::complex<double> *hpsi = new std::complex<double>[DIAGOTEST::npw];
+    for(int i=0;i<DIAGOTEST::npw;i++)
+    {
         hpsi[i] = 0.0;
-        for(int j=0;j<DIAGOTEST::npw;j++)
+        for(int j=0;j<(DIAGOTEST::npw_local[mypnum]);j++)
         {
-            hpsi[i] += DIAGOTEST::hmatrix(i,j) * psi_in[j];
+            hpsi[i] += DIAGOTEST::hmatrix_local(i,j) * psi_in[j];
         }
     }
+    Parallel_Reduce::reduce_complex_double_pool(hpsi, DIAGOTEST::npw);
+    DIAGOTEST::divide_psi<std::complex<double>>(hpsi,hpsi_local);
+    delete [] hpsi;
 }
 
