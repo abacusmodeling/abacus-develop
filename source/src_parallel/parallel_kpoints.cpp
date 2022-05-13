@@ -67,7 +67,7 @@ void Parallel_Kpoints::divide_pools(void)
     if (GlobalV::NPROC < GlobalV::KPAR)
     {
         std::cout<<"\n NPROC=" << GlobalV::NPROC << " KPAR=" << GlobalV::KPAR;
-        std::cout<<"Error : Too many stogroups !"<<std::endl;
+        std::cout<<"Error : Too many pools !"<<std::endl;
         exit(0);
     }
 
