@@ -95,6 +95,15 @@ class Gint_k : public Gint_k_init
     void cal_rho_k(double** DM_R_in);
 
     //------------------------------------------------------
+    // in gint_k_env.cpp 
+    //------------------------------------------------------
+    // calculate the envelop function via grid integrals
+    void cal_env_k(
+        int ik, 
+        const std::complex<double>* wfc_k,
+        double* rho);
+
+    //------------------------------------------------------
     // in gint_k_fvl.cpp 
     //------------------------------------------------------
     // calculate force & stress (many k-points).
@@ -124,16 +133,6 @@ class Gint_k : public Gint_k_init
         double** distance, 
         const double &delta_r);
 
-    //------------------------------------------------------
-    // in gint_k_rho.cpp 
-    //------------------------------------------------------
-    // evaluate the <phi0 | Density Matrix | phiR> to get the charge density.
-    void evaluate_pDMp(
-        const int &grid_index, 
-        const int &size,
-        bool** cal_flag, 
-        double*** psir_ylm, 
-        int* vindex);
 
     //------------------------------------------------------
     // in gint_k_fvl.cpp 

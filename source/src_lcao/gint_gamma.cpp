@@ -93,10 +93,19 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 
 	this->vfactor = std::abs(this->latvec0.Det())/gt.ncxyz;
 
-    //OUT(GlobalV::ofs_running,"Max atom number on sub-FFT-grid",max_size);
-    //GlobalV::ofs_running << "\n dense(DIY) = " << dense;
-    //GlobalV::ofs_running << "\n count_dense = " << (double)count_dense/nxyz*100 << "%";
-    //GlobalV::ofs_running << "\n count_sparse = " << (double)count_sparse/nxyz*100 << "%" << std::endl;
-
     return;
+}
+
+void Gint_Gamma::prepare(
+    const ModuleBase::Matrix3 &latvec_in,
+    const double& lat0_in)
+{
+	ModuleBase::TITLE("Grid_Base_Beta","prepare");
+
+	this->lat0 = lat0_in;
+
+	this->latvec0 = latvec_in;
+	this->latvec0 *= this->lat0;
+	
+	return;
 }

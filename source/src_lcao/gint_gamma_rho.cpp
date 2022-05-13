@@ -189,7 +189,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 			const int nbz = GlobalC::GridT.nbzp;
 		
 			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
-
+            
+            // it's a uniform grid to save orbital values, so the delta_r is a constant.
+            const double delta_r = GlobalC::ORB.dr_uniform;		
 #ifdef _OPENMP
 			#pragma omp for
 #endif
@@ -207,10 +209,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 		
 						// get the value: how many atoms has orbital value on this grid.
 						const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
-						if(na_grid==0) continue;
-
-						// it's a uniform grid to save orbital values, so the delta_r is a constant.
-						const double delta_r = GlobalC::ORB.dr_uniform;						
+						if(na_grid==0) continue;				
 						
 						// here vindex refers to local potentials
 						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
@@ -226,10 +225,12 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 						// set up band matrix psir_ylm and psir_DM
 						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 						
-						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
-							na_grid, LD_pool, grid_index, delta_r,
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+                        Gint_Tools::cal_psir_ylm(
+							na_grid, grid_index, delta_r,
 							block_index, block_size, 
-							cal_flag);
+							cal_flag,
+                            psir_ylm.ptr_2D);
 						
 						this->cal_band_rho(na_grid, LD_pool, block_iw, block_size, block_index,
 							cal_flag, psir_ylm.ptr_2D, vindex, DM, rho);
@@ -299,11 +300,9 @@ double Gint_Gamma::cal_rho(double*** DM_in)
     ModuleBase::TITLE("Gint_Gamma","cal_rho");
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
-    this->DM = DM_in;
-    this->job = cal_charge;
     this->save_atoms_on_grid(GlobalC::GridT);
 
-	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(this->DM);
+	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(DM_in);
     const double ne = sum_up_rho(rho);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");

@@ -18,7 +18,6 @@ complexmatrix.o\
 matrix.o\
 
 OBJS_GRID=
-grid_base_beta.o\
 grid_bigcell.o\
 grid_meshball.o\
 grid_meshk.o\
