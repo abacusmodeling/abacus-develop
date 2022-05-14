@@ -276,6 +276,10 @@ target_link_libraries(${ABACUS_BIN_NAME}
     ri
     driver
     xc
+    hsolver
+    elecstate
+    hamilt
+    psi
     esolver
     -lm
 )

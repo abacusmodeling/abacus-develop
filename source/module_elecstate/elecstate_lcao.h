@@ -24,6 +24,7 @@ class ElecStateLCAO : public ElecState
         this->loc = loc_in;
         this->uhm = uhm_in;
         this->lowf = lowf_in;
+        this->classname = "ElecStateLCAO";
     }
     // void init(Charge* chg_in):charge(chg_in){} override;
 

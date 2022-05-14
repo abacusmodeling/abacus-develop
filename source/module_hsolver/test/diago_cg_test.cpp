@@ -95,9 +95,9 @@ class DiagoCGPrepare
 	//======================================================================
         double *en = new double[npw];
         int ik = 1;
+        Hamilt_PW* hpw;
 	    hamilt::Hamilt* ha;
-	    ha =new hamilt::HamiltPW;
-	    Hamilt_PW* hpw;
+	    ha =new hamilt::HamiltPW(hpw);
 	    int* ngk = new int [1];
 	    //psi::Psi<std::complex<double>> psi(ngk,ik,nband,npw);
 	    psi::Psi<std::complex<double>> psi;

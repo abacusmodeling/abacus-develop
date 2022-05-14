@@ -3,6 +3,9 @@
 #include "./esolver_fp.h"
 #include "string.h"
 #include "fstream"
+#include "module_hsolver/hsolver.h"
+#include "module_hamilt/hamilt.h"
+#include "module_elecstate/elecstate.h"
 // #include "estates.h"
 // #include "h2e.h"
 namespace ModuleESolver
@@ -56,6 +59,9 @@ class ESolver_KS: public ESolver_FP
         void reset_diagethr(std::ofstream &ofs_running, const double hsover_error);
 
 
+    hsolver::HSolver* phsol = nullptr;
+    elecstate::ElecState* pelec = nullptr;
+    hamilt::Hamilt* phami = nullptr;
 
     protected:
         std::string basisname; //PW or LCAO

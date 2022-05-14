@@ -5,6 +5,7 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/complexmatrix.h"
 #include "wf_igk.h"
+#include "module_psi/psi.h"
 
 class WF_atomic : public WF_igk
 {
@@ -15,7 +16,11 @@ class WF_atomic : public WF_igk
 
 	ModuleBase::realArray table_local;//mohan add 2009-09-10
 
-    ModuleBase::ComplexMatrix *evc;  // wavefunctions in the PW basis
+    ModuleBase::ComplexMatrix *evc = nullptr;  // wavefunctions in the PW basis
+    //temporary psi for new code
+    psi::Psi<std::complex<double>>* psi = nullptr;
+    void evc_transform_psi();
+    void psi_transform_evc();
 
     ModuleBase::ComplexMatrix *wanf2; // wannier functions in the PW basis
     

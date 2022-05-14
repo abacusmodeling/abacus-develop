@@ -10,7 +10,18 @@ namespace elecstate
 void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 {
     this->calculate_weights();
+
     this->calEBand();
+
+    for(int is=0; is<GlobalV::NSPIN; is++)
+	{
+		ModuleBase::GlobalFunc::ZEROS(this->charge->rho[is], this->charge->nrxx);
+		if (XC_Functional::get_func_type() == 3)
+		{
+            ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[is], this->charge->nrxx);
+        }
+	}
+
     for (int ik = 0; ik < psi.get_nk(); ++ik)
     {
         psi.fix_k(ik);
@@ -126,6 +137,7 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
         }
     }
     else
+    {
         for (int ibnd = 0; ibnd < nbands; ibnd++)
         {
             ///
@@ -171,6 +183,7 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
                 }
             }
         }
+    }
 
     return;
 }

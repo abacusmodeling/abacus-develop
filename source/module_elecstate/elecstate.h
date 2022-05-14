@@ -11,6 +11,7 @@ namespace elecstate
 class ElecState
 {
   public:
+    ElecState(){};
     virtual void init(Charge *chg_in, // pointer for class Charge
                       const K_Vectors *klist_in,
                       int nk_in, // number of k points
@@ -67,6 +68,8 @@ class ElecState
     ModuleBase::matrix ekb;
     // occupation weight for each k-point and band
     ModuleBase::matrix wg;
+
+    std::string classname = "none";
 
   protected:
     // calculate ebands for all k points and all occupied bands
