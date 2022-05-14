@@ -435,6 +435,7 @@ void Input_Conv::Convert(void)
     GlobalC::wf.out_wfc_r = INPUT.out_wfc_r;
     GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;
+    GlobalC::en.out_proj_band = INPUT.out_proj_band;
 #ifdef __LCAO
     Local_Orbital_Charge::out_dm = INPUT.out_dm;
     Pdiag_Double::out_mat_hs = INPUT.out_mat_hs;
