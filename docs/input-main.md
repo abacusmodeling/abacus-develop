@@ -153,7 +153,7 @@ This part of variables are used to control general system parameters.
 #### bndpar
 
 - **Type**: Integer
-- **Description**: devide all processors into bndpar groups, and bands (only stochastic orbitals now) will be distributed among each group. 
+- **Description**: devide all processors into bndpar groups, and bands (only stochastic orbitals now) will be distributed among each group. It should be larger than 0.
 - **Default**: 1
 
 #### latname
