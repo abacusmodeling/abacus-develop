@@ -108,8 +108,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
 		opt.cal_epsilon2(GlobalV::NBANDS);
 	}
 
-	// compute density of states
-	GlobalC::en.perform_dos_pw();
+    p_esolver->postprocess();
 
 	ModuleBase::timer::tick("Run_pw","plane_wave_line");
     return;

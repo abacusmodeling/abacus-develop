@@ -97,7 +97,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     //------------------------------------------------------------
 
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GK.cal_rho_k(this->loc->DM_R);
+    this->uhm->GK.cal_rho_k(this->loc->DM_R, this->charge);
 
     this->charge->renormalize_rho();
 
@@ -146,7 +146,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     // calculate the charge density on real space grid.
     //------------------------------------------------------------
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GG.cal_rho(this->loc->DM);
+    this->uhm->GG.cal_rho(this->loc->DM, this->charge);
 
     this->charge->renormalize_rho();
 
