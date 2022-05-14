@@ -12,6 +12,8 @@ double Stochastic_hchi::Emax;
 
 Stochastic_hchi::Stochastic_hchi()
 {
+	Stochastic_hchi:: Emin = INPUT.emin_sto;	
+	Stochastic_hchi:: Emax = INPUT.emax_sto;
 }
 
 Stochastic_hchi::~Stochastic_hchi()

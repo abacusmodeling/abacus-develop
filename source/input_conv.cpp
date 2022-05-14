@@ -61,7 +61,7 @@ void Input_Conv::Convert(void)
     GlobalV::KPAR = temp_nproc;
 #else
     GlobalV::KPAR = INPUT.kpar;
-    GlobalV::NSTOGROUP = INPUT.nstogroup;
+    GlobalV::NSTOGROUP = INPUT.bndpar;
 #endif
     GlobalV::CALCULATION = INPUT.calculation;
 

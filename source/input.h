@@ -68,7 +68,7 @@ class Input
     int seed_sto; // random seed for sDFT
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
-    int nstogroup;
+    int bndpar; //parallel for stochastic/deterministic bands
 
     //==========================================================
     // electrons / spin
