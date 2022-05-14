@@ -38,9 +38,9 @@ void Stochastic_Chebychev::init(int ndmax_in, int norder_in)
     this->ndmax = ndmax_in;
     this->norder = norder_in;
 
-    if(norder<5)
+    if(norder<1)
     {
-        ModuleBase::WARNING_QUIT("Stochastic_Chebychev", "The Chebychev expansion order should be at least 5!");
+        ModuleBase::WARNING_QUIT("Stochastic_Chebychev", "The Chebychev expansion order should be at least 1!");
     }
 
     assert(extend >= 1);

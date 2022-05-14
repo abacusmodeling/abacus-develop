@@ -138,7 +138,7 @@ void Input::Default(void)
     nbands_sto = 0;
     nbands_istate = 5;
     pw_seed = 1;
-    nche_sto = 0;
+    nche_sto = 5;
     seed_sto = 0;
     bndpar = 1;
     kpar = 1;
