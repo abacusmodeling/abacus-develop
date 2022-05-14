@@ -12,7 +12,7 @@ class ESolver_KS_LCAO: public ESolver_KS
 public:
     ESolver_KS_LCAO()
     {
-        tag = "ESolver_KS_LCAO";
+        classname = "ESolver_KS_LCAO";
     }
     void Init(Input& inp, UnitCell_pseudo& cell) override;
     
@@ -21,7 +21,7 @@ public:
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc& lowf,
         LCAO_Hamilt& uhm) override;
-    void Run(int istep, UnitCell_pseudo& cell) override {};
+    void Run(const int istep, UnitCell_pseudo& cell) override {};
     
     void cal_Energy(energy& en) override;
     void cal_Force(ModuleBase::matrix &force) override;

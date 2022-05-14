@@ -86,188 +86,11 @@ void Gint_k::destroy_pvpR(void)
     return;
 }
 
-
-
-
-
 // fold the <phi | vl |dphi(R)> * DM(R) to 
 // calculate the force.
-void Gint_k::folding_force(
-    ModuleBase::matrix& fvl_dphi,
-    double* pvdpx, 
-    double* pvdpy, 
-    double* pvdpz)
-{
-    ModuleBase::TITLE("Gint_k","folding_force");
-    ModuleBase::timer::tick("Gint_k","folding_force");
-
-    //xiaohui modify 2013-12-17, test
-//	assert(GlobalC::GridT.lgd > 0); //mohan add 2012-06-10
-
-    // mohan add 2014-01-20
-    const int lgd = GlobalC::GridT.lgd;
-
-    double** ppx;
-    double** ppy;
-    double** ppz;
-
-    if(GlobalC::GridT.lgd>0)
-    {
-        ppx = new double*[lgd];
-          ppy = new double*[lgd];
-          ppz = new double*[lgd];
-          for(int i=0; i<lgd; i++)
-          {
-            ppx[i] = new double[lgd];
-            ppy[i] = new double[lgd];
-            ppz[i] = new double[lgd];
-            ModuleBase::GlobalFunc::ZEROS( ppx[i], lgd);
-            ModuleBase::GlobalFunc::ZEROS( ppy[i], lgd);
-            ModuleBase::GlobalFunc::ZEROS( ppz[i], lgd);
-        }
-    }
-    
-    ModuleBase::Vector3<double> tau1, dtau;
-    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
-    {
-        Atom* atom1 = &GlobalC::ucell.atoms[T1];
-        for(int I1=0; I1< atom1->na; ++I1)
-        {
-            const int iat = GlobalC::ucell.itia2iat(T1,I1);
-            if(GlobalC::GridT.in_this_processor[iat])
-            {
-                assert( lgd > 0 );
-
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                // get the start positions of elements.
-                const int DM_start = GlobalC::GridT.nlocstartg[iat];
-                // get the coordinates of adjacent atoms.
-                tau1 = atom1->tau[I1];
-                //GlobalC::GridD.Find_atom(tau1);
-                GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-                // search for the adjacent atoms.
-                int nad = 0;
-                for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
-                {
-                    // get iat2
-                    const int T2 = GlobalC::GridD.getType(ad);
-                    const int I2 = GlobalC::GridD.getNatom(ad);
-                    const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
-                    if(GlobalC::GridT.in_this_processor[iat2])
-                    {
-                        Atom* atom2 = &GlobalC::ucell.atoms[T2];
-                        dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
-                        double distance = dtau.norm() * GlobalC::ucell.lat0;
-                        double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
-                        if(distance < rcut)
-                        {
-                            const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                            int ixxx = DM_start + GlobalC::GridT.find_R2st[iat][nad];
-                            for(int iw=0; iw<atom1->nw; iw++)
-                            {
-                                const int iw_all = start1+iw;
-                                const int iw_local = GlobalC::GridT.trace_lo[iw_all];
-                                // iw1_lo
-                                double *vijx = ppx[iw_local];
-                                double *vijy = ppy[iw_local];
-                                double *vijz = ppz[iw_local];
-
-                                double *vRx = &pvdpx[ixxx]; //just fold R to normal matrix.
-                                double *vRy = &pvdpy[ixxx];
-                                double *vRz = &pvdpz[ixxx];
-
-                                int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
-                                int* iw2_end = iw2_lo + atom2->nw;
-
-                                for(; iw2_lo<iw2_end; ++iw2_lo, ++vRx, ++vRy, ++vRz)
-                                {
-                                    vijx[iw2_lo[0]] += vRx[0] ;
-                                    vijy[iw2_lo[0]] += vRy[0] ;
-                                    vijz[iw2_lo[0]] += vRz[0] ;
-                                }
-                                ixxx += atom2->nw;
-                            }
-                            ++nad;
-                        }//end distance<rcut
-                    }
-                }//end ad
-            }
-        }//end ia
-    }//end it
-
-
-
-    double* tmp = new double[GlobalV::NLOCAL*3];
-    for(int i=0; i<GlobalV::NLOCAL; ++i)
-    {
-        ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
-        const int mug = GlobalC::GridT.trace_lo[i];
-        // if the row element is on this processor
-        if(mug>=0)
-        {
-            //GlobalV::ofs_running << " i=" << i << " mug=" << mug << std::endl;
-            for(int j=0; j<GlobalV::NLOCAL; ++j)
-            {
-                const int nug = GlobalC::GridT.trace_lo[j];
-                // if the col element is on this processor
-                if(nug>=0)
-                {
-    //				if(mug<nug)
-    //				{
-                        const int index = 3*j;
-                        tmp[index] = ppx[mug][nug];
-                        tmp[index+1] = ppy[mug][nug];
-                        tmp[index+2] = ppz[mug][nug];
-    //				}
-    //				else
-    //				{
-                    //	tmpx[j] = 0.0;
-                    //	tmpy[j] = 0.0;
-                    //	tmpz[j] = 0.0;
-    //				}
-                }
-            }
-        }
-        // collect the matrix after folding.
-        Parallel_Reduce::reduce_double_pool( tmp, GlobalV::NLOCAL*3 );
-        for (int j=0; j<GlobalV::NLOCAL; j++)
-        {
-            if (!this->LM->ParaV->in_this_processor(i,j))
-            {
-                continue;
-            }
-            const int iat = GlobalC::ucell.iwt2iat[i];
-            const int index = 3*j;
-            fvl_dphi(iat,0) += 2.0*tmp[index];	
-            fvl_dphi(iat,1) += 2.0*tmp[index+1];	
-            fvl_dphi(iat,2) += 2.0*tmp[index+2];	
-        }
-    }
-    delete[] tmp;
-
-    // mohan add 2014-01-20
-    if(GlobalC::GridT.lgd > 0)
-    {
-        //-------------------------
-        // delete the tmp matrix.
-        //-------------------------
-        for(int i=0; i<GlobalC::GridT.lgd; i++)
-        {
-            delete[] ppx[i];
-            delete[] ppy[i];
-            delete[] ppz[i];
-        }
-        delete[] ppx;
-        delete[] ppy;
-        delete[] ppz;
-    }
-    ModuleBase::timer::tick("Gint_k","folding_force");
-    return;
-}
-
 // fold the <phi | vl * R_beta|dphi(R_alpha)> * DM(R) to 
 // calculate the stress.
-void Gint_k::folding_stress(
+void Gint_k::folding_force(
     const bool isforce,
     const bool isstress,
     ModuleBase::matrix& fvl_dphi, 
@@ -282,7 +105,7 @@ void Gint_k::folding_stress(
     double* pvdp13, 
     double* pvdp23)
 {
-    ModuleBase::TITLE("Gint_k","folding_stress");
+    ModuleBase::TITLE("Gint_k","folding_force");
     if(!isforce&&!isstress) return;
 
     const int lgd = GlobalC::GridT.lgd;

@@ -147,7 +147,7 @@ int Local_Orbital_wfc::localIndex(int globalindex, int nblk, int nprocs, int& my
 }
 
 #ifdef __MPI
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, double* wfc_2d, double** wfc_grid)
+void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, const double* wfc_2d, double** wfc_grid)
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
     ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
@@ -222,7 +222,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, double* wfc_2d, double*
 
 void Local_Orbital_wfc::wfc_2d_to_grid(
     int out_wfc_lcao,
-    std::complex<double>* wfc_2d,
+    const std::complex<double>* wfc_2d,
     std::complex<double>** wfc_grid,
     int ik)
 {
