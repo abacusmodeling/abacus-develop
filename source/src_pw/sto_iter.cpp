@@ -131,7 +131,7 @@ void Stochastic_Iter::checkemm(const int& ik, int &iter, Stochastic_WF& stowf)
         Stochastic_hchi:: Emax = Emax;
         if(change)
 	    {
-	    	std::cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<std::endl;
+	    	GlobalV::ofs_running<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<std::endl;
 	    }
         change = false;
     }
@@ -224,7 +224,7 @@ void Stochastic_Iter::itermu(int &iter)
     double tmpre;
     tmpre = stoche.coef[stoche.norder-1] * spolyv[stoche.norder-1];
     MPI_Allreduce(MPI_IN_PLACE, &tmpre, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
-    GlobalV::ofs_running<<"Chebyshev Precision: "<<abs(tmpre/targetne)<<std::endl;
+    GlobalV::ofs_running<<"Chebyshev Precision: "<<abs(tmpre/targetne)*1e9<<"E+09"<<std::endl;
     if(tmpre/targetne > GlobalV::SCF_THR )
     {
         stringstream ss;

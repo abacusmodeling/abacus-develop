@@ -9,6 +9,11 @@
 #include "../src_pw/global.h"
 #include "../src_pw/symmetry_rho.h"
 //----------------------------------------------
+//-----force-------------------
+#include "../src_pw/sto_forces.h"
+//-----stress------------------
+#include "../src_pw/sto_stress_pw.h"
+//---------------------------------------------------
 
 namespace ModuleESolver
 {
@@ -43,6 +48,7 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
 void ESolver_SDFT_PW::beforescf(const int istep)
 {
     ESolver_KS_PW::beforescf(istep);
+	if(istep > 0 && INPUT.nbands_sto != 0) Update_Sto_Orbitals(this->stowf, INPUT.seed_sto);
 	// if(NITER==0)
 	// {
 	// 	int iter = 1;
@@ -292,11 +298,13 @@ void ESolver_SDFT_PW::cal_Energy(energy &en)
 
 void ESolver_SDFT_PW::cal_Force(ModuleBase::matrix &force)
 {
-	
+	Sto_Forces ff;
+    ff.init(force, this->stowf);
 }
 void ESolver_SDFT_PW::cal_Stress(ModuleBase::matrix &stress)
 {
-
+	Sto_Stress_PW ss;
+    ss.cal_stress(stress, this->stowf);
 }
 
 

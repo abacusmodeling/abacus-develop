@@ -2262,9 +2262,9 @@ void Input::Check(void)
             ModuleBase::WARNING_QUIT("Input::Check", "calculate = istate is only availble for LCAO.");
         }
     }
-    else if (calculation == "md") // mohan add 2011-11-04
+    else if (calculation == "md" || calculation == "sto-md") // mohan add 2011-11-04
     {
-        GlobalV::CALCULATION = "md";
+        GlobalV::CALCULATION = calculation;
         symmetry = false;
         cal_force = 1;
         if (mdp.md_nstep == 0)

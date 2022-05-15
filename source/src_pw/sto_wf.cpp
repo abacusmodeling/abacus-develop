@@ -76,6 +76,30 @@ void Init_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in)
     }
 }
 
+void Update_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in)
+{
+    const int nchi = INPUT.nbands_sto;
+    const int nks = GlobalC::kv.nks;
+
+    for(int ik = 0 ; ik < nks ; ++ik)
+    {
+        if(seed_in >= 0)
+            for(int i = 0 ; i < stowf.chi0[ik].size ; ++i)
+            {
+                const double phi = 2 * ModuleBase::PI * rand()/double(RAND_MAX);
+                stowf.chi0[ik].c[i] = complex<double>(cos(phi), sin(phi)) / sqrt(double(nchi));
+            }
+        else
+            for(int i = 0; i < stowf.chi0[ik].size ; ++i)
+            {
+                if(rand()/double(RAND_MAX) < 0.5)
+                    stowf.chi0[ik].c[i]=-1.0 / sqrt(double(nchi));
+                else
+                    stowf.chi0[ik].c[i]=1.0 / sqrt(double(nchi));
+            }
+    }
+}
+
 #ifdef __MPI
 void Init_Com_Orbitals(Stochastic_WF& stowf, K_Vectors& kv)
 {
