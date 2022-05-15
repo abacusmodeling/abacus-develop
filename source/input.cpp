@@ -1804,6 +1804,7 @@ void Input::Default_2(void) // jiyy add 2019-08-04
         }
     }
     if(calculation.substr(0,3) != "sto")    bndpar = 1;
+    if(bndpar > GlobalV::NPROC) bndpar = GlobalV::NPROC;
 }
 #ifdef __MPI
 void Input::Bcast()
