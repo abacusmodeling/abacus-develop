@@ -138,7 +138,7 @@ void Input::Default(void)
     nbands_sto = 0;
     nbands_istate = 5;
     pw_seed = 1;
-    nche_sto = 0;
+    nche_sto = 5;
     seed_sto = 0;
     bndpar = 1;
     kpar = 1;
@@ -268,6 +268,7 @@ void Input::Default(void)
     out_wfc_r = 0;
     out_dos = 0;
     out_band = 0;
+    out_proj_band = 0;
     out_mat_hs = 0;
     out_mat_hs2 = 0; // LiuXh add 2019-07-15
     out_mat_r = 0; // jingan add 2019-8-14
@@ -994,6 +995,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("out_band", word) == 0)
         {
             read_value(ifs, out_band);
+        }
+        else if (strcmp("out_proj_band", word) == 0)
+        {
+            read_value(ifs, out_proj_band);
         }
 
         else if (strcmp("out_mat_hs", word) == 0)
@@ -1942,6 +1947,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(out_wfc_r);
     Parallel_Common::bcast_int(out_dos);
     Parallel_Common::bcast_int(out_band);
+    Parallel_Common::bcast_int(out_proj_band);
     Parallel_Common::bcast_int(out_mat_hs);
     Parallel_Common::bcast_int(out_mat_hs2); // LiuXh add 2019-07-15
     Parallel_Common::bcast_int(out_mat_r); // jingan add 2019-8-14
@@ -2228,6 +2234,7 @@ void Input::Check(void)
         out_stru = 0;
         out_dos = 0;
         out_band = 0;
+        out_proj_band = 0;
         cal_force = 0;
         init_wfc = "file";
         init_chg = "atomic"; // useless,
@@ -2249,6 +2256,7 @@ void Input::Check(void)
         out_stru = 0;
         out_dos = 0;
         out_band = 0;
+        out_proj_band = 0;
         cal_force = 0;
         init_wfc = "file";
         init_chg = "atomic";

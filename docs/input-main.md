@@ -8,7 +8,7 @@
 
 - [System variables](#system-variables)
 
-    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
+    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
 
 - [Variables related to input files](#variables-related-to-input-files)
 
@@ -24,7 +24,7 @@
 
 - [Electronic structure](#electronic-structure)
 
-    [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap)
+    [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_sto](#nbands_sto) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto)
 
 - [Geometry relaxation](#geometry-relaxation)
 
@@ -32,7 +32,7 @@
 
 - [Variables related to output information](#variables-related-to-output-information)
 
-    [out_force](#out_force) | [out_mul](#out_mul) | [out_freq_elec](#out_freq_elec) | [out_freq_ion](#out_freq_ion) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out-dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
+    [out_force](#out_force) | [out_mul](#out_mul) | [out_freq_elec](#out_freq_elec) | [out_freq_ion](#out_freq_ion) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out-dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out-dos) | [out_band](#out-band) | [out_proj_band](#out-proj-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
 
 - [Density of states](#density-of-states)
 
@@ -148,6 +148,12 @@ This part of variables are used to control general system parameters.
 
 - **Type**: Integer
 - **Description**: devide all processors into kpar groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
+- **Default**: 1
+
+#### bndpar
+
+- **Type**: Integer
+- **Description**: devide all processors into bndpar groups, and bands (only stochastic orbitals now) will be distributed among each group. It should be larger than 0.
 - **Default**: 1
 
 #### latname
@@ -453,6 +459,14 @@ calculations.
   - nspin=1: 1.2\*occupied_bands, occupied_bands+10)
   - nspin=2: max(1.2\*nelec, nelec+20)
 
+#### nbands_sto
+
+- **Type**: Integer
+- **Description**: 
+  - nbands_sto>0: Number of stochastic orbitals to calculate in stochastic DFT (SDFT) or mix stochastic-deterministic (MDFT). More bands obtain more precise results or smaller stochastic errors ($ \propto 1/\sqrt{N_{\chi}}$); 
+  - nbands_sto=0: Complete basis will be used to replace stochastic orbitals with the Chebyshev method (CT) and it will get the results the same as KSDFT without stochastic errors.
+- **Default**: 0
+
 #### nbands_istate
 
 - **Type**: Integer
@@ -550,6 +564,32 @@ calculations.
   - first-order: first-order extrapolation
   - second-order: second-order extrapolation
 - **Default**:atomic
+
+#### nche_sto
+
+- **Type**: Integer
+- **Description**: Chebyshev expansion orders for SDFT, MDFT, CT methods.
+- **Default**:5
+
+#### emin_sto
+
+- **Type**: Real
+- **Description**: Trial energy to guess the lower bound of eigen energies of the Hamitonian Operator $\hat{H}$. The unit is Ry.
+- **Default**:0.0
+
+#### emax_sto
+
+- **Type**: Real
+- **Description**: Trial energy to guess the upper bound of eigen energies of the Hamitonian Operator $\hat{H}$. The unit is Ry.
+- **Default**:0.0
+
+#### seed_sto
+
+- **Type**: Integer
+- **Description**: The random seed to generate stochastic orbitals.
+  - seed_sto>=0: Stochastic orbitals have the form of $\exp(i2\pi\theta(G))$, where $\theta$ is a uniform distribution in $(0,1)$. If seed_sto=0, the seed is decided by time(NULL).
+  - seed_sto<=-1: Stochastic orbitals have the form of $\pm1$ with the equal probability. If seed_sto=-1, the seed is decided by time(NULL).
+- **Default**:0
 
 ### Geometry relaxation
 
@@ -733,6 +773,12 @@ This part of variables are used to control the output of properties.
 
 - **Type**: Integer
 - **Description**: Controls whether to output the band structure. For mroe information, refer to the [worked example](examples/band-struc.md)
+- **Default**: 0
+
+#### out_proj_band
+
+- **Type**: Integer
+- **Description**: Controls whether to output the projected band structure. For mroe information, refer to the [worked example](examples/band-struc.md)
 - **Default**: 0
 
 #### out_stru

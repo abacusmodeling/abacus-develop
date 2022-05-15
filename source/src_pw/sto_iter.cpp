@@ -224,7 +224,7 @@ void Stochastic_Iter::itermu(int &iter)
     double tmpre;
     tmpre = stoche.coef[stoche.norder-1] * spolyv[stoche.norder-1];
     MPI_Allreduce(MPI_IN_PLACE, &tmpre, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
-    GlobalV::ofs_running<<"Chebyshev Precision: "<<abs(tmpre/targetne)*1e9<<"E+09"<<std::endl;
+    GlobalV::ofs_running<<"Chebyshev Precision: "<<abs(tmpre/targetne)*1e9<<"E-09"<<std::endl;
     if(tmpre/targetne > GlobalV::SCF_THR )
     {
         stringstream ss;
