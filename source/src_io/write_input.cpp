@@ -97,6 +97,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "out_wfc_r", out_wfc_r, "output wave functions in realspace");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_dos", out_dos, "output energy and dos");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_band", out_band, "output energy and band structure");
+    ModuleBase::GlobalFunc::OUTP(ofs, "out_proj_band", out_proj_band, "output projected band structure");
     ModuleBase::GlobalFunc::OUTP(ofs, "restart_save", restart_save, "print to disk every step for restart");
     ModuleBase::GlobalFunc::OUTP(ofs, "restart_load", restart_load, "restart from disk");
     ModuleBase::GlobalFunc::OUTP(ofs, "read_file_dir", read_file_dir, "directory of files for reading");
