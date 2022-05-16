@@ -50,7 +50,7 @@ class WF_atomic : public WF_igk
     void random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
     void atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
 
-    void check_psi()const;
+    void check_evc()const;
 
 };
 #endif 

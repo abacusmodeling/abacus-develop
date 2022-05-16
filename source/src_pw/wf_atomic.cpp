@@ -218,7 +218,7 @@ void WF_atomic::print_PAOs(void)const
 //===================================================================
 // from wfcinit.f90
 
-void WF_atomic::check_psi()const
+void WF_atomic::check_evc()const
 {
     std::cout<<"\n Check psi : \n";
 

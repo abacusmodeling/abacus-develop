@@ -59,7 +59,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
     if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
     {
         Numerical_Descriptor nc;
-        nc.output_descriptor(GlobalC::wf.evc, INPUT.deepks_descriptor_lmax);
+        nc.output_descriptor(GlobalC::wf.psi[0], INPUT.deepks_descriptor_lmax);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 

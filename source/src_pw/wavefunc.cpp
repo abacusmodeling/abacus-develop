@@ -172,7 +172,11 @@ void wavefunc::wfcinit(void)
     if (GlobalV::test_wf>2)
     {
         output::printrm(GlobalV::ofs_running, " wg  ",  wg);
-        this->check_psi();
+        if(this->evc!=nullptr) 
+		{
+			this->check_evc();
+		}
+		//lack of check for psi
     }
 
     ModuleBase::timer::tick("wavefunc","wfcinit");
