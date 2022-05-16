@@ -187,7 +187,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 
 	if(GlobalC::wf.out_wfc_r == 1)				// Peize Lin add 2021.11.21
 	{
-		Write_Wfc_Realspace::write_wfc_realspace_1(GlobalC::wf.evc, "wfc_realspace", true);
+		Write_Wfc_Realspace::write_wfc_realspace_1(GlobalC::wf.psi[0], "wfc_realspace", true);
 	}	
 
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
