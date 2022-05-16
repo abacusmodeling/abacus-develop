@@ -11,8 +11,6 @@
 
 WF_atomic::WF_atomic()
 {
-    evc  = new ModuleBase::ComplexMatrix[1];
-    wanf2= new ModuleBase::ComplexMatrix[1];
     pw_seed = 0;
 }
 
@@ -22,8 +20,18 @@ WF_atomic::~WF_atomic()
 	{
 		std::cout << " ~WF_atomic()" << std::endl;
 	}
-    delete[] evc;
-    delete[] wanf2;
+    if(this->evc!=nullptr)
+    {
+        delete[] evc;
+    }
+    if(this->wanf2!= nullptr)
+    {
+        delete[] wanf2;
+    }
+    if(this->psi != nullptr)
+    {
+        delete psi;
+    }
 }
 
 //==========================================================
@@ -210,7 +218,7 @@ void WF_atomic::print_PAOs(void)const
 //===================================================================
 // from wfcinit.f90
 
-void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
+void WF_atomic::check_psi()const
 {
     std::cout<<"\n Check psi : \n";
 
@@ -667,7 +675,9 @@ void WF_atomic::evc_transform_psi()
 {
     if(this->evc==nullptr || this->psi != nullptr)
     {
-        ModuleBase::WARNING_QUIT("WF_atomic","no evc or psi is not nullptr, please check!");
+        //ModuleBase::WARNING_QUIT("WF_atomic","no evc or psi is not nullptr, please check!");
+        std::cout<<__FILE__<<__LINE__<<" there is no need to transform!"<<std::endl;
+        return;
     }
     this->psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, this->evc[0].nr, this->evc[0].nc, GlobalC::kv.ngk.data());
     for(int ik = 0; ik < GlobalC::kv.nks; ++ik)

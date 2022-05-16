@@ -22,7 +22,7 @@ class WF_atomic : public WF_igk
     void evc_transform_psi();
     void psi_transform_evc();
 
-    ModuleBase::ComplexMatrix *wanf2; // wannier functions in the PW basis
+    ModuleBase::ComplexMatrix *wanf2 = nullptr; // wannier functions in the PW basis
     
     int pw_seed; //random seed for wave functions qianrui add 2021-8-13
 
@@ -50,7 +50,7 @@ class WF_atomic : public WF_igk
     void random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
     void atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
 
-    void check_psi(const ModuleBase::ComplexMatrix *psi)const;
+    void check_psi()const;
 
 };
 #endif 

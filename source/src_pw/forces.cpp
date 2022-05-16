@@ -681,7 +681,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
+        const int nbasis = GlobalC::kv.ngk[ik];
         // generate vkb
         if (GlobalC::ppcell.nkb > 0)
         {
@@ -697,9 +697,11 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
         {
             for (int i=0;i<nkb;i++)
             {
-                for (int ig=0; ig<GlobalC::wf.npw; ig++)
+                const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+                const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
+                for (int ig=0; ig<nbasis; ig++)
                 {
-                    becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
+                    becp(i,ib) += ppsi[ig] * conj( pvkb[ig] );
                 }
             }
         }
@@ -715,17 +717,17 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 			{
 				if (ipol==0)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+					for (int ig=0; ig<nbasis; ig++)
                         vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
                 }
 				if (ipol==1)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+					for (int ig=0; ig<nbasis; ig++)
                         vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
                 }
 				if (ipol==2)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+					for (int ig=0; ig<nbasis; ig++)
                         vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
                 }
 			}
@@ -737,9 +739,11 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
                 if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
                 for (int i=0; i<nkb; i++)
                 {
-                    for (int ig=0; ig<GlobalC::wf.npw; ig++)
+                    const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+                    const std::complex<double>* pvkb1 = &(vkb1(i, 0));
+                    for (int ig=0; ig<nbasis; ig++)
                     {
-                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * GlobalC::wf.evc[ik](ib,ig) ;
+                        dbecp(i,ib, ipol) += conj( pvkb1[ig] ) * ppsi[ig] ;
                     }
                 }
             }

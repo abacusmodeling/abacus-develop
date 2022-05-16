@@ -46,7 +46,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma)
 			const double w1 = GlobalC::wf.wg(ik, ibnd) / GlobalC::ucell.omega;
 			for(int ig = 0; ig<npw; ig++)
 			{
-				psi[ig]=GlobalC::wf.evc[ik](ibnd,ig);
+				psi[ig]=GlobalC::wf.psi[0](ik, ibnd, ig);
 			}
 			XC_Functional::grad_wfc(psi, ik, gradwfc, npw);
 

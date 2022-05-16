@@ -228,7 +228,7 @@ namespace ModuleESolver
             this->phami = new hamilt::HamiltPW(hpw);
         }
         //initial psi
-        GlobalC::wf.evc_transform_psi();
+        //GlobalC::wf.evc_transform_psi();
     } 
 
     void ESolver_KS_PW::eachiterinit(const int istep, const int iter)
@@ -406,7 +406,7 @@ namespace ModuleESolver
     {
         //temporary transform psi to evc 
         // psi back to evc
-        GlobalC::wf.psi_transform_evc();
+        //GlobalC::wf.psi_transform_evc();
         for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
         {
             for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
