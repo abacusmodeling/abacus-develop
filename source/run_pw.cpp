@@ -96,7 +96,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
         if ( winput::out_spillage <= 2 )
         {
             Numerical_Basis numerical_basis;
-            numerical_basis.output_overlap(GlobalC::wf.evc);
+            numerical_basis.output_overlap(GlobalC::wf.psi[0]);
             ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
         }
     }
