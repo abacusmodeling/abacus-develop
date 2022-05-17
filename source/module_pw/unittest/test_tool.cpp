@@ -18,7 +18,7 @@ void setupmpi(int argc,char **argv,int &nproc, int &myrank)
 	MPI_Aint dipc[2]={0,sizeof(double)};
 
 	// MPI_Type_struct: create a struct datatype
-	MPI_Type_struct(
+	MPI_Type_create_struct(
 	2,// count: number of blocks(integer)
 	ac,//number of element in each block(array)
 	dipc,//byte displacement of each block

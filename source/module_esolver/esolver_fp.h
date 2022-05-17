@@ -4,11 +4,11 @@
 // #include "hamilt.h"
 namespace ModuleESolver
 {
-class ESolver_FP: public ESolver
-{
-    public: 
+    class ESolver_FP : public ESolver
+    {
+    public:
         // Hamilt* phamilt;
-};
+    };
 }
 
 #endif

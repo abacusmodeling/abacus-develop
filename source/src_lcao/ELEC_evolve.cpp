@@ -1,5 +1,4 @@
 #include "ELEC_evolve.h"
-#include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
 #include "../src_pw/symmetry_rho.h"
@@ -8,8 +7,8 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
-ELEC_evolve::ELEC_evolve(){};
-ELEC_evolve::~ELEC_evolve(){};
+ELEC_evolve::ELEC_evolve() {};
+ELEC_evolve::~ELEC_evolve() {};
 
 int ELEC_evolve::tddft;
 double ELEC_evolve::td_scf_thr;
@@ -27,9 +26,9 @@ int ELEC_evolve::td_dipoleout;
 
 // this routine only serves for TDDFT using LCAO basis set
 void ELEC_evolve::evolve_psi(
-	const int &istep,
+    const int& istep,
     LCAO_Hamilt& uhm,
-    Local_Orbital_wfc &lowf)
+    Local_Orbital_wfc& lowf)
 {
 	ModuleBase::TITLE("ELEC_evolve","eveolve_psi");
 	ModuleBase::timer::tick("ELEC_evolve","evolve_psi");

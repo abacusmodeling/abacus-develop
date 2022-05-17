@@ -294,6 +294,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 			ModuleBase::Memory::record("Gint_Gamma","GridVlocal_therad",lgd_now*lgd_now,"double");
 
 			const int LD_pool = max_size*GlobalC::ucell.nwmax;
+            const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
 
 #ifdef _OPENMP
 			#pragma omp for
@@ -329,14 +330,17 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						// compute atomic basis phi(r) with both radial and angular parts
 						//------------------------------------------------------------------
-						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
-							na_grid, LD_pool, grid_index, delta_r,
-							block_index, block_size, cal_flag);
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+                        Gint_Tools::cal_psir_ylm(
+							na_grid, grid_index, delta_r,
+							block_index, block_size, 
+							cal_flag,
+                            psir_ylm.ptr_2D);
 
 						//------------------------------------------------------------------
 						// extract the local potentials.
 						//------------------------------------------------------------------
-						double *vldr3 = this->get_vldr3(vlocal, ncyz, ibx, jby, kbz);
+						double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, dv);
 
                         const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
                                 na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
@@ -458,17 +462,16 @@ void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal,
 
 // calculate the H matrix in terms of effective potentials
 void Gint_Gamma::cal_vlocal(
-    const double*const vlocal)
+    const double*const vlocal,
+    LCAO_Matrix &lm)
 {
     ModuleBase::TITLE("Gint_Gamma","cal_vlocal");
     ModuleBase::timer::tick("Gint_Gamma", "cal_vlocal"
     );
 
-    this->job=cal_local;
-    this->save_atoms_on_grid(GlobalC::GridT);
-
+    this->max_size = GlobalC::GridT.max_atom;
     const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
-	vl_grid_to_2D(GridVlocal, *LM);
+	vl_grid_to_2D(GridVlocal, lm);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_vlocal");
 }

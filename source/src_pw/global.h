@@ -312,7 +312,6 @@ namespace GlobalC
 extern K_Vectors kv;
 extern Use_FFT UFFT;
 extern PW_Basis pw;
-extern Stochastic_WF sto_wf; // qianrui add 2021-2-5
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;

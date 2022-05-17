@@ -5,6 +5,7 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
+#include "module_esolver/esolver_ks_lcao.h"
 
 class Potential
 {
@@ -12,7 +13,8 @@ class Potential
 
 	friend class Hamilt_PW; 
 	friend class Electrons;
-	friend class ELEC_scf;
+    friend class ELEC_scf;
+    friend class ModuleESolver::ESolver_KS_LCAO;
 
     // constructor and deconstructor
     Potential();

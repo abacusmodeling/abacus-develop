@@ -1,6 +1,5 @@
 #include "../src_pw/global.h"
 #include "record_adj.h" //mohan add 2012-07-06
-#include "src_lcao/LOOP_elec.h"
 #include "../module_base/timer.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -382,7 +381,7 @@ void LCAO_Matrix::folding_fixedH(const int &ik)
 							if(nu<0)continue;
 							//const int iic = mu*pv->ncol+nu;
                             int iic;
-                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                            if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                             {
                                 iic=mu+nu*pv->nrow;
                             }
