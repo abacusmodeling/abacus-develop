@@ -52,7 +52,7 @@ public:
 /******************************
  * read wavefunction
  ******************************/
-void read_wfc2(const std::string& fn, ModuleBase::ComplexMatrix* psi, ModuleBase::Vector3<double>* gkk)
+void read_wfc2(const std::string& fn, psi::Psi<std::complex<double>> &psi, ModuleBase::Vector3<double>* gkk)
 {
     std::string* wfilename;
     wfilename = new std::string[GlobalC::kv.nkstot];
@@ -94,7 +94,7 @@ void read_wfc2(const std::string& fn, ModuleBase::ComplexMatrix* psi, ModuleBase
                     double realpart;
                     double imagpart;
                     ifs >> realpart >> imagpart;
-                    psi[ik](ib, ig) = std::complex<double>(realpart, imagpart);
+                    psi(ik, ib, ig) = std::complex<double>(realpart, imagpart);
                 }
                 getline(ifs, tmpstring);
                 getline(ifs, tmpstring);
@@ -307,7 +307,7 @@ TEST_F(EState,RhoPW)
     std::stringstream ssw;
     ssw <<GlobalV::global_out_dir<< "WAVEFUNC";
     // we need to supply out_wfc_pw here
-    read_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+    read_wfc2(ssw.str(), GlobalC::wf.psi[0], GlobalC::pw.gcar);
 
     // copy data from old wf.evc to new evc(an object of Psi)
     evc.resize(GlobalC::kv.nks,GlobalV::NBANDS,GlobalC::wf.npwx);
@@ -316,7 +316,7 @@ TEST_F(EState,RhoPW)
     {
 	    for(int j=0;j<GlobalC::wf.npwx;j++)
             {
-		    evc(i,j)=GlobalC::wf.evc[0](i,j);
+		    evc(i,j)=GlobalC::wf.psi[0](i,j);
 	    }
     }
     // using class ElecStatePW to calculate rho

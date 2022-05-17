@@ -136,12 +136,11 @@ void wavefunc::allocate(const int nks)
 {
 	this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
 	this->wg.create(nks,GlobalV::NBANDS);
-	this->evc=new ModuleBase::ComplexMatrix[nks];
 	this->ekb = new double*[nks];
+	this->psi = new psi::Psi<std::complex<double>>(nks, GlobalV::NBANDS,npwx, nullptr);
 	for (int ik=0;ik<nks;ik++)
 	{
 		this->ekb[ik] = new double[GlobalV::NBANDS];
-		this->evc[ik].create(GlobalV::NBANDS,npwx);
 	}
 	return;
 }
