@@ -16,7 +16,7 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
-#include "dipole.h"    // liuyu add 2022-05-06
+#include "../module_surchem/dipole.h"    // liuyu add 2022-05-06
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif
@@ -160,6 +160,7 @@ void energy::print_etot(
 			this->print_format("E_demet", demet); //mohan add 2011-12-02
 			this->print_format("E_descf", descf);
 			this->print_format("E_efield", Efield::etotefield);
+            this->print_format("E_dipole", Dipole::dipole_energy);
 			if (GlobalC::vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
 			{
 				this->print_format("E_vdwD2", evdw);

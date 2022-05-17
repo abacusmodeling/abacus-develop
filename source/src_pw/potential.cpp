@@ -10,7 +10,7 @@
 // new
 #include "../module_surchem/surchem.h"
 #include "H_Hartree_pw.h"
-#include "dipole.h"
+#include "../module_surchem/dipole.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
