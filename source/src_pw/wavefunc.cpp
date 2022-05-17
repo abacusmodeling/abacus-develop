@@ -349,7 +349,7 @@ void wavefunc::wfcinit_k(void)
 {
 	ModuleBase::TITLE("wavefunc","wfcinit_k");
 
-	if(mem_saver)
+	if(GlobalV::CALCULATION=="nscf")
 	{
 		return;
 	}
