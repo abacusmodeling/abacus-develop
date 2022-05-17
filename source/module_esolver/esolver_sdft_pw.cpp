@@ -9,6 +9,11 @@
 #include "../src_pw/global.h"
 #include "../src_pw/symmetry_rho.h"
 //----------------------------------------------
+//-----force-------------------
+#include "../src_pw/sto_forces.h"
+//-----stress------------------
+#include "../src_pw/sto_stress_pw.h"
+//---------------------------------------------------
 
 namespace ModuleESolver
 {
@@ -43,57 +48,7 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
 void ESolver_SDFT_PW::beforescf(const int istep)
 {
     ESolver_KS_PW::beforescf(istep);
-	// if(NITER==0)
-	// {
-	// 	int iter = 1;
-	// 	ETHR = 0.1*DRHO2/ std::max(1.0, CHR.nelec);
-	// 	double *h_diag = new double[wf.npwx * NPOL];
-	// 	for (int ik = 0;ik < kv.nks;ik++)
-	// 	{
-	// 		if(NBANDS > 0 && MY_STOGROUP == 0)
-	// 		{
-	// 			this->c_bands_k(ik,h_diag,istep+1);
-	// 		}
-	// 		else
-	// 		{
-	// 			hm.hpw.init_k(ik); 
-	// 		}
-	// 		if(NBANDS > 0)
-	// 		{
-	// 			MPI_Bcast(wf.evc[ik].c, wf.npwx*NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
-	// 			MPI_Bcast(wf.ekb[ik], NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
-	// 		}
-	// 		stoiter.stoche.ndmin = wf.npw;
-	// 		stoiter.orthog(ik);
-	// 		stoiter.checkemm(ik,iter);
-	// 	}
-	// 	for (int ik = 0;ik < kv.nks;ik++)
-	// 	{
-	// 		//init k
-	// 		if(kv.nks > 1) hm.hpw.init_k(ik);
-	// 		stoiter.stoche.ndmin = wf.npw;
-
-	// 		stoiter.sumpolyval_k(ik);
-	// 	}
-	// 	delete [] h_diag;
-	// 	stoiter.itermu(iter);
-	// 	stoiter.stoche.calcoef(Stochastic_Iter::nroot_fd);
-	// 	for(int ik = 0; ik < kv.nks; ++ik)
-    // 	{
-    // 	    //init k
-    // 	    if(kv.nks > 1) hm.hpw.init_k(ik);
-    // 		stoiter.stoche.ndmin = wf.npw;
-	// 		complex<double> * out, *pchi;
-	// 		out = stowf.shchi[ik].c;
-    //     	if(NBANDS > 0)
-    //     	    pchi = stowf.chiortho[ik].c;
-    //     	else
-    //     	    pchi = stowf.chi0[ik].c;
-	
-    //     	stoiter.stoche.calfinalvec(stoiter.stohchi.hchi_reciprocal, pchi, out, stoiter.nchip[ik]);
-	// 	}
-
-	// }
+	if(istep > 0 && INPUT.nbands_sto != 0) Update_Sto_Orbitals(this->stowf, INPUT.seed_sto);
 }
 
 void ESolver_SDFT_PW::eachiterfinish(int iter)
@@ -292,11 +247,13 @@ void ESolver_SDFT_PW::cal_Energy(energy &en)
 
 void ESolver_SDFT_PW::cal_Force(ModuleBase::matrix &force)
 {
-	
+	Sto_Forces ff;
+    ff.init(force, this->stowf);
 }
 void ESolver_SDFT_PW::cal_Stress(ModuleBase::matrix &stress)
 {
-
+	Sto_Stress_PW ss;
+    ss.cal_stress(stress, this->stowf);
 }
 
 

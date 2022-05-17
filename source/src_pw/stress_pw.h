@@ -13,7 +13,7 @@ class Stress_PW: public Stress_Func
 	//calculate the stress in PW basis
 	void cal_stress(ModuleBase::matrix& smearing_sigmatot);
 
-	private :
+	protected :
 
 	//call the vdw stress
 	void stress_vdw(ModuleBase::matrix& smearing_sigma);   //force and stress calculated in vdw together.
