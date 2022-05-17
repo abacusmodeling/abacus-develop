@@ -121,7 +121,7 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
         {
             //density matrix has already been calcualted.
         }
-        else if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="lapack")
+        else if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="lapack" || GlobalV::KS_SOLVER=="cusolver")
         {
             //LiuXh modify 2021-09-06, clear memory, cal_dk_gamma() not used for genelpa solver.
             //density matrix has already been calculated.
@@ -144,7 +144,7 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
     {
         ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
         this->cal_dk_k( GlobalC::GridT );
-        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="lapack")        // Peize Lin test 2019-05-15
+        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="lapack" || GlobalV::KS_SOLVER=="cusolver")        // Peize Lin test 2019-05-15
 		{
             this->cal_dm(GlobalC::wf.wg,
                 this->LOWF->wfc_k, this->dm_k);

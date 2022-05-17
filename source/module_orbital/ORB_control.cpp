@@ -167,7 +167,7 @@ void ORB_control::setup_2d_division(std::ofstream& ofs_running,
 
     // (1) calculate nrow, ncol, nloc.
     if (ks_solver == "genelpa" || ks_solver == "hpseps" || ks_solver == "scalpack"
-        || ks_solver == "selinv" || ks_solver == "scalapack_gvx")
+        || ks_solver == "selinv" || ks_solver == "scalapack_gvx" || ks_solver == "cusolver")
     {
         ofs_running << " divide the H&S matrix using 2D block algorithms." << std::endl;
 #ifdef __MPI

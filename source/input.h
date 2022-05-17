@@ -64,11 +64,11 @@ class Input
     // Stochastic DFT
     //==========================================================
     int nche_sto; // number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
+    int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
     int seed_sto; // random seed for sDFT
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
-    std::string stotype;
-    int nbands_sto; // number of stochastic bands //qianrui 2021-2-5
+    int bndpar; //parallel for stochastic/deterministic bands
 
     //==========================================================
     // electrons / spin
@@ -179,9 +179,9 @@ class Input
     //==========================================================
     // charge mixing
     //==========================================================
-    std::string mixing_mode; // "plain","broden",...
+    std::string mixing_mode; // "plain","broyden",...
     double mixing_beta; // 0 : no_mixing
-    int mixing_ndim; // used in Broden method
+    int mixing_ndim; // used in Broyden method
     double mixing_gg0; // used in kerker method. mohan add 2014-09-27
 
     //==========================================================
@@ -206,6 +206,7 @@ class Input
     int out_wfc_r; // 0: no; 1: yes
     int out_dos; // dos calculation. mohan add 20090909
     int out_band; // band calculation pengfei 2014-10-13
+    int out_proj_band; // projected band structure calculation jiyy add 2022-05-11
     int out_mat_hs; // output H matrix and S matrix in local basis.
     int out_mat_hs2; // LiuXh add 2019-07-16, output H(R) matrix and S(R) matrix in local basis.
     int out_mat_r; // jingan add 2019-8-14, output r(R) matrix.

@@ -97,6 +97,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "out_wfc_r", out_wfc_r, "output wave functions in realspace");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_dos", out_dos, "output energy and dos");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_band", out_band, "output energy and band structure");
+    ModuleBase::GlobalFunc::OUTP(ofs, "out_proj_band", out_proj_band, "output projected band structure");
     ModuleBase::GlobalFunc::OUTP(ofs, "restart_save", restart_save, "print to disk every step for restart");
     ModuleBase::GlobalFunc::OUTP(ofs, "restart_load", restart_load, "restart from disk");
     ModuleBase::GlobalFunc::OUTP(ofs, "read_file_dir", read_file_dir, "directory of files for reading");
@@ -112,7 +113,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "ks_solver",
                                  GlobalV::KS_SOLVER,
-                                 "cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
+                                 "cg; dav; lapack; genelpa; hpseps; scalapack_gvx; cusolver");
     ModuleBase::GlobalFunc::OUTP(ofs, "scf_nmax", scf_nmax, "#number of electron iterations");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_force", out_force, "output the out_force or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "relax_nmax", relax_nmax, "number of ion iteration steps");
@@ -167,7 +168,7 @@ void Input::Print(const std::string &fn) const
 
     ofs << "\n#Parameters (4.LCAO)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "basis_type", basis_type, "PW; LCAO in pw; LCAO");
-    if (ks_solver == "HPSEPS" || ks_solver == "genelpa" || ks_solver == "scalapack_gvx")
+    if (ks_solver == "HPSEPS" || ks_solver == "genelpa" || ks_solver == "scalapack_gvx" || ks_solver == "cusolver")
     {
         ModuleBase::GlobalFunc::OUTP(ofs, "nb2d", nb2d, "2d distribution of atoms");
     }

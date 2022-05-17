@@ -28,9 +28,9 @@ namespace ModuleESolver
         virtual void beforescf(const int istep) override;
         virtual void eachiterinit(const int istep, const int iter) override;
         virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
-        virtual void updatepot(const int istep, const int iter, const bool conv) override;
-        virtual void eachiterfinish(const int iter, const bool conv) override;
-        virtual void afterscf(const int iter, const bool conv) override;
+        virtual void updatepot(const int istep, const int iter) override;
+        virtual void eachiterfinish(const int iter) override;
+        virtual void afterscf() override;
 
         virtual void othercalculation(const int istep)override;
         ORB_control orb_con;    //Basis_LCAO

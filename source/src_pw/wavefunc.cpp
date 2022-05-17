@@ -61,8 +61,6 @@ void wavefunc::allocate(const int nks)
 
 	assert(npwx > 0);
 	assert(nks > 0);
-	if( (GlobalV::CALCULATION!="scf-sto" && GlobalV::CALCULATION!="relax-sto" && GlobalV::CALCULATION!="md-sto") ) //qianrui add
-	assert(GlobalV::NBANDS > 0);
 
 	// allocate for kinetic energy
 	delete[] g2kin;

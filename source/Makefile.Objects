@@ -57,9 +57,8 @@ soc.o\
 to_wannier90.o \
 unk_overlap_pw.o \
 berryphase.o \
-sto_elec.o\
-sto_wf.o\
 sto_iter.o\
+sto_wf.o\
 sto_hchi.o\
 sto_che.o\
 
@@ -121,6 +120,7 @@ gint_k_init.o\
 gint_k_vl.o\
 gint_k_rho.o\
 gint_k_fvl.o\
+gint_k_fvl_new.o\
 gint_k_env.o \
 ORB_control.o\
 ORB_read.o\
