@@ -225,6 +225,10 @@ void energy::print_etot(
 	{
         label = "GV";
 	}
+	else if(GlobalV::KS_SOLVER=="cusolver")
+	{
+        label = "CU";
+	}
 	else
 	{
 		ModuleBase::WARNING_QUIT("Energy","print_etot");
