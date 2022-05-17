@@ -106,7 +106,10 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 	{
 		for(int m=0;m<3;m++)
 		{
-			Parallel_Reduce::reduce_double_all( s_kin[l][m] ); //qianrui fix a bug for kpar > 1
+			if(GlobalV::CALCULATION.substr(0,3)=="sto")
+				MPI_Allreduce(MPI_IN_PLACE , &s_kin[l][m] , 1, MPI_DOUBLE , MPI_SUM , STO_WORLD);
+			else
+				Parallel_Reduce::reduce_double_all( s_kin[l][m] ); //qianrui fix a bug for kpar > 1
 		}
 	}
 

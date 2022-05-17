@@ -160,7 +160,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, const bool bit, const 
                     if (ic>=0)
                     {
                         int iic;
-                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                         {
                             iic=ir+ic*pv.nrow;
                         }
@@ -253,7 +253,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, const bool bit, const 
                     if (ic>=0)
                     {
                         int iic;
-                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                         {
                             iic=ir+ic*pv.nrow;
                         }
@@ -439,7 +439,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
                     if (ic>=0)
                     {
                         int iic;
-                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                         {
                             iic=ir+ic*pv.nrow;
                         }
@@ -532,7 +532,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
                     if (ic>=0)
                     {
                         int iic;
-                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                         {
                             iic=ir+ic*pv.nrow;
                         }
@@ -740,7 +740,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin, LCAO_Matrix &lm)
                                 //lineH[j-i] = H[ir*lm.ParaV->ncol+ic];
                                 //lineS[j-i] = S[ir*lm.ParaV->ncol+ic];
                                 int iic;
-                                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                                if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                                 {
                                     iic=ir+ic*lm.ParaV->nrow;
                                 }
@@ -1505,4 +1505,4 @@ void HS_Matrix::output_soc_single_R(std::ofstream &ofs, const std::map<size_t, s
         std::remove(tem1.str().c_str());
     }
 
-} 
+}

@@ -79,7 +79,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 
 		// mohan added eiter to count for the electron iteration number, 2021-01-28
 		int eiter=0;		
-        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")  // pengfei 2014-10-13
+        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")  // pengfei 2014-10-13
         {
 #ifdef __LCAO
 #ifdef __MPI

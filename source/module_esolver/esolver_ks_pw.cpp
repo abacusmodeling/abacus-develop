@@ -66,99 +66,100 @@ namespace ModuleESolver
             ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
         }
 
-        // Setup the k points according to symmetry.
-        GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
+    // Setup the k points according to symmetry.
+    GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
-        // print information
-        // mohan add 2021-01-30
-        Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv);
+    // print information
+    // mohan add 2021-01-30
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv);
 
-        // Initalize the plane wave basis set
-        GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT PLANEWAVE");
-        std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx << " * " << GlobalC::pw.ny << " * " << GlobalC::pw.nz << std::endl;
-        std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx << " * " << GlobalC::pw.nby << " * " << GlobalC::pw.nbz << std::endl;
+    // Initalize the plane wave basis set
+    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
+    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
-        // mohan add 2010-09-13
-        // initialize the real-space uniform grid for FFT and parallel
-        // distribution of plane waves
-        GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
-            GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    // mohan add 2010-09-13
+    // initialize the real-space uniform grid for FFT and parallel
+    // distribution of plane waves
+    GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+    GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+        
 
+    // Calculate Structure factor
+    GlobalC::pw.setup_structure_factor();
+    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+    
+    //----------------------------------------------------------
+    // 1 read in initial data:
+    //   a lattice structure:atom_species,atom_positions,lattice vector
+    //   b k_points
+    //   c pseudopotential
+    // 2 setup planeware basis, FFT,structure factor, ...
+    // 3 initialize local and nonlocal pseudopotential in G_space
+    // 4 initialize charge desity and warefunctios in G_space
+    //----------------------------------------------------------
 
-            // Calculate Structure factor
-        GlobalC::pw.setup_structure_factor();
-        // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+    //=====================================
+    // init charge/potential/wave functions
+    //=====================================
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
-        //----------------------------------------------------------
-        // 1 read in initial data:
-        //   a lattice structure:atom_species,atom_positions,lattice vector
-        //   b k_points
-        //   c pseudopotential
-        // 2 setup planeware basis, FFT,structure factor, ...
-        // 3 initialize local and nonlocal pseudopotential in G_space
-        // 4 initialize charge desity and warefunctios in G_space
-        //----------------------------------------------------------
+    GlobalC::wf.allocate(GlobalC::kv.nks);
 
-        //=====================================
-        // init charge/potential/wave functions
-        //=====================================
-        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
-        GlobalC::pot.allocate(GlobalC::pw.nrxx);
+    // cout<<GlobalC::pw.nrxx<<endl;
+    // cout<<"before ufft allocate"<<endl;
+    GlobalC::UFFT.allocate();
 
-        GlobalC::wf.allocate(GlobalC::kv.nks);
+    // cout<<"after ufft allocate"<<endl;
 
-        // cout<<GlobalC::pw.nrxx<<endl;
-        // cout<<"before ufft allocate"<<endl;
-        GlobalC::UFFT.allocate();
+    //=======================
+    // init pseudopotential
+    //=======================
+    GlobalC::ppcell.init(GlobalC::ucell.ntype);
 
-        // cout<<"after ufft allocate"<<endl;
+    //=====================
+    // init hamiltonian
+    // only allocate in the beginning of ELEC LOOP!
+    //=====================
+    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
 
-        //=======================
-        // init pseudopotential
-        //=======================
-        GlobalC::ppcell.init(GlobalC::ucell.ntype);
+    //=================================
+    // initalize local pseudopotential
+    //=================================
+    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
-        //=====================
-        // init hamiltonian
-        // only allocate in the beginning of ELEC LOOP!
-        //=====================
-        GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
+    //======================================
+    // Initalize non local pseudopotential
+    //======================================
+    GlobalC::ppcell.init_vnl(GlobalC::ucell);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
-        //=================================
-        // initalize local pseudopotential
-        //=================================
-        GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
+    //=========================================================
+    // calculate the total local pseudopotential in real space
+    //=========================================================
+    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
 
-        //======================================
-        // Initalize non local pseudopotential
-        //======================================
-        GlobalC::ppcell.init_vnl(GlobalC::ucell);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
+    GlobalC::pot.newd();
 
-        //=========================================================
-        // calculate the total local pseudopotential in real space
-        //=========================================================
-        GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
-        GlobalC::pot.newd();
+    //==================================================
+    // create GlobalC::ppcell.tab_at , for trial wave functions.
+    //==================================================
+    GlobalC::wf.init_at_1();
 
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
-
-        //==================================================
-        // create GlobalC::ppcell.tab_at , for trial wave functions.
-        //==================================================
-        GlobalC::wf.init_at_1();
-
-        //================================
-        // Initial start wave functions
-        //================================
-        if (GlobalV::NBANDS != 0 || (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto" && GlobalV::CALCULATION != "md-sto")) //qianrui add
-        {
-            GlobalC::wf.wfcinit();
-        }
+    //================================
+    // Initial start wave functions
+    //================================
+    if (GlobalV::NBANDS != 0 || GlobalV::CALCULATION.substr(0,3) != "sto")
+    // qianrui add temporarily. In the future, wfcinit() should be compatible with cases when NBANDS=0
+    {
+        GlobalC::wf.wfcinit();
+    }
 
 #ifdef __LCAO
 #ifdef __MPI
@@ -250,7 +251,10 @@ namespace ModuleESolver
 
         //(2) save change density as previous charge,
         // prepared fox mixing.
-        GlobalC::CHR.save_rho_before_sum_band();
+        if(GlobalV::MY_STOGROUP == 0)
+	    {
+            GlobalC::CHR.save_rho_before_sum_band();
+        }
     }
 
     //Temporary, it should be replaced by hsolver later.
@@ -323,9 +327,9 @@ namespace ModuleESolver
     }
 
     //Temporary, it should be rewritten with Hamilt class. 
-    void ESolver_KS_PW::updatepot(const int istep, const int iter, const bool conv_elec)
+    void ESolver_KS_PW::updatepot(const int istep, const int iter)
     {
-        if (!conv_elec)
+        if (!this->conv_elec)
         {
             // not converged yet, calculate new potential from mixed charge density
             GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
@@ -355,7 +359,7 @@ namespace ModuleESolver
         GlobalC::pot.set_vr_eff();
     }
 
-    void ESolver_KS_PW::eachiterfinish(const int iter, const bool conv_elec)
+    void ESolver_KS_PW::eachiterfinish(const int iter)
     {
         //print_eigenvalue(GlobalV::ofs_running);
         GlobalC::en.calculate_etot();
@@ -363,11 +367,11 @@ namespace ModuleESolver
         bool print = false;
         if (this->out_freq_elec == 0)
         {
-            if (conv_elec) print = true;
+            if (this->conv_elec) print = true;
         }
         else
         {
-            if (iter % this->out_freq_elec == 0 || conv_elec) print = true;
+            if (iter % this->out_freq_elec == 0 || this->conv_elec) print = true;
         }
 
         if (print)
@@ -402,7 +406,7 @@ namespace ModuleESolver
     }
 
 
-    void ESolver_KS_PW::afterscf(const int iter, const bool conv)
+    void ESolver_KS_PW::afterscf()
     {
         //temporary transform psi to evc 
         // psi back to evc
@@ -454,7 +458,7 @@ namespace ModuleESolver
             GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str());//mohan add 2007-10-17
             GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
         }
-        if (conv)
+        if (this->conv_elec)
         {
             //GlobalV::ofs_running << " convergence is achieved" << std::endl;			
             //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 

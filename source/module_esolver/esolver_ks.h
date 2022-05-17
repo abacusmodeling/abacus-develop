@@ -21,6 +21,7 @@ namespace ModuleESolver
         double drho;      // the difference between rho_in (before HSolver) and rho_out (After HSolver)
         int maxniter;     // maximum iter steps for scf
         int niter;        // iter steps actually used in scf
+        bool conv_elec;   // If electron density is converged in scf.
         int out_freq_elec;// frequency for output
 
         virtual void Run(const int istep, UnitCell_pseudo& cell) override;
@@ -36,11 +37,11 @@ namespace ModuleESolver
         // Something to do before hamilt2density function in each iter loop.
         virtual void eachiterinit(const int istep, const int iter) {};
         // Something to do after hamilt2density function in each iter loop.
-        virtual void eachiterfinish(const int iter, const bool conv) {};
+        virtual void eachiterfinish(const int iter) {};
         // Something to do after SCF iterations when SCF is converged or comes to the max iter step.
-        virtual void afterscf(const int iter, const bool conv) {};
+        virtual void afterscf() {};
         // <Temporary> It should be replaced by a function in Hamilt Class
-        virtual void updatepot(const int istep, const int iter, const bool conv) {};
+        virtual void updatepot(const int istep, const int iter) {};
 
 
         //TOOLS:
@@ -52,7 +53,7 @@ namespace ModuleESolver
         void printhead();
         // Print inforamtion in each iter
         // G1    -3.435545e+03  0.000000e+00   3.607e-01  2.862e-01
-        void printiter(const bool conv, const int iter, const double drho, const double duration, const double ethr);
+        void printiter(const int iter, const double drho, const double duration, const double ethr);
         // Write the headline in the running_log file
         // "PW/LCAO" ALGORITHM --------------- ION=   1  ELEC=   1--------------------------------
         void writehead(std::ofstream& ofs_running, const int istep, const int iter);

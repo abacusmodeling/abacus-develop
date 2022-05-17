@@ -6,7 +6,6 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "../src_pw/charge_extra.h"
-#include "../src_pw/sto_elec.h" //mohan added 2021-01-28
 #include "ions_move_methods.h"
 #include "lattice_change_methods.h"
 #include "module_esolver/esolver.h"
@@ -25,9 +24,6 @@ class Ions
 
 	// mohan add 2021-01-28
     Electrons elec;
-
-	// mohan add for stochastic wave functions
-	Stochastic_Elec elec_sto;	
 
 	// mohan add 2021-01-28
 	// mohan moved this variable from electrons.h to ions.h

@@ -46,6 +46,19 @@ void ElecStatePW::parallelK()
 {
 #ifdef __MPI
     charge->rho_mpi();
+    if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it 2021-7-21
+	{
+		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
+		MPI_Allreduce(MPI_IN_PLACE, &GlobalC::en.eband, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+	}
+	else
+	{
+    	//==================================
+    	// Reduce all the Energy in each cpu
+    	//==================================
+		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
+		Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
+	}
 #endif
     return;
 }

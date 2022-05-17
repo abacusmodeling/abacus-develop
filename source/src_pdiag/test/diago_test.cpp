@@ -415,6 +415,20 @@ INSTANTIATE_TEST_SUITE_P(
         DiagoPrepare(0, 0, 1, 0, false, "scalapack_gvx", "H-KPoints-large.dat", "S-KPoints-large.dat")
         ));
 
+#ifdef __CUSOLVER_LCAO
+INSTANTIATE_TEST_SUITE_P(
+    CusolverDoubleTest,
+    DiagoTest,
+    ::testing::Values( //int nlocal, int nbands, int nb2d, int sparsity, bool gamma_only, std::string ks_solver, bool readhs
+        DiagoPrepare(0, 0, 1, 0, true, "cusolver", "H-GammaOnly-large.dat", "S-GammaOnly-large.dat")));
+
+INSTANTIATE_TEST_SUITE_P(
+    CusolverComplexTest,
+    DiagoTest,
+    ::testing::Values( //int nlocal, int nbands, int nb2d, int sparsity, bool gamma_only, std::string ks_solver, bool readhs
+        DiagoPrepare(0, 0, 1, 0, false, "cusolver", "H-KPoints-large.dat", "S-KPoints-large.dat")));
+#endif
+
 int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);

@@ -211,7 +211,10 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 			{
 				sigmanlc[l][m] = sigmanlc[m][l];
 			}
-			Parallel_Reduce::reduce_double_all( sigmanlc[l][m] ); //qianrui fix a bug for kpar > 1
+			if(GlobalV::CALCULATION.substr(0,3)=="sto")
+				MPI_Allreduce(MPI_IN_PLACE , &sigmanlc[l][m] , 1, MPI_DOUBLE , MPI_SUM , STO_WORLD);
+			else
+				Parallel_Reduce::reduce_double_all( sigmanlc[l][m] ); //qianrui fix a bug for kpar > 1
 		}
 	}
 
