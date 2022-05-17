@@ -277,7 +277,6 @@ namespace Gint_Tools
 			int iat = GlobalC::GridT.which_atom[mcell_index];
 			const int it = GlobalC::ucell.iat2it[iat];
 			const int ia = GlobalC::ucell.iat2ia[iat];
-			const int start = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
 			Atom *atom = &GlobalC::ucell.atoms[it];
 
 			const double mt[3]={

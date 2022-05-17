@@ -109,21 +109,15 @@ class Gint_k : public Gint_k_init
     //------------------------------------------------------
     // calculate force & stress (many k-points).
 
-    void fvl_k_RealSpace(
-        const bool isforce,
-        const bool isstress,
-        ModuleBase::matrix& fvl_dphi, 
-        ModuleBase::matrix& svl_dphi, 
-        const double* vl);
-        //mohan add 2011-06-19
-        //zhengdy add 2016-10-18
-
     void cal_force_k(
         const bool isforce,
         const bool isstress,
         ModuleBase::matrix& fvl_dphi, 
         ModuleBase::matrix& svl_dphi, 
         const double* vl);
+        //mohan add 2011-06-19 initial implementation
+        //zhengdy add 2016-10-18 add stress calculation
+        //wenfei modify 2022-5-17 reconstruction
 
     private:
     
@@ -157,61 +151,40 @@ class Gint_k : public Gint_k_init
     //------------------------------------------------------
     // in gint_k_fvl.cpp 
     //------------------------------------------------------
-    // set the orbital info 
-    // set the derivative/Ylm information on each real space grid.
-    void set_ijk_atom_force(
+    // evaluate the force due to local potential.
+    void cal_meshball_force(
         const int &grid_index, 
         const int &size,
-        double*** psir_ylm, 
-        double*** dr, 
-        bool** cal_flag, 
-        double** distance, 
-        double* ylma, 
-        const double &delta_r,
-        double*** dphi_x, 
-        double ***dphi_y, 
-        double*** dphi_z);
-
-    // evaluate the force due to local potential.
-    void evaluate_vl_force(
-        const int &grid_index, 
-        const int &size, 
-        const int &i, 
-        const int &j, 
-        const int &k,
-        double*** psir_ylm, 
-        bool** cal_flag, 
-        double* vldr3, 
-        double** distance,
-        double*** dphi_x, // gradient of orbital phi along x direction
-        double*** dphi_y, // gradient of orbital phi along y direction
-        double*** dphi_z, // gradient of orbital phi along z direction
+        const int*const block_index, 
+        bool** cal_flag,
+        double** psir_vlbr3, 
+        double** dphi_x, // gradient of orbital phi along x direction
+        double** dphi_y, // gradient of orbital phi along y direction
+        double** dphi_z, // gradient of orbital phi along z direction
         double* pvdpx, 
         double* pvdpy, 
         double* pvdpz,
         const Grid_Technique &gt);
 
     // evaluate the stresses due to local potential
-    void evaluate_vl_stress(
+    void cal_meshball_stress(
         const int &grid_index, 
-        const int &size, 
-        const int &i, 
-        const int &j, 
-        const int &k,
-        double*** psir_ylm, 
+        const int &size,
+        const int*const block_index,
         bool** cal_flag, 
-        double* vldr3, 
-        double** distance,
-        double*** dphi_x, 
-        double*** dphi_y, 
-        double*** dphi_z,
+        double** psir_vlbr3,
+        double** dpsir_xx,
+        double** dpsir_xy,
+        double** dpsir_xz,
+        double** dpsir_yy,
+        double** dpsir_yz,
+        double** dpsir_zz,
         double* pvdp11, 
         double* pvdp22, 
         double* pvdp33, 
         double* pvdp12, 
         double* pvdp13, 
-        double* pvdp23,
-        double*** dr,
+        double* pvdp23, 
         const Grid_Technique &gt);
 
     private:

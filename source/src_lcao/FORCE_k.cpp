@@ -1140,7 +1140,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// fvl_dphi can not be set to zero here if Vna is used
 		if(isstress||isforce) 
 		{
-			this->UHM->GK.fvl_k_RealSpace(isforce, isstress, fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
+			this->UHM->GK.cal_force_k(isforce, isstress, fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
 		}
 	}
 
