@@ -293,7 +293,7 @@ void Run_MD_LCAO::md_force_virial(
                 {
                     this->LM_md.Hloc2_laststep[i]=this->LM_md.Hloc2[i];
                 }*/
-            //this->cal_edm_tddft(LOWF_md, LOC_md, UHM_md);
+            this->cal_edm_tddft(LOWF_md, LOC_md, UHM_md);
          #endif
      }
 

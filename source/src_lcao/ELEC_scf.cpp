@@ -139,7 +139,7 @@ void ELEC_scf::scf(const int& istep,
 		// mohan add iter > 1 on 2011-04-02
 		// because the GlobalC::en.ekb has not value now.
 		// so the smearing can not be done.
-		if(iter>1 && !GlobalV::ocp )Occupy::calculate_weights();
+		if(iter>1 && !GlobalV::ocp && !ELEC_evolve::tddft )Occupy::calculate_weights();
 
 		if(GlobalC::wf.init_wfc == "file")
 		{
