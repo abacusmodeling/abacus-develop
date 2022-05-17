@@ -41,7 +41,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
 
     
 
-    if(GlobalV::CALCULATION == "md")
+    if(GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
     {
         Run_MD_PW run_md_pw;
         run_md_pw.md_cells_pw(p_esolver);

@@ -31,7 +31,9 @@ class Stochastic_WF
 
 };
 //init stochastic orbitals
-void Init_Sto_Orbitals(Stochastic_WF& chi, const int seed_in);
+void Init_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in);
+//update stochastic orbitals
+void Update_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in);
 //init complete orbitals
-void Init_Com_Orbitals(Stochastic_WF& chi, K_Vectors& kv);
+void Init_Com_Orbitals(Stochastic_WF& stowf, K_Vectors& kv);
 #endif 

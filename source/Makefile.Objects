@@ -61,6 +61,8 @@ sto_iter.o\
 sto_wf.o\
 sto_hchi.o\
 sto_che.o\
+sto_forces.o\
+sto_stress_pw.o
 
 OBJS_TOOLS=complexarray.o\
 complexmatrix.o \
