@@ -745,19 +745,16 @@ if __name__ == "__main__":
     parent = Path(r"C:\Users\YY.Ji\Desktop")
     name = "PBANDS_1"
     path = parent/name
-    # notes = {'s': '(b)'}
-    # datafile = [path/"soc.dat", path/"non-soc.dat"]
-    # kptfile = path/"KPT"
     fig, ax = plt.subplots(figsize=(12, 6))
-    # label = ["with SOC", "without SOC"]
-    # color = ["r", "g"]
-    # linestyle = ["solid", "dashed"]
     energy_range = [-5, 6]
     efermi = 4.417301755850272
     shift = False
     #species = {"Ag": [2], "Cl": [1], "In": [0]}
     atom_index = {8: {2: [1, 2]}, 4: {2: [1, 2]}, 10: [1, 2]}
     pband = PBand(str(path))
+
+    # if you want to specify `species` or `index`, you need to 
+    # set `species=species` or `index=index` in the following two functions 
     pband.plot(fig, ax, atom_index=atom_index, efermi=efermi,
-               energy_range=energy_range, shift=shift)
+               energy_range=energy_range, shift=shift)    
     pband.write(atom_index=atom_index)

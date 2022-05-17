@@ -109,7 +109,7 @@ class DOSPlot:
         # y-axis
         if dos_range:
             self.ax.set_ylim(dos_range[0], dos_range[1])
-        if "xlabel_params" in self.plot_params.keys():
+        if "ylabel_params" in self.plot_params.keys():
             self.ax.set_ylabel("DOS", **self.plot_params["ylabel_params"])
         else:
             self.ax.set_ylabel("DOS", size=25)
@@ -506,18 +506,6 @@ class PDOS(DOS):
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    pdosfile = r"C:\Users\YY.Ji\Desktop\PDOS"
-    pdos = PDOS(pdosfile)
-    #species = {"Ag": [2], "Cl": [1], "In": [0]}
-    atom_index = {8: {2: [1, 2]}, 4: {2: [1, 2]}, 10: [1, 2]}
-    fig, ax = plt.subplots(3, 1, sharex=True)
-    energy_range = [-1.5, 6]
-    dos_range = [0, 5]
-    dosplots = pdos.plot(fig, ax, atom_index=atom_index, efermi=5, shift=True,
-                         energy_range=energy_range, dos_range=dos_range, notes=[{'s': '(a)'}, {'s': '(b)'}, {'s': '(c)'}])
-    fig.savefig("pdos.png")
-    pdos.write(atom_index=atom_index)
-
     #tdosfile = r"C:\Users\YY.Ji\Desktop\TDOS"
     #tdos = TDOS(tdosfile)
     #fig, ax = plt.subplots()
@@ -526,3 +514,18 @@ if __name__ == "__main__":
     # dosplots = tdos.plot(fig, ax, efermi=5, shift=True,
     #                     energy_range=energy_range, dos_range=dos_range, notes={'s': '(a)'})
     # fig.savefig("tdos.png")
+
+    pdosfile = r"C:\Users\YY.Ji\Desktop\PDOS"
+    pdos = PDOS(pdosfile)
+    #species = {"Ag": [2], "Cl": [1], "In": [0]}
+    atom_index = {8: {2: [1, 2]}, 4: {2: [1, 2]}, 10: [1, 2]}
+    fig, ax = plt.subplots(3, 1, sharex=True)
+    energy_range = [-1.5, 6]
+    dos_range = [0, 5]
+
+    # if you want to specify `species` or `index`, you need to 
+    # set `species=species` or `index=index` in the following two functions 
+    dosplots = pdos.plot(fig, ax, atom_index=atom_index, efermi=5, shift=True,
+                         energy_range=energy_range, dos_range=dos_range, notes=[{'s': '(a)'}, {'s': '(b)'}, {'s': '(c)'}])
+    fig.savefig("pdos.png")
+    pdos.write(atom_index=atom_index)
