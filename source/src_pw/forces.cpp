@@ -8,7 +8,7 @@
 #include "../module_base/math_integral.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
-#include "../module_surchem/dipole.h"
+#include "../module_surchem/efield.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -75,7 +75,7 @@ void Forces::init(ModuleBase::matrix& force)
     if(GlobalV::EFIELD)
     {
         force_e.create(GlobalC::ucell.nat, 3);
-        Dipole::compute_force(GlobalC::ucell, force_e);
+        Efield::compute_force(GlobalC::ucell, force_e);
     }
 
     //impose total force = 0

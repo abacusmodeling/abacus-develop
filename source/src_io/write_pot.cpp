@@ -1,6 +1,6 @@
 #include "../src_pw/potential.h"
 #include "../src_pw/global.h"
-#include "../module_surchem/dipole.h"
+#include "../module_surchem/efield.h"
 #include "../module_base/timer.h"
 
 // translate from write_rho in charge.cpp.
@@ -254,13 +254,13 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 
     //==========================================
-    // Efield and dipole correction
+    // Dipole correction
     //==========================================
     ModuleBase::matrix v_efield;
-    if (GlobalV::EFIELD)
+    if (GlobalV::EFIELD && GlobalV::DIPOLE)
     {
         v_efield.create(GlobalV::NSPIN, GlobalC::pw.nrxx);
-        v_efield = Dipole::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
+        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
     }
 
     //==========================================

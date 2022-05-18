@@ -72,7 +72,7 @@ charge_broyden.o \
 charge_extra.o \
 diago_david.o\
 diago_cg.o\
-dipole.o\
+efield.o\
 electrons.o \
 energy.o \
 energy_dos_pw.o\

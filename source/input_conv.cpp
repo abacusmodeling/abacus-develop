@@ -26,6 +26,7 @@
 #include "src_lcao/local_orbital_charge.h"
 #endif
 #include "module_base/timer.h"
+#include "module_surchem/efield.h"
 
 void Input_Conv::Convert(void)
 {
@@ -208,6 +209,16 @@ void Input_Conv::Convert(void)
         GlobalV::DOMAG_Z = false;
         GlobalV::NPOL = 1;
     }
+
+//----------------------------------------------------------
+// Yu Liu add 2022-05-18
+//----------------------------------------------------------
+    GlobalV::EFIELD = INPUT.efield;
+    GlobalV::DIPOLE = INPUT.dipole;
+    Efield::edir = INPUT.edir;
+    Efield::emaxpos = INPUT.emaxpos;
+    Efield::eopreg = INPUT.eopreg;
+    Efield::eamp = INPUT.eamp;
 
 //----------------------------------------------------------
 // Fuxiang He add 2016-10-26

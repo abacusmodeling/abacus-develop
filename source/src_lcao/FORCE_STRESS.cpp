@@ -5,7 +5,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #include "../module_base/timer.h"
-#include "../module_surchem/dipole.h"        // liuyu add 2022-05-18
+#include "../module_surchem/efield.h"        // liuyu add 2022-05-18
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"	//caoyu add for deepks 2021-06-03
 #endif
@@ -181,7 +181,7 @@ void Force_Stress_LCAO::getForceStress(
     if(GlobalV::EFIELD&&isforce)
     {
         fefield.create(nat, 3);
-        Dipole::compute_force(GlobalC::ucell, fefield);
+        Efield::compute_force(GlobalC::ucell, fefield);
     }
 	//Force contribution from DFT+U
 	ModuleBase::matrix force_dftu;

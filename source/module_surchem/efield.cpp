@@ -1,44 +1,32 @@
-#include "dipole.h"
+#include "efield.h"
 #include "../module_base/constants.h"
 #include "../module_base/timer.h"
 #include "../module_base/global_variable.h"
 #include "../src_parallel/parallel_reduce.h"
 
-double Dipole::etotefield = 0.0;
-double Dipole::tot_dipole = 0.0;
-int Dipole::edir = 2;
-double Dipole::emaxpos = 0.5;
-double Dipole::eopreg = 0.1;
-double Dipole::eamp = 0.0;
-bool Dipole::first = true;
-double Dipole::bvec[3];
-double Dipole::bmod;
+double Efield::etotefield = 0.0;
+double Efield::tot_dipole = 0.0;
+int Efield::edir;
+double Efield::emaxpos;
+double Efield::eopreg;
+double Efield::eamp;
+double Efield::bvec[3];
+double Efield::bmod;
 
-Dipole::Dipole(){}
+Efield::Efield(){}
 
-Dipole::~Dipole(){}
+Efield::~Efield(){}
 
 //=======================================================
 // calculate dipole potential in surface calculations
 //=======================================================
-ModuleBase::matrix Dipole::add_efield(const UnitCell &cell, 
+ModuleBase::matrix Efield::add_efield(const UnitCell &cell, 
                                         PW_Basis &pwb, 
                                         const int &nspin, 
                                         const double *const *const rho)
 {
-    ModuleBase::TITLE("Dipole", "add_efield");
-    ModuleBase::timer::tick("Dipole", "add_efield");
-
-    ModuleBase::matrix v(nspin, pwb.nrxx);
-
-    // efield only needs to be added on the first iteration, if dipfield
-    // is not used. note that for relax calculations it has to be added
-    // again on subsequent relax steps.
-    if(!GlobalV::DIPOLE && !first)
-    {
-        return v;
-    }
-    first = false;
+    ModuleBase::TITLE("Efield", "add_efield");
+    ModuleBase::timer::tick("Efield", "add_efield");
 
     double latvec;    // latvec along the efield direction
     if(edir == 0)
@@ -64,7 +52,7 @@ ModuleBase::matrix Dipole::add_efield(const UnitCell &cell,
     }
     else
     {
-        ModuleBase::WARNING_QUIT("Dipole::ion_dipole", "direction is wrong!");
+        ModuleBase::WARNING_QUIT("Efield::add_efield", "direction is wrong!");
     }
     bmod = sqrt(pow(bvec[0],2) + pow(bvec[1],2) + pow(bvec[2],2));
 
@@ -83,20 +71,22 @@ ModuleBase::matrix Dipole::add_efield(const UnitCell &cell,
     else
     {
         ion_dipole = cal_ion_dipole(cell, bmod);
-        tot_dipole = ion_dipole - elec_dipole;
 
         // energy correction
-        etotefield = - ModuleBase::e2 * eamp * tot_dipole * cell.omega / ModuleBase::FOUR_PI;
+        etotefield = - ModuleBase::e2 * eamp * ion_dipole * cell.omega / ModuleBase::FOUR_PI;
     }
 
     const double length = (1.0 - eopreg) * latvec * cell.lat0;
     const double vamp = ModuleBase::e2 * (eamp - tot_dipole) * length;
 
     GlobalV::ofs_running << "\n\n Adding external electric field: " << std::endl;
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Computed dipole along edir", edir);
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Elec. dipole (Ry a.u.)", elec_dipole);
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Ion dipole (Ry a.u.)", ion_dipole);
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total dipole (Ry a.u.)", tot_dipole);
+    if(GlobalV::DIPOLE)
+    {
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Computed dipole along edir", edir);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Elec. dipole (Ry a.u.)", elec_dipole);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Ion dipole (Ry a.u.)", ion_dipole);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total dipole (Ry a.u.)", tot_dipole);
+    }
     if( abs(eamp) > 0.0) 
     {
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Amplitute of Efield (Hartree)", eamp);
@@ -105,6 +95,7 @@ ModuleBase::matrix Dipole::add_efield(const UnitCell &cell,
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total length (Bohr)", length);
 
     // dipole potential
+    ModuleBase::matrix v(nspin, pwb.nrxx);
     const int nspin0 = (nspin == 2) ? 2 : 1;
 
     for (int ir = 0; ir < pwb.nrxx; ++ir)
@@ -127,7 +118,7 @@ ModuleBase::matrix Dipole::add_efield(const UnitCell &cell,
 
     double fac = ModuleBase::e2 * (eamp - tot_dipole) * cell.lat0 / bmod;
 
-    ModuleBase::timer::tick("Dipole", "add_efield");
+    ModuleBase::timer::tick("Efield", "add_efield");
     return v * fac;
 }
 
@@ -135,7 +126,7 @@ ModuleBase::matrix Dipole::add_efield(const UnitCell &cell,
 //=======================================================
 // calculate dipole density in surface calculations
 //=======================================================
-double Dipole::cal_ion_dipole(const UnitCell &cell, const double &bmod)
+double Efield::cal_ion_dipole(const UnitCell &cell, const double &bmod)
 {
     double ion_dipole = 0;
     for(int it=0; it<cell.ntype; ++it)
@@ -152,7 +143,7 @@ double Dipole::cal_ion_dipole(const UnitCell &cell, const double &bmod)
     return ion_dipole;
 }
 
-double Dipole::cal_elec_dipole(const UnitCell &cell, 
+double Efield::cal_elec_dipole(const UnitCell &cell, 
                             PW_Basis &pwb, 
                             const int &nspin, 
                             const double *const *const rho,
@@ -185,7 +176,7 @@ double Dipole::cal_elec_dipole(const UnitCell &cell,
     return elec_dipole;
 }
 
-double Dipole::saw_function(const double &a, const double &b, const double &x)
+double Efield::saw_function(const double &a, const double &b, const double &x)
 {
     assert(x>=0);
     assert(x<=1);
@@ -206,7 +197,7 @@ double Dipole::saw_function(const double &a, const double &b, const double &x)
     }
 }
 
-void Dipole::compute_force(const UnitCell &cell, ModuleBase::matrix &fdip)
+void Efield::compute_force(const UnitCell &cell, ModuleBase::matrix &fdip)
 {
     if(GlobalV::DIPOLE)
     {

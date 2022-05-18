@@ -1,14 +1,14 @@
-#ifndef DIPOLE_H
-#define DIPOLE_H
+#ifndef EFIELD_H
+#define EFIELD_H
 
 #include "../src_pw/pw_basis.h"
 #include "../module_cell/unitcell.h"
 
-class Dipole
+class Efield
 {
 public:
-    Dipole();
-    ~Dipole();
+    Efield();
+    ~Efield();
 
     static ModuleBase::matrix add_efield(const UnitCell &cell, 
                                             PW_Basis &pwb, 
@@ -35,7 +35,6 @@ public:
     static double emaxpos;              // the maximum position of the saw function
     static double eopreg;               // the decrease region length of the saw function
     static double eamp;                 // field amplitude (in a.u.) (1 a.u. = 51.44 10^10 V/m)
-    static bool first;                  // efield only needs to be added on the first iteration, if dipfield is not used.
     static double bvec[3];
     static double bmod;
 };

@@ -21,7 +21,6 @@
 #include "../src_io/chi0_hilbert.h"
 #include "../src_io/epsilon0_pwscf.h"
 #include "../src_io/epsilon0_vasp.h"
-#include "../module_surchem/dipole.h"
 //-----force-------------------
 #include "../src_pw/forces.h"
 //-----stress------------------
@@ -197,15 +196,8 @@ namespace ModuleESolver
     void ESolver_KS_PW::eachiterinit(const int istep, const int iter)
     {
         // mohan add 2010-07-16
-        if (iter == 1) 
-        {
-            GlobalC::CHR.set_new_e_iteration(true);
-            Dipole::first = true;
-        }
-        else
-        {
-            GlobalC::CHR.set_new_e_iteration(false);
-        }
+        if (iter == 1) GlobalC::CHR.set_new_e_iteration(true);
+        else GlobalC::CHR.set_new_e_iteration(false);
 
         if (GlobalV::FINAL_SCF && iter == 1)
         {

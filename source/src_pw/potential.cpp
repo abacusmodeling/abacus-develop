@@ -9,7 +9,7 @@
 // new
 #include "../module_surchem/surchem.h"
 #include "H_Hartree_pw.h"
-#include "../module_surchem/dipole.h"
+#include "../module_surchem/efield.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
@@ -280,6 +280,16 @@ void Potential::set_local_pot(double *vl_pseudo, // store the local pseudopotent
 
     GlobalC::UFFT.ToRealSpace(vg, vl_pseudo);
 
+    if (GlobalV::EFIELD && !GlobalV::DIPOLE)
+    {
+        ModuleBase::matrix v_efield(GlobalV::NSPIN, GlobalC::pw.nrxx);
+        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
+        for (int ir = 0; ir < GlobalC::pw.nrxx; ++ir)
+        {
+            vl_pseudo[ir] += v_efield(0, ir);
+        }
+    }
+
     delete[] vg;
 
     // GlobalV::ofs_running <<" set local pseudopotential done." << std::endl;
@@ -349,9 +359,9 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
     //----------------------------------------------------------
     //  calculate the efield and dipole correction
     //----------------------------------------------------------
-    if (GlobalV::EFIELD)
+    if (GlobalV::EFIELD && GlobalV::DIPOLE)
     {
-        v += Dipole::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
+        v += Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
     }
 
 
