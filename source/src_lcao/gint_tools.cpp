@@ -563,4 +563,162 @@ namespace Gint_Tools
 		return psir_vlbr3_DM;
 	}
 
+	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DMR(const int &grid_index, const int &na_grid,
+		const int*const block_index, const int*const block_size,
+		bool** cal_flag, double** psir_vlbr3, 
+		double** dphi_x, double** dphi_y, double** dphi_z,
+		const Grid_Technique &gt,
+		double** DMR)
+	{                       
+		double *psi2, *psi2_dmr;
+		int iwi, iww;
+		const int LD_pool = GlobalC::GridT.max_atom*GlobalC::ucell.nwmax;
+		Gint_Tools::Array_Pool<double> psir_vlbr3_DMR(GlobalC::pw.bxyz, LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DMR.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+
+		bool *all_out_of_range = new bool[na_grid];
+		for(int ia=0; ia<na_grid; ++ia) //number of atoms
+		{
+			all_out_of_range[ia] = true;
+			for(int ib=0; ib<gt.bxyz; ++ib) //number of small box in big box
+			{
+				if(cal_flag[ib][ia])
+				{
+					all_out_of_range[ia] = false;
+					//break; //mohan add 2012-07-10
+				}
+			}
+		}
+
+		double* dmR = DMR[GlobalV::CURRENT_SPIN];
+		double* dmR2;
+
+		for (int ia1=0; ia1<na_grid; ia1++)
+		{
+			if(all_out_of_range[ia1]) continue;
+
+			const int mcell_index1 = gt.bcell_start[grid_index] + ia1;
+			const int iat = gt.which_atom[mcell_index1];
+			const int T1 = GlobalC::ucell.iat2it[iat];
+			const int I1 = GlobalC::ucell.iat2ia[iat];
+			Atom *atom1 = &GlobalC::ucell.atoms[T1];
+
+			//~~~~~~~~~~~~~~~~
+			// get cell R1.
+			//~~~~~~~~~~~~~~~~
+			const int id1 = gt.which_unitcell[mcell_index1];
+			const int R1x = gt.ucell_index2x[id1];
+			const int R1y = gt.ucell_index2y[id1];
+			const int R1z = gt.ucell_index2z[id1];
+			const int DM_start = gt.nlocstartg[iat];
+
+			// get (j,beta,R2)
+			for (int ia2=0; ia2<na_grid; ia2++)
+			{
+				if(all_out_of_range[ia2]) continue;
+
+				//---------------------------------------------
+				// check if we need to calculate the big cell.
+				//---------------------------------------------
+				bool same_flag = false;
+				for(int ib=0; ib<gt.bxyz; ++ib)
+				{
+					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+					{
+						same_flag = true;
+						break;
+					}
+				}
+
+				if(!same_flag) continue;
+
+				const int bcell2 = gt.bcell_start[grid_index] + ia2;
+				const int T2 = GlobalC::ucell.iat2it[ gt.which_atom[bcell2]];
+				const int iat2 = gt.which_atom[bcell2];
+
+				Atom *atom2 = &GlobalC::ucell.atoms[T2];
+
+				//---------------
+				// get cell R2.
+				//---------------
+				const int id2 = gt.which_unitcell[bcell2];
+				const int R2x = gt.ucell_index2x[id2];
+				const int R2y = gt.ucell_index2y[id2];
+				const int R2z = gt.ucell_index2z[id2];
+
+				//------------------------------------------------
+				// calculate the 'offset': R2 position relative
+				// to R1 atom.
+				//------------------------------------------------
+				const int dRx = R1x - R2x;
+				const int dRy = R1y - R2y;
+				const int dRz = R1z - R2z;
+
+				const int index = gt.cal_RindexAtom(dRx, dRy, dRz, iat2);
+				int offset = -1;
+
+				int* find_start = gt.find_R2[iat];
+				int* findend = gt.find_R2[iat] + gt.nad[iat];
+
+				// the nad should be a large expense of time.
+				for(int* find=find_start; find < findend; find++)
+				{
+					if( find[0] == index )
+					{
+						offset = find - find_start;
+						break;
+					}
+				}
+
+				if(offset == -1 )
+				{
+					ModuleBase::WARNING_QUIT("gint_k","get_psir_vlbr3_DMR wrong");
+				}
+				assert(offset < gt.nad[iat]);
+
+				//--------------------------------------------------------------- 
+				// what I do above is to get 'offset' for atom std::pair (iat1, iat2)
+				// if I want to simplify this searching for offset,
+				// I should take advantage of gt.which_unitcell.
+				//--------------------------------------------------------------- 
+
+				const int iatw = DM_start + gt.find_R2st[iat][offset];
+
+				for(int ib=0; ib<gt.bxyz; ++ib)
+				{
+					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+					{
+						psi2_dmr = &psir_vlbr3_DMR.ptr_2D[ib][block_index[ia1]];
+						psi2 = &psir_vlbr3[ib][block_index[ia2]];
+
+						//------------------------------------
+						// circle for wave functions of atom 1.
+						//------------------------------------
+						iwi = 0;
+
+						for (int iw1=0; iw1 < atom1->nw; iw1++)
+						{
+
+							iww = iatw + iwi;// -1 because ++iww from below.
+							dmR2 = &dmR[iww]; //mohan add 2012-01-05
+							iwi += atom2->nw;
+
+							//------------------------------------
+							// circle for wave functions of atom 2.
+							//------------------------------------
+							for(int iw2=0; iw2 < atom2->nw; iw2++)
+							{
+								psi2_dmr[iw1] += dmR2[iw2] * psi2[iw2];
+							}//iw2
+						}// iw1
+					}//end flag
+				}//end ib
+			}// ia2
+		}//ia1
+
+		delete[] all_out_of_range;
+		return psir_vlbr3_DMR;
+
+	}
+
 }
