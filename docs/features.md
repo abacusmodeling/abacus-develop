@@ -74,7 +74,7 @@ equation. For PW basis, there are CG and Blocked Davidson methods for solving th
 equation for each basis.
 
 - PW: ks_solver = ‘cg’ or ‘dav’
-- LCAO: ks_solver = ‘hpseps’ , ‘genelpa’ or ‘lapack’
+- LCAO: ks_solver = ‘hpseps’ , ‘genelpa’ , ‘scalapack_gvx’ or 'cusolver'
 - LCAO_in_PW: ks_solver = ‘lapack’
 
 If you set ks_solver=‘hpseps’ for basis_type=‘pw’, the program will be stopped with an error

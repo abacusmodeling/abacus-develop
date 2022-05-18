@@ -861,13 +861,18 @@ void Charge::sum_band_k(void)
 
 #ifdef __MPI
 	this->rho_mpi();
-	if(GlobalV::CALCULATION!="scf-sto" && GlobalV::CALCULATION!="relax-sto" && GlobalV::CALCULATION!="md-sto") //qinarui add it temporarily.
+	if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it 2021-7-21
 	{
-    //==================================
-    // Reduce all the Energy in each cpu
-    //==================================
-	GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
-	Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
+		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
+		MPI_Allreduce(MPI_IN_PLACE, &GlobalC::en.eband, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+	}
+	else
+	{
+    	//==================================
+    	// Reduce all the Energy in each cpu
+    	//==================================
+		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
+		Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
 	}
 #endif
 	// check how many electrons on this grid.
@@ -889,7 +894,7 @@ void Charge::rho_mpi(void)
 {
 	ModuleBase::TITLE("Charge","rho_mpi");
     if (GlobalV::NPROC==1) return;
-	if((GlobalV::CALCULATION=="scf-sto" || GlobalV::CALCULATION=="relax-sto" || GlobalV::CALCULATION=="md-sto")&&GlobalV::NPROC_IN_POOL==1) 
+	if(GlobalV::CALCULATION.substr(0,3) == "sto" && GlobalV::NPROC_IN_STOGROUP==1) 
 		return;//qinarui add it temporarily.
     ModuleBase::timer::tick("Charge","rho_mpi");
     int ir;//counters on real space mesh point.
@@ -1057,12 +1062,12 @@ void Charge::rho_mpi(void)
         //==================================
         // Reduce all the rho in each cpu
         //==================================
-		if(GlobalV::CALCULATION=="scf-sto" || GlobalV::CALCULATION=="relax-sto" || GlobalV::CALCULATION=="md-sto") //qinarui add it temporarily.
+		if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it temporarily.
 		{
-			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
 			if(XC_Functional::get_func_type() == 3)
 			{
-				MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+				MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
 			}
 		}
 		else
@@ -1228,7 +1233,8 @@ void Charge::cal_nelec(void)
 	}
 
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"occupied bands",occupied_bands);
-	
+	if ( GlobalV::CALCULATION.substr(0,3) != "sto" ) //qianrui 2021-2-20
+	{
 	// mohan add 2010-09-04
     //std::cout << "nbands(GlobalC::ucell) = " <<GlobalV::NBANDS <<std::endl;
 	if(GlobalV::NBANDS==occupied_bands)
@@ -1239,40 +1245,38 @@ void Charge::cal_nelec(void)
 		}
 	}
 	
-	if ( GlobalV::CALCULATION!="scf-sto" && GlobalV::CALCULATION!="relax-sto" && GlobalV::CALCULATION!="md-sto" ) //qianrui 2021-2-20
+	if(GlobalV::NBANDS == 0)
 	{
-		if(GlobalV::NBANDS == 0)
+		if(GlobalV::NSPIN == 1)
 		{
-			if(GlobalV::NSPIN == 1)
-			{
-				const int nbands1 = static_cast<int>(occupied_bands) + 10;
-				const int nbands2 = static_cast<int>(1.2 * occupied_bands);
-				GlobalV::NBANDS = std::max(nbands1, nbands2);
-				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = std::min(GlobalV::NBANDS, GlobalV::NLOCAL);
-			}
-			else if (GlobalV::NSPIN ==2 || GlobalV::NSPIN == 4)
-			{
-				const int nbands3 = nelec + 20;
-				const int nbands4 = 1.2 * nelec;
-				GlobalV::NBANDS = std::max(nbands3, nbands4);
-				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = std::min(GlobalV::NBANDS, GlobalV::NLOCAL);
-			}
-			ModuleBase::GlobalFunc::AUTO_SET("NBANDS",GlobalV::NBANDS);
+			const int nbands1 = static_cast<int>(occupied_bands) + 10;
+			const int nbands2 = static_cast<int>(1.2 * occupied_bands);
+			GlobalV::NBANDS = std::max(nbands1, nbands2);
+			if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = std::min(GlobalV::NBANDS, GlobalV::NLOCAL);
 		}
-		//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
-		else
+		else if (GlobalV::NSPIN ==2 || GlobalV::NSPIN == 4)
 		{
-			if(GlobalV::NBANDS < occupied_bands) ModuleBase::WARNING_QUIT("unitcell","Too few bands!");
-			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
-			{
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
-				ModuleBase::WARNING_QUIT("unitcell","Too few spin up bands!");
-			}
-			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
-			{
-				ModuleBase::WARNING_QUIT("unitcell","Too few spin down bands!");
-			}
+			const int nbands3 = nelec + 20;
+			const int nbands4 = 1.2 * nelec;
+			GlobalV::NBANDS = std::max(nbands3, nbands4);
+			if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = std::min(GlobalV::NBANDS, GlobalV::NLOCAL);
 		}
+		ModuleBase::GlobalFunc::AUTO_SET("NBANDS",GlobalV::NBANDS);
+	}
+	//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
+	else
+	{
+		if(GlobalV::NBANDS < occupied_bands) ModuleBase::WARNING_QUIT("unitcell","Too few bands!");
+		if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
+		{
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
+			ModuleBase::WARNING_QUIT("unitcell","Too few spin up bands!");
+		}
+		if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
+		{
+			ModuleBase::WARNING_QUIT("unitcell","Too few spin down bands!");
+		}
+	}
 	}
 
 	// mohan update 2021-02-19

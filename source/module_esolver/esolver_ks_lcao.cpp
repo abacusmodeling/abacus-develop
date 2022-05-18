@@ -536,18 +536,18 @@ namespace ModuleESolver
         // (7) calculate delta energy
         GlobalC::en.deband = GlobalC::en.delta_e();
     }
-    void ESolver_KS_LCAO::updatepot(const int istep, const int iter, const bool conv)
+    void ESolver_KS_LCAO::updatepot(const int istep, const int iter)
     {
         // (9) Calculate new potential according to new Charge Density.
 
-        if (conv || iter == GlobalV::SCF_NMAX)
+        if (this->conv_elec || iter == GlobalV::SCF_NMAX)
         {
             if (GlobalC::pot.out_pot < 0) //mohan add 2011-10-10
             {
                 GlobalC::pot.out_pot = -2;
             }
         }
-        if (!conv)
+        if (!this->conv_elec)
         {
             GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
             GlobalC::en.delta_escf();
@@ -570,7 +570,7 @@ namespace ModuleESolver
             GlobalC::pot.set_vrs_tddft(istep);
         }
     }
-    void ESolver_KS_LCAO::eachiterfinish(int iter, bool conv)
+    void ESolver_KS_LCAO::eachiterfinish(int iter)
     {
         //-----------------------------------
         // save charge density
@@ -613,10 +613,10 @@ namespace ModuleESolver
         GlobalC::en.etot_old = GlobalC::en.etot;
 
     }
-    void ESolver_KS_LCAO::afterscf(const int iter, bool conv)
+    void ESolver_KS_LCAO::afterscf()
     {
-        if (conv || iter == GlobalV::SCF_NMAX)
-        {
+        // if (this->conv_elec || iter == GlobalV::SCF_NMAX)
+        // {
             //--------------------------------------
             // 1. output charge density for converged,
             // 0 means don't need to consider iter,
@@ -667,7 +667,7 @@ namespace ModuleESolver
                 */
             }
 
-            if (conv)
+            if (this->conv_elec)
             {
                 GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
                 GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
@@ -678,7 +678,7 @@ namespace ModuleESolver
                 Threshold_Elec::print_eigenvalue(GlobalV::ofs_running);
             }
 
-            if (conv)
+            if (this->conv_elec)
             {
                 //xiaohui add "OUT_LEVEL", 2015-09-16
                 if (GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << std::setprecision(16);
@@ -828,7 +828,7 @@ namespace ModuleESolver
             }
 #endif
 
-        }
+        // }
 
         //3. DeePKS PDM and descriptor 
 #ifdef __DEEPKS

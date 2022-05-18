@@ -155,7 +155,7 @@ void LCAO_Matrix::set_HSgamma(
     long index=0;
 
     // save the matrix as column major format
-    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+    if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
     {
         index=ic*this->ParaV->nrow+ir;
     }
@@ -208,7 +208,7 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const std::com
     const int ic = this->ParaV->trace_loc_col[ iw2_all ];
     //const int index = ir * this->ParaV->ncol + ic;
     long index;
-    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+    if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
     {
         index=ic*this->ParaV->nrow+ir;
     }
@@ -819,7 +819,7 @@ void LCAO_Matrix::set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const i
 //std::cout<<"ir: "<<ir<<std::endl;
 //std::cout<<"ic: "<<ic<<std::endl;
     long index;
-    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+    if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
     {
         index=ic*this->ParaV->nrow+ir;
 //std::cout<<"index: "<<index<<std::endl;
@@ -854,7 +854,7 @@ void LCAO_Matrix::set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, con
 //std::cout<<"ir: "<<ir<<std::endl;
 //std::cout<<"ic: "<<ic<<std::endl;
     long index;
-    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+    if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
     {
         index=ic*this->ParaV->nrow+ir;
 //std::cout<<"index: "<<index<<std::endl;

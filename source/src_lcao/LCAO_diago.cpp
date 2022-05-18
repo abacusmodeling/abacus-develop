@@ -233,7 +233,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 		//this->using_LAPACK(ik, wfc);
 	}
 #ifdef __MPI
-	else if(GlobalV::KS_SOLVER=="hpseps" || GlobalV::KS_SOLVER=="genelpa"|| GlobalV::KS_SOLVER=="scalapack_gvx")
+	else if(GlobalV::KS_SOLVER=="hpseps" || GlobalV::KS_SOLVER=="genelpa"|| GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="cusolver")
 	{
 		this->using_HPSEPS_double(ik, lowf);
 	}

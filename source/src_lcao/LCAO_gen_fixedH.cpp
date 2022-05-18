@@ -1328,7 +1328,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new(double* HSloc) //update by liuyu 2
                             const int ir = pv->trace_loc_row[ iw1_all ];
                             const int ic = pv->trace_loc_col[ iw2_all ];
                             long index=0;
-                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+                            if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                             {
                                 index=ic*pv->nrow+ir;
                             }

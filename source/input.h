@@ -64,11 +64,11 @@ class Input
     // Stochastic DFT
     //==========================================================
     int nche_sto; // number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
+    int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
     int seed_sto; // random seed for sDFT
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
-    std::string stotype;
-    int nbands_sto; // number of stochastic bands //qianrui 2021-2-5
+    int bndpar; //parallel for stochastic/deterministic bands
 
     //==========================================================
     // electrons / spin
@@ -179,9 +179,9 @@ class Input
     //==========================================================
     // charge mixing
     //==========================================================
-    std::string mixing_mode; // "plain","broden",...
+    std::string mixing_mode; // "plain","broyden",...
     double mixing_beta; // 0 : no_mixing
-    int mixing_ndim; // used in Broden method
+    int mixing_ndim; // used in Broyden method
     double mixing_gg0; // used in kerker method. mohan add 2014-09-27
 
     //==========================================================
