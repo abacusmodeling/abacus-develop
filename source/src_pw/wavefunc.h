@@ -45,6 +45,7 @@ class wavefunc : public WF_atomic
 	// evc: get the initial wave functions from diagnalized the PAO
 	// orbitals first.
 	void diago_PAO_in_pw_k(const int &ik, psi::Psi<std::complex<double>> &wvf);
+    void diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf);
 
 	// used if k dependent staff is ready.
 	void prepare_k(void);

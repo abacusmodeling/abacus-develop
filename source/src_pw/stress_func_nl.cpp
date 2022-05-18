@@ -60,7 +60,15 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 			if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 			for (int i = 0; i < nkb; i++) 
 			{
-				const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+				const std::complex<double>* ppsi=nullptr;
+				if(GlobalC::wf.psi!=nullptr)
+				{
+					ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+				}
+				else
+				{
+					ppsi = &(GlobalC::wf.evc[ik](ib, 0));
+				}
 				const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
                 for (int ig = 0; ig < GlobalC::wf.npw; ig++) 
 				{
@@ -146,7 +154,15 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 					if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 					for (int i=0; i<nkb; i++)
 					{
-						const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+						const std::complex<double>* ppsi=nullptr;
+						if(GlobalC::wf.psi!=nullptr)
+						{
+							ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+						}
+						else
+						{
+							ppsi = &(GlobalC::wf.evc[ik](ib, 0));
+						}
 						const std::complex<double>* pdbecp_noevc = &(dbecp_noevc(i, 0));
 						for (int ig=0; ig<GlobalC::wf.npw; ig++) 
 						{

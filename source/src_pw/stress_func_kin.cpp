@@ -51,7 +51,15 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 			{
 				for(int ibnd=0;ibnd<GlobalV::NBANDS;ibnd++)
 				{
-					const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ibnd, 0));
+					const std::complex<double>* ppsi=nullptr;
+					if(GlobalC::wf.psi!=nullptr)
+					{
+						ppsi = &(GlobalC::wf.psi[0](ik, ibnd, 0));
+					}
+					else
+					{
+						ppsi = &(GlobalC::wf.evc[ik](ibnd, 0));
+					}
 					for(int i=0;i<npw;i++)
 					{
 						s_kin[l][m] +=

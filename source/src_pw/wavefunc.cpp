@@ -128,6 +128,14 @@ void wavefunc::allocate(const int nks)
 		std::cout << " MEMORY FOR PSI (MB)  : " << 
 		ModuleBase::Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 	}
+	else if(GlobalV::CALCULATION.substr(0,3) == "sto")
+	{
+		this->evc = new ModuleBase::ComplexMatrix [nks2];
+		for (int ik = 0; ik < nks2; ik++)
+		{
+			this->evc[ik].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);//added by zhengdy-soc
+		}
+	}
 	else
 	{
 		//initial psi rather than evc
@@ -359,7 +367,14 @@ void wavefunc::wfcinit_k(void)
 			// get the wave functions
 			// by first diagolize PAO
 			// wave functions.
-			this->diago_PAO_in_pw_k(ik, this->psi[0]);
+			if(GlobalV::CALCULATION.substr(0,3) == "sto")
+			{
+				this->diago_PAO_in_pw_k(ik, this->evc[ik]);
+			}
+			else
+			{
+				this->diago_PAO_in_pw_k(ik, this->psi[0]);
+			}
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -823,6 +838,15 @@ void wavefunc::init_after_vc(const int nks)
 }
 
 //temporary function for nscf
+void wavefunc::diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
+{
+	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k");
+
+	GlobalC::hm.hpw.init_k(ik);
+    this->diago_PAO_in_pw_k2(ik, wvf);
+
+	return;
+}
 void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k2");
