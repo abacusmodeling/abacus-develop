@@ -374,7 +374,7 @@ void Input::Default(void)
 
     cell_factor = 1.2; // LiuXh add 20180619
 
-    GlobalV::out_mul = 0; // qi feng add 2019/9/10
+    out_mul = 0; // qi feng add 2019/9/10
 
     //----------------------------------------------------------			//Peize Lin add 2020-04-04
     // restart
@@ -1305,7 +1305,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("out_mul", word) == 0)
         {
-            read_value(ifs, GlobalV::out_mul);
+            read_value(ifs, out_mul);
         } // qifeng add 2019/9/10
         //----------------------------------------------------------
         // exx
@@ -2049,7 +2049,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(test_just_neighbor);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
-    Parallel_Common::bcast_int(GlobalV::out_mul); // qifeng add 2019/9/10
+    Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10
 
     // Peize Lin add 2018-06-20
     Parallel_Common::bcast_string(dft_functional);
