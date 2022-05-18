@@ -21,7 +21,7 @@ python setup.py install
 
 ## Usage
 There are two ways to use this tool:
-1. Specify parameters in `band.py` or `dos.py` directly, and then `python band.py` or `python dos.py`. And you can also import module in your own script e.g. `from abacus_plot.band import Band`
+1. Specify parameters in `band.py` or `dos.py` directly, and then `python band.py` or `python dos.py`. And you can also import module in your own script e.g. `from abacus_plot.band import Band`. (Recommend)
 2. Command-line tools are also supported in this tool. In this way, you need prepare an input file and execute some commands (see below). You can use `abacus-plot -h` to check command-line information
 
 ### Band Structure

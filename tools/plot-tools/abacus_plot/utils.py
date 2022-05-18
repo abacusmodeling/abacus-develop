@@ -331,3 +331,26 @@ def parse_projected_data(orbitals, species: Union[Sequence[Any], Dict[Any, List[
                         totnum += 1
 
         return data, totnum
+
+def key2int(species):
+    """Convert keys of dict in str type to int"""
+    
+    new_species = {}
+    if isinstance(species, dict):
+        elements = list(map(int, species.keys()))
+        l = list(species.values())
+        for i, elem in enumerate(elements):
+            if isinstance(l[i], dict):
+                new_species[elem] = {}
+                for ang, mag in l[i].items():
+                    l_index = int(ang)
+                    new_species[elem][l_index] = []
+                    for m_index in mag:
+                        new_species[elem][l_index].append(m_index)
+
+            elif isinstance(l[i], list):
+                new_species[elem] = []
+                for l_index in l[i]:
+                    new_species[elem].append(int(l_index))
+    
+    return new_species

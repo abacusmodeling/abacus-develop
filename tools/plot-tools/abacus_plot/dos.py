@@ -154,7 +154,7 @@ class DOSPlot:
 class TDOS(DOS):
     """Parse total DOS data"""
 
-    def __init__(self, tdosfile: PathLike=None) -> None:
+    def __init__(self, tdosfile: PathLike = None) -> None:
         super().__init__()
         self.tdosfile = tdosfile
         self._read()
@@ -202,7 +202,7 @@ class TDOS(DOS):
 class PDOS(DOS):
     """Parse partial DOS data"""
 
-    def __init__(self, pdosfile: PathLike=None) -> None:
+    def __init__(self, pdosfile: PathLike = None) -> None:
         super().__init__()
         self.pdosfile = pdosfile
         self._read()
@@ -391,6 +391,8 @@ class PDOS(DOS):
         Returns:
             DOSPlot object: for manually plotting picture with dosplot.ax 
         """
+        if not isinstance(ax, list):
+            ax = [ax]
 
         dos, totnum = parse_projected_data(self.orbitals, species, keyname)
         energy_f, tdos = self._shift_energy(efermi, shift, prec)
@@ -403,7 +405,7 @@ class PDOS(DOS):
                                     notes=dosplot.plot_params["notes"])
             else:
                 dosplot._set_figure(energy_range, dos_range)
-        
+
             return dosplot
 
         if isinstance(species, (list, tuple)):
@@ -515,17 +517,18 @@ if __name__ == "__main__":
     #                     energy_range=energy_range, dos_range=dos_range, notes={'s': '(a)'})
     # fig.savefig("tdos.png")
 
-    pdosfile = r"C:\Users\YY.Ji\Desktop\PDOS"
+    pdosfile = r"C:\Users\YY.Ji\Desktop\Si\PDOS"
     pdos = PDOS(pdosfile)
     #species = {"Ag": [2], "Cl": [1], "In": [0]}
-    atom_index = {8: {2: [1, 2]}, 4: {2: [1, 2]}, 10: [1, 2]}
-    fig, ax = plt.subplots(3, 1, sharex=True)
-    energy_range = [-1.5, 6]
+    atom_index = {1: {1: [0, 1]}}
+    fig, ax = plt.subplots(1, 1, sharex=True)
+    energy_range = [-5, 7]
+    efermi = 6.585653952007503
     dos_range = [0, 5]
 
-    # if you want to specify `species` or `index`, you need to 
-    # set `species=species` or `index=index` in the following two functions 
-    dosplots = pdos.plot(fig, ax, atom_index=atom_index, efermi=5, shift=True,
-                         energy_range=energy_range, dos_range=dos_range, notes=[{'s': '(a)'}, {'s': '(b)'}, {'s': '(c)'}])
+    # if you want to specify `species` or `index`, you need to
+    # set `species=species` or `index=index` in the following two functions
+    dosplots = pdos.plot(fig, ax, atom_index=atom_index, efermi=efermi, shift=True,
+                         energy_range=energy_range, dos_range=dos_range, notes=[{'s': '(a)'}])
     fig.savefig("pdos.png")
     pdos.write(atom_index=atom_index)
