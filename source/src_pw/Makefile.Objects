@@ -74,7 +74,6 @@ diago_david.o\
 diago_cg.o\
 dipole.o\
 electrons.o \
-efield.o \
 energy.o \
 energy_dos_pw.o\
 dos.o\

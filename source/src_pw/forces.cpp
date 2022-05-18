@@ -8,6 +8,7 @@
 #include "../module_base/math_integral.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
+#include "../module_surchem/dipole.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -18,7 +19,7 @@ Forces::Forces()
 Forces::~Forces() {}
 
 #include "../module_base/mathzone.h"
-#include "efield.h"
+
 void Forces::init(ModuleBase::matrix& force)
 {
 	ModuleBase::TITLE("Forces", "init");
@@ -69,16 +70,16 @@ void Forces::init(ModuleBase::matrix& force)
 			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
 		}
 	}
+
+    ModuleBase::matrix force_e;
+    if(GlobalV::EFIELD)
+    {
+        force_e.create(GlobalC::ucell.nat, 3);
+        Dipole::compute_force(GlobalC::ucell, force_e);
+    }
+
     //impose total force = 0
     int iat = 0;
-
-	ModuleBase::matrix force_e;
-	if(GlobalV::EFIELD)
-	{
-		force_e.create(GlobalC::ucell.nat, 3);
-		Efield::compute_force(force_e);
-	}
-	
 	for (int ipol = 0; ipol < 3; ipol++)
 	{
 		double sum = 0.0;

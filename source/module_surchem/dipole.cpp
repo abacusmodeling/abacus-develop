@@ -4,10 +4,15 @@
 #include "../module_base/global_variable.h"
 #include "../src_parallel/parallel_reduce.h"
 
-int Dipole::dir = 2;
-double Dipole::dipole_energy = 0.0;
-double Dipole::max_pos = 0.5;
-double Dipole::de_reg = 0.1;
+double Dipole::etotefield = 0.0;
+double Dipole::tot_dipole = 0.0;
+int Dipole::edir = 2;
+double Dipole::emaxpos = 0.5;
+double Dipole::eopreg = 0.1;
+double Dipole::eamp = 0.0;
+bool Dipole::first = true;
+double Dipole::bvec[3];
+double Dipole::bmod;
 
 Dipole::Dipole(){}
 
@@ -16,41 +21,90 @@ Dipole::~Dipole(){}
 //=======================================================
 // calculate dipole potential in surface calculations
 //=======================================================
-ModuleBase::matrix Dipole::v_dipole(const UnitCell &cell, 
-                                    PW_Basis &pwb, 
-                                    const int &nspin, 
-                                    const double *const *const rho)
+ModuleBase::matrix Dipole::add_efield(const UnitCell &cell, 
+                                        PW_Basis &pwb, 
+                                        const int &nspin, 
+                                        const double *const *const rho)
 {
-    ModuleBase::TITLE("Dipole", "v_dipole");
-    ModuleBase::timer::tick("Dipole", "v_dipole");
+    ModuleBase::TITLE("Dipole", "add_efield");
+    ModuleBase::timer::tick("Dipole", "add_efield");
 
-    double h_inv;    // inverse of height
-    if(dir == 0)
+    ModuleBase::matrix v(nspin, pwb.nrxx);
+
+    // efield only needs to be added on the first iteration, if dipfield
+    // is not used. note that for relax calculations it has to be added
+    // again on subsequent relax steps.
+    if(!GlobalV::DIPOLE && !first)
     {
-        h_inv = sqrt(cell.G.e11 * cell.G.e11 + cell.G.e12 * cell.G.e12 + cell.G.e13 * cell.G.e13);
+        return v;
     }
-    else if(dir == 1)
+    first = false;
+
+    double latvec;    // latvec along the efield direction
+    if(edir == 0)
     {
-        h_inv = sqrt(cell.G.e21 * cell.G.e21 + cell.G.e22 * cell.G.e22 + cell.G.e23 * cell.G.e23);
+        bvec[0] = cell.G.e11;
+        bvec[1] = cell.G.e12; 
+        bvec[2] = cell.G.e13; 
+        latvec = cell.a1.norm();
     }
-    else if(dir = 2)
+    else if(edir == 1)
     {
-        h_inv = sqrt(cell.G.e31 * cell.G.e31 + cell.G.e32 * cell.G.e32 + cell.G.e33 * cell.G.e33);
+        bvec[0] = cell.G.e21;
+        bvec[1] = cell.G.e22; 
+        bvec[2] = cell.G.e23; 
+        latvec = cell.a2.norm();
+    }
+    else if(edir = 2)
+    {
+        bvec[0] = cell.G.e31;
+        bvec[1] = cell.G.e32; 
+        bvec[2] = cell.G.e33; 
+        latvec = cell.a3.norm();
     }
     else
     {
-        ModuleBase::WARNING_QUIT("Dipole::ion_dipole", "dipole direction is wrong!");
+        ModuleBase::WARNING_QUIT("Dipole::ion_dipole", "direction is wrong!");
+    }
+    bmod = sqrt(pow(bvec[0],2) + pow(bvec[1],2) + pow(bvec[2],2));
+
+    double ion_dipole = 0;
+    double elec_dipole = 0;
+
+    if(GlobalV::DIPOLE)
+    {
+        ion_dipole = cal_ion_dipole(cell, bmod);
+        elec_dipole = cal_elec_dipole(cell, pwb, nspin, rho, bmod);
+        tot_dipole = ion_dipole - elec_dipole;
+
+        // energy correction
+        etotefield = - ModuleBase::e2 * (eamp - 0.5 * tot_dipole) * tot_dipole * cell.omega / ModuleBase::FOUR_PI;
+    }
+    else
+    {
+        ion_dipole = cal_ion_dipole(cell, bmod);
+        tot_dipole = ion_dipole - elec_dipole;
+
+        // energy correction
+        etotefield = - ModuleBase::e2 * eamp * tot_dipole * cell.omega / ModuleBase::FOUR_PI;
     }
 
-    double ion_dipole = cal_ion_dipole(cell, h_inv);
-    double elec_dipole = cal_elec_dipole(cell, pwb, nspin, rho, h_inv);
-    double tot_dipole = ion_dipole - elec_dipole;
+    const double length = (1.0 - eopreg) * latvec * cell.lat0;
+    const double vamp = ModuleBase::e2 * (eamp - tot_dipole) * length;
 
-    // dipole energy correction
-    dipole_energy = 0.5 * ModuleBase::e2 * tot_dipole * tot_dipole * cell.omega / ModuleBase::FOUR_PI;
+    GlobalV::ofs_running << "\n\n Adding external electric field: " << std::endl;
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Computed dipole along edir", edir);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Elec. dipole (Ry a.u.)", elec_dipole);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Ion dipole (Ry a.u.)", ion_dipole);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total dipole (Ry a.u.)", tot_dipole);
+    if( abs(eamp) > 0.0) 
+    {
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Amplitute of Efield (Hartree)", eamp);
+    }
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Potential amplitute (Ry)", vamp);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total length (Bohr)", length);
 
     // dipole potential
-    ModuleBase::matrix v(nspin, pwb.nrxx);
     const int nspin0 = (nspin == 2) ? 2 : 1;
 
     for (int ir = 0; ir < pwb.nrxx; ++ir)
@@ -63,7 +117,7 @@ ModuleBase::matrix Dipole::v_dipole(const UnitCell &cell,
         double z = (double)k / pwb.ncz;
         ModuleBase::Vector3<double> pos(x, y, z);
 
-        double saw = saw_function(max_pos, de_reg, pos[dir]);
+        double saw = saw_function(emaxpos, eopreg, pos[edir]);
 
         for (int is = 0; is < nspin0; is++)
         {
@@ -71,9 +125,9 @@ ModuleBase::matrix Dipole::v_dipole(const UnitCell &cell,
         }
     }
 
-    double fac = - ModuleBase::e2 * tot_dipole * cell.lat0 / h_inv;
+    double fac = ModuleBase::e2 * (eamp - tot_dipole) * cell.lat0 / bmod;
 
-    ModuleBase::timer::tick("Dipole", "v_dipole");
+    ModuleBase::timer::tick("Dipole", "add_efield");
     return v * fac;
 }
 
@@ -81,48 +135,7 @@ ModuleBase::matrix Dipole::v_dipole(const UnitCell &cell,
 //=======================================================
 // calculate dipole density in surface calculations
 //=======================================================
-// double Dipole::dipole(const UnitCell &cell, 
-//                         PW_Basis &pwb, 
-//                         const double *const *const rho,
-//                         complex<double> *TOTN)
-// {
-//     double *Porter = new double[pwb.nrxx];
-
-//     for (int ir = 0; ir < pwb.nrxx; ++ir)
-//     {
-//         int i = ir / (pwb.ncy * pwb.nczp);
-//         int j = ir / pwb.nczp - i * pwb.ncy;
-//         int k = ir % pwb.nczp + pwb.nczp_start;
-//         double x = (double)i / pwb.ncx;
-//         double y = (double)j / pwb.ncy;
-//         double z = (double)k / pwb.ncz;
-//         ModuleBase::Vector3<double> pos(x, y, z);
-
-//         pos = cell.latvec * pos;
-
-//         Porter[ir] = cell.lat0 * pos[dir];
-//     }
-
-//     complex<double> *Porter_g = new complex<double>[pwb.ngmc];
-//     GlobalC::UFFT.ToReciSpace(Porter, Porter_g);
-
-//     double m = 0;
-//     for (int ig = 0; ig < pwb.ngmc; ig++)
-//     {
-//         m += (conj(TOTN[ig]) * Porter_g[ig]).real();
-//     }
-
-//     Parallel_Reduce::reduce_double_pool(m);
-
-//     // height
-//     const double h = cell.latvec.to_matrix()(dir, dir) * cell.lat0;
-
-//     delete[] Porter, Porter_g;
-
-//     return -m * h * ModuleBase::e2;
-// }
-
-double Dipole::cal_ion_dipole(const UnitCell &cell, const double &h_inv)
+double Dipole::cal_ion_dipole(const UnitCell &cell, const double &bmod)
 {
     double ion_dipole = 0;
     for(int it=0; it<cell.ntype; ++it)
@@ -130,13 +143,11 @@ double Dipole::cal_ion_dipole(const UnitCell &cell, const double &h_inv)
         double sum = 0;
         for(int ia=0; ia<cell.atoms[it].na; ++ia)
         {
-            sum += saw_function(max_pos, de_reg, cell.atoms[it].taud[ia][dir]);
+            sum += saw_function(emaxpos, eopreg, cell.atoms[it].taud[ia][edir]);
         }
         ion_dipole += sum * cell.atoms[it].zv;
     }
-    ion_dipole *= cell.lat0 / h_inv * ModuleBase::FOUR_PI / cell.omega;
-
-    // std::cout << "ion_dipole = " << ion_dipole << std::endl;
+    ion_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / cell.omega;
 
     return ion_dipole;
 }
@@ -145,7 +156,7 @@ double Dipole::cal_elec_dipole(const UnitCell &cell,
                             PW_Basis &pwb, 
                             const int &nspin, 
                             const double *const *const rho,
-                            const double &h_inv)
+                            const double &bmod)
 {
     double elec_dipole = 0;
     const int nspin0 = (nspin == 2) ? 2 : 1;
@@ -160,7 +171,7 @@ double Dipole::cal_elec_dipole(const UnitCell &cell,
         double z = (double)k / pwb.ncz;
         ModuleBase::Vector3<double> pos(x, y, z);
 
-        double saw = saw_function(max_pos, de_reg, pos[dir]);
+        double saw = saw_function(emaxpos, eopreg, pos[edir]);
 
         for (int is = 0; is < nspin0; is++)
         {
@@ -169,9 +180,7 @@ double Dipole::cal_elec_dipole(const UnitCell &cell,
     }
 
     Parallel_Reduce::reduce_double_pool(elec_dipole);
-    elec_dipole *= cell.lat0 / h_inv * ModuleBase::FOUR_PI / pwb.ncxyz;
-
-    // std::cout << "elec_dipole = " << elec_dipole << std::endl;
+    elec_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / pwb.ncxyz;
 
     return elec_dipole;
 }
@@ -194,5 +203,39 @@ double Dipole::saw_function(const double &a, const double &b, const double &x)
     else
     {
         return 0.5 * fac - fac * (x - a) / b;
+    }
+}
+
+void Dipole::compute_force(const UnitCell &cell, ModuleBase::matrix &fdip)
+{
+    if(GlobalV::DIPOLE)
+    {
+        int iat = 0;
+        for(int it=0; it<cell.ntype; ++it)
+        {
+            for(int ia=0; ia<cell.atoms[it].na; ++ia)
+            {
+                for(int jj=0; jj<3; ++jj)
+                {
+                    fdip(iat, jj) = ModuleBase::e2 * (eamp - tot_dipole) * cell.atoms[it].zv * bvec[jj] / bmod;
+                }
+                ++iat;
+            }
+        }
+    }
+    else
+    {
+        int iat = 0;
+        for(int it=0; it<cell.ntype; ++it)
+        {
+            for(int ia=0; ia<cell.atoms[it].na; ++ia)
+            {
+                for(int jj=0; jj<3; ++jj)
+                {
+                    fdip(iat, jj) = ModuleBase::e2 * eamp * cell.atoms[it].zv * bvec[jj] / bmod;
+                }
+                ++iat;
+            }
+        }
     }
 }

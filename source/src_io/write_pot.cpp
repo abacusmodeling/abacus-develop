@@ -254,12 +254,13 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 
     //==========================================
-    // Dipole correction
+    // Efield and dipole correction
     //==========================================
-    ModuleBase::matrix v_dip(GlobalV::NSPIN, GlobalC::pw.nrxx);
-    if (!GlobalV::EFIELD && GlobalV::DIPOLE)
+    ModuleBase::matrix v_efield;
+    if (GlobalV::EFIELD)
     {
-        v_dip = Dipole::v_dipole(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
+        v_efield.create(GlobalV::NSPIN, GlobalC::pw.nrxx);
+        v_efield = Dipole::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
     }
 
     //==========================================
@@ -267,7 +268,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     //==========================================
     for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
     {
-        v_elecstat[ir] = Porter[ir].real() + this->vltot[ir] + v_dip(0, ir);
+        v_elecstat[ir] = Porter[ir].real() + this->vltot[ir] + v_efield(0, ir);
     }
 
     //-------------------------------------------

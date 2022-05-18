@@ -42,8 +42,6 @@ energy::~energy()
 {
 }
 
-#include "efield.h"
-
 void energy::calculate_harris(const int &flag)
 {
 //	ModuleBase::TITLE("energy","calculate_harris");
@@ -60,9 +58,8 @@ void energy::calculate_harris(const int &flag)
 		+ H_Hartree_pw::hartree_energy 
 		+ demet
 		+ exx
-		+ Efield::etotefield
-		+ evdw  						// Peize Lin add evdw 2021.03.09
-        + Dipole::dipole_energy;        // liuyu add 2022-05-06
+		+ Dipole::etotefield
+		+ evdw;  						// Peize Lin add evdw 2021.03.09
 
 #ifdef __LCAO
         if(INPUT.dft_plus_u) 
@@ -92,9 +89,8 @@ void energy::calculate_etot(void)
 	+ demet
 	+ descf
 	+ exx
-	+ Efield::etotefield
-	+ evdw							// Peize Lin add evdw 2021.03.09
-    + Dipole::dipole_energy;        // liuyu add 2022-05-06
+	+ Dipole::etotefield
+	+ evdw;							// Peize Lin add evdw 2021.03.09
 
     //Quxin adds for DFT+U energy correction on 20201029
 /*
@@ -159,8 +155,7 @@ void energy::print_etot(
 			this->print_format("E_Ewald", H_Ewald_pw::ewald_energy);
 			this->print_format("E_demet", demet); //mohan add 2011-12-02
 			this->print_format("E_descf", descf);
-			this->print_format("E_efield", Efield::etotefield);
-            this->print_format("E_dipole", Dipole::dipole_energy);
+			this->print_format("E_efield", Dipole::etotefield);
 			if (GlobalC::vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
 			{
 				this->print_format("E_vdwD2", evdw);

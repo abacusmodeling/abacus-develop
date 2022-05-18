@@ -14,6 +14,7 @@
 #include "src_pw/symmetry_rho.h"
 #include "src_io/chi0_hilbert.h"
 #include "src_pw/threshold_elec.h"
+#include "module_surchem/dipole.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -315,6 +316,7 @@ namespace ModuleESolver
         if (iter == 1)
         {
             GlobalC::CHR.set_new_e_iteration(true);
+            Dipole::first = true;
         }
         else
         {

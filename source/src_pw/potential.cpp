@@ -4,7 +4,6 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/memory.h"
 #include "../module_xc/xc_functional.h"
-#include "efield.h"
 #include "global.h"
 #include "math.h"
 // new
@@ -283,22 +282,6 @@ void Potential::set_local_pot(double *vl_pseudo, // store the local pseudopotent
 
     delete[] vg;
 
-    if (GlobalV::EFIELD && !GlobalV::DIPOLE)
-    {
-        Efield EFID;
-        // in fact, GlobalC::CHR.rho is not used here.
-        // if charge correction due to Efield is considered,
-        // the structure here need to be updated.
-
-        static bool first = true;
-        if (first)
-        {
-            std::cout << " ADD THE GlobalV::EFIELD (V/A) : " << Efield::eamp * 51.44 << std::endl;
-            first = false;
-        }
-        EFID.add_efield(GlobalC::CHR.rho[0], vl_pseudo);
-    }
-
     // GlobalV::ofs_running <<" set local pseudopotential done." << std::endl;
     ModuleBase::timer::tick("Potential", "set_local_pot");
     return;
@@ -363,20 +346,15 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
         }
     }
 
-    if (!GlobalV::EFIELD && GlobalV::DIPOLE)
+    //----------------------------------------------------------
+    //  calculate the efield and dipole correction
+    //----------------------------------------------------------
+    if (GlobalV::EFIELD)
     {
-        v += Dipole::v_dipole(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
+        v += Dipole::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
     }
 
-    // mohan add 2011-06-20
-    if (GlobalV::EFIELD && GlobalV::DIPOLE)
-    {
-        Efield EFID;
-        for (int is = 0; is < GlobalV::NSPIN; is++)
-        {
-            EFID.add_efield(rho_in[is], &v.c[is * GlobalC::pw.nrxx]);
-        }
-    }
+
     ModuleBase::timer::tick("Potential", "v_of_rho");
     return v;
 } // end subroutine v_of_rho
