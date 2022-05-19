@@ -18,8 +18,6 @@ public:
 public:
     Stochastic_WF stowf;
     Stochastic_Iter stoiter;
-    // Stochastic_Chebychev stoche;
-    // Stochastic_hchi stohchi;
 
 protected:
     virtual void beforescf(const int istep) override; 

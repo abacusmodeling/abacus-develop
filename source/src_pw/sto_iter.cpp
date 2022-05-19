@@ -23,12 +23,12 @@ Stochastic_Iter::~Stochastic_Iter()
 
 void Stochastic_Iter::init(const int dim, int* nchip_in)
 {
-    p_che = new ModuleBase::Chebyshev<double>(INPUT.nche_sto, GlobalC::wf.npwx);
+    p_che = new ModuleBase::Chebyshev<double>(INPUT.nche_sto);
     nchip = nchip_in;
     targetne = GlobalC::CHR.nelec;
     stohchi.init();
     delete [] spolyv;
-    int norder = p_che->norder;
+    const int norder = p_che->norder;
     spolyv = new double [norder];
     stofunc.Emin = INPUT.emin_sto;
     stofunc.Emax = INPUT.emax_sto;
@@ -74,7 +74,7 @@ void Stochastic_Iter::checkemm(const int& ik, int &iter, Stochastic_WF& stowf)
         return;
 	}
         
-    int norder = p_che->norder;
+    const int norder = p_che->norder;
     complex<double> * pchi;
     int ntest = 1;
 
@@ -97,11 +97,11 @@ void Stochastic_Iter::checkemm(const int& ik, int &iter, Stochastic_WF& stowf)
         {
             bool converge;
             converge = p_che->checkconverge(
-				stohchi.hchi_reciprocal, 
-				pchi, 
-				Stochastic_hchi::Emax, 
-				Stochastic_hchi::Emin, 
-				5);
+				&stohchi, &Stochastic_hchi::hchi_reciprocal, 
+				pchi, GlobalC::wf.npw,
+				stohchi.Emax, 
+				stohchi.Emin, 
+				5.0);
 
             if(!converge)
 			{
@@ -115,19 +115,19 @@ void Stochastic_Iter::checkemm(const int& ik, int &iter, Stochastic_WF& stowf)
     }
     if(ik == GlobalC::kv.nks-1)
     {
-        stofunc.Emax = Stochastic_hchi:: Emax;
-        stofunc.Emin = Stochastic_hchi:: Emin;
+        stofunc.Emax = stohchi.Emax;
+        stofunc.Emin = stohchi.Emin;
 
 #ifdef __MPI
         MPI_Allreduce(MPI_IN_PLACE, &stofunc.Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
         MPI_Allreduce(MPI_IN_PLACE, &stofunc.Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
         MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
 #endif
-        Stochastic_hchi:: Emin = stofunc.Emin;
-        Stochastic_hchi:: Emax = stofunc.Emax;
+        stohchi.Emin = stofunc.Emin;
+        stohchi.Emax = stofunc.Emax;
         if(change)
 	    {
-	    	GlobalV::ofs_running<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<std::endl;
+	    	GlobalV::ofs_running<<"New Emax "<<stohchi.Emax<<" ; new Emin "<<stohchi.Emin<<std::endl;
 	    }
         change = false;
     }
@@ -252,15 +252,15 @@ void Stochastic_Iter:: sumpolyval_k(const int& ik, Stochastic_WF& stowf)
 {
     ModuleBase::TITLE("Stochastic_Iter","sumpolyval_k");
     ModuleBase::timer::tick("Stochastic_Iter","sumpolyval");
-    int norder = p_che->norder;
+    const int norder = p_che->norder;
     if(ik==0)   ModuleBase::GlobalFunc::ZEROS(spolyv, norder);
     std::complex<double> * pchi;
     if(GlobalV::NBANDS > 0)  pchi = stowf.chiortho[ik].c; 
     else            pchi = stowf.chi0[ik].c;
-    p_che->calpolyval(stohchi.hchi_reciprocal, pchi, nchip[ik]);
+    p_che->tracepolyA(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, GlobalC::wf.npw, GlobalC::wf.npwx, nchip[ik]);
     for(int i = 0 ; i < norder ; ++i)
     {
-        spolyv[i] += p_che->polyvalue[i] * GlobalC::kv.wk[ik];
+        spolyv[i] += p_che->polytrace[i] * GlobalC::kv.wk[ik];
     }
     ModuleBase::timer::tick("Stochastic_Iter","sumpolyval");
     return;
@@ -272,7 +272,7 @@ double Stochastic_Iter::calne()
     ModuleBase::timer::tick("Stochastic_Iter","calne");
 
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nfd);
-    int norder = p_che->norder;
+    const int norder = p_che->norder;
     double totne = 0;
     KS_ne = 0;
     double sto_ne = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
@@ -305,7 +305,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     ModuleBase::timer::tick("Stochastic_Iter","sum_stoband");
     int nrxx = GlobalC::pw.nrxx;
     int npwx = GlobalC::wf.npwx;
-    int norder = p_che->norder;
+    const int norder = p_che->norder;
 
     //cal demet
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nfdlnfd);
@@ -329,9 +329,6 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     //cal eband
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nxfd);
     double sto_eband = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
-        //double sto_eband=0;
-
-
 
     //cal rho
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nroot_fd);
@@ -362,9 +359,8 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     {
         //init k
         if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
-        p_che->ndmin = GlobalC::wf.npw;
 
-        int npw = GlobalC::kv.ngk[ik];
+        const int npw = GlobalC::kv.ngk[ik];
         double stok_eband;
         out = stowf.shchi[ik].c;
         if(GlobalV::NBANDS > 0)
@@ -372,7 +368,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
         else
             pchi = stowf.chi0[ik].c;
         
-        p_che->calfinalvec_real(stohchi.hchi_reciprocal, pchi, out, nchip[ik]);
+        p_che->calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, out, npw, GlobalC::wf.npwx, nchip[ik]);
 
         std::complex<double> *tmpout = out;
         for(int ichi = 0; ichi < nchip[ik] ; ++ichi)
