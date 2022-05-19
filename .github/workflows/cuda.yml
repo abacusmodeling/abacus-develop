@@ -39,7 +39,6 @@ jobs:
         env:
           GTEST_COLOR: 'yes'
         run: |
-          /usr/local/cuda/bin/nvcc -v
           cmake -B build -DBUILD_TESTING=ON -DUSE_CUDA=ON
           cmake --build build -j4
           cmake --install build
