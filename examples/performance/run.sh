@@ -109,7 +109,7 @@ cat version >>sumall.dat
 date >>sumall.dat
 cat /proc/version >>sumall.dat
 cat /proc/cpuinfo | grep "model name" | tail -1 | cut -d ':' -f 2 >>sumall.dat
-echo "ABACUS path: $abacus" >>sumall.dat
+echo "ABACUS path: `which $abacus`" >>sumall.dat
 echo "Number of Cores: $ncpu" >>sumall.dat
 echo "Accuracy: $ca" >>sumall.dat
 echo >>sumall.dat
