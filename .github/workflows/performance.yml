@@ -22,7 +22,8 @@ jobs:
           cmake --install build
       - name: Test
         run: |
-          cd examples/performance/ && bash run.sh
+          cd examples/performance/
+          bash run.sh
       - name: Show Result
         run: |
           cat examples/performance/sumall.dat
