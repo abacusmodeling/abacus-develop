@@ -721,40 +721,6 @@ namespace Gint_Tools
         				}
     				}
 				} // cal_num
-
-/*
-				const int iatw = DM_start + gt.find_R2st[iat][offset];
-
-				for(int ib=0; ib<gt.bxyz; ++ib)
-				{
-					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-					{
-						psi2_dmr = &psir_vlbr3_DMR.ptr_2D[ib][block_index[ia1]];
-						psi2 = &psir_vlbr3[ib][block_index[ia2]];
-
-						//------------------------------------
-						// circle for wave functions of atom 1.
-						//------------------------------------
-						iwi = 0;
-
-						for (int iw1=0; iw1 < atom1->nw; iw1++)
-						{
-
-							iww = iatw + iwi;// -1 because ++iww from below.
-							dmR2 = &dmR[iww]; //mohan add 2012-01-05
-							iwi += atom2->nw;
-
-							//------------------------------------
-							// circle for wave functions of atom 2.
-							//------------------------------------
-							for(int iw2=0; iw2 < atom2->nw; iw2++)
-							{
-								psi2_dmr[iw1] += dmR2[iw2] * psi2[iw2];
-							}//iw2
-						}// iw1
-					}//end flag
-				}//end ib
-*/
 			}// ia2
 		}//ia1
 
@@ -762,5 +728,4 @@ namespace Gint_Tools
 		return psir_vlbr3_DMR;
 
 	}
-
 }
