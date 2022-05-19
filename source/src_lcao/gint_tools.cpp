@@ -593,6 +593,11 @@ namespace Gint_Tools
 		double* dmR = DMR[GlobalV::CURRENT_SPIN];
 		double* dmR2;
 
+		//parameters for lapack subroutiens
+		const char transa='N', transb='N';
+		const double alpha=1.0, beta=1.0;
+		const int inc=1;
+
 		for (int ia1=0; ia1<na_grid; ia1++)
 		{
 			if(all_out_of_range[ia1]) continue;
@@ -610,7 +615,6 @@ namespace Gint_Tools
 			const int R1x = gt.ucell_index2x[id1];
 			const int R1y = gt.ucell_index2y[id1];
 			const int R1z = gt.ucell_index2z[id1];
-			const int DM_start = gt.nlocstartg[iat];
 
 			// get (j,beta,R2)
 			for (int ia2=0; ia2<na_grid; ia2++)
@@ -682,6 +686,43 @@ namespace Gint_Tools
 				// I should take advantage of gt.which_unitcell.
 				//--------------------------------------------------------------- 
 
+
+				int cal_num=0;
+   				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+    			{
+        			if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+        			    ++cal_num;
+    			}
+
+				if(cal_num>GlobalC::pw.bxyz/4)
+				{
+					const int idx1=block_index[ia1];
+			        const int idx2=block_index[ia2];
+    				const int DM_start = GlobalC::GridT.nlocstartg[iat]+ GlobalC::GridT.find_R2st[iat][offset];
+    				dgemm_(&transa, &transb, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha,
+    					&dmR[DM_start], &block_size[ia2], 
+    					&psir_vlbr3[0][idx1], &LD_pool,
+    					&beta, &psir_vlbr3_DMR.ptr_2D[0][idx2], &LD_pool);
+				}
+				else if(cal_num>0)
+				{
+					const int idx1=block_index[ia1];
+					const int idx2=block_index[ia2];
+    				const int DM_start = GlobalC::GridT.nlocstartg[iat]+ GlobalC::GridT.find_R2st[iat][offset];
+					
+    				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+    				{
+        				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+        				{
+            				dgemv_(&transb, &block_size[ia2], &block_size[ia1], &alpha,
+            					&dmR[DM_start], &block_size[ia2], 
+            					&psir_vlbr3[ib][idx1], &inc,
+            					&beta, &psir_vlbr3_DMR.ptr_2D[ib][idx2], &inc);
+        				}
+    				}
+				} // cal_num
+
+/*
 				const int iatw = DM_start + gt.find_R2st[iat][offset];
 
 				for(int ib=0; ib<gt.bxyz; ++ib)
@@ -713,6 +754,7 @@ namespace Gint_Tools
 						}// iw1
 					}//end flag
 				}//end ib
+*/
 			}// ia2
 		}//ia1
 
