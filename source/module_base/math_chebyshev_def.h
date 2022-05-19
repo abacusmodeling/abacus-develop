@@ -1,6 +1,7 @@
 #include "./constants.h"
 #include "./tool_quit.h"
 #include "assert.h"
+#include "./global_function.h"
 namespace ModuleBase
 {
 
@@ -8,7 +9,7 @@ template<typename REAL>
 template<class T>
 void Chebyshev<REAL>:: calcoef_real(T *ptr, REAL (T::*fun)(REAL))
 {
-    complex<REAL> *pcoef = (complex<REAL> *)this->fftw.ccoef;
+    std::complex<REAL> *pcoef = (std::complex<REAL> *)this->fftw.ccoef;
 
     //three point = 2/3 M + 1/3 T;
     //-----------------------------------------------
@@ -66,7 +67,7 @@ template<typename REAL>
 template<class T>
 void Chebyshev<REAL>::calcoef_complex(T *ptr, std::complex<REAL> (T::*fun)(std::complex<REAL>))
 {
-    complex<double> *pcoef = (complex<double> *)this->fftw.ccoef;
+     std::complex<double> *pcoef = ( std::complex<double> *)this->fftw.ccoef;
 
     //three point = 2/3 M + 1/3 T;
     //-----------------------------------------------
@@ -153,7 +154,7 @@ template<typename REAL>
 template<class T>
 void Chebyshev<REAL>::calcoef_pair(T *ptr, REAL (T::*fun1)(REAL), REAL (T::*fun2)(REAL))
 {
-    complex<double> *pcoef = (complex<double> *)this->fftw.ccoef;
+     std::complex<double> *pcoef = ( std::complex<double> *)this->fftw.ccoef;
 
     //three point = 2/3 M + 1/3 T;
     //-----------------------------------------------
