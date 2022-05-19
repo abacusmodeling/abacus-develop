@@ -1,0 +1,28 @@
+name: Performance test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Performance test
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        tag: ["gnu", "intel"]
+    if: github.repository_owner == 'deepmodeling'
+    container: ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{ matrix.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build
+        run: |
+          cmake -B build -DENABLE_DEEPKS=ON -DENABLE_LIBXC=ON
+          cmake --build build -j16
+          cmake --install build
+      - name: Test
+        run: |
+          cd examples/performance/ && bash run.sh
+      - name: Show Result
+        run: |
+          echo sumall.dat
