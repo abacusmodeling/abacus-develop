@@ -6,6 +6,7 @@
 #include "grid_technique.h"
 #include "LCAO_matrix.h"
 #include "../src_pw/charge.h"
+#include "gint_tools.h"
 
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
 #include "../src_ri/abfs-vector3_order.h"
@@ -68,27 +69,6 @@ class Gint_k : public Gint_k_init
 
     void folding_vl_k_nc(const int &ik);//zhengdy-soc
 
-    // folding the < dphi_0 | V | phi_R> matrix to 
-    // < dphi_0i | V | phi_0j>
-    // folding the < dphi_0 | V * R_beta | phi_R> matrix
-    // < dphi_0i | V | phi_0j>
-    void folding_force(
-        const bool isforce,
-        const bool isstress,
-        ModuleBase::matrix& fvl_dphi, 
-        ModuleBase::matrix& svl_dphi,
-        double* pvdpx, 
-        double* pvdpy, 
-        double* pvdpz,
-        double* pvdp11, 
-        double* pvdp22, 
-        double* pvdp33, 
-        double* pvdp12, 
-        double* pvdp13, 
-        double* pvdp23);
-        //mohan add 2012-1-6
-        //zhengdy add 2016-10-18
-
     //------------------------------------------------------
     // in gint_k_rho.cpp 
     //------------------------------------------------------
@@ -109,38 +89,18 @@ class Gint_k : public Gint_k_init
     //------------------------------------------------------
     // calculate force & stress (many k-points).
 
-    void fvl_k_RealSpace(
-        const bool isforce,
-        const bool isstress,
-        ModuleBase::matrix& fvl_dphi, 
-        ModuleBase::matrix& svl_dphi, 
-        const double* vl);
-        //mohan add 2011-06-19
-        //zhengdy add 2016-10-18
-
     void cal_force_k(
         const bool isforce,
         const bool isstress,
         ModuleBase::matrix& fvl_dphi, 
         ModuleBase::matrix& svl_dphi, 
         const double* vl);
+        //mohan add 2011-06-19 initial implementation
+        //zhengdy add 2016-10-18 add stress calculation
+        //wenfei modify 2022-5-17 reconstruction
 
     private:
     
-    //------------------------------------------------------
-    // in gint_k.cpp 
-    //------------------------------------------------------
-    // set the orbital info 
-    // set the orbital/Ylm information on each real space grid.
-    void set_ijk_atom(
-        const int &grid_index, 
-        const int &size,
-        double*** psir_ylm, 
-        double*** dr, 
-        bool** cal_flag, 
-        double** distance, 
-        const double &delta_r);
-
     void cal_meshball_vlocal(
         int na_grid,
         int LD_pool,
@@ -157,62 +117,30 @@ class Gint_k : public Gint_k_init
     //------------------------------------------------------
     // in gint_k_fvl.cpp 
     //------------------------------------------------------
-    // set the orbital info 
-    // set the derivative/Ylm information on each real space grid.
-    void set_ijk_atom_force(
-        const int &grid_index, 
-        const int &size,
-        double*** psir_ylm, 
-        double*** dr, 
-        bool** cal_flag, 
-        double** distance, 
-        double* ylma, 
-        const double &delta_r,
-        double*** dphi_x, 
-        double ***dphi_y, 
-        double*** dphi_z);
-
     // evaluate the force due to local potential.
-    void evaluate_vl_force(
-        const int &grid_index, 
-        const int &size, 
-        const int &i, 
-        const int &j, 
-        const int &k,
-        double*** psir_ylm, 
-        bool** cal_flag, 
-        double* vldr3, 
-        double** distance,
-        double*** dphi_x, // gradient of orbital phi along x direction
-        double*** dphi_y, // gradient of orbital phi along y direction
-        double*** dphi_z, // gradient of orbital phi along z direction
-        double* pvdpx, 
-        double* pvdpy, 
-        double* pvdpz,
-        const Grid_Technique &gt);
 
-    // evaluate the stresses due to local potential
-    void evaluate_vl_stress(
-        const int &grid_index, 
-        const int &size, 
-        const int &i, 
-        const int &j, 
-        const int &k,
-        double*** psir_ylm, 
-        bool** cal_flag, 
-        double* vldr3, 
-        double** distance,
-        double*** dphi_x, 
-        double*** dphi_y, 
-        double*** dphi_z,
-        double* pvdp11, 
-        double* pvdp22, 
-        double* pvdp33, 
-        double* pvdp12, 
-        double* pvdp13, 
-        double* pvdp23,
-        double*** dr,
-        const Grid_Technique &gt);
+    void cal_meshball_force(
+        const int grid_index,
+        const int na_grid,  					    // how many atoms on this (i,j,k) grid
+        const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
+        const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+        const double*const*const psir_vlbr3_DMR,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+        const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+        const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+        const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+        ModuleBase::matrix &force);
+
+    void cal_meshball_stress(
+        const int na_grid,  					    // how many atoms on this (i,j,k) grid
+        const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+        const double*const*const psir_vlbr3_DMR,
+        const double*const*const dpsir_xx,
+        const double*const*const dpsir_xy,
+        const double*const*const dpsir_xz,
+        const double*const*const dpsir_yy,
+        const double*const*const dpsir_yz,
+        const double*const*const dpsir_zz,
+        ModuleBase::matrix &stress);
 
     private:
 

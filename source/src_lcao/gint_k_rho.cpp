@@ -8,6 +8,7 @@
 #include "../module_base/blas_connector.h"
 #include "../module_base/timer.h"
 #include "global_fp.h" // mohan add 2021-01-30
+#include "gint_tools.h"
 
 #ifdef _OPENMP
 #include <omp.h>

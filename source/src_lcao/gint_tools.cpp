@@ -277,7 +277,6 @@ namespace Gint_Tools
 			int iat = GlobalC::GridT.which_atom[mcell_index];
 			const int it = GlobalC::ucell.iat2it[iat];
 			const int ia = GlobalC::ucell.iat2ia[iat];
-			const int start = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
 			Atom *atom = &GlobalC::ucell.atoms[it];
 
 			const double mt[3]={
@@ -564,4 +563,169 @@ namespace Gint_Tools
 		return psir_vlbr3_DM;
 	}
 
+	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DMR(const int &grid_index, const int &na_grid,
+		const int*const block_index, const int*const block_size,
+		bool** cal_flag, double** psir_vlbr3, 
+		double** dphi_x, double** dphi_y, double** dphi_z,
+		const Grid_Technique &gt,
+		double** DMR)
+	{                       
+		double *psi2, *psi2_dmr;
+		int iwi, iww;
+		const int LD_pool = GlobalC::GridT.max_atom*GlobalC::ucell.nwmax;
+		Gint_Tools::Array_Pool<double> psir_vlbr3_DMR(GlobalC::pw.bxyz, LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DMR.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+
+		bool *all_out_of_range = new bool[na_grid];
+		for(int ia=0; ia<na_grid; ++ia) //number of atoms
+		{
+			all_out_of_range[ia] = true;
+			for(int ib=0; ib<gt.bxyz; ++ib) //number of small box in big box
+			{
+				if(cal_flag[ib][ia])
+				{
+					all_out_of_range[ia] = false;
+					//break; //mohan add 2012-07-10
+				}
+			}
+		}
+
+		double* dmR = DMR[GlobalV::CURRENT_SPIN];
+		double* dmR2;
+
+		//parameters for lapack subroutiens
+		const char transa='N', transb='N';
+		const double alpha=1.0, beta=1.0;
+		const int inc=1;
+
+		for (int ia1=0; ia1<na_grid; ia1++)
+		{
+			if(all_out_of_range[ia1]) continue;
+
+			const int mcell_index1 = gt.bcell_start[grid_index] + ia1;
+			const int iat = gt.which_atom[mcell_index1];
+			const int T1 = GlobalC::ucell.iat2it[iat];
+			const int I1 = GlobalC::ucell.iat2ia[iat];
+			Atom *atom1 = &GlobalC::ucell.atoms[T1];
+
+			//~~~~~~~~~~~~~~~~
+			// get cell R1.
+			//~~~~~~~~~~~~~~~~
+			const int id1 = gt.which_unitcell[mcell_index1];
+			const int R1x = gt.ucell_index2x[id1];
+			const int R1y = gt.ucell_index2y[id1];
+			const int R1z = gt.ucell_index2z[id1];
+
+			// get (j,beta,R2)
+			for (int ia2=0; ia2<na_grid; ia2++)
+			{
+				if(all_out_of_range[ia2]) continue;
+
+				//---------------------------------------------
+				// check if we need to calculate the big cell.
+				//---------------------------------------------
+				bool same_flag = false;
+				for(int ib=0; ib<gt.bxyz; ++ib)
+				{
+					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+					{
+						same_flag = true;
+						break;
+					}
+				}
+
+				if(!same_flag) continue;
+
+				const int bcell2 = gt.bcell_start[grid_index] + ia2;
+				const int T2 = GlobalC::ucell.iat2it[ gt.which_atom[bcell2]];
+				const int iat2 = gt.which_atom[bcell2];
+
+				Atom *atom2 = &GlobalC::ucell.atoms[T2];
+
+				//---------------
+				// get cell R2.
+				//---------------
+				const int id2 = gt.which_unitcell[bcell2];
+				const int R2x = gt.ucell_index2x[id2];
+				const int R2y = gt.ucell_index2y[id2];
+				const int R2z = gt.ucell_index2z[id2];
+
+				//------------------------------------------------
+				// calculate the 'offset': R2 position relative
+				// to R1 atom.
+				//------------------------------------------------
+				const int dRx = R1x - R2x;
+				const int dRy = R1y - R2y;
+				const int dRz = R1z - R2z;
+
+				const int index = gt.cal_RindexAtom(dRx, dRy, dRz, iat2);
+				int offset = -1;
+
+				int* find_start = gt.find_R2[iat];
+				int* findend = gt.find_R2[iat] + gt.nad[iat];
+
+				// the nad should be a large expense of time.
+				for(int* find=find_start; find < findend; find++)
+				{
+					if( find[0] == index )
+					{
+						offset = find - find_start;
+						break;
+					}
+				}
+
+				if(offset == -1 )
+				{
+					ModuleBase::WARNING_QUIT("gint_k","get_psir_vlbr3_DMR wrong");
+				}
+				assert(offset < gt.nad[iat]);
+
+				//--------------------------------------------------------------- 
+				// what I do above is to get 'offset' for atom std::pair (iat1, iat2)
+				// if I want to simplify this searching for offset,
+				// I should take advantage of gt.which_unitcell.
+				//--------------------------------------------------------------- 
+
+
+				int cal_num=0;
+   				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+    			{
+        			if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+        			    ++cal_num;
+    			}
+
+				if(cal_num>GlobalC::pw.bxyz/4)
+				{
+					const int idx1=block_index[ia1];
+			        const int idx2=block_index[ia2];
+    				const int DM_start = GlobalC::GridT.nlocstartg[iat]+ GlobalC::GridT.find_R2st[iat][offset];
+    				dgemm_(&transa, &transb, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha,
+    					&dmR[DM_start], &block_size[ia2], 
+    					&psir_vlbr3[0][idx1], &LD_pool,
+    					&beta, &psir_vlbr3_DMR.ptr_2D[0][idx2], &LD_pool);
+				}
+				else if(cal_num>0)
+				{
+					const int idx1=block_index[ia1];
+					const int idx2=block_index[ia2];
+    				const int DM_start = GlobalC::GridT.nlocstartg[iat]+ GlobalC::GridT.find_R2st[iat][offset];
+					
+    				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+    				{
+        				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+        				{
+            				dgemv_(&transb, &block_size[ia2], &block_size[ia1], &alpha,
+            					&dmR[DM_start], &block_size[ia2], 
+            					&psir_vlbr3[ib][idx1], &inc,
+            					&beta, &psir_vlbr3_DMR.ptr_2D[ib][idx2], &inc);
+        				}
+    				}
+				} // cal_num
+			}// ia2
+		}//ia1
+
+		delete[] all_out_of_range;
+		return psir_vlbr3_DMR;
+
+	}
 }
