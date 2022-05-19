@@ -40,6 +40,7 @@ jobs:
         env:
           GTEST_COLOR: 'yes'
         run: |
+          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
           cmake -B build -DUSE_CUDA=ON
           cmake --build build -j4
           cmake --install build
