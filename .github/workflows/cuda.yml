@@ -27,6 +27,7 @@ jobs:
           ec2-instance-type: g4dn.xlarge
           subnet-id: subnet-72d3e53e
           security-group-id: sg-06b0c93122c08aeab
+
   test:
     name: Do the job on the runner
     needs: start-runner # required to start the main job when the runner is ready
@@ -39,9 +40,12 @@ jobs:
         env:
           GTEST_COLOR: 'yes'
         run: |
-          cmake -B build -DBUILD_TESTING=ON -DUSE_CUDA=ON
+          cmake -B build -DUSE_CUDA=ON
           cmake --build build -j4
           cmake --install build
+          cd tests/integrate
+          echo "ks_solver cusolver" >> ./270_NO_MD_2O/INPUT
+          ./Autotest.sh -r 270_NO_MD_2O
 
   stop-runner:
     name: Stop self-hosted EC2 runner
