@@ -80,7 +80,7 @@ run_abacus() {
         lastword=$(tail -1 result.log | awk '{print $1}')
     fi
     if [[ $lastword != "SEE" ]]; then
-        /usr/bin/time -v mpirun -n $1 -env OMP_NUM_THREADS=$2 $abacus >result.log 2>time.log
+        /usr/bin/time -v mpirun -n $1 -env OMP_NUM_THREADS=$2 $abacus 2>time.log ｜ tee result.log
     else
         printf "**result.log is normal end, skip this job** "
     fi
