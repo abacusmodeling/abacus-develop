@@ -10,7 +10,8 @@ void Gint_k::cal_force_k(
 	const bool isstress,
 	ModuleBase::matrix& fvl_dphi, 
 	ModuleBase::matrix& svl_dphi, 
-	const double *vl)
+	const double *vl,
+    double** DM_R)
 {
 	ModuleBase::TITLE("Gint_k","cal_force_k");
 	ModuleBase::timer::tick("Gint_k","cal_force_k");
@@ -84,7 +85,7 @@ void Gint_k::cal_force_k(
 							dpsir_ylm_x.ptr_2D,
 							dpsir_ylm_y.ptr_2D,
 							dpsir_ylm_z.ptr_2D,
-							GlobalC::GridT, this->DM_R);
+							GlobalC::GridT, DM_R);
 
 					if(isforce)
 					{

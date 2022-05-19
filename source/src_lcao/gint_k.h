@@ -27,19 +27,27 @@ class Gint_k : public Gint_k_init
     void destroy_pvpR(void);
     //LiuXh add 2019-07-15
     void destroy_pvpR_tr(void);
-    void distribute_pvpR_tr(void);
+    void distribute_pvpR_tr(LCAO_Matrix *LM);
 
     // jingan add 2021-6-4, modify 2021-12-2
     void distribute_pvpR_sparseMatrix(
         const int current_spin, 
         const double &sparse_threshold, 
-        const std::map<Abfs::Vector3_Order<int>, std::map<size_t, std::map<size_t, double>>> &pvpR_sparseMatrix
+        const std::map<Abfs::Vector3_Order<int>,
+        std::map<size_t, std::map<size_t, double>>> &pvpR_sparseMatrix,
+        LCAO_Matrix *LM
     );
     void distribute_pvpR_soc_sparseMatrix(
         const double &sparse_threshold, 
-        const std::map<Abfs::Vector3_Order<int>, std::map<size_t, std::map<size_t, std::complex<double>>>> &pvpR_soc_sparseMatrix
+        const std::map<Abfs::Vector3_Order<int>,
+        std::map<size_t,
+        std::map<size_t, std::complex<double>>>> &pvpR_soc_sparseMatrix,
+        LCAO_Matrix *LM
     );
-    void cal_vlocal_R_sparseMatrix(const int &current_spin, const double &sparse_threshold);
+    void cal_vlocal_R_sparseMatrix(
+        const int &current_spin,
+        const double &sparse_threshold,
+        LCAO_Matrix *LM);
 
     // reset the spin.
     void reset_spin(const int &spin_now);
@@ -65,15 +73,15 @@ class Gint_k : public Gint_k_init
     // <phi_0i | V | phi_0j>
     // V is (Vl + Vh + Vxc) if no Vna is used,
     // and is (Vna + delta_Vh + Vxc) if Vna is used.
-    void folding_vl_k(const int &ik);
+    void folding_vl_k(const int &ik, LCAO_Matrix* LM);
 
-    void folding_vl_k_nc(const int &ik);//zhengdy-soc
+    void folding_vl_k_nc(const int &ik, LCAO_Matrix* LM);//zhengdy-soc
 
     //------------------------------------------------------
     // in gint_k_rho.cpp 
     //------------------------------------------------------
     // calculate the charge density via grid integrals
-    void cal_rho_k(double** DM_R_in, Charge* chr);
+    void cal_rho_k(double** DM_R, Charge* chr);
 
     //------------------------------------------------------
     // in gint_k_env.cpp 
@@ -94,7 +102,8 @@ class Gint_k : public Gint_k_init
         const bool isstress,
         ModuleBase::matrix& fvl_dphi, 
         ModuleBase::matrix& svl_dphi, 
-        const double* vl);
+        const double* vl,
+        double **DM_R);
         //mohan add 2011-06-19 initial implementation
         //zhengdy add 2016-10-18 add stress calculation
         //wenfei modify 2022-5-17 reconstruction
@@ -148,32 +157,17 @@ class Gint_k : public Gint_k_init
     // key variable 
     //----------------------------
 
-    double***** pvpR_tr; //LiuXh add 2019-07-15
-    std::complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
-
-    //----------------------------
-    // key variable 
-    //----------------------------
+    // used only in vlocal.
     // dimension: [GlobalC::LNNR.nnrg] 
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.
     double** pvpR_reduced;
-
-    //----------------------------
-    // key variable 
-    //----------------------------
-    // dimension: [GridT.lgd, GridT.lgd]	
-    // used only when folding the H matrix.
-    std::complex<double>** pvp;
-    std::complex<double>** pvp_nc[4];
-
-    // used only in vlocal.
-    int ik_now;
+    double***** pvpR_tr; //LiuXh add 2019-07-15
+    std::complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
+    
+    bool pvpR_alloc_flag;
+    
     int spin_now;
 
-    // just pointer.
-    bool pvpR_alloc_flag;
-
-    double** DM_R; //pointer to Local_Orbital_Charge::DM_R
 };
 
 #endif

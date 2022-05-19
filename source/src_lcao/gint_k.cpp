@@ -12,7 +12,6 @@
 
 Gint_k::Gint_k()
 {
-    ik_now = 0;	
     pvpR_alloc_flag = false;
     spin_now = -1; // for a start value, must not equal 1,2 or 4.
 }
@@ -88,7 +87,7 @@ void Gint_k::destroy_pvpR(void)
 
 // folding the matrix for 'ik' k-point.
 // H(k)=\sum{R} H(R)exp(ikR) 
-void Gint_k::folding_vl_k(const int &ik)
+void Gint_k::folding_vl_k(const int &ik, LCAO_Matrix *LM)
 {
     ModuleBase::TITLE("Gint_k","folding_vl_k");
     ModuleBase::timer::tick("Gint_k","folding_vl_k");
@@ -112,12 +111,12 @@ void Gint_k::folding_vl_k(const int &ik)
     // here we construct a temporary matrix to store the
     // matrix element < phi_0 | Vlocal | phi_R >
     //#################################################################
-    this->ik_now = ik;
-    this->pvp = new std::complex<double>*[GlobalC::GridT.lgd];
+
+    std::complex<double>** pvp = new std::complex<double>*[GlobalC::GridT.lgd];
     for(int i=0; i<GlobalC::GridT.lgd; i++)
     {
-        this->pvp[i] = new std::complex<double>[GlobalC::GridT.lgd];
-        ModuleBase::GlobalFunc::ZEROS( this->pvp[i], GlobalC::GridT.lgd);
+        pvp[i] = new std::complex<double>[GlobalC::GridT.lgd];
+        ModuleBase::GlobalFunc::ZEROS( pvp[i], GlobalC::GridT.lgd);
     }
 
     int lgd = 0;
@@ -174,13 +173,13 @@ void Gint_k::folding_vl_k(const int &ik)
                             dR.z = GlobalC::GridD.getBox(ad).z;
 
                             // calculate the phase factor exp(ikR).
-                            const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * ModuleBase::TWO_PI;
+                            const double arg = (GlobalC::kv.kvec_d[ ik ] * dR) * ModuleBase::TWO_PI;
                             std::complex<double> phase = std::complex<double>(cos(arg), sin(arg));
                             int ixxx = DM_start + GlobalC::GridT.find_R2st[iat][nad];
                             for(int iw=0; iw<atom1->nw; iw++)
                             {
                                 // iw1_lo
-                                std::complex<double> *vij = this->pvp[GlobalC::GridT.trace_lo[start1+iw]];
+                                std::complex<double> *vij = pvp[GlobalC::GridT.trace_lo[start1+iw]];
 
 
                                 int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
@@ -224,13 +223,13 @@ void Gint_k::folding_vl_k(const int &ik)
                     if (mug <= nug)
                     {
                         // pvp is symmetric, only half is calculated.
-                        tmp[j] = this->pvp[mug][nug];
+                        tmp[j] = pvp[mug][nug];
                     }
                     else
                     {
                         // need to get elements from the other half.
                         // I have question on this! 2011-02-22
-                        tmp[j] = conj(this->pvp[nug][mug]);
+                        tmp[j] = conj(pvp[nug][mug]);
                     }
                 }
             }
@@ -244,12 +243,12 @@ void Gint_k::folding_vl_k(const int &ik)
         //-----------------------------------------------------
         for (int j=0; j<GlobalV::NLOCAL; j++)
         {
-            if (!this->LM->ParaV->in_this_processor(i,j))
+            if (!LM->ParaV->in_this_processor(i,j))
             {
                 continue;
             }
             // set the matrix value.
-            this->LM->set_HSk(i,j,tmp[j],'L');
+            LM->set_HSk(i,j,tmp[j],'L');
         }
         delete[] tmp;
     }
@@ -269,7 +268,7 @@ void Gint_k::folding_vl_k(const int &ik)
 // folding the matrix for 'ik' k-point.
 // H(k)=\sum{R} H(R)exp(ikR) 
 // for non-collinear case  
-void Gint_k::folding_vl_k_nc(const int &ik)
+void Gint_k::folding_vl_k_nc(const int &ik, LCAO_Matrix *LM)
 {
     ModuleBase::TITLE("Gint_k","folding_vl_k_nc");
     ModuleBase::timer::tick("Gint_k","folding_vl_k_nc");
@@ -279,15 +278,14 @@ void Gint_k::folding_vl_k_nc(const int &ik)
         ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
     }
 
-    this->ik_now = ik;
-//	std::complex<double>** pvp_nc[4];
+	std::complex<double>** pvp_nc[4];
     for(int spin=0;spin<4;spin++)
     {
         pvp_nc[spin] = new std::complex<double>*[GlobalC::GridT.lgd];
         for(int i=0; i<GlobalC::GridT.lgd; i++)
         {
             pvp_nc[spin][i] = new std::complex<double>[GlobalC::GridT.lgd];
-            ModuleBase::GlobalFunc::ZEROS( this->pvp_nc[spin][i], GlobalC::GridT.lgd);
+            ModuleBase::GlobalFunc::ZEROS( pvp_nc[spin][i], GlobalC::GridT.lgd);
         }
     }
 
@@ -344,7 +342,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
                             dR.z = GlobalC::GridD.getBox(ad).z;
 
                             // calculate the phase factor exp(ikR).
-                            const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * ModuleBase::TWO_PI;
+                            const double arg = (GlobalC::kv.kvec_d[ ik ] * dR) * ModuleBase::TWO_PI;
                             std::complex<double> phase = std::complex<double>(cos(arg), sin(arg));
                             int ixxx = DM_start + GlobalC::GridT.find_R2st[iat][nad];
                             for(int iw=0; iw<atom1->nw; iw++)
@@ -352,7 +350,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
                                 // iw1_lo
                                 std::complex<double> *vij[4];
                                 for(int spin=0;spin<4;spin++)
-                                    vij[spin] = this->pvp_nc[spin][GlobalC::GridT.trace_lo[start1]/GlobalV::NPOL + iw];
+                                    vij[spin] = pvp_nc[spin][GlobalC::GridT.trace_lo[start1]/GlobalV::NPOL + iw];
 
 
                                 int iw2_lo = GlobalC::GridT.trace_lo[start2]/GlobalV::NPOL;
@@ -409,24 +407,24 @@ void Gint_k::folding_vl_k_nc(const int &ik)
                         if(i%2==0&&j%2==0)
                         {
                             //spin = 0;
-                            tmp[j] = this->pvp_nc[0][mug0][nug0]+this->pvp_nc[3][mug0][nug0];
+                            tmp[j] = pvp_nc[0][mug0][nug0]+pvp_nc[3][mug0][nug0];
                         }	
                         else if(i%2==1&&j%2==1)
                         {
                             //spin = 3;
-                            tmp[j] = this->pvp_nc[0][mug0][nug0]-this->pvp_nc[3][mug0][nug0];
+                            tmp[j] = pvp_nc[0][mug0][nug0]-pvp_nc[3][mug0][nug0];
                         }
                         else if(i%2==0&&j%2==1)
                         {
                             // spin = 1;
                             if(!GlobalV::DOMAG) tmp[j] = 0;
-                            else tmp[j] = this->pvp_nc[1][mug0][nug0] - std::complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
+                            else tmp[j] = pvp_nc[1][mug0][nug0] - std::complex<double>(0.0,1.0) * pvp_nc[2][mug0][nug0];
                         }
                         else if(i%2==1&&j%2==0) 
                         {
                             //spin = 2;
                             if(!GlobalV::DOMAG) tmp[j] = 0;
-                            else tmp[j] = this->pvp_nc[1][mug0][nug0] + std::complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
+                            else tmp[j] = pvp_nc[1][mug0][nug0] + std::complex<double>(0.0,1.0) * pvp_nc[2][mug0][nug0];
                         }
                         else
                         {
@@ -441,24 +439,24 @@ void Gint_k::folding_vl_k_nc(const int &ik)
                         if(i%2==0&&j%2==0)
                         {
                             //spin = 0;
-                            tmp[j] = conj(this->pvp_nc[0][nug0][mug0]+this->pvp_nc[3][nug0][mug0]);
+                            tmp[j] = conj(pvp_nc[0][nug0][mug0]+pvp_nc[3][nug0][mug0]);
                         }	
                         else if(i%2==1&&j%2==1)
                         {
                             //spin = 3;
-                            tmp[j] = conj(this->pvp_nc[0][nug0][mug0]-this->pvp_nc[3][nug0][mug0]);
+                            tmp[j] = conj(pvp_nc[0][nug0][mug0]-pvp_nc[3][nug0][mug0]);
                         }
                         else if(i%2==1&&j%2==0)
                         {
                             // spin = 1;
                             if(!GlobalV::DOMAG) tmp[j] = 0;
-                            else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] - std::complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
+                            else tmp[j] = conj(pvp_nc[1][nug0][mug0] - std::complex<double>(0.0,1.0) * pvp_nc[2][nug0][mug0]);
                         }
                         else if(i%2==0&&j%2==1) 
                         {
                             //spin = 2;
                             if(!GlobalV::DOMAG) tmp[j] = 0;
-                            else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] + std::complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
+                            else tmp[j] = conj(pvp_nc[1][nug0][mug0] + std::complex<double>(0.0,1.0) * pvp_nc[2][nug0][mug0]);
                         }
                         else
                         {
@@ -479,12 +477,12 @@ void Gint_k::folding_vl_k_nc(const int &ik)
         //-----------------------------------------------------
         for (int j=0; j<GlobalV::NLOCAL; j++)
         {
-            if (!this->LM->ParaV->in_this_processor(i, j))
+            if (!LM->ParaV->in_this_processor(i, j))
             {
                 continue;
             }
             // set the matrix value.
-            this->LM->set_HSk(i,j,tmp[j],'L');
+            LM->set_HSk(i,j,tmp[j],'L');
         }
         delete[] tmp;
     }
@@ -494,9 +492,9 @@ void Gint_k::folding_vl_k_nc(const int &ik)
     {
         for(int i=0; i<GlobalC::GridT.lgd; i++)
         {
-            delete[] this->pvp_nc[spin][i];
+            delete[] pvp_nc[spin][i];
         }
-        delete[] this->pvp_nc[spin];
+        delete[] pvp_nc[spin];
     }
     ModuleBase::timer::tick("Gint_k","Distri");
 
@@ -610,7 +608,7 @@ void Gint_k::destroy_pvpR_tr(void)
     return;
 }
 
-void Gint_k::distribute_pvpR_tr(void)
+void Gint_k::distribute_pvpR_tr(LCAO_Matrix *LM)
 {
     ModuleBase::TITLE("Gint_k","distribute_pvpR_tr");
 
@@ -657,15 +655,14 @@ void Gint_k::distribute_pvpR_tr(void)
                     else Parallel_Reduce::reduce_complex_double_pool( tmp_soc, GlobalV::NLOCAL );
                     for(int j=0; j<GlobalV::NLOCAL; j++)
                     {
-                        if(!this->LM->ParaV->in_this_processor(i,j))
+                        if(!LM->ParaV->in_this_processor(i,j))
                         {
                             continue;
                         }
                         else
                         {
-                            //this->LM->set_HSk(i,j,tmp[j],'L');
-                            if(GlobalV::NSPIN!=4) this->LM->set_HR_tr(ix,iy,iz,i,j,tmp[j]);
-                            else this->LM->set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
+                            if(GlobalV::NSPIN!=4) LM->set_HR_tr(ix,iy,iz,i,j,tmp[j]);
+                            else LM->set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
                         }
                     }
                     if(GlobalV::NSPIN!=4) delete[] tmp;
@@ -677,146 +674,25 @@ void Gint_k::distribute_pvpR_tr(void)
 
     return;
 }
-void Gint_k::cal_vlocal_R(const int current_spin)
-{
-    ModuleBase::TITLE("Gint_k","cal_vlocal_R");
 
-    allocate_pvpR_tr();
-
-    int lgd = 0;
-
-    double R_minX = GlobalC::GridD.getD_minX();
-    double R_minY = GlobalC::GridD.getD_minY();
-    double R_minZ = GlobalC::GridD.getD_minZ();
-
-    int R_x;
-    int R_y;
-    int R_z;
-
-    ModuleBase::Vector3<double> tau1, dtau, dR;
-    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
-    {
-        for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
-        {
-            const int iat = GlobalC::ucell.itia2iat(T1,I1);
-            if(GlobalC::GridT.in_this_processor[iat])
-            {
-                Atom* atom1 = &GlobalC::ucell.atoms[T1];
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-
-                const int DM_start = GlobalC::GridT.nlocstartg[iat];
-                tau1 = GlobalC::ucell.atoms[T1].tau[I1];
-                //GlobalC::GridD.Find_atom(tau1);        
-                GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-                int nad2 = 0;
-
-                for(int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
-                {
-                    const int T2 = GlobalC::GridD.getType(ad);
-                    const int I2 = GlobalC::GridD.getNatom(ad);
-                    const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
-
-                    if(GlobalC::GridT.in_this_processor[iat2])
-                    {
-                        Atom* atom2 = &GlobalC::ucell.atoms[T2];
-                        dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
-                        double distance = dtau.norm() * GlobalC::ucell.lat0;
-                        double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
-
-                        if(distance < rcut)
-                        {
-                            const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-
-                            dR.x = GlobalC::GridD.getBox(ad).x;
-                            dR.y = GlobalC::GridD.getBox(ad).y;
-                            dR.z = GlobalC::GridD.getBox(ad).z;
-
-                            R_x = (int) (dR.x -R_minX);
-                            R_y = (int) (dR.y -R_minY);
-                            R_z = (int) (dR.z -R_minZ);
-
-                            int ixxx = DM_start + GlobalC::GridT.find_R2st[iat][nad2];
-                            for(int iw=0; iw<atom1->nw * GlobalV::NPOL; iw++)
-                            {
-                                int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
-                                int* iw2_end = iw2_lo + atom2->nw;
-
-                                double *vijR = &pvpR_reduced[current_spin][ixxx];
-                                for(int iw2=0;iw2<atom2->nw * GlobalV::NPOL; iw2++)
-                                {
-                                    double *HlocR;
-                                    std::complex<double> *HlocR_soc;
-                                    if(GlobalV::NSPIN!=4) HlocR = &pvpR_tr[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][GlobalC::GridT.trace_lo[start2+iw2]];
-                                    else    HlocR_soc = &pvpR_tr_soc[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][GlobalC::GridT.trace_lo[start2+iw2]];
-                                    const int nw = atom2->nw;
-                                    const int mug0 = iw/GlobalV::NPOL;
-                                    const int nug0 = iw2/GlobalV::NPOL;
-                                    const int iw_nowg = ixxx + mug0*nw + nug0;
-                                    const int iw_nowg1 = ixxx + nug0*nw + mug0;
-                                    if(GlobalV::NSPIN==4)
-                                    {                                   
-                                        // pvp is symmetric, only half is calculated.
-                                        //int spin=0;
-                                        if(iw%2==0&&iw2%2==0)
-                                        {
-                                            //spin = 0;
-                                            HlocR_soc[0] = std::complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] + std::complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
-                                        }	
-                                        else if(iw%2==1&&iw2%2==1)
-                                        {
-                                            //spin = 3;
-                                            HlocR_soc[0] = std::complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] - std::complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
-                                        }
-                                        else if(iw%2==0&&iw2%2==1)
-                                        {
-                                            // spin = 1;
-                                            if(!GlobalV::DOMAG) HlocR_soc[0] = std::complex<double>(0.0,0.0);
-                                            else HlocR_soc[0] = pvpR_reduced[1][iw_nowg] - std::complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
-                                        }	
-                                        else if(iw%2==1&&iw2%2==0) 
-                                        {
-                                            //spin = 2;
-                                            if(!GlobalV::DOMAG) HlocR_soc[0] = std::complex<double>(0.0,0.0);
-                                            else HlocR_soc[0] = pvpR_reduced[1][iw_nowg] + std::complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
-                                        }
-                                        else
-                                        {
-                                            ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
-                                        }
-                                    }//endif NC
-                                    else
-                                    {
-                                        HlocR[0] = pvpR_reduced[current_spin][iw_nowg];
-                                    }//endif normal
-                                }
-                                ++lgd;
-                            }
-                            ++nad2;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return;
-}
 
 void Gint_k::distribute_pvpR_sparseMatrix(
     const int current_spin, 
     const double &sparse_threshold, 
-    const std::map<Abfs::Vector3_Order<int>, std::map<size_t, std::map<size_t, double>>> &pvpR_sparseMatrix
+    const std::map<Abfs::Vector3_Order<int>,
+    std::map<size_t, std::map<size_t, double>>> &pvpR_sparseMatrix,
+    LCAO_Matrix *LM
 )
 {
     ModuleBase::TITLE("Gint_k","distribute_pvpR_sparseMatrix");
 
-    int total_R_num = this->LM->all_R_coor.size();
+    int total_R_num = LM->all_R_coor.size();
     int *nonzero_num = new int[total_R_num];
     int *minus_nonzero_num = new int[total_R_num];
     ModuleBase::GlobalFunc::ZEROS(nonzero_num, total_R_num);
     ModuleBase::GlobalFunc::ZEROS(minus_nonzero_num, total_R_num);
     int count = 0;
-    for (auto &R_coor : this->LM->all_R_coor)
+    for (auto &R_coor : LM->all_R_coor)
     {
         auto iter = pvpR_sparseMatrix.find(R_coor);
         if (iter != pvpR_sparseMatrix.end())
@@ -850,7 +726,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(
     tmp = new double[GlobalV::NLOCAL];
 
     count = 0;
-    for (auto &R_coor : this->LM->all_R_coor)
+    for (auto &R_coor : LM->all_R_coor)
     {
         if (nonzero_num[count] != 0 || minus_nonzero_num[count] != 0)
         {
@@ -900,19 +776,19 @@ void Gint_k::distribute_pvpR_sparseMatrix(
                 
                 Parallel_Reduce::reduce_double_pool(tmp, GlobalV::NLOCAL);
 
-                if (this->LM->ParaV->trace_loc_row[row] >= 0)
+                if (LM->ParaV->trace_loc_row[row] >= 0)
                 {
                     for(int col = 0; col < GlobalV::NLOCAL; ++col)
                     {
-                        if(this->LM->ParaV->trace_loc_col[col] >= 0)
+                        if(LM->ParaV->trace_loc_col[col] >= 0)
                         {
                             if (std::abs(tmp[col]) > sparse_threshold)
                             {
-                                double &value = this->LM->HR_sparse[current_spin][R_coor][row][col];
+                                double &value = LM->HR_sparse[current_spin][R_coor][row][col];
                                 value += tmp[col];
                                 if (std::abs(value) <= sparse_threshold)
                                 {
-                                    this->LM->HR_sparse[current_spin][R_coor][row].erase(col);
+                                    LM->HR_sparse[current_spin][R_coor][row].erase(col);
                                 }
                             }
                         }
@@ -938,18 +814,20 @@ void Gint_k::distribute_pvpR_sparseMatrix(
 
 void Gint_k::distribute_pvpR_soc_sparseMatrix(
     const double &sparse_threshold, 
-    const std::map<Abfs::Vector3_Order<int>, std::map<size_t, std::map<size_t, std::complex<double>>>> &pvpR_soc_sparseMatrix
+    const std::map<Abfs::Vector3_Order<int>,
+    std::map<size_t, std::map<size_t, std::complex<double>>>> &pvpR_soc_sparseMatrix,
+    LCAO_Matrix *LM
 )
 {
     ModuleBase::TITLE("Gint_k","distribute_pvpR_soc_sparseMatrix");
 
-    int total_R_num = this->LM->all_R_coor.size();
+    int total_R_num = LM->all_R_coor.size();
     int *nonzero_num = new int[total_R_num];
     int *minus_nonzero_num = new int[total_R_num];
     ModuleBase::GlobalFunc::ZEROS(nonzero_num, total_R_num);
     ModuleBase::GlobalFunc::ZEROS(minus_nonzero_num, total_R_num);
     int count = 0;
-    for (auto &R_coor : this->LM->all_R_coor)
+    for (auto &R_coor : LM->all_R_coor)
     {
         auto iter = pvpR_soc_sparseMatrix.find(R_coor);
         if (iter != pvpR_soc_sparseMatrix.end())
@@ -983,7 +861,7 @@ void Gint_k::distribute_pvpR_soc_sparseMatrix(
     tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
 
     count = 0;
-    for (auto &R_coor : this->LM->all_R_coor)
+    for (auto &R_coor : LM->all_R_coor)
     {
         if (nonzero_num[count] != 0 || minus_nonzero_num[count] != 0)
         {
@@ -1032,19 +910,19 @@ void Gint_k::distribute_pvpR_soc_sparseMatrix(
                 
                 Parallel_Reduce::reduce_complex_double_pool(tmp_soc, GlobalV::NLOCAL);
 
-                if (this->LM->ParaV->trace_loc_row[row] >= 0)
+                if (LM->ParaV->trace_loc_row[row] >= 0)
                 {
                     for(int col = 0; col < GlobalV::NLOCAL; ++col)
                     {
-                        if(this->LM->ParaV->trace_loc_col[col] >= 0)
+                        if(LM->ParaV->trace_loc_col[col] >= 0)
                         {
                             if (std::abs(tmp_soc[col]) > sparse_threshold)
                             {
-                                std::complex<double> &value = this->LM->HR_soc_sparse[R_coor][row][col];
+                                std::complex<double> &value = LM->HR_soc_sparse[R_coor][row][col];
                                 value += tmp_soc[col];
                                 if (std::abs(value) <= sparse_threshold)
                                 {
-                                    this->LM->HR_soc_sparse[R_coor][row].erase(col);
+                                    LM->HR_soc_sparse[R_coor][row].erase(col);
                                 }
                             }
                         }
@@ -1069,7 +947,7 @@ void Gint_k::distribute_pvpR_soc_sparseMatrix(
 
 }
 
-void Gint_k::cal_vlocal_R_sparseMatrix(const int &current_spin, const double &sparse_threshold)
+void Gint_k::cal_vlocal_R_sparseMatrix(const int &current_spin, const double &sparse_threshold, LCAO_Matrix *LM)
 {
     ModuleBase::TITLE("Gint_k","cal_vlocal_R_sparseMatrix");
 
@@ -1206,11 +1084,11 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int &current_spin, const double &sp
 
     if (GlobalV::NSPIN != 4)
     {
-        distribute_pvpR_sparseMatrix(current_spin, sparse_threshold, pvpR_sparseMatrix);
+        distribute_pvpR_sparseMatrix(current_spin, sparse_threshold, pvpR_sparseMatrix, LM);
     }
     else
     {
-        distribute_pvpR_soc_sparseMatrix(sparse_threshold, pvpR_soc_sparseMatrix);
+        distribute_pvpR_soc_sparseMatrix(sparse_threshold, pvpR_soc_sparseMatrix, LM);
     }
 
     return;

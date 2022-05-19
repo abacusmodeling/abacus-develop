@@ -24,8 +24,6 @@ public:
 
 protected:
 
-    LCAO_Matrix* LM;
-
 	Gint_k_init();
 	~Gint_k_init();
 

@@ -241,11 +241,11 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
         if(GlobalV::NSPIN!=4) 
         {
-            this->GK.folding_vl_k(ik);
+            this->GK.folding_vl_k(ik, this->LM);
         }
         else 
         {
-            this->GK.folding_vl_k_nc(ik);
+            this->GK.folding_vl_k_nc(ik, this->LM);
         }
 
     #ifdef __MPI //liyuanbo 2022/2/23
@@ -791,7 +791,7 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
 
     calculate_STN_R_sparse(current_spin, sparse_threshold);
 
-    GK.cal_vlocal_R_sparseMatrix(current_spin, sparse_threshold);
+    GK.cal_vlocal_R_sparseMatrix(current_spin, sparse_threshold, this->LM);
 
     if (INPUT.dft_plus_u)
     {

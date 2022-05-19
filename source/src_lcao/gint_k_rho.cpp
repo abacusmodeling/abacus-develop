@@ -193,12 +193,10 @@ inline void cal_band_rho(
 }
 
 
-void Gint_k::cal_rho_k(double** DM_R_in, Charge* chr)
+void Gint_k::cal_rho_k(double** DM_R, Charge* chr)
 {
 	ModuleBase::TITLE("Gint_k","cal_rho_k");
     ModuleBase::timer::tick("Gint_k", "cal_rho_k");
-
-    this->DM_R = DM_R_in;
 
 	const int max_size = GlobalC::GridT.max_atom;
 
