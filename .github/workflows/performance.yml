@@ -25,4 +25,4 @@ jobs:
           cd examples/performance/ && bash run.sh
       - name: Show Result
         run: |
-          cat sumall.dat
+          cat examples/performance/sumall.dat
