@@ -21,6 +21,30 @@ Gint_k::~Gint_k()
     
 }
 
+void Gint_k::prep_grid(
+	const int &nbx_in,
+	const int &nby_in,
+	const int &nbz_in,
+	const int &nbz_start_in,
+    const int& ncxyz_in)
+{
+	ModuleBase::TITLE(GlobalV::ofs_running,"Gint_k","prep_grid");
+    
+    this->nbx = nbx_in;
+	this->nby = nby_in;
+	this->nbz = nbz_in;
+	this->ncxyz = ncxyz_in;
+	this->nbz_start = nbz_start_in;
+	assert(nbx>0);
+	assert(nby>0);
+	assert(nbz>0);
+	assert(ncxyz>0);
+
+	assert( GlobalC::ucell.omega > 0.0);
+
+	return;
+}
+
 void Gint_k::reset_spin(const int &spin_now_in)
 {
     this->spin_now = spin_now_in;

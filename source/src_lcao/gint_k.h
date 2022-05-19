@@ -1,7 +1,6 @@
 #ifndef GINT_K_H
 #define GINT_K_H
 
-#include "gint_k_init.h"
 #include "../module_orbital/ORB_atomic_lm.h"
 #include "grid_technique.h"
 #include "LCAO_matrix.h"
@@ -11,17 +10,24 @@
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
 #include "../src_ri/abfs-vector3_order.h"
 
-class Gint_k : public Gint_k_init
+class Gint_k
 {
     public:
 
     Gint_k();
     ~Gint_k();
 
+    // preparing FFT grid
+    void prep_grid(
+        const int &nbx_in,
+		const int &nby_in,
+		const int &nbz_in,
+		const int &nbz_start_in,
+        const int& ncxyz_in);
+
     // allocate the <phi_0 | V | phi_R> matrix element.
     void allocate_pvpR(void);
     void allocate_pvpR_tr(void); //LiuXh add 2019-07-15
-
 
     // destroy the temporary <phi_0 | V | phi_R> matrix element.
     void destroy_pvpR(void);
@@ -55,7 +61,6 @@ class Gint_k : public Gint_k_init
     // get the spin.
     int get_spin(void)const{return spin_now;}
 
-
     //------------------------------------------------------
     // in gint_k_vl.cpp 
     //------------------------------------------------------
@@ -63,11 +68,6 @@ class Gint_k : public Gint_k_init
     // < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
     // < phi_0 | delta_Vh + Vxc | phi_R>.
     void cal_vlocal_k(const double* vrs1, const Grid_Technique &gt, const int spin=0);
-
-    //------------------------------------------------------
-    // in gint_k.cpp 
-    //------------------------------------------------------
-    void cal_vlocal_R(const int current_spin); //LiuXh add 2019-07-15
 
     // folding the < phi_0 | V | phi_R> matrix to 
     // <phi_0i | V | phi_0j>
@@ -123,11 +123,6 @@ class Gint_k : public Gint_k_init
         double** psir_vlbr3,
         double* pvpR);
 
-    //------------------------------------------------------
-    // in gint_k_fvl.cpp 
-    //------------------------------------------------------
-    // evaluate the force due to local potential.
-
     void cal_meshball_force(
         const int grid_index,
         const int na_grid,  					    // how many atoms on this (i,j,k) grid
@@ -156,6 +151,13 @@ class Gint_k : public Gint_k_init
     //----------------------------
     // key variable 
     //----------------------------
+
+    // variables related to FFT grid
+ 	int nbx;
+	int nby;
+	int nbz;
+	int ncxyz;
+	int nbz_start;   
 
     // used only in vlocal.
     // dimension: [GlobalC::LNNR.nnrg] 
