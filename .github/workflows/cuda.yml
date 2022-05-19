@@ -36,14 +36,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Build and Test
-        env:
-          GTEST_COLOR: 'yes'
+      - name: Build cuSolver
         run: |
-          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
-          cmake -B build -DUSE_CUDA=ON
+          cmake -B build -USE_CUSOLVER_LCAO=ON
           cmake --build build -j4
           cmake --install build
+      - name: Test
+        run: |
+          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
           cd tests/integrate
           echo "ks_solver cusolver" >> ./270_NO_MD_2O/INPUT
           ./Autotest.sh -r 270_NO_MD_2O
