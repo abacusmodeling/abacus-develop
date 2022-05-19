@@ -16,6 +16,7 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
+#include "../module_surchem/efield.h"    // liuyu add 2022-05-06
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif
@@ -41,8 +42,6 @@ energy::~energy()
 {
 }
 
-#include "efield.h"
-
 void energy::calculate_harris(const int &flag)
 {
 //	ModuleBase::TITLE("energy","calculate_harris");
@@ -60,7 +59,8 @@ void energy::calculate_harris(const int &flag)
 		+ demet
 		+ exx
 		+ Efield::etotefield
-		+ evdw;							// Peize Lin add evdw 2021.03.09
+		+ evdw;  						// Peize Lin add evdw 2021.03.09
+
 #ifdef __LCAO
         if(INPUT.dft_plus_u) 
 		{

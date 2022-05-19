@@ -243,6 +243,7 @@ OBJS_SURCHEM=H_correction_pw.o\
     cal_vel.o\
     corrected_energy.o\
     minimize_cg.o\
+    efield.o\
 
 OBJS_XC=xc_funct_corr_gga.o \
 xc_funct_corr_lda.o \
@@ -293,7 +294,6 @@ write_HS.o\
 write_HS_R.o\
 write_dm.o\
 write_wfc_realspace.o\
-efield.o \
 magnetism.o\
 optical.o\
 Cell_PW.o\

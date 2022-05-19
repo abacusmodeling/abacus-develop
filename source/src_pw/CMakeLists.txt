@@ -10,7 +10,6 @@ list(APPEND objects
     charge_pulay.cpp
     diago_cg.cpp
     diago_david.cpp
-    efield.cpp
     energy.cpp
     forces.cpp
     global.cpp
