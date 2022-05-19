@@ -104,7 +104,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 				MPI_Bcast(GlobalC::wf.ekb[ik], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
 			}
 #endif
-			stoiter.stoche.ndmin = GlobalC::wf.npw;
+			stoiter.p_che->ndmin = GlobalC::wf.npw;
 			stoiter.orthog(ik,this->stowf);
 			stoiter.checkemm(ik,iter,this->stowf);	//check and reset emax & emin
 		}
@@ -113,7 +113,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 		{
 			//init k
 			if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
-			stoiter.stoche.ndmin = GlobalC::wf.npw;
+			stoiter.p_che->ndmin = GlobalC::wf.npw;
 			stoiter.sumpolyval_k(ik, this->stowf);
 		}
 		delete [] h_diag;

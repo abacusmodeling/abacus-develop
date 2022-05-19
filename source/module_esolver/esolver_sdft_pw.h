@@ -1,7 +1,6 @@
 #include "./esolver_ks_pw.h"
 #include "../src_pw/sto_wf.h"
 #include "../src_pw/sto_iter.h"
-#include "../src_pw/sto_che.h"
 #include "../src_pw/sto_hchi.h"
 
 namespace ModuleESolver
