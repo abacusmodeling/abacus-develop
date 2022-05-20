@@ -40,6 +40,7 @@ list(APPEND objects
     gint_k_vl.cpp
     gint_k_env.cpp
     gint_k_sparse.cpp
+    gint_k_pvpr.cpp
     gint_tools.cpp
     global_fp.cpp
     grid_bigcell.cpp

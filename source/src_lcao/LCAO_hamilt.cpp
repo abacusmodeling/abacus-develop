@@ -226,21 +226,12 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
     if(GlobalV::VL_IN_H)
     {
-        //-------------------------
-        // set the local potential
-        // in plane wave basis.
-        //-------------------------
-//		Build_ST_pw bsp;
-//		bsp.set_local(ik);	
-//		this->LM->print_HSk('H','C',1.0e-5);
-
         //--------------------------
         // set the local potential
         // in LCAO basis.
         //--------------------------
 
         this->GK.folding_vl_k(ik, this->LM);
-
 
     #ifdef __MPI //liyuanbo 2022/2/23
         // Peize Lin add 2016-12-03
@@ -262,7 +253,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     #endif
     }
 
-
     //-----------------------------------------
     // folding matrix here: S(k) (SlocR->Sloc2)
     // folding matrix here: T(k)+Vnl(k)
@@ -270,22 +260,13 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     //-----------------------------------------
     this->LM->zeros_HSk('S');
     this->LM->zeros_HSk('T');
-//	std::cout << " after folding Hfixed k." << std::endl;
     this->LM->folding_fixedH(ik);
 
     //------------------------------------------
     // Add T(k)+Vnl(k)+Vlocal(k)
     // (Hloc2 += Hloc_fixed2), (std::complex matrix)
     //------------------------------------------
-//	std::cout << " Folding matrix here." << std::endl;
 	this->LM->update_Hloc2(ik);
-/*
-    if(GlobalV::NURSE)
-    {
-        this->LM->print_HSk('H','R',1.0e-5);
-//		this->LM->print_HSk('S','R',1.0e-5);
-    }
-    */
     
     ModuleBase::timer::tick("LCAO_Hamilt","calculate_Hk");
     return;

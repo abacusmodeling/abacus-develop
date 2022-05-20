@@ -230,7 +230,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 							pvpR_reduced_thread);
 		#else
 						cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
-							block_size, at, block_index, block_iw, cal_flag, at,
+							block_size, block_index, block_iw, cal_flag, at,
 							psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
 							this->pvpR_reduced[spin]);
 		#endif

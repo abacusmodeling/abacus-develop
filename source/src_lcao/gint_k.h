@@ -68,12 +68,52 @@ class Gint_k
 		const int &nbz_start_in,
         const int& ncxyz_in);
 
+    //the unified interface
+    void cal_gint_k(Gint_inout *inout);
+
+ 
+
+    //------------------------------------------------------
+    // in gint_k_vl.cpp 
+    //------------------------------------------------------
+    // calculate the matrix elements of Hamiltonian matrix,
+    // < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
+    // < phi_0 | delta_Vh + Vxc | phi_R>.
+    void cal_vlocal_k(const double* vrs1, const Grid_Technique &gt, const int spin=0);
+
+
+    //------------------------------------------------------
+    // in gint_k_pvpr.cpp 
+    //------------------------------------------------------
+    // pvpR and reset_spin/get_spin : auxilliary methods
+    // for calculating hamiltonian
+
+    // reset the spin.
+    void reset_spin(const int &spin_now_in){this->spin_now = spin_now_in;};
+    // get the spin.
+    int get_spin(void)const{return spin_now;}
+ 
     // allocate the <phi_0 | V | phi_R> matrix element.
     void allocate_pvpR(void);
-
     // destroy the temporary <phi_0 | V | phi_R> matrix element.
     void destroy_pvpR(void);
 
+    // folding the < phi_0 | V | phi_R> matrix to 
+    // <phi_0i | V | phi_0j>
+    // V is (Vl + Vh + Vxc) if no Vna is used,
+    // and is (Vna + delta_Vh + Vxc) if Vna is used.
+    void folding_vl_k(const int &ik, LCAO_Matrix* LM);
+
+    //------------------------------------------------------
+    // in gint_k_env.cpp 
+    //------------------------------------------------------
+    // calculate the envelop function via grid integrals
+    void cal_env_k(
+        int ik, 
+        const std::complex<double>* wfc_k,
+        double* rho);
+
+    //related to sparse matrix
     // jingan add 2021-6-4, modify 2021-12-2
     void distribute_pvpR_sparseMatrix(
         const int current_spin, 
@@ -94,55 +134,6 @@ class Gint_k
         const double &sparse_threshold,
         LCAO_Matrix *LM);
 
-    // reset the spin.
-    void reset_spin(const int &spin_now_in){this->spin_now = spin_now_in;};
-
-    // get the spin.
-    int get_spin(void)const{return spin_now;}
-
-    //------------------------------------------------------
-    // in gint_k_vl.cpp 
-    //------------------------------------------------------
-    // calculate the matrix elements of Hamiltonian matrix,
-    // < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
-    // < phi_0 | delta_Vh + Vxc | phi_R>.
-    void cal_vlocal_k(const double* vrs1, const Grid_Technique &gt, const int spin=0);
-
-    // folding the < phi_0 | V | phi_R> matrix to 
-    // <phi_0i | V | phi_0j>
-    // V is (Vl + Vh + Vxc) if no Vna is used,
-    // and is (Vna + delta_Vh + Vxc) if Vna is used.
-    void folding_vl_k(const int &ik, LCAO_Matrix* LM);
-
-    //------------------------------------------------------
-    // in gint_k_rho.cpp 
-    //------------------------------------------------------
-    // calculate the charge density via grid integrals
-    void cal_gint_k(Gint_inout *inout);
-    void gint_kernel_force(
-        const int na_grid,
-        const int grid_index,
-        const double delta_r,
-        double* vldr3,
-        const int LD_pool,
-        Gint_inout *inout);
-
-    void gint_kernel_rho(
-        const int na_grid,
-        const int grid_index,
-        const double delta_r,
-        int* vindex,
-        const int LD_pool,
-        Gint_inout *inout);
-    //------------------------------------------------------
-    // in gint_k_env.cpp 
-    //------------------------------------------------------
-    // calculate the envelop function via grid integrals
-    void cal_env_k(
-        int ik, 
-        const std::complex<double>* wfc_k,
-        double* rho);
-
     private:
     
     void cal_meshball_vlocal(
@@ -157,6 +148,18 @@ class Gint_k
         double** psir_ylm,
         double** psir_vlbr3,
         double* pvpR);
+
+    //------------------------------------------------------
+    // in gint_k_fvl.cpp 
+    //------------------------------------------------------
+    // calculate vl contributuion to force & stress via grid integrals
+    void gint_kernel_force(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        const int LD_pool,
+        Gint_inout *inout);
 
     void cal_meshball_force(
         const int grid_index,
@@ -180,6 +183,18 @@ class Gint_k
         const double*const*const dpsir_yz,
         const double*const*const dpsir_zz,
         ModuleBase::matrix *stress);
+
+    //------------------------------------------------------
+    // in gint_k_rho.cpp 
+    //------------------------------------------------------
+    // calculate the charge density via grid integrals
+    void gint_kernel_rho(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        int* vindex,
+        const int LD_pool,
+        Gint_inout *inout);
 
     void cal_meshball_rho(
         const int na_grid,
@@ -205,14 +220,11 @@ class Gint_k
     // used only in vlocal.
     // dimension: [GlobalC::LNNR.nnrg] 
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.
-    double** pvpR_reduced;
-    double***** pvpR_tr; //LiuXh add 2019-07-15
-    std::complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
-    
     bool pvpR_alloc_flag;
-    
     int spin_now;
 
+    double** pvpR_reduced;
+    
 };
 
 #endif
