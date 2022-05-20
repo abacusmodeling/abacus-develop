@@ -157,7 +157,6 @@ class Gint_k
         int* block_index,
         int* block_iw,
         bool** cal_flag, 
-        int* at, 
         double** psir_ylm,
         double** psir_vlbr3,
         double* pvpR);

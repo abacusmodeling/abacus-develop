@@ -53,8 +53,7 @@ void Gint_k::cal_meshball_vlocal(
 	int* block_size,
 	int* block_index,
 	int* block_iw,
-	bool** cal_flag, 
-	int* at, 
+	bool** cal_flag,  
 	double** psir_ylm,
 	double** psir_vlbr3,
 	double* pvpR)
@@ -70,9 +69,9 @@ void Gint_k::cal_meshball_vlocal(
 		//const int iw1_lo=block_iw[ia1];
 		const int idx1=block_index[ia1];
 		int m=block_size[ia1];
-		const int iat1=at[ia1];
-		const int T1 = GlobalC::ucell.iat2it[iat1];
 		const int mcell_index1 = GlobalC::GridT.bcell_start[grid_index] + ia1;
+		const int iat1= GlobalC::GridT.which_atom[mcell_index1];
+		const int T1 = GlobalC::ucell.iat2it[iat1];
 		const int id1 = GlobalC::GridT.which_unitcell[mcell_index1];
 		const int DM_start = GlobalC::GridT.nlocstartg[iat1];
 		// nad : how many adjacent atoms for atom 'iat'
@@ -80,7 +79,8 @@ void Gint_k::cal_meshball_vlocal(
 		int* find_end = GlobalC::GridT.find_R2[iat1] + GlobalC::GridT.nad[iat1];
 		for(int ia2=0; ia2<na_grid; ++ia2)
 		{
-			const int iat2=at[ia2];
+			const int mcell_index2 = GlobalC::GridT.bcell_start[grid_index] + ia2;
+			const int iat2 = GlobalC::GridT.which_atom[mcell_index2];
 			const int T2 = GlobalC::ucell.iat2it[iat2];
 			if (iat1 <= iat2)
 			{
@@ -140,8 +140,8 @@ void Gint_k::gint_kernel_vlocal(
 	double* pvpR_reduced)
 {
 	//prepare block information
-	int * block_iw, * block_index, * block_size, * at;
-	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, at);
+	int * block_iw, * block_index, * block_size;
+	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 	bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
 	
 	//evaluate psi and dpsi on grids
@@ -157,7 +157,7 @@ void Gint_k::gint_kernel_vlocal(
 			na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
 
 	cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
-		block_size, block_index, block_iw, cal_flag, at,
+		block_size, block_index, block_iw, cal_flag,
 		psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
 		pvpR_reduced);
 
