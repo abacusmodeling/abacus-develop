@@ -77,6 +77,22 @@ Chebyshev<REAL>::~Chebyshev()
 }
 
 template<typename REAL>
+void Chebyshev<REAL>::getpolyval(const REAL x, REAL* polyval, const int N)
+{
+    polyval[0] = 1;
+    polyval[1] = x;
+    for(int i = 2; i < N; ++i)
+    {
+        polyval[i] = 2 * x * polyval[i-1] - polyval[i-2];
+    }
+}
+template<typename REAL>
+REAL Chebyshev<REAL>::recurs(const REAL x, const REAL Tn, REAL const Tn_1)
+{
+    return 2*x*Tn-Tn_1;
+}
+
+template<typename REAL>
 REAL Chebyshev<REAL>:: ddot_real(
     const std::complex<REAL>* psi_L,
     const std::complex<REAL>* psi_R,
