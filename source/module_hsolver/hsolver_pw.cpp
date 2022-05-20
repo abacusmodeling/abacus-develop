@@ -45,6 +45,7 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
     }
     else if (this->method == "dav")
     {
+        DiagoDavid::PW_DIAG_NDIM = GlobalV::PW_DIAG_NDIM;
         if (pdiagh != nullptr)
         {
             if (pdiagh->method != this->method)

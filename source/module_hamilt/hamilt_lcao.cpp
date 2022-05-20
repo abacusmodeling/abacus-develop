@@ -11,6 +11,8 @@ namespace hamilt
 template class HamiltLCAO<double, double>;
 // case for nspin<4, multi-k-points
 template class HamiltLCAO<std::complex<double>, double>;
+// case for nspin == 4, non-collinear spin case
+//template class HamiltLCAO<std::complex<double>, std::complex<double>>;
 
 template <typename T, typename T1> void HamiltLCAO<T, T1>::constructFixedReal()
 {
@@ -83,8 +85,9 @@ template <typename T, typename T1> void HamiltLCAO<T, T1>::getMatrix(MatrixBlock
 }
 
 // case for nspin==4
-/*void HamiltLCAO<std::complex<double>, std::complex<double>>::matrix(MatrixBlock<std::complex<double>> hk_in,
-MatrixBlock<std::complex<double>> sk_in)const
+/*template <>
+void HamiltLCAO<std::complex<double>, std::complex<double>>::matrix(MatrixBlock<std::complex<double>> &hk_in,
+                                                      MatrixBlock<std::complex<double>> &sk_in)
 {
     this->getMatrix(hk_in, sk_in);
 }*/
@@ -102,41 +105,16 @@ template <> void HamiltLCAO<double, double>::matrix(MatrixBlock<double> &hk_in, 
     this->getMatrix(hk_in, sk_in);
 }
 
-// nspin==4 case not supported yet
-/*void HamiltLCAO<std::complex<double>, std::complex<double>>::constructHamilt(const int iter, const MatrixBlock<double>
-rho)
-{
-    this->constructFixedReal();
-    this->constructUpdateReal();
-}*/
 template <typename T, typename T1>
 void HamiltLCAO<T, T1>::constructHamilt(const int iter, const MatrixBlock<double> rho)
 {
     this->constructFixedReal();
     this->constructUpdateReal();
 }
-/*template<>
-void HamiltLCAO<double, double>::constructHamilt(const int iter, const MatrixBlock<double> rho)
-{
-    this->constructFixedReal();
-    this->constructUpdateReal();
-}*/
-
-/*void HamiltLCAO<std::complex<double>, std::complex<double>>::updateHk(const int ik)
-{
-    this->hk_fixed_mock(ik);
-    this->hk_update_mock(ik);
-};*/
 template <typename T, typename T1> void HamiltLCAO<T, T1>::updateHk(const int ik)
 {
     this->hk_fixed_mock(ik);
     this->hk_update_mock(ik);
 }
-/*template<>
-void HamiltLCAO<double, double>::updateHk(const int ik)
-{
-    this->hk_fixed_mock(ik);
-    this->hk_update_mock(ik);
-}*/
 
 } // namespace hamilt

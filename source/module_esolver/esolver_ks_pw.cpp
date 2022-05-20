@@ -199,37 +199,43 @@ namespace ModuleESolver
         hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
         hsolver::DiagoIterAssist::PW_DIAG_THR = GlobalV::PW_DIAG_THR;
         const PW_Basis* pbas = &(GlobalC::pw);
-        if(this->phsol == nullptr)
+        if(this->phsol != nullptr)
+        {
+            if(this->phsol->classname != "HSolverPW")
+            {
+                delete this->phsol;
+                this->phsol = nullptr;
+            }
+        }
+        else
         {
             this->phsol = new hsolver::HSolverPW(pbas);
+            this->phsol->method = GlobalV::KS_SOLVER;
         }
-        else if(this->phsol->classname != "HSolverPW")
+        if(this->pelec != nullptr)
         {
-            delete[] this->phsol;
-            this->phsol = new hsolver::HSolverPW(pbas);
+            if(this->pelec->classname != "ElecStatePW")
+            {
+                delete this->pelec;
+                this->pelec = nullptr;
+            }
         }
-        this->phsol->method = GlobalV::KS_SOLVER;
-        if(this->pelec == nullptr)
+        else
         {
             this->pelec = new elecstate::ElecStatePW( pbas, (Charge*)(&(GlobalC::CHR)), GlobalV::NBANDS);
         }
-        else if(this->pelec->classname != "ElecStatePW")
+        if(this->phami != nullptr)
         {
-            delete[] this->pelec;
-            this->pelec = new elecstate::ElecStatePW( pbas, (Charge*)(&(GlobalC::CHR)), GlobalV::NBANDS);
+            if(this->phami->classname != "HamiltPW")
+            {
+                delete this->phami;
+                this->phami = nullptr;
+            }
         }
-        Hamilt_PW* hpw = &(GlobalC::hm.hpw);
-        if(this->phami == nullptr)
+        else
         {
-            this->phami = new hamilt::HamiltPW(hpw);
+            this->phami = new hamilt::HamiltPW(&(GlobalC::hm.hpw));
         }
-        else if(this->phami->classname != "HamiltPW")
-        {
-            delete[] this->phami;
-            this->phami = new hamilt::HamiltPW(hpw);
-        }
-        //initial psi
-        //GlobalC::wf.evc_transform_psi();
     } 
 
     void ESolver_KS_PW::eachiterinit(const int istep, const int iter)
