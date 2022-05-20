@@ -11,7 +11,11 @@ void Gint_k::gint_kernel_force(
 	const double delta_r,
 	double* vldr3,
 	const int LD_pool,
-	Gint_inout *inout)
+	double**DM_R,
+    const bool isforce,
+    const bool isstress,
+    ModuleBase::matrix* fvl_dphi,
+    ModuleBase::matrix* svl_dphi)
 {
     //prepare block information
 	int * block_iw, * block_index, * block_size;
@@ -33,13 +37,6 @@ void Gint_k::gint_kernel_force(
 		dpsir_ylm_y.ptr_2D,
 		dpsir_ylm_z.ptr_2D
 	);
-
-    //setting variables
-	double** DM_R = inout->DM_R;
-	const bool isforce = inout->isforce;
-	const bool isstress = inout->isstress;
-	ModuleBase::matrix* fvl_dphi = inout->fvl_dphi;
-	ModuleBase::matrix* svl_dphi = inout->svl_dphi;
 
     //calculating f_mu(r) = v(r)*psi_mu(r)*dv
 	const Gint_Tools::Array_Pool<double> psir_vlbr3 

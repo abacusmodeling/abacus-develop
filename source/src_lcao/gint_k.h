@@ -71,8 +71,6 @@ class Gint_k
     //the unified interface
     void cal_gint_k(Gint_inout *inout);
 
- 
-
     //------------------------------------------------------
     // in gint_k_vl.cpp 
     //------------------------------------------------------
@@ -159,7 +157,11 @@ class Gint_k
         const double delta_r,
         double* vldr3,
         const int LD_pool,
-        Gint_inout *inout);
+        double**DM_R,
+        const bool isforce,
+        const bool isstress,
+        ModuleBase::matrix* fvl_dphi,
+        ModuleBase::matrix* svl_dphi);
 
     void cal_meshball_force(
         const int grid_index,

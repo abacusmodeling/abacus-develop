@@ -9,6 +9,7 @@
 #include "global_fp.h" // mohan add 2021-01-30
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
+#include "../module_base/matrix.h"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -83,6 +84,21 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
         		pvpR_reduced_thread = new double[GlobalC::GridT.nnrg];
         		ModuleBase::GlobalFunc::ZEROS(pvpR_reduced_thread, GlobalC::GridT.nnrg);
 			}
+			ModuleBase::matrix fvl_dphi_thread;
+			ModuleBase::matrix svl_dphi_thread;
+			if(inout->job==Gint_Tools::job_type::force)
+			{
+				if(inout->isforce)
+				{
+					fvl_dphi_thread.create(inout->fvl_dphi->nr,inout->fvl_dphi->nc);
+					fvl_dphi_thread.zero_out();
+				}
+				if(inout->isstress)
+				{
+					svl_dphi_thread.create(inout->svl_dphi->nr,inout->svl_dphi->nc);
+					svl_dphi_thread.zero_out();
+				}
+			}
 
     		#pragma omp for
 #endif
@@ -114,7 +130,15 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 								break;
 							case Gint_Tools::job_type::force:
 								double *vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
-								this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, inout);
+								#ifdef _OPENMP
+									this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
+										inout->DM_R, inout->isforce, inout->isstress,
+										&fvl_dphi_thread, &svl_dphi_thread);
+								#else
+									this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
+										inout->DM_R, inout->isforce, inout->isstress,
+										inout->fvl_dphi, inout->svl_dphi);
+								#endif
 								delete[] vldr3;
 								break;
 						}
@@ -122,6 +146,21 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 					}// int k
 				}// int j
 			} // int i
+
+#ifdef _OPENMP
+	#pragma omp critical(cal_gint_k)
+			if(inout->job==Gint_Tools::job_type::force)
+			{
+				if(inout->isforce)
+				{
+					inout->fvl_dphi[0]+=fvl_dphi_thread;
+				}
+				if(inout->isstress)
+				{
+					inout->svl_dphi[0]+=svl_dphi_thread;
+				}
+			}
+#endif
 		} // end of #pragma omp parallel
 #ifdef __MKL
     mkl_set_num_threads(mkl_threads);
