@@ -61,6 +61,18 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 
 	const int max_size = GlobalC::GridT.max_atom;
 
+	if(inout->job==Gint_Tools::job_type::vlocal)
+	{
+		if(!pvpR_alloc_flag)
+		{
+			ModuleBase::WARNING_QUIT("Gint_k::cal_vlocal_k","pvpR has not been allocated yet!");
+		}
+		else
+		{
+			ModuleBase::GlobalFunc::ZEROS(this->pvpR_reduced[inout->ispin], GlobalC::GridT.nnrg);
+		}
+	}
+
     if(max_size!=0)
     {
 #ifdef __MKL
@@ -76,7 +88,8 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 			const double dv = GlobalC::ucell.omega/this->ncxyz;
 			
 			// it's a uniform grid to save orbital values, so the delta_r is a constant.
-			const double delta_r = GlobalC::ORB.dr_uniform;	
+			const double delta_r = GlobalC::ORB.dr_uniform;
+
 #ifdef _OPENMP
 			double* pvpR_reduced_thread;
 			if(inout->job==Gint_Tools::job_type::vlocal)
@@ -84,6 +97,7 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
         		pvpR_reduced_thread = new double[GlobalC::GridT.nnrg];
         		ModuleBase::GlobalFunc::ZEROS(pvpR_reduced_thread, GlobalC::GridT.nnrg);
 			}
+
 			ModuleBase::matrix fvl_dphi_thread;
 			ModuleBase::matrix svl_dphi_thread;
 			if(inout->job==Gint_Tools::job_type::force)
@@ -102,6 +116,7 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 
     		#pragma omp for
 #endif
+
 			for(int i=0; i<nbx; i++)
 			{
 				const int ibx = i*GlobalC::pw.bx; // mohan add 2012-03-25
@@ -141,6 +156,17 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 								#endif
 								delete[] vldr3;
 								break;
+							case Gint_Tools::job_type::vlocal:
+								vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
+								#ifdef _OPENMP
+									this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+										pvpR_reduced_thread);
+								#else
+									this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+										this->pvpR_reduced[inout->ispin]);
+								#endif
+								delete[] vldr3;
+								break;
 						}
 
 					}// int k
@@ -148,7 +174,15 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 			} // int i
 
 #ifdef _OPENMP
-	#pragma omp critical(cal_gint_k)
+			#pragma omp critical(gint_k)
+			if(inout->job==Gint_Tools::job_type::vlocal)
+			{
+				for(int innrg=0; innrg<GlobalC::GridT.nnrg; innrg++)
+				{
+					pvpR_reduced[inout->ispin][innrg] += pvpR_reduced_thread[innrg];
+				}
+				delete[] pvpR_reduced_thread;
+			}
 			if(inout->job==Gint_Tools::job_type::force)
 			{
 				if(inout->isforce)
@@ -161,7 +195,9 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 				}
 			}
 #endif
+
 		} // end of #pragma omp parallel
+
 #ifdef __MKL
     mkl_set_num_threads(mkl_threads);
 #endif

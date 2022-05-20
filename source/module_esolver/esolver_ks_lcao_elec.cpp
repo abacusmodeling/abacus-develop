@@ -128,8 +128,7 @@ namespace ModuleESolver
             }
             else
             {
-                Gint_inout inout;
-                inout.prep_gint_inout_rho(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+                Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GK.cal_gint_k(&inout);
             }
 

@@ -23,6 +23,7 @@ class Gint_inout
         double* vl;
         bool isforce;
         bool isstress;
+        int ispin;
     //output
         Charge* chr;
         ModuleBase::matrix* fvl_dphi;
@@ -30,14 +31,14 @@ class Gint_inout
 
         Gint_Tools::job_type job;
 
-        void prep_gint_inout_rho(double **DM_R_in, Charge* chr_in, Gint_Tools::job_type job_in)
+        Gint_inout(double **DM_R_in, Charge* chr_in, Gint_Tools::job_type job_in)
         {
             DM_R = DM_R_in;
             chr = chr_in;
             job = job_in;
         }
 
-        void prep_gint_inout_force(double** DM_R_in, double* vl_in,
+        Gint_inout(double** DM_R_in, double* vl_in,
             bool isforce_in, bool isstress_in,
             ModuleBase::matrix* fvl_dphi_in,
             ModuleBase::matrix* svl_dphi_in,
@@ -49,6 +50,15 @@ class Gint_inout
             isstress = isstress_in;
             fvl_dphi = fvl_dphi_in;
             svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
+        Gint_inout(double* vl_in,
+            int ispin_in,
+            Gint_Tools::job_type job_in)
+        {
+            vl = vl_in;
+            ispin = ispin_in;
             job = job_in;
         }
 };
@@ -77,8 +87,13 @@ class Gint_k
     // calculate the matrix elements of Hamiltonian matrix,
     // < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
     // < phi_0 | delta_Vh + Vxc | phi_R>.
-    void cal_vlocal_k(const double* vrs1, const Grid_Technique &gt, const int spin=0);
-
+    void gint_kernel_vlocal(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        const int LD_pool,
+        double* pvpR_reduced);
 
     //------------------------------------------------------
     // in gint_k_pvpr.cpp 

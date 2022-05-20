@@ -131,135 +131,45 @@ void Gint_k::cal_meshball_vlocal(
 	}
 }
 
-void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const int spin)
+void Gint_k::gint_kernel_vlocal(
+	const int na_grid,
+	const int grid_index,
+	const double delta_r,
+	double* vldr3,
+	const int LD_pool,
+	double* pvpR_reduced)
 {
-	ModuleBase::TITLE("Gint_k","cal_vlocal_k");
+	//prepare block information
+	int * block_iw, * block_index, * block_size, * at;
+	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, at);
+	bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
+	
+	//evaluate psi and dpsi on grids
+	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+	Gint_Tools::cal_psir_ylm(
+		na_grid, grid_index, delta_r,
+		block_index, block_size, 
+		cal_flag,
+		psir_ylm.ptr_2D);
+	
+	//calculating f_mu(r) = v(r)*psi_mu(r)*dv
+	const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
+			na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
 
-	if(!pvpR_alloc_flag)
+	cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
+		block_size, block_index, block_iw, cal_flag, at,
+		psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
+		pvpR_reduced);
+
+    //release memories
+	delete[] block_iw;
+	delete[] block_index;
+	delete[] block_size;
+	for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 	{
-		ModuleBase::WARNING_QUIT("Gint_k::cal_vlocal_k","pvpR has not been allocated yet!");
+		delete[] cal_flag[ib];
 	}
-	else
-	{
-		ModuleBase::GlobalFunc::ZEROS(this->pvpR_reduced[spin], GlobalC::GridT.nnrg);
-	}
+	delete[] cal_flag;
 
-	ModuleBase::timer::tick("Gint_k","vlocal");
-	const int max_size = GlobalC::GridT.max_atom;
-	const double dv = GlobalC::ucell.omega/this->ncxyz;
-
-	if(max_size)
-    {
-#ifdef __MKL
-		const int mkl_threads = mkl_get_max_threads();
-		mkl_set_num_threads(std::max(1,mkl_threads/GlobalC::GridT.nbx));		// Peize Lin update 2021.01.20
-#endif
-		
-#ifdef _OPENMP
-		#pragma omp parallel
-#endif
-		{
-#ifdef _OPENMP
-			double* pvpR_reduced_thread;
-        	pvpR_reduced_thread = new double[GlobalC::GridT.nnrg];
-        	ModuleBase::GlobalFunc::ZEROS(pvpR_reduced_thread, GlobalC::GridT.nnrg);
-#endif
-			const int nbx = GlobalC::GridT.nbx;
-			const int nby = GlobalC::GridT.nby;
-			const int nbz_start = GlobalC::GridT.nbzp_start;
-			const int nbz = GlobalC::GridT.nbzp;
-		
-			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
-			
-			// it's a uniform grid to save orbital values, so the delta_r is a constant.
-			const double delta_r = GlobalC::ORB.dr_uniform;	
-
-#ifdef _OPENMP
-    		#pragma omp for
-#endif
-			for(int i=0; i<nbx; i++)
-			{
-				const int ibx=i*GlobalC::pw.bx;
-				for(int j=0; j<nby; j++)
-				{
-					const int jby=j*GlobalC::pw.by;
-					// count the z according to big box.
-					for(int k=nbz_start; k<nbz_start+nbz; k++)
-					{
-						const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; //mohan add 2012-03-25
-						
-						const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
-
-						// get the value: how many atoms has orbital value on this grid.
-						const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
-						if(na_grid==0) continue;				
-						
-						// here vindex refers to local potentials
-						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);
-
-                        int * block_iw, * block_index, * block_size, * at;
-                        Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, at);
-
-						//------------------------------------------------------
-						// whether the atom-grid distance is larger than cutoff
-						//------------------------------------------------------
-						bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
-
-						// set up band matrix psir_ylm and psir_DM
-						const int LD_pool = max_size*GlobalC::ucell.nwmax;
-						
-						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
-                        Gint_Tools::cal_psir_ylm(
-							na_grid, grid_index, delta_r,
-							block_index, block_size, 
-							cal_flag,
-                            psir_ylm.ptr_2D);
-						
-						//------------------------------------------------------------------
-						// extract the local potentials.
-						//------------------------------------------------------------------
-						double *vldr3 = Gint_Tools::get_vldr3(vrs1, ncyz, ibx, jby, kbz, dv);
-
-                        const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
-                                na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
-
-		#ifdef _OPENMP
-						cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
-							block_size, block_index, block_iw, cal_flag, at,
-							psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
-							pvpR_reduced_thread);
-		#else
-						cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
-							block_size, block_index, block_iw, cal_flag, at,
-							psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
-							this->pvpR_reduced[spin]);
-		#endif
-						free(vldr3);		vldr3=nullptr;
-                        delete[] block_iw;
-                        delete[] block_index;
-                        delete[] block_size;
-
-						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-							free(cal_flag[ib]);
-						free(cal_flag);			cal_flag=nullptr;
-					}// int k
-				}// int j
-			} // int i
-
-#ifdef _OPENMP
-			#pragma omp critical(cal_vl_k)
-			for(int innrg=0; innrg<GlobalC::GridT.nnrg; innrg++)
-			{
-				pvpR_reduced[spin][innrg] += pvpR_reduced_thread[innrg];
-			}
-			delete[] pvpR_reduced_thread;
-#endif
-    	} // end omp
-#ifdef __MKL
-    mkl_set_num_threads(mkl_threads);
-#endif
-	} // end of max_size
-
-	ModuleBase::timer::tick("Gint_k","vlocal");
 	return;
 }
