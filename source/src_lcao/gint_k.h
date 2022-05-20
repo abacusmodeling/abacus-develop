@@ -15,6 +15,8 @@ namespace Gint_Tools
     enum class job_type{vlocal, rho, force};
 }
 
+//the class used to pass input/output variables
+//into the unified interface gint_k
 class Gint_inout
 {
     public:
@@ -70,6 +72,9 @@ class Gint_k
     Gint_k();
     ~Gint_k();
 
+    //------------------------------------------------------
+    // in gint_k.cpp 
+    //------------------------------------------------------
     // preparing FFT grid
     void prep_grid(
         const int &nbx_in,
@@ -80,20 +85,6 @@ class Gint_k
 
     //the unified interface
     void cal_gint_k(Gint_inout *inout);
-
-    //------------------------------------------------------
-    // in gint_k_vl.cpp 
-    //------------------------------------------------------
-    // calculate the matrix elements of Hamiltonian matrix,
-    // < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
-    // < phi_0 | delta_Vh + Vxc | phi_R>.
-    void gint_kernel_vlocal(
-        const int na_grid,
-        const int grid_index,
-        const double delta_r,
-        double* vldr3,
-        const int LD_pool,
-        double* pvpR_reduced);
 
     //------------------------------------------------------
     // in gint_k_pvpr.cpp 
@@ -126,7 +117,10 @@ class Gint_k
         const std::complex<double>* wfc_k,
         double* rho);
 
-    //related to sparse matrix
+    //------------------------------------------------------
+    // in gint_k_sparse.cpp 
+    //------------------------------------------------------    
+    // related to sparse matrix
     // jingan add 2021-6-4, modify 2021-12-2
     void distribute_pvpR_sparseMatrix(
         const int current_spin, 
@@ -149,6 +143,20 @@ class Gint_k
 
     private:
     
+    //------------------------------------------------------
+    // in gint_k_vl.cpp 
+    //------------------------------------------------------
+    // calculate the matrix elements of Hamiltonian matrix,
+    // < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
+    // < phi_0 | delta_Vh + Vxc | phi_R>.
+    void gint_kernel_vlocal(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        const int LD_pool,
+        double* pvpR_reduced);
+
     void cal_meshball_vlocal(
         int na_grid,
         int LD_pool,

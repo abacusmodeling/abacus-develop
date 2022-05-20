@@ -17,6 +17,49 @@
 #include <mkl_service.h>
 #endif
 
+void Gint_k::gint_kernel_vlocal(
+	const int na_grid,
+	const int grid_index,
+	const double delta_r,
+	double* vldr3,
+	const int LD_pool,
+	double* pvpR_reduced)
+{
+	//prepare block information
+	int * block_iw, * block_index, * block_size;
+	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
+	bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
+	
+	//evaluate psi and dpsi on grids
+	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+	Gint_Tools::cal_psir_ylm(
+		na_grid, grid_index, delta_r,
+		block_index, block_size, 
+		cal_flag,
+		psir_ylm.ptr_2D);
+	
+	//calculating f_mu(r) = v(r)*psi_mu(r)*dv
+	const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
+			na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
+
+	this->cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
+		block_size, block_index, block_iw, cal_flag,
+		psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
+		pvpR_reduced);
+
+    //release memories
+	delete[] block_iw;
+	delete[] block_index;
+	delete[] block_size;
+	for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+	{
+		delete[] cal_flag[ib];
+	}
+	delete[] cal_flag;
+
+	return;
+}
+
 inline int find_offset(const int id1, const int id2, const int iat1, const int iat2,
 				int* find_start, int* find_end)
 {
@@ -129,47 +172,4 @@ void Gint_k::cal_meshball_vlocal(
 			}
 		}
 	}
-}
-
-void Gint_k::gint_kernel_vlocal(
-	const int na_grid,
-	const int grid_index,
-	const double delta_r,
-	double* vldr3,
-	const int LD_pool,
-	double* pvpR_reduced)
-{
-	//prepare block information
-	int * block_iw, * block_index, * block_size;
-	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
-	bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
-	
-	//evaluate psi and dpsi on grids
-	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
-	Gint_Tools::cal_psir_ylm(
-		na_grid, grid_index, delta_r,
-		block_index, block_size, 
-		cal_flag,
-		psir_ylm.ptr_2D);
-	
-	//calculating f_mu(r) = v(r)*psi_mu(r)*dv
-	const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
-			na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
-
-	cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
-		block_size, block_index, block_iw, cal_flag,
-		psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
-		pvpR_reduced);
-
-    //release memories
-	delete[] block_iw;
-	delete[] block_index;
-	delete[] block_size;
-	for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-	{
-		delete[] cal_flag[ib];
-	}
-	delete[] cal_flag;
-
-	return;
 }
