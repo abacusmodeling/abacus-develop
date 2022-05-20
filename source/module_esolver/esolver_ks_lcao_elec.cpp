@@ -128,7 +128,9 @@ namespace ModuleESolver
             }
             else
             {
-                this->UHM.GK.cal_rho_k(this->LOC.DM_R, (Charge*)(&GlobalC::CHR));
+                Gint_inout inout;
+                inout.prep_gint_inout_rho(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+                this->UHM.GK.cal_gint_k(&inout);
             }
 
             // renormalize the charge density

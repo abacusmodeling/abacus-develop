@@ -10,6 +10,49 @@
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
 #include "../src_ri/abfs-vector3_order.h"
 
+namespace Gint_Tools
+{
+    enum class job_type{vlocal, rho, force};
+}
+
+class Gint_inout
+{
+    public:
+    //input
+        double** DM_R;
+        double* vl;
+        bool isforce;
+        bool isstress;
+    //output
+        Charge* chr;
+        ModuleBase::matrix* fvl_dphi;
+        ModuleBase::matrix* svl_dphi;
+
+        Gint_Tools::job_type job;
+
+        void prep_gint_inout_rho(double **DM_R_in, Charge* chr_in, Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            chr = chr_in;
+            job = job_in;
+        }
+
+        void prep_gint_inout_force(double** DM_R_in, double* vl_in,
+            bool isforce_in, bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in,
+            ModuleBase::matrix* svl_dphi_in,
+            Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            vl = vl_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+};
+
 class Gint_k
 {
     public:
@@ -27,13 +70,9 @@ class Gint_k
 
     // allocate the <phi_0 | V | phi_R> matrix element.
     void allocate_pvpR(void);
-    void allocate_pvpR_tr(void); //LiuXh add 2019-07-15
 
     // destroy the temporary <phi_0 | V | phi_R> matrix element.
     void destroy_pvpR(void);
-    //LiuXh add 2019-07-15
-    void destroy_pvpR_tr(void);
-    void distribute_pvpR_tr(LCAO_Matrix *LM);
 
     // jingan add 2021-6-4, modify 2021-12-2
     void distribute_pvpR_sparseMatrix(
@@ -41,22 +80,22 @@ class Gint_k
         const double &sparse_threshold, 
         const std::map<Abfs::Vector3_Order<int>,
         std::map<size_t, std::map<size_t, double>>> &pvpR_sparseMatrix,
-        LCAO_Matrix *LM
-    );
+        LCAO_Matrix *LM);
+
     void distribute_pvpR_soc_sparseMatrix(
         const double &sparse_threshold, 
         const std::map<Abfs::Vector3_Order<int>,
         std::map<size_t,
         std::map<size_t, std::complex<double>>>> &pvpR_soc_sparseMatrix,
-        LCAO_Matrix *LM
-    );
+        LCAO_Matrix *LM);
+
     void cal_vlocal_R_sparseMatrix(
         const int &current_spin,
         const double &sparse_threshold,
         LCAO_Matrix *LM);
 
     // reset the spin.
-    void reset_spin(const int &spin_now);
+    void reset_spin(const int &spin_now_in){this->spin_now = spin_now_in;};
 
     // get the spin.
     int get_spin(void)const{return spin_now;}
@@ -75,14 +114,26 @@ class Gint_k
     // and is (Vna + delta_Vh + Vxc) if Vna is used.
     void folding_vl_k(const int &ik, LCAO_Matrix* LM);
 
-    void folding_vl_k_nc(const int &ik, LCAO_Matrix* LM);//zhengdy-soc
-
     //------------------------------------------------------
     // in gint_k_rho.cpp 
     //------------------------------------------------------
     // calculate the charge density via grid integrals
-    void cal_rho_k(double** DM_R, Charge* chr);
+    void cal_gint_k(Gint_inout *inout);
+    void gint_kernel_force(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        const int LD_pool,
+        Gint_inout *inout);
 
+    void gint_kernel_rho(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        int* vindex,
+        const int LD_pool,
+        Gint_inout *inout);
     //------------------------------------------------------
     // in gint_k_env.cpp 
     //------------------------------------------------------
@@ -91,22 +142,6 @@ class Gint_k
         int ik, 
         const std::complex<double>* wfc_k,
         double* rho);
-
-    //------------------------------------------------------
-    // in gint_k_fvl.cpp 
-    //------------------------------------------------------
-    // calculate force & stress (many k-points).
-
-    void cal_force_k(
-        const bool isforce,
-        const bool isstress,
-        ModuleBase::matrix& fvl_dphi, 
-        ModuleBase::matrix& svl_dphi, 
-        const double* vl,
-        double **DM_R);
-        //mohan add 2011-06-19 initial implementation
-        //zhengdy add 2016-10-18 add stress calculation
-        //wenfei modify 2022-5-17 reconstruction
 
     private:
     
@@ -132,7 +167,7 @@ class Gint_k
         const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
         const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
         const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-        ModuleBase::matrix &force);
+        ModuleBase::matrix *force);
 
     void cal_meshball_stress(
         const int na_grid,  					    // how many atoms on this (i,j,k) grid
@@ -144,7 +179,15 @@ class Gint_k
         const double*const*const dpsir_yy,
         const double*const*const dpsir_yz,
         const double*const*const dpsir_zz,
-        ModuleBase::matrix &stress);
+        ModuleBase::matrix *stress);
+
+    void cal_meshball_rho(
+        const int na_grid,
+        int* block_index,
+        int* vindex,
+        double** psir_ylm,
+        double** psir_DMR,
+        double* rho);
 
     private:
 

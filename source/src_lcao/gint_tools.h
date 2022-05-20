@@ -58,10 +58,8 @@ namespace Gint_Tools
 		int * &block_iw,
 		int * &block_index,
 		int * &block_size,
-		int * &at,
-		int * &uc
+		int * &at
 	);
-
 	// whether the atom-grid distance is larger than cutoff
 	// cal_flag[pw.bxyz][na_grid]
 	bool** get_cal_flag(
@@ -124,18 +122,16 @@ namespace Gint_Tools
 		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const DM);
 
-	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DMR(
+	Gint_Tools::Array_Pool<double> mult_psi_DMR(
         const int &grid_index, 
         const int &na_grid,
         const int*const block_index, 
         const int*const block_size,
         bool** cal_flag,
-        double** psir_vlbr3, 
-        double** dphi_x, // gradient of orbital phi along x direction
-        double** dphi_y, // gradient of orbital phi along y direction
-        double** dphi_z, // gradient of orbital phi along z direction
         const Grid_Technique &gt,
-        double** DMR);
+        double** psi, 
+        double* DMR,
+		const int job);
 }
 
 

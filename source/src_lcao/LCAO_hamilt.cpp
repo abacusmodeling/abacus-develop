@@ -239,14 +239,8 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
         // in LCAO basis.
         //--------------------------
 
-        if(GlobalV::NSPIN!=4) 
-        {
-            this->GK.folding_vl_k(ik, this->LM);
-        }
-        else 
-        {
-            this->GK.folding_vl_k_nc(ik, this->LM);
-        }
+        this->GK.folding_vl_k(ik, this->LM);
+
 
     #ifdef __MPI //liyuanbo 2022/2/23
         // Peize Lin add 2016-12-03

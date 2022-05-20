@@ -89,15 +89,13 @@ namespace Gint_Tools
 		int * &block_iw,
 		int * &block_index,
 		int * &block_size,
-		int * &at,
-		int * &uc
+		int * &at
 	)
 	{
 		block_iw = new int[na_grid];
 		block_index = new int[na_grid+1];
 		block_size = new int[na_grid];
 		at = new int[na_grid];
-		uc = new int[na_grid];
 
 		block_index[0] = 0;
 		for (int id=0; id<na_grid; id++)
@@ -111,10 +109,8 @@ namespace Gint_Tools
 			block_index[id+1] = block_index[id]+GlobalC::ucell.atoms[it].nw;
 			block_size[id]=GlobalC::ucell.atoms[it].nw;	
 			at[id] = iat;
-			uc[id] = GlobalC::GridT.which_unitcell[mcell_index];
 		}
 	}
-
 	// whether the atom-grid distance is larger than cutoff
 	bool** get_cal_flag(
 		const int na_grid, 			// number of atoms on this grid 
@@ -563,18 +559,27 @@ namespace Gint_Tools
 		return psir_vlbr3_DM;
 	}
 
-	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DMR(const int &grid_index, const int &na_grid,
-		const int*const block_index, const int*const block_size,
-		bool** cal_flag, double** psir_vlbr3, 
-		double** dphi_x, double** dphi_y, double** dphi_z,
+//calculating (psi_DMR)_mu = sum_nu DMR_mu,nu psi_nu
+//note : there is a difference between rho and force
+//in calculating rho, due to symmetry, the summation over mu,nu
+//can be done as sum_mu,mu + 2 sum_mu<nu, saving some time
+//but for force, we cannot exchange the index
+	Gint_Tools::Array_Pool<double> mult_psi_DMR(
+		const int &grid_index,
+		const int &na_grid,
+		const int*const block_index,
+		const int*const block_size,
+		bool** cal_flag,
 		const Grid_Technique &gt,
-		double** DMR)
+		double** psi, 
+		double* DMR,
+		const int job)
 	{                       
 		double *psi2, *psi2_dmr;
 		int iwi, iww;
 		const int LD_pool = GlobalC::GridT.max_atom*GlobalC::ucell.nwmax;
-		Gint_Tools::Array_Pool<double> psir_vlbr3_DMR(GlobalC::pw.bxyz, LD_pool);
-		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DMR.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+		Gint_Tools::Array_Pool<double> psi_DMR(GlobalC::pw.bxyz, LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psi_DMR.ptr_1D, GlobalC::pw.bxyz*LD_pool);
 
 		bool *all_out_of_range = new bool[na_grid];
 		for(int ia=0; ia<na_grid; ++ia) //number of atoms
@@ -590,13 +595,22 @@ namespace Gint_Tools
 			}
 		}
 
-		double* dmR = DMR[GlobalV::CURRENT_SPIN];
-		double* dmR2;
-
 		//parameters for lapack subroutiens
-		const char transa='N', transb='N';
+		const char trans='N';
 		const double alpha=1.0, beta=1.0;
 		const int inc=1;
+		double alpha1;
+		switch(job)
+		{
+			case 1:
+				alpha1=2.0;
+				break;
+			case 2:
+				alpha1=1.0;
+				break;
+			default:
+				ModuleBase::WARNING_QUIT("psir_dmr","job can only be 1 or 2");
+		}
 
 		for (int ia1=0; ia1<na_grid; ia1++)
 		{
@@ -616,8 +630,82 @@ namespace Gint_Tools
 			const int R1y = gt.ucell_index2y[id1];
 			const int R1z = gt.ucell_index2z[id1];
 
+			if(job==1) //density
+			{
+				const int idx1=block_index[ia1];
+				int* find_start = GlobalC::GridT.find_R2[iat];
+				int* find_end = GlobalC::GridT.find_R2[iat] + GlobalC::GridT.nad[iat];
+				//ia2==ia1
+				int cal_num=0;
+				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+				{
+					if(cal_flag[ib][ia1])
+					{
+						++cal_num;
+					}
+				}
+
+				int offset;
+				if(cal_num>0)
+				{
+					//find offset				
+					const int index = GlobalC::GridT.cal_RindexAtom(0, 0, 0, iat);
+					offset = -1;
+					for(int* find=find_start; find < find_end; find++)
+					{
+						//--------------------------------------------------------------
+						// start positions of adjacent atom of 'iat'
+						//--------------------------------------------------------------
+						if( find[0] == index ) 
+						{
+							offset = find - find_start; // start positions of adjacent atom of 'iat'
+							break;
+						}
+					}
+
+					assert(offset!=-1);
+					assert(offset < GlobalC::GridT.nad[iat]);				
+				}
+
+				if(cal_num>GlobalC::pw.bxyz/4)
+				{				
+					const int DM_start = GlobalC::GridT.nlocstartg[iat]+ GlobalC::GridT.find_R2st[iat][offset];					
+					dgemm_(&trans, &trans, &block_size[ia1], &GlobalC::pw.bxyz, &block_size[ia1], &alpha,
+						&DMR[DM_start], &block_size[ia1], 
+						&psi[0][idx1], &LD_pool,  
+						&beta, &psi_DMR.ptr_2D[0][idx1], &LD_pool);
+				}
+				else if(cal_num>0)
+				{	
+					const int DM_start = GlobalC::GridT.nlocstartg[iat]+ GlobalC::GridT.find_R2st[iat][offset];
+					for(int ib=0; ib<GlobalC::pw.bxyz; ++ib					)
+					{
+						if(cal_flag[ib][ia1])
+						{
+							dgemv_(&trans, &block_size[ia1], &block_size[ia1], &alpha,
+									&DMR[DM_start], &block_size[ia1], 
+									&psi[ib][idx1], &inc,  
+									&beta, &psi_DMR.ptr_2D[ib][idx1], &inc);
+						}
+					}
+				}
+			}
+
 			// get (j,beta,R2)
-			for (int ia2=0; ia2<na_grid; ia2++)
+			int start;
+			switch(job)
+			{
+				case 1:
+					start=ia1+1;
+					break;
+				case 2:
+					start=0;
+					break;
+				default:
+					ModuleBase::WARNING_QUIT("psi_dmr","job can only be 1 or 2");
+			}
+
+			for (int ia2=start; ia2<na_grid; ia2++)
 			{
 				if(all_out_of_range[ia2]) continue;
 
@@ -676,7 +764,7 @@ namespace Gint_Tools
 
 				if(offset == -1 )
 				{
-					ModuleBase::WARNING_QUIT("gint_k","get_psir_vlbr3_DMR wrong");
+					ModuleBase::WARNING_QUIT("gint_k","mult_psi_DMR wrong");
 				}
 				assert(offset < gt.nad[iat]);
 
@@ -685,7 +773,6 @@ namespace Gint_Tools
 				// if I want to simplify this searching for offset,
 				// I should take advantage of gt.which_unitcell.
 				//--------------------------------------------------------------- 
-
 
 				int cal_num=0;
    				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
@@ -699,10 +786,10 @@ namespace Gint_Tools
 					const int idx1=block_index[ia1];
 			        const int idx2=block_index[ia2];
     				const int DM_start = GlobalC::GridT.nlocstartg[iat]+ GlobalC::GridT.find_R2st[iat][offset];
-    				dgemm_(&transa, &transb, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha,
-    					&dmR[DM_start], &block_size[ia2], 
-    					&psir_vlbr3[0][idx1], &LD_pool,
-    					&beta, &psir_vlbr3_DMR.ptr_2D[0][idx2], &LD_pool);
+    				dgemm_(&trans, &trans, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha1,
+    					&DMR[DM_start], &block_size[ia2], 
+    					&psi[0][idx1], &LD_pool,
+    					&beta, &psi_DMR.ptr_2D[0][idx2], &LD_pool);
 				}
 				else if(cal_num>0)
 				{
@@ -714,10 +801,10 @@ namespace Gint_Tools
     				{
         				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
         				{
-            				dgemv_(&transb, &block_size[ia2], &block_size[ia1], &alpha,
-            					&dmR[DM_start], &block_size[ia2], 
-            					&psir_vlbr3[ib][idx1], &inc,
-            					&beta, &psir_vlbr3_DMR.ptr_2D[ib][idx2], &inc);
+            				dgemv_(&trans, &block_size[ia2], &block_size[ia1], &alpha1,
+            					&DMR[DM_start], &block_size[ia2], 
+            					&psi[ib][idx1], &inc,
+            					&beta, &psi_DMR.ptr_2D[ib][idx2], &inc);
         				}
     				}
 				} // cal_num
@@ -725,7 +812,7 @@ namespace Gint_Tools
 		}//ia1
 
 		delete[] all_out_of_range;
-		return psir_vlbr3_DMR;
+		return psi_DMR;
 
 	}
 }

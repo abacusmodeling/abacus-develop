@@ -197,8 +197,8 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 						// here vindex refers to local potentials
 						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);
 
-                        int * block_iw, * block_index, * block_size, * at, * uc;
-                        Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, at, uc);
+                        int * block_iw, * block_index, * block_size, * at;
+                        Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, at);
 
 						//------------------------------------------------------
 						// whether the atom-grid distance is larger than cutoff
