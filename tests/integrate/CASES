@@ -47,6 +47,8 @@
 111_PW_elec_minus
 111_PW_S2_elec_add
 111_PW_S2_elec_minus
+112_PW_dipole
+112_PW_efield
 114_PW_BD_15
 120_PW_KP_MD_FIRE
 120_PW_KP_MD_NVE
