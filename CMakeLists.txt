@@ -282,6 +282,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     symmetry
     md
+    planewave
     surchem
     neighbor
     orb
