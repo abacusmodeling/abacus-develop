@@ -25,6 +25,8 @@ list(APPEND objects
     sto_iter.cpp
     sto_hchi.cpp
     sto_wf.cpp
+    sto_forces.cpp 
+    sto_stress_pw.cpp
     stress_func_cc.cpp
     stress_func_ewa.cpp
     stress_func_gga.cpp

@@ -26,6 +26,10 @@
 //-----stress------------------
 #include "../src_pw/stress_pw.h"
 //---------------------------------------------------
+#include "module_hsolver/hsolver_pw.h"
+#include "module_elecstate/elecstate_pw.h"
+#include "module_hamilt/hamilt_pw.h"
+#include "module_hsolver/diago_iter_assist.h"
 
 namespace ModuleESolver
 {
@@ -191,7 +195,42 @@ namespace ModuleESolver
         {
             srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
         }
-    }
+        //init Psi, HSolver, ElecState, Hamilt
+        hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
+        hsolver::DiagoIterAssist::PW_DIAG_THR = GlobalV::PW_DIAG_THR;
+        const PW_Basis* pbas = &(GlobalC::pw);
+        if(this->phsol == nullptr)
+        {
+            this->phsol = new hsolver::HSolverPW(pbas);
+        }
+        else if(this->phsol->classname != "HSolverPW")
+        {
+            delete[] this->phsol;
+            this->phsol = new hsolver::HSolverPW(pbas);
+        }
+        this->phsol->method = GlobalV::KS_SOLVER;
+        if(this->pelec == nullptr)
+        {
+            this->pelec = new elecstate::ElecStatePW( pbas, (Charge*)(&(GlobalC::CHR)), GlobalV::NBANDS);
+        }
+        else if(this->pelec->classname != "ElecStatePW")
+        {
+            delete[] this->pelec;
+            this->pelec = new elecstate::ElecStatePW( pbas, (Charge*)(&(GlobalC::CHR)), GlobalV::NBANDS);
+        }
+        Hamilt_PW* hpw = &(GlobalC::hm.hpw);
+        if(this->phami == nullptr)
+        {
+            this->phami = new hamilt::HamiltPW(hpw);
+        }
+        else if(this->phami->classname != "HamiltPW")
+        {
+            delete[] this->phami;
+            this->phami = new hamilt::HamiltPW(hpw);
+        }
+        //initial psi
+        //GlobalC::wf.evc_transform_psi();
+    } 
 
     void ESolver_KS_PW::eachiterinit(const int istep, const int iter)
     {
@@ -219,26 +258,41 @@ namespace ModuleESolver
     }
 
     //Temporary, it should be replaced by hsolver later.
-    void ESolver_KS_PW::hamilt2density(const int istep, const int iter, const double ethr)
+    void ESolver_KS_PW:: hamilt2density(const int istep, const int iter, const double ethr)
     {
-        GlobalV::PW_DIAG_THR = ethr;
-        this->c_bands(istep, iter);
+        if(this->phsol != nullptr)
+        {
+            // reset energy 
+            this->pelec->eband  = 0.0;
+            this->pelec->demet  = 0.0;
+            this->pelec->ef     = 0.0;
+            GlobalC::en.ef_up  = 0.0;
+            GlobalC::en.ef_dw  = 0.0;
+            // choose if psi should be diag in subspace
+            // be careful that istep start from 0 and iter start from 1
+            if((istep==0||istep==1)&&iter==1) 
+            {
+                hsolver::DiagoIterAssist::need_subspace = false;
+            }
+            else 
+            {
+                hsolver::DiagoIterAssist::need_subspace = true;
+            }
 
-        GlobalC::en.eband = 0.0;
-        GlobalC::en.demet = 0.0;
-        GlobalC::en.ef = 0.0;
-        GlobalC::en.ef_up = 0.0;
-        GlobalC::en.ef_dw = 0.0;
+            hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
+            this->phsol->solve(this->phami, GlobalC::wf.psi[0], this->pelec);
 
-        // calculate weights of each band.
-        Occupy::calculate_weights();
+            // transform energy for print
+            GlobalC::en.eband = this->pelec->eband;
+            GlobalC::en.demet = this->pelec->demet;
+            GlobalC::en.ef = this->pelec->ef;
+        }
+        else
+        {
+            ModuleBase::WARNING_QUIT("ESolver_KS_PW", "HSolver has not been initialed!");
+        }
 
-        // calculate new charge density according to
-        // new wave functions.
-        // calculate the new eband here.
-        GlobalC::CHR.sum_band();
-
-        // add exx
+    // add exx
 #ifdef __LCAO
 #ifdef __MPI
         GlobalC::en.set_exx();		// Peize Lin add 2019-03-09
@@ -342,7 +396,7 @@ namespace ModuleESolver
                 //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
                 // mohan update 2011-02-21
                 //qianrui update 2020-10-17
-                WF_io::write_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+                WF_io::write_wfc2(ssw.str(), GlobalC::wf.psi[0], GlobalC::pw.gcar);
                 //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
             }
 
@@ -354,6 +408,17 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::afterscf()
     {
+        //temporary transform psi to evc 
+        // psi back to evc
+        //GlobalC::wf.psi_transform_evc();
+        for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
+        {
+            for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
+            {
+                GlobalC::wf.ekb[ik][ib] = this->pelec->ekb(ik, ib);
+                GlobalC::wf.wg(ik, ib) = this->pelec->wg(ik, ib);
+            }
+        }
 #ifdef __LCAO
         if (GlobalC::chi0_hilbert.epsilon)                 // pengfei 2016-11-23
         {

@@ -206,7 +206,7 @@ void Run_MD_PW::md_force_virial(
 
     // mohan added eiter to count for the electron iteration number, 2021-01-28
     int eiter = 0;
-    if (GlobalV::CALCULATION == "md")
+    if (GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
     {
         Electrons elec;
 #ifdef __LCAO

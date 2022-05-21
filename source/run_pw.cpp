@@ -41,7 +41,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
 
     
 
-    if(GlobalV::CALCULATION == "md")
+    if(GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
     {
         Run_MD_PW run_md_pw;
         run_md_pw.md_cells_pw(p_esolver);
@@ -59,7 +59,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
     if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
     {
         Numerical_Descriptor nc;
-        nc.output_descriptor(GlobalC::wf.evc, INPUT.deepks_descriptor_lmax);
+        nc.output_descriptor(GlobalC::wf.psi[0], INPUT.deepks_descriptor_lmax);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
@@ -96,7 +96,7 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
         if ( winput::out_spillage <= 2 )
         {
             Numerical_Basis numerical_basis;
-            numerical_basis.output_overlap(GlobalC::wf.evc);
+            numerical_basis.output_overlap(GlobalC::wf.psi[0]);
             ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
         }
     }

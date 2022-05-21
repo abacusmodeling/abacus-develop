@@ -71,13 +71,11 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf
     }
 
     //for pw-wfc in G space
-    ModuleBase::ComplexMatrix* pw_wfc_g;
+    psi::Psi<std::complex<double>> pw_wfc_g;
 
     if (out_wfc_pw || out_wfc_r)
     {
-        pw_wfc_g = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
-        for (int ik = 0;ik < GlobalC::kv.nks;++ik)
-            pw_wfc_g[ik].create(GlobalV::NBANDS, GlobalC::kv.ngk[ik], true);
+        pw_wfc_g.resize(1, GlobalV::NBANDS, GlobalC::kv.ngk[0]);
     }
 
 
@@ -115,8 +113,8 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf
                 GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ss.str(), 3, for_plot);
 
                 if (out_wfc_pw || out_wfc_r) //only for gamma_only now
-                    this->set_pw_wfc(GlobalC::pw, 0, ib, GlobalV::NSPIN, GlobalC::kv.ngk[0],
-                        GlobalC::CHR.rho_save, pw_wfc_g[0]);
+                    this->set_pw_wfc(GlobalC::pw, 0, ib, GlobalV::NSPIN,
+                        GlobalC::CHR.rho_save, pw_wfc_g);
             }
         }
     }
@@ -132,8 +130,9 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf
             WF_io::write_wfc2(ssw.str(), pw_wfc_g, GlobalC::pw.gcar);
         }
         if (out_wfc_r)
+        {
             Write_Wfc_Realspace::write_wfc_realspace_1(pw_wfc_g, "wfc_realspace", false);
-        delete[] pw_wfc_g;
+        }
     }
 
     delete[] bands_picked;
@@ -193,13 +192,11 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, in
     }
 
     //for pw-wfc in G space
-    ModuleBase::ComplexMatrix* pw_wfc_g;
+    psi::Psi<std::complex<double>> pw_wfc_g(GlobalC::kv.ngk.data());
 
     if (out_wf || out_wf_r)
     {
-        pw_wfc_g = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
-        for (int ik = 0;ik < GlobalC::kv.nks;++ik)
-            pw_wfc_g[ik].create(GlobalV::NBANDS, GlobalC::kv.ngk[ik], true);
+        pw_wfc_g.resize(GlobalC::kv.nks, GlobalV::NBANDS, GlobalC::wf.npwx);
     }
 
     for (int ib = 0; ib < GlobalV::NBANDS; ib++)
@@ -233,8 +230,11 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, in
                 GlobalC::CHR.write_rho(GlobalC::CHR.rho[ispin], ispin, 0, ss.str(), 3, for_plot);
 
                 if (out_wf || out_wf_r) //only for gamma_only now
-                    this->set_pw_wfc(GlobalC::pw, ik, ib, GlobalV::NSPIN, GlobalC::kv.ngk[ik],
-                        GlobalC::CHR.rho, pw_wfc_g[ik]);
+                {
+                    pw_wfc_g.fix_k(ik);
+                    this->set_pw_wfc(GlobalC::pw, ik, ib, GlobalV::NSPIN,
+                        GlobalC::CHR.rho, pw_wfc_g);
+                }
             }
         }
     }
@@ -250,8 +250,9 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, in
             WF_io::write_wfc2(ssw.str(), pw_wfc_g, GlobalC::pw.gcar);
         }
         if (out_wf_r)
+        {
             Write_Wfc_Realspace::write_wfc_realspace_1(pw_wfc_g, "wfc_realspace", false);
-        delete[] pw_wfc_g;
+        }
     }
 
     delete[] bands_picked;
@@ -260,9 +261,9 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, in
 
 //for each band
 void IState_Envelope::set_pw_wfc(PW_Basis& pwb,
-    const int& ik, const int& ib, const int& nspin, const int& ngk,
+    const int& ik, const int& ib, const int& nspin,
     const double* const* const rho,
-    ModuleBase::ComplexMatrix& wfc_g)
+    psi::Psi<std::complex<double>> &wfc_g)
 {
     if (ib == 0)//once is enough
         ModuleBase::TITLE("IState_Envelope", "set_pw_wfc");
@@ -279,6 +280,6 @@ void IState_Envelope::set_pw_wfc(PW_Basis& pwb,
 
     // set pw_wfc_g
     // ig2fftw: the index map from i_ngk(local) to i_ngmw(local)
-    for (int ig = 0;ig < ngk;++ig)
+    for (int ig = 0;ig < wfc_g.get_nbasis();++ig)
         wfc_g(ib, ig) = Porter[pwb.ig2fftw[GlobalC::wf.igk(ik, ig)]];
 }

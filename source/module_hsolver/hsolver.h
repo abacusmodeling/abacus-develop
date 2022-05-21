@@ -14,6 +14,7 @@ namespace hsolver
 class HSolver
 {
   public:
+    HSolver(){};
     /*//initialization, used in construct function or restruct a new HSolver
     virtual void init(
         const Basis* pbas //We need Basis class here, use global class for this initialization first
@@ -34,15 +35,15 @@ class HSolver
         return;
     }
 
+    std::string classname = "none";
+    // choose method of DiagH for solve Hamiltonian matrix
+    // cg, dav, elpa, scalapack, hpseps, cusolver
+    std::string method = "none";
+
   protected:
     DiagH* pdiagh = nullptr; // for single Hamiltonian matrix diagonal solver
 
-    // choose method of DiagH for solve Hamiltonian matrix
-    // cg, dav, elpa, scalapack, hpseps, cusolver
-    static std::string method;
 };
-
-std::string HSolver::method = "none";
 
 } // namespace hsolver
 #endif
