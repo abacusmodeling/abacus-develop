@@ -24,8 +24,6 @@ void PW_Basis_K:: initparameters(
     double gk_ecut_in,
     int nks_in, //number of k points in this pool
     ModuleBase::Vector3<double> *kvec_d_in, // Direct coordinates of k points
-    int poolnproc_in, // Number of processors in this pool
-    int poolrank_in, // Rank in this pool
     int distribution_type_in
 )
 {
@@ -53,8 +51,6 @@ void PW_Basis_K:: initparameters(
     this->nxy = this->nx * this->ny;
     this->nxyz = this->nxy * this->nz;
 
-    this->poolnproc = poolnproc_in;
-    this->poolrank = poolrank_in;
     this->distribution_type = distribution_type_in;
     return;
 }
@@ -103,6 +99,12 @@ void PW_Basis_K::setupIndGk()
 
     return;
 }
+
+/// 
+/// distribute plane wave basis and real-space grids to different processors
+/// set up maps for fft and create arrays for MPI_Alltoall
+/// set up ffts
+///
 void PW_Basis_K::setuptransform()
 {
     this->distribute_r();

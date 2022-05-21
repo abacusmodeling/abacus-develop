@@ -52,6 +52,11 @@ PW_Basis:: ~PW_Basis()
     if(startr != NULL) delete[] startr;
 }
 
+/// 
+/// distribute plane wave basis and real-space grids to different processors
+/// set up maps for fft and create arrays for MPI_Alltoall
+/// set up ffts
+///
 void PW_Basis::setuptransform()
 {
     this->distribute_r();
@@ -96,14 +101,11 @@ void PW_Basis::getstartgr()
     return;
 }
 
-//
-// Collect planewaves on current core, and construct gg, gdirect, gcar according to ig2isz and is2ixy.
-// is2ixy contains the x-coordinate and y-coordinate of sticks on current core.
-// ig2isz contains the z-coordinate of planewaves on current core.
-// We will scan the sticks on current core and find the planewaves on them, then store the information into corresponding arrays.
-// known: ig2isz, is2ixy
-// output: gg, gdirect, gcar
-// 
+///
+/// Collect planewaves on current core, and construct gg, gdirect, gcar according to ig2isz and is2ixy.
+/// known: ig2isz, is2ixy
+/// output: gg, gdirect, gcar
+/// 
 void PW_Basis::collect_local_pw()
 {
     if(gg != NULL) delete[] gg;
@@ -114,34 +116,24 @@ void PW_Basis::collect_local_pw()
     this->gcar = new ModuleBase::Vector3<double>[this->npw];
 
     ModuleBase::Vector3<double> f;
-    int pw_filled = 0; // how many current core's planewaves have been found.
-    for (int is = 0; is < this->nst; ++is)
+    for(int ig = 0 ; ig < this-> npw ; ++ig)
     {
-        int ix = this->is2ixy[is] / this->ny;
-        int iy = this->is2ixy[is] % this->ny;
+        int isz = this->ig2isz[ig];
+        int iz = isz % this->nz;
+        int is = isz / this->nz;
+        int ixy = this->is2ixy[is];
+        int ix = ixy / this->ny;
+        int iy = ixy % this->ny;
         if (ix >= int(this->nx/2) + 1) ix -= this->nx;
         if (iy >= int(this->bigny/2) + 1) iy -= this->bigny;
-        for (int ig = pw_filled; ig < this->npw; ++ig)
-        {
-            if (this->ig2isz[ig] < (is + 1) * this->nz) // meaning this pw belongs to is^th sticks.
-            {
-                int iz = this->ig2isz[ig] % this->nz;
-                if (iz >= int(this->nz/2) + 1) iz -= this->nz;
-                f.x = ix;
-                f.y = iy;
-                f.z = iz;
-                this->gg[pw_filled] = f * (this->GGT * f);
-                this->gdirect[pw_filled] = f;
-                this->gcar[pw_filled] = f * this->G;
-                pw_filled++;
-            }
-            else
-            {
-                break;
-            }
-        }
+        if (iz >= int(this->nz/2) + 1) iz -= this->nz;
+        f.x = ix;
+        f.y = iy;
+        f.z = iz;
+        this->gg[ig] = f * (this->GGT * f);
+        this->gdirect[ig] = f;
+        this->gcar[ig] = f * this->G;
     }
-    assert(pw_filled == this->npw);
     return;
 }
 

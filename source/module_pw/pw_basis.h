@@ -10,14 +10,14 @@
 namespace ModulePW
 {
 
-//
-//A class which can convert a function of "r" to the corresponding linear 
-// superposition of plane waves (real space to reciprocal space)
-// or convert a linear superposition of plane waves to the function 
-// of "r" (reciprocal to real).
-//plane waves: <r|g>=1/sqrt(V) * exp(igr)
-// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
-//
+///
+/// A class which can convert a function of "r" to the corresponding linear 
+/// superposition of plane waves (real space to reciprocal space)
+/// or convert a linear superposition of plane waves to the function 
+/// of "r" (reciprocal to real).
+/// plane waves: <r|g>=1/sqrt(V) * exp(igr)
+/// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
+///
 class PW_Basis
 {
 
@@ -29,21 +29,23 @@ public:
     void initgrids(
         double lat0_in, //unit length (unit in bohr)
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
-        double gridecut //unit in Ry, ecut to set up grids
+        double gridecut, //unit in Ry, ecut to set up grids
+        int poolnproc_in, // Number of processors in this pool
+        int poolrank_in // Rank in this pool
     );
     //Init the grids for FFT
     void initgrids(
         double lat0_in,
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        int nx_in, int bigny_in, int nz_in
+        int nx_in, int bigny_in, int nz_in,
+        int poolnproc_in, // Number of processors in this pool
+        int poolrank_in // Rank in this pool
     );
 
     //Init some parameters
     void initparameters(
         bool gamma_only_in,
         double pwecut_in, //unit in Ry, ecut to decides plane waves
-        int poolnproc_in, // Number of processors in this pool
-        int poolrank_in, // Rank in this pool
         int distribution_type_in
     );
 
@@ -53,15 +55,15 @@ public:
 public:
     //reciprocal-space
     // only on first proc.
-    int *startnsz_per; // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
-    int *nstnz_per; // nz * nst(number of sticks) on each core.
+    int *startnsz_per;//useless // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
+    int *nstnz_per;//useless // nz * nst(number of sticks) on each core.
     int *nst_per;// nst on each core
     // on all proc.
     int *ig2isz; // map ig to (is, iz).
     int *istot2bigixy; // istot2bigixy[is]: iy + ix * bigny of is^th stick among all sticks.
-    int *ixy2istot; // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
-    int *is2ixy; // is2ixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
-    int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
+    int *ixy2istot; //useless // ixy2istot[iy + ix * ny]: is of stick on (ix, iy) among all sticks.
+    int *is2ixy; // is2ixy[is]: iy + ix * bigny of is^th stick among sticks on current proc.
+    int *ixy2ip; // useless// ixy2ip[iy + ix * ny]: ip of proc which contains stick on (ix, iy).
     int nst; //num. of sticks in current proc.
     int nstnz; // nst * nz
     int nstot; //num. of sticks in total.
@@ -91,13 +93,12 @@ public:
     //distribute real-space grids to different processors
     void distribute_r();
 
+    //prepare for MPI_Alltoall
     void getstartgr();
 
-    //distribute plane waves to different processors
-    void distribution_method1(); // x varies fast
-    void distribution_method2(); // sticks sorted according to ixy
-    // void distribution_method3(); // y varies fast
 
+
+    //prepare for transforms between real and reciprocal spaces
     void collect_local_pw();
 
     // void collect_tot_pw(
@@ -118,19 +119,37 @@ public:
     int distribution_type;
     int poolnproc;
     int poolrank;
-   
+    //distribute plane waves to different processors
 
-// for both distributeg_method1 and distributeg_method2
+    //method 1: first consider number of plane waves
+    void distribution_method1(); 
+    // Distribute sticks to cores in method 1.
+    void divide_sticks_1(
+        int* st_i,          // x or x + nx (if x < 0) of stick.
+        int* st_j,          // y or y + ny (if y < 0) of stick.
+        int* st_length,     // the stick on (ix, iy) consists of st_length[ix*ny+iy] planewaves.
+        int* npw_per       // number of planewaves on each core.
+    );
+
+    //method 2: first consider number of sticks
+    void distribution_method2();
+    // Distribute sticks to cores in method 2.
+    void divide_sticks_2();
+   
+    //Count the total number of planewaves (tot_npw) and sticks (this->nstot) (in distributeg method1 and method2)
     void count_pw_st(
         int &tot_npw,     // total number of planewaves.
         int* st_length2D, // the number of planewaves that belong to the stick located on (x, y).
         int* st_bottom2D  // the z-coordinate of the bottom of stick on (x, y).
     );
+
+    //get ig2isz and is2ixy
     void get_ig2isz_is2ixy(
         int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
         int* st_length     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
     );
-// for distributeg_method1
+
+    //Collect the x, y indexs, length of the sticks (in distributeg method1)
     void collect_st(
         int* st_length2D,                               // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
         int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
@@ -138,44 +157,18 @@ public:
         int* st_j,                                      // y or y + ny (if y < 0) of stick.
         int* st_length                                 // number of planewaves in stick, stored in 1d array with tot_nst elements.
     );
-    void divide_sticks(
-        int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j,          // y or y + ny (if y < 0) of stick.
-        int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-        int* npw_per       // number of planewaves on each core.
-    );
+
+    //get istot2bigixy
     void get_istot2bigixy(
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j          // y or y + ny (if y < 0) of stick.
     );
-// for distributeg_method2
-    void divide_sticks2();
+
+    //Create the maps from ixy to (in method 2)
     void create_maps(
         int* st_length2D,  // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
         int* npw_per       // number of planewaves on each core.
     );
-// for distributeg_method3
-    // void divide_sticks2(
-    //     const int tot_npw,  // total number of planewaves.
-    //     int* st_i,          // x or x + nx (if x < 0) of stick.
-    //     int* st_j,          // y or y + ny (if y < 0) of stick.
-    //     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-    //     int* npw_per,       // number of planewaves on each core.
-    //     int* nst_per,       // number of sticks on each core.
-    //     int* is2ip         // ip of core containing is^th stick, map is to ip.         
-    // );
-    // void get_istot2ixy2(
-    //     int* st_i,          // x or x + nx (if x < 0) of stick.
-    //     int* st_j,          // y or y + ny (if y < 0) of stick.
-    //     int* is2ip          // ip of core containing is^th stick, map is to ip.
-    // );
-    // void get_ig2isz_is2ixy2(
-    //     int* st_i,          // x or x + nx (if x < 0) of stick.
-    //     int* st_j,          // y or y + ny (if y < 0) of stick.
-    //     int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
-    //     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-    //     int* is2ip          // ip of core containing is^th stick, map is to ip.
-    // );
 
 //===============================================
 //                  FFT
@@ -199,16 +192,14 @@ public:
     void recip2real(std::complex<float> * in, float *out); //in:(nz, ns)  ; out(nplane,nx*ny)
     void recip2real(std::complex<float> * in, std::complex<float> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
 #endif
+    //gather planes and scatter sticks of all processors
     template<typename T>
-    void gatherp_scatters(std::complex<T> *in, std::complex<T> *out); //gather planes and scatter sticks of all processors
-    template<typename T>
-    void gathers_scatterp(std::complex<T> *in, std::complex<T> *out); //gather sticks of and scatter planes of all processors
-    // void gathers_scatterp2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
-    // void gatherp_scatters2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
-    // void gatherp_scatters_gamma(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
-    // void gathers_scatterp_gamma(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
+    void gatherp_scatters(std::complex<T> *in, std::complex<T> *out); 
 
+    //gather sticks of and scatter planes of all processors
+    template<typename T>
+    void gathers_scatterp(std::complex<T> *in, std::complex<T> *out); 
 };
 
 }
-#endif //PlaneWave class
+#endif //PlaneWave 
