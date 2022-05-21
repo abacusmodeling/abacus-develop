@@ -59,8 +59,8 @@ unk_overlap_pw.o \
 berryphase.o \
 sto_iter.o\
 sto_wf.o\
+sto_func.o\
 sto_hchi.o\
-sto_che.o\
 sto_forces.o\
 sto_stress_pw.o
 
@@ -81,6 +81,7 @@ math_integral.o\
 math_ylmreal.o\
 mathzone_add1.o\
 math_bspline.o\
+math_chebyshev.o\
 integral.o \
 polint.o \
 sph_bessel.o \

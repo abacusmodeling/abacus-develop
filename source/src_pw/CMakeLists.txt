@@ -21,10 +21,10 @@ list(APPEND objects
     bspline_sf.cpp
     pw_complement.cpp
     soc.cpp
-    sto_che.cpp
     sto_iter.cpp
     sto_hchi.cpp
     sto_wf.cpp
+    sto_func.cpp
     sto_forces.cpp 
     sto_stress_pw.cpp
     stress_func_cc.cpp
