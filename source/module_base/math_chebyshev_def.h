@@ -429,9 +429,13 @@ bool Chebyshev<REAL>::checkconverge(
     (ptr->*funA)(arrayn_1, arrayn,1);
     REAL sum1,sum2;
     REAL t;
-
+#ifdef __MPI
     sum1=ModuleBase::GlobalFunc::ddot_real(N,arrayn_1,arrayn_1);
     sum2=ModuleBase::GlobalFunc::ddot_real(N,arrayn_1,arrayn);
+#else
+    sum1=this->ddot_real(arrayn_1,arrayn_1,N);
+    sum2=this->ddot_real(arrayn_1,arrayn,N);
+#endif
     t = sum2 / sum1 * (tmax - tmin) / 2 + (tmax + tmin) / 2;
     if(t < tmin || tmin == 0)
     {
@@ -447,8 +451,13 @@ bool Chebyshev<REAL>::checkconverge(
     for(int ior = 2; ior < norder; ++ior)
     {
         (ptr->*funA)(arrayn,arraynp1,1);
+#ifdef __MPI
         sum1=ModuleBase::GlobalFunc::ddot_real(N,arrayn,arrayn);
         sum2=ModuleBase::GlobalFunc::ddot_real(N,arrayn,arraynp1);
+#else
+    sum1=this->ddot_real(arrayn,arrayn,N);
+    sum2=this->ddot_real(arrayn,arraynp1,N);
+#endif
         t = sum2/sum1 * (tmax - tmin) / 2 + (tmax + tmin) / 2;
         if(t < tmin)
         {

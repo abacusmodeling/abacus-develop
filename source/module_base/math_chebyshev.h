@@ -24,7 +24,7 @@ class FFTW;
  * T_{n+2}(x) = 2xT_{n+1}(x) - T_n(x)
  * II. 
  * Any analytical function f(x) can be expanded by Chebyshev polynomial:
- * f(x) = \sum_{n=0}^{norder} C_n[f]*T_n(x) (|x| < 1),
+ * f(x) = \sum_{n=0}^{norder-1} C_n[f]*T_n(x) (|x| < 1),
  * where C_n[f] = \frac{2-\delta_{n0}}{\pi} \int_0^\pi f(cos(\theta))cos(n\theta) d\theta
  * Here C_n can be calculate with FFT.
  * III. 
@@ -40,13 +40,13 @@ class FFTW;
  * USAGE：
  * Chebyshev che(10); // constructe a chebyshev expansion of 10 orders (n=0,1,...,9)
  * 1. che.calcoef_real(&a, &A::cos) 						// calculate C_n[f], where f is a.cos
- *    for(inti=0;i<10;++i) cout<<che.coef_real[i]<<endl; 	//Then we print C_n[f]
+ *    for(int i=0;i<10;++i) cout<<che.coef_real[i]<<endl; 	//Then we print C_n[f]
  * 
  *    che.calcoef_complex(&b, &B::expi) 					// calculate C_n[g], where g is b.expi
- *    for(inti=0;i<10;++i) cout<<che.coef_complex[i]<<endl; //Then we print C_n[g]
+ *    for(int i=0;i<10;++i) cout<<che.coef_complex[i]<<endl; //Then we print C_n[g]
  * 
  *    che.calcoef_pair(&c, &C::cos, &C::sin) 				// calculate C_n[g], where g is (c.cos, c.sin)
- *    for(inti=0;i<10;++i) cout<<che.coef_complex[i]<<endl; //Then we print C_n[g]
+ *    for(int i=0;i<10;++i) cout<<che.coef_complex[i]<<endl; //Then we print C_n[g]
  * 
  * 2. che.calcoef_real(&occ, &Occupy::fd)
  * 	  che.calfinalvec_real(&hamilt, &Hamilt::hpsi, psi_in, psi_out, npw);
@@ -59,7 +59,15 @@ class FFTW;
  * 3. che.tracepolyA(&hamilt, &Hamilt::hpsi, psi_in, npw, npwx, nbands)
  * 	  //calculate \sum_i^{nbands} <psi_i|T_n(H)|psi_i>
  * 
- * 4. che.recurs_complex(&hamilt, &Hamilt::hpsi, vp1, v, vm1, npw)
+ * 4. che.calcoef_complex(&fun, &toolfunc::expi);  //calculate C_n[exp(ix)]
+ * 	  che.getpolyval(PI/4, T, norder);             //get T_n(pi/4)
+ *    std::complex<double> sum(0,0);
+ *    for(int i = 0; i < norder ; ++i)
+ *    {
+ * 		sum += che.coef_complex[i]*T[i];          //sum = exp(i*pi/4) = \sum_n C_n[exp(ix)]*T_n(pi/4)
+ *    }
+ * 
+ * 5. che.recurs_complex(&hamilt, &Hamilt::hpsi, vp1, v, vm1, npw)
  *    //calculate vp1: |vp1> = 2 H|v> - |vm1>;
  * 
  */
@@ -121,6 +129,8 @@ public:
 		T *ptr, void (T::*funA)(std::complex<REAL> *in, std::complex<REAL> *out, const int), 
 		std::complex<REAL> *wavein, 
 		const int N, const int LDA = 1,  const int m = 1);
+	//get T_n(x)
+	void getpolyval(REAL x, REAL* polyval, const int N);
 	
 	// IV.
 	// recurs fomula: v_{n+1} = 2Av_n - v_{n-1}
@@ -141,6 +151,8 @@ public:
 		std::complex<REAL>* arrayn,    //v_n
 		std::complex<REAL>* arrayn_1,  //v_{n-1}
 		const int N, const int LDA = 1,  const int m = 1);
+	//return 2xTn-Tn_1
+	inline REAL recurs(const REAL x, const REAL Tn, const REAL Tn_1);
 	
 	// V.
 	// auxiliary function
