@@ -23,7 +23,6 @@ Grid_Technique::Grid_Technique()
 	this->bcell_start = new int[1];
 	this->in_this_processor = new bool[1];
 	this->trace_lo = new int[1];
-	this->trace_beta = new int[1];//sun zhiyuan add
 
 	this->total_atoms_on_grid = 0;
     allocate_find_R2 = false;
@@ -42,7 +41,6 @@ Grid_Technique::~Grid_Technique()
 	delete[] bcell_start;
 	delete[] in_this_processor;
 	delete[] trace_lo;
-    delete[] trace_beta; //sun zhiyuan add
     
     if (allocate_find_R2)
 	{
@@ -134,25 +132,15 @@ void Grid_Technique::init_atoms_on_grid(void)
 	this->how_many_atoms = new int[nbxx];
 	ModuleBase::GlobalFunc::ZEROS(how_many_atoms, nbxx);
 	ModuleBase::Memory::record("atoms_on_grid","how_many_atoms",nbxx,"int");
-
-	// (2) start z and ended z,
-	// consistent with division of FFT grid.
-	// mohan add 2010-07-01
-	const int zstart = nbzp_start;
-	const int zend = nbzp + zstart;
-	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"zstart",zstart);
-	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"zend",zend);
-	int iz_now = -1;
 	
-	// (3) information about gloabl grid
+	// (2) information about gloabl grid
 	// and local grid.
 	// mohan add 2010-07-02
-	int ix,iy,iz;	
-	const int nbyz = nby * nbz;
-	const int nz = nbzp;
-	int f; // normal local form.
-	
-	// (4) Find the atoms using
+	int *ind_bigcell;
+	bool *bigcell_on_processor; // normal local form.
+	this->check_bigcell(ind_bigcell, bigcell_on_processor);
+
+	// (3) Find the atoms using
 	// when doing grid integration. 
 	delete[] in_this_processor;
 	this->in_this_processor = new bool[GlobalC::ucell.nat];
@@ -168,7 +156,6 @@ void Grid_Technique::init_atoms_on_grid(void)
 	ModuleBase::Memory::record("Grid_Meshcell","index2normal",this->nxyze,"int");
 	this->grid_expansion_index(1,index2normal); 
 
- 	
 	// (5) record how many atoms on
 	// each local grid point (ix,iy,iz)
 	int iat=0;
@@ -193,19 +180,11 @@ void Grid_Technique::init_atoms_on_grid(void)
 					ModuleBase::WARNING_QUIT("Grid_Technique::init_atoms_on_grid","normal >= nbxyz");
 				}
 
-				assert(normal>=0);	
+				assert(normal>=0);
 
-				// mohan add 2010-07-01 part1 
-				iz_now = normal % nbz;
-				if(iz_now<zstart)continue;
-				else if(iz_now>=zend)continue;
-				
-				// mohan add 2010-07-01 part2
-				ix = normal / nbyz;
-				iy = ( normal - ix * nbyz ) / nbz;
-				iz = iz_now - zstart;
-				f = ix * nby * nz + iy * nz + iz;
-					
+				int f = ind_bigcell[normal];
+				if(!bigcell_on_processor[normal]) continue;
+
 				++how_many_atoms[f];
 				++total_atoms_on_grid;
 
@@ -214,6 +193,9 @@ void Grid_Technique::init_atoms_on_grid(void)
 			++iat;
 		}
 	}
+
+	delete[] ind_bigcell;
+	delete[] bigcell_on_processor;
 
 	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total_atoms_on_grid",total_atoms_on_grid);
 	
@@ -237,6 +219,43 @@ void Grid_Technique::init_atoms_on_grid(void)
 	return;
 }
 
+void Grid_Technique::check_bigcell(int* &ind_bigcell, bool* &bigcell_on_processor)
+{
+	//check if a given bigcell is treated on this processor
+	const int zstart = nbzp_start;
+	const int zend = nbzp + zstart;
+	const int nbyz = nby * nbz;
+	const int nz = nbzp;
+
+	int iz_now, ix, iy, iz, ind;
+	bool flag;
+
+	ind_bigcell = new int[nbxyz];
+	bigcell_on_processor=new bool[nbxyz];
+	for(int i=0;i<nbxyz;i++)
+	{
+		int iz_now = i % nbz;
+		if(iz_now<zstart || iz_now>=zend)
+		{
+			flag=false;
+		}
+		else
+		{
+			flag=true;
+			ix = i / nbyz;
+			iy = ( i - ix * nbyz ) / nbz;
+			iz = iz_now - zstart;
+			ind = ix * nby * nz + iy * nz + iz;
+			//no need to calculate index if bigcell is
+			//not on this processor
+		}
+
+		ind_bigcell[i]=ind;
+		bigcell_on_processor[i]=flag;
+	}			
+	return;
+}
+
 void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 {	
 	ModuleBase::TITLE("Grid_Techinique","init_atoms_on_grid2");
@@ -252,13 +271,9 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	ModuleBase::Memory::record("Grid_Meshcell","index2ucell",this->nxyze,"int");	
 	this->grid_expansion_index(0,index2ucell);
 	
-	const int zstart = nbzp_start;
-	const int zend = nbzp + zstart;
-	int iz_now = -1;
-	int ix,iy,iz;	
-	const int nbyz = nby * nbz;
-	const int nz = nbzp;
-	int f; // normal local form.
+	int *ind_bigcell;
+	bool *bigcell_on_processor; // normal local form.
+	this->check_bigcell(ind_bigcell, bigcell_on_processor);
 
 	//--------------------------------------
 	// save which atom is in the bigcell.
@@ -294,15 +309,8 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 				const int normal = index2normal[ extgrid ];
 			
 				// mohan add 2010-07-01
-				iz_now = normal % nbz;
-				if(iz_now<zstart)continue;
-				else if(iz_now>=zend)continue;
-			
-				// mohan add 2010-07-01
-				ix = normal / nbyz;
-				iy = ( normal - ix * nbyz ) / nbz;
-				iz = iz_now - zstart;
-				f = ix * nby * nz + iy * nz + iz;
+				int f = ind_bigcell[normal];
+				if(!bigcell_on_processor[normal]) continue;
 				
 				// it's not the normal order to calculate which_atom
 				// and which_bigcell, especailly in 1D array. 
@@ -321,11 +329,6 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 				this->which_atom[ index ] = iat;
 				this->which_bigcell[ index ] = im;
 				this->which_unitcell[ index ] = index2ucell[extgrid];
-
-		//		if(im==13651)
-		//		{
-		//			std::cout << " which_unitcell=" << which_unitcell[index] << std::endl;
-		//		}
 				 
 				++how_many_atoms[f];
 				++count;
@@ -335,6 +338,8 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	}
 	assert( count == total_atoms_on_grid );
 	delete[] index2ucell;
+	delete[] ind_bigcell;
+	delete[] bigcell_on_processor;
 	return;
 }
 
@@ -375,56 +380,6 @@ void Grid_Technique::cal_grid_integration_index(void)
 	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Max atom on bigcell",max_atom);
 	return;
 }
-
-void Grid_Technique::cal_trace_beta(void)
-{
-	// save the atom information in trace_beta//
-	delete[] trace_beta;
-
-	// mohan modify 2021-04-06
-	//int nkb=GlobalC::ORB.nkb;
-	int nkb=GlobalC::ppcell.nkb;
-
-	this->trace_beta = new int[nkb];
-	for(int i=0; i<nkb; i++)
-	{
-		this->trace_beta[i] = -1;
-	}
-	this->lgbeta = 0;
-	int iat = 0;
-	int ih_all = 0;
-	int ih_local = 0;
-
-	GlobalV::ofs_running << "trace_beta" << std::endl;
-	for(int it=0; it<GlobalC::ucell.ntype; ++it)
-	{
-		Atom* atom = &GlobalC::ucell.atoms[it];
-		for(int ia=0; ia<atom->na; ++ia)
-		{
-			if(this->in_this_processor[iat])
-			{
-				for(int ih=0; ih<atom->nh; ih++)
-				{
-					this->trace_beta[ih_all] = ih_local;
-					GlobalV::ofs_running << std::setw(5) << ih_all << std::setw(15) << trace_beta[ih_all] << std::endl;
-					++ih_local;
-					++ih_all;
-				}
-			}
-			else
-			{
-				ih_all += atom->nh;
-			}
-			++iat;
-		}
-	}
-	this->lgbeta = ih_local;
-	assert(lgbeta>=0);
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgbeta",lgbeta);
-
-	return;
-}
-
 
 // set 'lgd' variable
 void Grid_Technique::cal_trace_lo(void)
