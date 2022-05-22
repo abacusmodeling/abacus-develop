@@ -67,7 +67,7 @@ template<typename REAL>
 template<class T>
 void Chebyshev<REAL>::calcoef_complex(T *ptr, std::complex<REAL> (T::*fun)(std::complex<REAL>))
 {
-     std::complex<double> *pcoef = ( std::complex<double> *)this->fftw.ccoef;
+     std::complex<REAL> *pcoef = ( std::complex<REAL> *)this->fftw.ccoef;
 
     //three point = 2/3 M + 1/3 T;
     //-----------------------------------------------
@@ -80,7 +80,7 @@ void Chebyshev<REAL>::calcoef_complex(T *ptr, std::complex<REAL> (T::*fun)(std::
     this->fftw.execute_fftw();
     for(int i = 0; i<norder; ++i)
     {
-        double phi=i*ModuleBase::PI/norder2;
+        REAL phi=i*ModuleBase::PI/norder2;
         if(i == 0)
         {
             coef_complex[i].real( (cos(phi) * pcoef[i].real() + sin(phi) * pcoef[i].imag()) / norder2 * 2 / 3 );
@@ -98,7 +98,7 @@ void Chebyshev<REAL>::calcoef_complex(T *ptr, std::complex<REAL> (T::*fun)(std::
     this->fftw.execute_fftw();
     for(int i = 0; i<norder; ++i)
     {
-        double phi=i*ModuleBase::PI/norder2;
+        REAL phi=i*ModuleBase::PI/norder2;
         if(i == 0)
         {
             coef_complex[i].imag( (cos(phi) * pcoef[i].real() + sin(phi) * pcoef[i].imag()) / norder2 * 2 / 3 );
@@ -154,7 +154,7 @@ template<typename REAL>
 template<class T>
 void Chebyshev<REAL>::calcoef_pair(T *ptr, REAL (T::*fun1)(REAL), REAL (T::*fun2)(REAL))
 {
-     std::complex<double> *pcoef = ( std::complex<double> *)this->fftw.ccoef;
+     std::complex<REAL> *pcoef = ( std::complex<REAL> *)this->fftw.ccoef;
 
     //three point = 2/3 M + 1/3 T;
     //-----------------------------------------------
@@ -167,7 +167,7 @@ void Chebyshev<REAL>::calcoef_pair(T *ptr, REAL (T::*fun1)(REAL), REAL (T::*fun2
     this->fftw.execute_fftw();
     for(int i = 0; i<norder; ++i)
     {
-        double phi=i*ModuleBase::PI/norder2;
+        REAL phi=i*ModuleBase::PI/norder2;
         if(i == 0)
         {
             coef_complex[i].real( (cos(phi) * pcoef[i].real() + sin(phi) * pcoef[i].imag()) / norder2 * 2 / 3 );
@@ -185,7 +185,7 @@ void Chebyshev<REAL>::calcoef_pair(T *ptr, REAL (T::*fun1)(REAL), REAL (T::*fun2
     this->fftw.execute_fftw();
     for(int i = 0; i<norder; ++i)
     {
-        double phi=i*ModuleBase::PI/norder2;
+        REAL phi=i*ModuleBase::PI/norder2;
         if(i == 0)
         {
             coef_complex[i].imag( (cos(phi) * pcoef[i].real() + sin(phi) * pcoef[i].imag()) / norder2 * 2 / 3 );

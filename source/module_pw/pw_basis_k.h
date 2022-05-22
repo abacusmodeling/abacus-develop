@@ -5,12 +5,41 @@
 namespace ModulePW
 {
 
-///
-/// Special pw_basis class.
-/// It includes different k-points
-/// plane waves: <r|g,k> = 1/sqrt(V) * exp(i(k+g)r)
-/// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(i(k+g)r)}
-///
+
+/**
+ * @brief Special pw_basis class. It includes different k-points.
+ * @author qianrui, Sunliang on 2021-10-15
+ * @details
+ * Math:
+ * plane waves: <r|g,k> = 1/sqrt(V) * exp(i(k+g)r)
+ * f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(i(k+g)r)}
+ * c(g,k) = \int f(r)*exp(-i(g+k)r) dr
+ * 
+ * USAGE：
+ * ModulePW::PW_Basis_K pwtest;
+ * //1. setup FFT grids for PW_Basis
+ * pwtest.initgrids(lat0,latvec,gridecut,nproc_in_pool,rank_in_pool);
+ * pwtest.initgrids(lat0,latvec,N1,N2,N3,nproc_in_pool,rank_in_pool); 
+ * //double lat0：unit length, (unit: bohr)
+ * //ModuleBase::Matrix3 latvec：lattice vector, (unit: lat0), e.g. ModuleBase::Matrix3 latvec(1, 1, 0, 0, 2, 0, 0, 0, 2);
+ * //double gridecut：cutoff energy to generate FFT grids, (unit: Ry)
+ * //int N1,N2,N3: FFT grids
+ * //2. init parameters
+ * pwtest.initparameters(gamma_only, ggecut, nks, kvec_d, dividemthd);
+ * //bool gamma_only: if use gamma_only
+ * //double ggecut: cutoff kinetic energy for planewaves(unit in Ry) (G+K)^2 < ggecut
+ * //int nks: number of k points in current cores
+ * //ModuleBase::Vector<double>* kvec_d: different k points
+ * //int dividemthd: method to divide planewaves to different cores
+ * //3. Setup transforms from real space to reciprocal space or from reciprocal space to real space.
+ * pwtest.setuptransform(); 
+ * pwtest.recip2real(wfg,wfr,ik); //wfg to wfr
+ * pwtest.real2recip(wfr,wfg,ik); //wfr to wfg
+ * //4. Generate the wave vector for planewaves
+ * pwtest.collect_local_pw(); 
+ * //then we can use pwtest.gg, pwtest.gdirect, pwtest.gcar, (unit in lat0^-1 or lat0^-2)
+ * 
+ */
 class PW_Basis_K : public PW_Basis
 {
 

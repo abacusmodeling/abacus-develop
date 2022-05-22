@@ -212,7 +212,7 @@ public:
 	FFTW(const int norder2_in);
 	~FFTW();
 	void execute_fftw();
-    double* dcoef; //[norder2]
+    float* dcoef; //[norder2]
 	fftwf_complex *ccoef;
 	fftwf_plan coef_plan;
 };

@@ -10,14 +10,40 @@
 namespace ModulePW
 {
 
-///
-/// A class which can convert a function of "r" to the corresponding linear 
-/// superposition of plane waves (real space to reciprocal space)
-/// or convert a linear superposition of plane waves to the function 
-/// of "r" (reciprocal to real).
-/// plane waves: <r|g>=1/sqrt(V) * exp(igr)
-/// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
-///
+/**
+ * @brief A class which can convert a function of "r" to the corresponding linear 
+ * superposition of plane waves (real space to reciprocal space)
+ * or convert a linear superposition of plane waves to the function 
+ * of "r" (reciprocal to real).
+ * @author qianrui, Sunliang on 2021-10-15
+ * @details
+ * Math:
+ * plane waves: <r|g>=1/sqrt(V) * exp(igr)
+ * f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
+ * c(g) = \int f(r)*exp(-igr) dr
+ * USAGE：
+ * ModulePW::PW_Basis pwtest;
+ * 1. setup FFT grids for PW_Basis
+ * pwtest.initgrids(lat0,latvec,gridecut,nproc_in_pool,rank_in_pool);
+ * pwtest.initgrids(lat0,latvec,N1,N2,N3,nproc_in_pool,rank_in_pool); 
+ * //double lat0：unit length, (unit: bohr)
+ * //ModuleBase::Matrix3 latvec：lattice vector, (unit: lat0), e.g. ModuleBase::Matrix3 latvec(1, 1, 0, 0, 2, 0, 0, 0, 2);
+ * //double gridecut：cutoff energy to generate FFT grids, (unit: Ry)
+ * //int N1,N2,N3: FFT grids
+ * 2. init parameters
+ * pwtest.initparameters(gamma_only,ggecut,dividemthd);
+ * //bool gamma_only: if use gamma_only
+ * //double ggecut: cutoff kinetic energy for planewaves,(unit in Ry) G^2 < ggecut
+ * //int dividemthd: method to divide planewaves to different cores
+ * 3. Setup transforms from real space to reciprocal space or from reciprocal space to real space.
+ * pwtest.setuptransform(); 
+ * pwtest.recip2real(rhog,rhor); //rhog to rhor
+ * pwtest.real2recip(rhor,rhog); //rhor to rhog
+ * 4. Generate the wave vector for planewaves
+ * pwtest.collect_local_pw(); 
+ * //then we can use pwtest.gg, pwtest.gdirect, pwtest.gcar, (unit in lat0^-1 or lat0^-2)
+ * 
+ */
 class PW_Basis
 {
 
