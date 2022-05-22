@@ -124,7 +124,8 @@ namespace ModuleESolver
             // calculate the charge density
             if (GlobalV::GAMMA_ONLY_LOCAL)
             {
-                this->UHM.GG.cal_rho(this->LOC.DM, (Charge*)(&GlobalC::CHR));
+                Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+                this->UHM.GG.cal_rho(&inout);
             }
             else
             {

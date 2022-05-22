@@ -10,61 +10,6 @@
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
 #include "../src_ri/abfs-vector3_order.h"
 
-namespace Gint_Tools
-{
-    enum class job_type{vlocal, rho, force};
-}
-
-//the class used to pass input/output variables
-//into the unified interface gint_k
-class Gint_inout
-{
-    public:
-    //input
-        double** DM_R;
-        double* vl;
-        bool isforce;
-        bool isstress;
-        int ispin;
-    //output
-        Charge* chr;
-        ModuleBase::matrix* fvl_dphi;
-        ModuleBase::matrix* svl_dphi;
-
-        Gint_Tools::job_type job;
-
-        Gint_inout(double **DM_R_in, Charge* chr_in, Gint_Tools::job_type job_in)
-        {
-            DM_R = DM_R_in;
-            chr = chr_in;
-            job = job_in;
-        }
-
-        Gint_inout(double** DM_R_in, double* vl_in,
-            bool isforce_in, bool isstress_in,
-            ModuleBase::matrix* fvl_dphi_in,
-            ModuleBase::matrix* svl_dphi_in,
-            Gint_Tools::job_type job_in)
-        {
-            DM_R = DM_R_in;
-            vl = vl_in;
-            isforce = isforce_in;
-            isstress = isstress_in;
-            fvl_dphi = fvl_dphi_in;
-            svl_dphi = svl_dphi_in;
-            job = job_in;
-        }
-
-        Gint_inout(double* vl_in,
-            int ispin_in,
-            Gint_Tools::job_type job_in)
-        {
-            vl = vl_in;
-            ispin = ispin_in;
-            job = job_in;
-        }
-};
-
 class Gint_k
 {
     public:

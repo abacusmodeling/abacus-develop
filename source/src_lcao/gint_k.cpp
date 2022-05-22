@@ -60,6 +60,7 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
     ModuleBase::timer::tick("Gint_k", "cal_gint_k");
 
 	const int max_size = GlobalC::GridT.max_atom;
+	const int LD_pool = max_size*GlobalC::ucell.nwmax;
 
 	if(inout->job==Gint_Tools::job_type::vlocal)
 	{
@@ -132,9 +133,6 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 						// get the value: how many atoms has orbital value on this grid.
 						const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
 						if(na_grid==0) continue;				
-
-						// set up band matrix psir_ylm and psir_DM
-						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 
 						if(inout->job == Gint_Tools::job_type::rho)
 						{

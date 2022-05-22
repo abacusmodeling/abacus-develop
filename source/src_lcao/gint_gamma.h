@@ -11,7 +11,6 @@
 #include "../module_base/global_variable.h"
 #include "grid_technique.h"
 #include "LCAO_matrix.h"
-#include "../src_pw/charge.h"
 #include <omp.h>
 
 //=========================================================
@@ -31,8 +30,24 @@ class Gint_Gamma
 	void cal_vlocal( const double*const vlocal, LCAO_Matrix &lm);
 
 	// (2) calculate charge density
-	void cal_rho(double*** DM_in, Charge* chr);
+	void cal_rho(Gint_inout *inout);
 
+	void cal_meshball_rho(
+		const int na_grid,
+		const int*const block_index,
+		const int*const vindex,
+		const double*const*const psir_ylm,
+		double** psir_DM,
+		double* rho) const;
+		
+	void gint_kernel_rho(
+		const int na_grid,
+		const int grid_index,
+		const double delta_r,
+		int* vindex,
+		const int LD_pool,
+		Gint_inout *inout) const;
+	
 	// (3) calcualte the forces related to grid
 	void cal_force(double*** DM_in, const double*const vlocal,
 			ModuleBase::matrix& force, ModuleBase::matrix& stress,
@@ -92,15 +107,12 @@ private:
 		const int lgd_now,
 		double*const*const GridVlocal) const;		// GridVlocal[lgd_now][lgd_now]
 
-	void cal_band_rho(
-		const int na_grid,   							// how many atoms on this (i,j,k) grid
-		const int LD_pool, 
-		const int*const block_iw, 						// block_iw[na_grid],	index of wave functions for each block
-		const int*const block_size, 					// block_size[na_grid],	band size: number of columns of a band
-		const int*const block_index,					// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag, 				// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
-		const int*const vindex,							// vindex[GlobalC::pw.bxyz]
+	void gint_kernel_rho(
+		const int na_grid,    							// how many atoms on this (i,j,k) grid
+		const int grid_index,
+		const double delta_r,
+		const int LD_pool,
+		const int*const vindex,
 		const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
 		Charge* chr) const;		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
 

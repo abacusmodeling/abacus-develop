@@ -82,7 +82,7 @@ void Gint_Gamma::cal_force(double*** DM_in, const double*const vlocal,
 
                     double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, dv);
                     const Gint_Tools::Array_Pool<double> psir_vlbr3    = Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
-                    const Gint_Tools::Array_Pool<double> psir_vlbr3_DM = Gint_Tools::get_psir_vlbr3_DM(na_grid, LD_pool, block_iw, block_size, block_index, cal_flag, psir_vlbr3.ptr_2D, DM_in[GlobalV::CURRENT_SPIN]);
+                    const Gint_Tools::Array_Pool<double> psir_vlbr3_DM = Gint_Tools::mult_psi_DM(na_grid, LD_pool, block_iw, block_size, block_index, cal_flag, psir_vlbr3.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
 
                     if(is_force)
                     {

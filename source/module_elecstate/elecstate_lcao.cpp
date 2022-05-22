@@ -143,7 +143,8 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     // calculate the charge density on real space grid.
     //------------------------------------------------------------
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GG.cal_rho(this->loc->DM, this->charge);
+    Gint_inout inout(this->loc->DM, this->charge,Gint_Tools::job_type::rho);
+    this->uhm->GG.cal_rho(&inout);
 
     this->charge->renormalize_rho();
 

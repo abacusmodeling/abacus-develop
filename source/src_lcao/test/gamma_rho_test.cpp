@@ -313,8 +313,8 @@ TEST_F(LCAOTest,GammaRho)
 	// calculate the charge density
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		GG.cal_rho(LOC.DM, (Charge*)(&GlobalC::CHR));
-		//std::cout<<"number of elec: "<<nelec<<std::endl;
+		Gint_inout inout(LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+		GG.cal_rho(&inout);
 	}
 	//std::cout<<"rho in test "<<GlobalC::CHR.rho[0][0]<<std::endl;
 

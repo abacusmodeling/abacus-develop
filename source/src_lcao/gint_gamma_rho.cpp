@@ -21,153 +21,61 @@
 #endif
 
 // can be done by GPU
-void Gint_Gamma::cal_band_rho(
-	const int na_grid,    							// how many atoms on this (i,j,k) grid
-	const int LD_pool, 
-    const int*const block_iw, 						// block_iw[na_grid],	index of wave functions for each block
-    const int*const block_size, 					// block_size[na_grid],	band size: number of columns of a band
-    const int*const block_index,					// block_index[na_grid+1], count total number of atomis orbitals
-    const bool*const*const cal_flag, 				// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-    const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
-    const int*const vindex,							// vindex[GlobalC::pw.bxyz]
-    const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-    Charge* chr) const		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
+void Gint_Gamma::gint_kernel_rho(
+	const int na_grid,
+	const int grid_index,
+	const double delta_r,
+	int* vindex,
+	const int LD_pool,
+	Gint_inout *inout) const		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
 {
-    //parameters for dsymm, dgemm and ddot
-    constexpr char side='L', uplo='U';
-    constexpr char transa='N', transb='N';
-    constexpr double alpha_symm=1, alpha_gemm=2, beta=1;    
-    constexpr int inc=1;
+	//prepare block information
+	int * block_iw, * block_index, * block_size;
+	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
+	bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
+
+	//evaluate psi on grids
+	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+	Gint_Tools::cal_psir_ylm(
+		na_grid, grid_index, delta_r,
+		block_index, block_size, 
+		cal_flag,
+		psir_ylm.ptr_2D);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        Gint_Tools::Array_Pool<double> psir_DM(GlobalC::pw.bxyz, LD_pool);
-        ModuleBase::GlobalFunc::ZEROS(psir_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+        Gint_Tools::Array_Pool<double> psir_DM
+			= Gint_Tools::mult_psi_DM(
+				na_grid, LD_pool,
+				block_iw, block_size,
+				block_index, cal_flag,
+				psir_ylm.ptr_2D,
+				inout->DM[is], 1);
 
-        for (int ia1=0; ia1<na_grid; ++ia1)
-        {
-            const int iw1_lo=block_iw[ia1];
-
-            //ia1==ia2, diagonal part
-            // find the first ib and last ib for non-zeros cal_flag
-            int first_ib=0, last_ib=0;
-            for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-            {
-                if(cal_flag[ib][ia1])
-                {
-                    first_ib=ib;
-                    break;
-                }
-            }
-            for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
-            {
-                if(cal_flag[ib][ia1])
-                {
-                    last_ib=ib+1;
-                    break;
-                }
-            }
-            const int ib_length=last_ib-first_ib;
-            if(ib_length<=0) continue;
-
-            int cal_num=0;
-            for(int ib=first_ib; ib<last_ib; ++ib)
-            {
-                cal_num += cal_flag[ib][ia1];
-            }
-            // if enough cal_flag is nonzero
-            if(cal_num>ib_length/4)
-            {
-                dsymm_(&side, &uplo, &block_size[ia1], &ib_length, 
-                    &alpha_symm, &DM[is][iw1_lo][iw1_lo], &GlobalC::GridT.lgd, 
-                    &psir_ylm[first_ib][block_index[ia1]], &LD_pool, 
-                    &beta, &psir_DM.ptr_2D[first_ib][block_index[ia1]], &LD_pool);
-            }
-            else
-            {
-                // int k=1;
-                for(int ib=first_ib; ib<last_ib; ++ib)
-                {
-                    if(cal_flag[ib][ia1])
-                    {
-                        dsymv_(&uplo, &block_size[ia1],
-                            &alpha_symm, &DM[is][iw1_lo][iw1_lo], &GlobalC::GridT.lgd,
-                            &psir_ylm[ib][block_index[ia1]], &inc,
-                            &beta, &psir_DM.ptr_2D[ib][block_index[ia1]], &inc);
-                    }
-                }
-            }
-            
-            //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "diagonal part of psir_DM done");
-            for (int ia2=ia1+1; ia2<na_grid; ++ia2)
-            {
-                int first_ib=0, last_ib=0;
-                for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-                {
-                    if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                    {
-                        first_ib=ib;
-                        break;
-                    }
-                }
-                for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
-                {
-                    if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                    {
-                        last_ib=ib+1;
-                        break;
-                    }
-                }
-                const int ib_length=last_ib-first_ib;
-                if(ib_length<=0) continue;
-
-                int cal_pair_num=0;
-                for(int ib=first_ib; ib<last_ib; ++ib)
-                {
-                    cal_pair_num += cal_flag[ib][ia1] && cal_flag[ib][ia2];
-                }
-                const int iw2_lo=block_iw[ia2];
-                if(cal_pair_num>ib_length/4)
-                {
-                    dgemm_(&transa, &transb, &block_size[ia2], &ib_length, &block_size[ia1], 
-                        &alpha_gemm, &DM[is][iw1_lo][iw2_lo], &GlobalC::GridT.lgd, 
-                        &psir_ylm[first_ib][block_index[ia1]], &LD_pool, 
-                        &beta, &psir_DM.ptr_2D[first_ib][block_index[ia2]], &LD_pool);
-                }
-                else
-                {
-                    for(int ib=first_ib; ib<last_ib; ++ib)
-                    {
-                        if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                        {
-                            dgemv_(&transa, &block_size[ia2], &block_size[ia1], 
-                                &alpha_gemm, &DM[is][iw1_lo][iw2_lo], &GlobalC::GridT.lgd,
-                                &psir_ylm[ib][block_index[ia1]], &inc,
-                                &beta, &psir_DM.ptr_2D[ib][block_index[ia2]], &inc);
-                        }
-                    }
-                }
-                //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "upper triangle part of psir_DM done, atom2", ia2);
-            }// ia2
-        } // ia1
-    
-        double *rhop = chr->rho[is];
-        for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-        {
-            const double r = ddot_(&block_index[na_grid], psir_ylm[ib], &inc, psir_DM.ptr_2D[ib], &inc);
-            const int grid = vindex[ib];
-            rhop[grid] += r;
-        }
+		this->cal_meshball_rho(na_grid, block_index,
+			vindex, psir_ylm.ptr_2D,
+			psir_DM.ptr_2D, inout->chr->rho[is]);
     } // end is
+	delete[] block_iw;
+	delete[] block_index;
+	delete[] block_size;
+
+	for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+	{
+		delete[] cal_flag[ib];
+	}
+	delete[] cal_flag;
+
 }
 
 // calculate charge density
-void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
+void Gint_Gamma::cal_rho(Gint_inout *inout)
 {
     ModuleBase::TITLE("Gint_Gamma","cal_rho");
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
     max_size = GlobalC::GridT.max_atom;
+	const int LD_pool = max_size*GlobalC::ucell.nwmax;
 
 	if(max_size)
     {
@@ -209,37 +117,14 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 						if(na_grid==0) continue;				
 						
 						// here vindex refers to local potentials
-						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
-						
-                        int * block_iw, * block_index, * block_size;
-                        Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
-
-						//------------------------------------------------------
-						// whether the atom-grid distance is larger than cutoff
-						//------------------------------------------------------
-						bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
-
-						// set up band matrix psir_ylm and psir_DM
-						const int LD_pool = max_size*GlobalC::ucell.nwmax;
-						
-						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
-                        Gint_Tools::cal_psir_ylm(
-							na_grid, grid_index, delta_r,
-							block_index, block_size, 
-							cal_flag,
-                            psir_ylm.ptr_2D);
-						
-						this->cal_band_rho(na_grid, LD_pool, block_iw, block_size, block_index,
-							cal_flag, psir_ylm.ptr_2D, vindex, DM_in, chr);
-
-						free(vindex);			vindex=nullptr;
-                        delete[] block_iw;
-                        delete[] block_index;
-                        delete[] block_size;
-
-						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-							free(cal_flag[ib]);
-						free(cal_flag);			cal_flag=nullptr;
+						if(inout->job == Gint_Tools::job_type::rho)
+						{
+							int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);						
+							this->gint_kernel_rho(na_grid, grid_index,
+								delta_r, vindex, LD_pool, 
+								inout); 
+							delete[] vindex;
+						}
 					}// k
 				}// j
 			}// i
@@ -252,4 +137,22 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
     return;
+}
+
+void Gint_Gamma::cal_meshball_rho(
+	const int na_grid,
+	const int*const block_index,
+	const int*const vindex,
+	const double*const*const psir_ylm,
+	double** psir_DM,
+	double* rho) const
+{		
+	const int inc = 1;
+	// sum over mu to get density on grid
+	for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+	{
+		double r=ddot_(&block_index[na_grid], psir_ylm[ib], &inc, psir_DM[ib], &inc);
+		const int grid = vindex[ib];
+		rho[ grid ] += r;
+	}
 }

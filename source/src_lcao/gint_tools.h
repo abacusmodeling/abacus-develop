@@ -5,6 +5,85 @@
 #define GINT_TOOLS_H
 #include "grid_technique.h"
 #include <cstdlib>
+#include "../src_pw/charge.h"
+
+namespace Gint_Tools
+{
+    enum class job_type{vlocal, rho, force};
+}
+
+//the class used to pass input/output variables
+//into the unified interface gint_k
+class Gint_inout
+{
+    public:
+    //input
+        double** DM_R;
+        double*** DM;
+        double* vl;
+        bool isforce;
+        bool isstress;
+        int ispin;
+    //output
+        Charge* chr;
+        ModuleBase::matrix* fvl_dphi;
+        ModuleBase::matrix* svl_dphi;
+
+        Gint_Tools::job_type job;
+
+        Gint_inout(double **DM_R_in, Charge* chr_in, Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            chr = chr_in;
+            job = job_in;
+        }
+
+        Gint_inout(double** DM_R_in, double* vl_in,
+            bool isforce_in, bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in,
+            ModuleBase::matrix* svl_dphi_in,
+            Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            vl = vl_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
+        Gint_inout(double* vl_in,
+            int ispin_in,
+            Gint_Tools::job_type job_in)
+        {
+            vl = vl_in;
+            ispin = ispin_in;
+            job = job_in;
+        }
+
+        Gint_inout(double ***DM_in, Charge* chr_in, Gint_Tools::job_type job_in)
+        {
+            DM = DM_in;
+            chr = chr_in;
+            job = job_in;
+        }
+
+        Gint_inout(double*** DM_in, double* vl_in,
+            bool isforce_in, bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in,
+            ModuleBase::matrix* svl_dphi_in,
+            Gint_Tools::job_type job_in)
+        {
+            DM = DM_in;
+            vl = vl_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+};
 
 namespace Gint_Tools
 {
@@ -104,15 +183,16 @@ namespace Gint_Tools
 		const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
 		const double*const*const psir_ylm);		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
 
-	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DM(
+	Gint_Tools::Array_Pool<double> mult_psi_DM(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
 		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
 		const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
 		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
 		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const DM);
+		const double*const*const psi,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		const double*const*const DM,
+		const int job);
 
 	Gint_Tools::Array_Pool<double> mult_psi_DMR(
         const int &grid_index, 
