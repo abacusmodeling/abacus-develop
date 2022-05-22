@@ -13,11 +13,11 @@ namespace ModulePW
 /// Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
 /// 
 void PW_Basis:: initgrids(
-        double lat0_in, //unit length (unit in bohr)
-        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        double gridecut,
-        int poolnproc_in,
-        int poolrank_in
+        const double lat0_in, //unit length (unit in bohr)
+        const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+        const double gridecut,
+        const int poolnproc_in,
+        const int poolrank_in
 )
 {
     //init lattice
@@ -34,24 +34,24 @@ void PW_Basis:: initgrids(
     //-------------------------init grids-------------------------
     //------------------------------------------------------------
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
-    gridecut = gridecut / tpiba2;
+    const double gridecut_lat = gridecut / tpiba2;
     ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];// ibox[i] are the minimal FFT dimensions,
     
     lat.x = latvec.e11;
     lat.y = latvec.e12;
     lat.z = latvec.e13;
-    ibox[0] = int(sqrt(gridecut) * sqrt(lat * lat)) + 1;
+    ibox[0] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
 
     lat.x = latvec.e21;
     lat.y = latvec.e22;
     lat.z = latvec.e23;
-    ibox[1] = int(sqrt(gridecut) * sqrt(lat * lat)) + 1;
+    ibox[1] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
 
     lat.x = latvec.e31;
     lat.y = latvec.e32;
     lat.z = latvec.e33;
-    ibox[2] = int(sqrt(gridecut) * sqrt(lat * lat)) + 1;
+    ibox[2] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
     
     int n1,n2,n3; 
     n1 = n2 = n3 = 0;
@@ -66,7 +66,7 @@ void PW_Basis:: initgrids(
                 f.y = igy;
                 f.z = igz;
                 double modulus = f * (this->GGT * f);
-                if(modulus <= gridecut)
+                if(modulus <= gridecut_lat)
                 {
                     if(n1 < abs(igx)) n1 = abs(igx);
                     if(n2 < abs(igy)) n2 = abs(igy);
@@ -146,11 +146,11 @@ void PW_Basis:: initgrids(
 /// Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
 /// 
 void PW_Basis:: initgrids(
-    double lat0_in,
-    ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    int nx_in, int bigny_in, int nz_in,
-    int poolnproc_in,
-    int poolrank_in
+    const double lat0_in,
+    const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+    const int nx_in, int bigny_in, int nz_in,
+    const int poolnproc_in,
+    const int poolrank_in
 )
 {
     this->lat0 = lat0_in;
@@ -172,9 +172,9 @@ void PW_Basis:: initgrids(
 
 //Init some parameters
 void PW_Basis:: initparameters(
-    bool gamma_only_in,
-    double pwecut_in,
-    int distribution_type_in
+    const bool gamma_only_in,
+    const double pwecut_in,
+    const int distribution_type_in
 )
 {
     this->gamma_only = gamma_only_in;

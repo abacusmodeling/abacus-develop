@@ -25,8 +25,7 @@ TEST_F(PWTEST,test2_1_2)
 
     pwtest.initgrids(lat0, latvec, 2*wfcecut,nproc_in_pool, rank_in_pool);
     pwtest.initparameters(gamma_only, wfcecut, distribution_type);
-    pwtest.distribute_r();
-    pwtest.distribute_g();
+    pwtest.setuptransform();
     pwtest.collect_local_pw();
     ModuleBase::Matrix3 GT,G,GGT;
     GT = latvec.Inverse();

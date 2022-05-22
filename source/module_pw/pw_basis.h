@@ -53,26 +53,26 @@ public:
 
     //Init the grids for FFT
     void initgrids(
-        double lat0_in, //unit length (unit in bohr)
-        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
-        double gridecut, //unit in Ry, ecut to set up grids
-        int poolnproc_in, // Number of processors in this pool
-        int poolrank_in // Rank in this pool
+        const double lat0_in, //unit length (unit in bohr)
+        const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
+        const double gridecut, //unit in Ry, ecut to set up grids
+        const int poolnproc_in, // Number of processors in this pool
+        const int poolrank_in // Rank in this pool
     );
     //Init the grids for FFT
     void initgrids(
-        double lat0_in,
-        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        int nx_in, int bigny_in, int nz_in,
-        int poolnproc_in, // Number of processors in this pool
-        int poolrank_in // Rank in this pool
+        const double lat0_in,
+        const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+        const int nx_in, int bigny_in, int nz_in,
+        const int poolnproc_in, // Number of processors in this pool
+        const int poolrank_in // Rank in this pool
     );
 
     //Init some parameters
     void initparameters(
-        bool gamma_only_in,
-        double pwecut_in, //unit in Ry, ecut to decides plane waves
-        int distribution_type_in
+        const bool gamma_only_in,
+        const double pwecut_in, //unit in Ry, ecut to decides plane waves
+        const int distribution_type_in = 1
     );
 
 //===============================================
@@ -112,7 +112,8 @@ public:
 
     //distribute plane waves and grids and set up fft
     void setuptransform();
-    
+
+protected:
     //distribute plane waves to different processors
     void distribute_g();
 
@@ -123,7 +124,7 @@ public:
     void getstartgr();
 
 
-
+public:
     //prepare for transforms between real and reciprocal spaces
     void collect_local_pw();
 
@@ -147,6 +148,7 @@ public:
     int poolrank;
     //distribute plane waves to different processors
 
+protected:
     //method 1: first consider number of plane waves
     void distribution_method1(); 
     // Distribute sticks to cores in method 1.
@@ -218,6 +220,7 @@ public:
     void recip2real(std::complex<float> * in, float *out); //in:(nz, ns)  ; out(nplane,nx*ny)
     void recip2real(std::complex<float> * in, std::complex<float> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
 #endif
+protected:
     //gather planes and scatter sticks of all processors
     template<typename T>
     void gatherp_scatters(std::complex<T> *in, std::complex<T> *out); 

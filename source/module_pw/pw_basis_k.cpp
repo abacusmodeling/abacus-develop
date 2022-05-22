@@ -20,11 +20,11 @@ PW_Basis_K::~PW_Basis_K()
 }
 
 void PW_Basis_K:: initparameters(
-    bool gamma_only_in,
-    double gk_ecut_in,
-    int nks_in, //number of k points in this pool
-    ModuleBase::Vector3<double> *kvec_d_in, // Direct coordinates of k points
-    int distribution_type_in
+    const bool gamma_only_in,
+    const double gk_ecut_in,
+    const int nks_in, //number of k points in this pool
+    const ModuleBase::Vector3<double> *kvec_d_in, // Direct coordinates of k points
+    const int distribution_type_in
 )
 {
     this->nks = nks_in;

@@ -49,11 +49,11 @@ public:
 
     //init parameters of pw_basis_k class
     void initparameters(
-        bool gamma_only_in,
-        double ecut_in,
-        int nk_in, //number of k points in this pool
-        ModuleBase::Vector3<double> *kvec_d, // Direct coordinates of k points
-        int distribution_type_in
+        const bool gamma_only_in,
+        const double ecut_in,
+        const int nk_in, //number of k points in this pool
+        const ModuleBase::Vector3<double> *kvec_d, // Direct coordinates of k points
+        const int distribution_type_in
     );
 
 
@@ -68,14 +68,15 @@ public:
 public:
     //prepare for transforms between real and reciprocal spaces
     void setuptransform();
-    
-    //create igl2isz_k map array for fft
-    void setupIndGk();
 
     int *igl2isz_k; //[npwk_max*nks] map (ig,ik) to (is,iz) 
 
     //create Direct coordinate, Cartesian coordinate, norm2 of plane waves in each processor
     void collect_local_pw();
+
+private:
+    //create igl2isz_k map array for fft
+    void setupIndGk();
 
 public:
     void real2recip(double * in, std::complex<double> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)

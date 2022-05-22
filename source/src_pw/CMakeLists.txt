@@ -8,8 +8,8 @@ list(APPEND objects
     charge_extra.cpp
     charge_mixing.cpp
     charge_pulay.cpp
-    diago_cg.cpp
-    diago_david.cpp
+    diago_cg_old.cpp
+    diago_david_old.cpp
     energy.cpp
     forces.cpp
     global.cpp
@@ -17,7 +17,7 @@ list(APPEND objects
     magnetism.cpp
     occupy.cpp
     potential.cpp
-    pw_basis.cpp
+    pw_basis_old.cpp
     bspline_sf.cpp
     pw_complement.cpp
     soc.cpp
@@ -68,7 +68,7 @@ elseif(USE_ROCM)
 else()
     list(APPEND objects
         hamilt.cpp
-        hamilt_pw.cpp
+        hamilt_pw_old.cpp
         electrons.cpp
     )
 endif()

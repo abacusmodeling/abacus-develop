@@ -260,12 +260,47 @@ xc_functional_wrapper_tauxc.o \
 xc_functional_wrapper_xc.o \
 xc_functional.o \
 
+OBJ_PLANEWAVE=fft.o\
+pw_basis.o\
+pw_basis_k.o\
+pw_distributeg.o\
+pw_distributeg_method1.o\
+pw_distributeg_method2.o\
+pw_distributer.o\
+pw_init.o\
+pw_operation.o\
+pw_transform.o\
+pw_transform_k.o
+
+OBJ_HSOLVER=diago_blas.o\
+diago_cg.o\
+diago_david.o\
+diago_elpa.o\
+diago_iter_assist.o\
+hsolver_lcao.o\
+hsolver_pw.o\
+
+OBJ_ELECSTATES=elecstate.o\
+dm2d_to_grid.o\
+elecstate_lcao.o\
+elecstate_pw.o\
+
+OBJ_PSI=psi.o
+
+OBJ_HAMILT=hamilt_lcao.o\
+hamilt_pw.o
+
 OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\
 $(OBJS_LCAO)\
 $(OBJS_ESOLVER)\
 $(OBJS_XC)\
 $(OBJS_SURCHEM)\
+$(OBJ_PLANEWAVE)\
+$(OBJ_HSOLVER)\
+$(OBJ_ELECSTATES)\
+$(OBJ_PSI)\
+${OBJ_HAMILT}\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
@@ -323,14 +358,14 @@ dmft.o \
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
-pw_basis.o\
+pw_basis_old.o\
 bspline_sf.o\
 hamilt.o \
 pw_complement.o\
 wf_local.o \
-hamilt_pw.o \
-diago_david.o\
-diago_cg.o\
+hamilt_pw_old.o \
+diago_david_old.o\
+diago_cg_old.o\
 output.o  \
 run_md_classic.o\
 LJ_potential.o\
