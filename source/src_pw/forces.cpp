@@ -76,6 +76,10 @@ void Forces::init(ModuleBase::matrix& force)
     {
         force_e.create(GlobalC::ucell.nat, 3);
         Efield::compute_force(GlobalC::ucell, force_e);
+        if(GlobalV::TEST_FORCE)
+        {
+            Forces::print("EFIELD      FORCE (Ry/Bohr)", force_e);
+        }
     }
 
     //impose total force = 0
