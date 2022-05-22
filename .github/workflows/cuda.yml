@@ -27,21 +27,28 @@ jobs:
           ec2-instance-type: g4dn.xlarge
           subnet-id: subnet-72d3e53e
           security-group-id: sg-06b0c93122c08aeab
+
   test:
     name: Do the job on the runner
     needs: start-runner # required to start the main job when the runner is ready
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
-    container: ghcr.io/deepmodeling/abacus-development-kit:cuda
+    container: 
+      image: ghcr.io/deepmodeling/abacus-development-kit:cuda
+      options: --gpus all
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Build and Test
-        env:
-          GTEST_COLOR: 'yes'
+      - name: Build cuSolver
         run: |
-          cmake -B build -DBUILD_TESTING=ON -DUSE_CUDA=ON
+          cmake -B build -DUSE_CUSOLVER_LCAO=ON
           cmake --build build -j4
           cmake --install build
+      - name: Test
+        run: |
+          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
+          cd tests/integrate
+          echo "ks_solver cusolver" >> ./270_NO_MD_2O/INPUT
+          ./Autotest.sh -r 270_NO_MD_2O
 
   stop-runner:
     name: Stop self-hosted EC2 runner
