@@ -277,7 +277,6 @@ void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry
 		std::cout << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 		std::cout << std::setiosflags(ios::showpos);
 		std::cout << std::setprecision(6);
-		std::cout << std::setiosflags(ios::fixed);
 	}
 
     int iat = 0;
@@ -314,7 +313,6 @@ void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry
 			if(GlobalV::TEST_FORCE && ry)
 			{
 				std::cout << " " << std::setw(8) << ss.str();
-                std::cout<<fixed;
 				if( abs(f(iat,0)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,0);
 				else std::cout << std::setw(15) << "0";
 				if( abs(f(iat,1)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,1);
@@ -326,7 +324,6 @@ void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry
 			else if (GlobalV::TEST_FORCE)
 			{
 				std::cout << " " << std::setw(8) << ss.str();
-                std::cout<<fixed;
 				if( abs(f(iat,0)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,0)*fac;
 				else std::cout << std::setw(15) << "0";
 				if( abs(f(iat,1)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,1)*fac;
