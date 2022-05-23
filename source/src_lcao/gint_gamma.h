@@ -52,6 +52,17 @@ class Gint_Gamma
 	void cal_force(double*** DM_in, const double*const vlocal,
 			ModuleBase::matrix& force, ModuleBase::matrix& stress,
 			const bool is_force, const bool is_stress);
+	void gint_kernel_force(
+		const int na_grid,
+		const int grid_index,
+		const double delta_r,
+		double* vldr3,
+		const int LD_pool,
+		double** DM,
+		const bool isforce,
+		const bool isstress,
+		ModuleBase::matrix* fvl_dphi,
+		ModuleBase::matrix* svl_dphi);
 
 	// (4) calcualte the envelope function
 	void cal_env(const double* wfc, double* rho);

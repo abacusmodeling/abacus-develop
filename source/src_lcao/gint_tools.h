@@ -70,7 +70,7 @@ class Gint_inout
         }
 
         Gint_inout(double*** DM_in, double* vl_in,
-            bool isforce_in, bool isstress_in,
+            const bool isforce_in, const bool isstress_in,
             ModuleBase::matrix* fvl_dphi_in,
             ModuleBase::matrix* svl_dphi_in,
             Gint_Tools::job_type job_in)
