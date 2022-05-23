@@ -282,6 +282,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 		const int nbz=GlobalC::GridT.nbzp;
 
 		const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
+        const int max_size = GlobalC::GridT.max_atom;
 
 		const int lgd_now=GlobalC::GridT.lgd;
 		if(max_size>0 && lgd_now>0)
@@ -469,7 +470,6 @@ void Gint_Gamma::cal_vlocal(
     ModuleBase::timer::tick("Gint_Gamma", "cal_vlocal"
     );
 
-    this->max_size = GlobalC::GridT.max_atom;
     const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
 	vl_grid_to_2D(GridVlocal, lm);
 

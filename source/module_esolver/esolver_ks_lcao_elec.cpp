@@ -125,7 +125,7 @@ namespace ModuleESolver
             if (GlobalV::GAMMA_ONLY_LOCAL)
             {
                 Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
-                this->UHM.GG.cal_rho(&inout);
+                this->UHM.GG.cal_gint_gamma(&inout);
             }
             else
             {

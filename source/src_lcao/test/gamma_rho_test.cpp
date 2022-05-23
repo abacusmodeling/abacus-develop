@@ -12,7 +12,7 @@
 
 /**
  * This unit test is designed to test the functions in src_lcao/
- * gint_gamma_rho.cpp: Gint_Gamma::cal_rho(), Gint_Gamma::gamma_charge()
+ * gint_gamma_rho.cpp: Gint_Gamma::cal_gint_gamma(), Gint_Gamma::gamma_charge()
  * and sum_up_rho. 
  * It can make two comparisons:
  * (1) compare density matrix calculated from wavefunction with that read
@@ -314,7 +314,7 @@ TEST_F(LCAOTest,GammaRho)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		Gint_inout inout(LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
-		GG.cal_rho(&inout);
+		GG.cal_gint_gamma(&inout);
 	}
 	//std::cout<<"rho in test "<<GlobalC::CHR.rho[0][0]<<std::endl;
 

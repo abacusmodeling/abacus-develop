@@ -30,39 +30,7 @@ class Gint_Gamma
 	void cal_vlocal( const double*const vlocal, LCAO_Matrix &lm);
 
 	// (2) calculate charge density
-	void cal_rho(Gint_inout *inout);
-
-	void cal_meshball_rho(
-		const int na_grid,
-		const int*const block_index,
-		const int*const vindex,
-		const double*const*const psir_ylm,
-		double** psir_DM,
-		double* rho) const;
-		
-	void gint_kernel_rho(
-		const int na_grid,
-		const int grid_index,
-		const double delta_r,
-		int* vindex,
-		const int LD_pool,
-		Gint_inout *inout) const;
-	
-	// (3) calcualte the forces related to grid
-	void cal_force(double*** DM_in, const double*const vlocal,
-			ModuleBase::matrix& force, ModuleBase::matrix& stress,
-			const bool is_force, const bool is_stress);
-	void gint_kernel_force(
-		const int na_grid,
-		const int grid_index,
-		const double delta_r,
-		double* vldr3,
-		const int LD_pool,
-		double** DM,
-		const bool isforce,
-		const bool isstress,
-		ModuleBase::matrix* fvl_dphi,
-		ModuleBase::matrix* svl_dphi);
+	void cal_gint_gamma(Gint_inout *inout);
 
 	// (4) calcualte the envelope function
 	void cal_env(const double* wfc, double* rho);
@@ -73,9 +41,6 @@ class Gint_Gamma
 private:
 
     double***  DM;   //pointer to LOC.DM
-
-	int grid_index;			// may delete?
-	int max_size;
 
     ///===============================
     /// Use MPI_Alltoallv to convert a grid distributed matrix
@@ -101,10 +66,29 @@ private:
 	Gint_Tools::Array_Pool<double> gamma_vlocal(const double*const vlocal) const;  
 	// for calculation of Mulliken charge.
 	void gamma_mulliken(double** mulliken);
-
 	// for calculation of envelope functions.
 	void gamma_envelope(const double* wfc, double* rho);// mohan add 2011-07-01
 
+    //------------------------------------------------------
+    // in gint_gamma_rho.cpp 
+    //------------------------------------------------------
+    // calculate the charge density via grid integrals
+	void gint_kernel_rho(
+		const int na_grid,
+		const int grid_index,
+		const double delta_r,
+		int* vindex,
+		const int LD_pool,
+		Gint_inout *inout) const;
+
+	void cal_meshball_rho(
+		const int na_grid,
+		const int*const block_index,
+		const int*const vindex,
+		const double*const*const psir_ylm,
+		double** psir_DM,
+		double* rho) const;
+	
 	void cal_meshball_vlocal(
 		const int na_grid,  						// how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -118,14 +102,21 @@ private:
 		const int lgd_now,
 		double*const*const GridVlocal) const;		// GridVlocal[lgd_now][lgd_now]
 
-	void gint_kernel_rho(
-		const int na_grid,    							// how many atoms on this (i,j,k) grid
+    //------------------------------------------------------
+    // in gint_gamma_fvl.cpp 
+    //------------------------------------------------------
+    // calculate vl contributuion to force & stress via grid integrals	
+	void gint_kernel_force(
+		const int na_grid,
 		const int grid_index,
 		const double delta_r,
+		double* vldr3,
 		const int LD_pool,
-		const int*const vindex,
-		const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-		Charge* chr) const;		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
+		double** DM,
+		const bool isforce,
+		const bool isstress,
+		ModuleBase::matrix* fvl_dphi,
+		ModuleBase::matrix* svl_dphi);
 
 	void cal_meshball_force(
 		const int grid_index,
