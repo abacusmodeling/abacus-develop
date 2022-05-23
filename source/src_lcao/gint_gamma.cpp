@@ -136,15 +136,16 @@ void Gint_Gamma::cal_gint_gamma(Gint_inout *inout)
 			}// i
 
 #ifdef _OPENMP
-			#pragma omp critical(gint_k)
 			if(inout->job==Gint_Tools::job_type::force)
 			{
 				if(inout->isforce)
 				{
+                    #pragma omp critical(gint_k)
 					inout->fvl_dphi[0]+=fvl_dphi_thread;
 				}
 				if(inout->isstress)
 				{
+                    #pragma omp critical(gint_k)
 					inout->svl_dphi[0]+=svl_dphi_thread;
 				}
 			}

@@ -172,11 +172,11 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 			} // int i
 
 #ifdef _OPENMP
-			#pragma omp critical(gint_k)
 			if(inout->job==Gint_Tools::job_type::vlocal)
 			{
 				for(int innrg=0; innrg<GlobalC::GridT.nnrg; innrg++)
 				{
+					#pragma omp critical(gint_k)
 					pvpR_reduced[inout->ispin][innrg] += pvpR_reduced_thread[innrg];
 				}
 				delete[] pvpR_reduced_thread;
@@ -185,10 +185,12 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 			{
 				if(inout->isforce)
 				{
+					#pragma omp critical(gint_k)
 					inout->fvl_dphi[0]+=fvl_dphi_thread;
 				}
 				if(inout->isstress)
 				{
+					#pragma omp critical(gint_k)
 					inout->svl_dphi[0]+=svl_dphi_thread;
 				}
 			}
