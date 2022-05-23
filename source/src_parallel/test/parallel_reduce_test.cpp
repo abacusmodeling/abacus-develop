@@ -23,8 +23,31 @@
  * using MPI_Allreduce with only 1 number, another one by
  * using MPI_Allreduce with n numbers. The total array is
  * deemed as the sum of local arrays with the same length.
- *   1. ParaReduce.IntAll:
- *       Tests two variations reduce_int_all function.
+ *   1. ReduceIntAll:
+ *       Tests two variations of reduce_int_all()
+ *   2. ReduceDoubleAll:
+ *       Tests two variations of reduce_double_all()
+ *   3. ReduceComplexAll:
+ *       Tests two variations of reduce_complex_all()
+ *   4. GatherIntAll:
+ *       Tests gather_int_all() and gather_min_int_all()
+ *   5. GatherDoubleAll:
+ *       Tests gather_min_double_all() and gather_max_double_all()
+ *   6. ReduceIntDiag:
+ *       Tests reduce_int_diag()
+ *   7. ReduceDoubleDiag:
+ *       Tests reduce_double_diag()
+ *   8. ReduceIntGrid:
+ *       Tests reduce_int_grid()
+ *   9. ReduceDoubleGrid:
+ *       Tests reduce_double_grid()
+ *   10.ReduceDoublePool:
+ *       Tests two variations of reduce_double_pool()
+ *       and two variations of reduce_double_allpool()
+ *   11.ReduceComplexPool:
+ *       Tests two variations of reduce_complex_double_pool()
+ *   12.GatherDoublePool:
+ *       Tests gather_min_double_pool() and gather_max_double_pool()
  *
  *
  */
