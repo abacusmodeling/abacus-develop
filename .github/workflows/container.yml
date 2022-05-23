@@ -8,6 +8,7 @@ on:
 jobs:
   build_container_and_push:
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'deepmodeling'
     strategy:
       matrix:
         dockerfile: ["gnu","intel","cuda"]
