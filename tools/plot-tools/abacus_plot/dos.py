@@ -517,7 +517,7 @@ if __name__ == "__main__":
     #                     energy_range=energy_range, dos_range=dos_range, notes={'s': '(a)'})
     # fig.savefig("tdos.png")
 
-    pdosfile = r"C:\Users\YY.Ji\Desktop\Si\PDOS"
+    pdosfile = r"../examples/Si/PDOS"
     pdos = PDOS(pdosfile)
     #species = {"Ag": [2], "Cl": [1], "In": [0]}
     atom_index = {1: {1: [0, 1]}}

@@ -756,7 +756,7 @@ class PBand(Band):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from pathlib import Path
-    parent = Path(r"C:\Users\YY.Ji\Desktop\Si")
+    parent = Path(r"../examples/Si")
     name = "PBANDS_1"
     path = parent/name
     fig, ax = plt.subplots(figsize=(12, 6))
