@@ -173,8 +173,6 @@ class Gint_k
         double** psir_DMR,
         double* rho);
 
-    private:
-
     //----------------------------
     // key variable 
     //----------------------------

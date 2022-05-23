@@ -6,6 +6,7 @@
 #include "grid_technique.h"
 #include <cstdlib>
 #include "../src_pw/charge.h"
+#include "LCAO_matrix.h"
 
 namespace Gint_Tools
 {
@@ -24,6 +25,8 @@ class Gint_inout
         bool isforce;
         bool isstress;
         int ispin;
+		LCAO_Matrix *lm;
+
     //output
         Charge* chr;
         ModuleBase::matrix* fvl_dphi;
@@ -81,6 +84,15 @@ class Gint_inout
             isstress = isstress_in;
             fvl_dphi = fvl_dphi_in;
             svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
+		Gint_inout(double* vl_in,
+            LCAO_Matrix *lm_in,
+            Gint_Tools::job_type job_in)
+        {
+            vl = vl_in;
+            lm = lm_in;
             job = job_in;
         }
 };

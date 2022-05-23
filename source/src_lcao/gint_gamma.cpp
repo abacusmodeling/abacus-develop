@@ -51,8 +51,9 @@ void Gint_Gamma::cal_gint_gamma(Gint_inout *inout)
 
     const int max_size = GlobalC::GridT.max_atom;
 	const int LD_pool = max_size*GlobalC::ucell.nwmax;
-
-	if(max_size)
+    const int lgd = GlobalC::GridT.lgd;
+	
+    if(max_size)
     {
 #ifdef __MKL
    		const int mkl_threads = mkl_get_max_threads();
@@ -72,7 +73,14 @@ void Gint_Gamma::cal_gint_gamma(Gint_inout *inout)
 			const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
             
             // it's a uniform grid to save orbital values, so the delta_r is a constant.
-            const double delta_r = GlobalC::ORB.dr_uniform;		
+            const double delta_r = GlobalC::ORB.dr_uniform;
+
+            if(inout->job==Gint_Tools::job_type::vlocal && lgd>0)
+            {
+                this->pvpR_grid = new double[lgd*lgd];
+                ModuleBase::GlobalFunc::ZEROS(pvpR_grid, lgd*lgd);
+            }
+
 #ifdef _OPENMP
 			ModuleBase::matrix fvl_dphi_thread;
 			ModuleBase::matrix svl_dphi_thread;
@@ -89,6 +97,13 @@ void Gint_Gamma::cal_gint_gamma(Gint_inout *inout)
 					svl_dphi_thread.zero_out();
 				}
 			}
+
+            double* pvpR_grid_thread;
+			if(inout->job==Gint_Tools::job_type::vlocal && lgd>0)
+			{
+                pvpR_grid_thread = new double[lgd*lgd];
+                ModuleBase::GlobalFunc::ZEROS(pvpR_grid_thread, lgd*lgd);
+			}            
 
 			#pragma omp for
 #endif
@@ -131,31 +146,58 @@ void Gint_Gamma::cal_gint_gamma(Gint_inout *inout)
                             #endif
 							delete [] vldr3;
 						}
+						if(inout->job == Gint_Tools::job_type::vlocal && lgd>0)
+                        {
+							double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
+                            #ifdef _OPENMP
+                                this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool, lgd, pvpR_grid_thread);
+                            #else
+                                this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool, lgd, pvpR_grid);
+                            #endif
+							delete [] vldr3;                            
+                        }
 					}// k
 				}// j
 			}// i
 
 #ifdef _OPENMP
+            if(inout->job==Gint_Tools::job_type::vlocal && lgd>0)
+			{
+                for(int i=0;i<lgd*lgd;i++)
+                {
+                    #pragma omp critical(gint_gamma)
+                    pvpR_grid[i] += pvpR_grid_thread[i];
+                }
+                delete[] pvpR_grid_thread;
+			} 
+
 			if(inout->job==Gint_Tools::job_type::force)
 			{
 				if(inout->isforce)
 				{
-                    #pragma omp critical(gint_k)
+                    #pragma omp critical(gint_gamma)
 					inout->fvl_dphi[0]+=fvl_dphi_thread;
 				}
 				if(inout->isstress)
 				{
-                    #pragma omp critical(gint_k)
+                    #pragma omp critical(gint_gamma)
 					inout->svl_dphi[0]+=svl_dphi_thread;
 				}
 			}
-#endif
+#endif 
 
 		} // end of #pragma omp parallel
 			
 #ifdef __MKL
    		mkl_set_num_threads(mkl_threads);
 #endif
+
+        if(inout->job==Gint_Tools::job_type::vlocal && lgd>0)
+        {
+            vl_grid_to_2D(lgd,inout->lm[0]);
+            delete[] pvpR_grid;
+        }
+
     } // end of if(max_size)
 
     ModuleBase::timer::tick("Gint_Gamma","cal_gint_gamma");

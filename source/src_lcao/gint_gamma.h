@@ -89,6 +89,15 @@ private:
 		double** psir_DM,
 		double* rho) const;
 	
+	void gint_kernel_vlocal(
+		const int na_grid,
+		const int grid_index,
+		const double delta_r,
+		double* vldr3,
+		const int LD_pool,
+		const int lgd_now,
+		double* pvpR_grid_in);
+
 	void cal_meshball_vlocal(
 		const int na_grid,  						// how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -100,7 +109,7 @@ private:
 		const double*const*const psir_ylm,			// psir_ylm[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const int lgd_now,
-		double*const*const GridVlocal) const;		// GridVlocal[lgd_now][lgd_now]
+		double*const GridVlocal) const;		// GridVlocal[lgd_now][lgd_now]
 
     //------------------------------------------------------
     // in gint_gamma_fvl.cpp 
@@ -127,8 +136,7 @@ private:
 		const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		ModuleBase::matrix &force
-	);
+		ModuleBase::matrix &force);
 
 	void cal_meshball_stress(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
@@ -140,10 +148,11 @@ private:
 		const double*const*const dpsir_yy,
 		const double*const*const dpsir_yz,
 		const double*const*const dpsir_zz,
-		ModuleBase::matrix &stress
-	);
+		ModuleBase::matrix &stress);
 
-    void vl_grid_to_2D(const Gint_Tools::Array_Pool<double>& GridVlocal, LCAO_Matrix& lm);
+    void vl_grid_to_2D(const int lgd, LCAO_Matrix& lm);
+
+	double* pvpR_grid;
 };
 
 #endif
