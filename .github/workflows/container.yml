@@ -36,7 +36,9 @@ jobs:
       - name: Build and Push Container
         uses: docker/build-push-action@v2
         with:
-          tags: ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{ matrix.dockerfile }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{ matrix.dockerfile }}
+            ${{ secrets.DP_HARBOR_REGISTRY }}/dplc/abacus:${{ matrix.dockerfile }}
           file: Dockerfile.${{ matrix.dockerfile }}
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{matrix.dockerfile}}
           cache-to: type=inline
