@@ -5,8 +5,7 @@
 //=========================================================
 #ifndef GINT_GAMMA_H
 #define GINT_GAMMA_H
-
-#include "gint_tools.h"
+#include "gint_interface.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "grid_technique.h"
@@ -19,17 +18,14 @@
 // Numerical Orbitals
 //=========================================================
 
-class Gint_Gamma
+class Gint_Gamma : public Gint_Interface
 {
 	public:
 
 	Gint_Gamma();
 	~Gint_Gamma();
 
-	// (1) calculate the H matrix in terms of effective potentials
-	void cal_vlocal( const double*const vlocal, LCAO_Matrix &lm);
-
-	// (2) calculate charge density
+	// the unified interface to grid integration
 	void cal_gint_gamma(Gint_inout *inout);
 
 	// (4) calcualte the envelope function
@@ -42,28 +38,6 @@ private:
 
     double***  DM;   //pointer to LOC.DM
 
-    ///===============================
-    /// Use MPI_Alltoallv to convert a grid distributed matrix
-    /// to 2D - block cyclic distributed matrix.
-    ///===============================
-    int sender_index_size;
-    int *sender_local_index;
-    int sender_size;
-    int *sender_size_process;
-    int *sender_displacement_process;
-    double* sender_buffer;
-
-    int receiver_index_size;
-    int *receiver_global_index;
-    int receiver_size;
-    int *receiver_size_process;
-    int *receiver_displacement_process;
-    double* receiver_buffer;
-
-	// for calculation of < phi_i | Vlocal | phi_j >
-	// Input:	vlocal[ir]
-	// Output:	GridVlocal.ptr_2D[iw1_lo][iw2_lo]
-	Gint_Tools::Array_Pool<double> gamma_vlocal(const double*const vlocal) const;  
 	// for calculation of Mulliken charge.
 	void gamma_mulliken(double** mulliken);
 	// for calculation of envelope functions.
@@ -88,14 +62,17 @@ private:
 		const double*const*const psir_ylm,
 		double** psir_DM,
 		double* rho) const;
-	
+
+    //------------------------------------------------------
+    // in gint_gamma_vl.cpp 
+    //------------------------------------------------------
+    // calculate the matrix elements of Hamiltonian matrix,	
 	void gint_kernel_vlocal(
 		const int na_grid,
 		const int grid_index,
 		const double delta_r,
 		double* vldr3,
 		const int LD_pool,
-		const int lgd_now,
 		double* pvpR_grid_in);
 
 	void cal_meshball_vlocal(
@@ -108,8 +85,28 @@ private:
 		const double*const vldr3,					// vldr3[GlobalC::pw.bxyz]
 		const double*const*const psir_ylm,			// psir_ylm[GlobalC::pw.bxyz][LD_pool]
 		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		const int lgd_now,
-		double*const GridVlocal) const;		// GridVlocal[lgd_now][lgd_now]
+		double* GridVlocal);		// GridVlocal[lgd_now][lgd_now]
+
+    void vl_grid_to_2D(const int lgd, LCAO_Matrix& lm); //redistribute the Hamiltonian to 2D block format
+
+	double* pvpR_grid; //stores Hamiltonian in grid format
+    ///===============================
+    /// Use MPI_Alltoallv to convert a grid distributed matrix
+    /// to 2D - block cyclic distributed matrix.
+    ///===============================
+    int sender_index_size;
+    int *sender_local_index;
+    int sender_size;
+    int *sender_size_process;
+    int *sender_displacement_process;
+    double* sender_buffer;
+
+    int receiver_index_size;
+    int *receiver_global_index;
+    int receiver_size;
+    int *receiver_size_process;
+    int *receiver_displacement_process;
+    double* receiver_buffer;
 
     //------------------------------------------------------
     // in gint_gamma_fvl.cpp 
@@ -149,10 +146,6 @@ private:
 		const double*const*const dpsir_yz,
 		const double*const*const dpsir_zz,
 		ModuleBase::matrix &stress);
-
-    void vl_grid_to_2D(const int lgd, LCAO_Matrix& lm);
-
-	double* pvpR_grid;
 };
 
 #endif

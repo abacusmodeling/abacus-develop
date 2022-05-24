@@ -28,6 +28,7 @@ list(APPEND objects
     dftu.cpp
     dftu_relax.cpp
     dftu_yukawa.cpp
+    gint_interface.cpp
     gint_gamma.cpp
     gint_gamma_env.cpp
     gint_gamma_fvl.cpp

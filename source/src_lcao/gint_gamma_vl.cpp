@@ -33,7 +33,6 @@ void Gint_Gamma::gint_kernel_vlocal(
 	const double delta_r,
 	double* vldr3,
 	const int LD_pool,
-    const int lgd_now,
 	double* pvpR_grid_in)
 {
 
@@ -59,7 +58,7 @@ void Gint_Gamma::gint_kernel_vlocal(
 
     this->cal_meshball_vlocal(
         na_grid, LD_pool, block_iw, block_size, block_index, cal_flag,
-        vldr3, psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, lgd_now, pvpR_grid_in);
+        vldr3, psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, pvpR_grid_in);
         
     delete[] block_iw;
     delete[] block_index;
@@ -81,11 +80,11 @@ void Gint_Gamma::cal_meshball_vlocal(
 	const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
 	const double*const*const psir_ylm,		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
 	const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-	const int lgd_now,
-	double*const GridVlocal) const	    // GridVlocal[lgd_now][lgd_now]
+	double* GridVlocal)	    // GridVlocal[lgd_now][lgd_now]
 {
 	const char transa='N', transb='T';
 	const double alpha=1, beta=1;
+    const int lgd_now = GlobalC::GridT.lgd;
 
 	for(int ia1=0; ia1<na_grid; ++ia1)
 	{
@@ -347,13 +346,6 @@ void Gint_Gamma::vl_grid_to_2D(const int lgd_now, LCAO_Matrix &lm)
     {
         const int g_row=this->receiver_global_index[i];
         const int g_col=this->receiver_global_index[i+1];
-        // if(g_col<0 || g_col>=GlobalV::NLOCAL||g_row<0 || g_row>=GlobalV::NLOCAL)
-        // {
-        //     OUT(GlobalV::ofs_running, "index error, i:", i);
-        //     OUT(GlobalV::ofs_running, "index：", this->receiver_global_index[i]);
-        //     OUT(GlobalV::ofs_running, "g_col:", g_col);
-        //     OUT(GlobalV::ofs_running, "g_col:", g_col);
-        // }
         lm.set_HSgamma(g_row,g_col,this->receiver_buffer[i/2],'L', lm.Hloc.data());
     }
 

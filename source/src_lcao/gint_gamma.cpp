@@ -150,9 +150,9 @@ void Gint_Gamma::cal_gint_gamma(Gint_inout *inout)
                         {
 							double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
                             #ifdef _OPENMP
-                                this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool, lgd, pvpR_grid_thread);
+                                this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool, pvpR_grid_thread);
                             #else
-                                this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool, lgd, pvpR_grid);
+                                this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool, pvpR_grid);
                             #endif
 							delete [] vldr3;                            
                         }

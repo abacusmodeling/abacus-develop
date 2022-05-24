@@ -5,12 +5,12 @@
 #include "grid_technique.h"
 #include "LCAO_matrix.h"
 #include "../src_pw/charge.h"
-#include "gint_tools.h"
+#include "gint_interface.h"
 
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
 #include "../src_ri/abfs-vector3_order.h"
 
-class Gint_k
+class Gint_k : public Gint_Interface
 {
     public:
 
@@ -20,13 +20,6 @@ class Gint_k
     //------------------------------------------------------
     // in gint_k.cpp 
     //------------------------------------------------------
-    // preparing FFT grid
-    void prep_grid(
-        const int &nbx_in,
-		const int &nby_in,
-		const int &nbz_in,
-		const int &nbz_start_in,
-        const int& ncxyz_in);
 
     //the unified interface
     void cal_gint_k(Gint_inout *inout);
@@ -175,22 +168,10 @@ class Gint_k
 
     //----------------------------
     // key variable 
-    //----------------------------
-
-    // variables related to FFT grid
- 	int nbx;
-	int nby;
-	int nbz;
-	int ncxyz;
-	int nbz_start;   
+    //----------------------------  
 
     // used only in vlocal.
-    // dimension: [GlobalC::LNNR.nnrg] 
-    // save the < phi_0i | V | phi_Rj > in sparse H matrix.
-    bool pvpR_alloc_flag;
     int spin_now;
-
-    double** pvpR_reduced;
     
 };
 

@@ -1,15 +1,7 @@
-#include "../module_base/global_function.h"
-#include "../module_base/global_variable.h"
-#include "../src_parallel/parallel_reduce.h"
-#include "gint_k.h"
-#include "../module_orbital/ORB_read.h"
-#include "grid_technique.h"
-#include "../module_base/ylm.h"
-#include "../src_pw/global.h"
-#include "global_fp.h" // mohan add 2021-01-30
+#include "gint_interface.h"
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
-#include "../module_base/matrix.h"
+#include "../src_pw/global.h"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -19,30 +11,20 @@
 #include <mkl_service.h>
 #endif
 
-Gint_k::Gint_k()
+void Gint_Interface::cal_gint(Gint_inout *inout)
 {
-    pvpR_alloc_flag = false;
-    spin_now = -1; // for a start value, must not equal 1,2 or 4.
-}
-
-Gint_k::~Gint_k()
-{
-    
-}
-
-void Gint_k::cal_gint_k(Gint_inout *inout)
-{
-	ModuleBase::TITLE("Gint_k","cal_gint_k");
-    ModuleBase::timer::tick("Gint_k", "cal_gint_k");
+	ModuleBase::TITLE("Gint_interface","cal_gint");
+    ModuleBase::timer::tick("Gint_interface", "cal_gint");
 
 	const int max_size = GlobalC::GridT.max_atom;
 	const int LD_pool = max_size*GlobalC::ucell.nwmax;
+    const int lgd = GlobalC::GridT.lgd;
 
-	if(inout->job==Gint_Tools::job_type::vlocal)
+	if(inout->job==Gint_Tools::job_type::vlocal && !GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		if(!pvpR_alloc_flag)
 		{
-			ModuleBase::WARNING_QUIT("Gint_k::cal_vlocal_k","pvpR has not been allocated yet!");
+			ModuleBase::WARNING_QUIT("Gint_interface::cal_gint","pvpR has not been allocated yet!");
 		}
 		else
 		{
@@ -68,11 +50,19 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 			const double delta_r = GlobalC::ORB.dr_uniform;
 
 #ifdef _OPENMP
-			double* pvpR_reduced_thread;
+			double* pvpR_thread;
 			if(inout->job==Gint_Tools::job_type::vlocal)
 			{
-        		pvpR_reduced_thread = new double[GlobalC::GridT.nnrg];
-        		ModuleBase::GlobalFunc::ZEROS(pvpR_reduced_thread, GlobalC::GridT.nnrg);
+                if(!GlobalV::GAMMA_ONLY_LOCAL)
+                {
+                    pvpR_thread = new double[GlobalC::GridT.nnrg];
+                    ModuleBase::GlobalFunc::ZEROS(pvpR_thread, GlobalC::GridT.nnrg);
+                }
+                if(GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
+                {
+                    pvpR_thread = new double[lgd*lgd];
+                    ModuleBase::GlobalFunc::ZEROS(pvpR_thread, lgd*lgd);
+                }
 			}
 
 			ModuleBase::matrix fvl_dphi_thread;
@@ -113,20 +103,23 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 						if(inout->job == Gint_Tools::job_type::rho)
 						{
 							int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);
-							this->gint_kernel_rho(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
+							//this->gint_kernel_rho(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
 							delete[] vindex;
 						}
 						else if(inout->job == Gint_Tools::job_type::force)
 						{
 							double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
+                            double** DM_in;
+                            if(GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM[GlobalV::CURRENT_SPIN];
+                            if(!GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM_R;
 							#ifdef _OPENMP
-								this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
-									inout->DM_R, inout->isforce, inout->isstress,
-									&fvl_dphi_thread, &svl_dphi_thread);
+								//this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
+								//	DM_in, inout->isforce, inout->isstress,
+								//	&fvl_dphi_thread, &svl_dphi_thread);
 							#else
-								this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
-									inout->DM_R, inout->isforce, inout->isstress,
-									inout->fvl_dphi, inout->svl_dphi);
+								//this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
+								//	DM_in, inout->isforce, inout->isstress,
+								//	inout->fvl_dphi, inout->svl_dphi);
 							#endif
 							delete[] vldr3;
 						}
@@ -134,11 +127,11 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 						{
 							double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
 							#ifdef _OPENMP
-								this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
-									pvpR_reduced_thread);
+								//this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+								//	pvpR_thread);
 							#else
-								this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
-									this->pvpR_reduced[inout->ispin]);
+								//this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+								//	this->pvpR_reduced[inout->ispin]);
 							#endif
 							delete[] vldr3;
 						}
@@ -153,9 +146,9 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 				for(int innrg=0; innrg<GlobalC::GridT.nnrg; innrg++)
 				{
 					#pragma omp critical(gint_k)
-					pvpR_reduced[inout->ispin][innrg] += pvpR_reduced_thread[innrg];
+					pvpR_reduced[inout->ispin][innrg] += pvpR_thread[innrg];
 				}
-				delete[] pvpR_reduced_thread;
+				delete[] pvpR_thread;
 			}
 			if(inout->job==Gint_Tools::job_type::force)
 			{
@@ -179,6 +172,30 @@ void Gint_k::cal_gint_k(Gint_inout *inout)
 #endif
     } // end of if (max_size)	
 
-	ModuleBase::timer::tick("Gint_k","cal_gint_k");
+	ModuleBase::timer::tick("Gint_interface","cal_gint");
+	return;
+}
+
+void Gint_Interface::prep_grid(
+	const int &nbx_in,
+	const int &nby_in,
+	const int &nbz_in,
+	const int &nbz_start_in,
+    const int& ncxyz_in)
+{
+	ModuleBase::TITLE(GlobalV::ofs_running,"Gint_k","prep_grid");
+    
+    this->nbx = nbx_in;
+	this->nby = nby_in;
+	this->nbz = nbz_in;
+	this->ncxyz = ncxyz_in;
+	this->nbz_start = nbz_start_in;
+	assert(nbx>0);
+	assert(nby>0);
+	assert(nbz>0);
+	assert(ncxyz>0);
+
+	assert( GlobalC::ucell.omega > 0.0);
+
 	return;
 }
