@@ -53,7 +53,7 @@ TESTFILE0 = ${DOUBLEFILE}
 ## FFTW package needed 
 ##==========================
 #Use fftw package
-FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8-mpi
+FFTW_DIR = /home/qianrui/gnucompile/fftw_3.3.8
 FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
 FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}

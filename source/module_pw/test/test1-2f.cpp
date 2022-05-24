@@ -37,8 +37,9 @@ TEST_F(PWTEST,test1_2f)
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
-    int npw = pwtest.npw;
-    int nrxx = pwtest.nrxx;
+    const int npw = pwtest.npw;
+    const int nrxx = pwtest.nrxx;
+    const int nmaxgr = pwtest.nmaxgr;
     nx = pwtest.nx;
     ny = pwtest.ny;
     nz = pwtest.nz;
@@ -95,13 +96,19 @@ TEST_F(PWTEST,test1_2f)
 #endif
     
     complex<float> * rhog = new complex<float> [npw];
+    complex<float> * rhogr = new complex<float> [nmaxgr];
     complex<float> * rhogout = new complex<float> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
         rhog[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
+        rhogr[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
     }    
     complex<float> * rhor = new complex<float> [nrxx];
-    pwtest.recip2real(rhog,rhor);
+
+    pwtest.recip2real(rhog,rhor);//check out-of-place transform
+
+    pwtest.recip2real(rhogr,rhogr);//check in-place transform
+
     int startiz = pwtest.startz[rank_in_pool];
     for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
     {
@@ -109,22 +116,29 @@ TEST_F(PWTEST,test1_2f)
         {
             EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz].real(),1e-6);
             EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhor[ixy*nplane+iz].imag(),1e-6);
+            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhogr[ixy*nplane+iz].real(),1e-6);
+            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhogr[ixy*nplane+iz].imag(),1e-6);
         }
     }
 
     
-    
-    pwtest.real2recip(rhor,rhogout);
+    pwtest.real2recip(rhor,rhogout);//check out-of-place transform
+
+    pwtest.real2recip(rhogr,rhogr);//check in-place transform
+
     for(int ig = 0 ; ig < npw ; ++ig)
     {
         EXPECT_NEAR(rhog[ig].real(),rhogout[ig].real(),1e-6);
         EXPECT_NEAR(rhog[ig].imag(),rhogout[ig].imag(),1e-6);
+        EXPECT_NEAR(rhogr[ig].real(),rhogout[ig].real(),1e-6);
+        EXPECT_NEAR(rhogr[ig].imag(),rhogout[ig].imag(),1e-6);
     }
   
     delete [] rhog;
     delete [] rhogout;
     delete [] rhor;
     delete []tmp; 
+    delete [] rhogr;
 
     fftw_cleanup();
 #ifdef __MIX_PRECISION
