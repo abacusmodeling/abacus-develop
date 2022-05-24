@@ -282,6 +282,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     symmetry
     md
+    planewave
     surchem
     neighbor
     orb
@@ -295,6 +296,10 @@ target_link_libraries(${ABACUS_BIN_NAME}
     ri
     driver
     xc
+    hsolver
+    elecstate
+    hamilt
+    psi
     esolver
     -lm
 )

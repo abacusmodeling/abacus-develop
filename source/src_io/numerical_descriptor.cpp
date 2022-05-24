@@ -23,7 +23,7 @@ Numerical_Descriptor::~Numerical_Descriptor()
 }
 
 
-void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *psi, const int &lmax_in)
+void Numerical_Descriptor::output_descriptor(const psi::Psi<std::complex<double>> &psi, const int &lmax_in)
 {
 	ModuleBase::TITLE("Numerical_Descriptor","output_descriptor");
 	ModuleBase::GlobalFunc::NEW_PART("DeepKS descriptor: D_{Inl}");
@@ -90,7 +90,8 @@ void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *ps
         GlobalV::ofs_running << "\n " << std::setw(8) << ik+1 << std::setw(8) << npw << std::endl;
 		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
         // search for all k-points.
-        this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
+		psi.fix_k(ik);
+        this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"jlq3d_overlap");
 	}
 
@@ -233,7 +234,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     const int &ik_ibz,
     const int &ik,
     const int &np,
-    const ModuleBase::ComplexMatrix &psi)
+    const psi::Psi<std::complex<double>> &psi)
 {
     ModuleBase::TITLE("Numerical_Descriptor","jlq3d_overlap");
     ModuleBase::timer::tick("Numerical_Descriptor","jlq3d_overlap");

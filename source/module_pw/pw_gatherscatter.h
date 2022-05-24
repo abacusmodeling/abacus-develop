@@ -8,11 +8,11 @@
 #endif
 namespace ModulePW
 {
-//
-//in: (nplane,nxy) out:(nz,nst)
-//in and out should be in different places 
-//in[] will be changed
-//
+/// 
+/// in: (nplane,ny,nx) out:(nz,nst)
+/// in and out should be in different places 
+/// in[] will be changed
+/// 
 template<typename T>
 void PW_Basis:: gatherp_scatters(std::complex<T> *in, std::complex<T> *out)
 {
@@ -68,11 +68,11 @@ void PW_Basis:: gatherp_scatters(std::complex<T> *in, std::complex<T> *out)
     return;
 }
 
-//
-//in: (nz,nst) out:(nplane,nxy)
-//in and out should be in different places 
-//in[] will be changed
-//
+/// 
+/// in: (nz,nst) out:(nplane,ny,nx)
+/// in and out should be in different places 
+/// in[] will be changed
+/// 
 template<typename T>
 void PW_Basis:: gathers_scatterp(std::complex<T> *in, std::complex<T> *out)
 {
