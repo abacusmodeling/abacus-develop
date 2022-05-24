@@ -268,7 +268,12 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     //==========================================
     for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
     {
-        v_elecstat[ir] = Porter[ir].real() + this->vltot[ir] + v_efield(0, ir);
+        v_elecstat[ir] = Porter[ir].real() + this->vltot[ir];
+
+        if (GlobalV::EFIELD && GlobalV::DIPOLE)
+        {
+            v_elecstat[ir] += v_efield(0, ir);
+        }
     }
 
     //-------------------------------------------
