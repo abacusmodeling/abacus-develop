@@ -192,14 +192,23 @@ void Gint_Gamma::cal_gint_gamma(Gint_inout *inout)
    		mkl_set_num_threads(mkl_threads);
 #endif
 
-        if(inout->job==Gint_Tools::job_type::vlocal && lgd>0)
-        {
-            vl_grid_to_2D(lgd,inout->lm[0]);
-            delete[] pvpR_grid;
-        }
-
     } // end of if(max_size)
 
     ModuleBase::timer::tick("Gint_Gamma","cal_gint_gamma");
     return;
+}
+
+void Gint_Gamma::cal_vlocal(Gint_inout *inout)
+{
+	this->cal_gint_gamma(inout);
+	const int max_size = GlobalC::GridT.max_atom;
+	const int lgd = GlobalC::GridT.lgd;
+	if(max_size)
+	{
+		if(inout->job==Gint_Tools::job_type::vlocal && lgd>0)
+		{
+			vl_grid_to_2D(lgd,inout->lm[0]);
+			delete[] pvpR_grid;
+		}
+	}
 }

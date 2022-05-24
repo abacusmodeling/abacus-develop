@@ -83,7 +83,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
         if(GlobalV::VL_IN_H)
         {	
             Gint_inout inout(GlobalC::pot.vr_eff1, this->LM, Gint_Tools::job_type::vlocal);
-            this->GG.cal_gint_gamma(&inout);
+            this->GG.cal_vlocal(&inout);
 
         #ifdef __MPI //liyuanbo 2022/2/23
             // Peize Lin add 2016-12-03

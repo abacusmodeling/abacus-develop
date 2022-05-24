@@ -27,6 +27,7 @@ class Gint_Gamma : public Gint_Interface
 
 	// the unified interface to grid integration
 	void cal_gint_gamma(Gint_inout *inout);
+	void cal_vlocal(Gint_inout *inout);
 
 	// (4) calcualte the envelope function
 	void cal_env(const double* wfc, double* rho);
