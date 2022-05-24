@@ -38,17 +38,11 @@ void MSST::setup(ModuleESolver::ESolver *p_esolver)
     ModuleBase::TITLE("MSST", "setup");
     ModuleBase::timer::tick("MSST", "setup");
 
+    Verlet::setup(p_esolver);
+
     int sd = mdp.msst_direction;
 
-    MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
-    MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
-    stress += virial;
-
-    if(mdp.md_restart)
-    {
-        restart();
-    }
-    else
+    if(!mdp.md_restart)
     {
         lag_pos = 0;
         v0 = ucell.omega;

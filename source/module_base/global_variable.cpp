@@ -130,6 +130,7 @@ std::string global_pseudo_type = "auto";
 std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified
+std::string global_stru_dir;
 
 std::ofstream ofs_running;
 std::ofstream ofs_warning;
