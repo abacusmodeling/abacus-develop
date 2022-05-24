@@ -5,7 +5,7 @@
 //=========================================================
 #ifndef GINT_GAMMA_H
 #define GINT_GAMMA_H
-#include "gint_interface.h"
+#include "gint.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "grid_technique.h"
@@ -18,7 +18,7 @@
 // Numerical Orbitals
 //=========================================================
 
-class Gint_Gamma : public Gint_Interface
+class Gint_Gamma : public Gint
 {
 	public:
 

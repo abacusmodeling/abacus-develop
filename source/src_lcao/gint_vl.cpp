@@ -17,7 +17,7 @@
 #include <mkl_service.h>
 #endif
 
-void Gint_Interface::gint_kernel_vlocal(
+void Gint::gint_kernel_vlocal(
 	const int na_grid,
 	const int grid_index,
 	const double delta_r,
@@ -68,7 +68,7 @@ void Gint_Interface::gint_kernel_vlocal(
 	return;
 }
 
-void Gint_Interface::cal_meshball_vlocal_gamma(
+void Gint::cal_meshball_vlocal_gamma(
 	const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int LD_pool,
 	const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
@@ -175,7 +175,7 @@ inline int find_offset(const int id1, const int id2, const int iat1, const int i
 	return offset;
 }
 
-void Gint_Interface::cal_meshball_vlocal_k(
+void Gint::cal_meshball_vlocal_k(
 	int na_grid,
 	int LD_pool,
 	int grid_index, 

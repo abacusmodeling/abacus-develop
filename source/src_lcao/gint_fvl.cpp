@@ -5,7 +5,7 @@
 #include "../module_base/ylm.h"
 #include "../module_base/timer.h"
 
-void Gint_Interface::gint_kernel_force(
+void Gint::gint_kernel_force(
 	const int na_grid,
 	const int grid_index,
 	const double delta_r,
@@ -125,7 +125,7 @@ void Gint_Interface::gint_kernel_force(
 	delete[] cal_flag;
 }
 
-void Gint_Interface::cal_meshball_force(
+void Gint::cal_meshball_force(
     const int grid_index,
     const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
@@ -158,7 +158,7 @@ void Gint_Interface::cal_meshball_force(
 	return;
 }
 
-void Gint_Interface::cal_meshball_stress(
+void Gint::cal_meshball_stress(
     const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
 	const double*const*const psir_vlbr3_DMR,

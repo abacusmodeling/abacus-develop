@@ -3,7 +3,7 @@
 
 #include "gint_tools.h"
 
-class Gint_Interface
+class Gint
 {
     public:
 

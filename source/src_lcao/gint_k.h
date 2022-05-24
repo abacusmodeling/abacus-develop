@@ -5,12 +5,12 @@
 #include "grid_technique.h"
 #include "LCAO_matrix.h"
 #include "../src_pw/charge.h"
-#include "gint_interface.h"
+#include "gint.h"
 
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
 #include "../src_ri/abfs-vector3_order.h"
 
-class Gint_k : public Gint_Interface
+class Gint_k : public Gint
 {
     public:
 

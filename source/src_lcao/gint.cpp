@@ -1,4 +1,4 @@
-#include "gint_interface.h"
+#include "gint.h"
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
 #include "../src_pw/global.h"
@@ -11,7 +11,7 @@
 #include <mkl_service.h>
 #endif
 
-void Gint_Interface::cal_gint(Gint_inout *inout)
+void Gint::cal_gint(Gint_inout *inout)
 {
 	ModuleBase::TITLE("Gint_interface","cal_gint");
     ModuleBase::timer::tick("Gint_interface", "cal_gint");
@@ -208,7 +208,7 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 	return;
 }
 
-void Gint_Interface::prep_grid(
+void Gint::prep_grid(
 	const int &nbx_in,
 	const int &nby_in,
 	const int &nbz_in,

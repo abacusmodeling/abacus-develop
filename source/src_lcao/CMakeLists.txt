@@ -28,14 +28,14 @@ list(APPEND objects
     dftu.cpp
     dftu_relax.cpp
     dftu_yukawa.cpp
-    gint_interface.cpp
+    gint.cpp
     gint_gamma.cpp
     gint_gamma_env.cpp
     gint_gamma_mull.cpp
     gint_gamma_vl.cpp
-    gint_k_fvl.cpp
-    gint_k_rho.cpp
-    gint_k_vl.cpp
+    gint_fvl.cpp
+    gint_rho.cpp
+    gint_vl.cpp
     gint_k_env.cpp
     gint_k_sparse.cpp
     gint_k_pvpr.cpp
