@@ -72,7 +72,6 @@ void Verlet::setup(ModuleESolver::ESolver *p_esolver)
 
 void Verlet::first_half()
 {
-    std::cout<<GlobalV::MY_RANK<<" dddd"<<std::endl;
     if(GlobalV::MY_RANK==0) //only first rank do md
     for(int i=0; i<ucell.nat; ++i)
     {

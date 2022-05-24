@@ -36,10 +36,8 @@ void FIRE::first_half()
 {
     ModuleBase::TITLE("FIRE", "first_half");
     ModuleBase::timer::tick("FIRE", "first_half");
-#ifdef __MPI
     if(GlobalV::MY_RANK == 0)
     {
-#endif
     for(int i=0; i<ucell.nat; ++i)
     {
         for(int k=0; k<3; ++k)
@@ -63,8 +61,8 @@ void FIRE::first_half()
             }
         }
     }
-#ifdef __MPI
     }
+#ifdef __MPI
     MPI_Bcast(pos , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
 

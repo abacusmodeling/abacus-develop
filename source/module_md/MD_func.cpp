@@ -75,10 +75,8 @@ void MD_func::kinetic_stress(
 //   This function calculates the classical kinetic energy of atoms
 //   and its contribution to stress.
 //----------------------------------------------------------------------------
-#ifdef __MPI
 	if(GlobalV::MY_RANK==0) //only first rank do md
 	{
-#endif
 	kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
 
 	ModuleBase::matrix temp;
@@ -109,9 +107,7 @@ void MD_func::kinetic_stress(
 			}
 		}
 	}
-#ifdef __MPI
 	}
-#endif
 }
 
 // Read Velocity from STRU liuyu 2021-09-24
