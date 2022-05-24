@@ -83,7 +83,9 @@ void MSST::first_half()
 
     const int sd = mdp.msst_direction;
     const double dthalf = 0.5 * mdp.md_dt;
-
+    double vol;
+    if( GlobalV::MY_RANK == 0 )
+    {
     energy_ = potential + kinetic;
 
     // propagate the time derivative of volume 1/2 step
@@ -112,7 +114,7 @@ void MSST::first_half()
     propagate_vel();
 
     // propagate volume 1/2 step
-    double vol = ucell.omega + omega[sd] * dthalf;
+    vol = ucell.omega + omega[sd] * dthalf;
 
     // rescale positions and change box size
     rescale(vol);
@@ -122,6 +124,11 @@ void MSST::first_half()
     {
         pos[i] += vel[i] * mdp.md_dt;
     }
+    }
+#ifdef __MPI
+    MPI_Bcast(pos , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+#endif
+
     ucell.update_pos_tau(pos);
     ucell.periodic_boundary_adjustment();
 
@@ -141,7 +148,8 @@ void MSST::second_half()
 
     const int sd = mdp.msst_direction;
     const double dthalf = 0.5 * mdp.md_dt;
-
+    if( GlobalV::MY_RANK == 0 )
+    {
     energy_ = potential + kinetic;
 
     // propagate velocities 1/2 step
@@ -156,6 +164,7 @@ void MSST::second_half()
 
     // calculate Lagrangian position
     lag_pos -= mdp.msst_vel * ucell.omega / v0 * mdp.md_dt;
+    }
 
     ModuleBase::timer::tick("MSST", "second_half");
 }
