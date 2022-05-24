@@ -17,9 +17,9 @@ class HSolverLCAO : public HSolver
     void update(//Input &in
     ) override;*/
 
-    void solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes) override;
+    void solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const bool skip_charge) override;
 
-    void solve(hamilt::Hamilt* pHamilt, psi::Psi<double>& psi, elecstate::ElecState* pes) override;
+    void solve(hamilt::Hamilt* pHamilt, psi::Psi<double>& psi, elecstate::ElecState* pes, const bool skip_charge) override;
 
     static int out_mat_hs; // mohan add 2010-09-02
     static int out_mat_hsR; // LiuXh add 2019-07-16
@@ -28,7 +28,7 @@ class HSolverLCAO : public HSolver
     void hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double>>& psi, double* eigenvalue);
     void hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<double>& psi, double* eigenvalue);
 
-    template <typename T> void solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecstate::ElecState* pes);
+    template <typename T> void solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecstate::ElecState* pes, const bool skip_charge);
     /*void solveTemplate(
         hamilt::Hamilt* pHamilt,
         psi::Psi<std::complex<double>>& psi,

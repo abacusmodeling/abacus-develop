@@ -6,6 +6,7 @@
 #include "module_hsolver/hsolver.h"
 #include "module_hamilt/hamilt.h"
 #include "module_elecstate/elecstate.h"
+#include "module_psi/psi.h"
 // #include "estates.h"
 // #include "h2e.h"
 namespace ModuleESolver
@@ -28,7 +29,11 @@ namespace ModuleESolver
 
         // calculate electron density from a specific Hamiltonian
         virtual void hamilt2density(const int istep, const int iter, const double ethr);
-        // get
+
+        // calculate electron states from a specific Hamiltonian
+        virtual void hamilt2estates(const double ethr){};
+
+        // get current step of Ionic simulation
         virtual int getniter() override;
 
     protected:

@@ -33,6 +33,7 @@ void Hamilt::diagH_pw(
             if(GlobalC::wf.mem_saver==1)
             {
 			    GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);
+                ik0 = 0;
             }
             else
             {
@@ -45,6 +46,7 @@ void Hamilt::diagH_pw(
             if(GlobalC::wf.mem_saver==1)
             {
 			    GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[0]);
+                ik0 = 0;
             }
             else
             {
@@ -52,7 +54,6 @@ void Hamilt::diagH_pw(
             }
 		}
 #endif
-		ik0 = 0;
 	}
 
     if(GlobalV::BASIS_TYPE=="lcao_in_pw")

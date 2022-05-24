@@ -5,7 +5,7 @@
 #include "global.h"
 
 //calculate the nonlocal pseudopotential stress in PW
-void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
+void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in)
 {
 	ModuleBase::TITLE("Stress_Func","stres_nl");
 	ModuleBase::timer::tick("Stress_Func","stres_nl");
@@ -61,9 +61,9 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 			for (int i = 0; i < nkb; i++) 
 			{
 				const std::complex<double>* ppsi=nullptr;
-				if(GlobalC::wf.psi!=nullptr)
+				if(psi_in!=nullptr)
 				{
-					ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+					ppsi = &(psi_in[0](ik, ib, 0));
 				}
 				else
 				{
@@ -155,9 +155,9 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 					for (int i=0; i<nkb; i++)
 					{
 						const std::complex<double>* ppsi=nullptr;
-						if(GlobalC::wf.psi!=nullptr)
+						if(psi_in!=nullptr)
 						{
-							ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+							ppsi = &(psi_in[0](ik, ib, 0));
 						}
 						else
 						{

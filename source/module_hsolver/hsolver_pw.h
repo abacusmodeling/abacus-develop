@@ -24,10 +24,12 @@ class HSolverPW : public HSolver
     void update(//Input &in
     ) override;*/
 
-    void solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes) override;
+    void solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const bool skip_charge) override;
 
   private:
     void hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double>>& psi, double* eigenvalue);
+
+    void updatePsiK(psi::Psi<std::complex<double>>& psi, const int ik);
 
     const PW_Basis* pbas = nullptr;
 

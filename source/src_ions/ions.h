@@ -46,7 +46,7 @@ class Ions
 	bool do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy);
 	bool do_cellrelax(const int& istep, const ModuleBase::matrix& stress, const double& total_energy);
 	void reset_after_relax(const int& istep);
-	void reset_after_cellrelax(int& force_step, int& stress_step);
+	void reset_after_cellrelax(int& force_step, int& stress_step, ModuleESolver::ESolver *p_esolver);
 
     void update_pot(void);
 

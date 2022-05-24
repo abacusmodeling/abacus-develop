@@ -31,6 +31,13 @@
 #include "module_hamilt/hamilt_pw.h"
 #include "module_hsolver/diago_iter_assist.h"
 
+#include "src_io/write_wfc_realspace.h"
+#include "src_io/winput.h"
+#include "src_io/numerical_descriptor.h"
+#include "src_io/numerical_basis.h"
+#include "src_io/to_wannier90.h"
+#include "src_io/berryphase.h"
+
 namespace ModuleESolver
 {
 
@@ -107,7 +114,7 @@ namespace ModuleESolver
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
-    GlobalC::wf.allocate(GlobalC::kv.nks);
+    this->psi = GlobalC::wf.allocate(GlobalC::kv.nks);
 
     // cout<<GlobalC::pw.nrxx<<endl;
     // cout<<"before ufft allocate"<<endl;
@@ -158,7 +165,7 @@ namespace ModuleESolver
     if (GlobalV::NBANDS != 0 || GlobalV::CALCULATION.substr(0,3) != "sto")
     // qianrui add temporarily. In the future, wfcinit() should be compatible with cases when NBANDS=0
     {
-        GlobalC::wf.wfcinit();
+        GlobalC::wf.wfcinit(this->psi);
     }
 
 #ifdef __LCAO
@@ -286,7 +293,7 @@ namespace ModuleESolver
             }
 
             hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
-            this->phsol->solve(this->phami, GlobalC::wf.psi[0], this->pelec);
+            this->phsol->solve(this->phami, this->psi[0], this->pelec);
 
             // transform energy for print
             GlobalC::en.eband = this->pelec->eband;
@@ -402,7 +409,7 @@ namespace ModuleESolver
                 //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
                 // mohan update 2011-02-21
                 //qianrui update 2020-10-17
-                WF_io::write_wfc2(ssw.str(), GlobalC::wf.psi[0], GlobalC::pw.gcar);
+                WF_io::write_wfc2(ssw.str(), this->psi[0], GlobalC::pw.gcar);
                 //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
             }
 
@@ -414,9 +421,6 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::afterscf()
     {
-        //temporary transform psi to evc 
-        // psi back to evc
-        //GlobalC::wf.psi_transform_evc();
         for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
         {
             for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
@@ -595,17 +599,153 @@ namespace ModuleESolver
     void ESolver_KS_PW::cal_Force(ModuleBase::matrix& force)
     {
         Forces ff;
-        ff.init(force);
+        ff.init(force, this->psi);
     }
+
     void ESolver_KS_PW::cal_Stress(ModuleBase::matrix& stress)
     {
         Stress_PW ss;
-        ss.cal_stress(stress);
+        ss.cal_stress(stress, this->psi);
     }
+
     void ESolver_KS_PW::postprocess()
     {
         // compute density of states
         GlobalC::en.perform_dos_pw();
+
+        // caoyu add 2020-11-24, mohan updat 2021-01-03
+        if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
+        {
+            Numerical_Descriptor nc;
+            nc.output_descriptor(this->psi[0], INPUT.deepks_descriptor_lmax);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
+        }
+
+        if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
+        {
+            //std::cout << "\n Output Spillage Information : " << std::endl;
+            // calculate spillage value.
+#ifdef __LCAO
+            if ( winput::out_spillage == 3)
+            {
+                GlobalV::BASIS_TYPE="pw"; 
+                std::cout << " NLOCAL = " << GlobalV::NLOCAL << std::endl;
+
+                for (int ik=0; ik<GlobalC::kv.nks; ik++)
+                {
+                    GlobalC::wf.wanf2[ik].create(GlobalV::NLOCAL, GlobalC::wf.npwx);
+                    if(GlobalV::BASIS_TYPE=="pw")
+                    {
+                        std::cout << " ik=" << ik + 1 << std::endl;
+
+                        GlobalV::BASIS_TYPE="lcao_in_pw";
+                        GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
+                        GlobalV::BASIS_TYPE="pw";
+                    }
+                }
+
+                //Spillage sp;
+                //sp.get_both(GlobalV::NBANDS, GlobalV::NLOCAL, GlobalC::wf.wanf2, GlobalC::wf.evc);
+            }
+#endif
+
+            // output overlap
+            if ( winput::out_spillage <= 2 )
+            {
+                Numerical_Basis numerical_basis;
+                numerical_basis.output_overlap(this->psi[0]);
+                ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
+            }
+        }
+
+        if(GlobalC::wf.out_wfc_r == 1)				// Peize Lin add 2021.11.21
+        {
+            Write_Wfc_Realspace::write_wfc_realspace_1(this->psi[0], "wfc_realspace", true);
+        }	
+    }
+
+    void ESolver_KS_PW::hamilt2estates(const double ethr)
+    {
+        if(this->phsol != nullptr)
+        {
+            hsolver::DiagoIterAssist::need_subspace = false;
+            hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
+            this->phsol->solve(this->phami, this->psi[0], this->pelec, true);
+        }
+        else
+        {
+            ModuleBase::WARNING_QUIT("ESolver_KS_PW", "HSolver has not been initialed!");
+        }
+    }
+
+    void ESolver_KS_PW::nscf()
+    {
+        ModuleBase::TITLE("ESolver_KS_PW","nscf");
+        ModuleBase::timer::tick("ESolver_KS_PW","nscf");
+
+        this->beforescf(1);
+        //========================================
+        // diagonalization of the KS hamiltonian
+        // =======================================
+        set_ethr(1, 1);
+
+        this->hamilt2estates(this->diag_ethr);
+
+        for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
+        {
+            for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
+            {
+                GlobalC::wf.ekb[ik][ib] = this->pelec->ekb(ik, ib);
+            }
+        }
+
+        GlobalV::ofs_running << "\n End of Band Structure Calculation \n" << std::endl;
+
+
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        {
+            if (GlobalV::NSPIN==2)
+            {
+                if (ik == 0) GlobalV::ofs_running << " spin up :" << std::endl;
+                if (ik == ( GlobalC::kv.nks / 2)) GlobalV::ofs_running << " spin down :" << std::endl;
+            }
+            //out.printV3(GlobalV::ofs_running, GlobalC::kv.kvec_c[ik]);
+
+            GlobalV::ofs_running << " k-points" << ik+1
+            << "(" << GlobalC::kv.nkstot << "): "
+            << GlobalC::kv.kvec_c[ik].x
+            << " " << GlobalC::kv.kvec_c[ik].y
+            << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
+
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+            {
+                GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1
+                << "_final_band " << ib+1
+                << " " << this->pelec->ekb(ik, ib) * ModuleBase::Ry_to_eV
+                << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
+            }
+            GlobalV::ofs_running << std::endl;
+        }
+
+        // add by jingan in 2018.11.7
+        if(INPUT.towannier90)
+        {
+            toWannier90 myWannier(GlobalC::kv.nkstot,GlobalC::ucell.G);
+            myWannier.init_wannier(this->psi);
+        }
+
+        //=======================================================
+        // Do a Berry phase polarization calculation if required
+        //=======================================================
+
+        if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
+        {
+            berryphase bp;
+            bp.Macroscopic_polarization(this->psi);
+        }
+
+        ModuleBase::timer::tick("ESolver_KS_PW","nscf");
+        return;
     }
 
 }

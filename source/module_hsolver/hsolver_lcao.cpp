@@ -7,7 +7,7 @@ namespace hsolver
 {
 
 template <typename T>
-void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecstate::ElecState* pes)
+void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecstate::ElecState* pes, const bool skip_charge)
 {
     // select the method of diagonalization
     if (this->method == "genelpa")
@@ -61,19 +61,31 @@ void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecs
         double* p_eigenvalues = &(pes->ekb(ik, 0));
         this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
     }
+
+    if (this->method != "genelpa" && this->method != "scalapack_gvx")
+    {
+        delete pdiagh;
+        pdiagh = nullptr;
+    }
+
+    //used in nscf calculation
+    if(skip_charge) return;
+
+    //calculate charge by psi
+    //called in scf calculation
     pes->psiToRho(psi);
 }
 
 int HSolverLCAO::out_mat_hs = 0;
 int HSolverLCAO::out_mat_hsR = 0;
 
-void HSolverLCAO::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes)
+void HSolverLCAO::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const bool skip_charge)
 {
-    this->solveTemplate(pHamilt, psi, pes);
+    this->solveTemplate(pHamilt, psi, pes, skip_charge);
 }
-void HSolverLCAO::solve(hamilt::Hamilt* pHamilt, psi::Psi<double>& psi, elecstate::ElecState* pes)
+void HSolverLCAO::solve(hamilt::Hamilt* pHamilt, psi::Psi<double>& psi, elecstate::ElecState* pes, const bool skip_charge)
 {
-    this->solveTemplate(pHamilt, psi, pes);
+    this->solveTemplate(pHamilt, psi, pes, skip_charge);
 }
 
 void HSolverLCAO::hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double>>& psi, double* eigenvalue)

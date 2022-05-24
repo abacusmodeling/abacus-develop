@@ -10,6 +10,7 @@
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/local_orbital_wfc.h"
 #include "src_lcao/LCAO_hamilt.h"
+#include "module_psi/psi.h"
 //--------------\temporary----------------------------
 //------It should be moved as fast as possible------
 
@@ -24,7 +25,14 @@ namespace ModuleESolver
         ESolver() {
             classname = "ESolver";
         }
-        virtual ~ESolver() {};
+        
+        virtual ~ESolver() 
+        {
+            if(this->psi != nullptr)
+            {
+                delete psi;
+            }
+        }
 
         //virtual void Init(Input_EnSolver &inp, matrix &lattice_v)=0
         virtual void Init(Input& inp, UnitCell_pseudo& cell) = 0;
@@ -35,6 +43,9 @@ namespace ModuleESolver
         // virtual void UpdateAtom(Atom &atom_in);
 
         virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
+
+        // this is the interface of non-self-consistant calculation
+        virtual void nscf() {};
 
         //Deal with exx and other calculation than scf/md/relax: 
         // such as nscf, istate-charge or envelope
@@ -52,6 +63,9 @@ namespace ModuleESolver
         //get iterstep used in current scf
         virtual int getniter() { return 0; }
         string classname;
+
+        //wavefunction coefficients
+        psi::Psi<std::complex<double>>* psi=nullptr;
     };
 
     void init_esolver(ESolver*& p_esolver, const string use_esol);

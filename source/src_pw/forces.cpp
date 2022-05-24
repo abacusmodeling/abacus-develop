@@ -19,7 +19,7 @@ Forces::~Forces() {}
 
 #include "../module_base/mathzone.h"
 #include "efield.h"
-void Forces::init(ModuleBase::matrix& force)
+void Forces::init(ModuleBase::matrix& force, const psi::Psi<complex<double>>* psi_in)
 {
 	ModuleBase::TITLE("Forces", "init");
 	this->nat = GlobalC::ucell.nat;
@@ -32,7 +32,7 @@ void Forces::init(ModuleBase::matrix& force)
 	ModuleBase::matrix forcescc(nat, 3);
     this->cal_force_loc(forcelc);
     this->cal_force_ew(forceion);
-    this->cal_force_nl(forcenl);
+    this->cal_force_nl(forcenl, psi_in);
 	this->cal_force_cc(forcecc);
 	this->cal_force_scc(forcescc);
 
@@ -662,7 +662,7 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 
 #include "../module_base/complexarray.h"
 #include "../module_base/complexmatrix.h"
-void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
+void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<double>>* psi_in)
 {
 	ModuleBase::TITLE("Forces","cal_force_nl");
 	ModuleBase::timer::tick("Forces","cal_force_nl");
@@ -697,7 +697,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
         {
             for (int i=0;i<nkb;i++)
             {
-                const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+                const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
                 const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
                 for (int ig=0; ig<nbasis; ig++)
                 {
@@ -739,7 +739,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
                 if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
                 for (int i=0; i<nkb; i++)
                 {
-                    const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+                    const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
                     const std::complex<double>* pvkb1 = &(vkb1(i, 0));
                     for (int ig=0; ig<nbasis; ig++)
                     {
