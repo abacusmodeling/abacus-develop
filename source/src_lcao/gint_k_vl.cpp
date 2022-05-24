@@ -23,7 +23,7 @@ void Gint_Interface::gint_kernel_vlocal(
 	const double delta_r,
 	double* vldr3,
 	const int LD_pool,
-	double* pvpR_reduced)
+	double* pvpR_in)
 {
 	//prepare block information
 	int * block_iw, * block_index, * block_size;
@@ -42,10 +42,18 @@ void Gint_Interface::gint_kernel_vlocal(
 	const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
 			na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
 
-	this->cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
-		block_size, block_index, block_iw, cal_flag,
-		psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
-		pvpR_reduced);
+    if(GlobalV::GAMMA_ONLY_LOCAL)
+    {
+		this->cal_meshball_vlocal_gamma(
+			na_grid, LD_pool, block_iw, block_size, block_index, cal_flag,
+			psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, pvpR_in);
+    }
+    else
+    {
+        this->cal_meshball_vlocal_k(
+            na_grid, LD_pool, grid_index, block_size, block_index, block_iw, cal_flag,
+            psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, pvpR_in);
+    }
 
     //release memories
 	delete[] block_iw;
@@ -58,6 +66,84 @@ void Gint_Interface::gint_kernel_vlocal(
 	delete[] cal_flag;
 
 	return;
+}
+
+void Gint_Interface::cal_meshball_vlocal_gamma(
+	const int na_grid,  					    // how many atoms on this (i,j,k) grid
+	const int LD_pool,
+	const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
+	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
+	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+	const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const*const psir_ylm,		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
+	const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+	double* GridVlocal)	    // GridVlocal[lgd_now][lgd_now]
+{
+	const char transa='N', transb='T';
+	const double alpha=1, beta=1;
+    const int lgd_now = GlobalC::GridT.lgd;
+
+	for(int ia1=0; ia1<na_grid; ++ia1)
+	{
+		const int iw1_lo=block_iw[ia1];
+		const int m=block_size[ia1];
+		for(int ia2=0; ia2<na_grid; ++ia2)
+		{
+			const int iw2_lo=block_iw[ia2];
+			if(iw1_lo<=iw2_lo)
+			{
+                int first_ib=0;
+                for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+                {
+                    if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+                    {
+                        first_ib=ib;
+                        break;
+                    }
+                }
+                int last_ib=0;
+                for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
+                {
+                    if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+                    {
+                        last_ib=ib+1;
+                        break;
+                    }
+                }
+                const int ib_length = last_ib-first_ib;
+                if(ib_length<=0) continue;
+
+                int cal_pair_num=0;
+                for(int ib=first_ib; ib<last_ib; ++ib)
+                {
+                    cal_pair_num += cal_flag[ib][ia1] && cal_flag[ib][ia2];
+                }
+
+                const int n=block_size[ia2];
+                if(cal_pair_num>ib_length/4)
+                {
+                    dgemm_(&transa, &transb, &n, &m, &ib_length, &alpha,
+                        &psir_vlbr3[first_ib][block_index[ia2]], &LD_pool,
+                        &psir_ylm[first_ib][block_index[ia1]], &LD_pool,
+                        &beta, &GridVlocal[iw1_lo*lgd_now+iw2_lo], &lgd_now);   
+                }
+                else
+                {
+                    for(int ib=first_ib; ib<last_ib; ++ib)
+                    {
+                        if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+                        {
+                            int k=1;                            
+                            dgemm_(&transa, &transb, &n, &m, &k, &alpha,
+                                &psir_vlbr3[ib][block_index[ia2]], &LD_pool,
+                                &psir_ylm[ib][block_index[ia1]], &LD_pool,
+                                &beta, &GridVlocal[iw1_lo*lgd_now+iw2_lo], &lgd_now);                          
+                        }
+                    }
+                }
+			}
+		}
+	}
 }
 
 inline int find_offset(const int id1, const int id2, const int iat1, const int iat2,
@@ -89,7 +175,7 @@ inline int find_offset(const int id1, const int id2, const int iat1, const int i
 	return offset;
 }
 
-void Gint_Interface::cal_meshball_vlocal(
+void Gint_Interface::cal_meshball_vlocal_k(
 	int na_grid,
 	int LD_pool,
 	int grid_index, 

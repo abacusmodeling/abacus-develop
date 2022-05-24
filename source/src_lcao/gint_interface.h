@@ -40,7 +40,7 @@ class Gint_Interface
         const int LD_pool,
         double* pvpR_reduced);
 
-    void cal_meshball_vlocal(
+    void cal_meshball_vlocal_k(
         int na_grid,
         int LD_pool,
         int grid_index, 
@@ -51,6 +51,17 @@ class Gint_Interface
         double** psir_ylm,
         double** psir_vlbr3,
         double* pvpR);
+
+	void cal_meshball_vlocal_gamma(
+		const int na_grid,  						// how many atoms on this (i,j,k) grid
+		const int LD_pool,
+		const int*const block_iw,					// block_iw[na_grid],	index of wave functions for each block
+		const int*const block_size, 				// block_size[na_grid],	number of columns of a band
+		const int*const block_index,				// block_index[na_grid+1], count total number of atomis orbitals
+		const bool*const*const cal_flag,			// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_ylm,			// psir_ylm[GlobalC::pw.bxyz][LD_pool]
+		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		double* GridVlocal);		// GridVlocal[lgd_now][lgd_now]
 
     //------------------------------------------------------
     // in gint_k_fvl.cpp 

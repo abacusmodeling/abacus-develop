@@ -20,18 +20,6 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 	const int LD_pool = max_size*GlobalC::ucell.nwmax;
     const int lgd = GlobalC::GridT.lgd;
 
-	if(inout->job==Gint_Tools::job_type::vlocal && !GlobalV::GAMMA_ONLY_LOCAL)
-	{
-		if(!pvpR_alloc_flag)
-		{
-			ModuleBase::WARNING_QUIT("Gint_interface::cal_gint","pvpR has not been allocated yet!");
-		}
-		else
-		{
-			ModuleBase::GlobalFunc::ZEROS(this->pvpR_reduced[inout->ispin], GlobalC::GridT.nnrg);
-		}
-	}
-
     if(max_size!=0)
     {
 #ifdef __MKL
@@ -49,6 +37,24 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 			
 			// it's a uniform grid to save orbital values, so the delta_r is a constant.
 			const double delta_r = GlobalC::ORB.dr_uniform;
+
+            if(inout->job==Gint_Tools::job_type::vlocal && !GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                if(!pvpR_alloc_flag)
+                {
+                    ModuleBase::WARNING_QUIT("Gint_interface::cal_gint","pvpR has not been allocated yet!");
+                }
+                else
+                {
+                    ModuleBase::GlobalFunc::ZEROS(this->pvpR_reduced[inout->ispin], GlobalC::GridT.nnrg);
+                }
+            }
+
+            if(inout->job==Gint_Tools::job_type::vlocal && GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
+            {
+                this->pvpR_grid = new double[lgd*lgd];
+                ModuleBase::GlobalFunc::ZEROS(pvpR_grid, lgd*lgd);
+            }
 
             //perpare auxiliary arrays to store thread-specific values
 #ifdef _OPENMP
@@ -131,11 +137,21 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 						{
 							double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
 							#ifdef _OPENMP
-								this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
-									pvpR_thread);
+                                if((GlobalV::GAMMA_ONLY_LOCAL && lgd>0) || !GlobalV::GAMMA_ONLY_LOCAL)
+                                {
+                                    this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+                                        pvpR_thread);
+                                }
 							#else
-								this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
-									this->pvpR_reduced[inout->ispin]);
+                                if(GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
+                                {
+                                    this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool, pvpR_grid);
+                                }
+                                if(!GlobalV::GAMMA_ONLY_LOCAL)
+                                {
+                                    this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+                                        this->pvpR_reduced[inout->ispin]);
+                                }
 							#endif
 							delete[] vldr3;
 						}
@@ -147,28 +163,40 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 #ifdef _OPENMP
 			if(inout->job==Gint_Tools::job_type::vlocal)
 			{
-				for(int innrg=0; innrg<GlobalC::GridT.nnrg; innrg++)
-				{
-					#pragma omp critical(gint_k)
-					pvpR_reduced[inout->ispin][innrg] += pvpR_thread[innrg];
-				}
-				delete[] pvpR_thread;
+                if(GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
+                {
+                    for(int i=0;i<lgd*lgd;i++)
+                    {
+                        #pragma omp critical(gint_gamma)
+                        pvpR_grid[i] += pvpR_thread[i];
+                    }
+                    delete[] pvpR_thread;
+                }
+                if(!GlobalV::GAMMA_ONLY_LOCAL)
+                {
+                    for(int innrg=0; innrg<GlobalC::GridT.nnrg; innrg++)
+                    {
+                        #pragma omp critical(gint_k)
+                        pvpR_reduced[inout->ispin][innrg] += pvpR_thread[innrg];
+                    }
+                    delete[] pvpR_thread;
+                }
 			}
+
 			if(inout->job==Gint_Tools::job_type::force)
 			{
 				if(inout->isforce)
 				{
-					#pragma omp critical(gint_k)
+					#pragma omp critical(gint)
 					inout->fvl_dphi[0]+=fvl_dphi_thread;
 				}
 				if(inout->isstress)
 				{
-					#pragma omp critical(gint_k)
+					#pragma omp critical(gint)
 					inout->svl_dphi[0]+=svl_dphi_thread;
 				}
 			}
 #endif
-
 		} // end of #pragma omp parallel
 
 #ifdef __MKL
