@@ -75,7 +75,8 @@ void MD_func::kinetic_stress(
 //   This function calculates the classical kinetic energy of atoms
 //   and its contribution to stress.
 //----------------------------------------------------------------------------
-
+	if(GlobalV::MY_RANK==0) //only first rank do md
+	{
 	kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
 
 	ModuleBase::matrix temp;
@@ -105,6 +106,7 @@ void MD_func::kinetic_stress(
 				stress(i, j) = temp(i, j)/unit_in.omega;
 			}
 		}
+	}
 	}
 }
 
