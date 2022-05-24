@@ -162,7 +162,7 @@ void Parallel_Reduce::reduce_complex_double_all(std::complex <double> *object, c
 #ifdef __MPI
 	std::complex<double> *swap = new std::complex<double>[n];
 	for(int i=0;i<n;i++) swap[i] = object[i];
-	MPI_Allreduce(swap, object, n, mpicomplex, myOp, POOL_WORLD);
+	MPI_Allreduce(swap, object, n, mpicomplex, myOp, MPI_COMM_WORLD);
 	delete[] swap;
 #endif
 	return;
@@ -285,27 +285,3 @@ void Parallel_Reduce::gather_min_double_all(double &v)
 	delete[] value;
 #endif
 }
-
-bool Parallel_Reduce::check_if_equal(double &v)
-{
-#ifdef __MPI
-	double *all=new double[GlobalV::NPROC];
-	MPI_Allgather(&v, 1, MPI_DOUBLE, all, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-	for(int i=0; i<GlobalV::NPROC; i++)
-	{
-		if( abs(all[i] - all[0]) > 1.0e-9 )
-		{
-			for(int j=0; j<GlobalV::NPROC; j++)
-			{
-				std::cout << "\n processor = " << j << " value = " << all[j];
-			}
-			delete[] all;
-			return false;
-		}
-	}
-	delete[] all;
-	return true;
-#endif
-	return true;
-}
-
