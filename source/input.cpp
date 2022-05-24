@@ -384,7 +384,7 @@ void Input::Default(void)
 
     cell_factor = 1.2; // LiuXh add 20180619
 
-    GlobalV::out_mul = 0; // qi feng add 2019/9/10
+    out_mul = 0; // qi feng add 2019/9/10
 
     //----------------------------------------------------------			//Peize Lin add 2020-04-04
     // restart
@@ -1343,7 +1343,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("out_mul", word) == 0)
         {
-            read_value(ifs, GlobalV::out_mul);
+            read_value(ifs, out_mul);
         } // qifeng add 2019/9/10
         //----------------------------------------------------------
         // exx
@@ -1842,6 +1842,7 @@ void Input::Default_2(void) // jiyy add 2019-08-04
         }
     }
     if(calculation.substr(0,3) != "sto")    bndpar = 1;
+    if(bndpar > GlobalV::NPROC) bndpar = GlobalV::NPROC;
 }
 #ifdef __MPI
 void Input::Bcast()
@@ -2093,7 +2094,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(test_just_neighbor);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
-    Parallel_Common::bcast_int(GlobalV::out_mul); // qifeng add 2019/9/10
+    Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10
 
     // Peize Lin add 2018-06-20
     Parallel_Common::bcast_string(dft_functional);
@@ -2315,9 +2316,9 @@ void Input::Check(void)
             ModuleBase::WARNING_QUIT("Input::Check", "calculate = istate is only availble for LCAO.");
         }
     }
-    else if (calculation == "md") // mohan add 2011-11-04
+    else if (calculation == "md" || calculation == "sto-md") // mohan add 2011-11-04
     {
-        GlobalV::CALCULATION = "md";
+        GlobalV::CALCULATION = calculation;
         symmetry = false;
         cal_force = 1;
         if (mdp.md_nstep == 0)

@@ -8,7 +8,7 @@
 #include "../diago_iter_assist.h"
 #include "diago_mock.h"
 #include "mpi.h"
-#include "module_pw/unittest/test_tool.h"
+#include "module_pw/test/test_tool.h"
 #include <complex>
 
 #include "gtest/gtest.h"
@@ -95,9 +95,9 @@ class DiagoCGPrepare
 	//======================================================================
         double *en = new double[npw];
         int ik = 1;
+        Hamilt_PW* hpw;
 	    hamilt::Hamilt* ha;
-	    ha =new hamilt::HamiltPW;
-	    Hamilt_PW* hpw;
+	    ha =new hamilt::HamiltPW(hpw);
 	    int* ngk = new int [1];
 	    //psi::Psi<std::complex<double>> psi(ngk,ik,nband,npw);
 	    psi::Psi<std::complex<double>> psi;

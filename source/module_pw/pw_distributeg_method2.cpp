@@ -2,26 +2,26 @@
 #include "../module_base/mymath.h"
 #include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
-#include "iostream"
+// #include "iostream"
 #include "../module_base/timer.h"
 
 
 namespace ModulePW
 {
-//
-// Distribute planewaves in reciprocal space to coreors.
-// Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
-// Secondly, distribute these sticks to coreors.
-// 
-// Example
-//                                ---- ixy increasing --->
-// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1], ...
-//                |___________________________|____________________________|___
-// ip                           0                            1              ...
-// 
-//Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
-//output: ig2isz[ig], istot2bigixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
-//
+///
+/// Distribute planewaves in reciprocal space to cores.
+/// Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
+/// Secondly, distribute these sticks to coreors.
+/// 
+/// Example
+///                                ---- ixy increasing --->
+/// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1]-1, ...
+///                |___________________________|______________________________|___
+/// ip                           0                            1              ...
+/// 
+/// Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
+/// output: ig2isz[ig], istot2bigixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
+///
 void PW_Basis::distribution_method2()
 {
     ModuleBase::timer::tick("PW_Basis", "distributeg_method2");
@@ -29,7 +29,6 @@ void PW_Basis::distribution_method2()
     // initial the variables needed by all proc.
     int tot_npw = 0;                     // total number of planewaves.
     this->nstot = 0;                     // total number of sticks.
-   // int st_start = 0;                    // index of the first stick on current proc.
     int *st_bottom2D = NULL;             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = NULL;             // st_length2D[ixy], number of planewaves in stick on (x, y).
 
@@ -48,27 +47,27 @@ void PW_Basis::distribution_method2()
 
         this->count_pw_st(tot_npw, st_length2D, st_bottom2D);
         // for test --------------------------------------------------
-        std::cout << "The first step done\n";
-        std::cout << "tot_npw   " << tot_npw << '\n';
-        std::cout << "this->nstot   " << this->nstot << '\n';
-        for (int ix = 0; ix < nx; ++ix)
-        {
-            for (int iy = 0; iy < ny; ++iy)
-            {
-                std::cout << st_length2D[ix * ny + iy] << std::setw(4);
-            }
-            std::cout << '\n';
-        }
+        // std::cout << "The first step done\n";
+        // std::cout << "tot_npw   " << tot_npw << '\n';
+        // std::cout << "this->nstot   " << this->nstot << '\n';
+        // for (int ix = 0; ix < nx; ++ix)
+        // {
+        //     for (int iy = 0; iy < ny; ++iy)
+        //     {
+        //         std::cout << st_length2D[ix * ny + iy] << std::setw(4);
+        //     }
+        //     std::cout << '\n';
+        // }
         // ------------------------------------------------------------
 
         // (2) Devide the sticks to each core, sticks are in the order of ixy increasing.
 
         ModuleBase::GlobalFunc::ZEROS(nst_per, this->poolnproc);
-        this->divide_sticks2();
+        this->divide_sticks_2();
         // for test ----------------------------------------------------------------------------
-        std::cout << "nst_per  ";
-        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << nst_per[ip] << std::setw(4);
-        std::cout << "\n";
+        // std::cout << "nst_per  ";
+        // for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << nst_per[ip] << std::setw(4);
+        // std::cout << "\n";
         //-------------------------------------------------------------------------------------- 
 
         // (3) Create the maps from ixy to ip, istot, and from istot to ixy
@@ -77,9 +76,9 @@ void PW_Basis::distribution_method2()
         ModuleBase::GlobalFunc::ZEROS(npw_per, this->poolnproc);
         this->create_maps(st_length2D, npw_per);
         // for test ----------------------------------------------------------------------------
-        std::cout << "npw_per  ";
-        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << npw_per[ip] << std::setw(4);
-        std::cout << "\n";
+        // std::cout << "npw_per  ";
+        // for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << npw_per[ip] << std::setw(4);
+        // std::cout << "\n";
         //-------------------------------------------------------------------------------------- 
 
         // (4) Send npw_per, nst[poolrank], st_* to all cores.
@@ -101,7 +100,7 @@ void PW_Basis::distribution_method2()
         MPI_Status ierror;
         MPI_Recv(&npw, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);  // number of planewaves in current proc.
         MPI_Recv(&nst, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
-        std::cout << this->poolrank << " recive done.\n";
+        // std::cout << this->poolrank << " recive done.\n";
 #endif
     }
 #ifdef __MPI
@@ -125,7 +124,7 @@ void PW_Basis::distribution_method2()
     MPI_Bcast(this->istot2bigixy, this->nstot, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->ixy2istot, this->nxy, MPI_INT, 0, POOL_WORLD);
 
-    std::cout << "Bcast done\n";
+    // std::cout << "Bcast done\n";
 #endif
     this->nstnz = this->nst * this->nz;
 
@@ -135,18 +134,19 @@ void PW_Basis::distribution_method2()
     if (st_bottom2D != NULL) delete[] st_bottom2D;
     if (st_length2D != NULL) delete[] st_length2D;
     // for test ----------------------------------------------
-    if (poolrank==0) std::cout << "The fifth step done\n";
+    // if (poolrank==0) std::cout << "The fifth step done\n";
     // -------------------------------------------------------
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
+    ModuleBase::timer::tick("PW_Basis", "distributeg_method2");
     return;
 }
 
-// 
-// (2) Devide the sticks to each core, sticks are in the order of ixy increasing.
-// known: this->nstot, this->poolnproc
-// output: nst_per, this->nstnz_per, this->startnsz_per
-// 
-void PW_Basis::divide_sticks2()
+/// 
+/// (2) Devide the sticks to each core according to the number of sticks
+/// Sticks are in the order of ixy increasing.
+/// known: this->nstot, this->poolnproc
+/// output: nst_per, this->nstnz_per, this->startnsz_per
+/// 
+void PW_Basis::divide_sticks_2()
 {
     this->nstnz_per = new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
     this->startnsz_per = new int[this->poolnproc];

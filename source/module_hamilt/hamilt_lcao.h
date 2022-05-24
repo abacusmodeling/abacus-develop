@@ -44,6 +44,7 @@ template <typename T, typename T1> class HamiltLCAO : public Hamilt
         this->GK = GK_in;
         this->genH = genH_in;
         this->LM = LM_in;
+        this->classname = "HamiltLCAO";
     }
     //~HamiltLCAO();
 

@@ -23,7 +23,7 @@ public:
 
     void init(ModuleBase::matrix& force);
 
-private:
+protected:
 
     int nat;
 	static double output_acc;
