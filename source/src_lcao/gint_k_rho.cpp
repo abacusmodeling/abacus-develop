@@ -31,29 +31,37 @@ void Gint_Interface::gint_kernel_rho(
 		cal_flag,
 		psir_ylm.ptr_2D);
 
-	//setting variables
-	double** DM_R = inout->DM_R;
-	Charge* chr = inout->chr;
-
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
-		//calculating g_mu(r) = sum_nu rho_mu,nu psi_nu(r)
-		const Gint_Tools::Array_Pool<double> psir_DMR
-			= Gint_Tools::mult_psi_DMR(
+		Gint_Tools::Array_Pool<double> psir_DM(GlobalC::pw.bxyz, LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+		if(GlobalV::GAMMA_ONLY_LOCAL)
+		{
+			Gint_Tools::mult_psi_DM(
+				na_grid, LD_pool,
+				block_iw, block_size,
+				block_index, cal_flag,
+				psir_ylm.ptr_2D,
+				psir_DM.ptr_2D,
+				inout->DM[is], 1);			
+		}
+		else
+		{
+			//calculating g_mu(r) = sum_nu rho_mu,nu psi_nu(r)
+			Gint_Tools::mult_psi_DMR(
 				grid_index, na_grid,
 				block_index, block_size,
 				cal_flag, GlobalC::GridT,
 				psir_ylm.ptr_2D,
-				DM_R[is], 1);
+				psir_DM.ptr_2D,
+				inout->DM_R[is], 1);
+		}
 
 		//do sum_mu g_mu(r)psi_mu(r) to get electron density on grid
 		this->cal_meshball_rho(
-			na_grid,
-			block_index,
-			vindex, 
-			psir_ylm.ptr_2D,
-			psir_DMR.ptr_2D,
-			chr->rho[is]);
+			na_grid, block_index,
+			vindex, psir_ylm.ptr_2D,
+			psir_DM.ptr_2D, inout->chr->rho[is]);
 	}
 	delete[] block_iw;
 	delete[] block_index;

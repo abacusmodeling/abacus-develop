@@ -11,7 +11,7 @@ void Gint_Interface::gint_kernel_force(
 	const double delta_r,
 	double* vldr3,
 	const int LD_pool,
-	double**DM_R,
+	double** DM_in,
     const bool isforce,
     const bool isstress,
     ModuleBase::matrix* fvl_dphi,
@@ -42,14 +42,30 @@ void Gint_Interface::gint_kernel_force(
 	const Gint_Tools::Array_Pool<double> psir_vlbr3 
 		= Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
 
-    //calculating g_mu(r) = sum_nu rho_mu,nu f_nu(r)
-	const Gint_Tools::Array_Pool<double> psir_vlbr3_DMR
-		= Gint_Tools::mult_psi_DMR(
+	Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::pw.bxyz, LD_pool);
+	ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+
+	//calculating g_mu(r) = sum_nu rho_mu,nu f_nu(r)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
+	{
+		Gint_Tools::mult_psi_DM(
+			na_grid, LD_pool,
+			block_iw, block_size,
+			block_index, cal_flag,
+			psir_vlbr3.ptr_2D,
+			psir_vlbr3_DM.ptr_2D,
+			DM_in, 2);
+	}
+	else
+	{
+		Gint_Tools::mult_psi_DMR(
 			grid_index, na_grid,
 			block_index, block_size,
 			cal_flag, GlobalC::GridT,
 			psir_vlbr3.ptr_2D,
-			DM_R[GlobalV::CURRENT_SPIN], 2);
+			psir_vlbr3_DM.ptr_2D,
+			DM_in[GlobalV::CURRENT_SPIN], 2);
+	}
 
 	if(isforce)
 	{
@@ -57,7 +73,7 @@ void Gint_Interface::gint_kernel_force(
 		this-> cal_meshball_force(
 			grid_index, na_grid, 
 			block_size, block_index,
-			psir_vlbr3_DMR.ptr_2D, 
+			psir_vlbr3_DM.ptr_2D, 
 			dpsir_ylm_x.ptr_2D, 
 			dpsir_ylm_y.ptr_2D, 
 			dpsir_ylm_z.ptr_2D, 
@@ -88,7 +104,7 @@ void Gint_Interface::gint_kernel_force(
 		);
         //do integration to get stress
 		this-> cal_meshball_stress(na_grid, block_index,
-			psir_vlbr3_DMR.ptr_2D, 
+			psir_vlbr3_DM.ptr_2D, 
 			dpsir_ylm_xx.ptr_2D, 
 			dpsir_ylm_xy.ptr_2D, 
 			dpsir_ylm_xz.ptr_2D,

@@ -456,7 +456,7 @@ namespace Gint_Tools
 		return psir_vlbr3;
 	}
 
-	Gint_Tools::Array_Pool<double> mult_psi_DM(
+	void mult_psi_DM(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
 		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
@@ -464,6 +464,7 @@ namespace Gint_Tools
 		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
 		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 		const double*const*const psi,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		double ** psi_DM,
 		const double*const*const DM,
 		const int job)
 	{
@@ -484,9 +485,6 @@ namespace Gint_Tools
 			default:
 				ModuleBase::WARNING_QUIT("psir_dm","job can only be 1 or 2");
 		}
-
-		Gint_Tools::Array_Pool<double> psi_DM(GlobalC::pw.bxyz, LD_pool);
-		ModuleBase::GlobalFunc::ZEROS(psi_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
 
 		for (int ia1=0; ia1<na_grid; ia1++)
 		{
@@ -526,7 +524,7 @@ namespace Gint_Tools
 					dsymm_(&side, &uplo, &block_size[ia1], &ib_length, 
 						&alpha_symm, &DM[iw1_lo][iw1_lo], &GlobalC::GridT.lgd, 
 						&psi[first_ib][block_index[ia1]], &LD_pool, 
-						&beta, &psi_DM.ptr_2D[first_ib][block_index[ia1]], &LD_pool);
+						&beta, &psi_DM[first_ib][block_index[ia1]], &LD_pool);
 				}
 				else
 				{
@@ -538,7 +536,7 @@ namespace Gint_Tools
 							dsymv_(&uplo, &block_size[ia1],
 								&alpha_symm, &DM[iw1_lo][iw1_lo], &GlobalC::GridT.lgd,
 								&psi[ib][block_index[ia1]], &inc,
-								&beta, &psi_DM.ptr_2D[ib][block_index[ia1]], &inc);
+								&beta, &psi_DM[ib][block_index[ia1]], &inc);
 						}
 					}
 				}			
@@ -590,7 +588,7 @@ namespace Gint_Tools
                     dgemm_(&transa, &transb, &block_size[ia2], &ib_length, &block_size[ia1], 
                         &alpha_gemm, &DM[iw1_lo][iw2_lo], &GlobalC::GridT.lgd, 
                         &psi[first_ib][block_index[ia1]], &LD_pool, 
-                        &beta, &psi_DM.ptr_2D[first_ib][block_index[ia2]], &LD_pool);
+                        &beta, &psi_DM[first_ib][block_index[ia2]], &LD_pool);
 				}
                 else
                 {
@@ -601,14 +599,12 @@ namespace Gint_Tools
                             dgemv_(&transa, &block_size[ia2], &block_size[ia1], 
                                 &alpha_gemm, &DM[iw1_lo][iw2_lo], &GlobalC::GridT.lgd,
                                 &psi[ib][block_index[ia1]], &inc,
-                                &beta, &psi_DM.ptr_2D[ib][block_index[ia2]], &inc);
+                                &beta, &psi_DM[ib][block_index[ia2]], &inc);
                         }
                     }
                 }
 			}// ia2       
 		} // ia1  
-		
-		return psi_DM;
 	}
 
 //calculating (psi_DMR)_mu = sum_nu DMR_mu,nu psi_nu
@@ -616,22 +612,21 @@ namespace Gint_Tools
 //in calculating rho, due to symmetry, the summation over mu,nu
 //can be done as sum_mu,mu + 2 sum_mu<nu, saving some time
 //but for force, we cannot exchange the index
-	Gint_Tools::Array_Pool<double> mult_psi_DMR(
+	void mult_psi_DMR(
 		const int &grid_index,
 		const int &na_grid,
 		const int*const block_index,
 		const int*const block_size,
 		bool** cal_flag,
 		const Grid_Technique &gt,
-		double** psi, 
+		double** psi,
+		double ** psi_DMR, 
 		double* DMR,
 		const int job)
 	{                       
 		double *psi2, *psi2_dmr;
 		int iwi, iww;
 		const int LD_pool = GlobalC::GridT.max_atom*GlobalC::ucell.nwmax;
-		Gint_Tools::Array_Pool<double> psi_DMR(GlobalC::pw.bxyz, LD_pool);
-		ModuleBase::GlobalFunc::ZEROS(psi_DMR.ptr_1D, GlobalC::pw.bxyz*LD_pool);
 
 		bool *all_out_of_range = new bool[na_grid];
 		for(int ia=0; ia<na_grid; ++ia) //number of atoms
@@ -725,7 +720,7 @@ namespace Gint_Tools
 					dgemm_(&trans, &trans, &block_size[ia1], &GlobalC::pw.bxyz, &block_size[ia1], &alpha,
 						&DMR[DM_start], &block_size[ia1], 
 						&psi[0][idx1], &LD_pool,  
-						&beta, &psi_DMR.ptr_2D[0][idx1], &LD_pool);
+						&beta, &psi_DMR[0][idx1], &LD_pool);
 				}
 				else if(cal_num>0)
 				{	
@@ -737,7 +732,7 @@ namespace Gint_Tools
 							dgemv_(&trans, &block_size[ia1], &block_size[ia1], &alpha,
 									&DMR[DM_start], &block_size[ia1], 
 									&psi[ib][idx1], &inc,  
-									&beta, &psi_DMR.ptr_2D[ib][idx1], &inc);
+									&beta, &psi_DMR[ib][idx1], &inc);
 						}
 					}
 				}
@@ -841,7 +836,7 @@ namespace Gint_Tools
     				dgemm_(&trans, &trans, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha1,
     					&DMR[DM_start], &block_size[ia2], 
     					&psi[0][idx1], &LD_pool,
-    					&beta, &psi_DMR.ptr_2D[0][idx2], &LD_pool);
+    					&beta, &psi_DMR[0][idx2], &LD_pool);
 				}
 				else if(cal_num>0)
 				{
@@ -856,7 +851,7 @@ namespace Gint_Tools
             				dgemv_(&trans, &block_size[ia2], &block_size[ia1], &alpha1,
             					&DMR[DM_start], &block_size[ia2], 
             					&psi[ib][idx1], &inc,
-            					&beta, &psi_DMR.ptr_2D[ib][idx2], &inc);
+            					&beta, &psi_DMR[ib][idx2], &inc);
         				}
     				}
 				} // cal_num
@@ -864,7 +859,6 @@ namespace Gint_Tools
 		}//ia1
 
 		delete[] all_out_of_range;
-		return psi_DMR;
 
 	}
 }

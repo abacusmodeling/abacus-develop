@@ -43,12 +43,14 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
     	#pragma omp parallel
 #endif
 		{
+            //prepare some constants
 			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
 			const double dv = GlobalC::ucell.omega/this->ncxyz;
 			
 			// it's a uniform grid to save orbital values, so the delta_r is a constant.
 			const double delta_r = GlobalC::ORB.dr_uniform;
 
+            //perpare auxiliary arrays to store thread-specific values
 #ifdef _OPENMP
 			double* pvpR_thread;
 			if(inout->job==Gint_Tools::job_type::vlocal)
@@ -83,7 +85,7 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 
     		#pragma omp for
 #endif
-
+            // entering the main loop of grid points
 			for(int i=0; i<nbx; i++)
 			{
 				const int ibx = i*GlobalC::pw.bx; // mohan add 2012-03-25
@@ -94,10 +96,12 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 					{
 						const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; //mohan add 2012-03-25
 						
+                        // get the index of grid
 						const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 
 						// get the value: how many atoms has orbital value on this grid.
 						const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
+
 						if(na_grid==0) continue;				
 
 						if(inout->job == Gint_Tools::job_type::rho)

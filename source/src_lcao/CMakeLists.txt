@@ -31,9 +31,7 @@ list(APPEND objects
     gint_interface.cpp
     gint_gamma.cpp
     gint_gamma_env.cpp
-    gint_gamma_fvl.cpp
     gint_gamma_mull.cpp
-    gint_gamma_rho.cpp
     gint_gamma_vl.cpp
     gint_k_fvl.cpp
     gint_k_rho.cpp

@@ -115,6 +115,8 @@ class Gint_Interface
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.
     bool pvpR_alloc_flag = false;
     double** pvpR_reduced;
+    
+	double* pvpR_grid; //stores Hamiltonian in grid format
 };
 
 #endif

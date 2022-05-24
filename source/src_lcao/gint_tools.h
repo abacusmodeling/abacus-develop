@@ -195,7 +195,7 @@ namespace Gint_Tools
 		const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
 		const double*const*const psir_ylm);		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
 
-	Gint_Tools::Array_Pool<double> mult_psi_DM(
+	void mult_psi_DM(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
 		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
@@ -203,17 +203,19 @@ namespace Gint_Tools
 		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
 		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 		const double*const*const psi,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		double** psi_DM,
 		const double*const*const DM,
 		const int job);
 
-	Gint_Tools::Array_Pool<double> mult_psi_DMR(
+	void mult_psi_DMR(
         const int &grid_index, 
         const int &na_grid,
         const int*const block_index, 
         const int*const block_size,
         bool** cal_flag,
         const Grid_Technique &gt,
-        double** psi, 
+        double** psi,
+		double** psi_DMR,
         double* DMR,
 		const int job);
 }

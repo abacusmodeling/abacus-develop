@@ -36,7 +36,8 @@ void LCAO_Hamilt::set_lcao_matrices(void)
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {   
         // calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
-        this->calculate_STNR_gamma();	
+        this->calculate_STNR_gamma();
+        this->GG.prep_grid(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz);	
 
     }
     else // multiple k-points

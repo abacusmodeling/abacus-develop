@@ -314,7 +314,7 @@ TEST_F(LCAOTest,GammaRho)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		Gint_inout inout(LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
-		GG.cal_gint_gamma(&inout);
+		GG.cal_gint(&inout);
 	}
 	//std::cout<<"rho in test "<<GlobalC::CHR.rho[0][0]<<std::endl;
 

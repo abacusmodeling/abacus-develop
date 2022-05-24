@@ -45,26 +45,6 @@ private:
 	void gamma_envelope(const double* wfc, double* rho);// mohan add 2011-07-01
 
     //------------------------------------------------------
-    // in gint_gamma_rho.cpp 
-    //------------------------------------------------------
-    // calculate the charge density via grid integrals
-	void gint_kernel_rho(
-		const int na_grid,
-		const int grid_index,
-		const double delta_r,
-		int* vindex,
-		const int LD_pool,
-		Gint_inout *inout) const;
-
-	void cal_meshball_rho(
-		const int na_grid,
-		const int*const block_index,
-		const int*const vindex,
-		const double*const*const psir_ylm,
-		double** psir_DM,
-		double* rho) const;
-
-    //------------------------------------------------------
     // in gint_gamma_vl.cpp 
     //------------------------------------------------------
     // calculate the matrix elements of Hamiltonian matrix,	
@@ -90,7 +70,6 @@ private:
 
     void vl_grid_to_2D(const int lgd, LCAO_Matrix& lm); //redistribute the Hamiltonian to 2D block format
 
-	double* pvpR_grid; //stores Hamiltonian in grid format
     ///===============================
     /// Use MPI_Alltoallv to convert a grid distributed matrix
     /// to 2D - block cyclic distributed matrix.
@@ -109,44 +88,6 @@ private:
     int *receiver_displacement_process;
     double* receiver_buffer;
 
-    //------------------------------------------------------
-    // in gint_gamma_fvl.cpp 
-    //------------------------------------------------------
-    // calculate vl contributuion to force & stress via grid integrals	
-	void gint_kernel_force(
-		const int na_grid,
-		const int grid_index,
-		const double delta_r,
-		double* vldr3,
-		const int LD_pool,
-		double** DM,
-		const bool isforce,
-		const bool isstress,
-		ModuleBase::matrix* fvl_dphi,
-		ModuleBase::matrix* svl_dphi);
-
-	void cal_meshball_force(
-		const int grid_index,
-		const int na_grid,  					    // how many atoms on this (i,j,k) grid
-		const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
-		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-		const double*const*const psir_vlbr3_DM,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		ModuleBase::matrix &force);
-
-	void cal_meshball_stress(
-		const int na_grid,  					    // how many atoms on this (i,j,k) grid
-		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-		const double*const*const psir_vlbr3_DM,
-		const double*const*const dpsir_xx,
-		const double*const*const dpsir_xy,
-		const double*const*const dpsir_xz,
-		const double*const*const dpsir_yy,
-		const double*const*const dpsir_yz,
-		const double*const*const dpsir_zz,
-		ModuleBase::matrix &stress);
 };
 
 #endif

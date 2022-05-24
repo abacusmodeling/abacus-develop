@@ -165,7 +165,7 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         Gint_inout inout(this->DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
-        uhm.GG.cal_gint_gamma(&inout);
+        uhm.GG.cal_gint(&inout);
     }
     else
     {
