@@ -1136,7 +1136,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		if(isstress||isforce) 
 		{
 			Gint_inout inout(DM_R, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
-			this->UHM->GK.cal_gint_k(&inout);
+			this->UHM->GK.cal_gint(&inout);
 		}
 	}
 

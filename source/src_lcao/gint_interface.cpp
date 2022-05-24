@@ -103,7 +103,7 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 						if(inout->job == Gint_Tools::job_type::rho)
 						{
 							int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);
-							//this->gint_kernel_rho(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
+							this->gint_kernel_rho(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
 							delete[] vindex;
 						}
 						else if(inout->job == Gint_Tools::job_type::force)
@@ -113,13 +113,13 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
                             if(GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM[GlobalV::CURRENT_SPIN];
                             if(!GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM_R;
 							#ifdef _OPENMP
-								//this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
-								//	DM_in, inout->isforce, inout->isstress,
-								//	&fvl_dphi_thread, &svl_dphi_thread);
+								this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
+									DM_in, inout->isforce, inout->isstress,
+									&fvl_dphi_thread, &svl_dphi_thread);
 							#else
-								//this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
-								//	DM_in, inout->isforce, inout->isstress,
-								//	inout->fvl_dphi, inout->svl_dphi);
+								this->gint_kernel_force(na_grid, grid_index, delta_r, vldr3, LD_pool, 
+									DM_in, inout->isforce, inout->isstress,
+									inout->fvl_dphi, inout->svl_dphi);
 							#endif
 							delete[] vldr3;
 						}
@@ -127,11 +127,11 @@ void Gint_Interface::cal_gint(Gint_inout *inout)
 						{
 							double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
 							#ifdef _OPENMP
-								//this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
-								//	pvpR_thread);
+								this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+									pvpR_thread);
 							#else
-								//this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
-								//	this->pvpR_reduced[inout->ispin]);
+								this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, LD_pool,
+									this->pvpR_reduced[inout->ispin]);
 							#endif
 							delete[] vldr3;
 						}

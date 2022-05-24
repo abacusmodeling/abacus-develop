@@ -17,7 +17,7 @@
 #include <mkl_service.h>
 #endif
 
-void Gint_k::gint_kernel_vlocal(
+void Gint_Interface::gint_kernel_vlocal(
 	const int na_grid,
 	const int grid_index,
 	const double delta_r,
@@ -89,7 +89,7 @@ inline int find_offset(const int id1, const int id2, const int iat1, const int i
 	return offset;
 }
 
-void Gint_k::cal_meshball_vlocal(
+void Gint_Interface::cal_meshball_vlocal(
 	int na_grid,
 	int LD_pool,
 	int grid_index, 

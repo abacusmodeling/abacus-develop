@@ -130,7 +130,7 @@ namespace ModuleESolver
             else
             {
                 Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
-                this->UHM.GK.cal_gint_k(&inout);
+                this->UHM.GK.cal_gint(&inout);
             }
 
             // renormalize the charge density

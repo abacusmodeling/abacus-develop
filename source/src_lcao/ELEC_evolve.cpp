@@ -69,7 +69,7 @@ void ELEC_evolve::evolve_psi(
 
             // vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
             Gint_inout inout(GlobalC::pot.vr_eff1, 0, Gint_Tools::job_type::vlocal);
-            uhm.GK.cal_gint_k(&inout);
+            uhm.GK.cal_gint(&inout);
             // added by zhengdy-soc, for non-collinear case
             // integral 4 times, is there any method to simplify?
             if (GlobalV::NSPIN == 4)
@@ -81,7 +81,7 @@ void ELEC_evolve::evolve_psi(
                         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
                     }
                     Gint_inout inout(GlobalC::pot.vr_eff1, is, Gint_Tools::job_type::vlocal);
-                    uhm.GK.cal_gint_k(&inout);
+                    uhm.GK.cal_gint(&inout);
                 }
             }
         }

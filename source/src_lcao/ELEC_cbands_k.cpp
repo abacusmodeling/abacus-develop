@@ -87,7 +87,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
             {
                 // vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
                 Gint_inout inout(GlobalC::pot.vr_eff1, 0, Gint_Tools::job_type::vlocal);
-                uhm.GK.cal_gint_k(&inout);
+                uhm.GK.cal_gint(&inout);
 
                 // added by zhengdy-soc, for non-collinear case
                 // integral 4 times, is there any method to simplify?
@@ -100,7 +100,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
                             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
                         }
                         Gint_inout inout(GlobalC::pot.vr_eff1, is, Gint_Tools::job_type::vlocal);
-                        uhm.GK.cal_gint_k(&inout);
+                        uhm.GK.cal_gint(&inout);
                     }
                 }
             }

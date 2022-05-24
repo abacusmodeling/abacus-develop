@@ -10,7 +10,7 @@
 #include "global_fp.h" // mohan add 2021-01-30
 #include "gint_tools.h"
 
-void Gint_k::gint_kernel_rho(
+void Gint_Interface::gint_kernel_rho(
 	const int na_grid,
 	const int grid_index,
 	const double delta_r,
@@ -65,7 +65,7 @@ void Gint_k::gint_kernel_rho(
 	delete[] cal_flag;
 }
 
-void Gint_k::cal_meshball_rho(
+void Gint_Interface::cal_meshball_rho(
 	const int na_grid,
 	int* block_index,
 	int* vindex,
