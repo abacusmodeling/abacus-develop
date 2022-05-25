@@ -280,7 +280,7 @@ void Potential::set_local_pot(double *vl_pseudo, // store the local pseudopotent
 
     GlobalC::UFFT.ToRealSpace(vg, vl_pseudo);
 
-    if (GlobalV::EFIELD && !GlobalV::DIPOLE)
+    if (GlobalV::EFIELD_FLAG && !GlobalV::DIP_COR_FLAG)
     {
         ModuleBase::matrix v_efield(GlobalV::NSPIN, GlobalC::pw.nrxx);
         v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
@@ -359,7 +359,7 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
     //----------------------------------------------------------
     //  calculate the efield and dipole correction
     //----------------------------------------------------------
-    if (GlobalV::EFIELD && GlobalV::DIPOLE)
+    if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
     {
         v += Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
     }

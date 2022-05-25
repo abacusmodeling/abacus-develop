@@ -22,8 +22,8 @@ smearing_method		fixed
 mixing_type		    pulay
 mixing_beta		    0.7
 
-efield              1
-dipole              1
-eamp                0.01
+efield_flag         1
+dip_cor_flag        1
+efield_amp          0.01
 cal_force           1
 cal_stress          1
