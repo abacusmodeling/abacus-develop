@@ -126,6 +126,7 @@ void PW_Basis::distribution_method2()
 
     // std::cout << "Bcast done\n";
 #endif
+     this->npwtot = tot_npw;
     this->nstnz = this->nst * this->nz;
 
     // (5) Construct ig2isz and is2ixy. 

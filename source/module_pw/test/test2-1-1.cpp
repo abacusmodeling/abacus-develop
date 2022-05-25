@@ -109,6 +109,7 @@ TEST_F(PWTEST,test2_1_1)
     ASSERT_EQ(pwtest.bigny, ny_ref);
     ASSERT_EQ(pwtest.nz, nz_ref);
     ASSERT_EQ(tot_npw, totnpw_ref);
+    ASSERT_EQ(pwtest.npwtot, totnpw_ref);
     ASSERT_EQ(pwtest.nstot,totnst_ref);
     ASSERT_EQ(pwtest.bignxyz, nx_ref*ny_ref*nz_ref);
 

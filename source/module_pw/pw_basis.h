@@ -94,6 +94,8 @@ public:
     int nstnz; // nst * nz
     int nstot; //num. of sticks in total.
     int npw; //num. of plane waves in current proc.
+    int npwtot; // total num. of plane waves in all proc. in this pool
+
     //real space
     int nrxx; //num. of real space grids
     int *startz; //startz[ip]: starting z plane in the ip-th proc. in current POOL_WORLD 
@@ -206,9 +208,10 @@ public:
 	int nx, ny, nz, nxyz, nxy;
     int bigny, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
     int liy,riy;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
-    int maxgrids; // max between nz * ns and bignxy * nplane
+    int nmaxgr; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
+                // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data
     FFT ft;
-
+    //The position of pointer in and out can be equal(in-place transform) or different(out-of-place transform).
     void real2recip(double * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
     void real2recip(std::complex<double> * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
     void recip2real(std::complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)

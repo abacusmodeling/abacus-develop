@@ -23,12 +23,14 @@ PW_Basis::PW_Basis()
     gg = NULL;
     startz = NULL;
     numz = NULL;  
-    this->numg = NULL;
-	this->startg = NULL;
-	this->startr = NULL;
-	this->numr = NULL;
+    numg = NULL;
+	startg = NULL;
+	startr = NULL;
+	numr = NULL;
     poolnproc = 1;
     poolrank = 0;
+    npw = 0;
+    npwtot = 0;
 }
 
 PW_Basis:: ~PW_Basis()
@@ -68,7 +70,9 @@ void PW_Basis::setuptransform()
 
 void PW_Basis::getstartgr()
 {
-    this->maxgrids = (this->nz * this->nst > this->bignxy * nplane) ? this->nz * this->nst : this->bignxy * nplane;
+    if(this->gamma_only)    this->nmaxgr = ( this->npw > (this->nrxx+1)/2 ) ? this->npw : (this->nrxx+1)/2;
+    else                    this->nmaxgr = ( this->npw > this->nrxx ) ? this->npw : this->nrxx;
+    this->nmaxgr = (this->nz * this->nst > this->bignxy * nplane) ? this->nz * this->nst : this->bignxy * nplane;
     
     //---------------------------------------------
 	// sum : starting plane of FFT box.
