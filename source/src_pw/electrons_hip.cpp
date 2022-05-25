@@ -57,62 +57,6 @@ Electrons::~Electrons()
 {
 }
 
-void Electrons::non_self_consistent(const int &istep)
-{
-	ModuleBase::TITLE("Electrons", "non_self_consistent");
-	ModuleBase::timer::tick("Electrons", "non_self_consistent");
-
-	//========================================
-	// diagonalization of the KS hamiltonian
-	// =======================================
-	Electrons::c_bands(istep);
-
-	GlobalV::ofs_running << "\n End of Band Structure Calculation \n" << std::endl;
-
-	for (int ik = 0; ik < GlobalC::kv.nks; ik++)
-	{
-		if (GlobalV::NSPIN == 2)
-		{
-			if (ik == 0)
-				GlobalV::ofs_running << " spin up :" << std::endl;
-			if (ik == (GlobalC::kv.nks / 2))
-				GlobalV::ofs_running << " spin down :" << std::endl;
-		}
-		// out.printV3(GlobalV::ofs_running, GlobalC::kv.kvec_c[ik]);
-
-		GlobalV::ofs_running << " k-points" << ik + 1 << "(" << GlobalC::kv.nkstot << "): " << GlobalC::kv.kvec_c[ik].x
-							 << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
-
-		for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-		{
-			GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik] + 1 << "_final_band " << ib + 1 << " "
-								 << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV << " "
-								 << GlobalC::wf.wg(ik, ib) * GlobalC::kv.nks << std::endl;
-		}
-		GlobalV::ofs_running << std::endl;
-	}
-
-	// add by jingan in 2018.11.7
-	if (GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
-	{
-		toWannier90 myWannier(GlobalC::kv.nkstot, GlobalC::ucell.G);
-		myWannier.init_wannier();
-	}
-
-	//=======================================================
-	// Do a Berry phase polarization calculation if required
-	//=======================================================
-
-	if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
-	{
-		berryphase bp;
-		bp.Macroscopic_polarization();
-	}
-
-	ModuleBase::timer::tick("Electrons", "non_self_consistent");
-	return;
-}
-
 #include "occupy.h"
 void Electrons::self_consistent(const int &istep)
 {
