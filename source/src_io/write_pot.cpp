@@ -1,5 +1,6 @@
 #include "../src_pw/potential.h"
 #include "../src_pw/global.h"
+#include "../module_surchem/efield.h"
 #include "../module_base/timer.h"
 
 // translate from write_rho in charge.cpp.
@@ -251,12 +252,28 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     //transform hartree potential to real space
     //==========================================
     GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
+
+    //==========================================
+    // Dipole correction
+    //==========================================
+    ModuleBase::matrix v_efield;
+    if (GlobalV::EFIELD && GlobalV::DIPOLE)
+    {
+        v_efield.create(GlobalV::NSPIN, GlobalC::pw.nrxx);
+        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
+    }
+
     //==========================================
     //Add hartree potential and local pseudopot
     //==========================================
     for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
     {
         v_elecstat[ir] = Porter[ir].real() + this->vltot[ir];
+
+        if (GlobalV::EFIELD && GlobalV::DIPOLE)
+        {
+            v_elecstat[ir] += v_efield(0, ir);
+        }
     }
 
     //-------------------------------------------

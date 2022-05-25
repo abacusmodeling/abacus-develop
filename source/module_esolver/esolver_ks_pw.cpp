@@ -73,100 +73,100 @@ namespace ModuleESolver
             ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
         }
 
-    // Setup the k points according to symmetry.
-    GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
-
-    // print information
-    // mohan add 2021-01-30
-    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv);
-
-    // Initalize the plane wave basis set
-    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
-    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
-
-    // mohan add 2010-09-13
-    // initialize the real-space uniform grid for FFT and parallel
-    // distribution of plane waves
-    GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
-    GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
-        
-
-    // Calculate Structure factor
-    GlobalC::pw.setup_structure_factor();
-    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+        // Setup the k points according to symmetry.
+        GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
     
-    //----------------------------------------------------------
-    // 1 read in initial data:
-    //   a lattice structure:atom_species,atom_positions,lattice vector
-    //   b k_points
-    //   c pseudopotential
-    // 2 setup planeware basis, FFT,structure factor, ...
-    // 3 initialize local and nonlocal pseudopotential in G_space
-    // 4 initialize charge desity and warefunctios in G_space
-    //----------------------------------------------------------
+        // print information
+        // mohan add 2021-01-30
+        Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv);
+    
+        // Initalize the plane wave basis set
+        GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+        std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
+        std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
+    
+        // mohan add 2010-09-13
+        // initialize the real-space uniform grid for FFT and parallel
+        // distribution of plane waves
+        GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+        GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+            
+    
+        // Calculate Structure factor
+        GlobalC::pw.setup_structure_factor();
+        // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+    
+        //----------------------------------------------------------
+        // 1 read in initial data:
+        //   a lattice structure:atom_species,atom_positions,lattice vector
+        //   b k_points
+        //   c pseudopotential
+        // 2 setup planeware basis, FFT,structure factor, ...
+        // 3 initialize local and nonlocal pseudopotential in G_space
+        // 4 initialize charge desity and warefunctios in G_space
+        //----------------------------------------------------------
 
-    //=====================================
-    // init charge/potential/wave functions
-    //=====================================
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
-    GlobalC::pot.allocate(GlobalC::pw.nrxx);
+        //=====================================
+        // init charge/potential/wave functions
+        //=====================================
+        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+        GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
-    this->psi = GlobalC::wf.allocate(GlobalC::kv.nks);
+        this->psi = GlobalC::wf.allocate(GlobalC::kv.nks);
 
-    // cout<<GlobalC::pw.nrxx<<endl;
-    // cout<<"before ufft allocate"<<endl;
-    GlobalC::UFFT.allocate();
+        // cout<<GlobalC::pw.nrxx<<endl;
+        // cout<<"before ufft allocate"<<endl;
+        GlobalC::UFFT.allocate();
 
-    // cout<<"after ufft allocate"<<endl;
+        // cout<<"after ufft allocate"<<endl;
 
-    //=======================
-    // init pseudopotential
-    //=======================
-    GlobalC::ppcell.init(GlobalC::ucell.ntype);
+        //=======================
+        // init pseudopotential
+        //=======================
+        GlobalC::ppcell.init(GlobalC::ucell.ntype);
 
-    //=====================
-    // init hamiltonian
-    // only allocate in the beginning of ELEC LOOP!
-    //=====================
-    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
+        //=====================
+        // init hamiltonian
+        // only allocate in the beginning of ELEC LOOP!
+        //=====================
+        GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
 
-    //=================================
-    // initalize local pseudopotential
-    //=================================
-    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
+        //=================================
+        // initalize local pseudopotential
+        //=================================
+        GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
-    //======================================
-    // Initalize non local pseudopotential
-    //======================================
-    GlobalC::ppcell.init_vnl(GlobalC::ucell);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
+        //======================================
+        // Initalize non local pseudopotential
+        //======================================
+        GlobalC::ppcell.init_vnl(GlobalC::ucell);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
-    //=========================================================
-    // calculate the total local pseudopotential in real space
-    //=========================================================
-    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
+        //=========================================================
+        // calculate the total local pseudopotential in real space
+        //=========================================================
+        GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
 
-    GlobalC::pot.newd();
+        GlobalC::pot.newd();
 
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
-    //==================================================
-    // create GlobalC::ppcell.tab_at , for trial wave functions.
-    //==================================================
-    GlobalC::wf.init_at_1();
+        //==================================================
+        // create GlobalC::ppcell.tab_at , for trial wave functions.
+        //==================================================
+        GlobalC::wf.init_at_1();
 
-    //================================
-    // Initial start wave functions
-    //================================
-    if (GlobalV::NBANDS != 0 || GlobalV::CALCULATION.substr(0,3) != "sto")
-    // qianrui add temporarily. In the future, wfcinit() should be compatible with cases when NBANDS=0
-    {
-        GlobalC::wf.wfcinit(this->psi);
-    }
+        //================================
+        // Initial start wave functions
+        //================================
+        if (GlobalV::NBANDS != 0 || GlobalV::CALCULATION.substr(0,3) != "sto")
+        // qianrui add temporarily. In the future, wfcinit() should be compatible with cases when NBANDS=0
+        {
+            GlobalC::wf.wfcinit(this->psi);
+        }
 
 #ifdef __LCAO
 #ifdef __MPI

@@ -3,7 +3,7 @@
 #include "vdwd2.h"
 #include "vdwd3.h"				  
 #include "../module_symmetry/symmetry.h"
-#include "./efield.h"
+#include "../module_surchem/efield.h"
 #include "../module_base/mathzone.h"
 
 // new
@@ -42,7 +42,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 	if(GlobalV::EFIELD)
 	{
 		force_e.create( GlobalC::ucell.nat, 3);
-		Efield::compute_force(force_e);
+		Efield::compute_force(GlobalC::ucell, force_e);
 	}
 	
 	for (int ipol = 0; ipol < 3; ipol++)

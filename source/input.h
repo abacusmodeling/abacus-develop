@@ -256,6 +256,17 @@ class Input
     MD_parameters mdp;
 
     //==========================================================
+    // efield and dipole correction
+    // Yu Liu add 2022-05-18
+    //==========================================================
+    bool efield;        // add electric field
+    bool dipole;        // dipole correction
+    int edir;           // the direction of the electric field or dipole correction
+    double emaxpos;     // position of the maximum of the saw-like potential along crystal axis edir
+    double eopreg;      // zone in the unit cell where the saw-like potential decreases
+    double eamp;        // amplitude of the electric field
+
+    //==========================================================
     // vdw
     // Peize Lin add 2014-03-31, jiyy update 2019-08-01
     //==========================================================

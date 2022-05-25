@@ -27,10 +27,16 @@ public:
 
 	FFT();
 	~FFT();
+	
+	// init parameters of fft
 	void initfft(int nx_in, int bigny_in, int nz_in, int liy_in, int riy_in, int ns_in, int nplane_in, 
 				 int nproc_in, bool gamma_only_in, bool mpifft_in = false);
-	void setupFFT();
-	void cleanFFT();
+
+	//init fftw_plans
+	void setupFFT(); 
+
+	//destroy fftw_plans
+	void cleanFFT(); 
 
 	void fftzfor(std::complex<double>* & in, std::complex<double>* & out);
 	void fftzbac(std::complex<double>* & in, std::complex<double>* & out);
@@ -50,10 +56,12 @@ public:
 #endif
 
 public:
-	void initplan();
+	//init fftw_plans
+	void initplan(); 
 	void initplan_mpi();
 #ifdef __MIX_PRECISION
-	void initplanf();
+	//init fftwf_plans
+	void initplanf(); 
 	void initplanf_mpi();
 #endif
 	

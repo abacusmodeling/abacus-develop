@@ -11,12 +11,9 @@
 #include "src_lcao/local_orbital_wfc.h"
 #include "src_lcao/LCAO_hamilt.h"
 #include "module_psi/psi.h"
-//--------------\temporary----------------------------
-//------It should be moved as fast as possible------
 
 namespace ModuleESolver
 {
-
     class ESolver
     {
         // protected:

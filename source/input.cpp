@@ -288,6 +288,15 @@ void Input::Default(void)
     lcao_dr = 0.01;
     lcao_rmax = 30; // (a.u.)
     //----------------------------------------------------------
+    // efield and dipole correction     Yu Liu add 2022-05-18
+    //----------------------------------------------------------
+    efield = false;
+    dipole = false;
+    edir = 2;
+    emaxpos = 0.5;
+    eopreg = 0.1;
+    eamp = 0.0;
+    //----------------------------------------------------------
     // vdw									//jiyy add 2019-08-04
     //----------------------------------------------------------
     vdw_method = "none";
@@ -1155,6 +1164,34 @@ bool Input::Read(const std::string &fn)
             read_value(ifs, mdp.md_damp);
         }
         //----------------------------------------------------------
+        // efield and dipole correction
+        // Yu Liu add 2022-05-18
+        //----------------------------------------------------------
+        else if (strcmp("efield", word) == 0)
+        {
+            read_value(ifs, efield);
+        }
+        else if (strcmp("dipole", word) == 0)
+        {
+            read_value(ifs, dipole);
+        }
+        else if (strcmp("edir", word) == 0)
+        {
+            read_value(ifs, edir);
+        }
+        else if (strcmp("emaxpos", word) == 0)
+        {
+            read_value(ifs, emaxpos);
+        }
+        else if (strcmp("eopreg", word) == 0)
+        {
+            read_value(ifs, eopreg);
+        }
+        else if (strcmp("eamp", word) == 0)
+        {
+            read_value(ifs, eamp);
+        }
+        //----------------------------------------------------------
         // tddft
         // Fuxiang He add 2016-10-26
         //----------------------------------------------------------
@@ -1998,6 +2035,13 @@ void Input::Bcast()
     Parallel_Common::bcast_double(mdp.msst_tscale);
     Parallel_Common::bcast_double(mdp.md_tfreq);
     Parallel_Common::bcast_double(mdp.md_damp);
+    // Yu Liu add 2022-05-18
+    Parallel_Common::bcast_bool(efield);
+    Parallel_Common::bcast_bool(dipole);
+    Parallel_Common::bcast_int(edir);
+    Parallel_Common::bcast_double(emaxpos);
+    Parallel_Common::bcast_double(eopreg);
+    Parallel_Common::bcast_double(eamp);
     /* 	// Peize Lin add 2014-04-07
         Parallel_Common::bcast_bool( vdwD2 );
         Parallel_Common::bcast_double( vdwD2_scaling );

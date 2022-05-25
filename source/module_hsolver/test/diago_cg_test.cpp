@@ -8,7 +8,7 @@
 #include "../diago_iter_assist.h"
 #include "diago_mock.h"
 #include "mpi.h"
-#include "module_pw/unittest/test_tool.h"
+#include "module_pw/test/test_tool.h"
 #include <complex>
 
 #include "gtest/gtest.h"

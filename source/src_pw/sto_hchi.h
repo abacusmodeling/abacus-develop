@@ -24,20 +24,20 @@ class Stochastic_hchi
 
 
 
-	static double Emin;
-	static double Emax;
+	double Emin;
+	double Emax;
 
-	static void hchi_real(
+	void hchi_real(
 		complex<double> *wfin, 
 		complex<double> *wfout, 
 		const int m = 1); //wfin & wfout are wavefunctions in real space
 	
-	static void orthogonal_to_psi_reciprocal(
+	void orthogonal_to_psi_reciprocal(
 		complex<double>* wfin, 
 		complex<double> *wfout, 
 		const int& ikk); //wfin & wfout are wavefunctions in reciprocal space
 
-	static void hchi_reciprocal(
+	void hchi_reciprocal(
 		complex<double> *wfin, 
 		complex<double> *wfout, 
 		const int m = 1); //wfin & wfout are wavefunctions in reciprocal space

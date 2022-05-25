@@ -111,7 +111,6 @@ void Init_Com_Orbitals(Stochastic_WF& stowf, K_Vectors& kv)
     else                    igroup = GlobalV::NSTOGROUP - GlobalV::MY_STOGROUP - 1;
 
     const int nks = kv.nks;
-    const int npool = GlobalV::KPAR;
     const int ngroup = GlobalV::NSTOGROUP;
     const int n_in_pool = GlobalV::NPROC_IN_POOL;
     const int i_in_group = GlobalV::RANK_IN_STOGROUP;

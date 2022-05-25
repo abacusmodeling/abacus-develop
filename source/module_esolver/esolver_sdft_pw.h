@@ -1,7 +1,6 @@
 #include "./esolver_ks_pw.h"
 #include "../src_pw/sto_wf.h"
 #include "../src_pw/sto_iter.h"
-#include "../src_pw/sto_che.h"
 #include "../src_pw/sto_hchi.h"
 
 namespace ModuleESolver
@@ -19,8 +18,6 @@ public:
 public:
     Stochastic_WF stowf;
     Stochastic_Iter stoiter;
-    // Stochastic_Chebychev stoche;
-    // Stochastic_hchi stohchi;
 
 protected:
     virtual void beforescf(const int istep) override; 
