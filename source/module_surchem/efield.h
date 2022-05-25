@@ -31,10 +31,10 @@ public:
 
     static double etotefield;           // dipole energy
     static double tot_dipole;           // total dipole
-    static int edir;                    // 0, 1, 2 denotes x, y, z direction for dipole correction
-    static double emaxpos;              // the maximum position of the saw function
-    static double eopreg;               // the decrease region length of the saw function
-    static double eamp;                 // field amplitude (in a.u.) (1 a.u. = 51.44 10^10 V/m)
+    static int efield_dir;                    // 0, 1, 2 denotes x, y, z direction for dipole correction
+    static double efield_pos_max;              // the maximum position of the saw function
+    static double efield_pos_dec;               // the decrease region length of the saw function
+    static double efield_amp ;                 // field amplitude (in a.u.) (1 a.u. = 51.44 10^10 V/m)
     static double bvec[3];
     static double bmod;
 };

@@ -72,7 +72,7 @@
 
 - [Electric field and dipole correction](#Electric-field-and-dipole-correction)
 
-    [efield](#efield) | [dipole](#dipole) | [edir](#edir) | [emaxpos](#emaxpos) | [eopreg](#eopreg) | [eamp](#eamp)
+    [efield_flag](#efield_flag) | [dip_cor_flag](#dip_cor_flag) | [efield_dir](#efield_dir) | [efield_pos_max](#efield_pos_max) | [efield_pos_dec](#efield_pos_dec) | [efield_amp ](#efield_amp )
 
 [back to main page](../README.md)
 
@@ -918,42 +918,42 @@ Warning: this function is not robust enough for version 2.2.0. Please try these 
 
 This part of variables are relevant to electric field and dipole correction
 
-#### efield
+#### efield_flag
 
 - **Type**: Boolean
 - **Description**: If set to true, a saw-like potential simulating an electric field
 is added to the bare ionic potential. 
 - **Default**: false
 
-#### dipole
+#### dip_cor_flag
 
 - **Type**: Boolean
-- **Description**: If dipole == true and efield == true,  a dipole correction is also
-added to the bare ionic potential. If you want no electric field, parameter eamp should be zero. Must be used ONLY in a slab geometry for surface calculations, with the discontinuity FALLING IN THE EMPTY SPACE.
+- **Description**: If dip_cor_flag == true and efield_flag == true,  a dipole correction is also
+added to the bare ionic potential. If you want no electric field, parameter efield_amp  should be zero. Must be used ONLY in a slab geometry for surface calculations, with the discontinuity FALLING IN THE EMPTY SPACE.
 - **Default**: false
 
-#### edir
+#### efield_dir
 
 - **Type**: Integer
-- **Description**: The direction of the electric field or dipole correction is parallel to the reciprocal lattice vector, so the potential is constant in planes defined by FFT grid points, edir = 0, 1 or 2. Used only if efield == true.
+- **Description**: The direction of the electric field or dipole correction is parallel to the reciprocal lattice vector, so the potential is constant in planes defined by FFT grid points, efield_dir = 0, 1 or 2. Used only if efield_flag == true.
 - **Default**: 2
 
-#### emaxpos
+#### efield_pos_max
 
 - **Type**: Real
-- **Description**: Position of the maximum of the saw-like potential along crystal axis edir, within the  unit cell, 0 < emaxpos < 1. Used only if efield == true.
+- **Description**: Position of the maximum of the saw-like potential along crystal axis efield_dir, within the  unit cell, 0 < efield_pos_max < 1. Used only if efield_flag == true.
 - **Default**: 0.5
 
-#### eopreg
+#### efield_pos_dec
 
 - **Type**: Real
-- **Description**: Zone in the unit cell where the saw-like potential decreases, 0 < eopreg < 1. Used only if efield == true.
+- **Description**: Zone in the unit cell where the saw-like potential decreases, 0 < efield_pos_dec < 1. Used only if efield_flag == true.
 - **Default**: 0.1
 
-#### eamp
+#### efield_amp 
 
 - **Type**: Real
-- **Description**: Amplitude of the electric field, in ***Hartree*** a.u.; 1 a.u. = 51.4220632*10^10 V/m. Used only if efield == true. The saw-like potential increases with slope eamp in the region from (emaxpos+eopreg-1) to (emaxpos), then decreases until (emaxpos+eopreg), in units of the crystal vector edir. Important: the change of slope of this potential must be located in the empty region, or else unphysical forces will result.
+- **Description**: Amplitude of the electric field, in ***Hartree*** a.u.; 1 a.u. = 51.4220632*10^10 V/m. Used only if efield_flag == true. The saw-like potential increases with slope efield_amp  in the region from (efield_pos_max+efield_pos_dec-1) to (efield_pos_max), then decreases until (efield_pos_max+efield_pos_dec), in units of the crystal vector efield_dir. Important: the change of slope of this potential must be located in the empty region, or else unphysical forces will result.
 - **Default**: 0.0
 
 ### Exact Exchange

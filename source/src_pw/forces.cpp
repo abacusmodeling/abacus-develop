@@ -72,7 +72,7 @@ void Forces::init(ModuleBase::matrix& force)
 	}
 
     ModuleBase::matrix force_e;
-    if(GlobalV::EFIELD)
+    if(GlobalV::EFIELD_FLAG)
     {
         force_e.create(GlobalC::ucell.nat, 3);
         Efield::compute_force(GlobalC::ucell, force_e);
@@ -105,7 +105,7 @@ void Forces::init(ModuleBase::matrix& force)
                     force(iat, ipol) += force_vdw(iat, ipol);
                 }																										   
 					
-				if(GlobalV::EFIELD)
+				if(GlobalV::EFIELD_FLAG)
 				{
 					force(iat,ipol) = force(iat, ipol) + force_e(iat, ipol);
 				}
@@ -213,7 +213,7 @@ void Forces::init(ModuleBase::matrix& force)
 		Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc,0);
 		Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
-		if(GlobalV::EFIELD) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+		if(GlobalV::EFIELD_FLAG) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
 	}
 	Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 
