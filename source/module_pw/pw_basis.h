@@ -206,7 +206,7 @@ protected:
 public:
 	// FFT dimensions for wave functions.
 	int nx, ny, nz, nxyz, nxy;
-    int bigny, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
+    int bignx, bigny, bignz, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
     int liy,riy;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
     int nmaxgr; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
                 // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data

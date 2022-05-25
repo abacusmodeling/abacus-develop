@@ -129,11 +129,11 @@ void PW_Basis:: initgrids(
         ibox[i] -= 1;
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
     }
-    this->nx = ibox[0];
+    this->bignx = this->nx = ibox[0];
     this->bigny = ibox[1];
-    this->nz = ibox[2];
-    this->bignxy = this->nx * this->bigny;
-    this->bignxyz = this->bignxy * this->nz;
+    this->bignz = this->nz = ibox[2];
+    this->bignxy =this->bignx * this->bigny;
+    this->bignxyz = this->bignxy * this->bignz;
 
     delete[] ibox;    
     return;
