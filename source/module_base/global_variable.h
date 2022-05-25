@@ -26,8 +26,8 @@ extern double PSEUDORCUT;
 extern bool PSEUDO_MESH;
 
 extern std::string CALCULATION; // 2 "scf";"nscf" ;"symmetry"
-extern int EFIELD; // 5 add electric field
-extern int DIPOLE; // 7 add dipole correction
+extern int EFIELD_FLAG; // 5 add electric field
+extern int DIP_COR_FLAG; // 7 add dipole correction
 
 extern std::string DFT_FUNCTIONAL; // 6.5 change the DFT functional from input file.
 extern int NSPIN; // 7

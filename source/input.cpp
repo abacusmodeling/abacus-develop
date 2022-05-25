@@ -291,12 +291,12 @@ void Input::Default(void)
     //----------------------------------------------------------
     // efield and dipole correction     Yu Liu add 2022-05-18
     //----------------------------------------------------------
-    efield = false;
-    dipole = false;
-    edir = 2;
-    emaxpos = 0.5;
-    eopreg = 0.1;
-    eamp = 0.0;
+    efield_flag = false;
+    dip_cor_flag = false;
+    efield_dir = 2;
+    efield_pos_max = 0.5;
+    efield_pos_dec = 0.1;
+    efield_amp  = 0.0;
     //----------------------------------------------------------
     // vdw									//jiyy add 2019-08-04
     //----------------------------------------------------------
@@ -1168,29 +1168,29 @@ bool Input::Read(const std::string &fn)
         // efield and dipole correction
         // Yu Liu add 2022-05-18
         //----------------------------------------------------------
-        else if (strcmp("efield", word) == 0)
+        else if (strcmp("efield_flag", word) == 0)
         {
-            read_value(ifs, efield);
+            read_value(ifs, efield_flag);
         }
-        else if (strcmp("dipole", word) == 0)
+        else if (strcmp("dip_cor_flag", word) == 0)
         {
-            read_value(ifs, dipole);
+            read_value(ifs, dip_cor_flag);
         }
-        else if (strcmp("edir", word) == 0)
+        else if (strcmp("efield_dir", word) == 0)
         {
-            read_value(ifs, edir);
+            read_value(ifs, efield_dir);
         }
-        else if (strcmp("emaxpos", word) == 0)
+        else if (strcmp("efield_pos_max", word) == 0)
         {
-            read_value(ifs, emaxpos);
+            read_value(ifs, efield_pos_max);
         }
-        else if (strcmp("eopreg", word) == 0)
+        else if (strcmp("efield_pos_dec", word) == 0)
         {
-            read_value(ifs, eopreg);
+            read_value(ifs, efield_pos_dec);
         }
-        else if (strcmp("eamp", word) == 0)
+        else if (strcmp("efield_amp", word) == 0)
         {
-            read_value(ifs, eamp);
+            read_value(ifs, efield_amp );
         }
         //----------------------------------------------------------
         // tddft
@@ -2037,12 +2037,12 @@ void Input::Bcast()
     Parallel_Common::bcast_double(mdp.md_tfreq);
     Parallel_Common::bcast_double(mdp.md_damp);
     // Yu Liu add 2022-05-18
-    Parallel_Common::bcast_bool(efield);
-    Parallel_Common::bcast_bool(dipole);
-    Parallel_Common::bcast_int(edir);
-    Parallel_Common::bcast_double(emaxpos);
-    Parallel_Common::bcast_double(eopreg);
-    Parallel_Common::bcast_double(eamp);
+    Parallel_Common::bcast_bool(efield_flag);
+    Parallel_Common::bcast_bool(dip_cor_flag);
+    Parallel_Common::bcast_int(efield_dir);
+    Parallel_Common::bcast_double(efield_pos_max);
+    Parallel_Common::bcast_double(efield_pos_dec);
+    Parallel_Common::bcast_double(efield_amp );
     /* 	// Peize Lin add 2014-04-07
         Parallel_Common::bcast_bool( vdwD2 );
         Parallel_Common::bcast_double( vdwD2_scaling );

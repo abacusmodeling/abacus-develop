@@ -213,12 +213,12 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // Yu Liu add 2022-05-18
 //----------------------------------------------------------
-    GlobalV::EFIELD = INPUT.efield;
-    GlobalV::DIPOLE = INPUT.dipole;
-    Efield::edir = INPUT.edir;
-    Efield::emaxpos = INPUT.emaxpos;
-    Efield::eopreg = INPUT.eopreg;
-    Efield::eamp = INPUT.eamp;
+    GlobalV::EFIELD_FLAG = INPUT.efield_flag;
+    GlobalV::DIP_COR_FLAG = INPUT.dip_cor_flag;
+    Efield::efield_dir = INPUT.efield_dir;
+    Efield::efield_pos_max = INPUT.efield_pos_max;
+    Efield::efield_pos_dec = INPUT.efield_pos_dec;
+    Efield::efield_amp  = INPUT.efield_amp ;
 
 //----------------------------------------------------------
 // Fuxiang He add 2016-10-26
