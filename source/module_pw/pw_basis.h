@@ -106,9 +106,9 @@ public:
     int *startr;  // startr[ip] = numr[ip-1] + startr[ip-1]
     int nplane; //num. of planes in current proc.
 
-    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc]
+    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[npw]
     ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
-    double *gg;       	// modulus (G^2) of G vectors [ngmc]
+    double *gg;       	// modulus (G^2) of G vectors [npw]
     //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
 	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
 
@@ -135,6 +135,11 @@ public:
     //     ModuleBase::Vector3<double> *gdirect_global,
     //     ModuleBase::Vector3<double> *gcar_global
     // ); 
+public:
+    int ngg; //number of different modulus (G^2) of G vectors
+    int *ig2igg;//[npw] map ig to igg(<ngg: the index of G^2)
+    double *gg_uniq; //[ngg] modulus (G^2) of G vectors of igg, each gg of igg is unique.
+    void collect_uniqgg();
    
 
 public:

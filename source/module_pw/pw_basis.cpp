@@ -27,10 +27,13 @@ PW_Basis::PW_Basis()
 	startg = NULL;
 	startr = NULL;
 	numr = NULL;
+    ig2igg = NULL;
+    gg_uniq = NULL;
     poolnproc = 1;
     poolrank = 0;
     npw = 0;
     npwtot = 0;
+    ngg = 0;
 }
 
 PW_Basis:: ~PW_Basis()
@@ -52,6 +55,8 @@ PW_Basis:: ~PW_Basis()
     if(numr != NULL) delete[] numr;
     if(startg != NULL) delete[] startg;
     if(startr != NULL) delete[] startr;
+    if(ig2igg != NULL) delete[] ig2igg;
+    if(gg_uniq != NULL) delete[] gg_uniq;
 }
 
 /// 
@@ -139,6 +144,61 @@ void PW_Basis::collect_local_pw()
         this->gcar[ig] = f * this->G;
     }
     return;
+}
+void PW_Basis::collect_uniqgg()
+{
+    this->ig2igg = new int [this->npw];
+    int *sortindex = new int [this->npw];
+    double *tmpgg = new double [this->npw];
+    ModuleBase::Vector3<double> f;
+    for(int ig = 0 ; ig < this-> npw ; ++ig)
+    {
+        int isz = this->ig2isz[ig];
+        int iz = isz % this->nz;
+        int is = isz / this->nz;
+        int ixy = this->is2ixy[is];
+        int ix = ixy / this->ny;
+        int iy = ixy % this->ny;
+        if (ix >= int(this->nx/2) + 1) ix -= this->nx;
+        if (iy >= int(this->bigny/2) + 1) iy -= this->bigny;
+        if (iz >= int(this->nz/2) + 1) iz -= this->nz;
+        f.x = ix;
+        f.y = iy;
+        f.z = iz;
+        tmpgg[ig] = f * (this->GGT * f);
+    }
+
+    ModuleBase::GlobalFunc::ZEROS(sortindex, this->npw);
+    ModuleBase::heapsort(this->npw, tmpgg, sortindex);
+   
+
+    int igg = 0;
+    this->ig2igg[sortindex[0]] = 0;
+    for (int ig = 0; ig < this->npw - 1; ++ig)
+    {
+        if (std::abs(tmpgg[ig] - tmpgg[ig+1]) > 1.0e-8)
+        {
+            ++igg;
+        }
+        else
+        {
+            tmpgg[ig] = -1.0;
+        }
+        this->ig2igg[sortindex[ig+1]] = igg;
+    }
+    this->ngg = igg + 1;
+    this->gg_uniq = new double [this->ngg];
+    igg = 0;
+    for(int ig = 0 ; ig < this->npw ; ++ig)
+    {
+        if(tmpgg[ig] >= 0.0)
+        {
+            gg_uniq[igg] = tmpgg[ig]; 
+            ++igg;
+        } 
+    }
+    delete[] sortindex;
+    delete[] tmpgg;
 }
 
 // //

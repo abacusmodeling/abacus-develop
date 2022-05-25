@@ -27,6 +27,7 @@ TEST_F(PWTEST,test1_1_1)
     pwtest.initparameters(gamma_only, wfcecut, distribution_type);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
+    pwtest.collect_uniqgg();
     ModuleBase::Matrix3 GT,G,GGT;
     GT = latvec.Inverse();
 	G  = GT.Transpose();
@@ -187,6 +188,11 @@ TEST_F(PWTEST,test1_1_1)
         EXPECT_NEAR(gcar.y,pwtest.gcar[ig].y,1e-6);
         EXPECT_NEAR(gcar.z,pwtest.gcar[ig].z,1e-6);
         EXPECT_NEAR(modulus,pwtest.gg[ig],1e-6);
+        EXPECT_NEAR(pwtest.gg[ig], pwtest.gg_uniq[pwtest.ig2igg[ig]],1e-6);
+    }
+    for(int igg = 1 ; igg < pwtest.ngg ; ++igg)
+    {
+        EXPECT_GT(pwtest.gg_uniq[igg], pwtest.gg_uniq[igg-1]);
     }
     delete [] startnst;
     delete [] tmpx;
