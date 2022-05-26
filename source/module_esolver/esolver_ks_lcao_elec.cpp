@@ -26,6 +26,10 @@
 #endif
 #include "../src_pw/H_Ewald_pw.h"
 
+#include "module_hamilt/hamilt_lcao.h"
+#include "module_elecstate/elecstate_lcao.h"
+#include "module_hsolver/hsolver_lcao.h"
+
 namespace ModuleESolver
 {
 
@@ -186,6 +190,75 @@ namespace ModuleESolver
         for (int is = 0; is < GlobalV::NSPIN; is++)
         {
             srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+        }
+
+        //init Psi, HSolver, ElecState, Hamilt
+        if(this->phsol != nullptr)
+        {
+            if(this->phsol->classname != "HSolverLCAO")
+            {
+                delete this->phsol;
+                this->phsol = nullptr;
+            }
+        }
+        else
+        {
+            this->phsol = new hsolver::HSolverLCAO();
+            this->phsol->method = GlobalV::KS_SOLVER;
+        }
+        if(this->pelec != nullptr)
+        {
+            if(this->pelec->classname != "ElecStateLCAO")
+            {
+                delete this->pelec;
+                this->pelec = nullptr;
+            }
+        }
+        else
+        {
+            this->pelec = new elecstate::ElecStateLCAO(
+                    (Charge*)(&(GlobalC::CHR)),
+                    &(GlobalC::kv), 
+                    GlobalC::kv.nks,
+                    GlobalV::NBANDS,
+                    &(this->LOC),
+                    &(this->UHM),
+                    &(this->LOWF));
+        }
+        if(this->phami != nullptr)
+        {
+            if(this->phami->classname != "HamiltLCAO")
+            {
+                delete this->phami;
+                this->phami = nullptr;
+            }
+        }
+        else
+        {
+            // three cases for hamilt class
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                this->phami = new hamilt::HamiltLCAO<double, double>(
+                    &(this->UHM.GG),
+                    &(this->UHM.genH),
+                    &(this->LM) );
+            }
+            // non-collinear spin case would not use the second template now, 
+            // would add this feature in the future
+            /*else if(GlobalV::NSPIN==4)
+            {
+                this->phami = new hamilt::HamiltLCAO<std::complex<double>, std::complex<double>>(
+                    &(this->UHM.GK),
+                    &(this->UHM.genH),
+                    &(this->LM) );
+            }*/ 
+            else
+            {
+                this->phami = new hamilt::HamiltLCAO<std::complex<double>, double>(
+                    &(this->UHM.GK),
+                    &(this->UHM.genH),
+                    &(this->LM) );
+            }
         }
 
         ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");

@@ -86,14 +86,14 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
     if (GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
         toWannier90 myWannier(GlobalC::kv.nkstot, GlobalC::ucell.G);
-        myWannier.init_wannier();
+        myWannier.init_wannier(nullptr);
     }
 
     // add by jingan
     if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
         berryphase bp(lowf);
-        bp.Macroscopic_polarization();
+        bp.Macroscopic_polarization(nullptr);
     }
 
     return;

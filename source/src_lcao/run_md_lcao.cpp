@@ -114,7 +114,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
 
             if(cellchange)
             {
-                Variable_Cell::init_after_vc();
+                Variable_Cell::init_after_vc(p_esolver);
             }
 
             // reset local potential

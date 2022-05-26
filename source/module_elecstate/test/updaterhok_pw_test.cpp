@@ -299,7 +299,7 @@ TEST_F(EState,RhoPW)
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     // GlobalC::pot.allocate(GlobalC::pw.nrxx);
     // we need to supply NBANDS here
-    GlobalC::wf.allocate(GlobalC::kv.nks);
+    psi::Psi<std::complex<double>>* psi = GlobalC::wf.allocate(GlobalC::kv.nks);
     // std::cout<<"npwx "<<GlobalC::wf.npwx<<std::endl;
     GlobalC::UFFT.allocate();
 
@@ -307,7 +307,7 @@ TEST_F(EState,RhoPW)
     std::stringstream ssw;
     ssw <<GlobalV::global_out_dir<< "WAVEFUNC";
     // we need to supply out_wfc_pw here
-    read_wfc2(ssw.str(), GlobalC::wf.psi[0], GlobalC::pw.gcar);
+    read_wfc2(ssw.str(), psi[0], GlobalC::pw.gcar);
 
     // copy data from old wf.evc to new evc(an object of Psi)
     evc.resize(GlobalC::kv.nks,GlobalV::NBANDS,GlobalC::wf.npwx);
@@ -316,9 +316,10 @@ TEST_F(EState,RhoPW)
     {
 	    for(int j=0;j<GlobalC::wf.npwx;j++)
             {
-		    evc(i,j)=GlobalC::wf.psi[0](i,j);
+		    evc(i,j) = psi[0](i,j);
 	    }
     }
+    delete psi;
     // using class ElecStatePW to calculate rho
     elecstate::MockElecStatePW* kk;
     kk = new elecstate::MockElecStatePW(&GlobalC::pw,&GlobalC::CHR,GlobalV::NBANDS);

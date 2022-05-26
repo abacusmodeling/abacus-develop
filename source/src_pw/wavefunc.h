@@ -15,7 +15,7 @@ class wavefunc : public WF_atomic
     ~wavefunc();
 
     // allocate memory
-    void allocate(const int nks);
+    psi::Psi<std::complex<double>>* allocate(const int nks);
     void allocate_ekb_wg(const int nks);
 
     int out_wfc_pw; //qianrui modify 2020-10-19
@@ -30,8 +30,8 @@ class wavefunc : public WF_atomic
     // init_wfc : "random",or "atomic" or "file"
     std::string init_wfc;
 	int mem_saver; //1: save evc when doing nscf calculation.
-    void wfcinit(void);// from wfcinit.f90
-    void wfcinit_k();
+    void wfcinit(psi::Psi<std::complex<double>>* psi_in=nullptr);// from wfcinit.f90
+    void wfcinit_k(psi::Psi<std::complex<double>>* psi_in=nullptr);
     int get_starting_nw(void)const;
 
 	// wanf2: save PAO orbitals,
@@ -58,7 +58,7 @@ class wavefunc : public WF_atomic
     int iw2it(int iw);
     int iw2ia(int iw);
 
-    void init_after_vc(const int nks); //LiuXh 20180515
+    void init_after_vc(const int nks, psi::Psi<std::complex<double>>* psi_in=nullptr); //LiuXh 20180515
 
     private: // pengfei 2016-11-23
 

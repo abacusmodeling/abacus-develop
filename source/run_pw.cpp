@@ -55,53 +55,6 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
     // cout<<"cpws SUCCESS"<<endl;
 
 
-    // caoyu add 2020-11-24, mohan updat 2021-01-03
-    if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
-    {
-        Numerical_Descriptor nc;
-        nc.output_descriptor(GlobalC::wf.psi[0], INPUT.deepks_descriptor_lmax);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
-    }
-
-
-    if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
-    {
-        //std::cout << "\n Output Spillage Information : " << std::endl;
-        // calculate spillage value.
-#ifdef __LCAO
-        if ( winput::out_spillage == 3)
-        {
-            GlobalV::BASIS_TYPE="pw"; 
-            std::cout << " NLOCAL = " << GlobalV::NLOCAL << std::endl;
-
-            for (int ik=0; ik<GlobalC::kv.nks; ik++)
-            {
-                GlobalC::wf.wanf2[ik].create(GlobalV::NLOCAL, GlobalC::wf.npwx);
-				if(GlobalV::BASIS_TYPE=="pw")
-                {
-					std::cout << " ik=" << ik + 1 << std::endl;
-
-                    GlobalV::BASIS_TYPE="lcao_in_pw";
-					GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
-                    GlobalV::BASIS_TYPE="pw";
-                }
-            }
-
-            //Spillage sp;
-            //sp.get_both(GlobalV::NBANDS, GlobalV::NLOCAL, GlobalC::wf.wanf2, GlobalC::wf.evc);
-        }
-#endif
-
-        // output overlap
-        if ( winput::out_spillage <= 2 )
-        {
-            Numerical_Basis numerical_basis;
-            numerical_basis.output_overlap(GlobalC::wf.psi[0]);
-            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
-        }
-    }
-
-
 	if(Optical::opt_epsilon2 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw"))
 	{
 		Optical opt;

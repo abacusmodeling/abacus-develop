@@ -4,6 +4,7 @@
 #ifdef __LCAO
 #include "unk_overlap_lcao.h"
 #endif
+#include "module_psi/psi.h"
 
 class berryphase
 {
@@ -36,11 +37,11 @@ public:
 
 	void set_kpoints(const int direction);
 
-	double stringPhase(int index_str, int nbands);
+	double stringPhase(int index_str, int nbands, const psi::Psi<std::complex<double>>* psi_in);
 
-	void Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot);
+	void Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot, const psi::Psi<std::complex<double>>* psi_in);
 
-	void Macroscopic_polarization();
+	void Macroscopic_polarization(const psi::Psi<std::complex<double>>* psi_in);
 
 	std::string outFormat(const double polarization, const double modulus, const ModuleBase::Vector3<double> project);
 	
