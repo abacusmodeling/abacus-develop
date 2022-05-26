@@ -11,11 +11,43 @@ void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecs
 {
     // select the method of diagonalization
     if (this->method == "genelpa")
-        pdiagh = new DiagoElpa();
+    {
+        if (pdiagh != nullptr)
+        {
+            if (pdiagh->method != this->method)
+            {
+                delete[] pdiagh;
+                pdiagh = new DiagoElpa();
+                pdiagh->method = this->method;
+            }
+        }
+        else
+        {
+            pdiagh = new DiagoElpa();
+            pdiagh->method = this->method;
+        }
+    }
     else if (this->method == "scalapack_gvx")
-        pdiagh = new DiagoBlas();
+    {
+        if (pdiagh != nullptr)
+        {
+            if (pdiagh->method != this->method)
+            {
+                delete[] pdiagh;
+                pdiagh = new DiagoBlas();
+                pdiagh->method = this->method;
+            }
+        }
+        else
+        {
+            pdiagh = new DiagoBlas();
+            pdiagh->method = this->method;
+        }
+    }
     else
+    {
         ModuleBase::WARNING_QUIT("HSolverLCAO::solve", "This method of DiagH is not supported!");
+    }
 
     /// Loop over k points for solve Hamiltonian to charge density
     for (int ik = 0; ik < psi.get_nk(); ++ik)

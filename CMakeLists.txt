@@ -1,7 +1,7 @@
 ########################################
 # CMake build system
 # This file is part of ABACUS
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 ########################################
 
 project(ABACUS
@@ -22,7 +22,7 @@ option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
 set(ABACUS_BIN_NAME abacus)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
 set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
@@ -85,6 +85,7 @@ else() # CUDA not found
 endif()
 
 if(USE_CUDA OR USE_CUSOLVER_LCAO)
+  cmake_minimum_required(VERSION 3.18) # required by `CUDA_ARCHITECTURES` below
   set(CMAKE_CXX_STANDARD 14)
   set(CMAKE_CXX_EXTENSIONS ON)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -282,6 +283,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     symmetry
     md
+    planewave
     surchem
     neighbor
     orb
@@ -295,6 +297,10 @@ target_link_libraries(${ABACUS_BIN_NAME}
     ri
     driver
     xc
+    hsolver
+    elecstate
+    hamilt
+    psi
     esolver
     -lm
 )

@@ -9,6 +9,7 @@ namespace hsolver
 class HSolverLCAO : public HSolver
 {
   public:
+    HSolverLCAO(){this->classname = "HSolverPW";}
     /*void init(
         const Basis* pbas
         //const Input &in,

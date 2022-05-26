@@ -228,36 +228,13 @@ void Input::Print(const std::string &fn) const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.md_tfreq,"oscillation frequency, used to determine qmass of NHC");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.md_damp,"damping parameter (time units) used to add force in Langevin method");
 
-    ofs << "\n#Parameters (9.Molecular dynamics)" << std::endl;
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_type", mdp.md_type, "choose ensemble");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_nstep", mdp.md_nstep, "md steps");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_ensolver", mdp.md_ensolver, "choose potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_dt", mdp.md_dt, "time step");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_mnhc", mdp.md_mnhc, "number of Nose-Hoover chains");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_tfirst", mdp.md_tfirst, "temperature first");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_tlast", mdp.md_tlast, "temperature last");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_dumpfreq", mdp.md_dumpfreq, "The period to dump MD information");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "md_restartfreq",
-                                 mdp.md_restartfreq,
-                                 "The period to output MD restart information");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_restart", mdp.md_restart, "whether restart");
-    ModuleBase::GlobalFunc::OUTP(ofs, "lj_rcut", mdp.lj_rcut, "cutoff radius of LJ potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "lj_epsilon", mdp.lj_epsilon, "the value of epsilon for LJ potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "lj_sigma", mdp.lj_sigma, "the value of sigma for LJ potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_direction", mdp.msst_direction, "the direction of shock wave");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_vel", mdp.msst_vel, "the velocity of shock wave");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_vis", mdp.msst_vis, "artificial viscosity");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_tscale", mdp.msst_tscale, "reduction in initial temperature");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_qmass", mdp.msst_qmass, "mass of thermostat");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "md_tfreq",
-                                 mdp.md_tfreq,
-                                 "oscillation frequency, used to determine msst_qmass of NHC");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "md_damp",
-                                 mdp.md_damp,
-                                 "damping parameter (time units) used to add force in Langevin method");
+    ofs << "\n#Parameters (10.Electric field and dipole correction)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_flag",efield_flag,"add electric field");
+    ModuleBase::GlobalFunc::OUTP(ofs,"dip_cor_flag",dip_cor_flag,"dipole correction");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_dir",efield_dir,"the direction of the electric field or dipole correction");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_pos_max",efield_pos_max,"position of the maximum of the saw-like potential along crystal axis efield_dir");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_pos_dec",efield_pos_dec,"zone in the unit cell where the saw-like potential decreases");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_amp ",efield_amp ,"amplitude of the electric field");
 
     ofs << "\n#Parameters (11.Test)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "out_alllog", out_alllog, "output information for each processor, when parallel");

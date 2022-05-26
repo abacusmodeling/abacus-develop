@@ -8,6 +8,7 @@
 #include "../module_base/math_integral.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
+#include "../module_surchem/efield.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -18,7 +19,7 @@ Forces::Forces()
 Forces::~Forces() {}
 
 #include "../module_base/mathzone.h"
-#include "efield.h"
+
 void Forces::init(ModuleBase::matrix& force)
 {
 	ModuleBase::TITLE("Forces", "init");
@@ -69,16 +70,20 @@ void Forces::init(ModuleBase::matrix& force)
 			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
 		}
 	}
+
+    ModuleBase::matrix force_e;
+    if(GlobalV::EFIELD_FLAG)
+    {
+        force_e.create(GlobalC::ucell.nat, 3);
+        Efield::compute_force(GlobalC::ucell, force_e);
+        if(GlobalV::TEST_FORCE)
+        {
+            Forces::print("EFIELD      FORCE (Ry/Bohr)", force_e);
+        }
+    }
+
     //impose total force = 0
     int iat = 0;
-
-	ModuleBase::matrix force_e;
-	if(GlobalV::EFIELD)
-	{
-		force_e.create(GlobalC::ucell.nat, 3);
-		Efield::compute_force(force_e);
-	}
-	
 	for (int ipol = 0; ipol < 3; ipol++)
 	{
 		double sum = 0.0;
@@ -100,7 +105,7 @@ void Forces::init(ModuleBase::matrix& force)
                     force(iat, ipol) += force_vdw(iat, ipol);
                 }																										   
 					
-				if(GlobalV::EFIELD)
+				if(GlobalV::EFIELD_FLAG)
 				{
 					force(iat,ipol) = force(iat, ipol) + force_e(iat, ipol);
 				}
@@ -208,7 +213,7 @@ void Forces::init(ModuleBase::matrix& force)
 		Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc,0);
 		Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
-		if(GlobalV::EFIELD) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+		if(GlobalV::EFIELD_FLAG) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
 	}
 	Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 
@@ -681,7 +686,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
+        const int nbasis = GlobalC::kv.ngk[ik];
         // generate vkb
         if (GlobalC::ppcell.nkb > 0)
         {
@@ -697,9 +702,11 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
         {
             for (int i=0;i<nkb;i++)
             {
-                for (int ig=0; ig<GlobalC::wf.npw; ig++)
+                const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+                const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
+                for (int ig=0; ig<nbasis; ig++)
                 {
-                    becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
+                    becp(i,ib) += ppsi[ig] * conj( pvkb[ig] );
                 }
             }
         }
@@ -715,17 +722,17 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 			{
 				if (ipol==0)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+					for (int ig=0; ig<nbasis; ig++)
                         vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
                 }
 				if (ipol==1)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+					for (int ig=0; ig<nbasis; ig++)
                         vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
                 }
 				if (ipol==2)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+					for (int ig=0; ig<nbasis; ig++)
                         vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
                 }
 			}
@@ -737,9 +744,11 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
                 if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
                 for (int i=0; i<nkb; i++)
                 {
-                    for (int ig=0; ig<GlobalC::wf.npw; ig++)
+                    const std::complex<double>* ppsi = &(GlobalC::wf.psi[0](ik, ib, 0));
+                    const std::complex<double>* pvkb1 = &(vkb1(i, 0));
+                    for (int ig=0; ig<nbasis; ig++)
                     {
-                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * GlobalC::wf.evc[ik](ib,ig) ;
+                        dbecp(i,ib, ipol) += conj( pvkb1[ig] ) * ppsi[ig] ;
                     }
                 }
             }

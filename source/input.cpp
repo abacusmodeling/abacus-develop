@@ -56,6 +56,7 @@ void Input::Init(const std::string &fn)
     ModuleBase::Global_File::make_dir_out(this->suffix,
                                           this->calculation,
                                           GlobalV::MY_RANK,
+                                          this->mdp.md_restart,
                                           this->out_alllog); // xiaohui add 2013-09-01
     Check();
 
@@ -288,6 +289,15 @@ void Input::Default(void)
     lcao_dr = 0.01;
     lcao_rmax = 30; // (a.u.)
     //----------------------------------------------------------
+    // efield and dipole correction     Yu Liu add 2022-05-18
+    //----------------------------------------------------------
+    efield_flag = false;
+    dip_cor_flag = false;
+    efield_dir = 2;
+    efield_pos_max = 0.5;
+    efield_pos_dec = 0.1;
+    efield_amp  = 0.0;
+    //----------------------------------------------------------
     // vdw									//jiyy add 2019-08-04
     //----------------------------------------------------------
     vdw_method = "none";
@@ -374,7 +384,7 @@ void Input::Default(void)
 
     cell_factor = 1.2; // LiuXh add 20180619
 
-    GlobalV::out_mul = 0; // qi feng add 2019/9/10
+    out_mul = 0; // qi feng add 2019/9/10
 
     //----------------------------------------------------------			//Peize Lin add 2020-04-04
     // restart
@@ -1155,6 +1165,34 @@ bool Input::Read(const std::string &fn)
             read_value(ifs, mdp.md_damp);
         }
         //----------------------------------------------------------
+        // efield and dipole correction
+        // Yu Liu add 2022-05-18
+        //----------------------------------------------------------
+        else if (strcmp("efield_flag", word) == 0)
+        {
+            read_value(ifs, efield_flag);
+        }
+        else if (strcmp("dip_cor_flag", word) == 0)
+        {
+            read_value(ifs, dip_cor_flag);
+        }
+        else if (strcmp("efield_dir", word) == 0)
+        {
+            read_value(ifs, efield_dir);
+        }
+        else if (strcmp("efield_pos_max", word) == 0)
+        {
+            read_value(ifs, efield_pos_max);
+        }
+        else if (strcmp("efield_pos_dec", word) == 0)
+        {
+            read_value(ifs, efield_pos_dec);
+        }
+        else if (strcmp("efield_amp", word) == 0)
+        {
+            read_value(ifs, efield_amp );
+        }
+        //----------------------------------------------------------
         // tddft
         // Fuxiang He add 2016-10-26
         //----------------------------------------------------------
@@ -1305,7 +1343,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("out_mul", word) == 0)
         {
-            read_value(ifs, GlobalV::out_mul);
+            read_value(ifs, out_mul);
         } // qifeng add 2019/9/10
         //----------------------------------------------------------
         // exx
@@ -1804,6 +1842,7 @@ void Input::Default_2(void) // jiyy add 2019-08-04
         }
     }
     if(calculation.substr(0,3) != "sto")    bndpar = 1;
+    if(bndpar > GlobalV::NPROC) bndpar = GlobalV::NPROC;
 }
 #ifdef __MPI
 void Input::Bcast()
@@ -1997,6 +2036,13 @@ void Input::Bcast()
     Parallel_Common::bcast_double(mdp.msst_tscale);
     Parallel_Common::bcast_double(mdp.md_tfreq);
     Parallel_Common::bcast_double(mdp.md_damp);
+    // Yu Liu add 2022-05-18
+    Parallel_Common::bcast_bool(efield_flag);
+    Parallel_Common::bcast_bool(dip_cor_flag);
+    Parallel_Common::bcast_int(efield_dir);
+    Parallel_Common::bcast_double(efield_pos_max);
+    Parallel_Common::bcast_double(efield_pos_dec);
+    Parallel_Common::bcast_double(efield_amp );
     /* 	// Peize Lin add 2014-04-07
         Parallel_Common::bcast_bool( vdwD2 );
         Parallel_Common::bcast_double( vdwD2_scaling );
@@ -2048,7 +2094,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(test_just_neighbor);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
-    Parallel_Common::bcast_int(GlobalV::out_mul); // qifeng add 2019/9/10
+    Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10
 
     // Peize Lin add 2018-06-20
     Parallel_Common::bcast_string(dft_functional);
@@ -2270,9 +2316,9 @@ void Input::Check(void)
             ModuleBase::WARNING_QUIT("Input::Check", "calculate = istate is only availble for LCAO.");
         }
     }
-    else if (calculation == "md") // mohan add 2011-11-04
+    else if (calculation == "md" || calculation == "sto-md") // mohan add 2011-11-04
     {
-        GlobalV::CALCULATION = "md";
+        GlobalV::CALCULATION = calculation;
         symmetry = false;
         cal_force = 1;
         if (mdp.md_nstep == 0)
