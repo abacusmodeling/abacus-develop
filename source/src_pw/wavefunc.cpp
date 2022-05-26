@@ -114,7 +114,7 @@ psi::Psi<std::complex<double>>* wavefunc::allocate(const int nks)
 					ModuleBase::Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
 			}
 			std::cout << " MEMORY FOR PSI (MB)  : " << 
-				ModuleBase::Memory::record("wavefunc","evc",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+				ModuleBase::Memory::record("wavefunc","psi",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 		}
 		else if(GlobalV::BASIS_TYPE!="pw")
 		{
@@ -141,7 +141,7 @@ psi::Psi<std::complex<double>>* wavefunc::allocate(const int nks)
 			psi_out = new psi::Psi<std::complex<double>>(nks2, GlobalV::NBANDS, npwx * GlobalV::NPOL, GlobalC::kv.ngk.data());
 
 			std::cout << " MEMORY FOR PSI (MB)  : " << 
-			ModuleBase::Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+			ModuleBase::Memory::record("wavefunc","psi",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 		}
 		return psi_out;
 	}

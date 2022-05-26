@@ -46,6 +46,21 @@ namespace ModuleESolver
         classname = "ESolver_KS_PW";
         basisname = "PW";
     }
+    ESolver_KS_PW::~ESolver_KS_PW()
+    {
+        if(this->pelec!=nullptr)
+        {
+            delete this->pelec;
+        }
+        if(this->phami!=nullptr)
+        {
+            delete this->phami;
+        }
+        if(this->phsol!=nullptr)
+        {
+            delete this->phsol;
+        }
+    }
 
     void ESolver_KS_PW::Init(Input& inp, UnitCell_pseudo& ucell)
     {
@@ -188,23 +203,7 @@ namespace ModuleESolver
 
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
 
-
-
-    }
-
-    void ESolver_KS_PW::beforescf(int istep)
-    {
-        //calculate ewald energy
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
-        //Symmetry_rho should be moved to Init()
-        Symmetry_rho srho;
-        for (int is = 0; is < GlobalV::NSPIN; is++)
-        {
-            srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
-        }
         //init Psi, HSolver, ElecState, Hamilt
-        hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
-        hsolver::DiagoIterAssist::PW_DIAG_THR = GlobalV::PW_DIAG_THR;
         const PW_Basis* pbas = &(GlobalC::pw);
         if(this->phsol != nullptr)
         {
@@ -217,7 +216,6 @@ namespace ModuleESolver
         else
         {
             this->phsol = new hsolver::HSolverPW(pbas);
-            this->phsol->method = GlobalV::KS_SOLVER;
         }
         if(this->pelec != nullptr)
         {
@@ -242,6 +240,19 @@ namespace ModuleESolver
         else
         {
             this->phami = new hamilt::HamiltPW(&(GlobalC::hm.hpw));
+        }
+
+    }
+
+    void ESolver_KS_PW::beforescf(int istep)
+    {
+        //calculate ewald energy
+        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+        //Symmetry_rho should be moved to Init()
+        Symmetry_rho srho;
+        for (int is = 0; is < GlobalV::NSPIN; is++)
+        {
+            srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
         }
     } 
 
@@ -293,7 +304,8 @@ namespace ModuleESolver
             }
 
             hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
-            this->phsol->solve(this->phami, this->psi[0], this->pelec);
+            hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
+            this->phsol->solve(this->phami, this->psi[0], this->pelec, GlobalV::KS_SOLVER);
 
             // transform energy for print
             GlobalC::en.eband = this->pelec->eband;
@@ -670,7 +682,7 @@ namespace ModuleESolver
         {
             hsolver::DiagoIterAssist::need_subspace = false;
             hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
-            this->phsol->solve(this->phami, this->psi[0], this->pelec, true);
+            this->phsol->solve(this->phami, this->psi[0], this->pelec, GlobalV::KS_SOLVER, true);
         }
         else
         {

@@ -6,10 +6,6 @@
 #include "../src_pw/energy.h"
 #include "../module_base/matrix.h"
 //--------------temporary----------------------------
-#include "src_lcao/record_adj.h"
-#include "src_lcao/local_orbital_charge.h"
-#include "src_lcao/local_orbital_wfc.h"
-#include "src_lcao/LCAO_hamilt.h"
 #include "module_psi/psi.h"
 
 namespace ModuleESolver
@@ -25,6 +21,7 @@ namespace ModuleESolver
         
         virtual ~ESolver() 
         {
+            //--------------temporary----------------------------
             if(this->psi != nullptr)
             {
                 delete psi;
@@ -40,9 +37,6 @@ namespace ModuleESolver
         // virtual void UpdateAtom(Atom &atom_in);
 
         virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
-
-        // this is the interface of non-self-consistant calculation
-        virtual void nscf() {};
 
         //Deal with exx and other calculation than scf/md/relax: 
         // such as nscf, istate-charge or envelope
@@ -61,6 +55,10 @@ namespace ModuleESolver
         virtual int getniter() { return 0; }
         string classname;
 
+        //--------------temporary----------------------------
+        // this is the interface of non-self-consistant calculation
+        virtual void nscf() {};
+        
         //wavefunction coefficients
         psi::Psi<std::complex<double>>* psi=nullptr;
     };

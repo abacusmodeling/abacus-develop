@@ -20,12 +20,13 @@ void HSolverPW::update()
     return;
 }*/
 
-void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const bool skip_charge)
+void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge)
 {
     // prepare for the precondition of diagonalization
     this->precondition.resize(psi.get_nbasis());
 
     // select the method of diagonalization
+    this->method = method_in;
     if (this->method == "cg")
     {
         if(pdiagh!=nullptr)

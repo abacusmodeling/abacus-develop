@@ -6,7 +6,6 @@
 #include "module_hsolver/hsolver.h"
 #include "module_hamilt/hamilt.h"
 #include "module_elecstate/elecstate.h"
-#include "module_psi/psi.h"
 // #include "estates.h"
 // #include "h2e.h"
 namespace ModuleESolver
