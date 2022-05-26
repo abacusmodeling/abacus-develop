@@ -106,6 +106,7 @@
 211_NO_S2_elec_add
 211_NO_elec_minus
 211_NO_S2_elec_minus
+212_NO_wfc_ienvelope
 220_NO_KP_MD_FIRE
 220_NO_KP_MD_NVE
 220_NO_KP_MD_NVT

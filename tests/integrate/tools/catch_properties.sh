@@ -46,7 +46,7 @@ test -e $1 && rm $1
 #--------------------------------------------
 # if NOT non-self-consistent calculations
 #--------------------------------------------
-if [ $calculation != "nscf" ]; then
+if [ $calculation != "nscf" ] && [ $calculation != "ienvelope" ]; then
 	etot=`grep ETOT_ $running_path | awk '{print $2}'`
 	etotperatom=`awk 'BEGIN {x='$etot';y='$natom';printf "%.10f\n",x/y}'`
 	echo "etotref $etot" >>$1
@@ -126,3 +126,13 @@ if ! test -z "$deepks_bandgap" && [ $deepks_bandgap -eq 1 ]; then
 	echo "oprec $oprec" >> $1
 fi
 
+if [ $calculation == "ienvelope" ]; then
+	../tools/sum_ENV_H2 OUT.autotest/BAND1_k_1_s_1_ENV >> $1
+	../tools/sum_ENV_H2 OUT.autotest/BAND1_k_2_s_1_ENV >> $1
+	../tools/sum_ENV_H2 OUT.autotest/BAND2_k_1_s_1_ENV >> $1
+	../tools/sum_ENV_H2 OUT.autotest/BAND2_k_2_s_1_ENV >> $1
+	../tools/sum_ENV_H2 OUT.autotest/BAND3_k_1_s_1_ENV >> $1
+	../tools/sum_ENV_H2 OUT.autotest/BAND3_k_2_s_1_ENV >> $1
+	../tools/sum_ENV_H2 OUT.autotest/BAND4_k_1_s_1_ENV >> $1
+	../tools/sum_ENV_H2 OUT.autotest/BAND4_k_2_s_1_ENV >> $1
+fi
