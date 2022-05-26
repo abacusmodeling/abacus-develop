@@ -48,24 +48,28 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 ///
 void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 {
-    ModuleBase::timer::tick("PW_Basis", "real2recip_gamma_only");
-    assert(this->gamma_only == true);
-    // for(int ir = 0 ; ir < this->nrxx ; ++ir)
-    // {
-    //     this->ft.r_rspace[ir] = in[ir];
-    // }
-    // r2c in place
-    int npy = this->bigny * this->nplane;
-    for(int ix = 0 ; ix < this->nx ; ++ix)
+    ModuleBase::timer::tick("PW_Basis", "real2recip");
+    if(this->gamma_only)
     {
-        for(int ipy = 0 ; ipy < npy ; ++ipy)
+        int npy = this->bigny * this->nplane;
+        for(int ix = 0 ; ix < this->nx ; ++ix)
         {
-            this->ft.r_rspace[ix*npy*2 + ipy] = in[ix*npy + ipy];
+            for(int ipy = 0 ; ipy < npy ; ++ipy)
+            {
+                this->ft.r_rspace[ix*npy*2 + ipy] = in[ix*npy + ipy];
+            }
         }
+
+        this->ft.fftxyr2c(ft.r_rspace,ft.aux1);
     }
-
-    this->ft.fftxyr2c(ft.r_rspace,ft.aux1);
-
+    else
+    {
+        for(int ir = 0 ; ir < this->nrxx ; ++ir)
+        {
+            this->ft.aux1[ir] = std::complex<double>(in[ir],0);
+        }
+        this->ft.fftxyfor(ft.aux1,ft.aux1);
+    }
     this->gatherp_scatters(this->ft.aux1, this->ft.aux2);
     
     this->ft.fftzfor(ft.aux2,ft.aux1);
@@ -74,7 +78,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
     {
         out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->bignxyz);
     }
-    ModuleBase::timer::tick("PW_Basis", "real2recip_gamma_only");
+    ModuleBase::timer::tick("PW_Basis", "real2recip");
     return;
 }
 
@@ -119,35 +123,40 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 ///
 void PW_Basis:: recip2real(std::complex<double> * in, double * out)
 {
-    ModuleBase::timer::tick("PW_Basis", "recip2real_gamma_only");
-    assert(this->gamma_only == true);
+    ModuleBase::timer::tick("PW_Basis", "recip2real");
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
         this->ft.aux1[this->ig2isz[ig]] = in[ig];
     }
-   this->ft.fftzbac(ft.aux1, ft.aux2);
-    
+    this->ft.fftzbac(ft.aux1, ft.aux2);
+
     this->gathers_scatterp(this->ft.aux2, this->ft.aux1);
 
-    this->ft.fftxyc2r(ft.aux1,ft.r_rspace);
-
-    // for(int ir = 0 ; ir < this->nrxx ; ++ir)
-    // {
-    //     out[ir] = this->ft.r_rspace[ir] / this->bignxyz;
-    // }
-
-    // r2c in place
-    int npy = this->bigny * this->nplane;
-    for(int ix = 0 ; ix < this->nx ; ++ix)
+    if(this->gamma_only)
     {
-        for(int ipy = 0 ; ipy < npy ; ++ipy)
+        this->ft.fftxyc2r(ft.aux1,ft.r_rspace);
+
+        // r2c in place
+        int npy = this->bigny * this->nplane;
+        for(int ix = 0 ; ix < this->nx ; ++ix)
         {
-            out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy];
+            for(int ipy = 0 ; ipy < npy ; ++ipy)
+            {
+                out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy];
+            }
         }
     }
-    ModuleBase::timer::tick("PW_Basis", "recip2real_gamma_only");
+    else
+    {
+        this->ft.fftxybac(ft.aux1,ft.aux1);
+        for(int ir = 0 ; ir < this->nrxx ; ++ir)
+        {
+            out[ir] = this->ft.aux1[ir].real();
+        }
+    }
+    ModuleBase::timer::tick("PW_Basis", "recip2real");
     return;
 }
 
@@ -184,17 +193,27 @@ void PW_Basis:: real2recip(std::complex<float> * in, std::complex<float> * out)
 ///
 void PW_Basis:: real2recip(float * in, std::complex<float> * out)
 {
-    assert(this->gamma_only == true);
-    int npy = this->bigny * this->nplane;
-    for(int ix = 0 ; ix < this->nx ; ++ix)
+    if(this->gamma_only)
     {
-        for(int ipy = 0 ; ipy < npy ; ++ipy)
+        int npy = this->bigny * this->nplane;
+        for(int ix = 0 ; ix < this->nx ; ++ix)
         {
-            this->ft.rf_rspace[ix*npy*2 + ipy] = in[ix*npy + ipy];
+            for(int ipy = 0 ; ipy < npy ; ++ipy)
+            {
+                this->ft.rf_rspace[ix*npy*2 + ipy] = in[ix*npy + ipy];
+            }
         }
-    }
 
-    this->ft.fftfxyr2c(ft.rf_rspace,ft.auxf1);
+        this->ft.fftfxyr2c(ft.rf_rspace,ft.auxf1);
+    }
+    else
+    {
+        for(int ir = 0 ; ir < this->nrxx ; ++ir)
+        {
+            this->ft.auxf1[ir] = std::complex<float>(in[ir], 0);
+        }
+        this->ft.fftfxyfor(ft.auxf1,ft.auxf1);
+    }
 
     this->gatherp_scatters(this->ft.auxf1, this->ft.auxf2);
     
@@ -242,25 +261,36 @@ void PW_Basis:: recip2real(std::complex<float> * in, std::complex<float> * out)
 ///
 void PW_Basis:: recip2real(std::complex<float> * in, float * out)
 {
-    assert(this->gamma_only == true);
     ModuleBase::GlobalFunc::ZEROS(ft.auxf1, this->nst * this->nz);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
         this->ft.auxf1[this->ig2isz[ig]] = in[ig];
     }
-   this->ft.fftfzbac(ft.auxf1, ft.auxf2);
+    this->ft.fftfzbac(ft.auxf1, ft.auxf2);
     
     this->gathers_scatterp(this->ft.auxf2, this->ft.auxf1);
 
-    this->ft.fftfxyc2r(ft.auxf1,ft.rf_rspace);
-
-    int npy = this->bigny * this->nplane;
-    for(int ix = 0 ; ix < this->nx ; ++ix)
+    if(this->gamma_only)
     {
-        for(int ipy = 0 ; ipy < npy ; ++ipy)
+        this->ft.fftfxyc2r(ft.auxf1,ft.rf_rspace);
+
+        int npy = this->bigny * this->nplane;
+        for(int ix = 0 ; ix < this->nx ; ++ix)
         {
-            out[ix*npy + ipy] = this->ft.rf_rspace[ix*npy*2 + ipy];
+            for(int ipy = 0 ; ipy < npy ; ++ipy)
+            {
+                out[ix*npy + ipy] = this->ft.rf_rspace[ix*npy*2 + ipy];
+            }
+        }
+    }
+    else
+    {
+        this->ft.fftfxybac(ft.auxf1,ft.auxf1);
+    
+        for(int ir = 0 ; ir < this->nrxx ; ++ir)
+        {
+            out[ir] = this->ft.auxf1[ir].real();
         }
     }
     return;
