@@ -194,6 +194,7 @@ TEST_F(PWTEST,test2_1_2)
     {
         EXPECT_GT(pwtest.gg_uniq[igg], pwtest.gg_uniq[igg-1]);
     }
+    if(pwtest.ig_gge0 >= 0) EXPECT_NEAR(0.0, pwtest.gg[pwtest.ig_gge0], 1e-8);
     delete [] startnst;
     delete [] tmpx;
     delete [] tmpy;

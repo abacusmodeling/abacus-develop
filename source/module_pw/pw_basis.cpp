@@ -29,6 +29,7 @@ PW_Basis::PW_Basis()
 	numr = NULL;
     ig2igg = NULL;
     gg_uniq = NULL;
+    ig_gge0 = -1;
     poolnproc = 1;
     poolrank = 0;
     npw = 0;
@@ -142,6 +143,7 @@ void PW_Basis::collect_local_pw()
         this->gg[ig] = f * (this->GGT * f);
         this->gdirect[ig] = f;
         this->gcar[ig] = f * this->G;
+        if(this->gg[ig] < 1e-8) this->ig_gge0 = ig;
     }
     return;
 }
@@ -166,6 +168,7 @@ void PW_Basis::collect_uniqgg()
         f.y = iy;
         f.z = iz;
         tmpgg[ig] = f * (this->GGT * f);
+        if(tmpgg[ig] < 1e-8) this->ig_gge0 = ig;
     }
 
     ModuleBase::GlobalFunc::ZEROS(sortindex, this->npw);

@@ -111,6 +111,7 @@ public:
     double *gg;       	// modulus (G^2) of G vectors [npw]
     //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
 	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
+    int ig_gge0;    //ig when gg == 0
 
     //distribute plane waves and grids and set up fft
     void setuptransform();
