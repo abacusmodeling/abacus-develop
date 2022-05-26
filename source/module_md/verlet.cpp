@@ -137,7 +137,8 @@ void Verlet::outputMD(std::ofstream &ofs)
             << std::left << std::setw(20) << press*unit_transform <<std::endl;
 	std::cout << " ------------------------------------------------------------------------------------------------" << std::endl;
 
-    ofs << std::endl;
+    ofs.unsetf(ios::fixed);
+    ofs << std::setprecision(8) << std::endl;
     ofs << std::endl;
     ofs << " ------------------------------------------------------------------------------------------------" << std::endl;
 	ofs << " " << std::left << std::setw(20) << "Energy" 
