@@ -805,7 +805,7 @@ void Pdiag_Double::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **c
 	// this is a bad position to output wave functions.
 	// but it works!
 	std::stringstream ss;
-	ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
+	ss << GlobalV::global_readin_dir << "LOWF_K_" << ik+1 << ".dat";
     if(this->out_wfc_lcao)
 	{
 //		std::cout << " write the wave functions" << std::endl;

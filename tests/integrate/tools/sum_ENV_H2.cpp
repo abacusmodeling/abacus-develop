@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 	{
         	cout << "\e[1;31m [  FAILED  ]  \e[0m";
 		cout << "Can't find " << input_file << " !" << endl;
-		return 0;
+		return 1;
 	}
 
 	int nx = 0;
@@ -51,5 +51,5 @@ int main(int argc, char **argv)
 	std::cout<<ne<<std::endl;
 
 	
-	return 1;
+	return 0;
 }

@@ -15,4 +15,4 @@ basis_type		lcao
 scf_thr			1e-10
 
 calculation     	ienvelope 
-out_wfc_lcao		1
+read_file_dir		./
