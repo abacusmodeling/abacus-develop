@@ -10,8 +10,6 @@ threshold=0.0000001
 ca=8
 # regex of case name
 #case="^[^#].*_.*$"
-case="^[^#].*_ienvelope$"
-#case="^[^#].*_PW_LT_sc$"
 # enable AddressSanitizer
 sanitize=false
 
