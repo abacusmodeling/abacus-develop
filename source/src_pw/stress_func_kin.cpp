@@ -2,7 +2,7 @@
 #include "global.h"
 
 //calculate the kinetic stress in PW base
-void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
+void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in)
 {
 	double *kfac;
 	double **gk;
@@ -52,9 +52,9 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 				for(int ibnd=0;ibnd<GlobalV::NBANDS;ibnd++)
 				{
 					const std::complex<double>* ppsi=nullptr;
-					if(GlobalC::wf.psi!=nullptr)
+					if(psi_in!=nullptr)
 					{
-						ppsi = &(GlobalC::wf.psi[0](ik, ibnd, 0));
+						ppsi = &(psi_in[0](ik, ibnd, 0));
 					}
 					else
 					{

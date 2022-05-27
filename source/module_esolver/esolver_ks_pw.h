@@ -14,11 +14,14 @@ namespace ModuleESolver
     {
     public:
         ESolver_KS_PW();
+        ~ESolver_KS_PW();
         void Init(Input& inp, UnitCell_pseudo& cell) override;
         void cal_Energy(energy& en) override;
         void cal_Force(ModuleBase::matrix& force) override;
         void cal_Stress(ModuleBase::matrix& stress) override;
         virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
+        virtual void hamilt2estates(const double ethr) override;
+        virtual void nscf() override;
         void postprocess() override;
 
     protected:

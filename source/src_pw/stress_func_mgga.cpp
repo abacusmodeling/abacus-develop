@@ -4,7 +4,7 @@
 #include "global.h"
 
 //calculate the mGGA stress correction in PW and LCAO
-void Stress_Func::stress_mgga(ModuleBase::matrix& sigma) 
+void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in) 
 {
 	ModuleBase::timer::tick("Stress_Func","stress_mgga");
 
@@ -45,9 +45,9 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma)
 		{
 			const double w1 = GlobalC::wf.wg(ik, ibnd) / GlobalC::ucell.omega;
 			const std::complex<double>* ppsi=nullptr;
-			if(GlobalC::wf.psi!=nullptr)
+			if(psi_in!=nullptr)
 			{
-				ppsi = &(GlobalC::wf.psi[0](ik, ibnd, 0));
+				ppsi = &(psi_in[0](ik, ibnd, 0));
 			}
 			else
 			{

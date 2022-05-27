@@ -20,12 +20,13 @@ void HSolverPW::update()
     return;
 }*/
 
-void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes)
+void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge)
 {
     // prepare for the precondition of diagonalization
     this->precondition.resize(psi.get_nbasis());
 
     // select the method of diagonalization
+    this->method = method_in;
     if (this->method == "cg")
     {
         if(pdiagh!=nullptr)
@@ -45,6 +46,7 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
     }
     else if (this->method == "dav")
     {
+        DiagoDavid::PW_DIAG_NDIM = GlobalV::PW_DIAG_NDIM;
         if (pdiagh != nullptr)
         {
             if (pdiagh->method != this->method)
@@ -66,12 +68,12 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
     }
 
     /// Loop over k points for solve Hamiltonian to charge density
-    for (int ik = 0; ik < psi.get_nk(); ++ik)
+    for (int ik = 0; ik < this->pbas->Klist->nks; ++ik)
     {
         /// update H(k) for each k point
         pHamilt->updateHk(ik);
 
-        psi.fix_k(ik);
+        this->updatePsiK(psi, ik);
 
         // template add precondition calculating here
         update_precondition(precondition, this->pbas->Klist->ngk[ik], GlobalC::wf.g2kin);
@@ -81,7 +83,47 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
         this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
         /// calculate the contribution of Psi for charge density rho
     }
+
+    // DiagoCG would keep 9*nbasis memory in cache during loop-k
+    // it should be deleted before calculating charge
+    if(this->method == "cg")
+    {
+        delete pdiagh;
+        pdiagh = nullptr;
+    }
+
+    if(skip_charge) return;
     pes->psiToRho(psi);
+
+    return;
+}
+
+void HSolverPW::updatePsiK(psi::Psi<std::complex<double>>& psi, const int ik)
+{
+    if(GlobalV::CALCULATION=="nscf")
+    {
+        if(GlobalV::BASIS_TYPE=="pw")
+        {
+            // generate PAOs first, then diagonalize to get
+            // inital wavefunctions.
+            if(GlobalC::wf.mem_saver==1)
+            {
+                psi.fix_k(ik);
+                GlobalC::wf.diago_PAO_in_pw_k2(ik, psi);
+            }
+            else
+            {
+                psi.fix_k(ik);
+                GlobalC::wf.diago_PAO_in_pw_k2(ik, psi);
+            }
+        }
+        else
+        {
+            ModuleBase::WARNING_QUIT("HSolverPW::updatePsiK", "lcao_in_pw is not supported now.");
+        }
+        return;
+    }
+    psi.fix_k(ik);
 }
 
 void HSolverPW::hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double>>& psi, double* eigenvalue)
