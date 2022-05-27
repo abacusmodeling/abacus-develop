@@ -25,6 +25,8 @@ class Hamilt
     virtual void matrix(MatrixBlock<std::complex<double>> &hk_in, MatrixBlock<std::complex<double>> &sk_in){return;}
     virtual void matrix(MatrixBlock<double> &hk_in, MatrixBlock<double> &sk_in){return;}
 
+    std::string classname = "none";
+
   protected:
     // array, save operations from each operators
     // would be implemented later

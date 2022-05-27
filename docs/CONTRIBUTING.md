@@ -6,7 +6,6 @@ This file provides a guideline for it.
 ## Table of Contents
 
 - [Got a question?](#got-a-question)
-- [Before getting started](#before-getting-started)
 - [Structure of the package](#structure-of-the-package)
 - [Submitting an Issue](#submitting-an-issue)
 - [Comment Style for documentation](#comment-style-for-documentation)
@@ -23,6 +22,7 @@ If you would like to implement a new feature, please submit an issue with a prop
 
 ## Structure of the package
 
+Please refer to [our instructions](./install.md) on how to installing ABACUS.
 The source code of ABACUS is based on several modules. Under the ABACUS root directory, there are the following folders:
 
 - `cmake`: relevant files for finding required packages when compiling the code with cmake;

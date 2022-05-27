@@ -10,6 +10,18 @@ namespace elecstate
 void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 {
     this->calculate_weights();
+
+    this->calEBand();
+
+    for(int is=0; is<GlobalV::NSPIN; is++)
+	{
+		ModuleBase::GlobalFunc::ZEROS(this->charge->rho[is], this->charge->nrxx);
+		if (XC_Functional::get_func_type() == 3)
+		{
+            ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[is], this->charge->nrxx);
+        }
+	}
+
     for (int ik = 0; ik < psi.get_nk(); ++ik)
     {
         psi.fix_k(ik);
@@ -20,13 +32,6 @@ void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 
 void ElecStatePW::updateRhoK(const psi::Psi<std::complex<double>>& psi)
 {
-    const int current_k = psi.get_current_k();
-    if (current_k == 0)
-    {
-        this->eband = 0.0;
-    }
-    this->eband += this->eBandK(current_k);
-
     this->rhoBandK(psi);
 
     return;
@@ -41,15 +46,19 @@ void ElecStatePW::parallelK()
 {
 #ifdef __MPI
     charge->rho_mpi();
-    if (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto"
-        && GlobalV::CALCULATION != "md-sto") // qinarui add it temporarily.
-    {
-        //==================================
-        // Reduce all the Energy in each cpu
-        //==================================
-        this->eband /= GlobalV::NPROC_IN_POOL;
-        Parallel_Reduce::reduce_double_all(this->eband);
-    }
+    if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it 2021-7-21
+	{
+		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
+		MPI_Allreduce(MPI_IN_PLACE, &GlobalC::en.eband, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+	}
+	else
+	{
+    	//==================================
+    	// Reduce all the Energy in each cpu
+    	//==================================
+		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
+		Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
+	}
 #endif
     return;
 }
@@ -141,6 +150,7 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
         }
     }
     else
+    {
         for (int ibnd = 0; ibnd < nbands; ibnd++)
         {
             ///
@@ -186,6 +196,7 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
                 }
             }
         }
+    }
 
     return;
 }

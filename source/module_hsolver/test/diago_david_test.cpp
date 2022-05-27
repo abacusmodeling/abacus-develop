@@ -7,7 +7,7 @@
 #include"gtest/gtest.h"
 #include "module_base/inverse_matrix.h"
 #include "module_base/lapack_connector.h"
-#include "module_pw/unittest/test_tool.h"
+#include "module_pw/test/test_tool.h"
 #include"mpi.h"
 
 #define CONVTHRESHOLD 1e-3
@@ -82,7 +82,7 @@ public:
 		double* en = new double[npw];		
 		Hamilt_PW hpw;
 		hamilt::Hamilt *phm;
-		phm = new hamilt::HamiltPW;
+		phm = new hamilt::HamiltPW(&hpw);
 		hsolver::DiagoDavid dav(&hpw, precondition);
 		hsolver::DiagoDavid::PW_DIAG_NDIM = order;
 		hsolver::DiagoIterAssist::PW_DIAG_NMAX = maxiter;
@@ -161,8 +161,8 @@ TEST_P(DiagoDavTest,RandomHamilt)
 INSTANTIATE_TEST_SUITE_P(VerifyDiag,DiagoDavTest,::testing::Values(
 		//DiagoDavPrepare(int nband, int npw, int sparsity, int order,double eps,int maxiter)
         DiagoDavPrepare(10,100,0,4,1e-5,500),
-        DiagoDavPrepare(20,500,7,4,1e-5,500),
-        DiagoDavPrepare(50,1000,8,4,1e-5,500)
+        DiagoDavPrepare(20,500,7,4,1e-5,500)
+        //DiagoDavPrepare(50,1000,8,4,1e-5,500)
 		//DiagoDavPrepare(20,2000,8,4,1e-5,500)
 ));
 
@@ -174,7 +174,7 @@ TEST(DiagoDavRealSystemTest,dataH)
 	ifs.close();
 	DIAGOTEST::hmatrix = hmatrix;
 	DIAGOTEST::npw = hmatrix.nc;
-	int nband = max(hmatrix.nc/4,1);
+	int nband = max(hmatrix.nc/20,1);
 
 	DiagoDavPrepare ddp(nband,DIAGOTEST::npw,0,2,1e-5,500);
 	

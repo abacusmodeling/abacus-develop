@@ -1,7 +1,7 @@
 ########################################
 # CMake build system
 # This file is part of ABACUS
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 ########################################
 
 project(ABACUS
@@ -13,7 +13,8 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
-option(USE_CUDA "Enable support to CUDA." OFF)
+option(USE_CUDA "Enable support to CUDA for PW." OFF)
+option(USE_CUSOLVER_LCAO "Enable support to CUSOLVER for LCAO." OFF)
 option(USE_ROCM "Enable support to ROCm." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
@@ -21,7 +22,7 @@ option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
 set(ABACUS_BIN_NAME abacus)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
 set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
@@ -58,21 +59,33 @@ set(CMAKE_CXX_STANDARD 11)
 include(CheckLanguage)
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
-  if(NOT DEFINED USE_CUDA)
-    message("CUDA components detected. \nWill build the CUDA version of ABACUS.")
-    set(USE_CUDA ON)
+  if(NOT DEFINED USE_CUDA OR NOT DEFINED USE_CUSOLVER_LCAO)
+    if (NOT DEFINED USE_CUDA AND NOT DEFINED USE_CUSOLVER_LCAO)
+      message("CUDA components detected. \nWill build the CUDA for PW version of ABACUS by default.")
+      set(USE_CUDA ON)
+      set(USE_CUSOLVER_LCAO OFF)
+    elseif (NOT DEFINED USE_CUDA)
+      set(USE_CUDA OFF)
+    else()
+      set(USE_CUSOLVER_LCAO OFF)
+    endif()
   else()
-    if(NOT USE_CUDA)
-      message(WARNING "CUDA components detected, but USE_CUDA set to OFF. \nNOT building CUDA version of ABACUS.")
+    if(NOT USE_CUDA AND NOT USE_CUSOLVER_LCAO)
+      message(WARNING "CUDA components detected, but both USE_CUDA and USE_CUSOLVER_LCAO set to OFF. \nNOT building CUDA version of ABACUS.")
+    elseif (USE_CUDA AND USE_CUSOLVER_LCAO)
+      message(FATAL_ERROR "USE_CUDA and USE_CUSOLVER_LCAO set, but now they not allowed to coexist.")
     endif()
   endif()
 else() # CUDA not found
-  if (USE_CUDA)
-    message(FATAL_ERROR "USE_CUDA set but no CUDA components found.")
+  if (USE_CUDA OR USE_CUSOLVER_LCAO)
+    message(FATAL_ERROR "USE_CUDA or USE_CUSOLVER_LCAO set but no CUDA components found.")
     set(USE_CUDA OFF)
+    set(USE_CUSOLVER_LCAO OFF)
   endif()
 endif()
-if(USE_CUDA)
+
+if(USE_CUDA OR USE_CUSOLVER_LCAO)
+  cmake_minimum_required(VERSION 3.18) # required by `CUDA_ARCHITECTURES` below
   set(CMAKE_CXX_STANDARD 14)
   set(CMAKE_CXX_EXTENSIONS ON)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -92,10 +105,17 @@ if(USE_CUDA)
   60 # P100
   70 # V100
   75 # T4
+  80 # A100
   )
   include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-  add_compile_definitions(__CUDA)
+  if (USE_CUDA)
+    add_compile_definitions(__CUDA)
+  endif()
+  if (USE_CUSOLVER_LCAO)
+    add_compile_definitions(__CUSOLVER_LCAO)
+  endif()
 endif()
+
 
 # Warning: CMake add support to HIP in version 3.21. This is rather a new version.
 # Use cmake with AMD-ROCm: https://rocmdocs.amd.com/en/latest/Installation_Guide/Using-CMake-with-AMD-ROCm.html
@@ -263,6 +283,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     symmetry
     md
+    planewave
     surchem
     neighbor
     orb
@@ -276,6 +297,10 @@ target_link_libraries(${ABACUS_BIN_NAME}
     ri
     driver
     xc
+    hsolver
+    elecstate
+    hamilt
+    psi
     esolver
     -lm
 )

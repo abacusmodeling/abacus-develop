@@ -40,7 +40,7 @@ namespace ModuleESolver
     void ESolver_KS::Run(const int istep, UnitCell_pseudo& cell)
     {
         if (!(GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md"
-            || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
+            || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax" || GlobalV::CALCULATION.substr(0,3) == "sto")
 #ifdef __MPI
             || Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type
 #endif
@@ -56,19 +56,24 @@ namespace ModuleESolver
             this->beforescf(istep); //Something else to do before the iter loop
 
             bool firstscf = true;
-            bool conv_elec = false;
+            this->conv_elec = false;
             this->niter = this->maxniter;
-            int iter = 1;
-            for (iter = 1; iter <= this->maxniter; ++iter)
+            for (int iter = 1; iter <= this->maxniter; ++iter)
             {
                 writehead(GlobalV::ofs_running, istep, iter);
                 clock_t iterstart, iterend;
                 iterstart = std::clock();
                 set_ethr(istep, iter);
                 eachiterinit(istep, iter);
-
                 this->hamilt2density(istep, iter, this->diag_ethr);
-
+                
+                //<Temporary> It may be changed when more clever parallel algorithm is put forward.
+                //When parallel algorithm for bands are adopted. Density will only be treated in the first group.
+                //(Different ranks should have abtained the same, but small differences always exist in practice.)
+                //Maybe in the future, density and wavefunctions should use different parallel algorithms, in which 
+                //they do not occupy all processors, for example wavefunctions uses 20 processors while density uses 10.
+                if(GlobalV::MY_STOGROUP == 0)
+                {
                 // double drho = this->estate.caldr2(); 
                 // EState should be used after it is constructed.
                 drho = GlobalC::CHR.get_drho();
@@ -87,10 +92,10 @@ namespace ModuleESolver
                     }
                 }
 
-                conv_elec = (drho < this->scf_thr);
+                this->conv_elec = (drho < this->scf_thr);
 
                 // If drho < hsolver_error in the first iter or drho < scf_thr, we do not change rho.
-                if (drho < hsolver_error || conv_elec)
+                if (drho < hsolver_error || this->conv_elec)
                 {
                     if (drho < hsolver_error)    GlobalV::ofs_warning << " drho < hsolver_error, keep charge density unchanged." << std::endl;
                 }
@@ -100,24 +105,30 @@ namespace ModuleESolver
                     //conv_elec = this->estate.mix_rho();
                     GlobalC::CHR.mix_rho(iter);
                 }
+                }
+#ifdef __MPI
+		        MPI_Bcast(&drho, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
+		        MPI_Bcast(&this->conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
+		        MPI_Bcast(GlobalC::CHR.rho[0], GlobalC::pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
+#endif
 
                 // Hamilt should be used after it is constructed.
                 // this->phamilt->update(conv_elec);
-                updatepot(istep, iter, conv_elec);
-                eachiterfinish(iter, conv_elec);
+                updatepot(istep, iter);
+                eachiterfinish(iter);
                 iterend = std::clock();
                 double duration = double(iterend - iterstart) / CLOCKS_PER_SEC;
-                printiter(conv_elec, iter, drho, duration, diag_ethr);
-                if (conv_elec)
+                printiter(iter, drho, duration, diag_ethr);
+                if (this->conv_elec)
                 {
                     this->niter = iter;
                     break;
                 }
             }
-            afterscf(iter, conv_elec);
+            afterscf();
 
             ModuleBase::timer::tick(this->classname, "Run");
-        }
+        }       
 
         return;
     };
@@ -165,7 +176,7 @@ namespace ModuleESolver
             this->diag_ethr = std::min(this->diag_ethr, 0.1 * this->drho / std::max(1.0, GlobalC::CHR.nelec));
 
         }
-        if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
+        if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw"|| GlobalV::CALCULATION.substr(0,3)=="sto")
         {
             this->diag_ethr = 0.0;
         }
@@ -185,9 +196,9 @@ namespace ModuleESolver
         std::cout << std::setw(11) << "TIME(s)" << std::endl;
     }
 
-    void ESolver_KS::printiter(const bool conv_elec, const int iter, const double drho, const double duration, const double ethr)
+    void ESolver_KS::printiter(const int iter, const double drho, const double duration, const double ethr)
     {
-        GlobalC::en.print_etot(conv_elec, iter, drho, duration, ethr);
+        GlobalC::en.print_etot(this->conv_elec, iter, drho, duration, ethr);
     }
 
     void ESolver_KS::writehead(std::ofstream& ofs_running, const int istep, const int iter)

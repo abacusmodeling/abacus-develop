@@ -31,7 +31,7 @@ inline int find_offset(const int id1, const int id2, const int iat1, const int i
 	const int dRz=R1z-R2z;
 
 	const int index=GlobalC::GridT.cal_RindexAtom(dRx, dRy, dRz, iat2);
-	
+
 	int offset=-1;
 	for(int* find=find_start; find < find_end; ++find)
 	{
@@ -49,12 +49,12 @@ inline int find_offset(const int id1, const int id2, const int iat1, const int i
 void Gint_k::cal_meshball_vlocal(
 	int na_grid,
 	int LD_pool,
-	int grid_index, 
+	int grid_index,
 	int* block_size,
 	int* block_index,
 	int* block_iw,
-	bool** cal_flag, 
-	int* at, 
+	bool** cal_flag,
+	int* at,
 	double** psir_ylm,
 	double** psir_vlbr3,
 	double* pvpR)
@@ -92,7 +92,7 @@ void Gint_k::cal_meshball_vlocal(
     			}
 
     			if(cal_num==0) continue;
-    			
+
                 const int idx2=block_index[ia2];
         		int n=block_size[ia2];
 				//const int I2 = GlobalC::ucell.iat2ia[iat2];
@@ -102,13 +102,13 @@ void Gint_k::cal_meshball_vlocal(
 				offset=find_offset(id1, id2, iat1, iat2,
 						find_start, find_end);
 
-				const int iatw = DM_start + GlobalC::GridT.find_R2st[iat1][offset];	
+				const int iatw = DM_start + GlobalC::GridT.find_R2st[iat1][offset];
 
 			    if(cal_num>GlobalC::pw.bxyz/4)
 			    {
 					k=GlobalC::pw.bxyz;
 					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
-						&psir_vlbr3[0][idx2], &LD_pool, 
+						&psir_vlbr3[0][idx2], &LD_pool,
 						&psir_ylm[0][idx1], &LD_pool,
 						&beta, &pvpR[iatw], &n);
 				}
@@ -120,9 +120,9 @@ void Gint_k::cal_meshball_vlocal(
 						{
 							k=1;
 							dgemm_(&transa, &transb, &n, &m, &k, &alpha,
-								&psir_vlbr3[ib][idx2], &LD_pool, 
+								&psir_vlbr3[ib][idx2], &LD_pool,
 								&psir_ylm[ib][idx1], &LD_pool,
-								&beta, &pvpR[iatw], &n);	
+								&beta, &pvpR[iatw], &n);
 						}
 					}
     			}
@@ -154,7 +154,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		const int mkl_threads = mkl_get_max_threads();
 		mkl_set_num_threads(std::max(1,mkl_threads/GlobalC::GridT.nbx));		// Peize Lin update 2021.01.20
 #endif
-		
+
 #ifdef _OPENMP
 		#pragma omp parallel
 #endif
@@ -168,11 +168,11 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 			const int nby = GlobalC::GridT.nby;
 			const int nbz_start = GlobalC::GridT.nbzp_start;
 			const int nbz = GlobalC::GridT.nbzp;
-		
+
 			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
-			
+
 			// it's a uniform grid to save orbital values, so the delta_r is a constant.
-			const double delta_r = GlobalC::ORB.dr_uniform;	
+			const double delta_r = GlobalC::ORB.dr_uniform;
 
 #ifdef _OPENMP
     		#pragma omp for
@@ -187,13 +187,13 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 					for(int k=nbz_start; k<nbz_start+nbz; k++)
 					{
 						const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; //mohan add 2012-03-25
-						
+
 						const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 
 						// get the value: how many atoms has orbital value on this grid.
 						const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
-						if(na_grid==0) continue;				
-						
+						if(na_grid==0) continue;
+
 						// here vindex refers to local potentials
 						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);
 
@@ -207,14 +207,14 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 
 						// set up band matrix psir_ylm and psir_DM
 						const int LD_pool = max_size*GlobalC::ucell.nwmax;
-						
+
 						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
                         Gint_Tools::cal_psir_ylm(
 							na_grid, grid_index, delta_r,
-							block_index, block_size, 
+							block_index, block_size,
 							cal_flag,
                             psir_ylm.ptr_2D);
-						
+
 						//------------------------------------------------------------------
 						// extract the local potentials.
 						//------------------------------------------------------------------
@@ -224,14 +224,14 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
                                 na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
 
 		#ifdef _OPENMP
-						cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
+						cal_meshball_vlocal(na_grid, LD_pool, grid_index,
 							block_size, block_index, block_iw, cal_flag, at,
-							psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
+							psir_ylm.ptr_2D, psir_vlbr3.ptr_2D,
 							pvpR_reduced_thread);
 		#else
-						cal_meshball_vlocal(na_grid, LD_pool, grid_index, 
-							block_size, at, block_index, block_iw, cal_flag, at,
-							psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, 
+						cal_meshball_vlocal(na_grid, LD_pool, grid_index,
+							block_size, block_index, block_iw, cal_flag, at,
+							psir_ylm.ptr_2D, psir_vlbr3.ptr_2D,
 							this->pvpR_reduced[spin]);
 		#endif
 						free(vldr3);		vldr3=nullptr;

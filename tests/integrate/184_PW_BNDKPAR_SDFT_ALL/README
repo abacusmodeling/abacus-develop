@@ -1,0 +1,10 @@
+This test for:
+*SDFT
+*Si
+*kpoints 2*2*2
+*10 stochastic orbitals
+*mixing_type plain
+*mixing_beta 0.7
+*seed_sto > 0
+*bndpar  2
+*kpar    2

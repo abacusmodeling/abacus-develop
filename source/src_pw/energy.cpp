@@ -16,6 +16,7 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
+#include "../module_surchem/efield.h"    // liuyu add 2022-05-06
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif
@@ -41,8 +42,6 @@ energy::~energy()
 {
 }
 
-#include "efield.h"
-
 void energy::calculate_harris(const int &flag)
 {
 //	ModuleBase::TITLE("energy","calculate_harris");
@@ -60,7 +59,8 @@ void energy::calculate_harris(const int &flag)
 		+ demet
 		+ exx
 		+ Efield::etotefield
-		+ evdw;							// Peize Lin add evdw 2021.03.09
+		+ evdw;  						// Peize Lin add evdw 2021.03.09
+
 #ifdef __LCAO
         if(INPUT.dft_plus_u) 
 		{
@@ -93,20 +93,21 @@ void energy::calculate_etot(void)
 	+ evdw;							// Peize Lin add evdw 2021.03.09
 
     //Quxin adds for DFT+U energy correction on 20201029
-/*
-	std::cout << std::resetiosflags(ios::scientific) << std::endl;
-	std::cout << std::setprecision(16) << std::endl;
-	std::cout << " eband=" << eband << std::endl;
-	std::cout << " deband=" << deband << std::endl;
-	std::cout << " etxc-etxcc=" << H_XC_pw::etxc-etxcc << std::endl;
-	std::cout << " ewld=" << H_Ewald_pw::ewald_energy << std::endl;
-	std::cout << " ehart=" << H_Hartree_pw::hartree_energy << std::endl;
-	std::cout << " demet=" << demet << std::endl;
-	std::cout << " descf=" << descf << std::endl;
-	std::cout << " exx=" << exx << std::endl;
-	std::cout << " efiled=" << Efield::etotefield << std::endl;
-	std::cout << " total= "<<etot<<std::endl;
-	std::cout << " fermienergy= "<<ef<<std::endl;*/
+
+	// std::cout << std::resetiosflags(ios::scientific) << std::endl;
+	// std::cout << std::setprecision(16) << std::endl;
+	// std::cout << " eband=" << eband << std::endl;
+	// std::cout << " deband=" << deband << std::endl;
+	// std::cout << " etxc-etxcc=" <<etxc-etxcc << std::endl;
+	// std::cout << " ewld=" << H_Ewald_pw::ewald_energy << std::endl;
+	// std::cout << " ehart=" << H_Hartree_pw::hartree_energy << std::endl;
+	// std::cout << " demet=" << demet << std::endl;
+	// std::cout << " descf=" << descf << std::endl;
+	// std::cout << " exx=" << exx << std::endl;
+	// std::cout << " efiled=" << Efield::etotefield << std::endl;
+	// std::cout << " total= "<<etot<<std::endl;
+	// std::cout << " fermienergy= "<<ef<<std::endl;
+
 #ifdef __LCAO
     if(INPUT.dft_plus_u) 
 	{
@@ -223,6 +224,10 @@ void energy::print_etot(
     else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
         label = "GV";
+	}
+	else if(GlobalV::KS_SOLVER=="cusolver")
+	{
+        label = "CU";
 	}
 	else
 	{
