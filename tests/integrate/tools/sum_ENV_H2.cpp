@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 	ne = sum * a0 * a0 * a0 / nr;
 	//std::cout<<nx<<"--"<<ny<<"--"<<nz<<std::endl;
 	//std::cout<<" sum = "<<sum<< " ne = "<<ne<<std::endl;
-	std::cout<<"nelec "<<ne<<std::endl;
+	std::cout<<ne<<std::endl;
 
 	
 	return 1;

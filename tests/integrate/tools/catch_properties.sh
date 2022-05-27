@@ -108,6 +108,17 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 	echo "totalSmatrix $total_s" >>$1
 fi
 
+if [ $calculation == "ienvelope" ]; then
+	nfile=0
+	envfiles=`ls OUT.autotest/ | grep ENV`
+	for env in $envfiles; 
+	do
+		nelec=`../tools/sum_ENV_H2 OUT.autotest/$env`
+		nfile=$(($nfile+1))
+		echo "nelec$nfile $nelec" >>$1	
+	done
+fi
+
 #echo $total_band
 ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1
@@ -124,15 +135,4 @@ if ! test -z "$deepks_bandgap" && [ $deepks_bandgap -eq 1 ]; then
 	echo "odelta $odelta" >>$1
 	oprec=`python get_oprec.py`
 	echo "oprec $oprec" >> $1
-fi
-
-if [ $calculation == "ienvelope" ]; then
-	../tools/sum_ENV_H2 OUT.autotest/BAND1_k_1_s_1_ENV >> $1
-	../tools/sum_ENV_H2 OUT.autotest/BAND1_k_2_s_1_ENV >> $1
-	../tools/sum_ENV_H2 OUT.autotest/BAND2_k_1_s_1_ENV >> $1
-	../tools/sum_ENV_H2 OUT.autotest/BAND2_k_2_s_1_ENV >> $1
-	../tools/sum_ENV_H2 OUT.autotest/BAND3_k_1_s_1_ENV >> $1
-	../tools/sum_ENV_H2 OUT.autotest/BAND3_k_2_s_1_ENV >> $1
-	../tools/sum_ENV_H2 OUT.autotest/BAND4_k_1_s_1_ENV >> $1
-	../tools/sum_ENV_H2 OUT.autotest/BAND4_k_2_s_1_ENV >> $1
 fi

@@ -9,7 +9,9 @@ threshold=0.0000001
 # check accuracy
 ca=8
 # regex of case name
-case="^[^#].*_.*$"
+#case="^[^#].*_.*$"
+case="^[^#].*_ienvelope$"
+#case="^[^#].*_PW_LT_sc$"
 # enable AddressSanitizer
 sanitize=false
 

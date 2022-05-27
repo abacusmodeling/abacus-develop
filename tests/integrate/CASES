@@ -130,6 +130,7 @@
 308_NO_GO_CS_CR
 311_NO_GO_elec_minus
 311_NO_GO_S2_elec_minus
+312_NO_GO_wfc_ienvelope
 320_NO_GO_MD_FIRE
 320_NO_GO_MD_NVE
 320_NO_GO_MD_NVT
