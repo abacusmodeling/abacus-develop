@@ -71,7 +71,7 @@ if(CMAKE_CUDA_COMPILER)
     endif()
   else()
     if(NOT USE_CUDA AND NOT USE_CUSOLVER_LCAO)
-      message(WARNING "CUDA components detected, but both USE_CUDA and USE_CUSOLVER_LCAO set to OFF. NOT building CUDA version of ABACUS.")
+      message(STATUS "CUDA components detected, but both USE_CUDA and USE_CUSOLVER_LCAO set to OFF. NOT building CUDA version of ABACUS.")
     elseif (USE_CUDA AND USE_CUSOLVER_LCAO)
       message(FATAL_ERROR "USE_CUDA and USE_CUSOLVER_LCAO set, but now they not allowed to coexist.")
     endif()
@@ -271,7 +271,10 @@ IF (BUILD_TESTING)
     add_executable(${UT_TARGET} ${UT_SOURCES})
     #dependencies & link library
     target_link_libraries(${UT_TARGET} ${UT_LIBS}
-      OpenMP::OpenMP_CXX Threads::Threads GTest::gtest_main GTest::gmock_main)
+      Threads::Threads GTest::gtest_main GTest::gmock_main)
+    if(USE_OPENMP)
+      target_link_libraries(${UT_TARGET} OpenMP::OpenMP_CXX)
+    endif()
     install(TARGETS ${UT_TARGET} DESTINATION ${CMAKE_BINARY_DIR}/tests )
     add_test(NAME ${UT_TARGET}
       COMMAND ${UT_TARGET}
