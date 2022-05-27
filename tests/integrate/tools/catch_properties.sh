@@ -46,7 +46,7 @@ test -e $1 && rm $1
 #--------------------------------------------
 # if NOT non-self-consistent calculations
 #--------------------------------------------
-if [ $calculation != "nscf" ]; then
+if [ $calculation != "nscf" ] && [ $calculation != "ienvelope" ]; then
 	etot=`grep ETOT_ $running_path | awk '{print $2}'`
 	etotperatom=`awk 'BEGIN {x='$etot';y='$natom';printf "%.10f\n",x/y}'`
 	echo "etotref $etot" >>$1
@@ -108,6 +108,17 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 	echo "totalSmatrix $total_s" >>$1
 fi
 
+if [ $calculation == "ienvelope" ]; then
+	nfile=0
+	envfiles=`ls OUT.autotest/ | grep ENV`
+	for env in $envfiles; 
+	do
+		nelec=`../tools/sum_ENV_H2 OUT.autotest/$env`
+		nfile=$(($nfile+1))
+		echo "nelec$nfile $nelec" >>$1	
+	done
+fi
+
 #echo $total_band
 ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1
@@ -125,4 +136,3 @@ if ! test -z "$deepks_bandgap" && [ $deepks_bandgap -eq 1 ]; then
 	oprec=`python get_oprec.py`
 	echo "oprec $oprec" >> $1
 fi
-
