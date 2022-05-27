@@ -37,6 +37,10 @@ class Band:
         if self.kptfile:
             self.kpt = read_kpt(kptfile)
         self.k_index = list(map(int, self.k_index))
+        if self.kpt:
+            self._kzip = self.kpt.label_special_k
+        else:
+            self._kzip = self.k_index
 
     @classmethod
     def read(cls, filename: PathLike):
@@ -168,14 +172,14 @@ class Band:
                   ax: axes.Axes,
                   x: Sequence,
                   y: Sequence,
-                  index: Sequence,
+                  kzip: Sequence,
                   efermi: float = 0,
                   energy_range: Sequence[float] = [],
                   **kwargs):
         """Plot band structure
 
         :params x, y: x-axis and y-axis coordinates
-        :params index: special k-points label and its index in data file
+        :params kzip: special k-points label and its k-index in data file
         :params efermi: Fermi level in unit eV
         :params energy_range: range of energy to plot, its length equals to two
         """
@@ -189,7 +193,7 @@ class Band:
 
         bandplot.ax.plot(kpoints, energy, lw=bandplot._lw, color=bandplot._color,
                          label=bandplot._label, linestyle=bandplot._linestyle)
-        bandplot._set_figure(index, energy_range)
+        bandplot._set_figure(kzip, energy_range)
 
     def plot(self,
              fig: Figure,
@@ -231,11 +235,7 @@ class Band:
             bandplot.ax.plot(self.k_index, band,
                              lw=bandplot._lw, color=bandplot._color, label=bandplot._label, linestyle=bandplot._linestyle)
 
-        if self.kpt:
-            index = self.kpt.label_special_k
-        else:
-            index = self.k_index
-        bandplot._set_figure(index, energy_range)
+        bandplot._set_figure(self._kzip, energy_range)
 
         return bandplot
 
@@ -253,16 +253,16 @@ class BandPlot:
         self._linestyle = kwargs.pop('linestyle', 'solid')
         self.plot_params = kwargs
 
-    def _set_figure(self, index, range: Sequence):
+    def _set_figure(self, kzip, range: Sequence):
         """set figure and axes for plotting
 
-        :params index: dict of label of points of x-axis and its index in data file. Range of x-axis based on index.value()
+        :params kzip: dict of label of points of x-axis and its index in data file. Range of x-axis based on kzip.value()
         :params range: range of y-axis
         """
 
         keys = []
         values = []
-        for t in index:
+        for t in kzip:
             if isinstance(t, tuple):
                 keys.append(t[0])
                 values.append(t[1])
@@ -355,6 +355,10 @@ class PBand(Band):
         if self.kptfile:
             self.kpt = read_kpt(kptfile)
         self.k_index = list(map(int, self.k_index))
+        if self.kpt:
+            self._kzip = self.kpt.label_special_k
+        else:
+            self._kzip = self.k_index
 
     def _check_energy(self, energy):
         assert energy.shape[0] == self.nkpoints, "The dimension of band structure dismatches with the number of k-points."
@@ -421,7 +425,7 @@ class PBand(Band):
 
         return nspin, norbitals, eunit, nbands, nkpoints, k_index, energy, orbitals
 
-    def _write(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], keyname='', file_dir:PathLike=''):
+    def _write(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], keyname='', file_dir: PathLike = ''):
         """Write parsed projected bands data to files
 
         Args:
@@ -581,10 +585,11 @@ class PBand(Band):
             BandPlot object: for manually plotting picture with bandplot.ax 
         """
 
-        def _seg_plot(bandplot, lc, index, file_dir, name):
+        def _seg_plot(bandplot, lc, file_dir, name):
             cbar = bandplot.fig.colorbar(lc, ax=bandplot.ax)
-            bandplot._set_figure(index, energy_range)
-            bandplot.fig.savefig(file_dir/f'{keyname}-{bandplot._label}.pdf', dpi=400)
+            bandplot._set_figure(self._kzip, energy_range)
+            bandplot.fig.savefig(
+                file_dir/f'{keyname}-{bandplot._label}.pdf', dpi=400)
             cbar.remove()
             plt.cla()
 
@@ -595,15 +600,10 @@ class PBand(Band):
         file_dir = Path(f"{outdir}", f"PBAND{out_index}_FIG")
         file_dir.mkdir(exist_ok=True)
 
-        if self.kpt:
-            index = self.kpt.label_special_k
-        else:
-            index = self.k_index
-
         if not species:
             bandplot = BandPlot(fig, ax, **kwargs)
             bandplot = super().plot(fig, ax, efermi, energy_range, shift, **kwargs)
-            bandplot._set_figure(index, energy_range)
+            bandplot._set_figure(self._kzip, energy_range)
 
             return bandplot
 
@@ -613,15 +613,19 @@ class PBand(Band):
                 bandplot = BandPlot(fig, ax, **kwargs)
                 bandplot._label = elem
                 for ib in range(self.nbands):
-                    points = np.array((self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
-                    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-                    norm = Normalize(vmin=wei[elem][0:, ib].min(), vmax=wei[elem][0:, ib].max())
-                    lc = LineCollection(segments, cmap=plt.get_cmap(cmap), norm=norm)
+                    points = np.array(
+                        (self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
+                    segments = np.concatenate(
+                        [points[:-1], points[1:]], axis=1)
+                    norm = Normalize(
+                        vmin=wei[elem][0:, ib].min(), vmax=wei[elem][0:, ib].max())
+                    lc = LineCollection(
+                        segments, cmap=plt.get_cmap(cmap), norm=norm)
                     lc.set_array(wei[elem][0:, ib])
                     lc.set_label(bandplot._label)
                     bandplot.ax.add_collection(lc)
-                
-                _seg_plot(bandplot, lc, index, file_dir, name=f'{elem}')
+
+                _seg_plot(bandplot, lc, file_dir, name=f'{elem}')
                 bandplots.append(bandplot)
             return bandplots
 
@@ -638,30 +642,40 @@ class PBand(Band):
                             m_index = int(mag)
                             bandplot._label = f"{elem}-{get_angular_momentum_name(l_index, m_index)}"
                             for ib in range(self.nbands):
-                                points = np.array((self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
-                                segments = np.concatenate([points[:-1], points[1:]], axis=1)
-                                norm = Normalize(vmin=wei[elem][ang][mag][0:, ib].min(), vmax=wei[elem][ang][mag][0:, ib].max())
-                                lc = LineCollection(segments, cmap=plt.get_cmap(cmap), norm=norm)
+                                points = np.array(
+                                    (self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
+                                segments = np.concatenate(
+                                    [points[:-1], points[1:]], axis=1)
+                                norm = Normalize(vmin=wei[elem][ang][mag][0:, ib].min(
+                                ), vmax=wei[elem][ang][mag][0:, ib].max())
+                                lc = LineCollection(
+                                    segments, cmap=plt.get_cmap(cmap), norm=norm)
                                 lc.set_array(wei[elem][ang][mag][0:, ib])
                                 lc.set_label(bandplot._label)
                                 bandplot.ax.add_collection(lc)
-                
-                            _seg_plot(bandplot, lc, index, elem_file_dir, name=f'{elem}_{ang}_{mag}')
+
+                            _seg_plot(bandplot, lc, elem_file_dir,
+                                      name=f'{elem}_{ang}_{mag}')
                             bandplots.append(bandplot)
 
                     else:
                         bandplot = BandPlot(fig, ax, **kwargs)
                         bandplot._label = f"{elem}-{get_angular_momentum_label(l_index)}"
                         for ib in range(self.nbands):
-                            points = np.array((self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
-                            segments = np.concatenate([points[:-1], points[1:]], axis=1)
-                            norm = Normalize(vmin=wei[elem][ang][0:, ib].min(), vmax=wei[elem][ang][0:, ib].max())
-                            lc = LineCollection(segments, cmap=plt.get_cmap(cmap), norm=norm)
+                            points = np.array(
+                                (self.k_index, energy[0:, ib])).T.reshape(-1, 1, 2)
+                            segments = np.concatenate(
+                                [points[:-1], points[1:]], axis=1)
+                            norm = Normalize(vmin=wei[elem][ang][0:, ib].min(
+                            ), vmax=wei[elem][ang][0:, ib].max())
+                            lc = LineCollection(
+                                segments, cmap=plt.get_cmap(cmap), norm=norm)
                             lc.set_array(wei[elem][ang][0:, ib])
                             lc.set_label(bandplot._label)
                             bandplot.ax.add_collection(lc)
-                
-                        _seg_plot(bandplot, lc, index, elem_file_dir, name=f'{elem}_{ang}')
+
+                        _seg_plot(bandplot, lc, elem_file_dir,
+                                  name=f'{elem}_{ang}')
                         bandplots.append(bandplot)
 
             return bandplots
@@ -742,22 +756,19 @@ class PBand(Band):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from pathlib import Path
-    parent = Path(r"C:\Users\YY.Ji\Desktop")
+    parent = Path(r"../examples/Si")
     name = "PBANDS_1"
     path = parent/name
-    # notes = {'s': '(b)'}
-    # datafile = [path/"soc.dat", path/"non-soc.dat"]
-    # kptfile = path/"KPT"
     fig, ax = plt.subplots(figsize=(12, 6))
-    # label = ["with SOC", "without SOC"]
-    # color = ["r", "g"]
-    # linestyle = ["solid", "dashed"]
-    energy_range = [-5, 6]
-    efermi = 4.417301755850272
+    energy_range = [-5, 7]
+    efermi = 6.585653952007503
     shift = False
     #species = {"Ag": [2], "Cl": [1], "In": [0]}
-    atom_index = {8: {2: [1, 2]}, 4: {2: [1, 2]}, 10: [1, 2]}
+    atom_index = {1: {1: [0, 1]}}
     pband = PBand(str(path))
+
+    # if you want to specify `species` or `index`, you need to
+    # set `species=species` or `index=index` in the following two functions
     pband.plot(fig, ax, atom_index=atom_index, efermi=efermi,
                energy_range=energy_range, shift=shift)
     pband.write(atom_index=atom_index)
