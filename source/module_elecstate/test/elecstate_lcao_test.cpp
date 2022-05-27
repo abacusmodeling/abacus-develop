@@ -22,9 +22,6 @@
 #include "src_pw/wavefunc.h"
 #include "src_pw/VNL_in_pw.h"
 #include "src_pw/energy.h"
-#include "module_xc/xc_functional.h"
-#include "module_xc/exx_global.h"
-#include "src_ri/exx_lcao.h"
 #include "module_neighbor/sltk_atom_arrange.h"
 Magnetism::Magnetism(){}
 Magnetism::~Magnetism(){}
@@ -44,12 +41,6 @@ Gint_k::Gint_k(){}
 Gint_k::~Gint_k(){}
 Gint_k_init::Gint_k_init(){}
 Gint_k_init::~Gint_k_init(){} 
-XC_Functional::XC_Functional(){}
-XC_Functional::~XC_Functional(){}
-int XC_Functional::get_func_type(){return 0;}
-Exx_Lcao::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
-    :hybrid_type(info_global.hybrid_type),hse_omega(info_global.hse_omega){}
-Exx_Lcao::Exx_Lcao(const Exx_Global::Exx_Info &info_global ):info(info_global){}
 wavefunc::wavefunc(){}
 wavefunc::~wavefunc(){}
 WF_atomic::WF_atomic(){}
@@ -72,9 +63,25 @@ namespace GlobalC
     wavefunc wf;
     Charge CHR;
     Grid_Driver GridD(GlobalV::test_deconstructor, GlobalV::test_grid_driver,GlobalV::test_grid);
+}
+
+#include "module_xc/xc_functional.h"
+#include "module_xc/exx_global.h"
+XC_Functional::XC_Functional(){}
+XC_Functional::~XC_Functional(){}
+int XC_Functional::get_func_type(){return 0;}
+
+#ifdef __MPI
+#include "src_ri/exx_lcao.h"
+Exx_Lcao::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
+    :hybrid_type(info_global.hybrid_type),hse_omega(info_global.hse_omega){}
+Exx_Lcao::Exx_Lcao(const Exx_Global::Exx_Info &info_global ):info(info_global){}
+namespace GlobalC
+{
     Exx_Global exx_global;
     Exx_Lcao exx_lcao(GlobalC::exx_global.info); 
 }
+#endif
 
 namespace WF_Local
 {
@@ -130,11 +137,13 @@ void set_pw()
 
 void init()
 {
+#ifdef __MPI
     MPI_Comm_size(MPI_COMM_WORLD,&GlobalV::NPROC);
 	MPI_Comm_rank(MPI_COMM_WORLD,&GlobalV::MY_RANK); 
     Parallel_Global::split_diag_world(GlobalV::NPROC);
     Parallel_Global::split_grid_world(GlobalV::NPROC);
     MPI_Comm_split(MPI_COMM_WORLD,0,1,&POOL_WORLD); //in LCAO kpar=1
+#endif
 
     GlobalV::BASIS_TYPE = "lcao";
     GlobalV::stru_file = "./support/si2.STRU";
@@ -170,13 +179,14 @@ namespace elecstate
     {
         public:
         MockElecStateLCAO(Charge* chg_in,
+                      const K_Vectors* klist_in,
                       int nks_in,
                       int nbands_in,
                       Local_Orbital_Charge* loc_in,
                       LCAO_Hamilt* uhm_in,
                       Local_Orbital_wfc* lowf_in,
                       ModuleBase::matrix &wg_in)
-                      :elecstate::ElecStateLCAO(chg_in,nks_in,nbands_in,loc_in,uhm_in,lowf_in)
+                      :elecstate::ElecStateLCAO(chg_in,klist_in,nks_in,nbands_in,loc_in,uhm_in,lowf_in)
                       {
                           this->wg = wg_in;
                       }               
@@ -188,6 +198,7 @@ namespace elecstate
     } 
 
     void ElecState::calculate_weights(void) {}
+    void ElecState::calEBand() {}
 }
 
 template<class T>
@@ -359,14 +370,15 @@ class ElecStateLCAOPrepare
 
     void gather_rho(Charge* charge)
     {
+        this->rho_cal = new double* [GlobalV::NSPIN];
+        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_cal[is] = new double[GlobalC::pw.ncxyz];
+
+#ifdef __MPI
         MPI_Status ierror;
         int ncx = GlobalC::pw.ncx;
         int ncy = GlobalC::pw.ncy;
         int ncz = GlobalC::pw.ncz;
         int nczp = GlobalC::pw.nczp;
-
-        this->rho_cal = new double* [GlobalV::NSPIN];
-        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_cal[is] = new double[GlobalC::pw.ncxyz];
 
         int* nz = new int[GlobalV::NPROC];
         for(int i=0;i<GlobalV::NPROC;i++)
@@ -402,6 +414,13 @@ class ElecStateLCAOPrepare
             }
         }
         delete [] nz;
+#else
+        for(int is = 0; is < GlobalV::NSPIN; is++)
+        {
+            for(int i=0;i<GlobalC::pw.ncxyz;i++)
+                rho_cal[is][i] = charge->rho[is][i];            
+        }
+#endif
     }
 
     void out_rho(Charge* charge)
@@ -434,9 +453,11 @@ class ElecStateLCAOPrepare
         orb_con.setup_2d_division(GlobalV::ofs_running, GlobalV::ofs_warning);
 
         loc.ParaV = lowf.ParaV = &(orb_con.ParaV);
-        
+#ifdef __MPI        
         this->distribute_psi_2d(this->psi,this->psi_local,loc.ParaV->desc_wfc);
-
+#else
+        this->psi_local = this->psi;
+#endif        
         GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
             GlobalV::ofs_running,
             GlobalV::OUT_LEVEL,
@@ -464,15 +485,15 @@ class ElecStateLCAOPrepare
 
         loc.allocate_dm_wfc(GlobalC::GridT.lgd, lowf);
 
-        elecstate::MockElecStateLCAO mesl(&GlobalC::CHR,nk,nbands,&loc,&uhm,&lowf,this->wg);
+        elecstate::MockElecStateLCAO mesl(&GlobalC::CHR,&GlobalC::kv,nk,nbands,&loc,&uhm,&lowf,this->wg);
 
         mesl.psiToRho(psi_local);  
     }
 
     void compare()
     {
-        //this->out_rho(&GlobalC::CHR);
-        this->gather_rho(&GlobalC::CHR);
+        //this->out_rho(&GlobalC::CHR);       
+        this->gather_rho(&GlobalC::CHR);          
         this->read_ref_rho();
         if(GlobalV::MY_RANK == 0)
         {
