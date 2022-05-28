@@ -53,7 +53,6 @@ target_link_libraries(${ABACUS_BIN_NAME} Threads::Threads)
 if(USE_OPENMP)
   find_package(OpenMP REQUIRED)
   target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
-  add_compile_options(${OpenMP_CXX_FLAGS})
 endif()
 
 include(CheckLanguage)
