@@ -10,8 +10,8 @@ namespace ModulePW
 /// 
 void PW_Basis::distribute_r()
 {
-    this->numz = new int[this->poolnproc];
-    this->startz = new int[this->poolnproc];
+    delete[] this->numz; this->numz = new int[this->poolnproc];
+    delete[] this->startz; this->startz = new int[this->poolnproc];
     ModuleBase::GlobalFunc::ZEROS(this->numz, this->poolnproc);
     ModuleBase::GlobalFunc::ZEROS(this->startz, this->poolnproc);
 

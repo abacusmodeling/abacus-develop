@@ -29,10 +29,16 @@ TEST_F(PWTEST,test1_2)
     gamma_only = false;
     int distribution_type = 1;
     //--------------------------------------------------
+
+    //Useless, only to test reinit function.
+    pwtest.initgrids(2, latvec, 50 ,nproc_in_pool, rank_in_pool);
+    pwtest.initparameters(true, 46, 2);
+    pwtest.setuptransform();
+    pwtest.collect_local_pw();
+    pwtest.collect_uniqgg();
     
-    //init
+    //init //Real parameters
     pwtest.initgrids(lat0,latvec,wfcecut, nproc_in_pool, rank_in_pool);
-    //pwtest.initgrids(lat0,latvec,5,7,7);
     pwtest.initparameters(gamma_only,wfcecut,distribution_type);
     pwtest.setuptransform();
     pwtest.collect_local_pw();

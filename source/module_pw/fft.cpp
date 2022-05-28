@@ -22,13 +22,17 @@ FFT::FFT()
 
 FFT::~FFT()
 {
+	this->clear();
+}
+void FFT::clear()
+{
 	this->cleanFFT();
-	if(aux1!=NULL) fftw_free(aux1);
-	if(aux2!=NULL) fftw_free(aux2);
+	if(aux1!=NULL) {fftw_free(aux1); aux1 = NULL;}
+	if(aux2!=NULL) {fftw_free(aux2); aux2 = NULL;}
 #ifdef __MIX_PRECISION
 	this->cleanfFFT();
-	if(auxf1!=NULL) fftw_free(auxf1);
-	if(auxf2!=NULL) fftw_free(auxf2);
+	if(auxf1!=NULL) {fftw_free(auxf1); auxf1 = NULL;}
+	if(auxf2!=NULL) {fftw_free(auxf2); auxf2 = NULL;}
 #endif
 }
 

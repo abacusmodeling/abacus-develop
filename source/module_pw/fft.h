@@ -27,6 +27,7 @@ public:
 
 	FFT();
 	~FFT();
+	void clear(); //reset fft
 	
 	// init parameters of fft
 	void initfft(int nx_in, int bigny_in, int nz_in, int liy_in, int riy_in, int ns_in, int nplane_in, 

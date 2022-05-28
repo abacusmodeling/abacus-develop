@@ -6,17 +6,17 @@ namespace ModulePW
 PW_Basis_K::PW_Basis_K()
 {
     nks = 1;
-    kvec_d = NULL;
-    kvec_c = NULL;
-    npwk = NULL;
-    igl2isz_k = NULL;
+    kvec_d = new ModuleBase::Vector3<double>[1];
+    kvec_c = new ModuleBase::Vector3<double>[1];
+    npwk = new int [1];
+    igl2isz_k = new int [1];
 }
 PW_Basis_K::~PW_Basis_K()
 {
-    if(kvec_d != NULL) delete[] kvec_d;
-    if(kvec_c != NULL) delete[] kvec_c;
-    if(npwk != NULL) delete[] npwk;
-    if(igl2isz_k != NULL) delete[] igl2isz_k;
+    delete[] kvec_d;
+    delete[] kvec_c;
+    delete[] npwk;
+    delete[] igl2isz_k;
 }
 
 void PW_Basis_K:: initparameters(
@@ -28,8 +28,8 @@ void PW_Basis_K:: initparameters(
 )
 {
     this->nks = nks_in;
-    this->kvec_d = new ModuleBase::Vector3<double> [nks];
-    this->kvec_c = new ModuleBase::Vector3<double> [nks];
+    delete[] this->kvec_d; this->kvec_d = new ModuleBase::Vector3<double> [nks];
+    delete[] this->kvec_c; this->kvec_c = new ModuleBase::Vector3<double> [nks];
 
     double kmaxmod = 0;
     for(int ik = 0 ; ik < this->nks ; ++ik)
@@ -59,7 +59,7 @@ void PW_Basis_K::setupIndGk()
 {
     //count npwk
     this->npwk_max = 0;
-    this->npwk = new int [this->nks];
+    delete[] this->npwk; this->npwk = new int [this->nks];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int ng = 0;
@@ -79,7 +79,7 @@ void PW_Basis_K::setupIndGk()
     }
 
     //get igl2isz_k
-    this->igl2isz_k = new int [this->nks * this->npwk_max];
+    delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int igl = 0;
@@ -111,6 +111,7 @@ void PW_Basis_K::setuptransform()
     this->distribute_g();
     this->getstartgr();
     this->setupIndGk();
+    this->ft.clear();
     this->ft.initfft(this->nx,this->bigny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
 }

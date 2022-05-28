@@ -111,16 +111,16 @@ void PW_Basis::get_ig2isz_is2ixy(
 {
     if (this->npw == 0)
     {
-        this->ig2isz = new int[1]; // map ig to the z coordinate of this planewave.
+        delete[] this->ig2isz; this->ig2isz = new int[1]; // map ig to the z coordinate of this planewave.
         this->ig2isz[0] = 0;
-        this->is2ixy = new int[1]; // map is (index of sticks) to ixy (iy + ix * ny).
+        delete[] this->is2ixy; this->is2ixy = new int[1]; // map is (index of sticks) to ixy (iy + ix * ny).
         this->is2ixy[0] = -1;
         return;
     }
 
-    this->ig2isz = new int[this->npw]; // map ig to the z coordinate of this planewave.
+    delete[] this->ig2isz; this->ig2isz = new int[this->npw]; // map ig to the z coordinate of this planewave.
     ModuleBase::GlobalFunc::ZEROS(this->ig2isz, this->npw);
-    this->is2ixy = new int[this->nst]; // map is (index of sticks) to ixy (iy + ix * ny).
+    delete[] this->is2ixy; this->is2ixy = new int[this->nst]; // map is (index of sticks) to ixy (iy + ix * ny).
     for (int is = 0; is < this->nst; ++is) 
     {
         this->is2ixy[is] = -1;
