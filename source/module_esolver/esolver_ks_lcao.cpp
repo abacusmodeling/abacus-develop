@@ -39,6 +39,7 @@ namespace ModuleESolver
 
     void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     {
+        ESolver_FP::Init(inp,ucell);
         // setup GlobalV::NBANDS
         // Yu Liu add 2021-07-03
         GlobalC::CHR.cal_nelec();
@@ -88,10 +89,10 @@ namespace ModuleESolver
         GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
             GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
         // Calculate Structure factor
-        GlobalC::pw.setup_structure_factor();
+        GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
 
         // Inititlize the charge density.
-        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::rhopw->npw);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
 
         // Initializee the potential.
@@ -135,7 +136,7 @@ namespace ModuleESolver
         // output is GlobalC::ppcell.vloc 3D local pseudopotentials
         // without structure factors
         // this function belongs to cell LOOP
-        GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
+        GlobalC::ppcell.init_vloc(GlobalC::ppcell.vloc, GlobalC::rhopw);
 
         // Initialize the sum of all local potentials.
         // if ion_step==0, read in/initialize the potentials

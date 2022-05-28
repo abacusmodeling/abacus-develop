@@ -199,15 +199,15 @@ void Charge::renormalize_rho(void)
 // rho_at (read from pseudopotential files)
 // allocate work space (psic must already be allocated)
 //-------------------------------------------------------
-void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Peize Lin refactor 2021.04.08
+void Charge::atomic_rho(const int spin_number_need, double** rho_in, ModulePW::PW_Basis* rho_basis)const		// Peize Lin refactor 2021.04.08
 {
     ModuleBase::TITLE("Charge","atomic_rho");
     ModuleBase::timer::tick("Charge","atomic_rho");
 
-	const ModuleBase::ComplexMatrix rho_g3d = [&]()->ModuleBase::ComplexMatrix
+	ModuleBase::ComplexMatrix rho_g3d = [&]()->ModuleBase::ComplexMatrix
 	{
 		// use interpolation to get three dimension charge density.
-		ModuleBase::ComplexMatrix rho_g3d( spin_number_need, GlobalC::pw.ngmc);
+		ModuleBase::ComplexMatrix rho_g3d( spin_number_need, rho_basis->npw);
 		
 		// check the start magnetization
 		const int startmag_type = [&]()->int
@@ -229,7 +229,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				const std::vector<double> rho_lgl = [&]()->std::vector<double>
 				{
 					// one dimension of charge in G space.
-					std::vector<double> rho_lgl(GlobalC::pw.nggm,0);
+					std::vector<double> rho_lgl(rho_basis->ngg,0);
 
 					// mesh point of this element.
 					const int mesh = atom->msh;
@@ -274,7 +274,8 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					//----------------------------------------------------------
 					// Here we compute the G=0 term
 					//----------------------------------------------------------
-					if (GlobalC::pw.gstart == 1)
+					int gstart = 0;
+					if(rho_basis->gg_uniq[0] < 1e-8)
 					{
 						for (int ir = 0;ir < mesh;ir++)
 						{
@@ -282,6 +283,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 							rho1d[ir] = rhoatm[ir];
 						}
 						ModuleBase::Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[0]);
+						gstart = 1;
 					}
 					if (GlobalV::test_charge>0) std::cout<<"\n |G|=0 term done." <<std::endl;
 					//----------------------------------------------------------
@@ -290,9 +292,9 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					// G=0 term only belong to 1 cpu.
 					// Other processors start from '0'
 					//----------------------------------------------------------
-					for (int ig = GlobalC::pw.gstart; ig < GlobalC::pw.nggm ;ig++)
+					for (int igg = gstart; igg < rho_basis->ngg ;++igg)
 					{
-						const double gx = sqrt(GlobalC::pw.ggs [ig]) * GlobalC::ucell.tpiba;
+						const double gx = sqrt(rho_basis->gg_uniq[igg]) * GlobalC::ucell.tpiba;
 						for (int ir = 0; ir < mesh;ir++)
 						{
 							if ( atom->r[ir] < 1.0e-8 )
@@ -307,7 +309,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 								rho1d[ir] = rhoatm[ir] * sin(gxx) / gxx;
 							}
 						}
-						ModuleBase::Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[ig]);
+						ModuleBase::Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[igg]);
 					}
 					
 					if (GlobalV::test_charge>0) std::cout<<" |G|>0 term done." <<std::endl;
@@ -315,8 +317,8 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					// EXPLAIN : Complete the transfer of rho from real space to
 					// reciprocal space
 					//----------------------------------------------------------
-					for (int ig=0; ig< GlobalC::pw.nggm ; ig++)
-						rho_lgl[ig] /= GlobalC::ucell.omega;
+					for (int igg=0; igg< rho_basis->ngg ; igg++)
+						rho_lgl[igg] /= GlobalC::ucell.omega;
 					return rho_lgl;
 				}();
 				//----------------------------------------------------------
@@ -324,9 +326,9 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				//----------------------------------------------------------
 				if(spin_number_need==1)
 				{
-					for (int ig=0; ig< GlobalC::pw.ngmc ;ig++)
+					for (int ig=0; ig< rho_basis->npw ;ig++)
 					{
-						rho_g3d(0, ig) += GlobalC::pw.strucFac(it, ig) * rho_lgl[ GlobalC::pw.ig2ngg[ig] ];
+						rho_g3d(0, ig) += GlobalC::pw.strucFac(it, ig) * rho_lgl[ rho_basis->ig2igg[ig] ];
 					}
 				}
 				// mohan add 2011-06-14, initialize the charge density according to each atom 
@@ -334,9 +336,9 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				{
 					if(startmag_type==1)
 					{
-						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
+						for (int ig = 0; ig < rho_basis->npw ; ig++)
 						{
-							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
+							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[rho_basis->ig2igg[ig]];
 							//rho_g3d(0, ig) += swap * GlobalC::ucell.magnet.nelup_percent(it);
 							//rho_g3d(1, ig) += swap * GlobalC::ucell.magnet.neldw_percent(it);
 							const double up = 0.5 * ( 1 + GlobalC::ucell.magnet.start_magnetization[it] / atom->zv );
@@ -358,14 +360,14 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 							const double dw = 0.5 * ( 1 - atom->mag[ia] / atom->zv );
 							//std::cout << " atom " << ia << " up=" << up << " dw=" << dw << std::endl;
 
-							for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
+							for (int ig = 0; ig < rho_basis->npw ; ig++)
 							{
 								const double Gtau =
-									GlobalC::pw.get_G_cartesian_projection(ig, 0) * atom->tau[ia].x + 
-									GlobalC::pw.get_G_cartesian_projection(ig, 1) * atom->tau[ia].y + 
-									GlobalC::pw.get_G_cartesian_projection(ig, 2) * atom->tau[ia].z;
+									rho_basis->gcar[ig][0] * atom->tau[ia].x + 
+									rho_basis->gcar[ig][1] * atom->tau[ia].y + 
+									rho_basis->gcar[ig][2] * atom->tau[ia].z;
 
-								swap = exp(ci_tpi * Gtau) * rho_lgl[GlobalC::pw.ig2ngg[ig]];
+								swap = exp(ci_tpi * Gtau) * rho_lgl[rho_basis->ig2igg[ig]];
 
 								rho_g3d(0, ig) += swap * up;
 								rho_g3d(1, ig) += swap * dw;
@@ -378,9 +380,9 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					//noncolinear case
 					if(startmag_type == 1)
 					{
-						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
+						for (int ig = 0; ig < rho_basis->npw ; ig++)
 						{
-							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
+							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[rho_basis->ig2igg[ig]];
 							rho_g3d(0, ig) += swap ;
 							if(GlobalV::DOMAG)
 							{
@@ -404,14 +406,14 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 						for(int ia = 0;ia<atom->na;ia++)
 						{
-							for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
+							for (int ig = 0; ig < rho_basis->npw ; ig++)
 							{
 								const double Gtau =
-									GlobalC::pw.get_G_cartesian_projection(ig, 0) * atom->tau[ia].x + 
-									GlobalC::pw.get_G_cartesian_projection(ig, 1) * atom->tau[ia].y + 
-									GlobalC::pw.get_G_cartesian_projection(ig, 2) * atom->tau[ia].z;
+									rho_basis->gcar[ig][0] * atom->tau[ia].x + 
+									rho_basis->gcar[ig][1] * atom->tau[ia].y + 
+									rho_basis->gcar[ig][2] * atom->tau[ia].z;
 
-								swap = exp(ci_tpi * Gtau) * rho_lgl[GlobalC::pw.ig2ngg[ig]];
+								swap = exp(ci_tpi * Gtau) * rho_lgl[rho_basis->ig2igg[ig]];
 
 								rho_g3d(0, ig) += swap;
 								if(GlobalV::DOMAG)
@@ -444,11 +446,11 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	std::vector<double> ne(spin_number_need);
     for (int is = 0; is < spin_number_need;is++)
     {
-        GlobalC::UFFT.ToRealSpace( is, rho_g3d, rho_in[is]);
+        GlobalC::UFFT.ToRealSpace( is, rho_g3d, rho_in[is], rho_basis);
 
-		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+		for(int ir=0; ir<rho_basis->nrxx; ++ir)
 			ne[is] += rho_in[is][ir];
-		ne[is] *= GlobalC::ucell.omega/(double)GlobalC::pw.ncxyz; 
+		ne[is] *= GlobalC::ucell.omega/(double)rho_basis->nxyz; 
 		Parallel_Reduce::reduce_double_pool( ne[is] );
 
         // we check that everything is correct
@@ -456,12 +458,12 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
         double rea = 0.0;
         double ima = 0.0;
 		double sumrea = 0.0;
-        for (int ir=0;ir < GlobalC::pw.nrxx; ir++)
+        for (int ir=0;ir < rho_basis->nrxx; ir++)
         {
-            rea = GlobalC::UFFT.porter[ir].real();
+            rea = rho_basis->ft.aux1[ir].real();
 			sumrea += rea;
             neg += std::min(0.0, rea);
-            ima += abs(GlobalC::UFFT.porter[ir].imag());
+            ima += abs(rho_basis->ft.aux1[ir].imag());
         }
 
 		Parallel_Reduce::reduce_double_pool( neg );	
@@ -469,9 +471,9 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 		Parallel_Reduce::reduce_double_pool( sumrea );	
 
 		// mohan fix bug 2011-04-03
-        neg = neg / (double)GlobalC::pw.ncxyz * GlobalC::ucell.omega;
-        ima = ima / (double)GlobalC::pw.ncxyz * GlobalC::ucell.omega;
-		sumrea = sumrea / (double)GlobalC::pw.ncxyz * GlobalC::ucell.omega;
+        neg = neg / (double)rho_basis->nxyz * GlobalC::ucell.omega;
+        ima = ima / (double)rho_basis->nxyz * GlobalC::ucell.omega;
+		sumrea = sumrea / (double)rho_basis->nxyz * GlobalC::ucell.omega;
 
         if( ((neg<-1.0e-4) && (is==0||GlobalV::NSPIN==2)) || ima>1.0e-4)
         {
@@ -505,7 +507,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"total electron number from rho",ne_tot);
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"should be",nelec);
 	for(int is=0; is<spin_number_need; ++is)
-		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+		for(int ir=0; ir<rho_basis->nrxx; ++ir)
 			rho_in[is][ir] = rho_in[is][ir] / ne_tot * nelec;
 
 	//wenfei 2021-7-29 : initial tau = 3/5 rho^2/3, Thomas-Fermi
@@ -516,7 +518,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 		int nspin = spin_number_need;
 		//ofstream test_tau0("tau0");
 		for(int is=0; is<spin_number_need; ++is)
-			for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+			for(int ir=0; ir<rho_basis->nrxx; ++ir)
 			{
 				kin_r[is][ir] = fact * pow(abs(rho_in[is][ir])*nspin,5.0/3.0)/nspin;
 				//test_tau0 << rho_in[is][ir] << " " << kin_r[is][ir] << endl;
@@ -570,16 +572,16 @@ void Charge::set_rho_core(
 
     if (!bl)
     {
-        ModuleBase::GlobalFunc::ZEROS( this->rho_core, GlobalC::pw.nrxx);
+        ModuleBase::GlobalFunc::ZEROS( this->rho_core, GlobalC::rhopw->nrxx);
     	ModuleBase::timer::tick("Charge","set_rho_core");
         return;
     }
 
-    double *rhocg = new double[GlobalC::pw.nggm];
-    ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::pw.nggm );
+    double *rhocg = new double[GlobalC::rhopw->ngg];
+    ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::rhopw->ngg );
 
 	// three dimension.
-    std::complex<double> *vg = new std::complex<double>[GlobalC::pw.ngmc];	
+    std::complex<double> *vg = new std::complex<double>[GlobalC::rhopw->npw];	
 
     for (int it = 0; it < GlobalC::ucell.ntype;it++)
     {
@@ -595,24 +597,25 @@ void Charge::set_rho_core(
                 GlobalC::ucell.atoms[it].r,
                 GlobalC::ucell.atoms[it].rab,
                 GlobalC::ucell.atoms[it].rho_atc,
-                rhocg);
+                rhocg,
+				GlobalC::rhopw);
 //----------------------------------------------------------
 // EXPLAIN : multiply by the structure factor and sum
 //----------------------------------------------------------
-            for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
+            for (int ig = 0; ig < GlobalC::rhopw->npw ; ig++)
             {
-                vg[ig] += structure_factor(it, ig) * rhocg[GlobalC::pw.ig2ngg[ig]];
+                vg[ig] += structure_factor(it, ig) * rhocg[GlobalC::rhopw->ig2igg[ig]];
             }
         }
     }
 
 	// for tmp use.
-	for(int ig=0; ig< GlobalC::pw.ngmc; ig++)
+	for(int ig=0; ig< GlobalC::rhopw->npw; ig++)
 	{
 		this->rhog_core[ig] = vg[ig];
 	}
 
-    GlobalC::UFFT.ToRealSpace(vg, this->rho_core);
+    GlobalC::UFFT.ToRealSpace(vg, this->rho_core,GlobalC::rhopw);
 
     // test on the charge and computation of the core energy
     double rhoima = 0.0;
@@ -659,7 +662,8 @@ void Charge::non_linear_core_correction
     const double *r,
     const double *rab,
     const double *rhoc,
-    double *rhocg)
+    double *rhocg,
+	ModulePW::PW_Basis* rho_basis)
 {
     ModuleBase::TITLE("charge","drhoc");
     double gx = 0.0;
@@ -673,7 +677,7 @@ void Charge::non_linear_core_correction
         // G=0 term
 
         int igl0 = 0;
-        if (GlobalC::pw.ggs [0] < 1.0e-8)
+        if (rho_basis->gg_uniq [0] < 1.0e-8)
         {
             for (int ir = 0;ir < mesh; ir++)
             {
@@ -686,9 +690,9 @@ void Charge::non_linear_core_correction
         }
 
         // G <> 0 term
-        for (int igl = igl0; igl < GlobalC::pw.nggm;igl++) 
+        for (int igl = igl0; igl < rho_basis->ngg;igl++) 
         {
-            gx = sqrt(GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2);
+            gx = sqrt(rho_basis->gg_uniq[igl] * GlobalC::ucell.tpiba2);
             ModuleBase::Sphbes::Spherical_Bessel(mesh, r, gx, 0, aux);
             for (int ir = 0;ir < mesh; ir++) 
             {
@@ -1162,28 +1166,28 @@ void Charge::init_final_scf()
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		rho[is] = new double[GlobalC::pw.nrxx];
-		rhog[is] = new std::complex<double>[GlobalC::pw.ngmc];
+		rhog[is] = new std::complex<double>[GlobalC::rhopw->npw];
 		rho_save[is] = new double[GlobalC::pw.nrxx];
-		rhog_save[is] = new std::complex<double>[GlobalC::pw.ngmc];			
+		rhog_save[is] = new std::complex<double>[GlobalC::rhopw->npw];			
 		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::pw.nrxx);
-		ModuleBase::GlobalFunc::ZEROS(rhog[is], GlobalC::pw.ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rhog[is], GlobalC::rhopw->npw);
 		ModuleBase::GlobalFunc::ZEROS(rho_save[is], GlobalC::pw.nrxx);
-		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], GlobalC::pw.ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], GlobalC::rhopw->npw);
 	}
 
     ModuleBase::Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
     ModuleBase::Memory::record("Charge","rho_save",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
-    ModuleBase::Memory::record("Charge","rhog",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
-    ModuleBase::Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rhog",GlobalV::NSPIN*GlobalC::rhopw->npw,"double");
+    ModuleBase::Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::rhopw->npw,"double");
 
     this->rho_core = new double[GlobalC::pw.nrxx]; // core charge in real space
     ModuleBase::GlobalFunc::ZEROS( rho_core, GlobalC::pw.nrxx);
 
-	this->rhog_core = new std::complex<double>[GlobalC::pw.ngmc]; // reciprocal core charge
-	ModuleBase::GlobalFunc::ZEROS( rhog_core, GlobalC::pw.ngmc);
+	this->rhog_core = new std::complex<double>[GlobalC::rhopw->npw]; // reciprocal core charge
+	ModuleBase::GlobalFunc::ZEROS( rhog_core, GlobalC::rhopw->npw);
 
     ModuleBase::Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
-    ModuleBase::Memory::record("Charge","rhog_core",GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rhog_core",GlobalC::rhopw->npw,"double");
 
 	this->allocate_rho_final_scf = true;
     return;

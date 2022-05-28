@@ -89,7 +89,7 @@ double Charge_Broyden::get_drho()
 
 
 		ModuleBase::GlobalFunc::NOTE("Calculate the charge difference between rho(G) and rho_save(G)");
-        for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
+        for (int ig=0; ig<GlobalC::rhopw->npw; ig++)
         {
             this->rhog[is][ig] -= this->rhog_save[is][ig];
         }
@@ -250,7 +250,7 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 	{
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			for(int ig = 0 ; ig < GlobalC::pw.ngmc; ++ig)
+			for(int ig = 0 ; ig < GlobalC::rhopw->npw; ++ig)
 			{
 				dF[ipos][is][ig] -= this->rhog[is][ig];
 				dn[ipos][is][ig] -= this->rhog_save[is][ig];
@@ -259,7 +259,7 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 	}
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ig = 0 ; ig < GlobalC::pw.ngmc; ++ig)
+		for(int ig = 0 ; ig < GlobalC::rhopw->npw; ++ig)
 		{
 			dF[mixing_ndim][is][ig] = rhog[is][ig];
 			dn[mixing_ndim][is][ig] = rhog_save[is][ig];
@@ -308,7 +308,7 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 			}
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				for(int ig = 0 ; ig < GlobalC::pw.ngmc; ++ig)
+				for(int ig = 0 ; ig < GlobalC::rhopw->npw; ++ig)
 				{
 					this->rhog[is][ig] -= gamma0 * dF[i][is][ig];
 					this->rhog_save[is][ig] -= gamma0 * dn[i][is][ig];
@@ -323,7 +323,7 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 	
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ig = 0 ; ig < GlobalC::pw.ngmc; ++ig)
+		for(int ig = 0 ; ig < GlobalC::rhopw->npw; ++ig)
 		{
 			dF[inext][is][ig] = dF[mixing_ndim][is][ig];
 			dn[inext][is][ig] = dn[mixing_ndim][is][ig];
@@ -336,7 +336,7 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ig = 0 ; ig < GlobalC::pw.ngmc; ++ig)
+		for(int ig = 0 ; ig < GlobalC::rhopw->npw; ++ig)
 		{
 			rhog_save[is][ig] += mixing_beta * rhog[is][ig];
 		}
@@ -428,12 +428,12 @@ void Charge_Broyden::allocate_Broyden()
     	    	dn[i] = new std::complex<double>*[GlobalV::NSPIN]; 
 				for (int is=0; is<GlobalV::NSPIN; is++)
     	    	{
-    	        	dF[i][is] = new std::complex<double>[GlobalC::pw.ngmc];
-    	        	dn[i][is] = new std::complex<double>[GlobalC::pw.ngmc];
+    	        	dF[i][is] = new std::complex<double>[GlobalC::rhopw->npw];
+    	        	dn[i][is] = new std::complex<double>[GlobalC::rhopw->npw];
     	    	}
 			}
-			ModuleBase::Memory::record("Charge_Broyden","dF", GlobalV::NSPIN*npdim*GlobalC::pw.ngmc,"cdouble");
-    		ModuleBase::Memory::record("Charge_Broyden","dn", GlobalV::NSPIN*npdim*GlobalC::pw.ngmc,"cdouble");
+			ModuleBase::Memory::record("Charge_Broyden","dF", GlobalV::NSPIN*npdim*GlobalC::rhopw->npw,"cdouble");
+    		ModuleBase::Memory::record("Charge_Broyden","dn", GlobalV::NSPIN*npdim*GlobalC::rhopw->npw,"cdouble");
 		}
 		else
 		{

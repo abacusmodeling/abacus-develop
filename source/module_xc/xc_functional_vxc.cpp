@@ -238,7 +238,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
             // initialize the charge density array in reciprocal space
             // bring electron charge density from real space to reciprocal space
             //------------------------------------------
-            std::vector<std::complex<double>> rhog(GlobalC::pw.ngmc);
+            std::vector<std::complex<double>> rhog(GlobalC::rhopw->npw);
             GlobalC::CHR.set_rhog(rhor.data(), rhog.data());
 
             //-------------------------------------------
@@ -246,7 +246,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
             // store the gradient in gdr[is]
             //-------------------------------------------
             gdr[is].resize(nrxx);
-            XC_Functional::grad_rho(rhog.data(), gdr[is].data());
+            XC_Functional::grad_rho(rhog.data(), gdr[is].data(), GlobalC::rhopw);
         }
 
         // converting grho
@@ -358,7 +358,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
             std::vector<std::vector<double>> dh(nspin, std::vector<double>( nrxx));
             for( int is=0; is!=nspin; ++is )
             {
-                XC_Functional::grad_dot( ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]), ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh[is]) );
+                XC_Functional::grad_dot( ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]), ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh[is]), GlobalC::rhopw );
             }
 
             for( int is=0; is!=nspin; ++is )
@@ -460,7 +460,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
         // initialize the charge density array in reciprocal space
         // bring electron charge density from real space to reciprocal space
         //------------------------------------------
-        std::vector<std::complex<double>> rhog(GlobalC::pw.ngmc);
+        std::vector<std::complex<double>> rhog(GlobalC::rhopw->npw);
         GlobalC::CHR.set_rhog(rhor.data(), rhog.data());
 
         //-------------------------------------------
@@ -468,7 +468,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
         // store the gradient in gdr[is]
         //-------------------------------------------
         gdr[is].resize(nrxx);
-        XC_Functional::grad_rho(rhog.data(), gdr[is].data());
+        XC_Functional::grad_rho(rhog.data(), gdr[is].data(), GlobalC::rhopw);
     }
 
     // converting grho
@@ -585,7 +585,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
         std::vector<std::vector<double>> dh(nspin, std::vector<double>( nrxx));
         for( int is=0; is!=nspin; ++is )
         {
-            XC_Functional::grad_dot( ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]), ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh[is]) );
+            XC_Functional::grad_dot( ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]), ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh[is]), GlobalC::rhopw );
         }
 
         for( int is=0; is!=nspin; ++is )

@@ -34,7 +34,7 @@ public:
 	};
 	Exx_Info info;
 
-	void init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_in, Use_FFT *UFFT_ptr_in, UnitCell_pseudo *ucell_ptr_in);
+	void init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_in, ModulePW::PW_Basis *p_basis_in, Use_FFT *UFFT_ptr_in, UnitCell_pseudo *ucell_ptr_in);
 	void cal_exx();
 	const std::complex<double> * const * const * get_exx_matrix() const { return exx_matrix; }
 	double get_exx_energy() const { return exx_energy; }
@@ -92,7 +92,8 @@ private:
 	
 public:
 
-	PW_Basis *pw_ptr;
+	PW_Basis *old_pwptr;
+	ModulePW::PW_Basis *rho_basis;
 	Use_FFT *UFFT_ptr;
 	UnitCell_pseudo *ucell_ptr;
 };

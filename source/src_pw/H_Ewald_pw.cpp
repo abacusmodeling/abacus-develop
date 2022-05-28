@@ -4,6 +4,7 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/constants.h"
 #include "../module_base/timer.h"
+#include "../src_pw/global.h"
 
 double H_Ewald_pw::alpha=0.0;
 int H_Ewald_pw::mxr = 50;
@@ -12,7 +13,7 @@ double H_Ewald_pw::ewald_energy=0.0;
 H_Ewald_pw::H_Ewald_pw(){};
 H_Ewald_pw::~H_Ewald_pw(){};
 
-void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
+void H_Ewald_pw::compute_ewald(const UnitCell &cell, ModulePW::PW_Basis* rho_basis)
 {
     ModuleBase::TITLE("H_Ewald_pw","compute_ewald");
     ModuleBase::timer::tick("H_Ewald_pw","compute_ewald");
@@ -76,7 +77,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
             ModuleBase::WARNING_QUIT("ewald","Can't find optimal alpha.");
         }
         upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / ModuleBase::TWO_PI) *
-                     erfc(sqrt(cell.tpiba2 * pwb.ggchg / 4.0 / alpha));
+                     erfc(sqrt(cell.tpiba2 * rho_basis->ggecut / 4.0 / alpha));
     }
     while (upperbound > 1.0e-7);
     if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"alpha",alpha);
@@ -84,7 +85,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     // G-space sum here.
     // Determine if this processor contains G=0 and set the constant term
-    if (pwb.gstart == 1)
+    if (rho_basis->ig_gge0 >= 0)
     {
         ewaldg = - charge * charge / alpha / 4.0;
     }
@@ -107,18 +108,16 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     //GlobalV::ofs_running << "\n pwb.gstart = " << pwb.gstart << std::endl;
 
-    for (int ig=pwb.gstart; ig<pwb.ngmc; ig++)
+    for (int ig = 0; ig < rho_basis->npw; ig++)
     {
+        if(ig == rho_basis->ig_gge0) continue;
         std::complex<double> rhon = ModuleBase::ZERO;
         for (int it=0; it<cell.ntype; it++)
         {
-            rhon += static_cast<double>( cell.atoms[it].zv ) * conj( pwb.strucFac(it, ig));
+            rhon += static_cast<double>( cell.atoms[it].zv ) * conj( GlobalC::pw.strucFac(it, ig));
         }
-        if(pwb.gg[ig] >= 1.0e-12) //LiuXh 20180515
-        {
-            ewaldg += fact * abs(rhon) * abs(rhon)
-                      * exp(- pwb.gg[ig] * cell.tpiba2 / alpha / 4.0 ) / pwb.gg[ig] / cell.tpiba2;
-        }
+        ewaldg += fact * abs(rhon) * abs(rhon)
+                  * exp(- rho_basis->gg[ig] * cell.tpiba2 / alpha / 4.0 ) / rho_basis->gg[ig] / cell.tpiba2;
     }
 
     ewaldg = ModuleBase::FOUR_PI / cell.omega * ewaldg;
@@ -126,7 +125,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 //	std::cout << "\n ewaldg = " << ewaldg;
 
     //  Here add the other constant term
-	if(pwb.gstart == 1)
+	if (rho_basis->ig_gge0 >= 0)
 	{
     	for (int it = 0; it < cell.ntype;it++)
     	{
@@ -136,7 +135,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     // R-space sum here (only done for the processor that contains G=0)
     ewaldr = 0.0;
-    if (pwb.gstart == 1)
+    if (rho_basis->ig_gge0 >= 0)
     {	
         rmax = 4.0 / sqrt(alpha) / cell.lat0;
 		if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rmax(unit lat0)",rmax);

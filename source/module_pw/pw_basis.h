@@ -52,7 +52,7 @@ public:
     ~PW_Basis();
 
     //Init the grids for FFT
-    void initgrids(
+    virtual void initgrids(
         const double lat0_in, //unit length (unit in bohr)
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
         const double gridecut, //unit in Ry, ecut to set up grids
@@ -121,7 +121,7 @@ protected:
     void distribute_g();
 
     //distribute real-space grids to different processors
-    void distribute_r();
+    virtual void distribute_r();
 
     //prepare for MPI_Alltoall
     void getstartgr();
@@ -241,3 +241,5 @@ protected:
 
 }
 #endif //PlaneWave 
+
+#include "./pw_basis_big.h" //temporary it will be removed

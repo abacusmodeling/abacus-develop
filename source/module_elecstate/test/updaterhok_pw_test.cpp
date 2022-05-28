@@ -296,7 +296,7 @@ TEST_F(EState,RhoPW)
     // Calculate Structure factor
     // GlobalC::pw.setup_structure_factor();
     // init charge/potential/wave functions
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::rhopw->npw);
     // GlobalC::pot.allocate(GlobalC::pw.nrxx);
     // we need to supply NBANDS here
     GlobalC::wf.allocate(GlobalC::kv.nks);

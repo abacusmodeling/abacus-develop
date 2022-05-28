@@ -419,7 +419,7 @@ double Charge::sum_rho(void) const
 void Use_FFT::ToRealSpace(int const &is, ModuleBase::ComplexMatrix const &vg, double *vr)
 {
 }
-void Use_FFT::ToRealSpace(std::complex<double> const *vg, double *vr)
+void Use_FFT::ToRealSpace(std::complex<double> const *vg, double *vr, GlobalC::rhopw)
 {
 }
 bool Occupy::use_gaussian_broadening = false;
@@ -814,7 +814,7 @@ void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
                     GlobalC::ucell.G,
                     GlobalC::ucell.latvec);
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
 
     ORB_control orb_con(GlobalV::GAMMA_ONLY_LOCAL,
                         GlobalV::NLOCAL,

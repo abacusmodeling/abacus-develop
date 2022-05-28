@@ -241,7 +241,8 @@ void PW_complement::setup_GVectors(
     ModuleBase::Vector3<double>* ig,
     ModuleBase::Vector3<double>* g)
 {
-    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","setup_GVectors");
+    if(ngmc_g_in<=0) return; //qianrui fix a bug resulting in segment fault.
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_compleme nt","setup_GVectors");
     ModuleBase::timer::tick("PW_complement","setup_GVectors");
 
     int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G std::vector index

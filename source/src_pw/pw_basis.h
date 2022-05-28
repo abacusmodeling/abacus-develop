@@ -6,6 +6,7 @@
 #include "../module_base/complexmatrix.h"
 #include "../module_base/vector3.h"
 #include "../src_parallel/ft.h"
+#include "../module_pw/pw_basis.h"
 
 using namespace std;
 
@@ -128,8 +129,8 @@ public:
 
 	// structure factor (ntype, ngmc)
     ModuleBase::ComplexMatrix strucFac;
-    void setup_structure_factor(void); 		// Calculate structure factors
-    void bspline_sf(const int); //calculate structure factors through Cardinal B-spline interpolation
+    void setup_structure_factor(ModulePW::PW_Basis* rho_basis); 		// Calculate structure factors
+    void bspline_sf(const int,ModulePW::PW_Basis* rho_basis); //calculate structure factors through Cardinal B-spline interpolation
     void bsplinecoef(complex<double> *b1, complex<double> *b2, complex<double> *b3, const int norder);
 
 private:

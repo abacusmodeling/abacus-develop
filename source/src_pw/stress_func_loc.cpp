@@ -4,44 +4,43 @@
 #include "global.h"
 
 //calculate local pseudopotential stress in PW or VL_dVL stress in LCAO
-void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
+void Stress_Func::stress_loc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw)
 {
     ModuleBase::timer::tick("Stress_Func","stress_loc");
 
-    double *dvloc;
+    double *dvloc = new double[rho_basis->npw];
     double evloc=0.0;
 	double fact=1.0;
 
 	if (INPUT.gamma_only && is_pw) fact=2.0;
 
-    dvloc = new double[GlobalC::pw.ngmc];
+    
 
-	std::complex<double> *Porter = GlobalC::UFFT.porter;
+	std::complex<double> *aux = new std::complex<double> [rho_basis->nmaxgr];
 
-	ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( aux, rho_basis->nrxx );
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for (int ir=0; ir<rho_basis->nrxx; ir++)
 		{
-			Porter[ir] += std::complex<double>(GlobalC::CHR.rho[is][ir], 0.0 );
+			aux[ir] += std::complex<double>(GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
-	GlobalC::pw.FFT_chg.FFT3D(Porter, -1);
+	rho_basis->real2recip(aux,aux);
 
 //    if(INPUT.gamma_only==1) fact=2.0;
 //    else fact=1.0;
 
 	evloc=0.0;
 
-	std::complex<double> *vg = new std::complex<double>[GlobalC::pw.ngmc];
-	ModuleBase::GlobalFunc::ZEROS( vg, GlobalC::pw.ngmc );
 	for (int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		if (GlobalC::pw.gstart==1) evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[0]) * (GlobalC::pw.strucFac(it,0) * conj(Porter[GlobalC::pw.ig2fftc[0]])).real();
-		for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
+		for (int ig=0; ig<rho_basis->npw; ig++)
 		{
-			const int j = GlobalC::pw.ig2fftc[ig];
-			evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
+			if(rho_basis->ig_gge0==ig)
+				evloc += GlobalC::ppcell.vloc(it, rho_basis->ig2igg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(aux[ig])).real();
+			else
+				evloc += GlobalC::ppcell.vloc(it, rho_basis->ig2igg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(aux[ig]) * fact).real();
 		}
 	}
 	for(int nt = 0;nt< GlobalC::ucell.ntype; nt++)
@@ -54,7 +53,7 @@ void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 		//
 		// special case: pseudopotential is coulomb 1/r potential
 		//
-			this->dvloc_coul (atom->zv, dvloc);
+			this->dvloc_coul (atom->zv, dvloc, rho_basis);
 		//
 		}
 		else
@@ -63,20 +62,19 @@ void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 		// normal case: dvloc contains dV_loc(G)/dG
 		//
 			this->dvloc_of_g ( atom->msh, atom->rab, atom->r,
-					atom->vloc_at, atom->zv, dvloc);
+					atom->vloc_at, atom->zv, dvloc, rho_basis);
 		//
 		}
 
-		for(int ng = 0;ng< GlobalC::pw.ngmc;ng++)
+		for(int ig = 0;ig< rho_basis->npw;ig++)
 		{
-			const int j = GlobalC::pw.ig2fftc[ng];
 			for (int l = 0;l< 3;l++)
 			{
 				for (int m = 0; m<l+1;m++)
 				{
-					sigma(l, m) = sigma(l, m) + (conj(Porter[j]) * GlobalC::pw.strucFac(nt, ng)).real() 
-						* 2.0 * dvloc[GlobalC::pw.ig2ngg[ng]] * GlobalC::ucell.tpiba2 * 
-						GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) * fact;
+					sigma(l, m) = sigma(l, m) + (conj(aux[ig]) * GlobalC::pw.strucFac(nt, ig)).real() 
+						* 2.0 * dvloc[rho_basis->ig2igg[ig]] * GlobalC::ucell.tpiba2 * 
+						rho_basis->gcar[ig][l] * rho_basis->gcar[ig][m] * fact;
 				}
 			}
 		}
@@ -98,7 +96,7 @@ void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 		}
 	}
 	delete[] dvloc;
-	delete[] vg;
+	delete[] aux;
 
 
 	ModuleBase::timer::tick("Stress_Func","stress_loc");
@@ -112,7 +110,8 @@ const double* rab,
 const double* r,
 const double* vloc_at,
 const double& zp,
-double*  dvloc
+double*  dvloc,
+ModulePW::PW_Basis* rho_basis
 )
 {
   //----------------------------------------------------------------------
@@ -138,7 +137,7 @@ double*  dvloc
 	ModuleBase::GlobalFunc::ZEROS(aux1, msh);
 
 	// the  G=0 component is not computed
-	if (GlobalC::pw.ggs[0] < 1.0e-8)
+	if (rho_basis->gg_uniq[0] < 1.0e-8)
 	{
 		dvloc[0] = 0.0;
 		igl0 = 1;
@@ -160,10 +159,11 @@ double*  dvloc
 	{
 		aux1[i] = r [i] * vloc_at [i] + zp * ModuleBase::e2 * erf(r[i]);
 	}
-	for(int igl = igl0;igl< GlobalC::pw.nggm;igl++)
+	for(int igl = igl0;igl< rho_basis->ngg;igl++)
 	{
-		double gx = sqrt (GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2);
-		double gx2 = GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2;
+		const double g2 = rho_basis->gg_uniq[igl];
+		const double gx = sqrt (g2 * GlobalC::ucell.tpiba2);
+		const double gx2 = g2 * GlobalC::ucell.tpiba2;
 		//
 		//    and here we perform the integral, after multiplying for the |G|
 		//    dependent  part
@@ -191,7 +191,8 @@ double*  dvloc
 void Stress_Func::dvloc_coul 
 (
 const double& zp,
-double* dvloc
+double* dvloc,
+ModulePW::PW_Basis* rho_basis
 )
 {
 	//----------------------------------------------------------------------
@@ -207,7 +208,7 @@ double* dvloc
 	// first shell with g != 0
 
 	// the  G=0 component is 0
-	if (GlobalC::pw.ggs[0] < 1.0e-8)
+	if (rho_basis->gg_uniq[0] < 1.0e-8)
 	{
 		dvloc[0] = 0.0;
 		igl0 = 1;
@@ -216,9 +217,9 @@ double* dvloc
 	{
 		igl0 = 0;
 	}
-	for(int i=igl0;i<GlobalC::pw.nggm;i++)
+	for(int i=igl0;i<rho_basis->ngg;i++)
 	{
-		dvloc[i] = ModuleBase::FOUR_PI * zp * ModuleBase::e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
+		dvloc[i] = ModuleBase::FOUR_PI * zp * ModuleBase::e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * rho_basis->gg_uniq[i] ),2);
 	}
 	
 	return;

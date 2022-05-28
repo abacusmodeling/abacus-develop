@@ -165,7 +165,7 @@ void Charge_Extra::extrapolate_charge()
 		}
 		else
 		{
-			GlobalC::pw.setup_structure_factor();
+			GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
 		}
 	}
 	// "atomic" extrapolation
@@ -182,7 +182,7 @@ void Charge_Extra::extrapolate_charge()
 			ModuleBase::GlobalFunc::ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
 			ModuleBase::GlobalFunc::ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
-		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
+		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old,GlobalC::rhopw);
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -195,9 +195,9 @@ void Charge_Extra::extrapolate_charge()
 		{
 			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
-		GlobalC::pw.setup_structure_factor();
+		GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
 
-		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new);
+		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new, GlobalC::rhopw);
 
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
@@ -231,7 +231,7 @@ void Charge_Extra::extrapolate_charge()
 		}
 
 		// generate atomic rho
-		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
+		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old,GlobalC::rhopw);
 
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
@@ -247,9 +247,9 @@ void Charge_Extra::extrapolate_charge()
 		{
 			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
-		GlobalC::pw.setup_structure_factor();
+		GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
 
-		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new);
+		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new,GlobalC::rhopw);
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -289,7 +289,7 @@ void Charge_Extra::extrapolate_charge()
 		}
 
 		// generate atomic_rho
-		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
+		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old,GlobalC::rhopw);
 
 		// compute alpha and beta
 		find_alpha_and_beta();
@@ -314,10 +314,10 @@ void Charge_Extra::extrapolate_charge()
 		}
 
 		// setup the structure factor
-		GlobalC::pw.setup_structure_factor();
+		GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
 
 		// generate atomic rho
-		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new);
+		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new,GlobalC::rhopw);
 
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{

@@ -63,38 +63,38 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, 
 	// for spin unpolarized case, 
 	// calculate the gradient of (rho_core+rho) in reciprocal space.
 	rhotmp1 = new double[GlobalC::pw.nrxx];
-	rhogsum1 = new std::complex<double>[GlobalC::pw.ngmc];
+	rhogsum1 = new std::complex<double>[GlobalC::rhopw->npw];
 	ModuleBase::GlobalFunc::ZEROS(rhotmp1, GlobalC::pw.nrxx);
-	ModuleBase::GlobalFunc::ZEROS(rhogsum1, GlobalC::pw.ngmc);
+	ModuleBase::GlobalFunc::ZEROS(rhogsum1, GlobalC::rhopw->npw);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] = GlobalC::CHR.rho[0][ir] + fac * GlobalC::CHR.rho_core[ir];
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum1[ig] = GlobalC::CHR.rhog[0][ig] + fac * GlobalC::CHR.rhog_core[ig];
+	for(int ig=0; ig<GlobalC::rhopw->npw; ig++) rhogsum1[ig] = GlobalC::CHR.rhog[0][ig] + fac * GlobalC::CHR.rhog_core[ig];
 
 	gdr1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	if(!is_stress)	h1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	
-	XC_Functional::grad_rho( rhogsum1 , gdr1 );
+	XC_Functional::grad_rho( rhogsum1 , gdr1, GlobalC::rhopw);
 
 	// for spin polarized case;
 	// calculate the gradient of (rho_core+rho) in reciprocal space.
 	if(GlobalV::NSPIN==2)
 	{
 		rhotmp2 = new double[GlobalC::pw.nrxx];
-		rhogsum2 = new std::complex<double>[GlobalC::pw.ngmc];
+		rhogsum2 = new std::complex<double>[GlobalC::rhopw->npw];
 		ModuleBase::GlobalFunc::ZEROS(rhotmp2, GlobalC::pw.nrxx);
-		ModuleBase::GlobalFunc::ZEROS(rhogsum2, GlobalC::pw.ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rhogsum2, GlobalC::rhopw->npw);
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp2[ir] = GlobalC::CHR.rho[1][ir] + fac * GlobalC::CHR.rho_core[ir];
-		for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum2[ig] = GlobalC::CHR.rhog[1][ig] + fac * GlobalC::CHR.rhog_core[ig];
+		for(int ig=0; ig<GlobalC::rhopw->npw; ig++) rhogsum2[ig] = GlobalC::CHR.rhog[1][ig] + fac * GlobalC::CHR.rhog_core[ig];
 
 		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		if(!is_stress) h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		
-		XC_Functional::grad_rho( rhogsum2 , gdr2 );
+		XC_Functional::grad_rho( rhogsum2 , gdr2, GlobalC::rhopw);
 	}
 
 	if(GlobalV::NSPIN == 4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z))
 	{
 		ModuleBase::GlobalFunc::ZEROS(rhotmp1, GlobalC::pw.nrxx);
-		ModuleBase::GlobalFunc::ZEROS(rhogsum1, GlobalC::pw.ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rhogsum1, GlobalC::rhopw->npw);
 		rhotmp2 = new double[GlobalC::pw.nrxx];
 		ModuleBase::GlobalFunc::ZEROS(rhotmp2, GlobalC::pw.nrxx);
  		neg = new double [GlobalC::pw.nrxx];
@@ -114,8 +114,8 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, 
 		}
 		noncolin_rho(rhotmp1,rhotmp2,neg);
 
-		rhogsum2 = new std::complex<double>[GlobalC::pw.ngmc];
-		ModuleBase::GlobalFunc::ZEROS(rhogsum2, GlobalC::pw.ngmc);
+		rhogsum2 = new std::complex<double>[GlobalC::rhopw->npw];
+		ModuleBase::GlobalFunc::ZEROS(rhogsum2, GlobalC::rhopw->npw);
 		GlobalC::CHR.set_rhog(rhotmp1, rhogsum1);
 		GlobalC::CHR.set_rhog(rhotmp2, rhogsum2);
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -123,7 +123,7 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, 
 			rhotmp2[ir] += fac * GlobalC::CHR.rho_core[ir];
 			rhotmp1[ir] += fac * GlobalC::CHR.rho_core[ir];
 		}
-		for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
+		for(int ig=0; ig<GlobalC::rhopw->npw; ig++)
 		{
 			rhogsum2[ig] += fac * GlobalC::CHR.rhog_core[ig];
 			rhogsum1[ig] += fac * GlobalC::CHR.rhog_core[ig];
@@ -132,8 +132,8 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, 
 		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 
-		XC_Functional::grad_rho( rhogsum1 , gdr1 );
-		XC_Functional::grad_rho( rhogsum2 , gdr2 );
+		XC_Functional::grad_rho( rhogsum1 , gdr1, GlobalC::rhopw );
+		XC_Functional::grad_rho( rhogsum2 , gdr2, GlobalC::rhopw );
 
 	}
 	
@@ -363,8 +363,8 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, 
 		for(int is=0; is<nspin0; is++)
 		{
 			ModuleBase::GlobalFunc::ZEROS(dh, GlobalC::pw.nrxx);
-			if(is==0)XC_Functional::grad_dot(h1,dh);
-			if(is==1)XC_Functional::grad_dot(h2,dh);
+			if(is==0)XC_Functional::grad_dot(h1,dh,GlobalC::rhopw);
+			if(is==1)XC_Functional::grad_dot(h2,dh,GlobalC::rhopw);
 
 			for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 				v(is, ir) -= dh[ir];
@@ -457,10 +457,10 @@ void XC_Functional::grad_wfc( const std::complex<double> *rhog, const int ik, st
 
 		// calculate the charge density gradient in reciprocal space.
 		for(int ig=0; ig<npw; ig++)
-			Porter[ GlobalC::pw.ig2fftc[ig] ] = complex<double>(0.0,kplusg[ig]) * rhog[ig];
+			Porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig) ]] = complex<double>(0.0,kplusg[ig]) * rhog[ig];
 
 		// bring the gdr from G --> R
-		GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
+		GlobalC::pw.FFT_wfc.FFT3D(Porter, 1);
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 			grad[ir][ipol]= Porter[ir];
@@ -469,92 +469,58 @@ void XC_Functional::grad_wfc( const std::complex<double> *rhog, const int ik, st
 	return;
 }
 
-void XC_Functional::grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr )
+void XC_Functional::grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr, ModulePW::PW_Basis *rho_basis)
 {
-	std::complex<double> *gdrtmpg = new std::complex<double>[GlobalC::pw.ngmc];
-	ModuleBase::GlobalFunc::ZEROS(gdrtmpg, GlobalC::pw.ngmc);
+	std::complex<double> *gdrtmp = new std::complex<double>[rho_basis->nmaxgr];
+	ModuleBase::GlobalFunc::ZEROS(gdrtmp, rho_basis->nmaxgr);
 
-	std::complex<double> *Porter = GlobalC::UFFT.porter;
+	
 
 	// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gdrtmpg[ig] = ModuleBase::IMAG_UNIT * rhog[ig];
+	for(int i = 0 ; i < 3 ; ++i)
+	{
+		// calculate the charge density gradient in reciprocal space.
+		for(int ig=0; ig<rho_basis->npw; ig++)
+			gdrtmp[ig] = ModuleBase::IMAG_UNIT * rhog[ig] * rho_basis->gcar[ig][i];
 
-	// calculate the charge density gradient in reciprocal space.
-	ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		Porter[ GlobalC::pw.ig2fftc[ig] ] = gdrtmpg[ig]* std::complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 0), 0.0);
-	// bring the gdr from G --> R
-	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
-	// remember to multily 2pi/a0, which belongs to G vectors.
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		gdr[ir].x = Porter[ir].real() * GlobalC::ucell.tpiba;
+		// bring the gdr from G --> R
+		rho_basis->recip2real(gdrtmp, gdrtmp);
 
-	// calculate the charge density gradient in reciprocal space.
-	ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		Porter[GlobalC::pw.ig2fftc[ig]] = gdrtmpg[ig] * std::complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 1), 0.0);
-	// bring the gdr from G --> R
-	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
-	// remember to multily 2pi/a0, which belongs to G vectors.
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		gdr[ir].y = Porter[ir].real() * GlobalC::ucell.tpiba;
+		// remember to multily 2pi/a0, which belongs to G vectors.
+		for(int ir=0; ir<rho_basis->nrxx; ir++)
+			gdr[ir][i] = gdrtmp[ir].real() * GlobalC::ucell.tpiba;
+	}
 
-	// calculate the charge density gradient in reciprocal space.
-	ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		Porter[GlobalC::pw.ig2fftc[ig]] = gdrtmpg[ig] * std::complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 2), 0.0);
-	// bring the gdr from G --> R
-	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
-	// remember to multily 2pi/a0, which belongs to G vectors.
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		gdr[ir].z = Porter[ir].real() * GlobalC::ucell.tpiba;
-
-	delete[] gdrtmpg;
+	delete[] gdrtmp;
 	return;
 }
 
 
-void XC_Functional::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
+void XC_Functional::grad_dot(const ModuleBase::Vector3<double> *h, double *dh, ModulePW::PW_Basis *rho_basis)
 {
-	std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
-	std::complex<double> *gaux = new std::complex<double>[GlobalC::pw.ngmc];
-	ModuleBase::GlobalFunc::ZEROS(gaux, GlobalC::pw.ngmc);
-	
-	ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		aux[ir] = std::complex<double>( h[ir].x, 0.0);
-	// bring to G space.
-	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 0) * ModuleBase::IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
+	std::complex<double> *aux = new std::complex<double>[rho_basis->nmaxgr];
+	std::complex<double> *gaux = new std::complex<double>[rho_basis->npw];
+	ModuleBase::GlobalFunc::ZEROS(gaux, rho_basis->npw);
 
-	ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		aux[ir] = std::complex<double>( h[ir].y, 0.0);
-	// bring to G space.
-	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 1) * ModuleBase::IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
+	for(int i = 0 ; i < 3 ; ++i)
+	{
+		for(int ir = 0; ir < rho_basis->nrxx; ++ir)
+			aux[ir] = std::complex<double>( h[ir][i], 0.0);
 
-	ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		aux[ir] = std::complex<double>( h[ir].z, 0.0);
-	// bring to G space.
-	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 2) * ModuleBase::IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
+		// bring to G space.
+		rho_basis->real2recip(aux,aux);
+		for(int ig = 0; ig < rho_basis->npw; ++ig)
+			gaux[ig] +=  ModuleBase::IMAG_UNIT * aux[ig] * rho_basis->gcar[ig][i];
+	}
 
-	ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
-	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		aux[ GlobalC::pw.ig2fftc[ig] ] = gaux[ig];
 	// bring back to R space
-	GlobalC::pw.FFT_chg.FFT3D(aux, 1);
+	rho_basis->recip2real(gaux,aux);
+
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		dh[ir] = aux[ir].real() * GlobalC::ucell.tpiba;
 	
 	delete[] aux;	
-	delete[] gaux; //mohan fix 2012-04-02
+	delete[] gaux;
 	return;
 }
 

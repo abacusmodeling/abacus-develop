@@ -42,6 +42,7 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::Init(Input& inp, UnitCell_pseudo& ucell)
     {
+        ESolver_FP::Init(inp,ucell);
         // setup GlobalV::NBANDS 
         // Yu Liu add 2021-07-03
         GlobalC::CHR.cal_nelec();
@@ -79,16 +80,15 @@ namespace ModuleESolver
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
         std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
         std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
-    
+
         // mohan add 2010-09-13
         // initialize the real-space uniform grid for FFT and parallel
         // distribution of plane waves
         GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
-            
     
         // Calculate Structure factor
-        GlobalC::pw.setup_structure_factor();
+        GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
         // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
         
         //----------------------------------------------------------
@@ -104,7 +104,7 @@ namespace ModuleESolver
         //=====================================
         // init charge/potential/wave functions
         //=====================================
-        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::rhopw->npw);
         GlobalC::pot.allocate(GlobalC::pw.nrxx);
     
         GlobalC::wf.allocate(GlobalC::kv.nks);
@@ -129,7 +129,7 @@ namespace ModuleESolver
         //=================================
         // initalize local pseudopotential
         //=================================
-        GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
+        GlobalC::ppcell.init_vloc(GlobalC::ppcell.vloc,GlobalC::rhopw);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
     
         //======================================
@@ -168,7 +168,7 @@ namespace ModuleESolver
         case Exx_Global::Hybrid_Type::HF:
         case Exx_Global::Hybrid_Type::PBE0:
         case Exx_Global::Hybrid_Type::HSE:
-            GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &GlobalC::ucell);
+            GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, GlobalC::rhopw, &GlobalC::UFFT, &GlobalC::ucell);
             break;
         case Exx_Global::Hybrid_Type::No:
             break;
@@ -188,7 +188,7 @@ namespace ModuleESolver
     void ESolver_KS_PW::beforescf(int istep)
     {
         //calculate ewald energy
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
         //Symmetry_rho should be moved to Init()
         Symmetry_rho srho;
         for (int is = 0; is < GlobalV::NSPIN; is++)

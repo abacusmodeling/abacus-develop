@@ -440,19 +440,19 @@ void eximport::out_kpoints(std::ofstream &out_data)
 
 void eximport::out_planewave(std::ofstream &out_data)
 {
-	//std::cout << "\n ==> out_planewave" << std::endl;
-	out_data << "\n<PLANEWAVE>";
-	out_data << "\n" << GlobalC::ucell.lat0 << " Lattice constant";
-	out_data << "\n" << GlobalC::pw.ngmc_g << " Number of plane waves."<<std::endl;
-	for(int i=0; i<GlobalC::pw.ngmc_g; i++)
-	{
-		if(i%4==0) out_data<<"\n";
-		out_data << std::setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 0)
-				 << std::setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 1)
-				 << std::setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 2);
-	}
-	out_data << "\n<PLANEWAVE>";
-	return;
+	// //std::cout << "\n ==> out_planewave" << std::endl;
+	// out_data << "\n<PLANEWAVE>";
+	// out_data << "\n" << GlobalC::ucell.lat0 << " Lattice constant";
+	// out_data << "\n" << GlobalC::rhopw->npwtot << " Number of plane waves."<<std::endl;
+	// for(int i=0; i<GlobalC::rhopw->npwtot; i++)
+	// {
+	// 	if(i%4==0) out_data<<"\n";
+	// 	out_data << std::setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 0)
+	// 			 << std::setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 1)
+	// 			 << std::setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 2);
+	// }
+	// out_data << "\n<PLANEWAVE>";
+	// return;
 }
 
 void eximport::out_igk(std::ofstream &out_data)

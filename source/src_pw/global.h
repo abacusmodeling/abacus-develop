@@ -17,6 +17,7 @@
 #include "magnetism.h"
 #include "potential.h"
 #include "pw_basis.h"
+#include "../module_pw/pw_basis.h"
 #include "use_fft.h"
 #include "vdwd2.h"
 #include "vdwd2_parameters.h"
@@ -312,6 +313,7 @@ namespace GlobalC
 extern K_Vectors kv;
 extern Use_FFT UFFT;
 extern PW_Basis pw;
+extern ModulePW::PW_Basis* rhopw;
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;

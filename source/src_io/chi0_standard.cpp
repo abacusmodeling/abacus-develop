@@ -297,16 +297,16 @@ void Chi0_standard::Parallel_G()
 	//----------------------------
 	num_G_core = new int[GlobalV::DSIZE];
 	num_G_dis = new int[GlobalV::DSIZE];
-	G_r_core = new double[GlobalC::pw.ngmc];
+	G_r_core = new double[GlobalC::rhopw->npw];
 	num_Gvector_core = new int[GlobalV::DSIZE];
 	num_Gvector_dis = new int[GlobalV::DSIZE];
-	G_r = new double[GlobalC::pw.ngmc_g];
-	Gvec_core = new double[3*GlobalC::pw.ngmc];
-	Gvec = new double[3*GlobalC::pw.ngmc_g];
-	all_gcar = new ModuleBase::Vector3<double>[GlobalC::pw.ngmc_g];
-	flag = new int[GlobalC::pw.ngmc_g];
+	G_r = new double[GlobalC::rhopw->npwtot];
+	Gvec_core = new double[3*GlobalC::rhopw->npw];
+	Gvec = new double[3*GlobalC::rhopw->npwtot];
+	all_gcar = new ModuleBase::Vector3<double>[GlobalC::rhopw->npwtot];
+	flag = new int[GlobalC::rhopw->npwtot];
 
-	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::rhopw->npwtot;i++)
 	{
 		flag[i] = i;
 	}
@@ -317,7 +317,7 @@ void Chi0_standard::Parallel_G()
 	ModuleBase::GlobalFunc::ZEROS( num_Gvector_core, GlobalV::DSIZE);
 	
 #ifdef __MPI
-	MPI_Allgather( &GlobalC::pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
+	MPI_Allgather( &GlobalC::rhopw->npw, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
 #endif
 
 	memset(num_G_dis,0,GlobalV::DSIZE*sizeof(int));
@@ -335,23 +335,23 @@ void Chi0_standard::Parallel_G()
 		num_Gvector_core[i] = num_G_core[i] * 3;
 	}
 
-	for(int g0=0;g0<GlobalC::pw.ngmc; g0++)
+	for(int g0=0;g0<GlobalC::rhopw->npw; g0++)
 	{
-		G_r_core[g0] = GlobalC::pw.get_NormG_cartesian(g0);
-		Gvec_core[3 * g0] = GlobalC::pw.get_G_cartesian_projection(g0, 0);
-		Gvec_core[3 * g0 + 1] = GlobalC::pw.get_G_cartesian_projection(g0, 1);
-		Gvec_core[3 * g0 + 2] = GlobalC::pw.get_G_cartesian_projection(g0, 2);
+		G_r_core[g0] = GlobalC::rhopw->gg[g0];
+		Gvec_core[3 * g0] = GlobalC::rhopw->gcar[g0][0];
+		Gvec_core[3 * g0 + 1] = GlobalC::rhopw->gcar[g0][1];
+		Gvec_core[3 * g0 + 2] = GlobalC::rhopw->gcar[g0][2];
 	}
 
 #ifdef __MPI
-	MPI_Allgatherv( G_r_core, GlobalC::pw.ngmc, MPI_DOUBLE, G_r, num_G_core, num_G_dis, MPI_DOUBLE, POOL_WORLD);
-	MPI_Allgatherv( Gvec_core, 3*GlobalC::pw.ngmc, MPI_DOUBLE, Gvec, num_Gvector_core, num_Gvector_dis, MPI_DOUBLE, POOL_WORLD);
+	MPI_Allgatherv( G_r_core, GlobalC::rhopw->npw, MPI_DOUBLE, G_r, num_G_core, num_G_dis, MPI_DOUBLE, POOL_WORLD);
+	MPI_Allgatherv( Gvec_core, 3*GlobalC::rhopw->npw, MPI_DOUBLE, Gvec, num_Gvector_core, num_Gvector_dis, MPI_DOUBLE, POOL_WORLD);
 #endif
 
 	double t1; int t2;
-	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::rhopw->npwtot;i++)
 	{
-		for(int j=0;j<GlobalC::pw.ngmc_g-i-1;j++)
+		for(int j=0;j<GlobalC::rhopw->npwtot-i-1;j++)
 		{
 			if(G_r[j]>G_r[j+1])
 			{
@@ -364,7 +364,7 @@ void Chi0_standard::Parallel_G()
 		}
 	}
 
-	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::rhopw->npwtot;i++)
 	{
 		all_gcar[i].x = Gvec[3*i]; all_gcar[i].y = Gvec[3*i+1]; all_gcar[i].z = Gvec[3*i+2];
 		//std::cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
@@ -376,11 +376,11 @@ void Chi0_standard::Parallel_G()
 void Chi0_standard:: Init()
 {
 
-	b_core = new std::complex<double>[GlobalC::pw.ngmc];
+	b_core = new std::complex<double>[GlobalC::rhopw->npw];
 
-	b_summary = new std::complex<double>[GlobalC::pw.ngmc_g];
+	b_summary = new std::complex<double>[GlobalC::rhopw->npwtot];
 
-	b_order = new std::complex<double>[GlobalC::pw.ngmc_g];
+	b_order = new std::complex<double>[GlobalC::rhopw->npwtot];
 
 	psi_r1 = new std::complex<double>*[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -554,7 +554,7 @@ void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 	return;
 }
 
-void Chi0_standard::Cal_b(int iq, int ik, int iqk)
+void Chi0_standard::Cal_b(int iq, int ik, int iqk,  ModulePW::PW_Basis *rho_basis)
 {
 	ModuleBase::TITLE("Chi0_standard","Cal_b");
 	ModuleBase::Vector3<double> qk;
@@ -562,47 +562,47 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
 	ModuleBase::Vector3<double> q = GlobalC::kv.kvec_d[iq];
-	std::complex<double> exp_tmp;
+	std::complex<double>* aux = new std::complex<double>[rho_basis->nmaxgr];
 
 	Cal_Psi(ik, psi_r1);
 	Cal_Psi(iqk, psi_r2);
+
+	const int startz = rho_basis->startz[GlobalV::RANK_IN_POOL]; 
+	const int nplane = rho_basis->nplane;
 
 	for(int ib1=0; ib1< oband; ib1++)
 	{
 		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			int ir=0;
-			for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+			for(int ix=0; ix<rho_basis->nx; ix++)
 			{
-				phase_x = q.x*ix/GlobalC::pw.ncx;
-				for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+				phase_x = q.x*ix/rho_basis->nx;
+				for(int iy=0; iy<rho_basis->ny; iy++)
 				{
-					phase_xy = phase_x + q.y*iy/GlobalC::pw.ncy;
-					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
+					phase_xy = phase_x + q.y*iy/rho_basis->ny;
+					for(int iz=startz; iz<startz+nplane; iz++)
 					{
-						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
-						exp_tmp = std::complex<double>(cos(-phase_xyz), sin(-phase_xyz));
-						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
+						phase_xyz = (phase_xy + q.z*iz/rho_basis->nz) *ModuleBase::TWO_PI;
+						std::complex<double> exp_tmp = std::complex<double>(cos(-phase_xyz), sin(-phase_xyz));
+						aux[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
 					}
 				}
 			}
 
-			GlobalC::pw.FFT_chg.FFT3D( GlobalC::UFFT.porter, -1);
-			//for(int g0=0; g0<dim; g0++)
-			//{
-			//	b[g0][ib1][ib2] = GlobalC::UFFT.porter[ GlobalC::pw.ig2fftc[g0] ];
-			//}
-			for(int g0=0;g0<GlobalC::pw.ngmc; g0++)
+			rho_basis->real2recip(aux,aux);
+
+			for(int ig=0 ; ig < rho_basis->npw; ++ig)
 			{
-				b_core[g0] = GlobalC::UFFT.porter[ GlobalC::pw.ig2fftc[g0] ];
+				b_core[ig] = aux[ ig ];
 			}
 
 #ifdef __MPI
-			MPI_Allgatherv( b_core, GlobalC::pw.ngmc, mpicomplex, b_summary, num_G_core, num_G_dis, mpicomplex, POOL_WORLD);
+			MPI_Allgatherv( b_core, rho_basis->npw, mpicomplex, b_summary, num_G_core, num_G_dis, mpicomplex, POOL_WORLD);
 #endif
 
-			for(int i=0;i<GlobalC::pw.ngmc_g;i++)
+			for(int i=0;i<rho_basis->npwtot;i++)
 			{
 				b_order[i] = b_summary[flag[i]];
 			}
@@ -615,6 +615,7 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 		}
 	}
 
+	delete[] aux;
 	return;
 }
 
@@ -665,7 +666,7 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		int iqk = Cal_iq(ik, iq, GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]);
-		Cal_b(iq, ik, iqk);
+		Cal_b(iq, ik, iqk,GlobalC::rhopw);
 		Cal_weight(iq, ik, omega);
 		Cal_last();
 		Cal_first();
