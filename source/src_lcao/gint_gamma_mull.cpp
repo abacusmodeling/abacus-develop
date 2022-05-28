@@ -8,24 +8,13 @@
 #include "../module_base/ylm.h"
 #include "../module_base/timer.h"
 
-void Gint_Gamma::cal_mulliken(double** mulliken)
-{
-    ModuleBase::TITLE("Gint_Gamma","cal_mulliken");
-    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
-
-    this->gamma_mulliken(mulliken);
-
-    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
-    return;
-}
-
 // this subroutine lies in the heart of LCAO algorithms.
 // so it should be done very efficiently, very carefully.
 // I might repeat again to emphasize this: need to optimize
 // this code very efficiently, very carefully.
-void Gint_Gamma::gamma_mulliken(double** mulliken)
+void Gint_Gamma::cal_mulliken(double** mulliken)
 {
-    ModuleBase::TITLE("Grid_Integral","gamma_charge");
+    ModuleBase::TITLE("Grid_Integral","cal_mulliken");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = GlobalC::ORB.dr_uniform;

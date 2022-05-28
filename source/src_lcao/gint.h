@@ -1,6 +1,14 @@
 #ifndef GINT_INTERFACE
 #define GINT_INTERFACE
 
+//This class provides a unified interface to the
+// grid intergration operation used to calculate
+// electron density, and the contribution of local potential
+// to Hamiltonian and force/stress
+// There are two derived classes of this class
+// namely Gint_k and Gint_Gamma, which contains some
+// specific operations for gamma point/multi-k calculations
+
 #include "gint_tools.h"
 
 class Gint
@@ -27,7 +35,7 @@ class Gint
 	int nbz_start;
 
     //------------------------------------------------------
-    // in gint_k_vl.cpp 
+    // in gint_vl.cpp 
     //------------------------------------------------------
     // calculate the matrix elements of Hamiltonian matrix,
     // < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
@@ -39,6 +47,17 @@ class Gint
         double* vldr3,
         const int LD_pool,
         double* pvpR_reduced);
+
+	void cal_meshball_vlocal_gamma(
+		const int na_grid,  						// how many atoms on this (i,j,k) grid
+		const int LD_pool,
+		const int*const block_iw,					// block_iw[na_grid],	index of wave functions for each block
+		const int*const block_size, 				// block_size[na_grid],	number of columns of a band
+		const int*const block_index,				// block_index[na_grid+1], count total number of atomis orbitals
+		const bool*const*const cal_flag,			// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_ylm,			// psir_ylm[GlobalC::pw.bxyz][LD_pool]
+		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		double* GridVlocal);		// GridVlocal[lgd_now][lgd_now]
 
     void cal_meshball_vlocal_k(
         int na_grid,
@@ -52,19 +71,8 @@ class Gint
         double** psir_vlbr3,
         double* pvpR);
 
-	void cal_meshball_vlocal_gamma(
-		const int na_grid,  						// how many atoms on this (i,j,k) grid
-		const int LD_pool,
-		const int*const block_iw,					// block_iw[na_grid],	index of wave functions for each block
-		const int*const block_size, 				// block_size[na_grid],	number of columns of a band
-		const int*const block_index,				// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag,			// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_ylm,			// psir_ylm[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		double* GridVlocal);		// GridVlocal[lgd_now][lgd_now]
-
     //------------------------------------------------------
-    // in gint_k_fvl.cpp 
+    // in gint_fvl.cpp 
     //------------------------------------------------------
     // calculate vl contributuion to force & stress via grid integrals
     void gint_kernel_force(
@@ -125,9 +133,9 @@ class Gint
     // dimension: [GlobalC::LNNR.nnrg] 
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.
     bool pvpR_alloc_flag = false;
-    double** pvpR_reduced;
+    double** pvpR_reduced; //stores Hamiltonian in reduced format, for multi-l
     
-	double* pvpR_grid; //stores Hamiltonian in grid format
+	double* pvpR_grid; //stores Hamiltonian in grid format, for gamma-point
 };
 
 #endif

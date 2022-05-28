@@ -14,7 +14,7 @@ namespace Gint_Tools
 }
 
 //the class used to pass input/output variables
-//into the unified interface gint_k
+//into the unified interface gint
 class Gint_inout
 {
     public:
@@ -34,6 +34,7 @@ class Gint_inout
 
         Gint_Tools::job_type job;
 
+	// electron density, multi-k
         Gint_inout(double **DM_R_in, Charge* chr_in, Gint_Tools::job_type job_in)
         {
             DM_R = DM_R_in;
@@ -41,6 +42,7 @@ class Gint_inout
             job = job_in;
         }
 
+	// force, multi-k
         Gint_inout(double** DM_R_in, double* vl_in,
             bool isforce_in, bool isstress_in,
             ModuleBase::matrix* fvl_dphi_in,
@@ -56,6 +58,7 @@ class Gint_inout
             job = job_in;
         }
 
+	// vlocal, multi-k
         Gint_inout(double* vl_in,
             int ispin_in,
             Gint_Tools::job_type job_in)
@@ -65,6 +68,7 @@ class Gint_inout
             job = job_in;
         }
 
+	// electron density, gamma point
         Gint_inout(double ***DM_in, Charge* chr_in, Gint_Tools::job_type job_in)
         {
             DM = DM_in;
@@ -72,6 +76,7 @@ class Gint_inout
             job = job_in;
         }
 
+	// force, gamma point
         Gint_inout(double*** DM_in, double* vl_in,
             const bool isforce_in, const bool isstress_in,
             ModuleBase::matrix* fvl_dphi_in,
@@ -87,6 +92,7 @@ class Gint_inout
             job = job_in;
         }
 
+	// vlocal, gamma point
 		Gint_inout(double* vl_in,
             LCAO_Matrix *lm_in,
             Gint_Tools::job_type job_in)
@@ -159,6 +165,7 @@ namespace Gint_Tools
 		const bool*const*const cal_flag,
 		double*const*const psir_ylm); // whether the atom-grid distance is larger than cutoff
 
+	// psir_ylm and dpsir_ylm, both[pw.bxyz][LD_pool]
 	void cal_dpsir_ylm(
 		const int na_grid, 					// number of atoms on this grid 
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
@@ -171,6 +178,7 @@ namespace Gint_Tools
 		double*const*const dpsir_ylm_y,
 		double*const*const dpsir_ylm_z);
 
+	// dpsir_ylm * (r-R), R is the atomic position
 	void cal_dpsirr_ylm(
 		const int na_grid, 					// number of atoms on this grid 
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
@@ -187,6 +195,7 @@ namespace Gint_Tools
 		double*const*const dpsir_ylm_yz,
 		double*const*const dpsir_ylm_zz);
 
+	// psir_ylm * vldr3
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -195,6 +204,7 @@ namespace Gint_Tools
 		const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
 		const double*const*const psir_ylm);		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
 
+	// sum_mu,nu rho_mu,nu psi_nu, for gamma point
 	void mult_psi_DM(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -207,6 +217,7 @@ namespace Gint_Tools
 		const double*const*const DM,
 		const int job);
 
+	// sum_mu,nu,R rho_mu,nu(R) psi_nu, for multi-k
 	void mult_psi_DMR(
         const int &grid_index, 
         const int &na_grid,
