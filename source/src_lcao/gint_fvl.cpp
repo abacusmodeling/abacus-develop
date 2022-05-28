@@ -19,8 +19,8 @@ void Gint::gint_kernel_force(
 {
     //prepare block information
 	int * block_iw, * block_index, * block_size;
-	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
-	bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
+	bool** cal_flag;
+	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, cal_flag);
 
     //evaluate psi and dpsi on grids
 	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);

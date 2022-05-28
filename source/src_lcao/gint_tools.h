@@ -140,20 +140,16 @@ namespace Gint_Tools
 	// block_iw : size na_grid, index of the first orbital on this atom
 	// block_size : size na_grid, number of orbitals on this atom
 	// block_index : size na_grid+1, start from 0, accumulates block_size
+	// cal_flag : whether the atom-grid distance is larger than cutoff
 	//------------------------------------------------------
 	void get_block_info(
 		const int na_grid,
 		const int grid_index,
 		int * &block_iw,
 		int * &block_index,
-		int * &block_size
-	);
-
-	// whether the atom-grid distance is larger than cutoff
-	// cal_flag[pw.bxyz][na_grid]
-	bool** get_cal_flag(
-		const int na_grid, 		// number of atoms on this grid 
-		const int grid_index);		
+		int * &block_size,
+		bool** &cal_flag
+	);		
 
 	// psir_ylm[pw.bxyz][LD_pool]
 	void cal_psir_ylm(

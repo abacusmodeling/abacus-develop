@@ -62,12 +62,18 @@ namespace Gint_Tools
 		const int grid_index,
 		int * &block_iw,
 		int * &block_index,
-		int * &block_size
+		int * &block_size,
+		bool** &cal_flag
 	)
 	{
 		block_iw = new int[na_grid];
 		block_index = new int[na_grid+1];
 		block_size = new int[na_grid];
+		cal_flag = new bool* [GlobalC::pw.bxyz];
+		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+		{
+			cal_flag[ib] = new bool[na_grid];
+		}
 
 		block_index[0] = 0;
 		for (int id=0; id<na_grid; id++)
@@ -80,33 +86,7 @@ namespace Gint_Tools
 			block_iw[id]=GlobalC::GridT.trace_lo[start];
 			block_index[id+1] = block_index[id]+GlobalC::ucell.atoms[it].nw;
 			block_size[id]=GlobalC::ucell.atoms[it].nw;	
-		}
-	}
 
-	// whether the atom-grid distance is larger than cutoff
-	bool** get_cal_flag(
-		const int na_grid, 			// number of atoms on this grid 
-		const int grid_index)		// 1d index of FFT index (i,j,k) 
-	{
-		bool** cal_flag = (bool**)malloc(GlobalC::pw.bxyz*sizeof(bool*));
-		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-			cal_flag[ib] = (bool*)malloc(na_grid*sizeof(bool));
-
-		for (int id=0; id<na_grid; id++)
-		{
-			// there are two parameters we want to know here:
-			// in which bigcell of the meshball the atom in?
-			// what's the cartesian coordinate of the bigcell?
-			const int mcell_index=GlobalC::GridT.bcell_start[grid_index] + id;
-			const int iat=GlobalC::GridT.which_atom[mcell_index];		
-			const int it=GlobalC::ucell.iat2it[iat];
-
-			// meshball_positions should be the bigcell position in meshball
-			// to the center of meshball.
-			// calculated in cartesian coordinates
-			// the std::vector from the grid which is now being operated to the atom position.
-			// in meshball language, is the std::vector from imcell to the center cel, plus
-			// tau_in_bigcell.
 			const int imcell=GlobalC::GridT.which_bigcell[mcell_index];
 			const double mt[3] = {
 				GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0],
@@ -127,8 +107,7 @@ namespace Gint_Tools
 				else
 					cal_flag[ib][id]=true;
 			}// end ib
-		}// end id
-		return cal_flag;
+		}
 	}
 
 	void cal_psir_ylm(
