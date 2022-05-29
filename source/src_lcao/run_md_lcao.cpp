@@ -89,14 +89,13 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
     // md cycle
     while ((verlet->step_ + verlet->step_rst_) <= GlobalV::MD_NSTEP && !verlet->stop)
     {
-        Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-
         if(verlet->step_ == 0)
         {
             verlet->setup(p_esolver);
         }
         else
         {
+            Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
             CE.update_all_pos(GlobalC::ucell);
 
             verlet->first_half();
@@ -143,7 +142,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
         {
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
-            file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_ + verlet->step_rst_;
+            file << GlobalV::global_stru_dir << "STRU_MD_" << verlet->step_ + verlet->step_rst_;
 #ifdef __LCAO
             verlet->ucell.print_stru_file(GlobalC::ORB, file.str(), 1, 1);
 #else

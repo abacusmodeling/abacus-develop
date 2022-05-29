@@ -39,7 +39,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
     int iat = 0;
 
 	ModuleBase::matrix force_e;
-	if(GlobalV::EFIELD)
+	if(GlobalV::EFIELD_FLAG)
 	{
 		force_e.create( GlobalC::ucell.nat, 3);
 		Efield::compute_force(GlobalC::ucell, force_e);
@@ -61,7 +61,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);																									   
 					
-				if(GlobalV::EFIELD)
+				if(GlobalV::EFIELD_FLAG)
 				{
 					force(iat,ipol) = force(iat, ipol) + force_e(iat, ipol);
 				}
@@ -136,7 +136,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 		Sto_Forces::print("NLCC     FORCE (Ry/Bohr)", forcecc);
 		Sto_Forces::print("ION      FORCE (Ry/Bohr)", forceion);
 		Sto_Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
-		if(GlobalV::EFIELD) Sto_Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
+		if(GlobalV::EFIELD_FLAG) Sto_Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
 	}
 	
 		
@@ -150,7 +150,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 		Sto_Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc,0);
 		Sto_Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Sto_Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
-		if(GlobalV::EFIELD) Sto_Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+		if(GlobalV::EFIELD_FLAG) Sto_Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
 	}
 	Sto_Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 	ModuleBase::timer::tick("Sto_Force","cal_force");

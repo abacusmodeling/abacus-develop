@@ -247,7 +247,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     // Dipole correction
     //==========================================
     ModuleBase::matrix v_efield;
-    if (GlobalV::EFIELD && GlobalV::DIPOLE)
+    if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
     {
         v_efield.create(GlobalV::NSPIN, rho_basis->nrxx);
         v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
@@ -258,7 +258,12 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     //==========================================
     for (int ir = 0;ir < rho_basis->nrxx;ir++)
     {
-        v_elecstat[ir] = vh_r[ir].real() + this->vltot[ir] + v_efield(0, ir);
+        v_elecstat[ir] = vh_r[ir].real() + this->vltot[ir];
+
+        if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
+        {
+            v_elecstat[ir] += v_efield(0, ir);
+        }
     }
 
     //-------------------------------------------

@@ -20,6 +20,7 @@ void ModuleBase::Global_File::make_dir_out(
     const std::string &suffix,
 	const std::string &calculation,
     const int rank,
+    const bool &restart,
     const bool out_alllog)
     //const bool linear_scaling, xiaohui modify 2013-09-01. Attention! Maybe there is some problem.
     //const bool out_alllog)
@@ -42,13 +43,14 @@ void ModuleBase::Global_File::make_dir_out(
 #endif
 
     GlobalV::global_out_dir = prefix + suffix + "/";
+    GlobalV::global_stru_dir = GlobalV::global_out_dir + "STRU/";
 
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
     int make_dir = 0;
 	// mohan update 2011-05-03
-	std::string command0 =  "test -d " + GlobalV::global_out_dir + " || mkdir " + GlobalV::global_out_dir;	
+    std::string command0 =  "test -d " + GlobalV::global_out_dir + " || mkdir " + GlobalV::global_out_dir;
 
 	int times = 0;
 	while(times<GlobalV::NPROC)
@@ -65,7 +67,7 @@ void ModuleBase::Global_File::make_dir_out(
 				std::cout << " PROC " << rank << " CAN NOT MAKE THE DIR !!! " << std::endl;	
 				make_dir = 0;
 			}
-		}
+        }
 #ifdef __MPI
 		Parallel_Reduce::reduce_int_all(make_dir);
 #endif
@@ -82,26 +84,64 @@ void ModuleBase::Global_File::make_dir_out(
 	MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
+    if(calculation == "md")
+    {
+        int make_dir_stru = 0;
+        std::string command1 =  "test -d " + GlobalV::global_stru_dir + " || mkdir " + GlobalV::global_stru_dir;
+
+        times = 0;
+        while(times<GlobalV::NPROC)
+        {
+            if(rank==times)
+            {
+                if ( system( command1.c_str() ) == 0 )
+                {
+                    std::cout << " MAKE THE STRU DIR    : " << GlobalV::global_stru_dir << std::endl;
+                    make_dir_stru = 1;
+                }
+                else
+                {
+                    std::cout << " PROC " << rank << " CAN NOT MAKE THE STRU DIR !!! " << std::endl;	
+                    make_dir_stru = 0;
+                }
+            }
+#ifdef __MPI
+            Parallel_Reduce::reduce_int_all(make_dir_stru);
+#endif
+            if(make_dir_stru>0) break;
+            ++times;
+        }
+
+#ifdef __MPI
+        if(make_dir_stru==0)
+        {
+            std::cout << " CAN NOT MAKE THE STRU DIR......." << std::endl;
+            ModuleBase::QUIT();		
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
+#endif
+    }
+
     std::stringstream ss,ss1;
 
     // mohan add 2010-09-12
     if(out_alllog)
     {
 	    ss << "running_" << calculation << "_" << rank + 1;
-	    open_log(GlobalV::ofs_running,ss.str());
+	    open_log(GlobalV::ofs_running, ss.str(), restart);
     }
     else
     {
 	    if(rank==0)
 	    {
 		    ss << "running_" << calculation;
-		    open_log(GlobalV::ofs_running,ss.str());
+		    open_log(GlobalV::ofs_running, ss.str(), restart);
 	    }
     }
 
     if(rank==0)
     {
-	    open_log(GlobalV::ofs_warning,"warning");
+	    open_log(GlobalV::ofs_warning, "warning", restart);
     }
     return;
 }
@@ -119,7 +159,7 @@ void ModuleBase::Global_File::make_dir_atom(const std::string &label)
     return;
 }
 
-void ModuleBase::Global_File::open_log(std::ofstream &ofs,const std::string &fn)
+void ModuleBase::Global_File::open_log(std::ofstream &ofs, const std::string &fn, const bool &restart)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLE :
@@ -128,7 +168,14 @@ void ModuleBase::Global_File::open_log(std::ofstream &ofs,const std::string &fn)
     std::stringstream ss;
     ss << GlobalV::global_out_dir << fn << ".log";
 
-    ofs.open( ss.str().c_str() );
+    if(fn == "running_md" && restart)
+    {
+        ofs.open( ss.str(), ios::app );
+    }
+    else
+    {
+        ofs.open( ss.str() );
+    }
 //	ofs << " WELCOME TO MESIA PROGRAM." << std::endl;
 //	ofs << " OPEN "<<fn<<".log"<<" DONE."<<std::endl;
     return;

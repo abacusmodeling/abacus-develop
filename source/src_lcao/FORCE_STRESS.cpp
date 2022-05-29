@@ -178,7 +178,7 @@ void Force_Stress_LCAO::getForceStress(
 	}
 	//implement force from E-field
     ModuleBase::matrix fefield;
-    if(GlobalV::EFIELD&&isforce)
+    if(GlobalV::EFIELD_FLAG&&isforce)
     {
         fefield.create(nat, 3);
         Efield::compute_force(GlobalC::ucell, fefield);
@@ -250,7 +250,7 @@ void Force_Stress_LCAO::getForceStress(
 					fcs(iat,i) += force_vdw(iat,i);
 				}
 				//E-field force
-				if(GlobalV::EFIELD)
+				if(GlobalV::EFIELD_FLAG)
 				{
 					fcs(iat, i) += fefield(iat, i);
 				}
@@ -371,7 +371,7 @@ void Force_Stress_LCAO::getForceStress(
 			//-------------------------------
 			//put extra force here for test!
 			//-------------------------------
-			if(GlobalV::EFIELD)
+			if(GlobalV::EFIELD_FLAG)
 			{
 				f_pw.print("EFIELD     FORCE", fefield,0);
 				//this->print_force("EFIELD     FORCE",fefield,1,ry);

@@ -26,7 +26,7 @@ jobs:
           cmake --install build
       - name: Test
         run: |
-          source /opt/intel/oneapi/setvars.sh 2> /dev/null || :
+          . /opt/intel/oneapi/setvars.sh 2> /dev/null || :
           cd examples/performance/
           bash run.sh
       - name: Show Result
