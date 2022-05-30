@@ -133,8 +133,8 @@ if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 				sed -i "1,$ s/[F-Z]//g" OUT.autotest/$lowf
 				sed -i "1,$ s/)//g" OUT.autotest/$lowf
 				sed -i "1,$ s/(//g" OUT.autotest/$lowf
-        			total_lowf=`sum_file OUT.autotest/$lowf`
-        			echo "$lowf $total_lowf" >>$1
+				total_lowf=`sum_file OUT.autotest/$lowf`
+				echo "$lowf $total_lowf" >>$1
 			fi
 		done
 	fi

@@ -171,7 +171,7 @@ for dir in $testdir; do
 		then
 			../tools/catch_properties.sh result.out
 			if [ $? == 1 ]; then
-            			echo -e "\e[1;31m [  FAILED  ]  Fatal Error in catch_properties.sh \e[0m"
+				echo -e "\e[1;31m [  FAILED  ]  Fatal Error in catch_properties.sh \e[0m"
 				let failed++
 				failed_case_list+=$dir
 				break
