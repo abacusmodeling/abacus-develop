@@ -111,7 +111,6 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 fi
 # echo "$has_lowf" ## test out_wfc_lcao > 0
 if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
-	nfile=0
 	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
 		lowfiles=`ls OUT.autotest/ | grep LOWF_GAMMA`
 	else
@@ -124,7 +123,7 @@ if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 		for lowf in $lowfiles;
 		do
 			if ! test -f OUT.autotest/$lowf; then
-				echo "Non-regular LOWF found"
+				echo "Irregular LOWF file found"
 				exit 1
 			else
 				sed -i "1,$ s/[a-d]//g" OUT.autotest/$lowf
