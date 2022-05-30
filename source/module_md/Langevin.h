@@ -12,7 +12,7 @@ public:
     void setup(ModuleESolver::ESolver *p_ensolve);
     void first_half();
     void second_half();
-    void outputMD(std::ofstream &ofs, bool &cal_stress);
+    void outputMD(std::ofstream &ofs, bool cal_stress);
     void write_restart();
     void restart();
     void post_force();

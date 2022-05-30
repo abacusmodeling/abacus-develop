@@ -111,7 +111,7 @@ void Verlet::second_half()
     }
 }
 
-void Verlet::outputMD(std::ofstream &ofs, bool &cal_stress)
+void Verlet::outputMD(std::ofstream &ofs, bool cal_stress)
 {
     if(GlobalV::MY_RANK) return;
 

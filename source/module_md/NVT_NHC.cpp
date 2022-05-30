@@ -89,7 +89,7 @@ void NVT_NHC::second_half()
     ModuleBase::timer::tick("NVT_NHC", "second_half");
 }
 
-void NVT_NHC::outputMD(std::ofstream &ofs, bool &cal_stress)
+void NVT_NHC::outputMD(std::ofstream &ofs, bool cal_stress)
 {
     Verlet::outputMD(ofs, cal_stress);
 }

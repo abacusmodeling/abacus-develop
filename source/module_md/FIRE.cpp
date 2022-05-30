@@ -85,7 +85,7 @@ void FIRE::second_half()
     ModuleBase::timer::tick("FIRE", "second_half");
 }
 
-void FIRE::outputMD(std::ofstream &ofs, bool &cal_stress)
+void FIRE::outputMD(std::ofstream &ofs, bool cal_stress)
 {
     Verlet::outputMD(ofs, cal_stress);
 
