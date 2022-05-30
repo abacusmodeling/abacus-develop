@@ -188,7 +188,7 @@ TEST_F(PWTEST,test1_1_1)
         EXPECT_NEAR(gcar.y,pwtest.gcar[ig].y,1e-6);
         EXPECT_NEAR(gcar.z,pwtest.gcar[ig].z,1e-6);
         EXPECT_NEAR(modulus,pwtest.gg[ig],1e-6);
-        EXPECT_NEAR(pwtest.gg[ig], pwtest.gg_uniq[pwtest.ig2igg[ig]],1e-6);
+        EXPECT_NEAR(pwtest.gg[ig], pwtest.gg_uniq[pwtest.ig2igg[ig]],1e-8);
     }
     for(int igg = 1 ; igg < pwtest.ngg ; ++igg)
     {
@@ -199,4 +199,23 @@ TEST_F(PWTEST,test1_1_1)
     delete [] tmpx;
     delete [] tmpy;
     delete [] tmpz;
+
+    //Add tests for gg_uniq
+    ModuleBase::Matrix3 latvec2(5.1358423233,0.0,0.0,0.1578526541,5.1334159104,0.0,-2.646847675,-2.5667081359,3.5753437737);
+    gamma_only = false;
+    wfcecut = 240;
+    lat0 = 1.88972613;
+    distribution_type = 1;
+    //--------------------------------------------------
+    pwtest.initgrids(lat0, latvec2, wfcecut,nproc_in_pool, rank_in_pool);
+    pwtest.initparameters(gamma_only, wfcecut, distribution_type);
+    pwtest.setuptransform();
+    pwtest.collect_local_pw();
+    pwtest.collect_uniqgg();
+    for(int ig = 0 ;ig < pwtest.npw ; ++ig)
+    {
+        EXPECT_NEAR(pwtest.gg[ig], pwtest.gg_uniq[pwtest.ig2igg[ig]],1e-8);
+    }
+
+
 }

@@ -188,7 +188,7 @@ TEST_F(PWTEST,test1_1_2)
         EXPECT_NEAR(gcar.y,pwtest.gcar[ig].y,1e-6);
         EXPECT_NEAR(gcar.z,pwtest.gcar[ig].z,1e-6);
         EXPECT_NEAR(modulus,pwtest.gg[ig],1e-6);
-        EXPECT_NEAR(pwtest.gg[ig], pwtest.gg_uniq[pwtest.ig2igg[ig]],1e-6);
+        EXPECT_NEAR(pwtest.gg[ig], pwtest.gg_uniq[pwtest.ig2igg[ig]],1e-8);
     }
     for(int igg = 1 ; igg < pwtest.ngg ; ++igg)
     {

@@ -150,6 +150,7 @@ void PW_Basis::collect_uniqgg()
     delete[] this->ig2igg; this->ig2igg = new int [this->npw];
     int *sortindex = new int [this->npw];
     double *tmpgg = new double [this->npw];
+    double *tmpgg2 = new double [this->npw];
     ModuleBase::Vector3<double> f;
     for(int ig = 0 ; ig < this-> npw ; ++ig)
     {
@@ -175,31 +176,39 @@ void PW_Basis::collect_uniqgg()
 
     int igg = 0;
     this->ig2igg[sortindex[0]] = 0;
-    for (int ig = 0; ig < this->npw - 1; ++ig)
+    tmpgg2[0] = tmpgg[0];
+    double avg_gg = tmpgg2[igg];
+    int avg_n = 1;
+    for (int ig = 1; ig < this->npw; ++ig)
     {
-        if (std::abs(tmpgg[ig] - tmpgg[ig+1]) > 1.0e-8)
+        if (std::abs(tmpgg[ig] - tmpgg2[igg]) > 1.0e-8)
         {
+            tmpgg2[igg] = avg_gg / double(avg_n) ;
             ++igg;
+            tmpgg2[igg] = tmpgg[ig];
+            avg_gg = tmpgg2[igg];
+            avg_n = 1;   
         }
         else
         {
-            tmpgg[ig] = -1.0;
+            avg_n++;
+            avg_gg += tmpgg[ig];
         }
-        this->ig2igg[sortindex[ig+1]] = igg;
+        this->ig2igg[sortindex[ig]] = igg;
+        if(ig == this->npw)
+        {
+            tmpgg2[igg] = avg_gg / double(avg_n) ;
+        }
     }
     this->ngg = igg + 1;
     delete[] this->gg_uniq; this->gg_uniq = new double [this->ngg];
-    igg = 0;
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igg = 0 ; igg < this->ngg ; ++igg)
     {
-        if(tmpgg[ig] >= 0.0)
-        {
-            gg_uniq[igg] = tmpgg[ig]; 
-            ++igg;
-        } 
+            gg_uniq[igg] = tmpgg2[igg];
     }
     delete[] sortindex;
     delete[] tmpgg;
+    delete[] tmpgg2;
 }
 
 // //
