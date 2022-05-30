@@ -4,12 +4,12 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/memory.h"
 #include "../module_xc/xc_functional.h"
-#include "efield.h"
 #include "global.h"
 #include "math.h"
 // new
 #include "../module_surchem/surchem.h"
 #include "H_Hartree_pw.h"
+#include "../module_surchem/efield.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
@@ -285,23 +285,17 @@ void Potential::set_local_pot(double *vl_pseudo, // store the local pseudopotent
 
     GlobalC::UFFT.ToRealSpace(vg, vl_pseudo);
 
-    delete[] vg;
-
-    if (GlobalV::EFIELD && !GlobalV::DIPOLE)
+    if (GlobalV::EFIELD_FLAG && !GlobalV::DIP_COR_FLAG)
     {
-        Efield EFID;
-        // in fact, GlobalC::CHR.rho is not used here.
-        // if charge correction due to Efield is considered,
-        // the structure here need to be updated.
-
-        static bool first = true;
-        if (first)
+        ModuleBase::matrix v_efield(GlobalV::NSPIN, GlobalC::pw.nrxx);
+        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
+        for (int ir = 0; ir < GlobalC::pw.nrxx; ++ir)
         {
-            std::cout << " ADD THE GlobalV::EFIELD (V/A) : " << Efield::eamp * 51.44 << std::endl;
-            first = false;
+            vl_pseudo[ir] += v_efield(0, ir);
         }
-        EFID.add_efield(GlobalC::CHR.rho[0], vl_pseudo);
     }
+
+    delete[] vg;
 
     // GlobalV::ofs_running <<" set local pseudopotential done." << std::endl;
     ModuleBase::timer::tick("Potential", "set_local_pot");
@@ -372,15 +366,15 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
         }
     }
 
-    // mohan add 2011-06-20
-    if (GlobalV::EFIELD && GlobalV::DIPOLE)
+    //----------------------------------------------------------
+    //  calculate the efield and dipole correction
+    //----------------------------------------------------------
+    if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
     {
-        Efield EFID;
-        for (int is = 0; is < GlobalV::NSPIN; is++)
-        {
-            EFID.add_efield(rho_in[is], &v.c[is * GlobalC::pw.nrxx]);
-        }
+        v += Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
     }
+
+
     ModuleBase::timer::tick("Potential", "v_of_rho");
     return v;
 } // end subroutine v_of_rho

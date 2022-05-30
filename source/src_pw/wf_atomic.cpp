@@ -7,11 +7,10 @@
 #include "soc.h"
 #include <complex>
 #include "../module_base/timer.h"
+#include "module_base/tool_quit.h"
 
 WF_atomic::WF_atomic()
 {
-    evc  = new ModuleBase::ComplexMatrix[1];
-    wanf2= new ModuleBase::ComplexMatrix[1];
     pw_seed = 0;
 }
 
@@ -21,8 +20,18 @@ WF_atomic::~WF_atomic()
 	{
 		std::cout << " ~WF_atomic()" << std::endl;
 	}
-    delete[] evc;
-    delete[] wanf2;
+    if(this->evc!=nullptr)
+    {
+        delete[] evc;
+    }
+    if(this->wanf2!= nullptr)
+    {
+        delete[] wanf2;
+    }
+    if(this->psi != nullptr)
+    {
+        delete psi;
+    }
 }
 
 //==========================================================
@@ -209,7 +218,7 @@ void WF_atomic::print_PAOs(void)const
 //===================================================================
 // from wfcinit.f90
 
-void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
+void WF_atomic::check_evc()const
 {
     std::cout<<"\n Check psi : \n";
 
@@ -658,6 +667,55 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
 #ifdef __MPI
     }
 #endif
+
+    return;
+}
+
+void WF_atomic::evc_transform_psi()
+{
+    if(this->evc==nullptr || this->psi != nullptr)
+    {
+        //ModuleBase::WARNING_QUIT("WF_atomic","no evc or psi is not nullptr, please check!");
+        std::cout<<__FILE__<<__LINE__<<" there is no need to transform!"<<std::endl;
+        return;
+    }
+    this->psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, this->evc[0].nr, this->evc[0].nc, GlobalC::kv.ngk.data());
+    for(int ik = 0; ik < GlobalC::kv.nks; ++ik)
+    {
+        this->psi->fix_k(ik);
+        std::complex<double> *ppsi = this->psi->get_pointer();
+        std::complex<double> *pevc = this->evc[ik].c;
+        for(int index = 0; index < this->evc[0].nc * this->evc[0].nr; ++index)
+        {
+            ppsi[index] =  pevc[index];
+        }
+    }
+    delete[] this->evc;
+    this->evc = nullptr;
+
+    return;
+}
+
+void WF_atomic::psi_transform_evc()
+{
+    if(this->psi==nullptr || this->evc != nullptr)
+    {
+        ModuleBase::WARNING_QUIT("WF_atomic","no psi, please check!");
+    }
+    this->evc = new ModuleBase::ComplexMatrix [this->psi->get_nk()];
+    for(int ik = 0; ik < this->psi->get_nk(); ++ik)
+    {
+        this->evc[ik].create(this->psi->get_nbands(), this->psi->get_nbasis());
+        this->psi->fix_k(ik);
+        std::complex<double> *ppsi = this->psi->get_pointer();
+        std::complex<double> *pevc = this->evc[ik].c;
+        for(int index = 0; index < this->evc[ik].nc * this->evc[ik].nr; ++index)
+        {
+            pevc[index] =  ppsi[index];
+        }
+    }
+    delete this->psi;
+    this->psi = nullptr;
 
     return;
 }

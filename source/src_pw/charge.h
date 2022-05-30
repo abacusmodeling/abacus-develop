@@ -94,13 +94,13 @@ public:
 
     void sum_band_k();
 
-	private:
+	
 
 	// mohan add 2021-02-20
 	int nrxx; // number of r vectors in this processor
 	int ngmc; // number of g vectors in this processor
 	int nspin; // number of spins
-
+  private:
 
     double sum_rho(void) const;
 

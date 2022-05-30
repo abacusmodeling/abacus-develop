@@ -3,11 +3,11 @@
 
 namespace ModulePW
 {
-//
-//distribute real-space grids to different processors
-//Known: nx, ny, nz, poolnproc, poolrank
-//output: nrxx, startz, numz
-//
+/// 
+/// distribute real-space grids to different processors
+/// Known: nx, ny, nz, poolnproc, poolrank
+/// output: nrxx, startz, numz
+/// 
 void PW_Basis::distribute_r()
 {
     this->numz = new int[this->poolnproc];

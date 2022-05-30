@@ -62,11 +62,12 @@ void DiagoCG::diag_mock(psi::Psi<std::complex<double>> &phi, double *eigenvalue_
         if (test_cg > 2)
             GlobalV::ofs_running << "Diagonal Band : " << m << std::endl;
         for (int i = 0; i < this->dim; i++)
+        {
             phi_m[i] = phi(m, i);
+        }
 
         this->hpw->s_1psi(this->dim, this->phi_m.data(), this->sphi.data()); // sphi = S|psi(m)>
         this->schmit_orth(m, phi);
-
         this->hpw->h_1psi(this->dim, this->phi_m.data(), this->hphi.data(), this->sphi.data());
 
         this->eigenvalue[m] = ModuleBase::GlobalFunc::ddot_real(this->dim, this->phi_m.data(), this->hphi.data());
@@ -346,7 +347,6 @@ bool DiagoCG::update_psi(double &cg_norm, double &theta, double &eigenvalue)
         = ModuleBase::GlobalFunc::ddot_real(this->dim, this->cg.data(), this->pphi.data()) / (cg_norm * cg_norm);
 
     const double e0 = eigenvalue;
-
     theta = atan(a0 / (e0 - b0)) / 2.0;
 
     const double new_e = (e0 - b0) * cos(2.0 * theta) + a0 * sin(2.0 * theta);
@@ -497,7 +497,10 @@ void DiagoCG::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, 
     this->notconv = 0;
     do
     {
-        DiagoIterAssist::diagH_subspace(this->hpw, psi, psi, eigenvalue_in);
+        if(DiagoIterAssist::need_subspace || ntry > 0)
+        {
+            DiagoIterAssist::diagH_subspace(this->hpw, psi, psi, eigenvalue_in);
+        }
 
         DiagoIterAssist::avg_iter += 1.0;
         this->reorder = true;
@@ -512,6 +515,7 @@ void DiagoCG::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, 
         std::cout << "\n notconv = " << this->notconv;
         std::cout << "\n DiagoCG::diag', too many bands are not converged! \n";
     }
+
     return;
 }
 

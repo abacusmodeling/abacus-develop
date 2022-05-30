@@ -21,6 +21,7 @@ class Parallel_Grid
 
 #ifdef __MPI	
 	void zpiece_to_all(double *zpiece, const int &iz, double *rho);
+	void zpiece_to_stogroup(double *zpiece, const int &iz, double *rho); //qainrui add for sto-dft 2021-7-21
 	
 	void reduce_to_fullrho(double *rhotot, double *rhoin);
 #endif

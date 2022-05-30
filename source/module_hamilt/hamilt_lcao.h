@@ -38,12 +38,19 @@ template <typename T> class LocalMatrix
 template <typename T, typename T1> class HamiltLCAO : public Hamilt
 {
   public:
-    HamiltLCAO(Gint_Gamma* GG_in, Gint_k* GK_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
+    HamiltLCAO(Gint_Gamma* GG_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
     {
         this->GG = GG_in;
+        this->genH = genH_in;
+        this->LM = LM_in;
+        this->classname = "HamiltLCAO";
+    }
+    HamiltLCAO(Gint_k* GK_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
+    {
         this->GK = GK_in;
         this->genH = genH_in;
         this->LM = LM_in;
+        this->classname = "HamiltLCAO";
     }
     //~HamiltLCAO();
 
@@ -62,8 +69,8 @@ template <typename T, typename T1> class HamiltLCAO : public Hamilt
 
     // core function: return H(k) and S(k) matrixs for direct solving eigenvalues.
     // not used in PW base
-    void matrix(MatrixBlock<std::complex<double>> hk_in, MatrixBlock<std::complex<double>> sk_in) override;
-    void matrix(MatrixBlock<double> hk_in, MatrixBlock<double> sk_in) override;
+    //void matrix(MatrixBlock<std::complex<double>> &hk_in, MatrixBlock<std::complex<double>> &sk_in) override;
+    void matrix(MatrixBlock<T> &hk_in, MatrixBlock<T> &sk_in) override;
 
   private:
     void ch_mock();

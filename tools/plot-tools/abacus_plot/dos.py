@@ -5,16 +5,16 @@ LastEditTime: 2022-01-03 17:18:21
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import OrderedDict, namedtuple
 import numpy as np
 from os import PathLike
 from pathlib import Path
-from typing import Dict, List, Sequence, Tuple, Union
+from typing import Dict, List, Sequence, Tuple, Union, Any
 from matplotlib.figure import Figure
 from matplotlib import axes
 
 from abacus_plot.utils import (energy_minus_efermi, get_angular_momentum_label,
-                               get_angular_momentum_name, remove_empty)
+                               get_angular_momentum_name, remove_empty, handle_data, parse_projected_data)
 
 
 class DOS:
@@ -92,14 +92,14 @@ class DOS:
 class DOSPlot:
     """Plot density of state(DOS)"""
 
-    def __init__(self, fig: Figure, ax: axes.Axes, **kwargs) -> None:
+    def __init__(self, fig: Figure = None, ax: axes.Axes = None, **kwargs) -> None:
         self.fig = fig
         self.ax = ax
         self._lw = kwargs.pop('lw', 2)
         self._bwidth = kwargs.pop('bwdith', 3)
         self.plot_params = kwargs
 
-    def _set_figure(self, energy_range: Sequence, dos_range: Sequence, notes: Dict = {}):
+    def _set_figure(self, energy_range: Sequence = [], dos_range: Sequence = [], notes: Dict = {}):
         """set figure and axes for plotting
 
         :params energy_range: range of energy
@@ -109,7 +109,7 @@ class DOSPlot:
         # y-axis
         if dos_range:
             self.ax.set_ylim(dos_range[0], dos_range[1])
-        if "xlabel_params" in self.plot_params.keys():
+        if "ylabel_params" in self.plot_params.keys():
             self.ax.set_ylabel("DOS", **self.plot_params["ylabel_params"])
         else:
             self.ax.set_ylabel("DOS", size=25)
@@ -154,7 +154,7 @@ class DOSPlot:
 class TDOS(DOS):
     """Parse total DOS data"""
 
-    def __init__(self, tdosfile: PathLike) -> None:
+    def __init__(self, tdosfile: PathLike = None) -> None:
         super().__init__()
         self.tdosfile = tdosfile
         self._read()
@@ -202,7 +202,7 @@ class TDOS(DOS):
 class PDOS(DOS):
     """Parse partial DOS data"""
 
-    def __init__(self, pdosfile: PathLike) -> None:
+    def __init__(self, pdosfile: PathLike = None) -> None:
         super().__init__()
         self.pdosfile = pdosfile
         self._read()
@@ -212,15 +212,6 @@ class PDOS(DOS):
 
         :params pdosfile: string of PDOS data file
         """
-
-        def handle_data(data):
-            data.remove('')
-
-            def handle_elem(elem):
-                elist = elem.split(' ')
-                remove_empty(elist)  # `list` will be modified in function
-                return elist
-            return list(map(handle_elem, data))
 
         from lxml import etree
         pdosdata = etree.parse(self.pdosfile)
@@ -257,74 +248,15 @@ class PDOS(DOS):
             res = res + orb['data']
         return res
 
-    def parse(self, species: Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[str, List[int]]]]):
-        """Extract partial dos from file
-
-        Args:
-            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[str, List[int]]]], optional): list of atomic species or dict of atomic species and its angular momentum list. Defaults to [].
-        """
-
-        if isinstance(species, (list, tuple)):
-            dos = {}
-            elements = species
-            for elem in elements:
-                count = 0
-                dos_temp = np.zeros_like(self.orbitals[0]["data"], dtype=float)
-                for orb in self.orbitals:
-                    if orb["species"] == elem:
-                        dos_temp += orb["data"]
-                        count += 1
-                if count:
-                    dos[elem] = dos_temp
-
-            return dos
-
-        elif isinstance(species, dict):
-            dos = defaultdict(dict)
-            elements = list(species.keys())
-            l = list(species.values())
-            for i, elem in enumerate(elements):
-                if isinstance(l[i], dict):
-                    for ang, mag in l[i].items():
-                        l_count = 0
-                        l_index = int(ang)
-                        l_dos = {}
-                        for m_index in mag:
-                            m_count = 0
-                            dos_temp = np.zeros_like(
-                                self.orbitals[0]["data"], dtype=float)
-                            for orb in self.orbitals:
-                                if orb["species"] == elem and orb["l"] == l_index and orb["m"] == m_index:
-                                    dos_temp += orb["data"]
-                                    m_count += 1
-                                    l_count += 1
-                            if m_count:
-                                l_dos[m_index] = dos_temp
-                        if l_count:
-                            dos[elem][l_index] = l_dos
-
-                elif isinstance(l[i], list):
-                    for l_index in l[i]:
-                        count = 0
-                        dos_temp = np.zeros_like(
-                            self.orbitals[0]["data"], dtype=float)
-                        for orb in self.orbitals:
-                            if orb["species"] == elem and orb["l"] == l_index:
-                                dos_temp += orb["data"]
-                                count += 1
-                        if count:
-                            dos[elem][l_index] = dos_temp
-
-            return dos
-
-    def write(self, species: Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[str, List[int]]]], outdir: PathLike = './'):
+    def _write(self, species: Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], keyname='', outdir: PathLike = './'):
         """Write parsed partial dos data to files
 
         Args:
-            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[str, List[int]]]], optional): list of atomic species or dict of atomic species and its angular momentum list. Defaults to [].
+            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
+            keyname (str): the keyword that extracts the PDOS. Allowed values: 'index', 'atom_index', 'species'
         """
 
-        dos = self.parse(species)
+        dos, totnum = parse_projected_data(self.orbitals, species, keyname)
         fmt = ['%13.7f', '%15.8f'] if self._nsplit == 1 else [
             '%13.7f', '%15.8f', '%15.8f']
         file_dir = Path(f"{outdir}", "PDOS_FILE")
@@ -334,14 +266,14 @@ class PDOS(DOS):
             for elem in dos.keys():
                 header_list = ['']
                 data = np.hstack((self.energy.reshape(-1, 1), dos[elem]))
-                with open(file_dir/f"{elem}.dat", 'w') as f:
+                with open(file_dir/f"{keyname}-{elem}.dat", 'w') as f:
                     header_list.append(
-                        f"\tpartial DOS for atom species: {elem}")
+                        f"Partial DOS for {keyname}: {elem}")
                     header_list.append('')
                     for orb in self.orbitals:
-                        if orb["species"] == elem:
+                        if orb[keyname] == elem:
                             header_list.append(
-                                f"\tAdd data for atom_index ={orb['atom_index']:4d},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
+                                f"\tAdd data for index ={orb['index']:4d}, atom_index ={orb['atom_index']:4d}, element ={orb['species']:4s},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
                     header_list.append('')
                     header_list.append('\tEnergy'+10*' ' +
                                        'spin 1'+8*' '+'spin 2')
@@ -351,7 +283,7 @@ class PDOS(DOS):
 
         elif isinstance(species, dict):
             for elem in dos.keys():
-                elem_file_dir = file_dir/f"{elem}"
+                elem_file_dir = file_dir/f"{keyname}-{elem}"
                 elem_file_dir.mkdir(exist_ok=True)
                 for ang in dos[elem].keys():
                     l_index = int(ang)
@@ -361,14 +293,14 @@ class PDOS(DOS):
                             data = np.hstack(
                                 (self.energy.reshape(-1, 1), dos[elem][ang][mag]))
                             m_index = int(mag)
-                            with open(elem_file_dir/f"{elem}_{ang}_{mag}.dat", 'w') as f:
+                            with open(elem_file_dir/f"{keyname}-{elem}_{ang}_{mag}.dat", 'w') as f:
                                 header_list.append(
-                                    f"\tpartial DOS for atom species: {elem}")
+                                    f"Partial DOS for {keyname}: {elem}")
                                 header_list.append('')
                                 for orb in self.orbitals:
-                                    if orb["species"] == elem and orb["l"] == l_index and orb["m"] == m_index:
+                                    if orb[keyname] == elem and orb["l"] == l_index and orb["m"] == m_index:
                                         header_list.append(
-                                            f"\tAdd data for atom_index ={orb['atom_index']:4d},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
+                                            f"\tAdd data for index ={orb['index']:4d}, atom_index ={orb['atom_index']:4d}, element ={orb['species']:4s},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
                                 header_list.append('')
                                 header_list.append(
                                     '\tEnergy'+10*' '+'spin 1'+8*' '+'spin 2')
@@ -380,20 +312,44 @@ class PDOS(DOS):
                         header_list = ['']
                         data = np.hstack(
                             (self.energy.reshape(-1, 1), dos[elem][ang]))
-                        with open(elem_file_dir/f"{elem}_{ang}.dat", 'w') as f:
+                        with open(elem_file_dir/f"{keyname}-{elem}_{ang}.dat", 'w') as f:
                             header_list.append(
-                                f"\tpartial DOS for atom species: {elem}")
+                                f"Partial DOS for {keyname}: {elem}")
                             header_list.append('')
                             for orb in self.orbitals:
-                                if orb["species"] == elem and orb["l"] == l_index:
+                                if orb[keyname] == elem and orb["l"] == l_index:
                                     header_list.append(
-                                        f"\tAdd data for atom_index ={orb['atom_index']:4d},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
+                                        f"\tAdd data for index ={orb['index']:4d}, atom_index ={orb['atom_index']:4d}, element ={orb['species']:4s},  l,m,z={orb['l']:3d}, {orb['m']:3d}, {orb['z']:3d}")
                             header_list.append('')
                             header_list.append(
                                 '\tEnergy'+10*' '+'spin 1'+8*' '+'spin 2')
                             header_list.append('')
                             header = '\n'.join(header_list)
                             np.savetxt(f, data, fmt=fmt, header=header)
+
+    def write(self,
+              index: Union[Sequence[int], Dict[int, List[int]],
+                           Dict[int, Dict[int, List[int]]]] = [],
+              atom_index: Union[Sequence[int], Dict[int, List[int]],
+                                Dict[int, Dict[int, List[int]]]] = [],
+              species: Union[Sequence[str], Dict[str, List[int]],
+                             Dict[str, Dict[int, List[int]]]] = [],
+              outdir: PathLike = './'
+              ):
+        """Write parsed partial dos data to files
+
+        Args:
+            index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom. Defaults to [].
+            atom_index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom with same atom_index. Defaults to [].
+            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[int, List[int]]]], optional): extract PDOS of each atom with same species. Defaults to [].
+            outdir (PathLike, optional): directory of parsed PDOS files. Defaults to './'.
+        """
+        if index:
+            self._write(index, keyname='index', outdir=outdir)
+        if atom_index:
+            self._write(atom_index, keyname='atom_index', outdir=outdir)
+        if species:
+            self._write(species, keyname='species', outdir=outdir)
 
     def _shift_energy(self, efermi: float = 0, shift: bool = False, prec: float = 0.01):
         tdos = self._all_sum()
@@ -407,10 +363,38 @@ class PDOS(DOS):
 
         return energy_f, tdos
 
-    def plot(self, fig: Figure, ax: Union[axes.Axes, Sequence[axes.Axes]], species: Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[str, List[int]]]] = [], efermi: float = 0, energy_range: Sequence[float] = [], dos_range: Sequence[float] = [], shift: bool = False, prec: float = 0.01, **kwargs):
-        """Plot partial DOS"""
+    def _parial_plot(self,
+                     fig: Figure,
+                     ax: Union[axes.Axes, Sequence[axes.Axes]],
+                     species: Union[Sequence[Any], Dict[Any, List[int]],
+                                    Dict[Any, Dict[int, List[int]]]] = [],
+                     efermi: float = 0,
+                     energy_range: Sequence[float] = [],
+                     dos_range: Sequence[float] = [],
+                     shift: bool = False,
+                     prec: float = 0.01,
+                     keyname: str = '',
+                     **kwargs):
+        """Plot parsed partial dos data
 
-        dos = self.parse(species)
+        Args:
+            fig (Figure): object of matplotlib.figure.Figure
+            ax (Union[axes.Axes, Sequence[axes.Axes]]): object of matplotlib.axes.Axes or a list of this objects
+            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
+            efermi (float, optional): fermi level in unit eV. Defaults to 0.
+            energy_range (Sequence[float], optional): energy range in unit eV for plotting. Defaults to [].
+            dos_range (Sequence[float], optional): dos range for plotting. Defaults to [].
+            shift (bool, optional): if shift energy by fermi level and set the VBM to zero, or not. Defaults to False.
+            prec (float, optional): precision for treating dos as zero. Defaults to 0.01.
+            keyname (str, optional): the keyword that extracts the PDOS. Defaults to ''.
+
+        Returns:
+            DOSPlot object: for manually plotting picture with dosplot.ax 
+        """
+        if not isinstance(ax, list):
+            ax = [ax]
+
+        dos, totnum = parse_projected_data(self.orbitals, species, keyname)
         energy_f, tdos = self._shift_energy(efermi, shift, prec)
 
         if not species:
@@ -424,7 +408,7 @@ class PDOS(DOS):
 
             return dosplot
 
-        elif isinstance(species, (list, tuple)):
+        if isinstance(species, (list, tuple)):
             dosplot = DOSPlot(fig, ax, **kwargs)
             if "xlabel_params" in dosplot.plot_params.keys():
                 dosplot.ax.set_xlabel("Energy(eV)", **
@@ -473,24 +457,78 @@ class PDOS(DOS):
 
             return dosplots
 
+    def plot(self,
+             fig: Figure,
+             ax: Union[axes.Axes, Sequence[axes.Axes]],
+             index: Union[Sequence[int], Dict[int, List[int]],
+                          Dict[int, Dict[int, List[int]]]] = [],
+             atom_index: Union[Sequence[int], Dict[int, List[int]],
+                               Dict[int, Dict[int, List[int]]]] = [],
+             species: Union[Sequence[str], Dict[str, List[int]],
+                            Dict[str, Dict[int, List[int]]]] = [],
+             efermi: float = 0,
+             energy_range: Sequence[float] = [],
+             dos_range: Sequence[float] = [],
+             shift: bool = False,
+             prec: float = 0.01,
+             **kwargs):
+        """Plot parsed partial dos data
+
+        Args:
+            fig (Figure): object of matplotlib.figure.Figure
+            ax (Union[axes.Axes, Sequence[axes.Axes]]): object of matplotlib.axes.Axes or a list of this objects
+            index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom. Defaults to [].
+            atom_index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PDOS of each atom with same atom_index. Defaults to [].
+            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[int, List[int]]]], optional): extract PDOS of each atom with same species. Defaults to [].
+            efermi (float, optional): fermi level in unit eV. Defaults to 0.
+            energy_range (Sequence[float], optional): energy range in unit eV for plotting. Defaults to [].
+            dos_range (Sequence[float], optional): dos range for plotting. Defaults to [].
+            shift (bool, optional): if shift energy by fermi level and set the VBM to zero, or not. Defaults to False.
+            prec (float, optional): precision for treating dos as zero. Defaults to 0.01.
+
+        Returns:
+            DOSPlot object: for manually plotting picture with dosplot.ax 
+        """
+
+        if not index and not atom_index and not species:
+            dosplot = self._parial_plot(fig=fig, ax=ax, species=[
+            ], efermi=efermi, energy_range=energy_range, dos_range=dos_range, shift=shift, prec=prec, keyname='', **kwargs)
+        if index:
+            dosplot = self._parial_plot(fig=fig, ax=ax, species=index, efermi=efermi, energy_range=energy_range,
+                                        dos_range=dos_range, shift=shift, prec=prec, keyname='index', **kwargs)
+        if atom_index:
+            dosplot = self._parial_plot(fig=fig, ax=ax, species=atom_index, efermi=efermi, energy_range=energy_range,
+                                        dos_range=dos_range, shift=shift, prec=prec, keyname='atom_index', **kwargs)
+        if species:
+            dosplot = self._parial_plot(fig=fig, ax=ax, species=species, efermi=efermi, energy_range=energy_range,
+                                        dos_range=dos_range, shift=shift, prec=prec, keyname='species', **kwargs)
+
+        return dosplot
+
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    pdosfile = r"C:\Users\YY.Ji\Desktop\PDOS"
-    pdos = PDOS(pdosfile)
-    species = {"Cs": [0, 1], "Na": [0, 1]}
-    fig, ax = plt.subplots(2, 1, sharex=True)
-    energy_range = [-6, 10]
-    dos_range = [0, 5]
-    dosplots = pdos.plot(fig, ax, species, efermi=5, shift=True,
-                         energy_range=energy_range, dos_range=dos_range, notes=[{'s': '(a)'}, {'s': '(b)'}])
-    fig.savefig("pdos.png")
+    #tdosfile = r"C:\Users\YY.Ji\Desktop\TDOS"
+    #tdos = TDOS(tdosfile)
+    #fig, ax = plt.subplots()
+    #energy_range = [-6, 10]
+    #dos_range = [0, 5]
+    # dosplots = tdos.plot(fig, ax, efermi=5, shift=True,
+    #                     energy_range=energy_range, dos_range=dos_range, notes={'s': '(a)'})
+    # fig.savefig("tdos.png")
 
-    tdosfile = r"C:\Users\YY.Ji\Desktop\TDOS"
-    tdos = TDOS(tdosfile)
-    fig, ax = plt.subplots()
-    energy_range = [-6, 10]
+    pdosfile = r"../examples/Si/PDOS"
+    pdos = PDOS(pdosfile)
+    #species = {"Ag": [2], "Cl": [1], "In": [0]}
+    atom_index = {1: {1: [0, 1]}}
+    fig, ax = plt.subplots(1, 1, sharex=True)
+    energy_range = [-5, 7]
+    efermi = 6.585653952007503
     dos_range = [0, 5]
-    dosplots = tdos.plot(fig, ax, efermi=5, shift=True,
-                         energy_range=energy_range, dos_range=dos_range, notes={'s': '(a)'})
-    fig.savefig("tdos.png")
+
+    # if you want to specify `species` or `index`, you need to
+    # set `species=species` or `index=index` in the following two functions
+    dosplots = pdos.plot(fig, ax, atom_index=atom_index, efermi=efermi, shift=True,
+                         energy_range=energy_range, dos_range=dos_range, notes=[{'s': '(a)'}])
+    fig.savefig("pdos.png")
+    pdos.write(atom_index=atom_index)

@@ -20,7 +20,6 @@ Electrons::Electrons()
 {
     iter = 0;
     test = 0;
-    unit = 0;
     delta_total_energy = 0.0;
 }
 
@@ -28,66 +27,7 @@ Electrons::~Electrons()
 {
 }
 
-void Electrons::non_self_consistent(const int &istep)
-{
-    ModuleBase::TITLE("Electrons","non_self_consistent");
-    ModuleBase::timer::tick("Electrons","non_self_consistent");
-
-    //========================================
-    // diagonalization of the KS hamiltonian
-    // =======================================
-    Electrons::c_bands(istep);
-
-    GlobalV::ofs_running << "\n End of Band Structure Calculation \n" << std::endl;
-
-
-    for (int ik = 0; ik < GlobalC::kv.nks; ik++)
-    {
-        if (GlobalV::NSPIN==2)
-        {
-            if (ik == 0) GlobalV::ofs_running << " spin up :" << std::endl;
-            if (ik == ( GlobalC::kv.nks / 2)) GlobalV::ofs_running << " spin down :" << std::endl;
-        }
-        //out.printV3(GlobalV::ofs_running, GlobalC::kv.kvec_c[ik]);
-
-        GlobalV::ofs_running << " k-points" << ik+1
-        << "(" << GlobalC::kv.nkstot << "): "
-        << GlobalC::kv.kvec_c[ik].x
-        << " " << GlobalC::kv.kvec_c[ik].y
-        << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
-
-        for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-        {
-            GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1
-            << "_final_band " << ib+1
-            << " " << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV
-            << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
-        }
-        GlobalV::ofs_running << std::endl;
-    }
-
-    // add by jingan in 2018.11.7
-    if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
-    {
-        toWannier90 myWannier(GlobalC::kv.nkstot,GlobalC::ucell.G);
-        myWannier.init_wannier();
-    }
-
-    //=======================================================
-    // Do a Berry phase polarization calculation if required
-    //=======================================================
-
-    if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
-    {
-        berryphase bp;
-        bp.Macroscopic_polarization();
-    }
-
-    ModuleBase::timer::tick("Electrons","non_self_consistent");
-    return;
-}
-
-
+/*
 #include "occupy.h"
 void Electrons::self_consistent(const int &istep)
 {
@@ -97,8 +37,6 @@ void Electrons::self_consistent(const int &istep)
 	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
     set_pw_diag_thr();
-
-    this->unit = 0;
 
     if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
     {
@@ -139,32 +77,6 @@ void Electrons::self_consistent(const int &istep)
 			std::cout << std::setw(11) << "TIME(s)" << std::endl;
 		}
 	}
-
-    // if(GlobalV::OUT_LEVEL=="ie")
-    // {
-    //     std::cout << std::setprecision(12);
-    //     std::cout<< " " << std::setw(7)<< "ITER"; // pengfei Li added 2015-1-31
-
-    //     if(GlobalV::NSPIN==2)
-    //     {
-    //         std::cout<<std::setw(10)<<"TMAG";
-    //         std::cout<<std::setw(10)<<"AMAG";
-    //     }
-
-    //     std::cout<<std::setw(15)<< "ETOT(eV)"<<std::setw(15)<< "EDIFF(eV)"<<std::setw(11)<< "SCF_THR"; // pengfei Li added 2015-1-31
-    //     //if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
-    //     if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
-    //     {
-    //         std::cout<<std::setw(11)<<"CG_ITER";
-    //     }
-
-    //     std::cout<<std::setw(11)<< "TIME(S)";
-    //     std::cout<<std::endl;
-    // }
-    // else
-    // {
-
-    // }
 
     Symmetry_rho srho;
     for(int is=0; is<GlobalV::NSPIN; is++)
@@ -299,7 +211,7 @@ void Electrons::self_consistent(const int &istep)
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
         {
-            GlobalC::CHR.mix_rho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
+            GlobalC::CHR.tmp_mixrho(scf_thr,0,GlobalV::SCF_THR,iter,conv_elec);
         }
         else
         {
@@ -320,7 +232,7 @@ void Electrons::self_consistent(const int &istep)
             // rho contain the output charge density.
             // in other cases rhoin contains the mixed charge density
             // (the new input density) while rho is unchanged.
-            GlobalC::CHR.mix_rho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
+            GlobalC::CHR.tmp_mixrho(scf_thr,diago_error,GlobalV::SCF_THR,iter,conv_elec);
 
             //if(GlobalV::MY_RANK==0)
             //{
@@ -379,12 +291,6 @@ void Electrons::self_consistent(const int &istep)
             GlobalC::en.descf = 0.0;
         }
 
-        std::stringstream ssw;
-        ssw << GlobalV::global_out_dir << "WAVEFUNC";
-
-		//qianrui add 2020-10-12
-		std::stringstream ssgk;
-		ssgk << GlobalV::global_out_dir << "GKK.dat";
 
         // output for tmp.
         for(int is=0; is<GlobalV::NSPIN; is++)
@@ -399,6 +305,8 @@ void Electrons::self_consistent(const int &istep)
 
         if(GlobalC::wf.out_wfc_pw == 1 || GlobalC::wf.out_wfc_pw == 2)
         {
+            std::stringstream ssw;
+            ssw << GlobalV::global_out_dir << "WAVEFUNC";
             //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
@@ -415,7 +323,7 @@ void Electrons::self_consistent(const int &istep)
         clock_t finish=clock();
         double duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		GlobalC::en.print_etot(conv_elec, istep, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, iter, scf_thr, duration, GlobalV::PW_DIAG_THR, avg_iter);
 
         if (conv_elec || iter==GlobalV::SCF_NMAX)
         {
@@ -495,7 +403,7 @@ void Electrons::self_consistent(const int &istep)
     ModuleBase::timer::tick("Electrons","self_consistent");
     return;
 } // end Electrons
-
+*/
 
 bool Electrons::check_stop_now(void)
 {

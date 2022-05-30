@@ -79,7 +79,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 
 		// mohan added eiter to count for the electron iteration number, 2021-01-28
 		int eiter=0;		
-        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")  // pengfei 2014-10-13
+        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")  // pengfei 2014-10-13
         {
 #ifdef __LCAO
 #ifdef __MPI
@@ -87,9 +87,8 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			{	
 #endif
 #endif		
-				p_esolver->Run(istep,GlobalC::ucell);
-				p_esolver->cal_Energy(GlobalC::en);
-				eiter = p_esolver->getiter();
+				p_esolver->Run(istep-1,GlobalC::ucell);
+				eiter = p_esolver->getniter();
 #ifdef __LCAO
 #ifdef __MPI
 			}
@@ -103,8 +102,8 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 				{
 					for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 					{
-						elec.self_consistent(istep-1);
-						eiter += elec.iter;
+						p_esolver->Run(istep-1,GlobalC::ucell);
+						eiter += p_esolver->getniter();
 						if( elec.iter==1 || hybrid_step==GlobalC::exx_global.info.hybrid_step-1 )		// exx converge
 							break;
 						XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);					
@@ -113,11 +112,11 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 				}
 				else
 				{
-					elec.self_consistent(istep-1);	
-					eiter += elec.iter;
+					p_esolver->Run(istep-1,GlobalC::ucell);
+					eiter += p_esolver->getniter();
 					XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-					elec.self_consistent(istep-1);
-					eiter += elec.iter;
+					p_esolver->Run(istep-1,GlobalC::ucell);
+					eiter += p_esolver->getniter();
 				}
 			}
 #endif //__MPI
@@ -125,8 +124,9 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
         }
         else if(GlobalV::CALCULATION=="nscf")
         {
-            elec.non_self_consistent(istep-1);
-			eiter = elec.iter;
+			p_esolver->nscf();
+            //elec.non_self_consistent(istep-1);
+			eiter = p_esolver->getniter();
         }
 
 		if(GlobalC::pot.out_pot == 2)
@@ -142,7 +142,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 		time_t fstart = time(NULL);
 
 
-        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")
         {
 			stop = this->after_scf(p_esolver, istep, force_step, stress_step);    // pengfei Li 2018-05-14
 		}
@@ -172,7 +172,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 
     }
 
-    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << std::setprecision(16);
@@ -185,11 +185,6 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 	{
 		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
 	}
-
-	if(GlobalC::wf.out_wfc_r == 1)				// Peize Lin add 2021.11.21
-	{
-		Write_Wfc_Realspace::write_wfc_realspace_1(GlobalC::wf.evc, "wfc_realspace", true);
-	}	
 
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
     return;
@@ -237,7 +232,7 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 		//do cell relax calculation and generate next structure
 		bool converged = 0;
 		converged = this->do_cellrelax(stress_step, stress, GlobalC::en.etot);
-		if(!converged) this->reset_after_cellrelax(force_step, stress_step);
+		if(!converged) this->reset_after_cellrelax(force_step, stress_step, p_esolver);
 		return converged;
 	}
 
@@ -345,14 +340,14 @@ void Ions::reset_after_relax(const int& istep)
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
 	//GlobalC::wf.wfcinit();
 }
-void Ions::reset_after_cellrelax(int& f_step, int& s_step)
+void Ions::reset_after_cellrelax(int& f_step, int& s_step, ModuleESolver::ESolver *p_esolver)
 {
 	ModuleBase::TITLE("Ions","reset_after_cellrelax");
-	Variable_Cell::init_after_vc();
+	Variable_Cell::init_after_vc(p_esolver);
 	GlobalC::pot.init_pot(s_step, GlobalC::pw.strucFac); //LiuXh add 20180619
 
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
-	GlobalC::wf.wfcinit(); //LiuXh add 20180619
+	GlobalC::wf.wfcinit(p_esolver->psi); //LiuXh add 20180619
 	f_step = 1;
 	++s_step;
 }

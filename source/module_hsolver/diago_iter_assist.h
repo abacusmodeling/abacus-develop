@@ -26,6 +26,7 @@ class DiagoIterAssist
 
     /// average steps of last cg diagonalization for each band.
     static double avg_iter;
+    static bool need_subspace;
 
     static void diagH_subspace(Hamilt_PW *phm,
                                const psi::Psi<std::complex<double>> &psi,

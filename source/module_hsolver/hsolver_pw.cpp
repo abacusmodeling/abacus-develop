@@ -20,36 +20,110 @@ void HSolverPW::update()
     return;
 }*/
 
-void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes)
+void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge)
 {
     // prepare for the precondition of diagonalization
-    std::vector<double> precondition(psi.get_nbasis());
+    this->precondition.resize(psi.get_nbasis());
 
     // select the method of diagonalization
+    this->method = method_in;
     if (this->method == "cg")
-        pdiagh = new DiagoCG(&(GlobalC::hm.hpw), precondition.data());
-    else if (this->method == "david")
-        pdiagh = new DiagoDavid(&(GlobalC::hm.hpw), precondition.data());
+    {
+        if(pdiagh!=nullptr)
+        {
+            if(pdiagh->method != this->method)
+            {
+                delete[] pdiagh;
+                pdiagh = new DiagoCG(&(GlobalC::hm.hpw), precondition.data());
+                pdiagh->method = this->method;
+            }
+        }
+        else
+        {
+            pdiagh = new DiagoCG(&(GlobalC::hm.hpw), precondition.data());
+            pdiagh->method = this->method;
+        }
+    }
+    else if (this->method == "dav")
+    {
+        DiagoDavid::PW_DIAG_NDIM = GlobalV::PW_DIAG_NDIM;
+        if (pdiagh != nullptr)
+        {
+            if (pdiagh->method != this->method)
+            {
+                delete[] pdiagh;
+                pdiagh = new DiagoDavid(&(GlobalC::hm.hpw), precondition.data());
+                pdiagh->method = this->method;
+            }
+        }
+        else
+        {
+            pdiagh = new DiagoDavid(&(GlobalC::hm.hpw), precondition.data());
+            pdiagh->method = this->method;
+        }
+    }
     else
+    {
         ModuleBase::WARNING_QUIT("HSolverPW::solve", "This method of DiagH is not supported!");
+    }
 
     /// Loop over k points for solve Hamiltonian to charge density
-    for (int ik = 0; ik < psi.get_nk(); ++ik)
+    for (int ik = 0; ik < this->pbas->Klist->nks; ++ik)
     {
         /// update H(k) for each k point
         pHamilt->updateHk(ik);
 
-        psi.fix_k(ik);
+        this->updatePsiK(psi, ik);
 
         // template add precondition calculating here
-        update_precondition(precondition, psi.get_current_nbas(), GlobalC::wf.g2kin);
+        update_precondition(precondition, this->pbas->Klist->ngk[ik], GlobalC::wf.g2kin);
 
         /// solve eigenvector and eigenvalue for H(k)
-        double* p_eigenvalues = GlobalC::wf.ekb[ik];
+        double* p_eigenvalues = &(pes->ekb(ik, 0));
         this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
         /// calculate the contribution of Psi for charge density rho
-        pes->updateRhoK(psi);
     }
+
+    // DiagoCG would keep 9*nbasis memory in cache during loop-k
+    // it should be deleted before calculating charge
+    if(this->method == "cg")
+    {
+        delete pdiagh;
+        pdiagh = nullptr;
+    }
+
+    if(skip_charge) return;
+    pes->psiToRho(psi);
+
+    return;
+}
+
+void HSolverPW::updatePsiK(psi::Psi<std::complex<double>>& psi, const int ik)
+{
+    if(GlobalV::CALCULATION=="nscf")
+    {
+        if(GlobalV::BASIS_TYPE=="pw")
+        {
+            // generate PAOs first, then diagonalize to get
+            // inital wavefunctions.
+            if(GlobalC::wf.mem_saver==1)
+            {
+                psi.fix_k(ik);
+                GlobalC::wf.diago_PAO_in_pw_k2(ik, psi);
+            }
+            else
+            {
+                psi.fix_k(ik);
+                GlobalC::wf.diago_PAO_in_pw_k2(ik, psi);
+            }
+        }
+        else
+        {
+            ModuleBase::WARNING_QUIT("HSolverPW::updatePsiK", "lcao_in_pw is not supported now.");
+        }
+        return;
+    }
+    psi.fix_k(ik);
 }
 
 void HSolverPW::hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double>>& psi, double* eigenvalue)
@@ -57,8 +131,9 @@ void HSolverPW::hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double
     pdiagh->diag(hm, psi, eigenvalue);
 }
 
-void HSolverPW::update_precondition(std::vector<double> h_diag, const int npw, const double* g2kin)
+void HSolverPW::update_precondition(std::vector<double> &h_diag, const int npw, const double* g2kin)
 {
+    h_diag.resize(h_diag.size(), 1.0);
     int precondition_type = 2;
     //===========================================
     // Conjugate-Gradient diagonalization
@@ -77,6 +152,14 @@ void HSolverPW::update_precondition(std::vector<double> h_diag, const int npw, c
         for (int ig = 0; ig < npw; ig++)
         {
             h_diag[ig] = 1 + g2kin[ig] + sqrt(1 + (g2kin[ig] - 1) * (g2kin[ig] - 1));
+        }
+    }
+    if(GlobalV::NSPIN==4)
+    {
+        const int size = h_diag.size();
+        for (int ig = 0; ig < npw; ig++)
+        {
+            h_diag[ig+size/2] = h_diag[ig];
         }
     }
 }

@@ -5,6 +5,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #include "../module_base/timer.h"
+#include "../module_surchem/efield.h"        // liuyu add 2022-05-18
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"	//caoyu add for deepks 2021-06-03
 #endif
@@ -16,7 +17,6 @@ Force_Stress_LCAO::Force_Stress_LCAO(Record_adj& ra) :
     RA(&ra){}
 Force_Stress_LCAO::~Force_Stress_LCAO() {}
 
-#include "../src_pw/efield.h"
 void Force_Stress_LCAO::getForceStress(
 	const bool isforce,
 	const bool isstress,
@@ -178,10 +178,10 @@ void Force_Stress_LCAO::getForceStress(
 	}
 	//implement force from E-field
     ModuleBase::matrix fefield;
-    if(GlobalV::EFIELD&&isforce)
+    if(GlobalV::EFIELD_FLAG&&isforce)
     {
         fefield.create(nat, 3);
-        Efield::compute_force(fefield);
+        Efield::compute_force(GlobalC::ucell, fefield);
     }
 	//Force contribution from DFT+U
 	ModuleBase::matrix force_dftu;
@@ -250,7 +250,7 @@ void Force_Stress_LCAO::getForceStress(
 					fcs(iat,i) += force_vdw(iat,i);
 				}
 				//E-field force
-				if(GlobalV::EFIELD)
+				if(GlobalV::EFIELD_FLAG)
 				{
 					fcs(iat, i) += fefield(iat, i);
 				}
@@ -371,7 +371,7 @@ void Force_Stress_LCAO::getForceStress(
 			//-------------------------------
 			//put extra force here for test!
 			//-------------------------------
-			if(GlobalV::EFIELD)
+			if(GlobalV::EFIELD_FLAG)
 			{
 				f_pw.print("EFIELD     FORCE", fefield,0);
 				//this->print_force("EFIELD     FORCE",fefield,1,ry);
