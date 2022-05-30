@@ -69,7 +69,7 @@ void Force_LCAO_k::ftable_k (
     // ---------------------------------------
     // doing on the real space grid.
     // ---------------------------------------
-    this->cal_fvl_dphi_k(isforce, isstress, fvl_dphi, svl_dphi);
+    this->cal_fvl_dphi_k(isforce, isstress, fvl_dphi, svl_dphi, loc.DM_R);
 
     this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
 
@@ -1099,7 +1099,8 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	const bool isforce, 
     const bool isstress,
     ModuleBase::matrix& fvl_dphi,
-	ModuleBase::matrix& svl_dphi)
+	ModuleBase::matrix& svl_dphi,
+	double **DM_R)
 {
 	ModuleBase::TITLE("Force_LCAO_k","cal_fvl_dphi_k");
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
@@ -1122,10 +1123,6 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		GlobalV::CURRENT_SPIN = is;
-//		ZEROS (this->UHM->LM->DHloc_fixedR_x, pv->nnr);
-//		ZEROS (this->UHM->LM->DHloc_fixedR_y, pv->nnr);
-//		ZEROS (this->UHM->LM->DHloc_fixedR_z, pv->nnr);
-//		std::cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << std::endl;
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
@@ -1138,7 +1135,8 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// fvl_dphi can not be set to zero here if Vna is used
 		if(isstress||isforce) 
 		{
-			this->UHM->GK.cal_force_k(isforce, isstress, fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
+			Gint_inout inout(DM_R, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
+			this->UHM->GK.cal_gint(&inout);
 		}
 	}
 

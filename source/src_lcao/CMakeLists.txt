@@ -28,18 +28,17 @@ list(APPEND objects
     dftu.cpp
     dftu_relax.cpp
     dftu_yukawa.cpp
+    gint.cpp
     gint_gamma.cpp
     gint_gamma_env.cpp
-    gint_gamma_fvl.cpp
     gint_gamma_mull.cpp
-    gint_gamma_rho.cpp
     gint_gamma_vl.cpp
-    gint_k.cpp
-    gint_k_fvl.cpp
-    gint_k_init.cpp
-    gint_k_rho.cpp
-    gint_k_vl.cpp
+    gint_fvl.cpp
+    gint_rho.cpp
+    gint_vl.cpp
     gint_k_env.cpp
+    gint_k_sparse.cpp
+    gint_k_pvpr.cpp
     gint_tools.cpp
     global_fp.cpp
     grid_bigcell.cpp

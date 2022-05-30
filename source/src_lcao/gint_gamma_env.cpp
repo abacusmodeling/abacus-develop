@@ -7,20 +7,7 @@
 
 void Gint_Gamma::cal_env(const double* wfc, double* rho)
 {
-    ModuleBase::TITLE("Gint_Gamma","cal_env");
-    ModuleBase::timer::tick("Gint_Gamma","cal_env");
-
-	this->max_size = GlobalC::GridT.max_atom;
-    this->gamma_envelope(wfc, rho);
-
-    ModuleBase::timer::tick("Gint_Gamma","cal_env");
-    return;
-}
-
-
-void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
-{
-    ModuleBase::TITLE("Grid_Integral","gamma_charge");
+    ModuleBase::TITLE("Grid_Integral","cal_env");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = GlobalC::ORB.dr_uniform;
@@ -30,6 +17,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 	double** distance; // distance between atom and grid: [bxyz, maxsize]
 	double*** psir_ylm;	
 	bool** cal_flag;
+	const int max_size = GlobalC::GridT.max_atom;
 	if(max_size!=0) 
 	{
 		dr = new double**[GlobalC::pw.bxyz];
@@ -76,10 +64,10 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
         {
             for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
             {
-                this->grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
+                const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 
                 // get the value: how many atoms has orbital value on this grid.
-                const int size = GlobalC::GridT.how_many_atoms[ this->grid_index ];
+                const int size = GlobalC::GridT.how_many_atoms[ grid_index ];
 				if(size==0) continue;
 
 				// (1) initialized the phi * Ylm.

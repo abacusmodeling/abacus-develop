@@ -106,26 +106,6 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
                         dr[ib][id][1] = GlobalC::GridT.meshcell_pos[ib][1] + mt[1];
                         dr[ib][id][2] = GlobalC::GridT.meshcell_pos[ib][2] + mt[2];
 
-                        //find R by tau (for double-check)
-                        //dr=r-\tau-R  =>  R= r-\tau-dr
-                        //now the eight in one bigcell are same but different with R form index2ucell.
-                        // const double Rx1 = (double)i * (GlobalC::ucell.a1[0] + GlobalC::ucell.a2[0] + GlobalC::ucell.a3[0])
-                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::pw.nbx    //r
-                        //     + GlobalC::GridT.meshcell_pos[ib][0]
-                        //     - GlobalC::ucell.atoms[it].tau[ia].x * GlobalC::ucell.lat0
-                        //     - dr[ib][id][0];
-                        // const double Ry1 = (double)j * (GlobalC::ucell.a1[1] + GlobalC::ucell.a2[1] + GlobalC::ucell.a3[1])
-                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::pw.nby
-                        //     + GlobalC::GridT.meshcell_pos[ib][1]
-                        //     - GlobalC::ucell.atoms[it].tau[ia].y * GlobalC::ucell.lat0
-                        //     - dr[ib][id][1];
-                        // const double Rz1 = (double)k * (GlobalC::ucell.a1[2] + GlobalC::ucell.a2[2] + GlobalC::ucell.a3[2])
-                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::pw.nbz
-                        //     + GlobalC::GridT.meshcell_pos[ib][2]
-                        //     - GlobalC::ucell.atoms[it].tau[ia].z * GlobalC::ucell.lat0
-                        //     - dr[ib][id][2];
-                        // std::cout << "R1:" << Rx1 << " " << Ry1 << " " << Rz1 << std::endl;
-
                         distance[ib][id] = std::sqrt(dr[ib][id][0] * dr[ib][id][0]
                             + dr[ib][id][1] * dr[ib][id][1]
                             + dr[ib][id][2] * dr[ib][id][2]);

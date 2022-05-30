@@ -142,8 +142,6 @@ void Grid_MeshCell::init_latvec(void)
 	return;
 }
 
-
-
 void Grid_MeshCell::init_meshcell_pos(void)
 {
 	assert(bx>0);

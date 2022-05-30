@@ -27,82 +27,16 @@ extern "C"
     void Cblacs_pcoord(int icontxt, int pnum, int *prow, int *pcol);
 }
 
-void Gint_Gamma::cal_meshball_vlocal(
-	const int na_grid,  					    // how many atoms on this (i,j,k) grid
-	const int LD_pool,
-	const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
-	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
-	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-	const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-	const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
-	const double*const*const psir_ylm,		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
-	const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-	const int lgd_now,
-	double*const*const GridVlocal) const	    // GridVlocal[lgd_now][lgd_now]
+void Gint_Gamma::cal_vlocal(Gint_inout *inout)
 {
-	const char transa='N', transb='T';
-	const double alpha=1, beta=1;
+	this->cal_gint(inout);
+	const int max_size = GlobalC::GridT.max_atom;
+	const int lgd = GlobalC::GridT.lgd;
 
-	for(int ia1=0; ia1<na_grid; ++ia1)
+	if(inout->job==Gint_Tools::job_type::vlocal)
 	{
-		const int iw1_lo=block_iw[ia1];
-		const int m=block_size[ia1];
-		for(int ia2=0; ia2<na_grid; ++ia2)
-		{
-			const int iw2_lo=block_iw[ia2];
-			if(iw1_lo<=iw2_lo)
-			{
-                int first_ib=0;
-                for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-                {
-                    if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                    {
-                        first_ib=ib;
-                        break;
-                    }
-                }
-                int last_ib=0;
-                for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
-                {
-                    if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                    {
-                        last_ib=ib+1;
-                        break;
-                    }
-                }
-                const int ib_length = last_ib-first_ib;
-                if(ib_length<=0) continue;
-
-                int cal_pair_num=0;
-                for(int ib=first_ib; ib<last_ib; ++ib)
-                {
-                    cal_pair_num += cal_flag[ib][ia1] && cal_flag[ib][ia2];
-                }
-
-                const int n=block_size[ia2];
-                if(cal_pair_num>ib_length/4)
-                {
-                    dgemm_(&transa, &transb, &n, &m, &ib_length, &alpha,
-                        &psir_vlbr3[first_ib][block_index[ia2]], &LD_pool,
-                        &psir_ylm[first_ib][block_index[ia1]], &LD_pool,
-                        &beta, &GridVlocal[iw1_lo][iw2_lo], &lgd_now);
-                }
-                else
-                {
-                    for(int ib=first_ib; ib<last_ib; ++ib)
-                    {
-                        if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                        {
-                            int k=1;
-                            dgemm_(&transa, &transb, &n, &m, &k, &alpha,
-                                &psir_vlbr3[ib][block_index[ia2]], &LD_pool,
-                                &psir_ylm[ib][block_index[ia1]], &LD_pool,
-                                &beta, &GridVlocal[iw1_lo][iw2_lo], &lgd_now);
-                        }
-                    }
-                }
-			}
-		}
+		vl_grid_to_2D(lgd,inout->lm[0]);
+		if (max_size >0 && lgd > 0) delete[] pvpR_grid;
 	}
 }
 
@@ -250,150 +184,7 @@ inline int setBufferParameter(
 }
 #endif
 
-// for calculation of < phi_i | Vlocal | phi_j >
-// Input:	vlocal[ir]
-// Output:	GridVlocal.ptr_2D[iw1_lo][iw2_lo]
-Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal) const						// Peize Lin update OpenMP 2020.09.27
-{
-    ModuleBase::TITLE("Gint_Gamma","gamma_vlocal");
-    ModuleBase::timer::tick("Gint_Gamma","gamma_vlocal");
-
-	Gint_Tools::Array_Pool<double> GridVlocal(GlobalC::GridT.lgd, GlobalC::GridT.lgd);
-	ModuleBase::GlobalFunc::ZEROS(GridVlocal.ptr_1D, GlobalC::GridT.lgd*GlobalC::GridT.lgd);
-    ModuleBase::Memory::record("Gint_Gamma","GridVlocal",GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
-
-#ifdef __MKL
-    const int mkl_threads = mkl_get_max_threads();
-	mkl_set_num_threads(std::max(1,mkl_threads/GlobalC::GridT.nbx));		// Peize Lin update 2021.01.20
-#endif
-
-#ifdef _OPENMP
-	#pragma omp parallel
-#endif
-	{
-		//OUT(GlobalV::ofs_running, "start calculate gamma_vlocal");
-
-		// it's a uniform grid to save orbital values, so the delta_r is a constant.
-		const double delta_r=GlobalC::ORB.dr_uniform;
-
-		const int nbx=GlobalC::GridT.nbx;
-		const int nby=GlobalC::GridT.nby;
-		const int nbz_start=GlobalC::GridT.nbzp_start;
-		const int nbz=GlobalC::GridT.nbzp;
-
-		const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
-
-		const int lgd_now=GlobalC::GridT.lgd;
-		if(max_size>0 && lgd_now>0)
-		{
-			//------------------------------------------------------
-			// <phi | V_local | phi>
-			//------------------------------------------------------
-			Gint_Tools::Array_Pool<double> GridVlocal_thread(lgd_now, lgd_now);
-			ModuleBase::GlobalFunc::ZEROS(GridVlocal_thread.ptr_1D, lgd_now*lgd_now);
-			ModuleBase::Memory::record("Gint_Gamma","GridVlocal_therad",lgd_now*lgd_now,"double");
-
-			const int LD_pool = max_size*GlobalC::ucell.nwmax;
-            const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
-
-#ifdef _OPENMP
-			#pragma omp for
-#endif
-			for (int i=0; i< nbx; i++)
-			{
-				const int ibx=i*GlobalC::pw.bx;
-				for (int j=0; j<nby; j++)
-				{
-					const int jby=j*GlobalC::pw.by;
-					for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
-					{
-						const int grid_index = i*nby*nbz + j*nbz + (k-nbz_start);
-
-						//------------------------------------------------------------------
-						// get the value: how many atoms are involved in this grid (big cell)
-						//------------------------------------------------------------------
-						const int na_grid=GlobalC::GridT.how_many_atoms[ grid_index ];
-						if(na_grid==0) continue;
-
-						//------------------------------------------------------------------
-						// kbz can be obtained using a previously stored array
-						//------------------------------------------------------------------
-						const int kbz=k*GlobalC::pw.bz-GlobalC::pw.nczp_start;
-
-                        int * block_iw, * block_index, * block_size;
-                        Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
-						//------------------------------------------------------
-						// whether the atom-grid distance is larger than cutoff
-						//------------------------------------------------------
-						bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
-
-						//------------------------------------------------------------------
-						// compute atomic basis phi(r) with both radial and angular parts
-						//------------------------------------------------------------------
-						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
-                        Gint_Tools::cal_psir_ylm(
-							na_grid, grid_index, delta_r,
-							block_index, block_size, 
-							cal_flag,
-                            psir_ylm.ptr_2D);
-
-						//------------------------------------------------------------------
-						// extract the local potentials.
-						//------------------------------------------------------------------
-						double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, dv);
-
-                        const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
-                                na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
-
-						//------------------------------------------------------------------
-						// calculate <phi_i|V|phi_j>
-						//------------------------------------------------------------------
-						this->cal_meshball_vlocal(
-							na_grid, LD_pool, block_iw, block_size, block_index, cal_flag,
-							vldr3, psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, lgd_now, GridVlocal_thread.ptr_2D);
-
-						free(vldr3);		vldr3=nullptr;
-                        delete[] block_iw;
-                        delete[] block_index;
-                        delete[] block_size;
-
-						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-							free(cal_flag[ib]);
-						free(cal_flag);			cal_flag=nullptr;
-					}// k
-				}// j
-			}// i
-
-#ifdef _OPENMP
-			#pragma omp critical(cal_vl)
-#endif
-			{
-				for (int i=0; i<lgd_now; i++)
-				{
-					for (int j=0; j<lgd_now; j++)
-					{
-						GridVlocal.ptr_2D[i][j] += GridVlocal_thread.ptr_2D[i][j];
-					}
-				}
-			}
-		} // end of if(max_size>0 && lgd_now>0)
-	} // end of #pragma omp parallel
-
-#ifdef __MKL
-    mkl_set_num_threads(mkl_threads);
-#endif
-
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "temp variables are deleted");
-    ModuleBase::timer::tick("Gint_Gamma","gamma_vlocal");
-#ifdef __MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
-    ModuleBase::timer::tick("Gint_Gamma","distri_vl");
-
-	return GridVlocal;
-}
-
-void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal, LCAO_Matrix &lm)
+void Gint_Gamma::vl_grid_to_2D(const int lgd_now, LCAO_Matrix &lm)
 {
     // setup send buffer and receive buffer size
     // OUT(GlobalV::ofs_running, "Start transforming vlocal from grid distribute to 2D block");
@@ -424,11 +215,11 @@ void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal,
         const int icol=this->sender_local_index[i+1];
         if(irow<=icol)
 		{
-            this->sender_buffer[i/2]=GridVlocal.ptr_2D[irow][icol];
+            this->sender_buffer[i/2]=pvpR_grid[irow*lgd_now+icol];
 		}
         else
 		{
-            this->sender_buffer[i/2]=GridVlocal.ptr_2D[icol][irow];
+            this->sender_buffer[i/2]=pvpR_grid[icol*lgd_now+irow];
 		}
     }
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal data are put in sender_buffer, size(M):", this->sender_size*8/1024/1024);
@@ -446,32 +237,9 @@ void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal,
     {
         const int g_row=this->receiver_global_index[i];
         const int g_col=this->receiver_global_index[i+1];
-        // if(g_col<0 || g_col>=GlobalV::NLOCAL||g_row<0 || g_row>=GlobalV::NLOCAL)
-        // {
-        //     OUT(GlobalV::ofs_running, "index error, i:", i);
-        //     OUT(GlobalV::ofs_running, "index：", this->receiver_global_index[i]);
-        //     OUT(GlobalV::ofs_running, "g_col:", g_col);
-        //     OUT(GlobalV::ofs_running, "g_col:", g_col);
-        // }
         lm.set_HSgamma(g_row,g_col,this->receiver_buffer[i/2],'L', lm.Hloc.data());
     }
 
     ModuleBase::timer::tick("Gint_Gamma","distri_vl_value");
     ModuleBase::timer::tick("Gint_Gamma","distri_vl");
-}
-
-// calculate the H matrix in terms of effective potentials
-void Gint_Gamma::cal_vlocal(
-    const double*const vlocal,
-    LCAO_Matrix &lm)
-{
-    ModuleBase::TITLE("Gint_Gamma","cal_vlocal");
-    ModuleBase::timer::tick("Gint_Gamma", "cal_vlocal"
-    );
-
-    this->max_size = GlobalC::GridT.max_atom;
-    const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
-	vl_grid_to_2D(GridVlocal, lm);
-
-    ModuleBase::timer::tick("Gint_Gamma","cal_vlocal");
 }

@@ -59,7 +59,7 @@ private:
         Local_Orbital_Charge& loc, ModuleBase::matrix& foverlap, ModuleBase::matrix& soverlap);
 
 	// calculate the force due to < phi | Vlocal | dphi >
-	void cal_fvl_dphi_k(const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);
+	void cal_fvl_dphi_k(const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi, double **DM_R);
 
 	// old method to calculate the force due to < phi | dbeta > < beta | phi >
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvnl_dbeta, ModuleBase::matrix& svnl_dbeta);
