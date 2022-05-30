@@ -124,6 +124,10 @@ namespace Gint_Tools
 		const int ibx,
 		const int jby,
 		const int kbz);
+	
+	int* get_vindex(
+		const int start_ind,
+		const int ncyz);
 
 	// extract the local potentials.
 	// vldr3[GlobalC::pw.bxyz]
@@ -133,6 +137,12 @@ namespace Gint_Tools
 		const int ibx,
 		const int jby,
 		const int kbz,
+		const double dv);
+
+    double* get_vldr3(
+		const double* const vlocal,
+		const int start_ind,
+		const int ncyz,
 		const double dv);
 
 	//------------------------------------------------------

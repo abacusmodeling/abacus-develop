@@ -9,6 +9,29 @@
 
 namespace Gint_Tools
 {
+	int* get_vindex(
+		const int start_ind,
+		const int ncyz)
+	{
+		int *vindex = new int[GlobalC::pw.bxyz];
+		int bindex = 0;
+
+		for(int ii=0; ii<GlobalC::pw.bx; ii++)
+		{
+			const int ipart = ii*ncyz;
+			for(int jj=0; jj<GlobalC::pw.by; jj++)
+			{
+				const int jpart = jj*GlobalC::pw.nczp + ipart;
+				for(int kk=0; kk<GlobalC::pw.bz; kk++)
+				{
+					vindex[bindex] = start_ind + kk + jpart;
+					++bindex;
+				}
+			}
+		}
+		return vindex;		
+	}
+
 	// here vindex refers to local potentials
 	int* get_vindex(
 		const int ncyz,
@@ -48,6 +71,23 @@ namespace Gint_Tools
 	{
 		// set the index for obtaining local potentials
 		int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
+		double *vldr3 = (double*)malloc(GlobalC::pw.bxyz*sizeof(double));					
+		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+		{
+			vldr3[ib]=vlocal[vindex[ib]] * dv;
+		}
+		free(vindex);	vindex=nullptr;
+		return vldr3;
+	}
+
+	double* get_vldr3(
+		const double*const vlocal,		// vlocal[ir]
+		const int start_ind,
+		const int ncyz,
+		const double dv)
+	{
+		// set the index for obtaining local potentials
+		int* vindex = Gint_Tools::get_vindex(start_ind, ncyz);	
 		double *vldr3 = (double*)malloc(GlobalC::pw.bxyz*sizeof(double));					
 		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 		{

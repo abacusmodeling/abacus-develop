@@ -22,6 +22,8 @@ class Grid_Technique : public Grid_MeshBall
 	// sum of how_many_atoms
 	int total_atoms_on_grid;
 
+	int* start_ind;
+
 	//------------------------------------
 	// 2: Info about which atom on grid.
 	//------------------------------------
@@ -113,6 +115,7 @@ private:
 	void cal_grid_integration_index(void);
 	void cal_trace_lo(void);
 	void check_bigcell(int* &ind_bigcell, bool* &bigcell_on_processor);
+	void get_startind(void);
 };
 
 namespace GlobalC

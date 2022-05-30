@@ -17,6 +17,7 @@ Grid_Technique::Grid_Technique()
 	this->nlocstartg = new int[1];
 	this->nad = new int[1];
     this->how_many_atoms = new int[1];
+	this->start_ind = new int[1];
 	this->which_atom = new int[1];
 	this->which_bigcell = new int[1];
 	this->which_unitcell = new int[1];
@@ -35,6 +36,7 @@ Grid_Technique::~Grid_Technique()
     delete[] nlocstartg;
     delete[] nad;
     delete[] how_many_atoms;
+	delete[] start_ind;
 	delete[] which_atom;
 	delete[] which_bigcell;
 	delete[] which_unitcell;
@@ -115,6 +117,40 @@ void Grid_Technique::set_pbc_grid(
 	return;
 }
 
+void Grid_Technique::get_startind(void)
+{
+	ModuleBase::TITLE("Grid_Technique","get_startind");
+
+	assert(nbxx>0);
+
+	// calculates start_ind, which stores the 
+	// starting index of each bigcell
+
+	delete[] this->start_ind;
+	this->start_ind = new int[nbxx];
+	ModuleBase::GlobalFunc::ZEROS(start_ind, nbxx);
+	ModuleBase::Memory::record("atoms_on_grid","start_ind",nbxx,"int");	
+
+	for(int i=0;i<nbxx;i++)
+	{
+		int ibx, iby, ibz;
+		int ix, iy, iz;
+
+		ibx = i / ( nby * nbzp );
+		iby = ( i - ibx * nby * nbzp ) / nbzp;
+		ibz = i % nbzp;
+	
+		ix = ibx * GlobalC::pw.bx;
+		iy = iby * GlobalC::pw.by;
+		iz = (ibz + nbzp_start) * GlobalC::pw.bz - GlobalC::pw.nczp_start;
+
+		int ind = iz + iy * GlobalC::pw.nczp + ix * GlobalC::pw.ncy*GlobalC::pw.nczp;
+		
+		start_ind[i] = ind;
+	}
+
+	return;
+}
 
 // PLEASE update this 'init_atoms_on_grid' to make
 // it adapted to 'cuboid' shape of grid
@@ -124,6 +160,8 @@ void Grid_Technique::init_atoms_on_grid(void)
 	ModuleBase::TITLE("Grid_Technique","init_atoms_on_grid");
 
 	assert(nbxx>0);
+
+	this->get_startind();
 	
 	// (1) prepare data. 
 	// counting the number of atoms whose orbitals have
