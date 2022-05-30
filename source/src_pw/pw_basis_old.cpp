@@ -33,8 +33,8 @@ PW_Basis::PW_Basis()
     gcar = nullptr;
 #endif
 
-    ggs = nullptr;
-    ig2ngg = nullptr;
+    // ggs = nullptr;
+    // ig2ngg = nullptr;
 
     ig1 = nullptr;
     ig2 = nullptr;
@@ -70,8 +70,8 @@ PW_Basis::~PW_Basis()
 #endif
 #endif
 
-    delete [] ggs;
-    delete [] ig2ngg;
+    // delete [] ggs;
+    // delete [] ig2ngg;
 
     delete [] ig1;
     delete [] ig2;
@@ -377,7 +377,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"fft wavefunction grid",nx,ny,nz);
     }
 
-    this->get_nggm(this->ngmc);
+    // this->get_nggm(this->ngmc);
 
 //	this->printPW("src_check/check_pw.txt");
     ModuleBase::timer::tick("PW_Basis","gen_pw");
@@ -683,75 +683,7 @@ void PW_Basis::get_GVectors(void)
     return;
 }//end get_GVectors;
 
-void PW_Basis::get_nggm(const int ngmc_local)
-{
-    ModuleBase::TITLE("PW_Basis","get_nggm");
-    ModuleBase::timer::tick("PW_Basis","get_nggm");
 
-//	GlobalV::ofs_running << " calculate the norm of G vectors." << std::endl;
-    //*********************************************
-    // Group the g vectors that have the same norm
-    //*********************************************
-	assert(ngmc_local>0);
-    double *tmp = new double[ngmc_local];
-	ModuleBase::GlobalFunc::ZEROS(tmp, ngmc_local);
-
-
-    delete[] ig2ngg;
-    this->ig2ngg = new int[ngmc_local];
-	ModuleBase::GlobalFunc::ZEROS(ig2ngg, ngmc_local);
-
-    tmp[0] = this->gg[0];
-    ig2ngg[0] = 0;
-    int ng = 0;
-
-    for (int ig = 1; ig < ngmc_local; ig++)
-    {
-        if (abs(this->gg[ig] - tmp[ng]) > 1.0e-8)
-        {
-            ng++;
-            tmp[ng] = this->gg[ig];
-        }
-        this->ig2ngg[ig] = ng;
-    }
-    ng++;
-	
-
-    //********************************
-    // number of different |G| values
-    // *******************************
-    this->nggm = ng;
-
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of |g|",nggm);
-
-    delete[] ggs;
-    this->ggs = new double[this->nggm];
-	ModuleBase::GlobalFunc::ZEROS(ggs, this->nggm);
-
-	// mohan update 2011-06-12
-	for(int ig=0; ig<nggm; ig++)
-	{
-		this->ggs[ig] = tmp[ig];
-	}
-
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max |g|",ggs[nggm-1]);
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"min |g|",ggs[0]);
-
-    if (this->ggs[0]>1.0e-4) // mohan modified 2009-07-07
-    {
-        gstart = 0;
-    }
-    else
-    {
-        gstart = 1;
-    }
-
-	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"gstart",gstart);
-
-    delete[] tmp;
-    ModuleBase::timer::tick("PW_Basis","get_nggm");
-    return;
-}
 
 #include "../module_base/constants.h"
 //  Calculate structure factor
@@ -1131,7 +1063,7 @@ void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
     this->get_MPI_GVectors();
 #endif
 
-    this->get_nggm(this->ngmc);
+    // this->get_nggm(this->ngmc);
 
     ModuleBase::timer::tick("PW_Basis","update_gvectors");
 

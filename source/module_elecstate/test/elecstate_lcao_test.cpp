@@ -173,7 +173,7 @@ void init()
                                 out_mat_r,GlobalV::CAL_FORCE,GlobalV::MY_RANK);
     ModuleBase::Ylm::set_coefficients();   
     set_pw();
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);                             
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, 0);                             
 }
 
 namespace elecstate

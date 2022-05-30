@@ -22,5 +22,9 @@ namespace ModuleESolver
         this->pw_rho->collect_local_pw(); 
         this->pw_rho->collect_uniqgg();
         GlobalC::rhopw = this->pw_rho; //Temporary
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of |g|", this->pw_rho->ngg);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max |g|", this->pw_rho->gg_uniq[ this->pw_rho->ngg-1]);
+	    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"min |g|", this->pw_rho->gg_uniq[0]);
+
     }
 }

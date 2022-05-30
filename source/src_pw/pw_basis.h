@@ -235,13 +235,13 @@ public:
 //===============================================
 public:
     // number of |G| shells (i.e., how many different |G|s)
-    int nggm;
-    double *ggs;	// store |G|^2 for each shell
-    int *ig2ngg;	// dimension [ngmc], index from ngmc to nggm
-    int gstart;		// first nonzero g std::vector
+    // int nggm;
+    // double *ggs;	// store |G|^2 for each shell
+    // int *ig2ngg;	// dimension [ngmc], index from ngmc to nggm
+    // int gstart;		// first nonzero g std::vector
 
 private:
-    void get_nggm(const int ngmc_local);
+    // void get_nggm(const int ngmc_local);
 
 
 
