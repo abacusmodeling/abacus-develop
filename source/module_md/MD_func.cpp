@@ -75,39 +75,42 @@ void MD_func::kinetic_stress(
 //   This function calculates the classical kinetic energy of atoms
 //   and its contribution to stress.
 //----------------------------------------------------------------------------
-	if(GlobalV::MY_RANK==0) //only first rank do md
-	{
-	kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
+    if(GlobalV::MY_RANK==0) //only first rank do md
+    {
+        kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
 
-	ModuleBase::matrix temp;
-	temp.create(3,3);    // initialize
+        if(GlobalV::CAL_STRESS)
+        {
+            ModuleBase::matrix temp;
+            temp.create(3,3);    // initialize
 
-	for(int ion=0; ion<unit_in.nat; ++ion)
-	{
-		for(int i=0; i<3; ++i)
-		{
-			for(int j=i; j<3; ++j)
-			{
-				temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
-			}
-		}
-	}
+            for(int ion=0; ion<unit_in.nat; ++ion)
+            {
+                for(int i=0; i<3; ++i)
+                {
+                    for(int j=i; j<3; ++j)
+                    {
+                        temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
+                    }
+                }
+            }
 
-	for(int i=0; i<3; ++i)
-	{
-		for(int j=0; j<3; ++j)
-		{
-			if(j<i) 
-			{
-				stress(i, j) = stress(j, i);
-			}
-			else
-			{
-				stress(i, j) = temp(i, j)/unit_in.omega;
-			}
-		}
-	}
-	}
+            for(int i=0; i<3; ++i)
+            {
+                for(int j=0; j<3; ++j)
+                {
+                    if(j<i) 
+                    {
+                        stress(i, j) = stress(j, i);
+                    }
+                    else
+                    {
+                        stress(i, j) = temp(i, j)/unit_in.omega;
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Read Velocity from STRU liuyu 2021-09-24
@@ -242,6 +245,7 @@ void MD_func::force_virial(
 
 	if(mdp.md_ensolver == "LJ")
 	{
+        GlobalV::CAL_STRESS = 1;
 		bool which_method = unit_in.judge_big_cell();
 		if(which_method)
 		{
@@ -275,6 +279,7 @@ void MD_func::force_virial(
 	}
 	else if(mdp.md_ensolver == "DP")
 	{
+        GlobalV::CAL_STRESS = 1;
 		DP_potential::DP_pot(unit_in, potential, force, stress);
 	}
 #ifndef __CMD
@@ -361,12 +366,15 @@ void MD_func::MDdump(const int &step,
     ofs << "  " << unit_in.latvec.e21 << "  " << unit_in.latvec.e22 << "  " << unit_in.latvec.e23 << std::endl;
     ofs << "  " << unit_in.latvec.e31 << "  " << unit_in.latvec.e32 << "  " << unit_in.latvec.e33 << std::endl;
 
-    ofs << "VIRIAL (KBAR)" << std::endl;
-    for(int i=0; i<3; ++i)
+    if(GlobalV::CAL_STRESS)
     {
-        ofs << "  " << virial(i, 0) * unit_virial 
-            << "  " << virial(i, 1) * unit_virial 
-            << "  " << virial(i, 2) * unit_virial << std::endl;
+        ofs << "VIRIAL (KBAR)" << std::endl;
+        for(int i=0; i<3; ++i)
+        {
+            ofs << "  " << virial(i, 0) * unit_virial 
+                << "  " << virial(i, 1) * unit_virial 
+                << "  " << virial(i, 2) * unit_virial << std::endl;
+        }
     }
 
     ofs << "INDEX    LABEL    POSITIONS    FORCE (eV/Angstrom)" << std::endl;

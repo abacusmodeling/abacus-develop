@@ -15,7 +15,7 @@ public:
     virtual void setup(ModuleESolver::ESolver *p_esolver);
     virtual void first_half();
     virtual void second_half();
-    virtual void outputMD(std::ofstream &ofs);
+    virtual void outputMD(std::ofstream &ofs, bool &cal_stress);
     virtual void write_restart();
     virtual void restart();
 
