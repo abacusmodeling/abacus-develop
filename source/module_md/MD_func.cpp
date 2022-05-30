@@ -316,16 +316,17 @@ void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matr
     GlobalV::ofs_running<<"Virial Term is "<<virial_scalar*unit_transform<<" Kbar "<<std::endl;
     GlobalV::ofs_running<<"Kenetic Term is "<<(stress_scalar-virial_scalar)*unit_transform<<" Kbar "<<std::endl;
 
-	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-	ModuleBase::GlobalFunc::NEW_PART("MD STRESS (KBAR)");
-	for (int i=0; i<3; i++)
-	{
-		GlobalV::ofs_running << " " << std::setw(15) << stress(i,0)*unit_transform 
-			<< std::setw(15)<< stress(i,1)*unit_transform 
-			<< std::setw(15) << stress(i,2)*unit_transform << std::endl;
+    GlobalV::ofs_running.unsetf(ios::fixed);
+    GlobalV::ofs_running << std::setprecision(8) << std::endl;
+    ModuleBase::GlobalFunc::NEW_PART("MD STRESS (KBAR)");
+    for (int i=0; i<3; i++)
+    {
+        GlobalV::ofs_running << std::setw(15) << stress(i,0)*unit_transform 
+            << std::setw(15) << stress(i,1)*unit_transform 
+            << std::setw(15) << stress(i,2)*unit_transform << std::endl;
 
-	}
-	GlobalV::ofs_running << std::setiosflags(ios::left);
+    }
+    GlobalV::ofs_running << std::setiosflags(ios::left);
 }
 
 void MD_func::MDdump(const int &step, 
@@ -374,8 +375,8 @@ void MD_func::MDdump(const int &step,
     {
         for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
         {
-            ofs << std::setw(6) << index
-            << std::setw(4) << unit_in.atom_label[it]
+            ofs << "  " << index
+            << "  " << unit_in.atom_label[it]
             << "  " << unit_in.atoms[it].tau[ia].x
             << "  " << unit_in.atoms[it].tau[ia].y
             << "  " << unit_in.atoms[it].tau[ia].z

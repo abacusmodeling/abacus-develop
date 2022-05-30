@@ -43,7 +43,7 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
         bvec[2] = cell.G.e23; 
         latvec = cell.a2.norm();
     }
-    else if(efield_dir = 2)
+    else if(efield_dir == 2)
     {
         bvec[0] = cell.G.e31;
         bvec[1] = cell.G.e32; 
@@ -183,7 +183,7 @@ double Efield::saw_function(const double &a, const double &b, const double &x)
 
     const double fac = 1 - b;
 
-    if( x < a )
+    if( x <= a )
     {
         return x - a + 0.5 * fac;
     }

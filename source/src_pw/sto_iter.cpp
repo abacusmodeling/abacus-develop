@@ -9,7 +9,7 @@
 
 Stochastic_Iter::Stochastic_Iter()
 {
-    p_che = NULL;
+    p_che = nullptr;
     spolyv = new double [1];
     change = false;
     mu0 = 0;
@@ -17,7 +17,7 @@ Stochastic_Iter::Stochastic_Iter()
 
 Stochastic_Iter::~Stochastic_Iter()
 {
-    if(p_che != NULL) delete p_che;
+    if(p_che != nullptr) delete p_che;
     delete[] spolyv;
 }
 

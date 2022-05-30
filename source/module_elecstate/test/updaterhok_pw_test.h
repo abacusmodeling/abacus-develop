@@ -134,17 +134,17 @@ void Use_FFT::allocate()
     return;
 }
 
-void wavefunc::allocate(const int nks)
+psi::Psi<complex<double>>* wavefunc::allocate(const int nks)
 {
 	this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
 	this->wg.create(nks,GlobalV::NBANDS);
 	this->ekb = new double*[nks];
-	this->psi = new psi::Psi<std::complex<double>>(nks, GlobalV::NBANDS,npwx, nullptr);
+	psi::Psi<std::complex<double>>* psi = new psi::Psi<std::complex<double>>(nks, GlobalV::NBANDS,npwx, nullptr);
 	for (int ik=0;ik<nks;ik++)
 	{
 		this->ekb[ik] = new double[GlobalV::NBANDS];
 	}
-	return;
+	return psi;
 }
 
 bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add by dwan

@@ -12,4 +12,6 @@ else()
         COMMAND ${BASH} Autotest.sh -a ${ABACUS_BIN_PATH} -n 4
         WORKING_DIRECTORY ${ABACUS_TEST_DIR}/integrate
     )
+    add_executable(sum_ENV_H2 ${ABACUS_TEST_DIR}/integrate/tools/sum_ENV_H2.cpp)
+    install(TARGETS sum_ENV_H2 DESTINATION ${ABACUS_TEST_DIR}/integrate/tools/)
 endif()

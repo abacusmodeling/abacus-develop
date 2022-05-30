@@ -85,9 +85,9 @@ void PW_Basis::getstartgr()
 	// sum : starting plane of FFT box.
 	//---------------------------------------------
     if(this->numg!=nullptr) delete[] this->numg; this->numg = new int[poolnproc];
-	delete[] this->startg; this->startg = new int[poolnproc];
-	delete[] this->startr; this->startr = new int[poolnproc];
-	delete[] this->numr; this->numr = new int[poolnproc];
+	if(this->startg!=nullptr) delete[] this->startg; this->startg = new int[poolnproc];
+	if(this->startr!=nullptr) delete[] this->startr; this->startr = new int[poolnproc];
+	if(this->numr!=nullptr) delete[] this->numr; this->numr = new int[poolnproc];
 
 	// Each processor has a set of full sticks,
 	// 'rank_use' processor send a piece(npps[ip]) of these sticks(nst_per[rank_use])

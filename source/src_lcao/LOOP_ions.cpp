@@ -351,7 +351,7 @@ xiaohui modify 2014-08-09*/
             }
             else
             {
-                Variable_Cell::init_after_vc();
+                Variable_Cell::init_after_vc(p_esolver);
                 GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                 ++stress_step;
@@ -396,7 +396,7 @@ xiaohui modify 2014-08-09*/
                     }
                     else
                     {
-                        Variable_Cell::init_after_vc();
+                        Variable_Cell::init_after_vc(p_esolver);
                         GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                         ++stress_step;

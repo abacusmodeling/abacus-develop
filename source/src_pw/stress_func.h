@@ -9,6 +9,7 @@
 #include "../module_base/realarray.h"
 #include "../module_base/vector3.h"
 #include "../module_pw/pw_basis.h"
+#include "module_psi/psi.h"
 
 //-------------------------------------------------------------------
 // mohan reconstruction note: 2021-02-07
@@ -54,7 +55,7 @@ class Stress_Func
 
 //stress functions
 // 1) the stress from the electron kinetic energy
-	void stress_kin(ModuleBase::matrix& sigma);  //electron kinetic part in PW basis
+	void stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in=nullptr);  //electron kinetic part in PW basis
 
 // 2) the stress from the Hartree term
 	void stress_har(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw);  //hartree part in PW or LCAO basis
@@ -90,10 +91,10 @@ class Stress_Func
 
 // 6) the stress from the exchange-correlation functional term
 	void stress_gga(ModuleBase::matrix& sigma);			//gga part in both PW and LCAO basis
-	void stress_mgga(ModuleBase::matrix& sigma);			//gga part in PW basis
+	void stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in=nullptr);			//gga part in PW basis
 
 // 7) the stress from the non-local pseudopotentials
-	void stress_nl(ModuleBase::matrix& sigma);			//nonlocal part in PW basis
+	void stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in=nullptr);			//nonlocal part in PW basis
 
 
 	void get_dvnl1(
