@@ -123,7 +123,7 @@ void Electrons::self_consistent(const int &istep)
     ModuleBase::timer::tick("Electrons","self_consistent");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
 
     set_pw_diag_thr();
 

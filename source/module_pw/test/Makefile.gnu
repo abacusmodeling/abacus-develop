@@ -35,6 +35,7 @@ pw_transform_k.o
 DOUBLEFILE=test1-1-1.o\
 test1-1-2.o\
 test1-2.o\
+test1-2-2.o\
 test1-3.o\
 test1-4.o\
 test2-1-1.o\
@@ -43,6 +44,7 @@ test2-2.o\
 test2-3.o
 
 FLOATFILE=test1-2f.o\
+test1-2-2f.o\
 test1-3f.o\
 test1-4f.o
 
@@ -53,7 +55,7 @@ TESTFILE0 = ${DOUBLEFILE}
 ## FFTW package needed 
 ##==========================
 #Use fftw package
-FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8-mpi
+FFTW_DIR = /home/qianrui/gnucompile/fftw_3.3.8
 FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
 FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}

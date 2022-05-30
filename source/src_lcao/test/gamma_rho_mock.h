@@ -26,6 +26,7 @@
 #include "src_pw/use_fft.h"
 #include "src_pw/wavefunc.h"
 #include "src_pw/wf_atomic.h"
+#include "module_pw/pw_basis.h"
 
 #ifdef __LCAO
 #include "module_neighbor/sltk_atom_arrange.h"
@@ -218,6 +219,7 @@ ModuleSymmetry::Symmetry symm;
 Parallel_Grid Pgrid;
 Use_FFT UFFT;
 PW_Basis pw;
+ModulePW::PW_Basis* rhopw;
 pseudopot_cell_vnl ppcell;
 Hamilt hm;
 energy en;
@@ -242,7 +244,7 @@ void Occupy::calculate_weights()
 void Use_FFT::allocate()
 {
     delete[] porter;
-    porter = new std::complex<double>[GlobalC::pw.nrxx];
+    porter = new std::complex<double>[GlobalC::rhopw->nrxx];
     return;
 }
 
@@ -304,26 +306,26 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	ModuleBase::CHECK_INT(ifs, GlobalV::NSPIN);
 	ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef);
 
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncx);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncy);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncz);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nx);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->ny);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nz);	
 
-	const int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+	const int nxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
 	double *zpiece = new double[nxy];
-	for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+	for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 	{
 		ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
-		for(int j=0; j<GlobalC::pw.ncy; j++)
+		for(int j=0; j<GlobalC::rhopw->ny; j++)
 		{
-			for(int i=0; i<GlobalC::pw.ncx; i++)
+			for(int i=0; i<GlobalC::rhopw->nx; i++)
 			{
-				ifs >> zpiece[ i*GlobalC::pw.ncy + j ];
+				ifs >> zpiece[ i*GlobalC::rhopw->ny + j ];
 			}
 		}
 
 		for(int ir=0; ir<nxy; ir++)
 		{
-			rho[ir*GlobalC::pw.nczp+iz] = zpiece[ir];
+			rho[ir*GlobalC::rhopw->nplane+iz] = zpiece[ir];
 		}
 	}// iz
 	delete[] zpiece;
@@ -401,7 +403,7 @@ double Charge::sum_rho(void) const
 	}
 
 	// multiply the sum of charge density by a factor
-    sum_rho *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+    sum_rho *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
 
 	// mohan fixed bug 2010-01-18,
 	// sum_rho may be smaller than 1, like Na bcc.
@@ -416,10 +418,10 @@ double Charge::sum_rho(void) const
 
 
 
-void Use_FFT::ToRealSpace(int const &is, ModuleBase::ComplexMatrix const &vg, double *vr)
+void Use_FFT::ToRealSpace(int const &is, ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
 }
-void Use_FFT::ToRealSpace(std::complex<double> const *vg, double *vr)
+void Use_FFT::ToRealSpace(std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
 }
 bool Occupy::use_gaussian_broadening = false;
@@ -432,7 +434,7 @@ double Magnetism::get_neldw()
 {
     return 0;
 }
-void PW_Basis::bspline_sf(const int norder)
+void PW_Basis::bspline_sf(const int norder, ModulePW::PW_Basis* rho_basis)
 {
 }
 
@@ -814,7 +816,17 @@ void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
                     GlobalC::ucell.G,
                     GlobalC::ucell.latvec);
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+
+	// pw_rho = new ModuleBase::PW_Basis();
+    //temporary, it will be removed
+    GlobalC::rhopw = new ModulePW::PW_Basis_Big(); 
+    ModulePW::PW_Basis_Big* tmp = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
+    tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
+    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc, 1, 0);
+    GlobalC::rhopw->initparameters(false, INPUT.ecutrho);
+	GlobalC::rhopw->setuptransform();
+
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
 
     ORB_control orb_con(GlobalV::GAMMA_ONLY_LOCAL,
                         GlobalV::NLOCAL,

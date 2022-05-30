@@ -6,17 +6,17 @@ namespace ModulePW
 PW_Basis_K::PW_Basis_K()
 {
     nks = 1;
-    kvec_d = NULL;
-    kvec_c = NULL;
-    npwk = NULL;
-    igl2isz_k = NULL;
+    kvec_d = nullptr;
+    kvec_c = nullptr;
+    npwk = nullptr;
+    igl2isz_k = nullptr;
 }
 PW_Basis_K::~PW_Basis_K()
 {
-    if(kvec_d != NULL) delete[] kvec_d;
-    if(kvec_c != NULL) delete[] kvec_c;
-    if(npwk != NULL) delete[] npwk;
-    if(igl2isz_k != NULL) delete[] igl2isz_k;
+    if(kvec_d != nullptr)    delete[] kvec_d;
+    if(kvec_c != nullptr)    delete[] kvec_c;
+    if(npwk != nullptr)      delete[] npwk;
+    if(igl2isz_k != nullptr) delete[] igl2isz_k;
 }
 
 void PW_Basis_K:: initparameters(
@@ -28,8 +28,8 @@ void PW_Basis_K:: initparameters(
 )
 {
     this->nks = nks_in;
-    this->kvec_d = new ModuleBase::Vector3<double> [nks];
-    this->kvec_c = new ModuleBase::Vector3<double> [nks];
+   if(this->kvec_d!=nullptr) delete[] this->kvec_d; this->kvec_d = new ModuleBase::Vector3<double> [nks];
+   if(this->kvec_c!=nullptr) delete[] this->kvec_c; this->kvec_c = new ModuleBase::Vector3<double> [nks];
 
     double kmaxmod = 0;
     for(int ik = 0 ; ik < this->nks ; ++ik)
@@ -59,7 +59,7 @@ void PW_Basis_K::setupIndGk()
 {
     //count npwk
     this->npwk_max = 0;
-    this->npwk = new int [this->nks];
+    if(this->npwk!=nullptr) delete[] this->npwk; this->npwk = new int [this->nks];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int ng = 0;
@@ -79,7 +79,7 @@ void PW_Basis_K::setupIndGk()
     }
 
     //get igl2isz_k
-    this->igl2isz_k = new int [this->nks * this->npwk_max];
+    if(this->igl2isz_k!=nullptr) delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int igl = 0;
@@ -111,6 +111,7 @@ void PW_Basis_K::setuptransform()
     this->distribute_g();
     this->getstartgr();
     this->setupIndGk();
+    this->ft.clear();
     this->ft.initfft(this->nx,this->bigny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
 }

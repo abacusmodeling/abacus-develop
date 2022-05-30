@@ -755,14 +755,14 @@ void PW_Basis::get_nggm(const int ngmc_local)
 
 #include "../module_base/constants.h"
 //  Calculate structure factor
-void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add OpenMP 2021.04.01
+void PW_Basis::setup_structure_factor(ModulePW::PW_Basis* rho_basis)			// Peize Lin optimize and add OpenMP 2021.04.01
 {
     ModuleBase::TITLE("PW_Basis","setup_structure_factor");
     ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
     const std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 
-    this->strucFac.create(Ucell->ntype, this->ngmc);
-    ModuleBase::Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");
+    this->strucFac.create(Ucell->ntype, rho_basis->npw);
+    ModuleBase::Memory::record("PW_Basis","struc_fac", Ucell->ntype*rho_basis->npw,"complexmatrix");
 
 //	std::string outstr;
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
@@ -774,7 +774,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     if(usebspline)
     {
         nbspline = int((nbspline+1)/2)*2; // nbspline must be a positive even number.
-        this->bspline_sf(nbspline);
+        this->bspline_sf(nbspline, rho_basis);
     }
     else
     {
@@ -785,9 +785,9 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 #ifdef _OPENMP
 		    #pragma omp parallel for schedule(static)
 #endif
-            for (int ig=0; ig<this->ngmc; ig++)
+            for (int ig=0; ig<rho_basis->npw; ig++)
             {
-		    	const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
+		    	const ModuleBase::Vector3<double> gcar_ig = rho_basis->gcar[ig];
                 std::complex<double> sum_phase = ModuleBase::ZERO;
                 for (int ia=0; ia<na; ia++)
                 {
@@ -802,13 +802,13 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 //	ofs.close();
 
     int i,j; //ng;
-    this->eigts1.create(Ucell->nat, 2*this->ncx + 1);
-    this->eigts2.create(Ucell->nat, 2*this->ncy + 1);
-    this->eigts3.create(Ucell->nat, 2*this->ncz + 1);
+    this->eigts1.create(Ucell->nat, 2*rho_basis->nx + 1);
+    this->eigts2.create(Ucell->nat, 2*rho_basis->ny + 1);
+    this->eigts3.create(Ucell->nat, 2*rho_basis->nz + 1);
 
-    ModuleBase::Memory::record("PW_Basis","eigts1",Ucell->nat*2*this->ncx + 1,"complexmatrix");
-    ModuleBase::Memory::record("PW_Basis","eigts2",Ucell->nat*2*this->ncy + 1,"complexmatrix");
-    ModuleBase::Memory::record("PW_Basis","eigts3",Ucell->nat*2*this->ncz + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts1",Ucell->nat*2*rho_basis->nx + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts2",Ucell->nat*2*rho_basis->ny + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts3",Ucell->nat*2*rho_basis->nz + 1,"complexmatrix");
 
     ModuleBase::Vector3<double> gtau;
     int inat = 0;
@@ -821,20 +821,20 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
         for (j = 0; j < Ucell->atoms[i].na;j++)
         {
             gtau = Ucell->G * Ucell->atoms[i].tau[j];  //HLX: fixed on 10/13/2006
-            for (int n1 = -ncx; n1 <= ncx;n1++)
+            for (int n1 = -rho_basis->nx; n1 <= rho_basis->nx;n1++)
             {
                 double arg = n1 * gtau.x;
-                this->eigts1(inat, n1 + ncx) = exp( ci_tpi*arg  );
+                this->eigts1(inat, n1 + rho_basis->nx) = exp( ci_tpi*arg  );
             }
-            for (int n2 = -ncy; n2 <= ncy;n2++)
+            for (int n2 = -rho_basis->ny; n2 <= rho_basis->ny;n2++)
             {
                 double arg = n2 * gtau.y;
                 this->eigts2(inat, n2 + ncy) = exp( ci_tpi*arg );
             }
-            for (int n3 = -ncz; n3 <= ncz;n3++)
+            for (int n3 = -rho_basis->nz; n3 <= rho_basis->nz;n3++)
             {
                 double arg = n3 * gtau.z;
-                this->eigts3(inat, n3 + ncz) = exp( ci_tpi*arg );
+                this->eigts3(inat, n3 + rho_basis->nz) = exp( ci_tpi*arg );
             }
             inat++;
         }
@@ -1132,8 +1132,6 @@ void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
 #endif
 
     this->get_nggm(this->ngmc);
-
-    this->setup_structure_factor();
 
     ModuleBase::timer::tick("PW_Basis","update_gvectors");
 

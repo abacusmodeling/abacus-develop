@@ -42,11 +42,12 @@ TEST_F(PWTEST,test1_4f)
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
-    int nrxx = pwtest.nrxx;
+    const int nrxx = pwtest.nrxx;
+    const int nmaxgr = pwtest.nmaxgr;
     nx = pwtest.nx;
     ny = pwtest.bigny;
     nz = pwtest.nz;
-    int nplane = pwtest.nplane;
+    const int nplane = pwtest.nplane;
 
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / lat0 / lat0;
     double ggecut = wfcecut / tpiba2;
@@ -56,6 +57,7 @@ TEST_F(PWTEST,test1_4f)
 	GGT = G * GT;
     complex<double> *tmp = new complex<double> [nx*ny*nz];
     complex<float> * rhor = new complex<float> [nrxx];
+    complex<float> * rhogr = new complex<float> [nmaxgr];
     for(int ik  = 0; ik < nks; ++ik)
     {
         int npw = pwtest.npwk[ik];
@@ -109,9 +111,13 @@ TEST_F(PWTEST,test1_4f)
         for(int ig = 0 ; ig < npw ; ++ig)
         {
             rhog[ig] = 1.0/(pwtest.gg[ik*npwk_max + ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ik*npwk_max + ig].x+1) + 1);
+            rhogr[ig] = 1.0/(pwtest.gg[ik*npwk_max + ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ik*npwk_max + ig].x+1) + 1);
         }    
 
-        pwtest.recip2real(rhog,rhor,ik);
+        pwtest.recip2real(rhog,rhor,ik); //check out-of-place transform
+
+        pwtest.recip2real(rhogr,rhogr,ik); //check in-place transform
+
         int startiz = pwtest.startz[rank_in_pool];
         for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
         {
@@ -119,14 +125,21 @@ TEST_F(PWTEST,test1_4f)
             {
                 EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz].real(),1e-4);
                 EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhor[ixy*nplane+iz].imag(),1e-4);
+                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhogr[ixy*nplane+iz].real(),1e-4);
+                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhogr[ixy*nplane+iz].imag(),1e-4);
             }
         }
 
         pwtest.real2recip(rhor,rhogout,ik);
+
+        pwtest.real2recip(rhogr,rhogr,ik);
+
         for(int ig = 0 ; ig < npw ; ++ig)
         {
             EXPECT_NEAR(rhog[ig].real(),rhogout[ig].real(),1e-6);
             EXPECT_NEAR(rhog[ig].imag(),rhogout[ig].imag(),1e-6);
+            EXPECT_NEAR(rhog[ig].real(),rhogr[ig].real(),1e-6);
+            EXPECT_NEAR(rhog[ig].imag(),rhogr[ig].imag(),1e-6);
         }
 
 
@@ -136,6 +149,7 @@ TEST_F(PWTEST,test1_4f)
     delete []tmp; 
     delete [] rhor;
     delete[] kvec_d;
+    delete[] rhogr;
     fftw_cleanup();
 #ifdef __MIX_PRECISION
     fftwf_cleanup();

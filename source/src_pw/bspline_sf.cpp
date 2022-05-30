@@ -1,7 +1,7 @@
 #include "pw_basis.h"
 #include "global.h"
-#include "unistd.h"
 #include "../module_base/math_bspline.h"
+using namespace std;
 
 //
 //DESCRIPTION:
@@ -14,29 +14,27 @@
 //    1. Use "r2c" fft
 //    2. Add parallel algorithm for fftw or na loop
 //
-void PW_Basis::bspline_sf(const int norder)
+void PW_Basis::bspline_sf(const int norder,ModulePW::PW_Basis* rho_basis)
 {
-    double *r = new double [ncxyz]; 
-    double *tmpr = new double[nrxx];
-    double *zpiece = new double[nx*ny];
-    complex<double> *b1 = new complex<double> [nx];
-    complex<double> *b2 = new complex<double> [ny];
-    complex<double> *b3 = new complex<double> [nz];
-    GlobalC::UFFT.allocate();
-    
+    double *r = new double [rho_basis->nxyz]; 
+    double *tmpr = new double[rho_basis->nrxx];
+    double *zpiece = new double[rho_basis->nxy];
+    complex<double> *b1 = new complex<double> [rho_basis->nx];
+    complex<double> *b2 = new complex<double> [rho_basis->ny];
+    complex<double> *b3 = new complex<double> [rho_basis->nz];
 
     for (int it=0; it<Ucell->ntype; it++)
     {
 		const int na = Ucell->atoms[it].na;
 		const ModuleBase::Vector3<double> * const taud = Ucell->atoms[it].taud;
-        ModuleBase::GlobalFunc::ZEROS(r,ncxyz);
+        ModuleBase::GlobalFunc::ZEROS(r,rho_basis->nxyz);
 
         //A parallel algorithm can be added in the future.
         for(int ia = 0 ; ia < na ; ++ia)
         {
-            double gridx = taud[ia].x * nx;
-            double gridy = taud[ia].y * ny;
-            double gridz = taud[ia].z * nz;
+            double gridx = taud[ia].x * rho_basis->nx;
+            double gridy = taud[ia].y * rho_basis->ny;
+            double gridz = taud[ia].z * rho_basis->nz;
             double dx = gridx - floor(gridx);
             double dy = gridy - floor(gridy);
             double dz = gridz - floor(gridz);
@@ -52,14 +50,14 @@ void PW_Basis::bspline_sf(const int norder)
 
             for(int iz = 0 ; iz <= norder ; ++iz)
             {
-                int icz = int(nz*10-iz+floor(gridz))%nz;
+                int icz = int(rho_basis->nz*10-iz+floor(gridz))%rho_basis->nz;
                 for(int iy = 0 ; iy <= norder ; ++iy)
                 {
-                    int icy = int(ny*10-iy+floor(gridy))%ny;
+                    int icy = int(rho_basis->ny*10-iy+floor(gridy))%rho_basis->ny;
                     for(int ix = 0 ; ix <= norder ; ++ix )
                     {
-                        int icx = int(nx*10-ix+floor(gridx))%nx;
-                        r[icz*ny*nx + icx*ny + icy] += bsz.bezier_ele(iz) 
+                        int icx = int(rho_basis->nx*10-ix+floor(gridx))%rho_basis->nx;
+                        r[icz*rho_basis->ny*rho_basis->nx + icx*rho_basis->ny + icy] += bsz.bezier_ele(iz) 
                                                  * bsy.bezier_ele(iy) 
                                                  * bsx.bezier_ele(ix); 
                     }
@@ -69,14 +67,14 @@ void PW_Basis::bspline_sf(const int norder)
         
         //distribute data to different processors for UFFT
         //---------------------------------------------------
-        for(int iz = 0; iz < nz; iz++)
+        for(int iz = 0; iz < rho_basis->nz; iz++)
 	    {
-	    	ModuleBase::GlobalFunc::ZEROS(zpiece, nx*ny);
+	    	ModuleBase::GlobalFunc::ZEROS(zpiece, rho_basis->nxy);
 	    	if(GlobalV::MY_RANK==0)
 	    	{
-	    		for(int ir = 0; ir < ny * nx; ir++)
+	    		for(int ir = 0; ir < rho_basis->nxy; ir++)
 	    		{
-	    			zpiece[ir] = r[iz*ny*nx + ir];
+	    			zpiece[ir] = r[iz*rho_basis->nxy + ir];
 	    		}
 	    	}
         
@@ -88,14 +86,14 @@ void PW_Basis::bspline_sf(const int norder)
         //---------------------------------------------------
 
         //It should be optimized with r2c
-        GlobalC::UFFT.ToReciSpace(tmpr, &strucFac(it,0));
+        rho_basis->real2recip(tmpr, &strucFac(it,0));
         this->bsplinecoef(b1,b2,b3,norder);
-        for(int ig = 0 ; ig < ngmc ; ++ig)
+        for(int ig = 0 ; ig < rho_basis->npw ; ++ig)
         {
-           int idx = int(gdirect[ig].x+0.1+this->nx)%this->nx;
-           int idy = int(gdirect[ig].y+0.1+this->ny)%this->ny;
-           int idz = int(gdirect[ig].z+0.1+this->nz)%this->nz;
-           strucFac(it,ig) *= ( b1[idx] * b2[idy] * b3[idz] * double(this->ncxyz) );
+           int idx = int(rho_basis->gdirect[ig].x+0.1+rho_basis->nx)%rho_basis->nx;
+           int idy = int(rho_basis->gdirect[ig].y+0.1+rho_basis->ny)%rho_basis->ny;
+           int idz = int(rho_basis->gdirect[ig].z+0.1+rho_basis->nz)%rho_basis->nz;
+           strucFac(it,ig) *= ( b1[idx] * b2[idy] * b3[idz] * double(rho_basis->nxyz) );
         }
     }   
     delete[] r;

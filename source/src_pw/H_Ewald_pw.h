@@ -4,7 +4,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_cell/unitcell.h"
-#include "pw_basis.h"
+#include "../module_pw/pw_basis.h"
 
 class H_Ewald_pw 
 {
@@ -22,7 +22,7 @@ class H_Ewald_pw
     static double ewald_energy;
 
 	// compute the Ewald energy
-    static void compute_ewald(const UnitCell &cell, const PW_Basis &pwb);
+    static void compute_ewald(const UnitCell &cell, ModulePW::PW_Basis* rho_basis);
 
 	private:
 

@@ -92,14 +92,13 @@ void PW_Basis:: initgrids(
         //int n7 = 0;
         bool done_factoring = false;
 	
-		int ns = 0;
         // increase ibox[i] by 1 until it is totally factorizable by (2,3,5,7) 
         do
         {
 			b = ibox[i];          
 
 			//n2 = n3 = n5 = n7 = 0;
-			n2 = n3 = n5 = ns = 0;
+			n2 = n3 = n5 = 0;
 			done_factoring = false;
 			while (!done_factoring)
 			{
@@ -130,11 +129,11 @@ void PW_Basis:: initgrids(
         ibox[i] -= 1;
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
     }
-    this->nx = ibox[0];
+    this->bignx = this->nx = ibox[0];
     this->bigny = ibox[1];
-    this->nz = ibox[2];
-    this->bignxy = this->nx * this->bigny;
-    this->bignxyz = this->bignxy * this->nz;
+    this->bignz = this->nz = ibox[2];
+    this->bignxy =this->bignx * this->bigny;
+    this->bignxyz = this->bignxy * this->bignz;
 
     delete[] ibox;    
     return;

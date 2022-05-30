@@ -8,7 +8,9 @@ namespace ModuleESolver
     class ESolver_FP : public ESolver
     {
     public:
-        ModulePW::PW_Basis pw_rho;
+        ModulePW::PW_Basis* pw_rho;
+        ESolver_FP();
+        virtual ~ESolver_FP();
         virtual void Init(Input& inp, UnitCell_pseudo& cell) override;
         // Hamilt* phamilt;
     };

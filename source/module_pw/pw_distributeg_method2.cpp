@@ -32,7 +32,7 @@ void PW_Basis::distribution_method2()
     int *st_bottom2D = NULL;             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = NULL;             // st_length2D[ixy], number of planewaves in stick on (x, y).
 
-    this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
+    if(this->nst_per!=nullptr) delete[] this->nst_per; this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
     if (poolrank == 0)
     {
         // (1) Count the total number of planewaves (tot_npw) and sticks (this->nstot).                  
@@ -113,9 +113,9 @@ void PW_Basis::distribution_method2()
     {
         st_bottom2D = new int[this->nxy];                      // minimum z of stick.
         st_length2D = new int[this->nxy];                      // number of planewaves in stick.
-        this->ixy2ip = new int[this->nxy];              // ip of core which contains stick on (x, y).
-        this->ixy2istot = new int[this->nxy];
-        this->istot2bigixy = new int[this->nstot];
+        if(this->ixy2ip!=nullptr) delete[] this->ixy2ip; this->ixy2ip = new int[this->nxy];              // ip of core which contains stick on (x, y).
+        if(this->ixy2istot!=nullptr) delete[]this->ixy2istot; this->ixy2istot = new int[this->nxy];
+        if(this->istot2bigixy!=nullptr) delete[] this->istot2bigixy; this->istot2bigixy = new int[this->nstot];
     }
 
     MPI_Bcast(st_length2D, this->nxy, MPI_INT, 0, POOL_WORLD);
@@ -126,6 +126,7 @@ void PW_Basis::distribution_method2()
 
     // std::cout << "Bcast done\n";
 #endif
+     this->npwtot = tot_npw;
     this->nstnz = this->nst * this->nz;
 
     // (5) Construct ig2isz and is2ixy. 
@@ -148,8 +149,8 @@ void PW_Basis::distribution_method2()
 /// 
 void PW_Basis::divide_sticks_2()
 {
-    this->nstnz_per = new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
-    this->startnsz_per = new int[this->poolnproc];
+    if(this->nstnz_per!=nullptr) delete[] this->nstnz_per; this->nstnz_per = new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
+    if(this->startnsz_per!=nullptr) delete[] this->startnsz_per; this->startnsz_per = new int[this->poolnproc];
     ModuleBase::GlobalFunc::ZEROS(this->nstnz_per, this->poolnproc);
     ModuleBase::GlobalFunc::ZEROS(this->startnsz_per, this->poolnproc);
     
@@ -174,9 +175,9 @@ void PW_Basis::create_maps(
     int* npw_per       // number of planewaves on each core.
 )
 {
-    this->ixy2ip = new int[this->nxy];
-    this->ixy2istot = new int[this->nxy];
-    this->istot2bigixy = new int[this->nstot];
+    if(this->ixy2ip!=nullptr) delete[] this->ixy2ip; this->ixy2ip = new int[this->nxy];
+    if(this->ixy2istot!=nullptr) delete[]this->ixy2istot; this->ixy2istot = new int[this->nxy];
+    if(this->istot2bigixy!=nullptr) delete[] this->istot2bigixy; this->istot2bigixy = new int[this->nstot];
 
     ModuleBase::GlobalFunc::ZEROS(this->istot2bigixy, this->nstot);
     int ip = 0;

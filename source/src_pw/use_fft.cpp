@@ -55,21 +55,9 @@ void Use_FFT::RoundTrip(
     return;
 }
 
-void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr)
+void Use_FFT::ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
-	// (1) set value
-    ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
-    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
-    {
-        porter[ GlobalC::pw.ig2fftc[ig] ] = vg(is, ig);
-    }
-
-	// (2) fft and get value
-    GlobalC::pw.FFT_chg.FFT3D(porter, 1);
-    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-    {
-        vr[ir] = porter[ir].real();
-    }
+    rho_basis->recip2real(&vg(is,0), vr);
     return;
 }
 
@@ -103,53 +91,23 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::Co
 
 
 
-void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &vr)
+void Use_FFT::ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &vr, ModulePW::PW_Basis* rho_basis)
 {
-	// (1) set value
-    ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx);
-    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
-    {
-        porter [GlobalC::pw.ig2fftc[ig]] = vg(is,ig);
-    }
-
-	// (2) fft and get value
-    GlobalC::pw.FFT_chg.FFT3D(porter, 1);
-    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-    {
-        vr(is,ir) = porter[ir].real();
-    }
+    rho_basis->recip2real(&vg(is,0), &vr(is,0));
     return;
 }
 
 
 // Fourer transform of vg,
 // then put vg into vr.
-void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr)
+void Use_FFT::ToRealSpace(std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
-    ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx);
-    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
-    {
-        porter[GlobalC::pw.ig2fftc[ig]] = vg[ig];
-    }
-    GlobalC::pw.FFT_chg.FFT3D(porter, 1);
-    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-    {
-        vr[ir] = porter[ir].real();
-    }
+    rho_basis->recip2real(vg, vr);
     return;
 }
 
-void Use_FFT::ToReciSpace(const double* vr, std::complex<double> *vg)
+void Use_FFT::ToReciSpace(double* vr, std::complex<double> *vg, ModulePW::PW_Basis* rho_basis)
 {
-	ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx);
-	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
-	{
-		porter[ir] = std::complex<double>(vr[ir], 0.0);
-	}
-	GlobalC::pw.FFT_chg.FFT3D( porter, -1);
-	for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
-	{
-		vg[ig] = porter[ GlobalC::pw.ig2fftc[ig] ];
-	}
+    rho_basis->real2recip(vr, vg);
 	return;
 }

@@ -10,46 +10,54 @@ namespace ModulePW
 
 PW_Basis::PW_Basis()
 {
-    ig2isz = NULL;
-    istot2bigixy = NULL;   
-    ixy2istot = NULL;
-    is2ixy = NULL;
-    ixy2ip = NULL; 
-    startnsz_per = NULL;
-    nstnz_per = NULL;
-    nst_per = NULL;
-    gdirect = NULL;		
-    gcar = NULL; 
-    gg = NULL;
-    startz = NULL;
-    numz = NULL;  
-    this->numg = NULL;
-	this->startg = NULL;
-	this->startr = NULL;
-	this->numr = NULL;
+    ig2isz = nullptr;
+    istot2bigixy = nullptr;   
+    ixy2istot = nullptr;
+    is2ixy = nullptr;
+    ixy2ip = nullptr;
+    startnsz_per =nullptr;
+    nstnz_per = nullptr;
+    nst_per = nullptr;
+    gdirect = nullptr;		
+    gcar = nullptr; 
+    gg = nullptr;
+    startz = nullptr;
+    numz = nullptr; 
+    numg = nullptr;
+	startg = nullptr;
+	startr = nullptr;
+	numr = nullptr;
+    ig2igg = nullptr;
+    gg_uniq = nullptr;
+    ig_gge0 = -1;
     poolnproc = 1;
     poolrank = 0;
+    npw = 0;
+    npwtot = 0;
+    ngg = 0;
 }
 
 PW_Basis:: ~PW_Basis()
 {
-    if(ig2isz != NULL) delete[] ig2isz;
-    if(istot2bigixy != NULL) delete[] istot2bigixy;
-    if(ixy2istot != NULL) delete[] ixy2istot;
-    if(is2ixy != NULL) delete[] is2ixy;
-    if(ixy2ip != NULL) delete[] ixy2ip;
-    if(startnsz_per != NULL) delete[] startnsz_per;
-    if(nstnz_per != NULL) delete[] nstnz_per;
-    if(nst_per != NULL) delete[] nst_per;
-    if(gdirect != NULL) delete[] gdirect;
-    if(gcar != NULL) delete[] gcar;
-    if(gg != NULL) delete[] gg;
-    if(startz != NULL) delete[] startz;
-    if(numz != NULL) delete[] numz;
-    if(numg != NULL) delete[] numg;
-    if(numr != NULL) delete[] numr;
-    if(startg != NULL) delete[] startg;
-    if(startr != NULL) delete[] startr;
+    if(ig2isz != nullptr)           delete[] ig2isz;
+    if(istot2bigixy != nullptr)     delete[] istot2bigixy;
+    if(ixy2istot != nullptr)        delete[] ixy2istot;
+    if(is2ixy != nullptr)           delete[] is2ixy;
+    if(ixy2ip != nullptr)           delete[] ixy2ip;
+    if(startnsz_per != nullptr)     delete[] startnsz_per;
+    if(nstnz_per != nullptr)        delete[] nstnz_per;
+    if(nst_per != nullptr)          delete[] nst_per;
+    if(gdirect != nullptr)          delete[] gdirect;
+    if(gcar != nullptr)             delete[] gcar;
+    if(gg != nullptr)               delete[] gg;
+    if(startz != nullptr)           delete[] startz;
+    if(numz != nullptr)             delete[] numz;
+    if(numg != nullptr)             delete[] numg;
+    if(numr != nullptr)             delete[] numr;
+    if(startg != nullptr)           delete[] startg;
+    if(startr != nullptr)           delete[] startr;
+    if(ig2igg != nullptr)           delete[] ig2igg;
+    if(gg_uniq != nullptr)          delete[] gg_uniq;
 }
 
 /// 
@@ -62,21 +70,24 @@ void PW_Basis::setuptransform()
     this->distribute_r();
     this->distribute_g();
     this->getstartgr();
+    this->ft.clear();
     this->ft.initfft(this->nx,this->bigny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
 }
 
 void PW_Basis::getstartgr()
 {
-    this->maxgrids = (this->nz * this->nst > this->bignxy * nplane) ? this->nz * this->nst : this->bignxy * nplane;
+    if(this->gamma_only)    this->nmaxgr = ( this->npw > (this->nrxx+1)/2 ) ? this->npw : (this->nrxx+1)/2;
+    else                    this->nmaxgr = ( this->npw > this->nrxx ) ? this->npw : this->nrxx;
+    this->nmaxgr = (this->nz * this->nst > this->bignxy * nplane) ? this->nz * this->nst : this->bignxy * nplane;
     
     //---------------------------------------------
 	// sum : starting plane of FFT box.
 	//---------------------------------------------
-    this->numg = new int[poolnproc];
-	this->startg = new int[poolnproc];
-	this->startr = new int[poolnproc];
-	this->numr = new int[poolnproc];
+    if(this->numg!=nullptr) delete[] this->numg; this->numg = new int[poolnproc];
+	delete[] this->startg; this->startg = new int[poolnproc];
+	delete[] this->startr; this->startr = new int[poolnproc];
+	delete[] this->numr; this->numr = new int[poolnproc];
 
 	// Each processor has a set of full sticks,
 	// 'rank_use' processor send a piece(npps[ip]) of these sticks(nst_per[rank_use])
@@ -108,12 +119,9 @@ void PW_Basis::getstartgr()
 /// 
 void PW_Basis::collect_local_pw()
 {
-    if(gg != NULL) delete[] gg;
-    if(gdirect != NULL) delete[] gdirect;
-    if(gcar != NULL) delete[] gcar;
-    this->gg = new double[this->npw];
-    this->gdirect = new ModuleBase::Vector3<double>[this->npw];
-    this->gcar = new ModuleBase::Vector3<double>[this->npw];
+   if(this->gg!=nullptr) delete[] this->gg; this->gg = new double[this->npw];
+   if(this->gdirect!=nullptr) delete[] this->gdirect; this->gdirect = new ModuleBase::Vector3<double>[this->npw];
+   if(this->gcar!=nullptr) delete[] this->gcar; this->gcar = new ModuleBase::Vector3<double>[this->npw];
 
     ModuleBase::Vector3<double> f;
     for(int ig = 0 ; ig < this-> npw ; ++ig)
@@ -133,8 +141,74 @@ void PW_Basis::collect_local_pw()
         this->gg[ig] = f * (this->GGT * f);
         this->gdirect[ig] = f;
         this->gcar[ig] = f * this->G;
+        if(this->gg[ig] < 1e-8) this->ig_gge0 = ig;
     }
     return;
+}
+void PW_Basis::collect_uniqgg()
+{
+    if(this->ig2igg!=nullptr) delete[] this->ig2igg; this->ig2igg = new int [this->npw];
+    int *sortindex = new int [this->npw];
+    double *tmpgg = new double [this->npw];
+    double *tmpgg2 = new double [this->npw];
+    ModuleBase::Vector3<double> f;
+    for(int ig = 0 ; ig < this-> npw ; ++ig)
+    {
+        int isz = this->ig2isz[ig];
+        int iz = isz % this->nz;
+        int is = isz / this->nz;
+        int ixy = this->is2ixy[is];
+        int ix = ixy / this->ny;
+        int iy = ixy % this->ny;
+        if (ix >= int(this->nx/2) + 1) ix -= this->nx;
+        if (iy >= int(this->bigny/2) + 1) iy -= this->bigny;
+        if (iz >= int(this->nz/2) + 1) iz -= this->nz;
+        f.x = ix;
+        f.y = iy;
+        f.z = iz;
+        tmpgg[ig] = f * (this->GGT * f);
+        if(tmpgg[ig] < 1e-8) this->ig_gge0 = ig;
+    }
+
+    ModuleBase::GlobalFunc::ZEROS(sortindex, this->npw);
+    ModuleBase::heapsort(this->npw, tmpgg, sortindex);
+   
+
+    int igg = 0;
+    this->ig2igg[sortindex[0]] = 0;
+    tmpgg2[0] = tmpgg[0];
+    double avg_gg = tmpgg2[igg];
+    int avg_n = 1;
+    for (int ig = 1; ig < this->npw; ++ig)
+    {
+        if (std::abs(tmpgg[ig] - tmpgg2[igg]) > 1.0e-8)
+        {
+            tmpgg2[igg] = avg_gg / double(avg_n) ;
+            ++igg;
+            tmpgg2[igg] = tmpgg[ig];
+            avg_gg = tmpgg2[igg];
+            avg_n = 1;   
+        }
+        else
+        {
+            avg_n++;
+            avg_gg += tmpgg[ig];
+        }
+        this->ig2igg[sortindex[ig]] = igg;
+        if(ig == this->npw)
+        {
+            tmpgg2[igg] = avg_gg / double(avg_n) ;
+        }
+    }
+    this->ngg = igg + 1;
+    if(this->gg_uniq!=nullptr) delete[] this->gg_uniq; this->gg_uniq = new double [this->ngg];
+    for(int igg = 0 ; igg < this->ngg ; ++igg)
+    {
+            gg_uniq[igg] = tmpgg2[igg];
+    }
+    delete[] sortindex;
+    delete[] tmpgg;
+    delete[] tmpgg2;
 }
 
 // //

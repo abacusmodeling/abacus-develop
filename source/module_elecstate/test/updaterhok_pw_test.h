@@ -26,6 +26,7 @@
 #include "input.h"
 #include "src_pw/energy.h"
 #include "module_xc/xc_functional.h"
+#include "module_pw/pw_basis.h"
 
 bool ModuleSymmetry::Symmetry::symm_flag;
 
@@ -108,6 +109,7 @@ ModuleSymmetry::Symmetry symm;
 Parallel_Grid Pgrid;
 Use_FFT UFFT;
 PW_Basis pw;
+ModulePW::PW_Basis* rhopw;
 pseudopot_cell_vnl ppcell;
 Hamilt hm;
 energy en;
@@ -128,7 +130,7 @@ void Occupy::calculate_weights()
 void Use_FFT::allocate()
 {
     delete[] porter;
-    porter = new std::complex<double>[GlobalC::pw.nrxx];
+    porter = new std::complex<double>[GlobalC::rhopw->nrxx];
     return;
 }
 
@@ -222,13 +224,13 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	return true;
 }
 
-void Use_FFT::ToRealSpace(int const&is, ModuleBase::ComplexMatrix const&vg, double*vr){}
-void Use_FFT::ToRealSpace(std::complex<double> const*vg, double*vr){}
+void Use_FFT::ToRealSpace(int const&is, ModuleBase::ComplexMatrix &vg, double*vr, ModulePW::PW_Basis* rho_basis){}
+void Use_FFT::ToRealSpace(std::complex<double> *vg, double*vr, ModulePW::PW_Basis* rho_basis){}
 //bool Occupy::use_gaussian_broadening=false;
 //bool Occupy::use_tetrahedron_method = false;
 double Magnetism::get_nelup(){return 0;}
 double Magnetism::get_neldw(){return 0;}
-void PW_Basis::bspline_sf(const int norder){}
+void PW_Basis::bspline_sf(const int norder, ModulePW::PW_Basis* rho_basis){}
 
 bool ModuleSymmetry::Symmetry_Basic::equal(double const&m, double const&n) const{return false;}
 

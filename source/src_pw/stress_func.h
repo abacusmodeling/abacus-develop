@@ -8,6 +8,7 @@
 #include "../module_base/complexmatrix.h"
 #include "../module_base/realarray.h"
 #include "../module_base/vector3.h"
+#include "../module_pw/pw_basis.h"
 
 //-------------------------------------------------------------------
 // mohan reconstruction note: 2021-02-07
@@ -56,26 +57,27 @@ class Stress_Func
 	void stress_kin(ModuleBase::matrix& sigma);  //electron kinetic part in PW basis
 
 // 2) the stress from the Hartree term
-	void stress_har(ModuleBase::matrix& sigma, const bool is_pw);  //hartree part in PW or LCAO basis
+	void stress_har(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw);  //hartree part in PW or LCAO basis
 
 // 3) the stress from the ewald term (ion-ion intraction under 
 //		periodic boundary conditions). 
-	void stress_ewa(ModuleBase::matrix& sigma, const bool is_pw);     //ewald part in PW or LCAO basis
+	void stress_ewa(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw);     //ewald part in PW or LCAO basis
 
 // 4) the stress from the local pseudopotentials
-	void stress_loc(ModuleBase::matrix& sigma, const bool is_pw);  //local pseudopotential part in PW or LCAO
+	void stress_loc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw);  //local pseudopotential part in PW or LCAO
 	
 	void dvloc_of_g (const int& msh,
 			const double* rab,
 			const double* r,
 			const double* vloc_at,
 			const double& zp,
-			double*  dvloc);	//used in local pseudopotential stress
+			double*  dvloc,
+			ModulePW::PW_Basis* rho_basis);	//used in local pseudopotential stress
 
-	void dvloc_coul (const double& zp, double* dvloc); //used in local pseudopotential stress
+	void dvloc_coul (const double& zp, double* dvloc, ModulePW::PW_Basis* rho_basis); //used in local pseudopotential stress
 
 // 5) the stress from the non-linear core correction (if any)
-	void stress_cc(ModuleBase::matrix& sigma, const bool is_pw); 			//nonlinear core correction stress in PW or LCAO basis
+	void stress_cc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw); 			//nonlinear core correction stress in PW or LCAO basis
 
 	void deriv_drhoc (
 			const bool &numeric,
@@ -83,7 +85,8 @@ class Stress_Func
 			const double *r,
 			const double *rab,
 			const double *rhoc,
-			double *drhocg);	//used in nonlinear core correction stress
+			double *drhocg,
+			ModulePW::PW_Basis* rho_basis);	//used in nonlinear core correction stress
 
 // 6) the stress from the exchange-correlation functional term
 	void stress_gga(ModuleBase::matrix& sigma);			//gga part in both PW and LCAO basis

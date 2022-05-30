@@ -56,10 +56,10 @@ void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
 	stress_kin(sigmakin);
 	
 	//hartree contribution
-	stress_har(sigmahar, 1);
+	stress_har(sigmahar, GlobalC::rhopw, 1);
 
     //ewald contribution
-    stress_ewa(sigmaewa, 1);
+    stress_ewa(sigmaewa, GlobalC::rhopw, 1);
 
     //xc contribution: add gradient corrections(non diagonal)
     for(int i=0;i<3;i++)
@@ -70,10 +70,10 @@ void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
     if(XC_Functional::get_func_type() == 3) stress_mgga(sigmaxc);
 
     //local contribution
-    stress_loc(sigmaloc, 1);
+    stress_loc(sigmaloc, GlobalC::rhopw, 1);
     
     //nlcc
-    stress_cc(sigmaxcc, 1);
+    stress_cc(sigmaxcc, GlobalC::rhopw, 1);
    
     //nonlocal
 	stress_nl(sigmanl);

@@ -27,13 +27,13 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 	ModuleBase::matrix forcenl(nat, 3);
     ModuleBase::matrix sto_forcenl(nat,3);
 	ModuleBase::matrix forcescc(nat, 3);
-    this->cal_force_loc(forcelc);
-    this->cal_force_ew(forceion);
+    this->cal_force_loc(forcelc, GlobalC::rhopw);
+    this->cal_force_ew(forceion, GlobalC::rhopw);
     if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0)  this->cal_force_nl(forcenl);
     this->cal_sto_force_nl(sto_forcenl,stowf);
     forcenl = forcenl + sto_forcenl;
-	this->cal_force_cc(forcecc);
-	this->cal_force_scc(forcescc);
+	this->cal_force_cc(forcecc, GlobalC::rhopw);
+	this->cal_force_scc(forcescc, GlobalC::rhopw);
 	
     //impose total force = 0
     int iat = 0;

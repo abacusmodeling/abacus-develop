@@ -6,6 +6,7 @@
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
 #include "module_esolver/esolver_ks_lcao.h"
+#include "../module_pw/pw_basis.h"
 
 class Potential
 {
@@ -67,7 +68,7 @@ class Potential
 	void write_potential(const int &is, const int &iter, const std::string &fn,
 		const ModuleBase::matrix &v, const int &precision, const int &hartree = 0)const;
 
-    void write_elecstat_pot(const std::string &fn, const std::string &fn_ave);
+    void write_elecstat_pot(const std::string &fn, const std::string &fn_ave, ModulePW::PW_Basis* rho_basis);
 	
 	private:
 
@@ -75,9 +76,8 @@ class Potential
 	void set_local_pot(
 		double* vl_pseudo, // store the local pseudopotential
 		const int &ntype, // number of atom types
-		const int &ngmc, // number of |g|, g is plane wave
 		ModuleBase::matrix &vloc, // local pseduopotentials
-		int* ig2ngg, // ig2ngg
+		ModulePW::PW_Basis* rho_basis,
 		ModuleBase::ComplexMatrix &sf // structure factors	
 	)const;
 

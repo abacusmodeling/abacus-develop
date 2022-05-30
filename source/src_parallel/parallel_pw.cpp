@@ -467,8 +467,8 @@ void Parallel_PW::fft_map(
 		//	ig_l2g[i] is the index of ig_global
 		//	it tells the position in ig_global
 		//  for each plane wave in local processor
-		//  The local plane wave number is ngm_i = GlobalC::pw.ngmc
-		//  The total plane wave number is GlobalC::pw.ngmc_g
+		//  The local plane wave number is ngm_i = GlobalC::rhopw->npw
+		//  The total plane wave number is GlobalC::rhopw->npwtot
 		int x = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].x);
 		int y = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].y);
 		int z = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].z);
@@ -635,8 +635,8 @@ void Parallel_PW::fft_map_final_scf(
 		//	ig_l2g[i] is the index of ig_global
 		//	it tells the position in ig_global
 		//  for each plane wave in local processor
-		//  The local plane wave number is ngm_i = GlobalC::pw.ngmc
-		//  The total plane wave number is GlobalC::pw.ngmc_g
+		//  The local plane wave number is ngm_i = GlobalC::rhopw->npw
+		//  The total plane wave number is GlobalC::rhopw->npwtot
 		int x = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].x);
 		int y = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].y);
 		int z = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].z);

@@ -16,6 +16,7 @@
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
 #include "exx_global.h"
+#include "../module_pw/pw_basis.h"
 class XC_Functional
 {
 	public:
@@ -187,11 +188,12 @@ class XC_Functional
 // 4. grad_dot, which calculates divergence of something
 // 5. noncolin_rho, which diagonalizes the spin density matrix
 //  and gives the spin up and spin down components of the charge.
+#include "../module_pw/pw_basis.h"
 
 	static void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, std::vector<double> &stress_gga, const bool is_stress = 0);
 	static void grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw );
-	static void grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr );
-	static void grad_dot( const ModuleBase::Vector3<double> *h, double *dh);
+	static void grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr, ModulePW::PW_Basis *rho_basis);
+	static void grad_dot( const ModuleBase::Vector3<double> *h, double *dh, ModulePW::PW_Basis *rho_basis);
 	static void noncolin_rho(double *rhoout1,double *rhoout2,double *seg);
 
 //-------------------

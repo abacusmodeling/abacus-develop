@@ -38,7 +38,6 @@ void Stress_Func::print_stress(const std::string &name, const ModuleBase::matrix
 
 		if(screen)
 		{
-			std::cout<<fixed;
 			if( abs(f(i,0)) >output_acc) std::cout << std::setw(15) << f(i,0)*fac;
 			else std::cout << std::setw(15) << "0";
 			if( abs(f(i,1)) >output_acc) std::cout << std::setw(15) << f(i,1)*fac;

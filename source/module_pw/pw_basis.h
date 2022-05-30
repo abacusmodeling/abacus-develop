@@ -52,7 +52,7 @@ public:
     ~PW_Basis();
 
     //Init the grids for FFT
-    void initgrids(
+    virtual void initgrids(
         const double lat0_in, //unit length (unit in bohr)
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
         const double gridecut, //unit in Ry, ecut to set up grids
@@ -94,6 +94,8 @@ public:
     int nstnz; // nst * nz
     int nstot; //num. of sticks in total.
     int npw; //num. of plane waves in current proc.
+    int npwtot; // total num. of plane waves in all proc. in this pool
+
     //real space
     int nrxx; //num. of real space grids
     int *startz; //startz[ip]: starting z plane in the ip-th proc. in current POOL_WORLD 
@@ -104,11 +106,12 @@ public:
     int *startr;  // startr[ip] = numr[ip-1] + startr[ip-1]
     int nplane; //num. of planes in current proc.
 
-    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc]
+    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[npw]
     ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
-    double *gg;       	// modulus (G^2) of G vectors [ngmc]
+    double *gg;       	// modulus (G^2) of G vectors [npw]
     //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
 	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
+    int ig_gge0;    //ig when gg == 0
 
     //distribute plane waves and grids and set up fft
     void setuptransform();
@@ -118,7 +121,7 @@ protected:
     void distribute_g();
 
     //distribute real-space grids to different processors
-    void distribute_r();
+    virtual void distribute_r();
 
     //prepare for MPI_Alltoall
     void getstartgr();
@@ -133,6 +136,11 @@ public:
     //     ModuleBase::Vector3<double> *gdirect_global,
     //     ModuleBase::Vector3<double> *gcar_global
     // ); 
+public:
+    int ngg; //number of different modulus (G^2) of G vectors
+    int *ig2igg;//[npw] map ig to igg(<ngg: the index of G^2)
+    double *gg_uniq; //[ngg] modulus (G^2) of G vectors of igg, each gg of igg is unique.
+    void collect_uniqgg();
    
 
 public:
@@ -204,11 +212,12 @@ protected:
 public:
 	// FFT dimensions for wave functions.
 	int nx, ny, nz, nxyz, nxy;
-    int bigny, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
+    int bignx, bigny, bignz, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
     int liy,riy;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
-    int maxgrids; // max between nz * ns and bignxy * nplane
+    int nmaxgr; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
+                // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data
     FFT ft;
-
+    //The position of pointer in and out can be equal(in-place transform) or different(out-of-place transform).
     void real2recip(double * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
     void real2recip(std::complex<double> * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
     void recip2real(std::complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
@@ -232,3 +241,5 @@ protected:
 
 }
 #endif //PlaneWave 
+
+#include "./pw_basis_big.h" //temporary it will be removed

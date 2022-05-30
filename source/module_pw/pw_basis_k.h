@@ -62,7 +62,8 @@ public:
     ModuleBase::Vector3<double> *kvec_d; // Direct coordinates of k points
     ModuleBase::Vector3<double> *kvec_c; // Cartesian coordinates of k points
     int *npwk; //[nks] number of plane waves of different k-points
-    int npwk_max; //max npwk among all nks k-points
+    int npwk_max; //max npwk among all nks k-points, it may be smaller than npw
+                  //npw cutoff: (|g|+|k|)^2, npwk in the the npw ball, thus is smaller
     double gk_ecut; //Energy cut off for (g+k)^2/2
 
 public:

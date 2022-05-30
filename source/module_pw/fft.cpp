@@ -11,24 +11,28 @@ FFT::FFT()
 	mpifft = false; 
 	destroyp = true;
 	gamma_only = false;
-	aux2 = aux1 = NULL;
-	r_rspace = NULL;
+	aux2 = aux1 = nullptr;
+	r_rspace = nullptr;
 #ifdef __MIX_PRECISION
 	destroypf = true;
-	auxf2 = auxf1 = NULL;
-	rf_rspace = NULL;
+	auxf2 = auxf1 = nullptr;
+	rf_rspace = nullptr;
 #endif
 }
 
 FFT::~FFT()
 {
+	this->clear();
+}
+void FFT::clear()
+{
 	this->cleanFFT();
-	if(aux1!=NULL) fftw_free(aux1);
-	if(aux2!=NULL) fftw_free(aux2);
+	if(aux1!=nullptr) {fftw_free(aux1); aux1 = nullptr;}
+	if(aux2!=nullptr) {fftw_free(aux2); aux2 = nullptr;}
 #ifdef __MIX_PRECISION
 	this->cleanfFFT();
-	if(auxf1!=NULL) fftw_free(auxf1);
-	if(auxf2!=NULL) fftw_free(auxf2);
+	if(auxf1!=nullptr) {fftw_free(auxf1); auxf1 = nullptr;}
+	if(auxf2!=nullptr) {fftw_free(auxf2); auxf2 = nullptr;}
 #endif
 }
 
@@ -115,7 +119,7 @@ void FFT :: initplan()
 	//---------------------------------------------------------
 	
 	//int nrank[2] = {this->nx,this->bigny};
-	int *embed = NULL;
+	int *embed = nullptr;
 	// It seems 1D+1D is much faster than 2D FFT!
 	if(this->gamma_only)
 	{
@@ -207,7 +211,7 @@ void FFT :: initplanf()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int *embed = NULL;
+	int *embed = nullptr;
 	int bignpy = this->nplane * this->bigny;
 	this->planfxfor1  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (liy + 1),	 (fftwf_complex *)auxf2, 		  embed, bignpy,     1,
 			(fftwf_complex *)auxf2, 	 embed, bignpy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );

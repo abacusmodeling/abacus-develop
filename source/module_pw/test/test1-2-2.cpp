@@ -12,9 +12,9 @@
 #include "pw_test.h"
 
 using namespace std;
-TEST_F(PWTEST,test1_3)
+TEST_F(PWTEST,test1_2_2)
 {
-    cout<<"dividemthd 1, gamma_only: on, double precision, check fft"<<endl;
+    cout<<"dividemthd 1, gamma_only: off, double precision, check fft between double and complex"<<endl;
     ModulePW::PW_Basis pwtest;
     ModuleBase::Matrix3 latvec;
     int nx,ny,nz;  //f*G
@@ -22,16 +22,16 @@ TEST_F(PWTEST,test1_3)
     double lat0;
     bool gamma_only;
     //--------------------------------------------------
-    lat0 = 4;
-    ModuleBase::Matrix3 la(1, 1, 0, 1, 0, 1, 0, 1, 1);
+    lat0 = 2.2;
+    ModuleBase::Matrix3 la(1, 1, 0, 0, 1, 1, 0, 0, 2);
     latvec = la;
-    wfcecut = 20;
-    gamma_only = true;
+    wfcecut = 18;
+    gamma_only = false;
     int distribution_type = 1;
     //--------------------------------------------------
     
     //init
-    pwtest.initgrids(lat0,latvec,1.5*wfcecut, nproc_in_pool, rank_in_pool);
+    pwtest.initgrids(lat0,latvec,wfcecut, nproc_in_pool, rank_in_pool);
     //pwtest.initgrids(lat0,latvec,5,7,7);
     pwtest.initparameters(gamma_only,wfcecut,distribution_type);
     pwtest.setuptransform();
@@ -41,7 +41,7 @@ TEST_F(PWTEST,test1_3)
     const int nrxx = pwtest.nrxx;
     const int nmaxgr = pwtest.nmaxgr;
     nx = pwtest.nx;
-    ny = pwtest.bigny;
+    ny = pwtest.ny;
     nz = pwtest.nz;
     int nplane = pwtest.nplane;
 
@@ -68,7 +68,7 @@ TEST_F(PWTEST,test1_3)
                     double modulus = v * (GGT * v);
                     if (modulus <= ggecut)
                     {
-                        tmp[ix*ny*nz + iy*nz + iz] = 1.0/(modulus+1);
+                        tmp[ix*ny*nz + iy*nz + iz]=1.0/(modulus+1);
                         if(vy > 0) tmp[ix*ny*nz + iy*nz + iz]+=ModuleBase::IMAG_UNIT / (abs(v.x+1) + 1);
                         else if(vy < 0) tmp[ix*ny*nz + iy*nz + iz]-=ModuleBase::IMAG_UNIT / (abs(-v.x+1) + 1);
                     }
@@ -76,8 +76,8 @@ TEST_F(PWTEST,test1_3)
             }   
         }
         fftw_plan pp = fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *) tmp, (fftw_complex *) tmp, FFTW_BACKWARD, FFTW_ESTIMATE);
-        fftw_execute(pp);  
-        fftw_destroy_plan(pp);    
+        fftw_execute(pp);    
+        fftw_destroy_plan(pp); 
         
         ModuleBase::Vector3<double> delta_g(double(int(nx/2))/nx, double(int(ny/2))/ny, double(int(ny/2))/nz); 
         for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
@@ -109,6 +109,11 @@ TEST_F(PWTEST,test1_3)
             rhog[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
             rhogr[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
         }
+        else if(pwtest.gdirect[ig].y < 0)
+        {
+            rhog[ig]-=ModuleBase::IMAG_UNIT / (abs(-pwtest.gdirect[ig].x+1) + 1);
+            rhogr[ig]-=ModuleBase::IMAG_UNIT / (abs(-pwtest.gdirect[ig].x+1) + 1);
+        }
     }    
     double * rhor = new double [nrxx];
     
@@ -121,10 +126,11 @@ TEST_F(PWTEST,test1_3)
     {
         for(int iz = 0 ; iz < nplane ; ++iz)
         {
-            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz],1e-6);
-            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),((double*)rhogr)[ixy*nplane+iz],1e-6);
+            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz],1e-4);
+            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),((double*)rhogr)[ixy*nplane+iz],1e-4);
         }
     }
+
     
     
     pwtest.real2recip(rhor,rhogout);//check out-of-place transform
@@ -133,16 +139,16 @@ TEST_F(PWTEST,test1_3)
 
     for(int ig = 0 ; ig < npw ; ++ig)
     {
-        EXPECT_NEAR(rhog[ig].real(),rhogout[ig].real(),1e-6);
-        EXPECT_NEAR(rhog[ig].imag(),rhogout[ig].imag(),1e-6);
-        EXPECT_NEAR(rhogr[ig].real(),rhogout[ig].real(),1e-6);
-        EXPECT_NEAR(rhogr[ig].imag(),rhogout[ig].imag(),1e-6);
+        EXPECT_NEAR(rhog[ig].real(),rhogout[ig].real(),1e-4);
+        EXPECT_NEAR(rhog[ig].imag(),rhogout[ig].imag(),1e-4);
+        EXPECT_NEAR(rhogr[ig].real(),rhogout[ig].real(),1e-4);
+        EXPECT_NEAR(rhogr[ig].imag(),rhogout[ig].imag(),1e-4);
     }
-    
+  
     delete [] rhog;
     delete [] rhogout;
     delete [] rhor;
-    delete [] tmp;
+    delete [] tmp; 
     delete [] rhogr;
 
     fftw_cleanup();

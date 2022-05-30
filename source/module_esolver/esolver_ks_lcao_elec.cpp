@@ -178,7 +178,7 @@ namespace ModuleESolver
         this->beforesolver(istep);
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
 
         //2. the electron charge density should be symmetrized,
         // here is the initialization

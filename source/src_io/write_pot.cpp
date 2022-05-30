@@ -198,60 +198,50 @@ void Potential::write_potential(
 }
 
 
-void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave)
+void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave, ModulePW::PW_Basis* rho_basis)
 {
     ModuleBase::TITLE("Potential","write_elecstat_pot");
     ModuleBase::timer::tick("Potential","write_elecstat_pot");
 
-    double *v_elecstat;
-    v_elecstat = new double[GlobalC::pw.nrxx];
-    ModuleBase::GlobalFunc::ZEROS(v_elecstat, GlobalC::pw.nrxx);
+    double *v_elecstat = new double[rho_basis->nrxx];
+    ModuleBase::GlobalFunc::ZEROS(v_elecstat, rho_basis->nrxx);
 
-    std::complex<double> *Porter = GlobalC::UFFT.porter;
-    ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
+    std::complex<double> *vh_r = new std::complex<double>[rho_basis->nrxx];
+    ModuleBase::GlobalFunc::ZEROS( vh_r, rho_basis->nrxx );
+    std::complex<double> *vh_g  = new std::complex<double>[rho_basis->npw];
+
     
     int nspin0 = 1;
     if(GlobalV::NSPIN==2) nspin0 = GlobalV::NSPIN;
     for(int is=0; is<nspin0; is++)
     {
-        for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+        for(int ir=0; ir<rho_basis->nrxx; ir++)
         {
-            Porter[ir] += std::complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
+            vh_r[ir] += std::complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
         }
     }
 
     //=============================
     //  bring rho (aux) to G space
     //=============================
-    GlobalC::pw.FFT_chg.FFT3D(Porter, -1);
+    rho_basis->real2recip(vh_r, vh_g);
 
     //=======================================================
     // calculate hartree potential in G-space (NB: V(G=0)=0 )
     //=======================================================
-    std::complex<double> *vh_g  = new std::complex<double>[GlobalC::pw.ngmc];
-    ModuleBase::GlobalFunc::ZEROS(vh_g, GlobalC::pw.ngmc);
+    
 
-    for(int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
+    for(int ig = 0; ig < rho_basis->npw; ++ig)
     {
-        const int j = GlobalC::pw.ig2fftc[ig];
-        if(GlobalC::pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
-        {
-            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
-            vh_g[ig] = fac * Porter[j];
-        }
-    }
-
-    ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
-
-    for (int ig = 0;ig < GlobalC::pw.ngmc;ig++)
-    {
-        Porter[GlobalC::pw.ig2fftc[ig]] = vh_g[ig];
+        if(rho_basis->ig_gge0==ig)    continue;
+        const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * rho_basis->gg[ig]);
+        vh_g[ig] *= fac;
     }
 
     //==========================================
     //transform hartree potential to real space
     //==========================================
-    GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
+    rho_basis->recip2real(vh_g, vh_r);
 
     //==========================================
     // Dipole correction
@@ -259,16 +249,16 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     ModuleBase::matrix v_efield;
     if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
     {
-        v_efield.create(GlobalV::NSPIN, GlobalC::pw.nrxx);
+        v_efield.create(GlobalV::NSPIN, rho_basis->nrxx);
         v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
     }
 
     //==========================================
     //Add hartree potential and local pseudopot
     //==========================================
-    for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
+    for (int ir = 0;ir < rho_basis->nrxx;ir++)
     {
-        v_elecstat[ir] = Porter[ir].real() + this->vltot[ir];
+        v_elecstat[ir] = vh_r[ir].real() + this->vltot[ir];
 
         if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
         {
@@ -331,8 +321,8 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
             }
         }
 
-        ofs << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
-        ofs_ave << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
+        ofs << rho_basis->nx << " " << rho_basis->ny << " " << rho_basis->nz;
+        ofs_ave << rho_basis->nx << " " << rho_basis->ny << " " << rho_basis->nz;
 
         int precision = 9;
         ofs << std::setprecision(precision);
@@ -347,18 +337,18 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
 
 #ifndef __MPI
     int count=0;
-    for(int k=0; k<GlobalC::pw.ncz; k++)
+    for(int k=0; k<rho_basis->nz; k++)
     {
         ofs << "\n" << k << " iz";
         double value = 0.0;
         double ave = 0.0;
-        for(int j=0; j<GlobalC::pw.ncy; j++)
+        for(int j=0; j<rho_basis->ny; j++)
         {
-            for(int i=0; i<GlobalC::pw.ncx; i++)
+            for(int i=0; i<rho_basis->nx; i++)
             {
                 //if(count%8==0) ofs << "\n";
                 if(count%5==0) ofs << "\n";
-                value = v_elecstat[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k];
+                value = v_elecstat[i*rho_basis->ny*rho_basis->nz + j*rho_basis->nz + k];
                 ofs << " " << value;
                 ave += value;
                 ++count;
@@ -366,7 +356,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         }
         //ofs << "\n" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy << " average";
         if(k==0) ofs_ave << "iz" << "\taverage";
-        ofs_ave << "\n" << k << "\t" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy;
+        ofs_ave << "\n" << k << "\t" << ave/rho_basis->nx/rho_basis->ny;
     }
 #else
     MPI_Barrier(MPI_COMM_WORLD);
@@ -397,9 +387,9 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         }
 
         // which_ip: found iz belongs to which ip.
-        int *which_ip = new int[GlobalC::pw.ncz];
-        ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
-        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+        int *which_ip = new int[rho_basis->nz];
+        ModuleBase::GlobalFunc::ZEROS(which_ip, rho_basis->nz);
+        for(int iz=0; iz<rho_basis->nz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
             {
@@ -417,10 +407,10 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
             //GlobalV::ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
         }
         int count=0;
-        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nxy = rho_basis->nxy;
         double* zpiece = new double[nxy];
         // save the rho one z by one z.
-        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+        for(int iz=0; iz<rho_basis->nz; iz++)
         {
             //GlobalV::ofs_running << "\n" << iz << " iz";
             // tag must be different for different iz.
@@ -473,20 +463,20 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
                 }
                 //ofs << "\n" << ave/nxy << " average"; 
                 */
-                for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+                for(int iy=0; iy<rho_basis->ny; iy++)
                 {
-                    for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+                    for(int ix=0; ix<rho_basis->nx; ix++)
                     {
                         //if(count%8==0) ofs << "\n";
                         if(count%5==0) ofs << "\n";
                         //ofs << " " << zpiece[ir];
-                        ofs << std::setw(17) << zpiece[ix*GlobalC::pw.ncy+iy];
-                        ave += zpiece[ix*GlobalC::pw.ncy+iy];
+                        ofs << std::setw(17) << zpiece[ix*rho_basis->ny+iy];
+                        ave += zpiece[ix*rho_basis->ny+iy];
                         ++count;
                     }
                 }
                 if(iz==0) ofs_ave << "\niz" << "\taverage";
-                ofs_ave << "\n" << iz << "\t" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy;
+                ofs_ave << "\n" << iz << "\t" << ave/rho_basis->nx/rho_basis->ny;
             }
         }
         delete[] num_z;
@@ -500,6 +490,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
 
     delete[] v_elecstat;
     delete[] vh_g;
+    delete[] vh_r;
 
     ModuleBase::timer::tick("Potential","write_potential");
     return;

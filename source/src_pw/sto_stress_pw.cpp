@@ -26,10 +26,10 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
 	sigmakin = sigmakin + sto_sigmakin;
 	
 	//hartree contribution
-	stress_har(sigmahar, 1);
+	stress_har(sigmahar, GlobalC::rhopw, 1);
 
     //ewald contribution
-    stress_ewa(sigmaewa, 1);
+    stress_ewa(sigmaewa, GlobalC::rhopw, 1);
 
     //xc contribution: add gradient corrections(non diagonal)
     for(int i=0;i<3;i++)
@@ -39,10 +39,10 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
     stress_gga(sigmaxc);
 
     //local contribution
-    stress_loc(sigmaloc, 1);
+    stress_loc(sigmaloc, GlobalC::rhopw, 1);
     
     //nlcc
-    stress_cc(sigmaxcc, 1);
+    stress_cc(sigmaxcc, GlobalC::rhopw, 1);
    
     //nonlocal
 	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_nl(sigmanl);

@@ -134,7 +134,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			std::stringstream ssp_ave;
 			ssp << GlobalV::global_out_dir << "ElecStaticPot";
 			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
 		}
 
 		time_t eend = time(NULL);
@@ -329,7 +329,7 @@ void Ions::reset_after_relax(const int& istep)
 {
 	ModuleBase::TITLE("Ions","reset_after_relax");
 	GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
-	GlobalC::pw.setup_structure_factor();
+	GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
 
 	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
 	// charge extrapolation if istep>0.
