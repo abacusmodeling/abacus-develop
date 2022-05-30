@@ -24,6 +24,12 @@ class surchem
     ModuleBase::matrix Vel;
     double qs;
 
+    // compensating charge params
+    double comp_q;
+    double comp_l;
+    double comp_center;
+    int comp_dim;
+    // get atom info
     atom_in GetAtom;
 
     void allocate(const int &nrxx, const int &nspin);

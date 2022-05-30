@@ -240,6 +240,7 @@ OBJS_ESOLVER=esolver.o\
 
 OBJS_SURCHEM=H_correction_pw.o\
     cal_epsilon.o\
+    surchem.o\
     cal_pseudo.o\
     cal_totn.o\
     cal_vcav.o\
@@ -414,7 +415,6 @@ pdt2s.o\
 pzt2s.o\
 pdtrsm.o\
 pzhtrsm.o\
-
 
 PDIAG_MR_0=dcopy.o\
 dlae2.o\

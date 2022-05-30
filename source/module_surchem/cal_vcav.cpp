@@ -136,7 +136,7 @@ void surchem::createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<d
     // cavitation energy
     //-------------------------------------------------------------
 
-    double Ael = cal_Acav(ucell, pwb);
+    // double Ael = cal_Acav(ucell, pwb);
 
     //  packs the real array into a complex one
     //  to G space

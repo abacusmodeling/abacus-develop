@@ -14,6 +14,7 @@
 #include "src_ions/ions_move_basic.h"
 #include "src_pw/global.h"
 #include "src_pw/occupy.h"
+#include "module_surchem/surchem.h"
 #ifdef __EXX
 #include "src_ri/exx_abfs-jle.h"
 #endif
@@ -501,6 +502,11 @@ void Input_Conv::Convert(void)
     GlobalV::tau = INPUT.tau;
     GlobalV::sigma_k = INPUT.sigma_k;
     GlobalV::nc_k = INPUT.nc_k;
+
+    GlobalC::solvent_model.comp_q = INPUT.comp_q;
+    GlobalC::solvent_model.comp_l = INPUT.comp_l;
+    GlobalC::solvent_model.comp_center = INPUT.comp_center;
+    GlobalC::solvent_model.comp_dim = INPUT.comp_dim;
     ModuleBase::timer::tick("Input_Conv", "Convert");
     return;
 }

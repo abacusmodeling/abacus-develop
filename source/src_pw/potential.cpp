@@ -360,7 +360,7 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
             v += GlobalC::solvent_model.v_correction(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
 
             // test energy outside
-            cout << endl << "energy Outside: " << endl;
+            cout << "energy Outside: " << endl;
             GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::pw);
             GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::pw);
         }
