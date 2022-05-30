@@ -169,7 +169,14 @@ for dir in $testdir; do
 		if test -z $g
 		then
 			../tools/catch_properties.sh result.out
-			check_out result.out
+			if [ $? == 1 ]; then
+				echo -e "\e[1;31m [  FAILED  ]  Fatal Error in catch_properties.sh \e[0m"
+				let failed++
+				failed_case_list+=$dir
+				break
+			else
+				check_out result.out
+			fi
 		else
 			../tools/catch_properties.sh result.ref
 		fi

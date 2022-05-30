@@ -106,6 +106,7 @@
 211_NO_S2_elec_add
 211_NO_elec_minus
 211_NO_S2_elec_minus
+212_NO_wfc_out
 212_NO_wfc_ienvelope
 220_NO_KP_MD_FIRE
 220_NO_KP_MD_NVE
@@ -130,6 +131,7 @@
 308_NO_GO_CS_CR
 311_NO_GO_elec_minus
 311_NO_GO_S2_elec_minus
+312_NO_GO_wfc_out
 312_NO_GO_wfc_ienvelope
 320_NO_GO_MD_FIRE
 320_NO_GO_MD_NVE

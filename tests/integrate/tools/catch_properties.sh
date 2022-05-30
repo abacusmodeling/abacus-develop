@@ -35,6 +35,8 @@ has_hs=`grep -En '(^|[[:space:]])out_mat_hs($|[[:space:]])' INPUT | awk '{print 
 has_r=`grep -En '(^|[[:space:]])out_mat_r($|[[:space:]])' INPUT | awk '{print $2}'`
 deepks_out_labels=`grep deepks_out_labels INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 deepks_bandgap=`grep deepks_bandgap INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+has_lowf=`grep out_wfc_lcao INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+gamma_only=`grep gamma_only INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 if [ $base == "pw" ]; then word="plane_wave_line" 
@@ -106,6 +108,35 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
         echo "totalHmatrix $total_h" >>$1
 	total_s=`sum_file OUT.autotest/data-0-S`
 	echo "totalSmatrix $total_s" >>$1
+fi
+# echo "$has_lowf" ## test out_wfc_lcao > 0
+if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
+	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
+		lowfiles=`ls OUT.autotest/ | grep LOWF_GAMMA`
+	else
+		lowfiles=`ls OUT.autotest/ | grep LOWF_K`
+	fi
+	if test -z "$lowfiles"; then
+		echo "Can't find LOWF files"
+		exit 1
+	else
+		for lowf in $lowfiles;
+		do
+			if ! test -f OUT.autotest/$lowf; then
+				echo "Irregular LOWF file found"
+				exit 1
+			else
+				sed -i "1,$ s/[a-d]//g" OUT.autotest/$lowf
+				sed -i "1,$ s/[f-z]//g" OUT.autotest/$lowf
+				sed -i "1,$ s/[A-D]//g" OUT.autotest/$lowf
+				sed -i "1,$ s/[F-Z]//g" OUT.autotest/$lowf
+				sed -i "1,$ s/)//g" OUT.autotest/$lowf
+				sed -i "1,$ s/(//g" OUT.autotest/$lowf
+				total_lowf=`sum_file OUT.autotest/$lowf`
+				echo "$lowf $total_lowf" >>$1
+			fi
+		done
+	fi
 fi
 
 if [ $calculation == "ienvelope" ]; then
