@@ -13,7 +13,7 @@ class Hamilt
 {
   public:
     // construct Hamiltonian matrix with inputed electonic density
-    virtual void constructHamilt(const int iter, const MatrixBlock<double> rho) = 0;
+    virtual void constructHamilt(const int iter, const MatrixBlock<double> rho) {return;}
 
     // for target K point, update consequence of hPsi() and matrix()
     virtual void updateHk(const int ik) = 0;

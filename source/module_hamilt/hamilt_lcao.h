@@ -10,32 +10,9 @@
 namespace hamilt
 {
 
-// memory for storing Hamiltonian matrix and overlap matrix for one k point
-template <typename T> class LocalMatrix
-{
-  public:
-    std::vector<T> hloc;
-    std::vector<T> sloc;
-    size_t size = 1;
-    void resize(size_t size_in, T value)
-    {
-        size = size_in;
-        hloc.resize(size, value);
-        sloc.resize(size, value);
-    }
-    T* getH()
-    {
-        return hloc.data();
-    }
-    T* getS()
-    {
-        return sloc.data();
-    }
-};
-
 // template first for type of k space H matrix elements
 // template second for type of temporary matrix, gamma_only fix-gamma-matrix + S-gamma, multi-k fix-Real + S-Real
-template <typename T, typename T1> class HamiltLCAO : public Hamilt
+template <typename T> class HamiltLCAO : public Hamilt
 {
   public:
     HamiltLCAO(Gint_Gamma* GG_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
@@ -53,9 +30,6 @@ template <typename T, typename T1> class HamiltLCAO : public Hamilt
         this->classname = "HamiltLCAO";
     }
     //~HamiltLCAO();
-
-    // construct Hamiltonian matrix with inputed electonic density
-    void constructHamilt(const int iter, const MatrixBlock<double> rho) override;
 
     // for target K point, update consequence of hPsi() and matrix()
     void updateHk(const int ik) override;
@@ -82,13 +56,8 @@ template <typename T, typename T1> class HamiltLCAO : public Hamilt
 
     // there are H and S matrix for each k point in reciprocal space
     // type double for gamma_only case, type complex<double> for multi-k-points case
-    LocalMatrix<T> kM;
-    // there are H and S matrix for fixed T+VNL and overlap terms in real space
-    // type double for nspin<4, type complex<double> for nspin==4
-    LocalMatrix<T1> fixedRealM;
-
-    // control if fixed Matrix should be construct
-    static bool isFixedDone;
+    std::vector<T> hmatrix_k;
+    std::vector<T> smatrix_k;
 
     void constructFixedReal();
     void constructUpdateReal();
@@ -105,7 +74,6 @@ template <typename T, typename T1> class HamiltLCAO : public Hamilt
 
     LCAO_Matrix* LM = nullptr;
 };
-template <typename T, typename T1> bool HamiltLCAO<T, T1>::isFixedDone = false;
 
 } // namespace hamilt
 

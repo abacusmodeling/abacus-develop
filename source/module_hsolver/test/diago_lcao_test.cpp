@@ -28,8 +28,8 @@ template <typename T> class HamiltTEST : public hamilt::Hamilt
     public:
     int desc[9];
     int nrow, ncol;
-    vector<T> h_local;
-    vector<T> s_local;
+    std::vector<T> h_local;
+    std::vector<T> s_local;
 
     void matrix(hamilt::MatrixBlock<T> &hk_in, hamilt::MatrixBlock<T> &sk_in) 
     {

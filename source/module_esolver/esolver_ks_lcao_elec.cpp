@@ -235,26 +235,19 @@ namespace ModuleESolver
         }
         else
         {
-            // three cases for hamilt class
+            // two cases for hamilt class
+            // Gamma_only case
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                this->phami = new hamilt::HamiltLCAO<double, double>(
+                this->phami = new hamilt::HamiltLCAO<double>(
                     &(this->UHM.GG),
                     &(this->UHM.genH),
                     &(this->LM) );
             }
-            // non-collinear spin case would not use the second template now, 
-            // would add this feature in the future
-            /*else if(GlobalV::NSPIN==4)
-            {
-                this->phami = new hamilt::HamiltLCAO<std::complex<double>, std::complex<double>>(
-                    &(this->UHM.GK),
-                    &(this->UHM.genH),
-                    &(this->LM) );
-            }*/ 
+            // multi_k case
             else
             {
-                this->phami = new hamilt::HamiltLCAO<std::complex<double>, double>(
+                this->phami = new hamilt::HamiltLCAO<std::complex<double>>(
                     &(this->UHM.GK),
                     &(this->UHM.genH),
                     &(this->LM) );
