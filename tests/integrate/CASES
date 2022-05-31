@@ -29,6 +29,7 @@
 106_PW_PU_chargemixing
 107_PW_OB_outputbands
 107_PW_OD_outputdos
+107_PW_outWfcR
 108_PW_RE
 108_PW_RE_MB
 108_PW_RE_MG
@@ -133,6 +134,7 @@
 311_NO_GO_S2_elec_minus
 312_NO_GO_wfc_out
 312_NO_GO_wfc_ienvelope
+312_NO_GO_wfc_istate
 320_NO_GO_MD_FIRE
 320_NO_GO_MD_NVE
 320_NO_GO_MD_NVT

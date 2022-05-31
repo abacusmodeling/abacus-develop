@@ -89,6 +89,7 @@ void Verlet::first_half()
     }
 #ifdef __MPI
     MPI_Bcast(pos , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(vel , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
 
     ucell.update_pos_tau(pos);
@@ -98,7 +99,6 @@ void Verlet::first_half()
 
 void Verlet::second_half()
 {
-    if(GlobalV::MY_RANK==0) //only first rank do md
     for(int i=0; i<ucell.nat; ++i)
     {
         for(int k=0; k<3; ++k)

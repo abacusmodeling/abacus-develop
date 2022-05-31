@@ -36,6 +36,7 @@ has_r=`grep -En '(^|[[:space:]])out_mat_r($|[[:space:]])' INPUT | awk '{print $2
 deepks_out_labels=`grep deepks_out_labels INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 deepks_bandgap=`grep deepks_bandgap INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 has_lowf=`grep out_wfc_lcao INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+has_wfc_r=`grep out_wfc_r INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 gamma_only=`grep gamma_only INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
@@ -48,7 +49,8 @@ test -e $1 && rm $1
 #--------------------------------------------
 # if NOT non-self-consistent calculations
 #--------------------------------------------
-if [ $calculation != "nscf" ] && [ $calculation != "ienvelope" ]; then
+if [ $calculation != "nscf" ] && [ $calculation != "ienvelope" ]\
+&& [ $calculation != "istate" ]	; then
 	etot=`grep ETOT_ $running_path | awk '{print $2}'`
 	etotperatom=`awk 'BEGIN {x='$etot';y='$natom';printf "%.10f\n",x/y}'`
 	echo "etotref $etot" >>$1
@@ -109,6 +111,28 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 	total_s=`sum_file OUT.autotest/data-0-S`
 	echo "totalSmatrix $total_s" >>$1
 fi
+
+# echo "$has_wfc_r" ## test out_wfc_r > 0
+if ! test -z "$has_wfc_r"  && [ $has_wfc_r -eq 1 ]; then
+	if [[ ! -f OUT.autotest/running_scf.log ]];then
+		echo "Can't find file OUT.autotest/running_scf.log"
+		exit 1
+	fi
+	nband=$(grep NBANDS OUT.autotest/running_scf.log|awk '{print $3}')
+	allgrid=$(grep "fft grid for wave functions" OUT.autotest/running_scf.log|awk -F "[=,]" '{print $2*$3*$4}')
+	for((band=0;band<$nband;band++));do
+		if [[ -f "OUT.autotest/wfc_realspace/wfc_realspace_0_$band" ]];then
+			variance_wfc_r=`sed -n "13,$"p OUT.autotest/wfc_realspace/wfc_realspace_0_$band | \
+						awk -v all=$allgrid 'BEGIN {sumall=0} {for(i=1;i<=NF;i++) {sumall+=($i-1)*($i-1)}}\
+						END {printf"%.5f",(sumall/all)}'`
+			echo "variance_wfc_r_0_$band $variance_wfc_r" >>$1
+		else
+			echo "Can't find file OUT.autotest/wfc_realspace/wfc_realspace_0_$band"
+			exit 1
+		fi
+	done
+fi	
+
 # echo "$has_lowf" ## test out_wfc_lcao > 0
 if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
@@ -142,12 +166,42 @@ fi
 if [ $calculation == "ienvelope" ]; then
 	nfile=0
 	envfiles=`ls OUT.autotest/ | grep ENV`
-	for env in $envfiles; 
-	do
-		nelec=`../tools/sum_ENV_H2 OUT.autotest/$env`
-		nfile=$(($nfile+1))
-		echo "nelec$nfile $nelec" >>$1	
-	done
+	if test -z "$envfiles"; then
+		echo "Can't find ENV(-elope) files"
+		exit 1
+	else
+		for env in $envfiles;
+		do
+			nelec=`../tools/sum_ENV_H2 OUT.autotest/$env`
+			nfile=$(($nfile+1))
+			echo "nelec$nfile $nelec" >>$1	
+		done
+	fi
+fi
+
+if [ $calculation == "istate" ]; then
+	chgfiles=`ls OUT.autotest/ | grep -E '_CHG$'`
+	if test -z "$chgfiles"; then
+		echo "Can't find BAND_CHG files"
+		exit 1
+	else
+		for chg in $chgfiles;
+		do
+			total_chg=`../tools/sum_BAND_CHG_H2 OUT.autotest/$chg`
+			echo "$chg $total_chg" >>$1
+		done
+	fi
+	cubefiles=`ls OUT.autotest/ | grep -E '.cube$'`
+	if test -z "$cubefiles"; then
+		echo "Can't find BAND_CHG files"
+		exit 1
+	else
+		for cube in $cubefiles;
+		do
+			total_chg=`../tools/sum_BAND_CHG_H2_cube OUT.autotest/$cube`
+			echo "$cube $total_chg" >>$1
+		done
+	fi
 fi
 
 #echo $total_band

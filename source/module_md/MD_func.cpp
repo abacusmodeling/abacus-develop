@@ -75,38 +75,35 @@ void MD_func::kinetic_stress(
 //   This function calculates the classical kinetic energy of atoms
 //   and its contribution to stress.
 //----------------------------------------------------------------------------
-    if(GlobalV::MY_RANK==0) //only first rank do md
+    kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
+
+    if(GlobalV::CAL_STRESS)
     {
-        kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
+        ModuleBase::matrix temp;
+        temp.create(3,3);    // initialize
 
-        if(GlobalV::CAL_STRESS)
+        for(int ion=0; ion<unit_in.nat; ++ion)
         {
-            ModuleBase::matrix temp;
-            temp.create(3,3);    // initialize
-
-            for(int ion=0; ion<unit_in.nat; ++ion)
-            {
-                for(int i=0; i<3; ++i)
-                {
-                    for(int j=i; j<3; ++j)
-                    {
-                        temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
-                    }
-                }
-            }
-
             for(int i=0; i<3; ++i)
             {
-                for(int j=0; j<3; ++j)
+                for(int j=i; j<3; ++j)
                 {
-                    if(j<i) 
-                    {
-                        stress(i, j) = stress(j, i);
-                    }
-                    else
-                    {
-                        stress(i, j) = temp(i, j)/unit_in.omega;
-                    }
+                    temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
+                }
+            }
+        }
+
+        for(int i=0; i<3; ++i)
+        {
+            for(int j=0; j<3; ++j)
+            {
+                if(j<i) 
+                {
+                    stress(i, j) = stress(j, i);
+                }
+                else
+                {
+                    stress(i, j) = temp(i, j)/unit_in.omega;
                 }
             }
         }
