@@ -82,16 +82,16 @@ private:
     ModuleBase::Vector3<double> cal_GplusK_cartesian(const int ik, const int ig) const;
 
 public:
-    void real2recip(const double * in, std::complex<double> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void real2recip(const std::complex<double> * in, std::complex<double> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void recip2real(const std::complex<double> * in, double *out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
-    void recip2real(const std::complex<double> * in, std::complex<double> * out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void real2recip(const double * in, std::complex<double> * out, const int ik, const bool add = false); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(const std::complex<double> * in, std::complex<double> * out, const int ik, const bool add = false); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(const std::complex<double> * in, double *out, const int ik, const bool add = false); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(const std::complex<double> * in, std::complex<double> * out, const int ik, const bool add = false); //in:(nz, ns)  ; out(nplane,nx*ny)
 
 #ifdef __MIX_PRECISION
-    void real2recip(const float * in, std::complex<float> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void real2recip(const std::complex<float> * in, std::complex<float> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void recip2real(const std::complex<float> * in, float *out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
-    void recip2real(const std::complex<float> * in, std::complex<float> * out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void real2recip(const float * in, std::complex<float> * out, const int ik, const bool add = false); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(const std::complex<float> * in, std::complex<float> * out, const int ik, const bool add = false); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(const std::complex<float> * in, float *out, const int ik, const bool add = false); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(const std::complex<float> * in, std::complex<float> * out, const int ik, const bool add = false); //in:(nz, ns)  ; out(nplane,nx*ny)
 #endif
 
 public:
