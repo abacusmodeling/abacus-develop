@@ -104,6 +104,7 @@ public:
     int *numr=nullptr; //numr[ip] :  numz[poolrank] * nst_per[ip]
     int *startg=nullptr;  // startg[ip] = numg[ip-1] + startg[ip-1]
     int *startr=nullptr;  // startr[ip] = numr[ip-1] + startr[ip-1]
+    int startz_current=0;
     int nplane=0; //num. of planes in current proc.
 
     ModuleBase::Vector3<double> *gdirect=nullptr;		//(= *G1d) ; // ig = new Vector igc[npw]

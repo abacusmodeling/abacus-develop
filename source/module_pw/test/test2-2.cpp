@@ -103,7 +103,7 @@ TEST_F(PWTEST,test2_2)
     }    
     complex<double> * rhor = new complex<double> [nrxx];
     pwtest.recip2real(rhog,rhor);
-    int startiz = pwtest.startz[rank_in_pool];
+    int startiz = pwtest.startz_current;
     for(int ixy = 0 ; ixy < fftnx * fftny ; ++ixy)
     {
         for(int iz = 0 ; iz < nplane ; ++iz)

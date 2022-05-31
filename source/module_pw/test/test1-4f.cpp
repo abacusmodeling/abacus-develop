@@ -118,7 +118,7 @@ TEST_F(PWTEST,test1_4f)
 
         pwtest.recip2real(rhogr,rhogr,ik); //check in-place transform
 
-        int startiz = pwtest.startz[rank_in_pool];
+        int startiz = pwtest.startz_current;
         for(int ixy = 0 ; ixy < fftnx * fftny ; ++ixy)
         {
             for(int iz = 0 ; iz < nplane ; ++iz)
