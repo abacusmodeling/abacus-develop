@@ -117,12 +117,12 @@ if ! test -z "$has_wfc_r"  && [ $has_wfc_r -eq 1 ]; then
 		echo "Can't find file OUT.autotest/running_scf.log"
 		exit 1
 	fi
-	nband=`grep NBANDS OUT.autotest/running_scf.log|awk '{print $3}'`
-	nbxx=`grep nbxx OUT.autotest/running_scf.log|awk '{print $3}'`
+	nband=$(grep NBANDS OUT.autotest/running_scf.log|awk '{print $3}')
+	allgrid=$(grep "fft grid for wave functions" OUT.autotest/running_scf.log|awk -F "[=,]" '{print $2*$3*$4}')
 	for((band=0;band<$nband;band++));do
 		if [[ -f "OUT.autotest/wfc_realspace/wfc_realspace_0_$band" ]];then
 			variance_wfc_r=`sed -n "13,$"p OUT.autotest/wfc_realspace/wfc_realspace_0_$band | \
-						awk -v all=$nbxx 'BEGIN {sumall=0} {for(i=1;i<=NF;i++) {sumall+=($i-1)*($i-1)}}\
+						awk -v all=$allgrid 'BEGIN {sumall=0} {for(i=1;i<=NF;i++) {sumall+=($i-1)*($i-1)}}\
 						END {printf"%.5f",(sumall/all)}'`
 			echo "variance_wfc_r_0_$band $variance_wfc_r" >>$1
 		else
