@@ -225,7 +225,7 @@ void berryphase::set_kpoints(const int direction)
 }
 
 #include "../module_base/complexmatrix.h"
-double berryphase::stringPhase(int index_str, int nbands)
+double berryphase::stringPhase(int index_str, int nbands, const psi::Psi<std::complex<double>>* psi_in)
 {
 	std::complex<double> zeta(1.0, 0.0);
 	ModuleBase::ComplexMatrix mat(nbands,nbands);
@@ -269,11 +269,11 @@ double berryphase::stringPhase(int index_str, int nbands)
 								G = tem_G;
 							}
 							
-							mat(nb,mb) = pw_method.unkdotp_G0(ik_1, ik_2, nb, mb, GlobalC::wf.evc, G);
+							mat(nb,mb) = pw_method.unkdotp_G0(ik_1, ik_2, nb, mb, psi_in, G);
 						}
 						else 
 						{
-							mat(nb, mb) = pw_method.unkdotp_G(ik_1, ik_2, nb, mb, GlobalC::wf.evc);
+							mat(nb, mb) = pw_method.unkdotp_G(ik_1, ik_2, nb, mb, psi_in);
 						}
 					}
 					else
@@ -296,9 +296,9 @@ double berryphase::stringPhase(int index_str, int nbands)
 								G = tem_G;
 							}
 							
-							mat(nb,mb) = pw_method.unkdotp_soc_G0(ik_1, ik_2, nb, mb, GlobalC::wf.evc, G);							
+							mat(nb,mb) = pw_method.unkdotp_soc_G0(ik_1, ik_2, nb, mb, psi_in, G);							
 						}
-						else  mat(nb, mb) = pw_method.unkdotp_soc_G(ik_1, ik_2, nb, mb, GlobalC::wf.evc);
+						else  mat(nb, mb) = pw_method.unkdotp_soc_G(ik_1, ik_2, nb, mb, psi_in);
 					}
 					
 				} // nb
@@ -374,7 +374,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 	return log(zeta).imag();
 }
 
-void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot)
+void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot, const psi::Psi<std::complex<double>>* psi_in)
 {		
 	std::complex<double> cave = 0.0;
 	double *phik = new double[total_string];
@@ -394,7 +394,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	
 	for(int istring = 0; istring < total_string; istring++)
 	{
-		phik[istring] = stringPhase(istring,nbands);
+		phik[istring] = stringPhase(istring,nbands, psi_in);
 		// 将相位转换成复数形式
 		cphik[istring] = std::complex<double>(cos(phik[istring]),sin(phik[istring]));	
 		cave = cave + std::complex<double>(wistring[istring],0.0) * cphik[istring];
@@ -446,7 +446,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 }
 
 
-void berryphase::Macroscopic_polarization()
+void berryphase::Macroscopic_polarization(const psi::Psi<std::complex<double>>* psi_in)
 {	
 	get_occupation_bands();
 	
@@ -574,7 +574,7 @@ void berryphase::Macroscopic_polarization()
 			set_kpoints(direction);
 			double pdl_elec_tot = 0.0;
 			int mod_elec_tot = 0;
-			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
+			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot, psi_in);
 		
 			const double rmod = GlobalC::ucell.a1.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
@@ -609,7 +609,7 @@ void berryphase::Macroscopic_polarization()
 			set_kpoints(direction);
 			double pdl_elec_tot = 0.0;
 			int mod_elec_tot = 0;
-			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
+			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot, psi_in);
 		
 			const double rmod = GlobalC::ucell.a2.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
@@ -644,7 +644,7 @@ void berryphase::Macroscopic_polarization()
 			set_kpoints(direction);
 			double pdl_elec_tot = 0.0;
 			int mod_elec_tot = 0;
-			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
+			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot, psi_in);
 		
 			const double rmod = GlobalC::ucell.a3.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;

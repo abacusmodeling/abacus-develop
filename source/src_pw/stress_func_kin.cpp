@@ -2,7 +2,7 @@
 #include "global.h"
 
 //calculate the kinetic stress in PW base
-void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
+void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in)
 {
 	double *kfac;
 	double **gk;
@@ -51,22 +51,20 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 			{
 				for(int ibnd=0;ibnd<GlobalV::NBANDS;ibnd++)
 				{
+					const std::complex<double>* ppsi=nullptr;
+					if(psi_in!=nullptr)
+					{
+						ppsi = &(psi_in[0](ik, ibnd, 0));
+					}
+					else
+					{
+						ppsi = &(GlobalC::wf.evc[ik](ibnd, 0));
+					}
 					for(int i=0;i<npw;i++)
 					{
-						if(0)
-						{
-							s_kin[l][m] +=
-								GlobalC::wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]
-								*(double((conj(GlobalC::wf.evc[ik](ibnd, i))
-								*GlobalC::wf.evc[ik](ibnd, i)).real())+
-								double((conj(GlobalC::wf.evc[ik](ibnd, i))*GlobalC::wf.evc[ik](ibnd, i+npwx)).real()));
-						}
-						else
-						{
-							s_kin[l][m] +=
-								GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
-								*(double((conj(GlobalC::wf.evc[ik](ibnd, i))*GlobalC::wf.evc[ik](ibnd, i)).real()));
-						}
+						s_kin[l][m] +=
+							GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+							*(double((conj(ppsi[i]) * ppsi[i]).real()));
 					}
 				}
 			}

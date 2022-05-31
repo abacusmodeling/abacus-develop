@@ -269,13 +269,16 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 }				   
 
 void Mulliken_Charge::stdout_mulliken(LCAO_Hamilt &uhm)
-{                    this->cal_mulliken(uhm);
+{                    
+	this->cal_mulliken(uhm);
+	
 	if(GlobalV::MY_RANK == 0)
 	{
 		ModuleBase::TITLE("Dos","calculate_Mulliken");
 		std::ofstream fout;
-		const char * fn= "mulliken.txt";
-		fout.open(fn);
+		std::stringstream ss;
+		ss << GlobalV::global_out_dir <<"mulliken.txt";
+		fout.open(ss.str().c_str());
 		// std::ofstream fout;
 		// std::string wordqf="mulliken.txt";
 		// wordqf += char(GlobalV::MY_RANK + 48);

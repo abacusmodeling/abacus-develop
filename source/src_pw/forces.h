@@ -4,6 +4,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
+#include "module_psi/psi.h"
 
 class Forces
 {
@@ -21,9 +22,9 @@ public:
     Forces();
     ~Forces();
 
-    void init(ModuleBase::matrix& force);
+    void init(ModuleBase::matrix& force, const psi::Psi<complex<double>>* psi_in=nullptr);
 
-private:
+protected:
 
     int nat;
 	static double output_acc;
@@ -31,7 +32,7 @@ private:
     void cal_force_loc(ModuleBase::matrix& forcelc);
     void cal_force_ew(ModuleBase::matrix& forceion);
     void cal_force_cc(ModuleBase::matrix& forcecc);
-    void cal_force_nl(ModuleBase::matrix& forcenl);
+    void cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<double>>* psi_in=nullptr);
     void cal_force_scc(ModuleBase::matrix& forcescc);
 
     static void print( const std::string &name, const ModuleBase::matrix &f, bool rv=true );

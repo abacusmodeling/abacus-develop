@@ -5,15 +5,10 @@
 #include "../src_parallel/parallel_reduce.h"
 
 
-double Stochastic_hchi::Emin;
-double Stochastic_hchi::Emax;
-
-
-
 Stochastic_hchi::Stochastic_hchi()
 {
-	Stochastic_hchi:: Emin = INPUT.emin_sto;	
-	Stochastic_hchi:: Emax = INPUT.emax_sto;
+	Emin = INPUT.emin_sto;	
+	Emax = INPUT.emax_sto;
 }
 
 Stochastic_hchi::~Stochastic_hchi()

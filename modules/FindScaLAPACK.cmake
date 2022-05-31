@@ -6,7 +6,7 @@
 #
 
 find_library(ScaLAPACK_LIBRARY
-    NAMES scalapack
+    NAMES scalapack scalapack-openmpi
     HINTS ${SCALAPACK_DIR}
     PATH_SUFFIXES "lib"
 )

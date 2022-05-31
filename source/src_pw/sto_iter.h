@@ -1,8 +1,9 @@
 #ifndef STO_ITER_H
 #define STO_ITER_H
 #include "sto_wf.h"
-#include "sto_che.h"
+#include "../module_base/math_chebyshev.h"
 #include "sto_hchi.h"
+#include "sto_func.h"
 
 //----------------------------------------------
 // Solve for the new electron density and iterate 
@@ -35,25 +36,14 @@ class Stochastic_Iter
 
     void checkemm(const int &ik, int &iter, Stochastic_WF& stowf);
 
-    Stochastic_Chebychev stoche;
+    ModuleBase::Chebyshev<double>* p_che;
 
     Stochastic_hchi stohchi;
+    Sto_Func<double> stofunc;
 
-
-	static double mu;
-	static double mu0; // chemical potential; unit in Ry
-
-    static double Emin;
-	static double Emax; // unit in Ry
-
+	double mu0; // chemical potential; unit in Ry
     bool change;
-    
-    //dos
-    static double fwhm;
-    static double targ_e;
-
     double targetne;
-
     double *spolyv;
 
 	public:
@@ -61,15 +51,6 @@ class Stochastic_Iter
     int * nchip;
     double th_ne;
     double KS_ne;
-
-    public:
-    static double root_fd(double e);
-    static double fd(double e);
-    static double nroot_fd(double e);
-    static double nfd(double e);
-    static double nxfd(double e);
-    static double fdlnfd(double e);
-    static double nfdlnfd(double e);
 
 };
 

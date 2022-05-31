@@ -1,52 +1,86 @@
 #include "./pw_basis.h"
 #include "../module_base/constants.h"
-#include "../module_base/timer.h"
+#ifdef __MPI
+#include "mpi.h"
+#include "../src_parallel/parallel_global.h"
+#endif
 
 namespace ModulePW
 {
-//
-//Init the grids for FFT
-//Input: lattice vectors of the cell, Energy cut off for G^2/2
-//Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
-//
+/// 
+/// Init the grids for FFT
+/// Input: lattice vectors of the cell, Energy cut off for G^2/2
+/// Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
+/// 
 void PW_Basis:: initgrids(
-        double lat0_in, //unit length (unit in bohr)
-        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        double gridecut
+        const double lat0_in, //unit length (unit in bohr)
+        const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+        const double gridecut,
+        const int poolnproc_in,
+        const int poolrank_in
 )
 {
-    // ModuleBase::timer::start();
-    //init latice
+    //init lattice
     this->lat0 = lat0_in;
     this->latvec = latvec_in;
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
+    this->poolnproc = poolnproc_in;
+    this->poolrank = poolrank_in;
     
 
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
     //------------------------------------------------------------
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
-    gridecut = gridecut / tpiba2;
+    const double gridecut_lat = gridecut / tpiba2;
     ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];// ibox[i] are the minimal FFT dimensions,
     
     lat.x = latvec.e11;
     lat.y = latvec.e12;
     lat.z = latvec.e13;
-    ibox[0] = 2 * int(sqrt(gridecut) * sqrt(lat * lat)) + 1;
+    ibox[0] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
 
     lat.x = latvec.e21;
     lat.y = latvec.e22;
     lat.z = latvec.e23;
-    ibox[1] = 2 * int(sqrt(gridecut) * sqrt(lat * lat)) + 1;
+    ibox[1] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
 
     lat.x = latvec.e31;
     lat.y = latvec.e32;
     lat.z = latvec.e33;
-    ibox[2] = 2 * int(sqrt(gridecut) * sqrt(lat * lat)) + 1;
-    //lat*lat=lat.x*lat.x+lat.y*lat.y+lat.z+lat.z
+    ibox[2] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
+    
+    int n1,n2,n3; 
+    n1 = n2 = n3 = 0;
+    for(int igz = -ibox[2]+this->poolrank; igz <= ibox[2]; igz += this->poolnproc)
+    {
+        for(int igy = -ibox[1]; igy <= ibox[1]; ++igy)
+        {
+            for(int igx = -ibox[0]; igx <= ibox[0]; ++igx)
+            {
+                ModuleBase::Vector3<double> f;
+                f.x = igx;
+                f.y = igy;
+                f.z = igz;
+                double modulus = f * (this->GGT * f);
+                if(modulus <= gridecut_lat)
+                {
+                    if(n1 < abs(igx)) n1 = abs(igx);
+                    if(n2 < abs(igy)) n2 = abs(igy);
+                    if(n3 < abs(igz)) n3 = abs(igz);
+                }
+            }
+        }
+    }
+    ibox[0] = 2*n1+1;
+    ibox[1] = 2*n2+1;
+    ibox[2] = 2*n3+1;
+#ifdef __MPI
+    MPI_Allreduce(MPI_IN_PLACE, ibox, 3, MPI_INT, MPI_MAX , POOL_WORLD);
+#endif
 
     // Find the minimal FFT box size the factors into the primes (2,3,5,7).
     for (int i = 0; i < 3; i++)
@@ -62,7 +96,6 @@ void PW_Basis:: initgrids(
         // increase ibox[i] by 1 until it is totally factorizable by (2,3,5,7) 
         do
         {
-            ibox[i] += 1;
 			b = ibox[i];          
 
 			//n2 = n3 = n5 = n7 = 0;
@@ -91,8 +124,10 @@ void PW_Basis:: initgrids(
 				//if (b%7==0) { n7++; b /= 7; continue; }
 				done_factoring = true;
 			}
+            ibox[i] += 1;
         }
         while (b != 1);
+        ibox[i] -= 1;
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
     }
     this->nx = ibox[0];
@@ -105,15 +140,17 @@ void PW_Basis:: initgrids(
     return;
 }
 
-//
-//Init the grids for FFT
-//Input: lattice vectors of the cell, nx, ny, nz
-//Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
-//
+/// 
+/// Init the grids for FFT
+/// Input: lattice vectors of the cell, nx, ny, nz
+/// Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
+/// 
 void PW_Basis:: initgrids(
-    double lat0_in,
-    ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    int nx_in, int bigny_in, int nz_in
+    const double lat0_in,
+    const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+    const int nx_in, int bigny_in, int nz_in,
+    const int poolnproc_in,
+    const int poolrank_in
 )
 {
     this->lat0 = lat0_in;
@@ -126,6 +163,8 @@ void PW_Basis:: initgrids(
     this->nz = nz_in;
     this->bignxy = this->nx * this->bigny;
     this->bignxyz = this->bignxy * this->nz;
+    this->poolnproc = poolnproc_in;
+    this->poolrank = poolrank_in;
 
     return;
 }
@@ -133,11 +172,9 @@ void PW_Basis:: initgrids(
 
 //Init some parameters
 void PW_Basis:: initparameters(
-    bool gamma_only_in,
-    double pwecut_in,
-    int poolnproc_in,
-    int poolrank_in,
-    int distribution_type_in
+    const bool gamma_only_in,
+    const double pwecut_in,
+    const int distribution_type_in
 )
 {
     this->gamma_only = gamma_only_in;
@@ -150,8 +187,6 @@ void PW_Basis:: initparameters(
 
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
     this->ggecut = pwecut_in / tpiba2;
-    this->poolnproc = poolnproc_in;
-    this->poolrank = poolrank_in;
     this->distribution_type = distribution_type_in;
 }
 

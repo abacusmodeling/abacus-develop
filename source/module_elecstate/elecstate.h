@@ -3,6 +3,7 @@
 
 #include "module_psi/psi.h"
 #include "src_pw/charge.h"
+#include "src_pw/klist.h"
 
 namespace elecstate
 {
@@ -10,11 +11,14 @@ namespace elecstate
 class ElecState
 {
   public:
+    ElecState(){};
     virtual void init(Charge *chg_in, // pointer for class Charge
+                      const K_Vectors *klist_in,
                       int nk_in, // number of k points
                       int nb_in) // number of bands
     {
         this->charge = chg_in;
+        this->klist = klist_in;
         this->ekb.create(nk_in, nb_in);
         this->wg.create(nk_in, nb_in);
     }
@@ -47,22 +51,29 @@ class ElecState
     }
 
     // calculate wg from ekb
-    void calculate_weights(void);
+    virtual void calculate_weights(void);
 
-    Charge *charge;
+    // pointer to charge density
+    Charge *charge = nullptr;
+    // pointer to k points lists
+    const K_Vectors* klist = nullptr;
     // energy for sum of electrons
     double eband = 0.0;
     // Fermi energy
     double ef = 0.0;
+    // correction energy for metals
+    double demet = 0.0;
 
     // band energy at each k point, each band.
     ModuleBase::matrix ekb;
     // occupation weight for each k-point and band
     ModuleBase::matrix wg;
 
+    std::string classname = "none";
+
   protected:
-    // calculate ebands for each k point
-    double eBandK(const int &ik);
+    // calculate ebands for all k points and all occupied bands
+    void calEBand();
 
     // print and check for band energy and occupations
     void print_band(const int &ik, const int &printe, const int &iter);

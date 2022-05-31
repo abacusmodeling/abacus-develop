@@ -52,7 +52,7 @@ void wavefunc::allocate_ekb_wg(const int nks)
     return;
 }
 
-void wavefunc::allocate(const int nks)
+psi::Psi<std::complex<double>>* wavefunc::allocate(const int nks)
 {	
 	ModuleBase::TITLE("wavefunc","allocate");
 
@@ -89,51 +89,65 @@ void wavefunc::allocate(const int nks)
 	ModuleBase::Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
 	ModuleBase::Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
 
-	delete[] evc;
-	delete[] wanf2;
-
 	const int nks2 = nks;
 
-	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
-	{
-		// mohan add 2010-09-07
-		this->evc = new ModuleBase::ComplexMatrix[1];
-		this->wanf2 = new ModuleBase::ComplexMatrix[1];
-		
-		// //added by zhengdy-soc
-		evc[0].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);
-
-		if(GlobalV::BASIS_TYPE=="lcao_in_pw")
-		{
-			wanf2[0].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);
-			std::cout << " Memory for wanf2 (MB): " << 
-				ModuleBase::Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
-		}
-		std::cout << " MEMORY FOR PSI (MB)  : " << 
-			ModuleBase::Memory::record("wavefunc","evc",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
-	}
-	else
+	if(GlobalV::CALCULATION.substr(0,3) == "sto")
 	{
 		this->evc = new ModuleBase::ComplexMatrix [nks2];
-		this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
-
 		for (int ik = 0; ik < nks2; ik++)
 		{
 			this->evc[ik].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);//added by zhengdy-soc
+		}
+	}
+	else
+	{
+		psi::Psi<std::complex<double>>* psi_out = nullptr;
+		if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
+		{
+			//initial psi rather than evc
+			psi_out = new psi::Psi<std::complex<double>>(1, GlobalV::NBANDS, npwx * GlobalV::NPOL, GlobalC::kv.ngk.data());
 
-			//Mohan add 2010-1-10
-			if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
+			if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 			{
-				this->wanf2[ik].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);//added by zhengdy-soc
+				wanf2[0].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);
+				std::cout << " Memory for wanf2 (MB): " << 
+					ModuleBase::Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
 			}
-		};
+			std::cout << " MEMORY FOR PSI (MB)  : " << 
+				ModuleBase::Memory::record("wavefunc","psi",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+		}
+		else if(GlobalV::BASIS_TYPE!="pw")
+		{
+			this->evc = new ModuleBase::ComplexMatrix [nks2];
+			this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
 
-		std::cout << " MEMORY FOR PSI (MB)  : " << 
-		ModuleBase::Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+			for (int ik = 0; ik < nks2; ik++)
+			{
+				this->evc[ik].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);//added by zhengdy-soc
+
+				//Mohan add 2010-1-10
+				if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
+				{
+					this->wanf2[ik].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);//added by zhengdy-soc
+				}
+			};
+
+			std::cout << " MEMORY FOR PSI (MB)  : " << 
+			ModuleBase::Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+		}
+		else
+		{
+			//initial psi rather than evc
+			psi_out = new psi::Psi<std::complex<double>>(nks2, GlobalV::NBANDS, npwx * GlobalV::NPOL, GlobalC::kv.ngk.data());
+
+			std::cout << " MEMORY FOR PSI (MB)  : " << 
+			ModuleBase::Memory::record("wavefunc","psi",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+		}
+		return psi_out;
 	}
 
 	//showMemStats();
-	return;
+	return nullptr;
 }
 
 //===================================================================
@@ -141,12 +155,12 @@ void wavefunc::allocate(const int nks)
 // from superposition of atomic wavefunctions or random wave functions.
 //===================================================================
 #include "occupy.h"
-void wavefunc::wfcinit(void)
+void wavefunc::wfcinit(psi::Psi<std::complex<double>>* psi_in)
 {
     ModuleBase::TITLE("wavefunc","wfcinit");
     ModuleBase::timer::tick("wavefunc","wfcinit");
 
-    this->wfcinit_k();
+    this->wfcinit_k(psi_in);
 
     GlobalC::en.demet = 0.0;
 
@@ -165,7 +179,11 @@ void wavefunc::wfcinit(void)
     if (GlobalV::test_wf>2)
     {
         output::printrm(GlobalV::ofs_running, " wg  ",  wg);
-        this->check_psi(evc);
+        if(this->evc!=nullptr) 
+		{
+			this->check_evc();
+		}
+		//lack of check for psi
     }
 
     ModuleBase::timer::tick("wavefunc","wfcinit");
@@ -266,24 +284,28 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Mod
 #endif
 
 
-void wavefunc::diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
+void wavefunc::diago_PAO_in_pw_k(const int &ik, psi::Psi<std::complex<double>> &wvf)
 {
 	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k");
 
 	GlobalC::hm.hpw.init_k(ik);
+	wvf.fix_k(ik);
     this->diago_PAO_in_pw_k2(ik, wvf);
 
 	return;
 }
 
-void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
+void wavefunc::diago_PAO_in_pw_k2(const int &ik, psi::Psi<std::complex<double>> &wvf)
 {
 	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k2");
 	// (6) Prepare for atmoic orbitals or random orbitals
 	const int starting_nw = this->get_starting_nw();
 	assert(starting_nw > 0);
 
-	ModuleBase::ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
+	const int nbasis = wvf.get_nbasis();
+	const int nbands = wvf.get_nbands();
+
+	ModuleBase::ComplexMatrix wfcatom(starting_nw, nbasis);//added by zhengdy-soc
 	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
 	if(init_wfc.substr(0,6)=="atomic")
 	{
@@ -297,20 +319,19 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 		// If not enough atomic wfc are available, complete
 		// with random wfcs
 		//====================================================
-		this->random(wfcatom, GlobalC::ucell.natomwfc, GlobalV::NBANDS, ik);
+		this->random(wfcatom, GlobalC::ucell.natomwfc, nbands, ik);
 	}
 	else if(init_wfc=="random")
 	{
-		this->random(wfcatom,0,GlobalV::NBANDS,ik);
+		this->random(wfcatom,0,nbands,ik);
 	}
 
 	// (7) Diago with cg method.
-	double *etatom  = new double[starting_nw];
-	ModuleBase::GlobalFunc::ZEROS(etatom, starting_nw);
+	std::vector<double> etatom(starting_nw, 0.0);
 	//if(GlobalV::DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
 	if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 	{
-		GlobalC::hm.diagH_subspace(ik ,starting_nw, GlobalV::NBANDS, wfcatom, wfcatom, etatom);
+		GlobalC::hm.diagH_subspace(ik ,starting_nw, nbands, wfcatom, wfcatom, etatom.data());
 	}
 
 	/*
@@ -321,29 +342,21 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 	}
 	*/
 
-	assert(wvf.nr <= wfcatom.nr);
-	for (int ib=0; ib<GlobalV::NBANDS; ib++)
+	assert(nbands <= wfcatom.nr);
+	for (int ib=0; ib<nbands; ib++)
 	{
-		for (int ig=0; ig<this->npwx; ig++)
+		for (int ig=0; ig<nbasis; ig++)
 		{
 			wvf(ib, ig) = wfcatom(ib, ig);
-			if(GlobalV::NPOL==2) wvf(ib,ig + this->npwx) = wfcatom(ib,ig + this->npwx);
 		}
 	}
-
-	//added by zhengdy-soc
-/*	for(int i = 0;i<starting_nw;i++)
-	{
-		ekb[ik][i] = etatom[i];
-	}*/
-	delete[] etatom;
 }
 
-void wavefunc::wfcinit_k(void)
+void wavefunc::wfcinit_k(psi::Psi<std::complex<double>>* psi_in)
 {
 	ModuleBase::TITLE("wavefunc","wfcinit_k");
 
-	if(mem_saver)
+	if(GlobalV::CALCULATION=="nscf")
 	{
 		return;
 	}
@@ -355,7 +368,14 @@ void wavefunc::wfcinit_k(void)
 			// get the wave functions
 			// by first diagolize PAO
 			// wave functions.
-			this->diago_PAO_in_pw_k(ik, GlobalC::wf.evc[ik]);
+			if(GlobalV::CALCULATION.substr(0,3) == "sto")
+			{
+				this->diago_PAO_in_pw_k(ik, this->evc[ik]);
+			}
+			else
+			{
+				this->diago_PAO_in_pw_k(ik, *psi_in);
+			}
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -754,36 +774,25 @@ int wavefunc::iw2ia( int iw)    // pengfei 2016-11-23
 
 //LiuXh add a new function here,
 //20180515
-void wavefunc::init_after_vc(const int nks)
+void wavefunc::init_after_vc(const int nks, psi::Psi<std::complex<double>>* psi_in)
 {
-    static bool done_once = false;
-    if(done_once)
-    {
-        //return; //LiuXh add 2017-12-12
-    }
-    else
-    {
-        done_once = true;
-    }
-
     ModuleBase::TITLE("wavefunc","init");
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",this->npwx);
 
-    assert(npwx > 0);
+    assert(this->npwx > 0);
     assert(nks > 0);
     assert(GlobalV::NBANDS > 0);
 
     delete[] g2kin;
-    this->g2kin = new double[npwx];   // [npw],kinetic energy
+    this->g2kin = new double[this->npwx];   // [npw],kinetic energy
 #ifdef __CUDA
 	cudaFree(this->d_g2kin);
-	cudaMalloc((void**)&this->d_g2kin, npwx*sizeof(double));
+	cudaMalloc((void**)&this->d_g2kin, this->npwx*sizeof(double));
 #endif
-	ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
-    ModuleBase::Memory::record("wavefunc","g2kin",npwx,"double");
+	ModuleBase::GlobalFunc::ZEROS(g2kin, this->npwx);
+    ModuleBase::Memory::record("wavefunc","g2kin",this->npwx,"double");
     if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"g2kin allocation","Done");
 
-    int prefactor = 1;
     this->ekb = new double*[nks];
     for(int ik=0; ik<nks; ik++)
     {
@@ -798,48 +807,28 @@ void wavefunc::init_after_vc(const int nks)
     if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "et allocation","Done");
     if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "wg allocation","Done");
 
-    delete[] evc;
-    delete[] wanf2;
 
-    const int nks2 = nks * prefactor;
+    const int nks2 = nks;
+	const int nbasis = this->npwx * GlobalV::NPOL;
 
-    if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
-    {
-        this->evc = new ModuleBase::ComplexMatrix[1];
-        this->wanf2 = new ModuleBase::ComplexMatrix[1];
+	if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
+	{
+		if(wanf2 != nullptr)delete[] wanf2;
+		this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
+		for (int ik = 0; ik < nks2; ik++)
+		{
+			this->wanf2[ik].create(GlobalV::NLOCAL, nbasis);
+		}
+	}
 
-        evc[0].create(GlobalV::NBANDS*prefactor, npwx);
-        if(GlobalV::BASIS_TYPE=="lcao_in_pw")
-        {
-            wanf2[0].create(GlobalV::NLOCAL*prefactor, npwx);
-            std::cout << " Memory for wanf2 (MB): " <<
-            ModuleBase::Memory::record("wavefunc","wanf2",(GlobalV::NLOCAL*prefactor)*npwx,"complexmatrix") << std::endl;
-        }
-        std::cout << " MEMORY FOR PSI (MB)  : " <<
-        ModuleBase::Memory::record("wavefunc","evc",(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
-    }
-    else
-    {
-        this->evc = new ModuleBase::ComplexMatrix [nks2];
-        this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
+	psi_in->resize(nks2, GlobalV::NBANDS, nbasis);
 
-        for (int ik = 0; ik < nks2; ik++)
-        {
-            this->evc[ik].create(GlobalV::NBANDS*prefactor, npwx);
-
-            if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
-            {
-                this->wanf2[ik].create(GlobalV::NLOCAL, npwx);
-            }
-        }
-
-        std::cout << " MEMORY FOR PSI (MB)  : " <<
-        ModuleBase::Memory::record("wavefunc","evc",(nks*prefactor)*(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
-    }
+	std::cout << " MEMORY FOR PSI (MB)  : " <<
+	ModuleBase::Memory::record("wavefunc","psi",nks*GlobalV::NBANDS*nbasis,"complexmatrix") << std::endl;
 
     if(GlobalV::test_wf)
     {
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"evc allocation","Done");
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"psi allocation","Done");
         if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
         {
             ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wanf2 allocation","Done");
@@ -847,4 +836,77 @@ void wavefunc::init_after_vc(const int nks)
     }
 
     return;
+}
+
+//temporary function for nscf
+void wavefunc::diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
+{
+	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k");
+
+	GlobalC::hm.hpw.init_k(ik);
+    this->diago_PAO_in_pw_k2(ik, wvf);
+
+	return;
+}
+void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
+{
+	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k2");
+	// (6) Prepare for atmoic orbitals or random orbitals
+	const int starting_nw = this->get_starting_nw();
+	assert(starting_nw > 0);
+
+	ModuleBase::ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
+	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
+	if(init_wfc.substr(0,6)=="atomic")
+	{
+		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
+		if( init_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
+		{
+			this->atomicrandom(wfcatom,0,starting_nw,ik);
+		}
+
+		//====================================================
+		// If not enough atomic wfc are available, complete
+		// with random wfcs
+		//====================================================
+		this->random(wfcatom, GlobalC::ucell.natomwfc, GlobalV::NBANDS, ik);
+	}
+	else if(init_wfc=="random")
+	{
+		this->random(wfcatom,0,GlobalV::NBANDS,ik);
+	}
+
+	// (7) Diago with cg method.
+	double *etatom  = new double[starting_nw];
+	ModuleBase::GlobalFunc::ZEROS(etatom, starting_nw);
+	//if(GlobalV::DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
+	if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
+	{
+		GlobalC::hm.diagH_subspace(ik ,starting_nw, GlobalV::NBANDS, wfcatom, wfcatom, etatom);
+	}
+
+	/*
+	GlobalV::ofs_running << " " << "ik = " << ik << " Bands(eV)" << std::endl;
+	for (int ib=0;ib<starting_nw;ib++)
+	{
+		GlobalV::ofs_running << " " << std::setw(15) << etatom[ib]*Ry_to_eV << std::endl;
+	}
+	*/
+
+	assert(wvf.nr <= wfcatom.nr);
+	for (int ib=0; ib<GlobalV::NBANDS; ib++)
+	{
+		for (int ig=0; ig<this->npwx; ig++)
+		{
+			wvf(ib, ig) = wfcatom(ib, ig);
+			if(GlobalV::NPOL==2) wvf(ib,ig + this->npwx) = wfcatom(ib,ig + this->npwx);
+		}
+	}
+
+	//added by zhengdy-soc
+/*	for(int i = 0;i<starting_nw;i++)
+	{
+		ekb[ik][i] = etatom[i];
+	}*/
+	delete[] etatom;
 }

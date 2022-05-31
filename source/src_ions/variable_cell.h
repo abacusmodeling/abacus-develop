@@ -8,6 +8,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../input.h"
+#include "module_esolver/esolver.h"
 
 class Variable_Cell
 {
@@ -18,10 +19,7 @@ class Variable_Cell
     ~Variable_Cell();
 
 
-    static void init_after_vc(void); //LiuXh add 20180515
-
-
-    static void final_calculation_after_vc(void); //LiuXh add 20180619
+    static void init_after_vc(ModuleESolver::ESolver *p_esolver); //LiuXh add 20180515
 
 };
 
