@@ -133,6 +133,7 @@
 311_NO_GO_S2_elec_minus
 312_NO_GO_wfc_out
 312_NO_GO_wfc_ienvelope
+312_NO_GO_wfc_istate
 320_NO_GO_MD_FIRE
 320_NO_GO_MD_NVE
 320_NO_GO_MD_NVT
