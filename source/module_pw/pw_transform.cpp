@@ -18,7 +18,7 @@ namespace ModulePW
 /// in: (nplane,ny,nx), complex<double> data
 /// out: (nz, ns),  complex<double> data
 /// 
-void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out)
+void PW_Basis:: real2recip(const std::complex<double> * in, std::complex<double> * out)
 {
     ModuleBase::timer::tick("PW_Basis", "real2recip");
 
@@ -35,7 +35,7 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->bignxyz);
+        out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->nxyz);
     }
     ModuleBase::timer::tick("PW_Basis", "real2recip");
     return;
@@ -46,17 +46,19 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 /// in: (nplane,ny,nx), double data
 /// out: (nz, ns), complex<double> data
 ///
-void PW_Basis:: real2recip(double * in, std::complex<double> * out)
+void PW_Basis:: real2recip(const double * in, std::complex<double> * out)
 {
     ModuleBase::timer::tick("PW_Basis", "real2recip");
     if(this->gamma_only)
     {
-        int npy = this->bigny * this->nplane;
+        const int npy = this->ny * this->nplane;
         for(int ix = 0 ; ix < this->nx ; ++ix)
         {
+            const int ixpy2 = ix*npy*2;
+            const int ixpy = ix*npy;
             for(int ipy = 0 ; ipy < npy ; ++ipy)
             {
-                this->ft.r_rspace[ix*npy*2 + ipy] = in[ix*npy + ipy];
+                this->ft.r_rspace[ixpy2 + ipy] = in[ixpy + ipy];
             }
         }
 
@@ -76,7 +78,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->bignxyz);
+        out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->nxyz);
     }
     ModuleBase::timer::tick("PW_Basis", "real2recip");
     return;
@@ -91,7 +93,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 /// in: (nz,ns), complex<double>
 /// out: (nplane, ny, nx), complex<double>
 /// 
-void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out)
+void PW_Basis:: recip2real(const std::complex<double> * in, std::complex<double> * out)
 {
     ModuleBase::timer::tick("PW_Basis", "recip2real");
     assert(this->gamma_only == false);
@@ -121,7 +123,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 /// in: (nz,ns), complex<double>
 /// out: (nplane, ny, nx), double
 ///
-void PW_Basis:: recip2real(std::complex<double> * in, double * out)
+void PW_Basis:: recip2real(const std::complex<double> * in, double * out)
 {
     ModuleBase::timer::tick("PW_Basis", "recip2real");
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
@@ -139,12 +141,14 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
         this->ft.fftxyc2r(ft.aux1,ft.r_rspace);
 
         // r2c in place
-        int npy = this->bigny * this->nplane;
+        const int npy = this->ny * this->nplane;
         for(int ix = 0 ; ix < this->nx ; ++ix)
         {
+            const int ixpy2 = ix*npy*2;
+            const int ixpy = ix*npy;
             for(int ipy = 0 ; ipy < npy ; ++ipy)
             {
-                out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy];
+                out[ixpy + ipy] = this->ft.r_rspace[ixpy2 + ipy];
             }
         }
     }
@@ -166,7 +170,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
 /// in: (nplane,ny,nx), complex<float> data
 /// out: (nz, ns),  complex<float> data
 ///
-void PW_Basis:: real2recip(std::complex<float> * in, std::complex<float> * out)
+void PW_Basis:: real2recip(const std::complex<float> * in, std::complex<float> * out)
 {
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
@@ -181,7 +185,7 @@ void PW_Basis:: real2recip(std::complex<float> * in, std::complex<float> * out)
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->bignxyz);
+        out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->nxyz);
     }
     return;
 }
@@ -191,16 +195,18 @@ void PW_Basis:: real2recip(std::complex<float> * in, std::complex<float> * out)
 /// in: (nplane,ny,nx), float data
 /// out: (nz, ns), complex<float> data
 ///
-void PW_Basis:: real2recip(float * in, std::complex<float> * out)
+void PW_Basis:: real2recip(const float * in, std::complex<float> * out)
 {
     if(this->gamma_only)
     {
-        int npy = this->bigny * this->nplane;
+        const int npy = this->ny * this->nplane;
         for(int ix = 0 ; ix < this->nx ; ++ix)
         {
+            const int ixpy2 = ix*npy*2;
+            const int ixpy = ix*npy;
             for(int ipy = 0 ; ipy < npy ; ++ipy)
             {
-                this->ft.rf_rspace[ix*npy*2 + ipy] = in[ix*npy + ipy];
+                this->ft.rf_rspace[ixpy2 + ipy] = in[ixpy + ipy];
             }
         }
 
@@ -221,7 +227,7 @@ void PW_Basis:: real2recip(float * in, std::complex<float> * out)
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->bignxyz);
+        out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->nxyz);
     }
     return;
 }
@@ -229,9 +235,9 @@ void PW_Basis:: real2recip(float * in, std::complex<float> * out)
 ///
 /// transform reciprocal space to real space
 /// in: (nz,ns), complex<float>
-/// out: (nplane, ny, nx), complex<float>
+/// out: (nplane, ny,nx), complex<float>
 ///
-void PW_Basis:: recip2real(std::complex<float> * in, std::complex<float> * out)
+void PW_Basis:: recip2real(const std::complex<float> * in, std::complex<float> * out)
 {
     assert(this->gamma_only == false);
     ModuleBase::GlobalFunc::ZEROS(ft.auxf1, this->nst * this->nz);
@@ -257,9 +263,9 @@ void PW_Basis:: recip2real(std::complex<float> * in, std::complex<float> * out)
 ///
 /// transform reciprocal space to real space
 /// in: (nz,ns), complex<float>
-/// out: (nplane, ny, nx), float
+/// out: (nplane, ny,nx), float
 ///
-void PW_Basis:: recip2real(std::complex<float> * in, float * out)
+void PW_Basis:: recip2real(const std::complex<float> * in, float * out)
 {
     ModuleBase::GlobalFunc::ZEROS(ft.auxf1, this->nst * this->nz);
 
@@ -275,12 +281,14 @@ void PW_Basis:: recip2real(std::complex<float> * in, float * out)
     {
         this->ft.fftfxyc2r(ft.auxf1,ft.rf_rspace);
 
-        int npy = this->bigny * this->nplane;
+        const int npy = this->ny * this->nplane;
         for(int ix = 0 ; ix < this->nx ; ++ix)
         {
+            const int ixpy2 = ix*npy*2;
+            const int ixpy = ix*npy;
             for(int ipy = 0 ; ipy < npy ; ++ipy)
             {
-                out[ix*npy + ipy] = this->ft.rf_rspace[ix*npy*2 + ipy];
+                out[ixpy + ipy] = this->ft.rf_rspace[ixpy2 + ipy];
             }
         }
     }

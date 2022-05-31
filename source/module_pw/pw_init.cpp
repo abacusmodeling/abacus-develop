@@ -10,7 +10,7 @@ namespace ModulePW
 /// 
 /// Init the grids for FFT
 /// Input: lattice vectors of the cell, Energy cut off for G^2/2
-/// Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
+/// Output: fftnx, fftny, fftnz, fftnxyz, latvec, G, GT, GGT
 /// 
 void PW_Basis:: initgrids(
         const double lat0_in, //unit length (unit in bohr)
@@ -129,11 +129,11 @@ void PW_Basis:: initgrids(
         ibox[i] -= 1;
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
     }
-    this->bignx = this->nx = ibox[0];
-    this->bigny = ibox[1];
-    this->bignz = this->nz = ibox[2];
-    this->bignxy =this->bignx * this->bigny;
-    this->bignxyz = this->bignxy * this->bignz;
+    this->nx = ibox[0];
+    this->ny = ibox[1];
+    this->nz = ibox[2];
+    this->nxy =this->nx * this->ny;
+    this->nxyz = this->nxy * this->nz;
 
     delete[] ibox;    
     return;
@@ -147,7 +147,7 @@ void PW_Basis:: initgrids(
 void PW_Basis:: initgrids(
     const double lat0_in,
     const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    const int nx_in, int bigny_in, int nz_in,
+    const int nx_in, int ny_in, int nz_in,
     const int poolnproc_in,
     const int poolrank_in
 )
@@ -158,10 +158,10 @@ void PW_Basis:: initgrids(
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
     this->nx = nx_in;
-    this->bigny = bigny_in;
+    this->ny = ny_in;
     this->nz = nz_in;
-    this->bignxy = this->nx * this->bigny;
-    this->bignxyz = this->bignxy * this->nz;
+    this->nxy = this->nx * this->ny;
+    this->nxyz = this->nxy * this->nz;
     this->poolnproc = poolnproc_in;
     this->poolrank = poolrank_in;
 
@@ -179,10 +179,12 @@ void PW_Basis:: initparameters(
     this->gamma_only = gamma_only_in;
     // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
     // we have F(-k) = F(k)*, so that only half of planewaves are needed.
-    if (this->gamma_only)   this->ny = int(this->bigny / 2) + 1;
-    else                    this->ny = bigny;
-    this->nxy = this->nx * this->ny;
-    this->nxyz = this->nxy * this->nz;
+    if (this->gamma_only)   this->fftny = int(this->ny / 2) + 1;
+    else                    this->fftny = ny;
+    this->fftnx = this->nx;
+    this->fftnz = this->nz;
+    this->fftnxy = this->fftnx * this->fftny;
+    this->fftnxyz = this->fftnxy * this->fftnz;
 
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
     this->ggecut = pwecut_in / tpiba2;

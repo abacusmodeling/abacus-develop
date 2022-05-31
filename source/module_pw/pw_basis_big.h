@@ -15,7 +15,7 @@ public:
     
     // combine [bx,by,bz] FFT grids into a big one
 	// typical values are bx=2, by=2, bz=2
-	// nbx=bignx/bx, nby=bigny/by, nbz=bignz/bz, 
+	// nbx=nx/bx, nby=ny/by, nbz=nz/bz, 
     PW_Basis_Big(){
         bx = 1;
         by = 1;
@@ -128,14 +128,14 @@ public:
         ibox[i] -= 1;
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
     }
-    this->bignx = this->nx = ibox[0];
-    this->bigny = ibox[1];
-    this->bignz = this->nz = ibox[2];
-    this->bignxy =this->bignx * this->bigny;
-    this->bignxyz = this->bignxy * this->bignz;
-    this->nbx = this->bignx / bx;
-    this->nby = this->bigny / by;
-    this->nbz = this->bignz / bz;
+    this->nx = ibox[0];
+    this->ny = ibox[1];
+    this->nz = ibox[2];
+    this->nxy =this->nx * this->ny;
+    this->nxyz = this->nxy * this->nz;
+    this->nbx = this->nx / bx;
+    this->nby = this->ny / by;
+    this->nbz = this->nz / bz;
 
     delete[] ibox;    
     return;
@@ -158,7 +158,7 @@ public:
             if(ip < this->poolnproc - 1)   this->startz[ip+1] = this->startz[ip] + numz[ip];
             if(ip == this->poolrank) this->nplane = numz[ip];
         }
-        this->nrxx = this->numz[this->poolrank] * this->bignxy;
+        this->nrxx = this->numz[this->poolrank] * this->nxy;
         return;
     }
 

@@ -19,8 +19,8 @@ namespace ModulePW
 ///                |___________________________|______________________________|___
 /// ip                           0                            1              ...
 /// 
-/// Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
-/// output: ig2isz[ig], istot2bigixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
+/// Known: G, GT, GGT, fftny, fftnx, nz, poolnproc, poolrank, ggecut
+/// output: ig2isz[ig], istot2ixy[is], fftixy2istot[fftnxy], is2fftixy[is], fftixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
 ///
 void PW_Basis::distribution_method2()
 {
@@ -29,8 +29,8 @@ void PW_Basis::distribution_method2()
     // initial the variables needed by all proc.
     int tot_npw = 0;                     // total number of planewaves.
     this->nstot = 0;                     // total number of sticks.
-    int *st_bottom2D = NULL;             // st_bottom2D[ixy], minimum z of stick on (x, y).
-    int *st_length2D = NULL;             // st_length2D[ixy], number of planewaves in stick on (x, y).
+    int *st_bottom2D = nullptr;             // st_bottom2D[ixy], minimum z of stick on (x, y).
+    int *st_length2D = nullptr;             // st_length2D[ixy], number of planewaves in stick on (x, y).
 
     if(this->nst_per!=nullptr) delete[] this->nst_per; this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
     if (poolrank == 0)
@@ -38,23 +38,23 @@ void PW_Basis::distribution_method2()
         // (1) Count the total number of planewaves (tot_npw) and sticks (this->nstot).                  
         
         // Actually we will scan [(2 * ibox[0] + 1) * (2 * ibox[1] + 1)] points on x-y plane,
-        // but we define st_length2D with (ny * nx) points here, because we assume that the diameter
+        // but we define st_length2D with (fftny * fftnx) points here, because we assume that the diameter
         // of the sphere is shorter than the sides of the cube.
-        st_length2D = new int[nxy];                    // the number of planewaves that belong to the stick located on (x, y).
-        st_bottom2D = new int[nxy];                    // the z-coordinate of the bottom of stick on (x, y).
-        ModuleBase::GlobalFunc::ZEROS(st_length2D, this->nxy);
-        ModuleBase::GlobalFunc::ZEROS(st_bottom2D, this->nxy);
+        st_length2D = new int[fftnxy];                    // the number of planewaves that belong to the stick located on (x, y).
+        st_bottom2D = new int[fftnxy];                    // the z-coordinate of the bottom of stick on (x, y).
+        ModuleBase::GlobalFunc::ZEROS(st_length2D, this->fftnxy);
+        ModuleBase::GlobalFunc::ZEROS(st_bottom2D, this->fftnxy);
 
         this->count_pw_st(tot_npw, st_length2D, st_bottom2D);
         // for test --------------------------------------------------
         // std::cout << "The first step done\n";
         // std::cout << "tot_npw   " << tot_npw << '\n';
         // std::cout << "this->nstot   " << this->nstot << '\n';
-        // for (int ix = 0; ix < nx; ++ix)
+        // for (int ix = 0; ix < fftnx; ++ix)
         // {
-        //     for (int iy = 0; iy < ny; ++iy)
+        //     for (int iy = 0; iy < fftny; ++iy)
         //     {
-        //         std::cout << st_length2D[ix * ny + iy] << std::setw(4);
+        //         std::cout << st_length2D[ix * fftny + iy] << std::setw(4);
         //     }
         //     std::cout << '\n';
         // }
@@ -111,29 +111,29 @@ void PW_Basis::distribution_method2()
     MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
     if (this->poolrank != 0)
     {
-        st_bottom2D = new int[this->nxy];                      // minimum z of stick.
-        st_length2D = new int[this->nxy];                      // number of planewaves in stick.
-        if(this->ixy2ip!=nullptr) delete[] this->ixy2ip; this->ixy2ip = new int[this->nxy];              // ip of core which contains stick on (x, y).
-        if(this->ixy2istot!=nullptr) delete[]this->ixy2istot; this->ixy2istot = new int[this->nxy];
-        if(this->istot2bigixy!=nullptr) delete[] this->istot2bigixy; this->istot2bigixy = new int[this->nstot];
+        st_bottom2D = new int[this->fftnxy];                      // minimum z of stick.
+        st_length2D = new int[this->fftnxy];                      // number of planewaves in stick.
+        if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains stick on (x, y).
+        if(this->fftixy2istot!=nullptr) delete[]this->fftixy2istot; this->fftixy2istot = new int[this->fftnxy];
+        if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
     }
 
-    MPI_Bcast(st_length2D, this->nxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(st_bottom2D, this->nxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->ixy2ip, this->nxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->istot2bigixy, this->nstot, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->ixy2istot, this->nxy, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(st_length2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(st_bottom2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(this->fftixy2ip, this->fftnxy, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(this->fftixy2istot, this->fftnxy, MPI_INT, 0, POOL_WORLD);
 
     // std::cout << "Bcast done\n";
 #endif
      this->npwtot = tot_npw;
     this->nstnz = this->nst * this->nz;
 
-    // (5) Construct ig2isz and is2ixy. 
-    this->get_ig2isz_is2ixy(st_bottom2D, st_length2D);
+    // (5) Construct ig2isz and is2fftixy. 
+    this->get_ig2isz_is2fftixy(st_bottom2D, st_length2D);
 
-    if (st_bottom2D != NULL) delete[] st_bottom2D;
-    if (st_length2D != NULL) delete[] st_length2D;
+    if (st_bottom2D != nullptr) delete[] st_bottom2D;
+    if (st_length2D != nullptr) delete[] st_length2D;
     // for test ----------------------------------------------
     // if (poolrank==0) std::cout << "The fifth step done\n";
     // -------------------------------------------------------
@@ -168,27 +168,27 @@ void PW_Basis::divide_sticks_2()
 // 
 // (3) Create the maps from ixy to ip, istot, and from istot to ixy, and construt npw_per simultaneously.
 // known: st_length2D
-// output: this->ixy2ip, this->ixy2istot, this->istot2bigixy, npw_per
+// output: this->fftixy2ip, this->fftixy2istot, this->istot2ixy, npw_per
 // 
 void PW_Basis::create_maps(
     int* st_length2D,  // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
     int* npw_per       // number of planewaves on each core.
 )
 {
-    if(this->ixy2ip!=nullptr) delete[] this->ixy2ip; this->ixy2ip = new int[this->nxy];
-    if(this->ixy2istot!=nullptr) delete[]this->ixy2istot; this->ixy2istot = new int[this->nxy];
-    if(this->istot2bigixy!=nullptr) delete[] this->istot2bigixy; this->istot2bigixy = new int[this->nstot];
+    if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];
+    if(this->fftixy2istot!=nullptr) delete[]this->fftixy2istot; this->fftixy2istot = new int[this->fftnxy];
+    if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
 
-    ModuleBase::GlobalFunc::ZEROS(this->istot2bigixy, this->nstot);
+    ModuleBase::GlobalFunc::ZEROS(this->istot2ixy, this->nstot);
     int ip = 0;
     int st_move = 0; // the number of sticks that have been found.
-    for (int ixy = 0; ixy < this->nxy; ++ixy)
+    for (int ixy = 0; ixy < this->fftnxy; ++ixy)
     {
         if (st_length2D[ixy] > 0)
         {
-            this->ixy2istot[ixy] = st_move;
-            this->istot2bigixy[st_move] = ixy / ny * bigny + ixy % ny;
-            this->ixy2ip[ixy] = ip;
+            this->fftixy2istot[ixy] = st_move;
+            this->istot2ixy[st_move] = ixy / fftny * ny + ixy % fftny;
+            this->fftixy2ip[ixy] = ip;
             npw_per[ip] += st_length2D[ixy];
             st_move++;
             if (ip < this->poolnproc - 1)
@@ -199,8 +199,8 @@ void PW_Basis::create_maps(
         }
         else
         {
-            this->ixy2istot[ixy] = -1;
-            this->ixy2ip[ixy] = -1;
+            this->fftixy2istot[ixy] = -1;
+            this->fftixy2ip[ixy] = -1;
         }
     }
 }

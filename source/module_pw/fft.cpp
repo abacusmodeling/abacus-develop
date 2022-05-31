@@ -4,20 +4,6 @@ namespace ModulePW
 
 FFT::FFT()
 {
-	bigny = nx = ny = nz = 2;
-	bignxy = nxy = 4;
-	ns = 1; 
-	nplane = 1;
-	mpifft = false; 
-	destroyp = true;
-	gamma_only = false;
-	aux2 = aux1 = nullptr;
-	r_rspace = nullptr;
-#ifdef __MIX_PRECISION
-	destroypf = true;
-	auxf2 = auxf1 = nullptr;
-	rf_rspace = nullptr;
-#endif
 }
 
 FFT::~FFT()
