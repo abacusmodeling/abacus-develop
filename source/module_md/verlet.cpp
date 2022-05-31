@@ -111,7 +111,7 @@ void Verlet::second_half()
     }
 }
 
-void Verlet::outputMD(std::ofstream &ofs)
+void Verlet::outputMD(std::ofstream &ofs, bool cal_stress)
 {
     if(GlobalV::MY_RANK) return;
 
@@ -128,13 +128,21 @@ void Verlet::outputMD(std::ofstream &ofs)
     std::cout << " " << std::left << std::setw(20) << "Energy" 
             << std::left << std::setw(20) << "Potential" 
             << std::left << std::setw(20) << "Kinetic" 
-            << std::left << std::setw(20) << "Temperature" 
-            << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
+            << std::left << std::setw(20) << "Temperature";
+    if(cal_stress)
+    {
+        std::cout << std::left << std::setw(20) << "Pressure (KBAR)";
+    }
+    std::cout << std::endl;
     std::cout << " " << std::left << std::setw(20) << potential+kinetic
             << std::left << std::setw(20) << potential
             << std::left << std::setw(20) << kinetic
-            << std::left << std::setw(20) << temperature_
-            << std::left << std::setw(20) << press*unit_transform <<std::endl;
+            << std::left << std::setw(20) << temperature_;
+    if(cal_stress)
+    {
+        std::cout << std::left << std::setw(20) << press*unit_transform;
+    }
+    std::cout << std::endl;
 	std::cout << " ------------------------------------------------------------------------------------------------" << std::endl;
 
     ofs.unsetf(ios::fixed);
@@ -144,15 +152,26 @@ void Verlet::outputMD(std::ofstream &ofs)
 	ofs << " " << std::left << std::setw(20) << "Energy" 
         << std::left << std::setw(20) << "Potential" 
         << std::left << std::setw(20) << "Kinetic" 
-        << std::left << std::setw(20) << "Temperature" 
-        << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
+        << std::left << std::setw(20) << "Temperature"; 
+    if(cal_stress)
+    {
+        ofs << std::left << std::setw(20) << "Pressure (KBAR)";
+    }
+    ofs << std::endl;
     ofs << " " << std::left << std::setw(20) << potential+kinetic
         << std::left << std::setw(20) << potential
         << std::left << std::setw(20) << kinetic
-        << std::left << std::setw(20) << temperature_
-        << std::left << std::setw(20) << press*unit_transform <<std::endl;
+        << std::left << std::setw(20) << temperature_;
+    if(cal_stress)
+    {
+        ofs << std::left << std::setw(20) << press*unit_transform;
+    }
+    ofs << std::endl;
     ofs << " ------------------------------------------------------------------------------------------------" << std::endl;
-    MD_func::outStress(virial, stress);
+    if(cal_stress)
+    {
+        MD_func::outStress(virial, stress);
+    }
     ofs << std::endl;
     ofs << std::endl;
 }

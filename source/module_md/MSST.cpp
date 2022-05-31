@@ -10,6 +10,7 @@ MSST::MSST(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para
 {
     std::cout << "MSST" << std::endl;
 
+    GlobalV::CAL_STRESS = 1;
     mdp.msst_qmass = mdp.msst_qmass / pow(ModuleBase::ANGSTROM_AU, 4) / pow(ModuleBase::AU_to_MASS, 2);
     mdp.msst_vel = mdp.msst_vel * ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
     mdp.msst_vis = mdp.msst_vis / ModuleBase::AU_to_MASS / ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
@@ -158,9 +159,9 @@ void MSST::second_half()
     ModuleBase::timer::tick("MSST", "second_half");
 }
 
-void MSST::outputMD(std::ofstream &ofs)
+void MSST::outputMD(std::ofstream &ofs, bool cal_stress)
 {
-    Verlet::outputMD(ofs);
+    Verlet::outputMD(ofs, cal_stress);
 }
 
 void MSST::write_restart()
