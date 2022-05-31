@@ -9,7 +9,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "grid_technique.h"
-#include "LCAO_matrix.h"
+#include "../src_lcao/LCAO_matrix.h"
 #include <omp.h>
 
 //=========================================================

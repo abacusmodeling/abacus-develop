@@ -2,7 +2,7 @@
 
 #include "math_tools.h"
 #include "module_base/timer.h"
-#include "src_lcao/grid_technique.h"
+#include "module_gint/grid_technique.h"
 
 namespace elecstate
 {

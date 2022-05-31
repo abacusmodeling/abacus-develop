@@ -1,6 +1,6 @@
 #include "gint_k.h"
 #include "../src_pw/global.h"
-#include "global_fp.h" // mohan add 2021-01-30
+#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
 
 #include "../module_base/ylm.h"
 #include "../module_base/timer.h"

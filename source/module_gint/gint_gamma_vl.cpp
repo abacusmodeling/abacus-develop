@@ -10,7 +10,7 @@
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
 
-#include "global_fp.h" // mohan add 2021-01-30
+#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
 
 #ifdef _OPENMP
 #include <omp.h>

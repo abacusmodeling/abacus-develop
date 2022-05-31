@@ -4,8 +4,8 @@
 #include "hamilt.h"
 #include "src_lcao/LCAO_gen_fixedH.h"
 #include "src_lcao/LCAO_matrix.h"
-#include "src_lcao/gint_gamma.h"
-#include "src_lcao/gint_k.h"
+#include "module_gint/gint_gamma.h"
+#include "module_gint/gint_k.h"
 
 namespace hamilt
 {

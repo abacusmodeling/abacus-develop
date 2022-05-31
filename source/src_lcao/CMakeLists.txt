@@ -28,24 +28,7 @@ list(APPEND objects
     dftu.cpp
     dftu_relax.cpp
     dftu_yukawa.cpp
-    gint.cpp
-    gint_gamma.cpp
-    gint_gamma_env.cpp
-    gint_gamma_mull.cpp
-    gint_gamma_vl.cpp
-    gint_fvl.cpp
-    gint_rho.cpp
-    gint_vl.cpp
-    gint_k_env.cpp
-    gint_k_sparse.cpp
-    gint_k_pvpr.cpp
-    gint_tools.cpp
     global_fp.cpp
-    grid_bigcell.cpp
-    grid_meshball.cpp
-    grid_meshcell.cpp
-    grid_meshk.cpp
-    grid_technique.cpp
     local_orbital_charge.cpp
     local_orbital_wfc.cpp
     record_adj.cpp
