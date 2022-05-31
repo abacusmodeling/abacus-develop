@@ -37,10 +37,6 @@ LCAO_Hamilt::LCAO_Hamilt(){}
 LCAO_Hamilt::~LCAO_Hamilt(){}
 LCAO_gen_fixedH::LCAO_gen_fixedH(){}
 LCAO_gen_fixedH::~LCAO_gen_fixedH(){}
-Gint_k::Gint_k(){}
-Gint_k::~Gint_k(){}
-Gint_k_init::Gint_k_init(){}
-Gint_k_init::~Gint_k_init(){} 
 wavefunc::wavefunc(){}
 wavefunc::~wavefunc(){}
 WF_atomic::WF_atomic(){}
