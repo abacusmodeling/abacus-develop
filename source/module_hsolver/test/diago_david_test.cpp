@@ -7,7 +7,7 @@
 #include"gtest/gtest.h"
 #include "module_base/inverse_matrix.h"
 #include "module_base/lapack_connector.h"
-#include "module_pw/unittest/test_tool.h"
+#include "module_pw/test/test_tool.h"
 #include"mpi.h"
 
 #define CONVTHRESHOLD 1e-3
@@ -82,7 +82,7 @@ public:
 		double* en = new double[npw];		
 		Hamilt_PW hpw;
 		hamilt::Hamilt *phm;
-		phm = new hamilt::HamiltPW;
+		phm = new hamilt::HamiltPW(&hpw);
 		hsolver::DiagoDavid dav(&hpw, precondition);
 		hsolver::DiagoDavid::PW_DIAG_NDIM = order;
 		hsolver::DiagoIterAssist::PW_DIAG_NMAX = maxiter;

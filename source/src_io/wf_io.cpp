@@ -18,7 +18,7 @@
     
 }*/
 
-void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *psi)
+void WF_io::write_wfc(const std::string &fn, const psi::Psi<std::complex<double>> &psi)
 {
     if (GlobalV::test_wf) ModuleBase::TITLE("WF_io","write_wfc");
 
@@ -41,8 +41,8 @@ void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *ps
             for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
             {
                 if (ig%4==0) ofs << "\n";
-                ofs << std::setw(15) << psi[ik](i, ig).real()
-                << std::setw(15) << psi[ik](i, ig).imag();
+                ofs << std::setw(15) << psi(ik, i, ig).real()
+                << std::setw(15) << psi(ik, i, ig).imag();
             }
             ofs << "\n";
         }
@@ -53,7 +53,7 @@ void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *ps
     return;
 }
 
-void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *psi, const ModuleBase::Vector3<double> *gkk)
+void WF_io::write_wfc2(const std::string &fn, const psi::Psi<std::complex<double>> &psi, const ModuleBase::Vector3<double> *gkk)
 {
     if (GlobalV::test_wf) ModuleBase::TITLE("WF_io","write_wfc2"); 
 
@@ -96,8 +96,9 @@ void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *p
         if( GlobalV::MY_POOL == ip )
 		{
 #endif
-			for(int ik=0; ik<GlobalC::kv.nks; ik++)
+			for(int ik=0; ik<psi.get_nk(); ik++)
 			{
+                psi.fix_k(ik);
                 int ikngtot=0; //ikngtot: the total number of plane waves of ikpoint
                 int ikstot=0;//ikstot : the index within all k-points
 #ifdef __MPI
@@ -123,8 +124,8 @@ void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *p
                         if(id==0)
                         {
                             ofs2<<std::setprecision(6);
-                            ofs2<<std::setw(10)<<"Kpoint"<<std::setw(10)<<"nKpoint"<<std::setw(10)<<"GlobalC::kv.x"<<std::setw(10)
-                            <<"GlobalC::kv.y"<<std::setw(10)<<"GlobalC::kv.z"<<std::setw(10)<<"weight"<<std::setw(10)
+                            ofs2<<std::setw(10)<<"Kpoint"<<std::setw(10)<<"nKpoint"<<std::setw(10)<<"kv.x"<<std::setw(10)
+                            <<"kv.y"<<std::setw(10)<<"kv.z"<<std::setw(10)<<"weight"<<std::setw(10)
                             <<"ngtot"<<std::setw(10)<<"nband"<<std::setw(10)<<"ecut"<<std::setw(10)<<"lat0"<<std::setw(10)<<"2pi/lat0"<<std::endl;
                             ofs2<<std::setw(10)<<ikstot+1<<std::setw(10)<<GlobalC::kv.nkstot<<std::setw(10)<<GlobalC::kv.kvec_c[ik].x<<std::setw(10)
                             <<GlobalC::kv.kvec_c[ik].y<<std::setw(10)<<GlobalC::kv.kvec_c[ik].z<<std::setw(10)<<GlobalC::kv.wk[ik]<<std::setw(10)
@@ -194,11 +195,11 @@ void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *p
                             if(id==0)   ofs2 << "\n< Band "<<ib+1 <<" >" <<std::endl; 
 							ofs2 << scientific;
 							
-                            for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
+                            for (int ig=0; ig<psi.get_current_nbas(); ig++)
 							{
 								if (ig%4==0&&(ig!=0||id!=0)) ofs2 << "\n";
-								ofs2 << std::setw(15) << psi[ik](ib, ig).real()
-									<< std::setw(15) << psi[ik](ib, ig).imag();
+								ofs2 << std::setw(15) << psi(ib, ig).real()
+									<< std::setw(15) << psi(ib, ig).imag();
 							} // end ig
                             if(id==GlobalV::NPROC_IN_POOL-1)   ofs2 << "\n< Band "<<ib+1 <<" >" <<std::endl; 
 							ofs2.close();
@@ -207,9 +208,9 @@ void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *p
                         {
                             Rwstream wfs2(wfilename[ikstot],"a");
                             if(id==0) wfs2<<ikngtot*16;
-                            for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
+                            for (int ig=0; ig<psi.get_current_nbas(); ig++)
 							{
-								wfs2 << psi[ik](ib, ig).real() << psi[ik](ib, ig).imag();
+								wfs2 << psi(ib, ig).real() << psi(ib, ig).imag();
 							}
                             if(id==GlobalV::NPROC_IN_POOL-1) wfs2<<ikngtot*16;
                             wfs2.close();

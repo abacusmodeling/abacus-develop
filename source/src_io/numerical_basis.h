@@ -14,6 +14,7 @@
 #include "../module_base/complexmatrix.h"
 #include "bessel_basis.h"
 #include <vector>
+#include "module_psi/psi.h"
 //==========================================================
 // CLASS :
 // NAME :  Numerical_Basis 
@@ -25,7 +26,7 @@ class Numerical_Basis
 	~Numerical_Basis();
 
 	void start_from_file_k( const int &ik, ModuleBase::ComplexMatrix &psi);
-	void output_overlap( const ModuleBase::ComplexMatrix *psi);
+	void output_overlap( const psi::Psi<std::complex<double>> &psi);
 
 	private:
 
@@ -39,7 +40,7 @@ class Numerical_Basis
 	void numerical_atomic_wfc(const int &ik,const int &np,ModuleBase::ComplexMatrix &psi);
 
 	ModuleBase::ComplexArray cal_overlap_Q(
-		const int &ik, const int &np, const ModuleBase::ComplexMatrix &psi,
+		const int &ik, const int &np, const psi::Psi<std::complex<double>> &psi,
 		const double derivative_order ) const;
 		
 	ModuleBase::ComplexArray cal_overlap_Sq(
@@ -47,7 +48,7 @@ class Numerical_Basis
 		const int &np,
 		const double derivative_order ) const;
 
-	static ModuleBase::matrix cal_overlap_V(const ModuleBase::ComplexMatrix *psi, const double derivative_order);
+	static ModuleBase::matrix cal_overlap_V(const psi::Psi<std::complex<double>> &psi, const double derivative_order);
 
 	ModuleBase::realArray cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const;
 

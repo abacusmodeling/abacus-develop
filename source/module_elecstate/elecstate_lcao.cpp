@@ -59,6 +59,9 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     ModuleBase::TITLE("ElecStateLCAO", "psiToRho");
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
 
+    this->calculate_weights();
+    this->calEBand();
+
     ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
 
     // this part for calculating dm_k in 2d-block format, not used for charge now
@@ -110,6 +113,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
 
     this->calculate_weights();
+    this->calEBand();
 
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack")
     {

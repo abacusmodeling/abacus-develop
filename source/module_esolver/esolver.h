@@ -6,16 +6,10 @@
 #include "../src_pw/energy.h"
 #include "../module_base/matrix.h"
 //--------------temporary----------------------------
-#include "src_lcao/record_adj.h"
-#include "src_lcao/local_orbital_charge.h"
-#include "src_lcao/local_orbital_wfc.h"
-#include "src_lcao/LCAO_hamilt.h"
-//--------------\temporary----------------------------
-//------It should be moved as fast as possible------
+#include "module_psi/psi.h"
 
 namespace ModuleESolver
 {
-
     class ESolver
     {
         // protected:
@@ -24,7 +18,15 @@ namespace ModuleESolver
         ESolver() {
             classname = "ESolver";
         }
-        virtual ~ESolver() {};
+        
+        virtual ~ESolver() 
+        {
+            //--------------temporary----------------------------
+            if(this->psi != nullptr)
+            {
+                delete psi;
+            }
+        }
 
         //virtual void Init(Input_EnSolver &inp, matrix &lattice_v)=0
         virtual void Init(Input& inp, UnitCell_pseudo& cell) = 0;
@@ -52,6 +54,13 @@ namespace ModuleESolver
         //get iterstep used in current scf
         virtual int getniter() { return 0; }
         string classname;
+
+        //--------------temporary----------------------------
+        // this is the interface of non-self-consistant calculation
+        virtual void nscf() {};
+        
+        //wavefunction coefficients
+        psi::Psi<std::complex<double>>* psi=nullptr;
     };
 
     void init_esolver(ESolver*& p_esolver, const string use_esol);

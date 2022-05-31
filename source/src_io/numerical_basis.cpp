@@ -43,7 +43,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatri
 }
 
 // The function is called in run_fp.cpp.
-void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
+void Numerical_Basis::output_overlap( const psi::Psi<std::complex<double>> &psi)
 {
     ModuleBase::TITLE("Numerical_Basis","output_overlap");
     ModuleBase::GlobalFunc::NEW_PART("Overlap Data For Spillage Minimization");
@@ -97,7 +97,8 @@ void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
             GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
 
             // search for all k-points.
-            overlap_Q[ik] = this->cal_overlap_Q(ik, npw, psi[ik], static_cast<double>(derivative_order));
+            psi.fix_k(ik);
+            overlap_Q[ik] = this->cal_overlap_Q(ik, npw, psi, static_cast<double>(derivative_order));
             ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"cal_overlap_Q");
 
             // (2) generate Sq matrix if necessary.
@@ -140,7 +141,7 @@ void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
 ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
     const int &ik,
     const int &np,
-    const ModuleBase::ComplexMatrix &psi,
+    const psi::Psi<std::complex<double>> &psi,
 	const double derivative_order) const
 {
     ModuleBase::TITLE("Numerical_Basis","cal_overlap_Q");
@@ -335,7 +336,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
 
 // Peize Lin add for dpsi 2020.04.23
 ModuleBase::matrix Numerical_Basis::cal_overlap_V(
-	const ModuleBase::ComplexMatrix *psi,
+	const psi::Psi<std::complex<double>> &psi,
 	const double derivative_order)
 {
 	ModuleBase::matrix overlap_V(GlobalC::kv.nks, GlobalV::NBANDS);
@@ -349,7 +350,7 @@ ModuleBase::matrix Numerical_Basis::cal_overlap_V(
 
 		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ++ig)
-				overlap_V(ik,ib)+= norm(psi[ik](ib,ig)) * gpow[ig];
+				overlap_V(ik,ib)+= norm(psi(ik,ib,ig)) * gpow[ig];
 	}
 	return overlap_V;
 }

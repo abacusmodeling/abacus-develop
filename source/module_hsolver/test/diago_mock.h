@@ -289,3 +289,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
     delete [] hpsi;
 }
 
+void Hamilt_PW::init_k(const int ik)
+{
+    return;
+}

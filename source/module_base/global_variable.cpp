@@ -26,8 +26,8 @@ double PSEUDORCUT;
 bool PSEUDO_MESH;
 
 std::string CALCULATION = "scf";
-int EFIELD = 0; // 5: add electric field
-int DIPOLE = 0; // 7: add dipole field
+int EFIELD_FLAG = 0; // 5: add electric field
+int DIP_COR_FLAG = 0; // 7: add dipole field
 
 std::string DFT_FUNCTIONAL = "default";
 int NSPIN = 1; // LDA
@@ -130,6 +130,7 @@ std::string global_pseudo_type = "auto";
 std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified
+std::string global_stru_dir;
 
 std::ofstream ofs_running;
 std::ofstream ofs_warning;

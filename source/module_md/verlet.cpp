@@ -5,6 +5,7 @@
 #endif
 #include "../module_base/timer.h"
 #include "module_esolver/esolver.h"
+#include "../src_io/print_info.h"
 
 Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
@@ -63,6 +64,8 @@ void Verlet::setup(ModuleESolver::ESolver *p_esolver)
         restart();
     }
 
+    Print_Info::print_screen(0, 0, step_ + step_rst_);
+
     MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
@@ -72,6 +75,7 @@ void Verlet::setup(ModuleESolver::ESolver *p_esolver)
 
 void Verlet::first_half()
 {
+    if(GlobalV::MY_RANK==0) //only first rank do md
     for(int i=0; i<ucell.nat; ++i)
     {
         for(int k=0; k<3; ++k)
@@ -83,6 +87,9 @@ void Verlet::first_half()
             }
         }
     }
+#ifdef __MPI
+    MPI_Bcast(pos , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+#endif
 
     ucell.update_pos_tau(pos);
     ucell.periodic_boundary_adjustment();
@@ -91,6 +98,7 @@ void Verlet::first_half()
 
 void Verlet::second_half()
 {
+    if(GlobalV::MY_RANK==0) //only first rank do md
     for(int i=0; i<ucell.nat; ++i)
     {
         for(int k=0; k<3; ++k)
@@ -129,7 +137,8 @@ void Verlet::outputMD(std::ofstream &ofs)
             << std::left << std::setw(20) << press*unit_transform <<std::endl;
 	std::cout << " ------------------------------------------------------------------------------------------------" << std::endl;
 
-    ofs << std::endl;
+    ofs.unsetf(ios::fixed);
+    ofs << std::setprecision(8) << std::endl;
     ofs << std::endl;
     ofs << " ------------------------------------------------------------------------------------------------" << std::endl;
 	ofs << " " << std::left << std::setw(20) << "Energy" 
