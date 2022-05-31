@@ -36,6 +36,7 @@ has_r=`grep -En '(^|[[:space:]])out_mat_r($|[[:space:]])' INPUT | awk '{print $2
 deepks_out_labels=`grep deepks_out_labels INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 deepks_bandgap=`grep deepks_bandgap INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 has_lowf=`grep out_wfc_lcao INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+has_wfc_r=`grep out_wfc_r INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 gamma_only=`grep gamma_only INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
@@ -110,6 +111,28 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 	total_s=`sum_file OUT.autotest/data-0-S`
 	echo "totalSmatrix $total_s" >>$1
 fi
+
+# echo "$has_wfc_r" ## test out_wfc_r > 0
+if ! test -z "$has_wfc_r"  && [ $has_wfc_r -eq 1 ]; then
+	if [[ ! -f OUT.autotest/running_scf.log ]];then
+		echo "Can't find file OUT.autotest/running_scf.log"
+		exit 1
+	fi
+	nband=$(grep NBANDS OUT.autotest/running_scf.log|awk '{print $3}')
+	allgrid=$(grep "fft grid for wave functions" OUT.autotest/running_scf.log|awk -F "[=,]" '{print $2*$3*$4}')
+	for((band=0;band<$nband;band++));do
+		if [[ -f "OUT.autotest/wfc_realspace/wfc_realspace_0_$band" ]];then
+			variance_wfc_r=`sed -n "13,$"p OUT.autotest/wfc_realspace/wfc_realspace_0_$band | \
+						awk -v all=$allgrid 'BEGIN {sumall=0} {for(i=1;i<=NF;i++) {sumall+=($i-1)*($i-1)}}\
+						END {printf"%.5f",(sumall/all)}'`
+			echo "variance_wfc_r_0_$band $variance_wfc_r" >>$1
+		else
+			echo "Can't find file OUT.autotest/wfc_realspace/wfc_realspace_0_$band"
+			exit 1
+		fi
+	done
+fi	
+
 # echo "$has_lowf" ## test out_wfc_lcao > 0
 if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
