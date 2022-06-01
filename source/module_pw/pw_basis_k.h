@@ -70,7 +70,8 @@ public:
     //prepare for transforms between real and reciprocal spaces
     void setuptransform();
 
-    int *igl2isz_k=nullptr; //[npwk_max*nks] map (ig,ik) to (is,iz) 
+    int *igl2isz_k=nullptr; //[npwk_max*nks] map (igl,ik) to (is,iz) 
+    int *igl2ig_k=nullptr;//[npwk_max*nks] map (igl,ik) to ig
 
     double *gk2=nullptr; // modulus (G+K)^2 of G vectors [npwk_max*nks]
 
@@ -97,11 +98,15 @@ public:
 public:
     //operator:
     //get (G+K)^2:
-    double& getgk2(const int ik, const int ig) const;
+    double& getgk2(const int ik, const int igl) const;
     //get G
-    ModuleBase::Vector3<double>& getgcar(const int ik, const int ig) const;
+    ModuleBase::Vector3<double>& getgcar(const int ik, const int igl) const;
     //get (G+K)
-    ModuleBase::Vector3<double> getgpluskcar(const int ik, const int ig) const;
+    ModuleBase::Vector3<double> getgpluskcar(const int ik, const int igl) const;
+    //get igl2isz_k
+    int& getigl2isz(const int ik, const int igl) const;
+    //get igl2ig_k or igk(ik,ig) in older ABACUS
+    int& getigl2ig(const int ik, const int igl) const;
 };
 
 }

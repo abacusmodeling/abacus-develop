@@ -32,8 +32,11 @@ public:
     int nbx, nby, nbz;
     virtual void distribute_r()
     {
-       if(this->numz!=nullptr) delete[] this->numz; this->numz = new int[this->poolnproc];
-       if(this->startz!=nullptr) delete[] this->startz; this->startz = new int[this->poolnproc];
+        this->nbx = this->nx / bx;
+        this->nby = this->ny / by;
+        this->nbz = this->nz / bz;
+        if(this->numz!=nullptr) delete[] this->numz; this->numz = new int[this->poolnproc];
+        if(this->startz!=nullptr) delete[] this->startz; this->startz = new int[this->poolnproc];
         ModuleBase::GlobalFunc::ZEROS(this->numz, this->poolnproc);
         ModuleBase::GlobalFunc::ZEROS(this->startz, this->poolnproc);
 

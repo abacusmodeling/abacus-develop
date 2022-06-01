@@ -66,7 +66,7 @@ TEST_F(PWTEST,test1_4)
     complex<double> * rhogr = new complex<double> [nmaxgr];
     for(int ik  = 0; ik < nks; ++ik)
     {
-        int npw = pwtest.npwk[ik];
+        int npwk = pwtest.npwk[ik];
         int npwk_max = pwtest.npwk_max;
         if(rank_in_pool == 0)
         {
@@ -112,9 +112,9 @@ TEST_F(PWTEST,test1_4)
 #ifdef __MPI
         MPI_Bcast(tmp,2*fftnx*fftny*fftnz,MPI_DOUBLE,0,POOL_WORLD);
 #endif
-        complex<double> * rhog = new complex<double> [npw];
-        complex<double> * rhogout = new complex<double> [npw];
-        for(int ig = 0 ; ig < npw ; ++ig)
+        complex<double> * rhog = new complex<double> [npwk];
+        complex<double> * rhogout = new complex<double> [npwk];
+        for(int ig = 0 ; ig < npwk ; ++ig)
         {
             rhog[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ik*npwk_max + ig].x+1) + 1);
             rhogr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ik*npwk_max + ig].x+1) + 1);
@@ -140,7 +140,7 @@ TEST_F(PWTEST,test1_4)
 
         pwtest.real2recip(rhogr,rhogr,ik);
 
-        for(int ig = 0 ; ig < npw ; ++ig)
+        for(int ig = 0 ; ig < npwk ; ++ig)
         {
             EXPECT_NEAR(rhog[ig].real(),rhogout[ig].real(),1e-6);
             EXPECT_NEAR(rhog[ig].imag(),rhogout[ig].imag(),1e-6);
@@ -151,6 +151,19 @@ TEST_F(PWTEST,test1_4)
 
         delete [] rhog;
         delete [] rhogout;
+
+        //check igl2ig
+        for(int igl = 0; igl < npwk ; ++igl)
+        {        
+            const int isz = pwtest.getigl2isz(ik,igl);
+            int ig = 0;
+            for(int ig = 0 ; ig < pwtest.npw; ++ig)
+            {
+                if(isz == pwtest.ig2isz[ig])
+                    EXPECT_EQ(ig,pwtest.getigl2ig(ik,igl));
+            }
+        }
+
     }
     delete []tmp; 
     delete [] rhor;

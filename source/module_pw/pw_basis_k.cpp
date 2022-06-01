@@ -12,6 +12,7 @@ PW_Basis_K::~PW_Basis_K()
     if(kvec_c != nullptr)    delete[] kvec_c;
     if(npwk != nullptr)      delete[] npwk;
     if(igl2isz_k != nullptr) delete[] igl2isz_k;
+    if(igl2ig_k != nullptr)  delete[] igl2ig_k;
     if(gk2 != nullptr)       delete[] gk2;
 }
 
@@ -60,7 +61,7 @@ void PW_Basis_K::setupIndGk()
     for (int ik = 0; ik < this->nks; ik++)
     {
         int ng = 0;
-        for (int ig = 0; ig < npw ; ig++)
+        for (int ig = 0; ig < this->npw ; ig++)
         {
             const double gk2 = this->cal_GplusK_cartesian(ik, ig).norm2();       
             if (gk2 <= this->gk_ecut)
@@ -75,24 +76,23 @@ void PW_Basis_K::setupIndGk()
         }
     }
 
-    //get igl2isz_k
+    //get igl2isz_k and igl2ig_k
     if(this->igl2isz_k!=nullptr) delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
+    if(this->igl2ig_k!=nullptr) delete[] igl2ig_k; this->igl2ig_k = new int [this->nks * this->npwk_max];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int igl = 0;
-        for (int ig = 0; ig < npw ; ig++)
+        for (int ig = 0; ig < this->npw ; ig++)
         {
             const double gk2 = this->cal_GplusK_cartesian(ik, ig).norm2();       
             if (gk2 <= this->gk_ecut)
             {
                 this->igl2isz_k[ik*npwk_max + igl] = this->ig2isz[ig];
+                this->igl2ig_k[ik*npwk_max + igl] = ig;
                 ++igl;
             }
         }
     }
-
-    delete[] this->ig2isz;
-    this->ig2isz = nullptr;
 
     return;
 }
@@ -166,22 +166,27 @@ ModuleBase::Vector3<double> PW_Basis_K:: cal_GplusK_cartesian(const int ik, cons
     return g_temp_;
 }
 
-double& PW_Basis_K::getgk2(const int ik, const int ig) const
+double& PW_Basis_K::getgk2(const int ik, const int igl) const
 {
-    return this->gk2[ik * this->npwk_max + ig];
+    return this->gk2[ik * this->npwk_max + igl];
 }
 
-ModuleBase::Vector3<double>& PW_Basis_K::getgcar(const int ik, const int ig) const
+ModuleBase::Vector3<double>& PW_Basis_K::getgcar(const int ik, const int igl) const
 {
-    return this->gcar[ik * this->npwk_max + ig];
+    return this->gcar[ik * this->npwk_max + igl];
 }
 
-ModuleBase::Vector3<double> PW_Basis_K::getgpluskcar(const int ik, const int ig) const
+ModuleBase::Vector3<double> PW_Basis_K::getgpluskcar(const int ik, const int igl) const
 {
-    return this->gcar[ik * this->npwk_max + ig]+this->kvec_c[ik];
+    return this->gcar[ik * this->npwk_max + igl]+this->kvec_c[ik];
 }
-
-
-
+int& PW_Basis_K::getigl2isz(const int ik, const int igl) const
+{
+    return this->igl2isz_k[ik*this->npwk_max + igl];
+}
+int& PW_Basis_K::getigl2ig(const int ik, const int igl) const
+{
+    return this->igl2ig_k[ik*this->npwk_max + igl];
+}
 
 }
