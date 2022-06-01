@@ -38,6 +38,8 @@ deepks_bandgap=`grep deepks_bandgap INPUT | awk '{print $2}' | sed s/[[:space:]]
 has_lowf=`grep out_wfc_lcao INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 has_wfc_r=`grep out_wfc_r INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 has_wfc_pw=`grep out_wfc_pw INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+out_dm=`grep out_dm INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+out_mul=`grep out_mul INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 gamma_only=`grep gamma_only INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
@@ -180,6 +182,57 @@ if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 				sed -i "1,$ s/(//g" OUT.autotest/$lowf
 				total_lowf=`sum_file OUT.autotest/$lowf`
 				echo "$lowf $total_lowf" >>$1
+			fi
+		done
+	fi
+fi
+
+if ! test -z "$out_dm"  && [ $out_dm -eq 1 ]; then
+      dmfile=`ls OUT.autotest/ | grep "^SPIN1_DM"`
+      if test -z "$dmfile"; then
+              echo "Can't find DM files"
+              exit 1
+      else
+              for dm in $dmfile;
+              do
+                      if ! test -f OUT.autotest/$dm; then
+                              echo "Irregular DM file found"
+                              exit 1
+                      else
+                              sed -i "1,$ s/[a-d]//g" OUT.autotest/$dm
+                              sed -i "1,$ s/[f-z]//g" OUT.autotest/$dm
+                              sed -i "1,$ s/[A-D]//g" OUT.autotest/$dm
+                              sed -i "1,$ s/[F-Z]//g" OUT.autotest/$dm
+                              sed -i "1,$ s/)//g" OUT.autotest/$dm
+                              sed -i "1,$ s/(//g" OUT.autotest/$dm
+                              total_dm=`sum_file OUT.autotest/$dm`
+                              echo "$dm $total_dm" >>$1
+                      fi
+              done
+      fi
+fi
+
+if ! test -z "$out_mul"  && [ $out_mul -eq 1 ]; then
+      mulfile=`ls OUT.autotest/ | grep mulliken`
+      if test -z "$mulfile"; then
+              echo "Can't find Mulliken files"
+              exit 1
+      else
+              for mul in $mulfile;
+              do
+                      if ! test -f OUT.autotest/$mul; then
+                              echo "Irregular Mulliken file found"
+                              exit 1
+                      else
+                              sed -i "1,$ s/[a-d]//g" OUT.autotest/$mul
+                              sed -i "1,$ s/[f-z]//g" OUT.autotest/$mul
+                              sed -i "1,$ s/[A-D]//g" OUT.autotest/$mul
+                              sed -i "1,$ s/[F-Z]//g" OUT.autotest/$mul
+                              sed -i "1,$ s/+//g" OUT.autotest/$mul
+                              sed -i "1,$ s/)//g" OUT.autotest/$mul
+                              sed -i "1,$ s/(//g" OUT.autotest/$mul
+                              total_mul=`sum_file OUT.autotest/$mul`
+                              echo "$mul $total_mul" >>$1
 			fi
 		done
 	fi

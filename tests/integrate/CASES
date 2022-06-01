@@ -110,6 +110,7 @@
 211_NO_S2_elec_minus
 212_NO_wfc_out
 212_NO_wfc_ienvelope
+213_NO_mulliken
 220_NO_KP_MD_FIRE
 220_NO_KP_MD_NVE
 220_NO_KP_MD_NVT
@@ -134,8 +135,11 @@
 311_NO_GO_elec_minus
 311_NO_GO_S2_elec_minus
 312_NO_GO_wfc_out
+312_NO_GO_wfc_file
 312_NO_GO_wfc_ienvelope
 312_NO_GO_wfc_istate
+313_NO_GO_mulliken
+314_NO_GO_dm_out
 320_NO_GO_MD_FIRE
 320_NO_GO_MD_NVE
 320_NO_GO_MD_NVT
