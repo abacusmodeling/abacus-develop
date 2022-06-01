@@ -80,7 +80,6 @@ public:
 		if(i==0) s=bx;
 		else if(i==1) s=by;
 		else if(i==2) s=bz;
-		int ns = 0;
 	
         // increase ibox[i] by 1 until it is totally factorizable by (2,3,5,7) 
         do

@@ -34,7 +34,7 @@ void PW_Basis_K:: real2recip(const std::complex<double> * in, std::complex<doubl
     if(add)
     for(int igl = 0 ; igl < npwk ; ++igl)
     {
-        out[igl] += factor * this->ft.aux1[this->igl2isz_k[igl+startig]] / double(this->nxyz);
+        out[igl] += factor / double(this->nxyz) * this->ft.aux1[this->igl2isz_k[igl+startig]];
     }
     else
     for(int igl = 0 ; igl < npwk ; ++igl)
@@ -81,7 +81,7 @@ void PW_Basis_K:: real2recip(const double * in, std::complex<double> * out, cons
     if(add)
     for(int igl = 0 ; igl < npwk ; ++igl)
     {
-        out[igl] += factor * this->ft.aux1[this->igl2isz_k[igl+startig]] / double(this->nxyz);
+        out[igl] += factor / double(this->nxyz) * this->ft.aux1[this->igl2isz_k[igl+startig]];
     }
     else
     for(int igl = 0 ; igl < npwk ; ++igl)
@@ -208,7 +208,7 @@ void PW_Basis_K:: real2recip(const std::complex<float> * in, std::complex<float>
     if(add)
     for(int igl = 0 ; igl < npwk ; ++igl)
     {
-        out[igl] += factor * this->ft.auxf1[this->igl2isz_k[igl+startig]] / float(this->nxyz);
+        out[igl] += factor / float(this->nxyz) * this->ft.auxf1[this->igl2isz_k[igl+startig]];
     }
     else
     for(int igl = 0 ; igl < npwk ; ++igl)
@@ -248,7 +248,7 @@ void PW_Basis_K:: real2recip(const float * in, std::complex<float> * out, const 
     if(add)
     for(int igl = 0 ; igl < npwk ; ++igl)
     {
-        out[igl] += factor * this->ft.auxf1[this->igl2isz_k[igl+startig]] / float(this->nxyz);
+        out[igl] += factor / float(this->nxyz) * this->ft.auxf1[this->igl2isz_k[igl+startig]];
     }
     else
     for(int igl = 0 ; igl < npwk ; ++igl)

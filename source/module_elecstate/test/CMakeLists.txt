@@ -88,7 +88,6 @@ add_test(NAME EState_psiToRho_lcao_parallel
     ../../module_pw/pw_distributeg_method2.cpp
     ../../module_pw/pw_distributer.cpp 
     ../../module_pw/pw_init.cpp 
-    ../../module_pw/pw_operation.cpp 
     ../../module_pw/pw_transform.cpp 
     ../../module_pw/pw_transform_k.cpp 
   )

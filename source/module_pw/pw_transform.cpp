@@ -36,7 +36,7 @@ void PW_Basis:: real2recip(const std::complex<double> * in, std::complex<double>
     if(add)
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] += factor * this->ft.aux1[this->ig2isz[ig]] / double(this->nxyz);
+        out[ig] += factor / double(this->nxyz) * this->ft.aux1[this->ig2isz[ig]];
     }
     else
     for(int ig = 0 ; ig < this->npw ; ++ig)
@@ -85,7 +85,7 @@ void PW_Basis:: real2recip(const double * in, std::complex<double> * out, const 
     if(add)
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] += factor * this->ft.aux1[this->ig2isz[ig]] / double(this->nxyz);
+        out[ig] += factor / double(this->nxyz) * this->ft.aux1[this->ig2isz[ig]];
     }
     else
     for(int ig = 0 ; ig < this->npw ; ++ig)
@@ -221,7 +221,7 @@ void PW_Basis:: real2recip(const std::complex<float> * in, std::complex<float> *
     if(add)
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] += factor * this->ft.auxf1[this->ig2isz[ig]] / float(this->nxyz);
+        out[ig] += factor / float(this->nxyz) * this->ft.auxf1[this->ig2isz[ig]];
     }
     else
     for(int ig = 0 ; ig < this->npw ; ++ig)
@@ -269,7 +269,7 @@ void PW_Basis:: real2recip(const float * in, std::complex<float> * out, const bo
     if(add)
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] += factor * this->ft.auxf1[this->ig2isz[ig]] / float(this->nxyz);
+        out[ig] += factor / float(this->nxyz) * this->ft.auxf1[this->ig2isz[ig]];
     }
     else
     for(int ig = 0 ; ig < this->npw ; ++ig)

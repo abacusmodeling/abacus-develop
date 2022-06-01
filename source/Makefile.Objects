@@ -268,7 +268,6 @@ pw_distributeg_method1.o\
 pw_distributeg_method2.o\
 pw_distributer.o\
 pw_init.o\
-pw_operation.o\
 pw_transform.o\
 pw_transform_k.o
 
