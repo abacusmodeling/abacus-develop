@@ -73,7 +73,7 @@ void shape_gradn(const complex<double> *PS_TOTN, PW_Basis &pw, double *eprime)
     delete[] PS_TOTN_real;
 }
 
-void createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *PS_TOTN, double *vwork)
+void surchem::createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *PS_TOTN, double *vwork)
 {
     ModuleBase::Vector3<double> *nablan = new ModuleBase::Vector3<double>[pwb.nrxx];
     ModuleBase::GlobalFunc::ZEROS(nablan, pwb.nrxx);
@@ -122,7 +122,7 @@ void createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *P
     // quantum surface area, integral of (gamma*A / n) * |\nabla n|
     //=term1 * sqrt_nablan_2
     //-------------------------------------------------------------
-    double qs = 0;
+    qs = 0;
 
     for (int ir = 0; ir < pwb.nrxx; ir++)
     {
@@ -136,7 +136,7 @@ void createcavity(const UnitCell &ucell, PW_Basis &pwb, const complex<double> *P
     // cavitation energy
     //-------------------------------------------------------------
 
-    double Ael = surchem::cal_Acav(ucell, pwb, qs);
+    // double Ael = cal_Acav(ucell, pwb);
 
     //  packs the real array into a complex one
     //  to G space
@@ -176,17 +176,17 @@ ModuleBase::matrix surchem::cal_vcav(const UnitCell &ucell, PW_Basis &pwb, const
     ModuleBase::TITLE("surchem", "cal_vcav");
     ModuleBase::timer::tick("surchem", "cal_vcav");
 
-    double *Vcav = new double[pwb.nrxx];
-    ModuleBase::GlobalFunc::ZEROS(Vcav, pwb.nrxx);
+    double *tmp_Vcav = new double[pwb.nrxx];
+    ModuleBase::GlobalFunc::ZEROS(tmp_Vcav, pwb.nrxx);
 
-    createcavity(ucell, pwb, PS_TOTN, Vcav);
+    createcavity(ucell, pwb, PS_TOTN, tmp_Vcav);
 
-    ModuleBase::matrix v(nspin, pwb.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(Vcav.c, nspin * pwb.nrxx);
     if (nspin == 4)
     {
         for (int ir = 0; ir < pwb.nrxx; ir++)
         {
-            v(0, ir) += Vcav[ir];
+            Vcav(0, ir) += tmp_Vcav[ir];
         }
     }
     else
@@ -195,11 +195,12 @@ ModuleBase::matrix surchem::cal_vcav(const UnitCell &ucell, PW_Basis &pwb, const
         {
             for (int ir = 0; ir < pwb.nrxx; ir++)
             {
-                v(is, ir) += Vcav[ir];
+                Vcav(is, ir) += tmp_Vcav[ir];
             }
         }
     }
-    delete[] Vcav;
+
+    delete[] tmp_Vcav;
     ModuleBase::timer::tick("surchem", "cal_vcav");
-    return v;
+    return Vcav;
 }

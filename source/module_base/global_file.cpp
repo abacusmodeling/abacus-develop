@@ -128,20 +128,20 @@ void ModuleBase::Global_File::make_dir_out(
     if(out_alllog)
     {
 	    ss << "running_" << calculation << "_" << rank + 1;
-	    open_log(GlobalV::ofs_running, ss.str(), restart);
+	    open_log(GlobalV::ofs_running, ss.str(), calculation, restart);
     }
     else
     {
 	    if(rank==0)
 	    {
 		    ss << "running_" << calculation;
-		    open_log(GlobalV::ofs_running, ss.str(), restart);
+		    open_log(GlobalV::ofs_running, ss.str(), calculation, restart);
 	    }
     }
 
     if(rank==0)
     {
-	    open_log(GlobalV::ofs_warning, "warning", restart);
+	    open_log(GlobalV::ofs_warning, "warning", calculation, restart);
     }
     return;
 }
@@ -159,7 +159,7 @@ void ModuleBase::Global_File::make_dir_atom(const std::string &label)
     return;
 }
 
-void ModuleBase::Global_File::open_log(std::ofstream &ofs, const std::string &fn, const bool &restart)
+void ModuleBase::Global_File::open_log(std::ofstream &ofs, const std::string &fn, const std::string &calculation, const bool &restart)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLE :
@@ -168,7 +168,7 @@ void ModuleBase::Global_File::open_log(std::ofstream &ofs, const std::string &fn
     std::stringstream ss;
     ss << GlobalV::global_out_dir << fn << ".log";
 
-    if(fn == "running_md" && restart)
+    if((calculation == "md" || calculation == "sto-md") && restart)
     {
         ofs.open( ss.str(), ios::app );
     }
