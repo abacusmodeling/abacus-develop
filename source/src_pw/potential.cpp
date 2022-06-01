@@ -61,6 +61,11 @@ void Potential::allocate(const int nrxx)
     this->vnew.create(GlobalV::NSPIN, nrxx);
     ModuleBase::Memory::record("Potential", "vnew", GlobalV::NSPIN * nrxx, "double");
 
+    if (GlobalV::imp_sol)
+    {
+        GlobalC::solvent_model.allocate(nrxx, GlobalV::NSPIN);
+    }
+
     return;
 }
 
@@ -352,7 +357,12 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
         v += H_Hartree_pw::v_hartree(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
         if (GlobalV::imp_sol)
         {
-            v += surchem::v_correction(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
+            v += GlobalC::solvent_model.v_correction(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, rho_in);
+
+            // test energy outside
+            cout << "energy Outside: " << endl;
+            GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::pw);
+            GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::pw);
         }
     }
 

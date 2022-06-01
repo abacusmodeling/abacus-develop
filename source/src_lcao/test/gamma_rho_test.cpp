@@ -7,7 +7,7 @@
 #include "gamma_rho_mock.h"
 
 /***************************************************************
-*  unit test of functions in src_lcao/gint_gamma_rho.cpp
+*  unit test of functions in module_gint/gint_gamma_rho.cpp
 ****************************************************************/
 
 /**

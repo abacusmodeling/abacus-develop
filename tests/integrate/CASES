@@ -29,6 +29,9 @@
 106_PW_PU_chargemixing
 107_PW_OB_outputbands
 107_PW_OD_outputdos
+107_PW_OBOD_MemSaver
+107_PW_outWfcR
+107_PW_outWfcPw
 108_PW_RE
 108_PW_RE_MB
 108_PW_RE_MG
@@ -108,6 +111,7 @@
 211_NO_S2_elec_minus
 212_NO_wfc_out
 212_NO_wfc_ienvelope
+213_NO_mulliken
 220_NO_KP_MD_FIRE
 220_NO_KP_MD_NVE
 220_NO_KP_MD_NVT
@@ -132,7 +136,11 @@
 311_NO_GO_elec_minus
 311_NO_GO_S2_elec_minus
 312_NO_GO_wfc_out
+312_NO_GO_wfc_file
 312_NO_GO_wfc_ienvelope
+312_NO_GO_wfc_istate
+313_NO_GO_mulliken
+314_NO_GO_dm_out
 320_NO_GO_MD_FIRE
 320_NO_GO_MD_NVE
 320_NO_GO_MD_NVT

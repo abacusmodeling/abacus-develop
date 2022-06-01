@@ -30,7 +30,7 @@ namespace Global_File
 		//const bool out_alllog = false);
 	
 	void make_dir_atom(const std::string &label);
-	void open_log ( std::ofstream &ofs, const std::string &fn, const bool &restart);
+	void open_log ( std::ofstream &ofs, const std::string &fn, const std::string &calculation, const bool &restart);
 	void close_log( std::ofstream &ofs, const std::string &fn);
 	void close_all_log(const int rank, const bool out_alllog = false);
 }

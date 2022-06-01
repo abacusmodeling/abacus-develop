@@ -57,7 +57,7 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     ModuleBase::TITLE("surchem", "cal_vel");
     ModuleBase::timer::tick("surchem", "cal_vel");
 
-    double *TOTN_real = new double[pwb.nrxx];
+    // double *TOTN_real = new double[pwb.nrxx];
     GlobalC::UFFT.ToRealSpace(TOTN, TOTN_real);
 
     // -4pi * TOTN(G)
@@ -80,8 +80,8 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     complex<double> *Sol_phi0 = new complex<double>[pwb.ngmc];
     int ncgsol = 0;
 
-    double *Vel = new double[pwb.nrxx];
-    ModuleBase::GlobalFunc::ZEROS(Vel, pwb.nrxx);
+    double *tmp_Vel = new double[pwb.nrxx];
+    ModuleBase::GlobalFunc::ZEROS(tmp_Vel, pwb.nrxx);
 
     // Calculate Sol_phi with epsilon.
     ncgsol = 0;
@@ -93,39 +93,37 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
 
     double *phi_tilda_R = new double[pwb.nrxx];
     double *phi_tilda_R0 = new double[pwb.nrxx];
-    double *delta_phi_R = new double[pwb.nrxx];
+    // double *delta_phi_R = new double[pwb.nrxx];
 
     GlobalC::UFFT.ToRealSpace(Sol_phi, phi_tilda_R);
     GlobalC::UFFT.ToRealSpace(Sol_phi0, phi_tilda_R0);
 
-    // the 1st item of Vel
+    // the 1st item of tmp_Vel
     for (int i = 0; i < pwb.nrxx; i++)
     {
-        delta_phi_R[i] = phi_tilda_R[i] - phi_tilda_R0[i];
-        Vel[i] += delta_phi_R[i];
+        delta_phi[i] = phi_tilda_R[i] - phi_tilda_R0[i];
+        tmp_Vel[i] += delta_phi[i];
     }
 
     // calculate Ael
-    double Ael = cal_Ael(cell, pwb, TOTN_real, delta_phi_R);
+    // double Ael = cal_Ael(cell, pwb);
 
-    // the 2nd item of Vel
-    double *Vel2 = new double[pwb.nrxx];
-    ModuleBase::GlobalFunc::ZEROS(Vel2, pwb.nrxx);
-
-    eps_pot(PS_TOTN_real, Sol_phi, pwb, epsilon, Vel2);
+    // the 2nd item of tmp_Vel
+    eps_pot(PS_TOTN_real, Sol_phi, pwb, epsilon, epspot);
 
     for (int i = 0; i < pwb.nrxx; i++)
     {
-        Vel[i] += Vel2[i];
+        tmp_Vel[i] += epspot[i];
     }
 
-    ModuleBase::matrix v(nspin, pwb.nrxx);
+    // ModuleBase::matrix v(nspin, pwb.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(Vel.c, nspin * pwb.nrxx);
 
     if (nspin == 4)
     {
         for (int ir = 0; ir < pwb.nrxx; ir++)
         {
-            v(0, ir) += Vel[ir];
+            Vel(0, ir) += tmp_Vel[ir];
         }
     }
     else
@@ -134,7 +132,7 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
         {
             for (int ir = 0; ir < pwb.nrxx; ir++)
             {
-                v(is, ir) += Vel[ir];
+                Vel(is, ir) += tmp_Vel[ir];
             }
         }
     }
@@ -145,13 +143,13 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     delete[] B;
     delete[] epsilon;
     delete[] epsilon0;
-    delete[] Vel;
-    delete[] Vel2;
-    delete[] TOTN_real;
+    delete[] tmp_Vel;
+    // delete[] Vel2;
+    // delete[] TOTN_real;
     delete[] phi_tilda_R;
     delete[] phi_tilda_R0;
-    delete[] delta_phi_R;
+    // delete[] delta_phi_R;
 
     ModuleBase::timer::tick("surchem", "cal_vel");
-    return v;
+    return Vel;
 }
