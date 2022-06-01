@@ -37,6 +37,7 @@ deepks_out_labels=`grep deepks_out_labels INPUT | awk '{print $2}' | sed s/[[:sp
 deepks_bandgap=`grep deepks_bandgap INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 has_lowf=`grep out_wfc_lcao INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 has_wfc_r=`grep out_wfc_r INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+has_wfc_pw=`grep out_wfc_pw INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 out_dm=`grep out_dm INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 out_mul=`grep out_mul INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 gamma_only=`grep gamma_only INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
@@ -134,6 +135,27 @@ if ! test -z "$has_wfc_r"  && [ $has_wfc_r -eq 1 ]; then
 		fi
 	done
 fi	
+
+# echo "$has_wfc_pw" ## test out_wfc_pw > 0
+if ! test -z "$has_wfc_pw"  && [ $has_wfc_pw -eq 1 ]; then
+	if [[ ! -f OUT.autotest/WAVEFUNC1.txt ]];then
+		echo "Can't find file OUT.autotest/WAVEFUNC1.txt"
+		exit 1
+	fi
+	awk 'BEGIN {max=0;read=0;band=1}
+	{
+		if(read==0 && $2 == "Band" && $3 == band){read=1}
+		else if(read==1 && $2 == "Band" && $3 == band)
+			{printf"Max_wfc_%d %.4f\n",band,max;read =0;band+=1;max=0}
+		else if(read==1)
+			{
+				for(i=1;i<=NF;i++) 
+				{
+					if(sqrt($i*$i)>max) {max=sqrt($i*$i)}
+				}
+			} 
+	}' OUT.autotest/WAVEFUNC1.txt >> $1
+fi
 
 # echo "$has_lowf" ## test out_wfc_lcao > 0
 if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
