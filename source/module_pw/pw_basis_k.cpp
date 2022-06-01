@@ -36,8 +36,7 @@ void PW_Basis_K:: initparameters(
         if(kmod > kmaxmod)  kmaxmod = kmod;
     }
     // MPI_Allreduce(MPI_IN_PLACE, &kmaxmod, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
-    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
-    this->gk_ecut = gk_ecut_in/tpiba2;
+    this->gk_ecut = gk_ecut_in/this->tpiba2;
     this->ggecut = pow(sqrt(this->gk_ecut) + kmaxmod, 2);
 
     this->gamma_only = gamma_only_in;

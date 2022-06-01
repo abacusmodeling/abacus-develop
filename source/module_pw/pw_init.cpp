@@ -22,6 +22,8 @@ void PW_Basis:: initgrids(
 {
     //init lattice
     this->lat0 = lat0_in;
+    this->tpiba = ModuleBase::TWO_PI / this->lat0;
+    this->tpiba2 = this->tpiba*this->tpiba;
     this->latvec = latvec_in;
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
@@ -32,9 +34,8 @@ void PW_Basis:: initgrids(
 
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
-    //------------------------------------------------------------
-    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
-    const double gridecut_lat = gridecut / tpiba2;
+    //-----------------------------------------------------------
+    const double gridecut_lat = gridecut / this->tpiba2;
     ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];// ibox[i] are the minimal FFT dimensions,
     
@@ -153,6 +154,8 @@ void PW_Basis:: initgrids(
 )
 {
     this->lat0 = lat0_in;
+    this->tpiba = ModuleBase::TWO_PI / this->lat0;
+    this->tpiba2 = this->tpiba*this->tpiba;
     this->latvec = latvec_in;
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
@@ -186,8 +189,7 @@ void PW_Basis:: initparameters(
     this->fftnxy = this->fftnx * this->fftny;
     this->fftnxyz = this->fftnxy * this->fftnz;
 
-    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
-    this->ggecut = pwecut_in / tpiba2;
+    this->ggecut = pwecut_in / this->tpiba2;
     this->distribution_type = distribution_type_in;
 }
 

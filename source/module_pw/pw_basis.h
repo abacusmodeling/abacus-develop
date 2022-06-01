@@ -148,6 +148,8 @@ public:
     bool gamma_only=false;	// only half g are used.
     double ggecut=0;    //Energy cut off for g^2/2, unit in 1/lat0^2, ggecut=ecutwfc(Ry)*lat0^2/4pi^2
     double lat0=1;     //unit length for lattice, unit in bohr
+    double tpiba=1;    //  2pi/lat0
+    double tpiba2=1;   //  4pi^2/lat0^2
     ModuleBase::Matrix3 latvec; // Unitcell lattice vectors, unit in lat0
     ModuleBase::Matrix3 G; // reciprocal lattice vector, unit in 1/lat0
     ModuleBase::Matrix3 GT; // traspose of G
