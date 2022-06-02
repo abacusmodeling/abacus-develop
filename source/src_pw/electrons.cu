@@ -331,7 +331,7 @@ void Electrons::self_consistent(const int &istep)
             //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
-            //WF_io::write_wfc2( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+            //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
             //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 

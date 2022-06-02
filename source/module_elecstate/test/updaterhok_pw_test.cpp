@@ -54,7 +54,7 @@ public:
 /******************************
  * read wavefunction
  ******************************/
-void read_wfc2(const std::string& fn, psi::Psi<std::complex<double>> &psi, ModuleBase::Vector3<double>* gkk)
+void read_wfc(const std::string& fn, psi::Psi<std::complex<double>> &psi)
 {
     std::string* wfilename;
     wfilename = new std::string[GlobalC::kv.nkstot];
@@ -80,7 +80,7 @@ void read_wfc2(const std::string& fn, psi::Psi<std::complex<double>> &psi, Modul
         // read gkk
         for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
         {
-            ifs >> gkk[ig].x >> gkk[ig].y >> gkk[ig].z;
+            ifs >> GlobalC::wfcpw->getgcar(ik,ig).x >> GlobalC::wfcpw->getgcar(ik,ig).y >> GlobalC::wfcpw->getgcar(ik,ig).z;
         }
         getline(ifs, tmpstring);
         getline(ifs, tmpstring);
@@ -330,7 +330,7 @@ TEST_F(EState,RhoPW)
     std::stringstream ssw;
     ssw <<GlobalV::global_out_dir<< "WAVEFUNC";
     // we need to supply out_wfc_pw here
-    read_wfc2(ssw.str(), psi[0], GlobalC::rhopw->gcar);
+    read_wfc(ssw.str(), psi[0]);
 
     // copy data from old wf.evc to new evc(an object of Psi)
     evc.resize(GlobalC::kv.nks,GlobalV::NBANDS,GlobalC::wf.npwx);

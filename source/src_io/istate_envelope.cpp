@@ -127,7 +127,7 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf
             ssw << GlobalV::global_out_dir << "WAVEFUNC";
             std::cout << " write G-space wavefunction into \"" <<
                 GlobalV::global_out_dir << "/" << ssw.str() << "\" files." << std::endl;
-            WF_io::write_wfc2(ssw.str(), pw_wfc_g, GlobalC::rhopw->gcar);
+            WF_io::write_wfc(ssw.str(), pw_wfc_g, &GlobalC::kv, GlobalC::wfcpw);
         }
         if (out_wfc_r)
         {
@@ -247,7 +247,7 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, in
             ssw << GlobalV::global_out_dir << "WAVEFUNC";
             std::cout << " write G-space wavefunction into \"" <<
                 GlobalV::global_out_dir << "/" << ssw.str() << "\" files." << std::endl;
-            WF_io::write_wfc2(ssw.str(), pw_wfc_g, GlobalC::rhopw->gcar);
+            WF_io::write_wfc(ssw.str(), pw_wfc_g, &GlobalC::kv, GlobalC::wfcpw);
         }
         if (out_wf_r)
         {
