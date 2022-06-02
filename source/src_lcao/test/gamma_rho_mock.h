@@ -823,10 +823,18 @@ void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
     GlobalC::rhopw = new ModulePW::PW_Basis_Big(); 
     ModulePW::PW_Basis_Big* tmp = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
     tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
+	 GlobalC::wfcpw = new ModulePW::PW_Basis_K_Big(); 
+    ModulePW::PW_Basis_K_Big* tmp2 = static_cast<ModulePW::PW_Basis_K_Big*>(GlobalC::wfcpw);
+    tmp2->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
     GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc, 1, 0);
     GlobalC::rhopw->initparameters(false, INPUT.ecutrho);
 	GlobalC::rhopw->setuptransform();
-
+	GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
+                                1, 0);
+    GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+    GlobalC::wfcpw->setuptransform();
+    for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)   GlobalC::kv.ngk[ik] = GlobalC::wfcpw->npwk[ik];
+	
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
 
     ORB_control orb_con(GlobalV::GAMMA_ONLY_LOCAL,
