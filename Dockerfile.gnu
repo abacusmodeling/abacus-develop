@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git g++ gfortran libssl-dev make cmake vim wget bc unzip \
+RUN apt-get update && apt-get install -y --no-install-recommends git g++ gfortran libssl-dev make cmake vim wget bc unzip python\
     && apt-get install -y --no-install-recommends mpich libmpich-dev
 
 ENV GIT_SSL_NO_VERIFY 1
