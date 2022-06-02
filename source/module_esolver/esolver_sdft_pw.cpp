@@ -161,7 +161,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 			Symmetry_rho srho;
 			for(int is=0; is < GlobalV::NSPIN; is++)
 			{
-				srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+				srho.begin(is, GlobalC::CHR,GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
 			}
 		}
 		else
