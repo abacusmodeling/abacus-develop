@@ -12,7 +12,7 @@ class ElecStatePW : public ElecState
   public:
     ElecStatePW(ModulePW::PW_Basis_K *wfc_basis_in, Charge* chg_in, K_Vectors *pkv_in, int nbands_in) : basis(wfc_basis_in)
     {
-        init(chg_in, pkv_in,basis->nks, nbands_in);
+        init(chg_in, pkv_in, pkv_in->nks, nbands_in);
         this->classname = "ElecStatePW";
     }
     // void init(Charge* chg_in):charge(chg_in){} override;

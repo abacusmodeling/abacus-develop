@@ -26,7 +26,7 @@
 #include "src_pw/use_fft.h"
 #include "src_pw/wavefunc.h"
 #include "src_pw/wf_atomic.h"
-#include "module_pw/pw_basis.h"
+#include "module_pw/pw_basis_k.h"
 
 #ifdef __LCAO
 #include "module_neighbor/sltk_atom_arrange.h"
@@ -220,6 +220,7 @@ Parallel_Grid Pgrid;
 Use_FFT UFFT;
 PW_Basis pw;
 ModulePW::PW_Basis* rhopw;
+ModulePW::PW_Basis_K* wfcpw;
 pseudopot_cell_vnl ppcell;
 Hamilt hm;
 energy en;

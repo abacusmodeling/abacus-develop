@@ -23,7 +23,7 @@
 #include "src_pw/VNL_in_pw.h"
 #include "src_pw/energy.h"
 #include "module_neighbor/sltk_atom_arrange.h"
-#include "module_pw/pw_basis.h"
+#include "module_pw/pw_basis_k.h"
 
 Magnetism::Magnetism(){}
 Magnetism::~Magnetism(){}
@@ -63,6 +63,7 @@ namespace GlobalC
     UnitCell_pseudo ucell;
     pseudopot_cell_vnl ppcell;
     ModulePW::PW_Basis* rhopw;
+    ModulePW::PW_Basis_K* wfcpw;
     wavefunc wf;
     Charge CHR;
     Grid_Driver GridD(GlobalV::test_deconstructor, GlobalV::test_grid_driver,GlobalV::test_grid);

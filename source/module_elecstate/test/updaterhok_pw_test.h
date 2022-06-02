@@ -26,7 +26,7 @@
 #include "input.h"
 #include "src_pw/energy.h"
 #include "module_xc/xc_functional.h"
-#include "module_pw/pw_basis.h"
+#include "module_pw/pw_basis_k.h"
 
 bool ModuleSymmetry::Symmetry::symm_flag;
 
@@ -110,6 +110,7 @@ Parallel_Grid Pgrid;
 Use_FFT UFFT;
 PW_Basis pw;
 ModulePW::PW_Basis* rhopw;
+ModulePW::PW_Basis_K* wfcpw;
 pseudopot_cell_vnl ppcell;
 Hamilt hm;
 energy en;
