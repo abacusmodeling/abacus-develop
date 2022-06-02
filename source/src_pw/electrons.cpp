@@ -447,7 +447,8 @@ void Electrons::c_bands(const int &istep)
         {
             for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = std::max(1.0, GlobalC::wf.g2kin[ig]);
+                double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2;
+                h_diag[ig] = std::max(1.0, g2kin);
                 if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }
@@ -455,7 +456,8 @@ void Electrons::c_bands(const int &istep)
         {
             for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = 1 + GlobalC::wf.g2kin[ig] + sqrt( 1 + (GlobalC::wf.g2kin[ig] - 1) * (GlobalC::wf.g2kin[ig] - 1));
+                double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2;
+                h_diag[ig] = 1 + g2kin + sqrt( 1 + (g2kin - 1) * (g2kin - 1));
                 if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }

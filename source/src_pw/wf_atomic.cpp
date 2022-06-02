@@ -276,7 +276,7 @@ void WF_atomic::atomic_wfc
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
 			//std::cout << "\n it = " << it << " ia = " << ia << std::endl;
-            std::complex<double> *sk = this->get_sk(ik, it, ia);
+            std::complex<double> *sk = this->get_sk(ik, it, ia,GlobalC::wfcpw);
             //-------------------------------------------------------
             // Calculate G space 3D wave functions
             //-------------------------------------------------------
@@ -485,7 +485,48 @@ void WF_atomic::atomic_wfc
     return;
 } //end subroutine atomic_wfc
 
-void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+#ifdef __MPI
+void stick_to_pool(double *stick, const int &ir, double *out, ModulePW::PW_Basis_K* wfc_basis)
+{	
+	//ModuleBase::TITLE("Parallel_Grid","zpiece_to_all");
+	MPI_Status ierror;
+
+    int is = 0;
+    for(is = 0 ; is < wfc_basis->nst; ++is)
+    {
+        if(wfc_basis->is2fftixy[is] == ir)
+        {
+            break;
+        }
+    }
+	const int ip = wfc_basis->fftixy2ip[ir];
+    const int nz = wfc_basis->nz;
+
+	if(ip == 0 && GlobalV::RANK_IN_POOL ==0)
+	{
+		for(int iz=0; iz<nz; iz++)
+		{
+			out[is*nz+iz] = stick[iz];
+		}
+	}
+	else if(ip == GlobalV::RANK_IN_POOL )
+	{
+		MPI_Recv(stick, nz, MPI_DOUBLE, 0, ir, POOL_WORLD,&ierror);
+		for(int iz=0; iz<nz; iz++)
+		{
+			out[is*nz+iz] = stick[iz];
+		}
+	}
+	else if(GlobalV::RANK_IN_POOL==0)
+	{
+		MPI_Send(stick, nz, MPI_DOUBLE, ip, ir, POOL_WORLD);
+	}
+
+	return;	
+}
+#endif
+
+void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik, ModulePW::PW_Basis_K* wfc_basis)
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
@@ -500,18 +541,14 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
     if(pw_seed > 0)//qianrui add 2021-8-13
     {
         srand(unsigned(pw_seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
-        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
-        int nrxx = GlobalC::pw.nrxx;
-        int nz = GlobalC::pw.ncz;
-        int *GR_index = new int [ng];
-        for (int ig = 0;ig < ng;ig++)
-        {
-            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
-        }
+        const int nxy = wfc_basis->fftnxy;
+        const int nz = wfc_basis->nz;
+        const int nstnz = wfc_basis->nst*nz;
+
         double *stickrr = new double[nz];
         double *stickarg = new double[nz];
-        double *tmprr = new double[nrxx];
-        double *tmparg = new double[nrxx];
+        double *tmprr = new double[nstnz];
+        double *tmparg = new double[nstnz];
         for (int iw = iw_start ;iw < iw_end;iw++)
         {
             int startig = 0;
@@ -520,7 +557,7 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
             
 	            for(int ir=0; ir < nxy; ir++)
 	            {
-                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+                    if(wfc_basis->fftixy2ip[ir] < 0) continue;
 	            	if(GlobalV::RANK_IN_POOL==0)
 	            	{
 	            		for(int iz=0; iz<nz; iz++)
@@ -529,16 +566,16 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
                             stickarg[ iz ] = std::rand()/double(RAND_MAX);
 	            		}
 	            	}
-	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
-                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            	stick_to_pool(stickrr, ir, tmprr, wfc_basis);
+                    stick_to_pool(stickarg, ir, tmparg, wfc_basis);
 	            }
 
                 for (int ig = 0;ig < ng;ig++)
                 {
-                    const double rr = tmprr[GR_index[ig]];
-                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
-                    ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
-                    psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+                    const double rr = tmprr[wfc_basis->getigl2isz(ik,ig)];
+                    const double arg= ModuleBase::TWO_PI * tmparg[wfc_basis->getigl2isz(ik,ig)];
+                    const double gk2 = GlobalC::wfcpw->getgk2(ik,ig);
+                    psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (gk2 + 1.0);
                 }
                 startig += npwx;
             }
@@ -547,7 +584,6 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
         delete[] stickarg;
         delete[] tmprr;
         delete[] tmparg;
-        delete[] GR_index;
     }
     else
     {
@@ -564,15 +600,15 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
             {
                 const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
                 const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
-                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
-                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+                const double gk2 = GlobalC::wfcpw->getgk2(ik,ig);
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (gk2 + 1.0);
             }
             if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
             {
                 const double rr = std::rand()/double(RAND_MAX);
                 const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
-                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
-                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+                const double gk2 = GlobalC::wfcpw->getgk2(ik,ig-this->npwx);
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (gk2 + 1.0);
             }
         }
 #ifdef __MPI
@@ -584,7 +620,7 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
     return;
 }
 
-void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik, ModulePW::PW_Basis_K* wfc_basis)const
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
@@ -593,27 +629,22 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
     if(pw_seed > 0)//qianrui add 2021-8-13
     {
         srand(unsigned(pw_seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
-        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
-        int nrxx = GlobalC::pw.nrxx;
-        int nz = GlobalC::pw.ncz;
-        int *GR_index = new int [ng];
-        for (int ig = 0;ig < ng;ig++)
-        {
-            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
-        }
+        const int nxy = wfc_basis->fftnxy;
+        const int nz = wfc_basis->nz;
+        const int nstnz = wfc_basis->nst*nz;
+
         double *stickrr = new double[nz];
         double *stickarg = new double[nz];
-        double *tmprr = new double[nrxx];
-        double *tmparg = new double[nrxx];
+        double *tmprr = new double[nstnz];
+        double *tmparg = new double[nstnz];
         for (int iw = iw_start ;iw < iw_end;iw++)
         {
             int startig = 0;
             for(int ipol = 0 ; ipol < GlobalV::NPOL ; ++ipol)
             {
-            
 	            for(int ir=0; ir < nxy; ir++)
 	            {
-                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+                    if(wfc_basis->fftixy2ip[ir] < 0) continue;
 	            	if(GlobalV::RANK_IN_POOL==0)
 	            	{
 	            		for(int iz=0; iz<nz; iz++)
@@ -622,14 +653,14 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
                             stickarg[ iz ] = std::rand()/double(RAND_MAX);
 	            		}
 	            	}
-	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
-                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            	stick_to_pool(stickrr, ir, tmprr, wfc_basis);
+                    stick_to_pool(stickarg, ir, tmparg, wfc_basis);
 	            }
 
                 for (int ig = 0;ig < ng;ig++)
                 {
-                    const double rr = tmprr[GR_index[ig]];
-                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
+                    const double rr = tmprr[wfc_basis->ig2isz[ig]];
+                    const double arg= ModuleBase::TWO_PI * tmparg[wfc_basis->ig2isz[ig]];
                     psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
                 }
                 startig += npwx;
@@ -639,7 +670,6 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
         delete[] stickarg;
         delete[] tmprr;
         delete[] tmparg;
-        delete[] GR_index;
     }
     else
     {

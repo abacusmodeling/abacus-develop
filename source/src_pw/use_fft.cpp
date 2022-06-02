@@ -31,63 +31,39 @@ void Use_FFT::allocate(void)
     return;
 }
 
-void Use_FFT::RoundTrip(
-    const std::complex<double> *psi,
-    const double *vr,
-    const int *fft_index,
-    std::complex<double> *psic)
-{
-	// (1) set value
-    for (int ig=0; ig< GlobalC::wf.npw; ig++)
-    {
-        psic[ fft_index[ig]  ] = psi[ig];
-    }
-
-	// (2) fft to real space and doing things.
-    GlobalC::pw.FFT_wfc.FFT3D( psic, 1);
-    for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
-    {
-        psic[ir] *= vr[ir];
-    }
-
-	// (3) fft back to G space.
-    GlobalC::pw.FFT_wfc.FFT3D( psic, -1);
-    return;
-}
-
 void Use_FFT::ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
     rho_basis->recip2real(&vg(is,0), vr);
     return;
 }
 
-void Use_FFT::ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir)
-{
-	ModuleBase::GlobalFunc::ZEROS(psir, GlobalC::pw.nrxx);
-	for(int ig=0; ig<GlobalC::wf.npw; ig++)
-	{
-		psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = psig[ig];
-	}
-	// 1: to real space.
-	GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
+// void Use_FFT::ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir)
+// {
+// 	ModuleBase::GlobalFunc::ZEROS(psir, GlobalC::pw.nrxx);
+// 	for(int ig=0; ig<GlobalC::wf.npw; ig++)
+// 	{
+// 		psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = psig[ig];
+// 	}
+// 	// 1: to real space.
+// 	GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
 
-	return;
-}
+// 	return;
+// }
 
 
-void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir)
-{
-	// (1) set value
-    ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::pw.nrxx );
-    for (int ig=0; ig<GlobalC::wf.npw; ig++)
-    {
-        psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = evc(ib, ig);
-    }
+// void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir)
+// {
+// 	// (1) set value
+//     ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::pw.nrxx );
+//     for (int ig=0; ig<GlobalC::wf.npw; ig++)
+//     {
+//         psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = evc(ib, ig);
+//     }
 
-	// (2) fft and get value
-    GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
-    return;
-}
+// 	// (2) fft and get value
+//     GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
+//     return;
+// }
 
 
 

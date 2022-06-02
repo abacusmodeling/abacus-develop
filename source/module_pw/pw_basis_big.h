@@ -45,7 +45,8 @@ public:
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
     //------------------------------------------------------------
-    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
+    this->tpiba = ModuleBase::TWO_PI / this->lat0;
+    this->tpiba2 = this->tpiba * this->tpiba;
     const double gridecut_lat = gridecut / tpiba2;
     ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];

@@ -20,10 +20,10 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 	int ipol2xy[3][3];
 	double sigma_mgga[3][3];
 
-	gradwfc = new std::complex<double>*[GlobalC::pw.nrxx];
-	crosstaus = new double**[GlobalC::pw.nrxx];
+	gradwfc = new std::complex<double>*[GlobalC::wfcpw->nrxx];
+	crosstaus = new double**[GlobalC::wfcpw->nrxx];
 	
-	for(int ir = 0;ir<GlobalC::pw.nrxx;ir++)
+	for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++)
 	{
 		crosstaus[ir] = new double*[6];
 		gradwfc[ir] = new std::complex<double>[3];
@@ -57,7 +57,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 			{
 				psi[ig] = ppsi[ig];
 			}
-			XC_Functional::grad_wfc(psi, ik, gradwfc, npw);
+			XC_Functional::grad_wfc(psi, ik, gradwfc, GlobalC::wfcpw);
 
 			int ipol = 0;
 			for (int ix = 0; ix < 3; ix++)
@@ -66,7 +66,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 				{
 					ipol2xy[ix][iy]=ipol;
 					ipol2xy[iy][ix]=ipol;
-					for(int ir = 0;ir<GlobalC::pw.nrxx;ir++)
+					for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++)
 					{
 						crosstaus[ir][ipol][current_spin] += 2.0 * w1 * (gradwfc[ir][ix].real() * gradwfc[ir][iy].real() + gradwfc[ir][ix].imag() * gradwfc[ir][iy].imag());
 					}
@@ -77,7 +77,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 		delete[] psi;
 	}//k loop
 #ifdef __MPI
-	for(int l = 0;l<GlobalC::pw.nrxx;l++)
+	for(int l = 0;l<GlobalC::wfcpw->nrxx;l++)
 	{
 		for(int m = 0;m<6;m++)
 		{
@@ -89,7 +89,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 	}
 #endif
 
-	for(int ir = 0;ir<GlobalC::pw.nrxx;ir++)
+	for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++)
 	{
 		delete[] gradwfc[ir];
 	}
@@ -104,7 +104,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 				double delta= 0.0;
 				if(ix==iy) delta=1.0;
 				sigma_mgga[ix][iy] = 0.0;
-				for(int ir = 0;ir<GlobalC::pw.nrxx;ir++)
+				for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++)
 				{
 					double x = GlobalC::pot.vofk(is,ir) * (GlobalC::CHR.kin_r[is][ir] * delta + crosstaus[ir][ipol2xy[ix][iy]][is]);
 					sigma_mgga[ix][iy] += x;
@@ -113,7 +113,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 		}
 	}
 	
-	for(int ir = 0;ir<GlobalC::pw.nrxx;ir++)
+	for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++)
 	{
 		for(int j = 0;j<6;j++)
 		{
@@ -136,7 +136,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 	{
 		for(int j=0;j<3;j++)
 		{
-			sigma(i,j) += sigma_mgga[i][j] / GlobalC::pw.ncxyz;
+			sigma(i,j) += sigma_mgga[i][j] / GlobalC::wfcpw->nxyz;
 		}
 	}
 	ModuleBase::timer::tick("Stress_Func","stress_mgga");

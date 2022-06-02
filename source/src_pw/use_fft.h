@@ -32,8 +32,8 @@ class Use_FFT
 	
 	// From G space to real space. ModuleBase::ComplexMatrix
 	void ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis);
-	void ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir);
-	void ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir);
+	// void ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir);
+	// void ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir);
 	
 	// From G space to real space. charge/MLWF
 	void ToRealSpace(std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis);
@@ -51,11 +51,6 @@ class Use_FFT
 
 	//---------------------------------------------------------------------
 
-	void RoundTrip(
-	    const std::complex<double> *psi,
-		const double *vr,
-		const int *_index,
-		std::complex<double> *psic);
 
 #ifdef __CUDA
 	double2 *d_porter;

@@ -360,7 +360,7 @@ void PW_complement::get_ig2fftw(const int &ngmw, const int &nx, const int &ny, c
 
 
 void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy, const int &ncz,
-                                const ModuleBase::Vector3<double> *ig, int* ig1, int *ig2, int *ig3, int *ig2fftc)
+                                const ModuleBase::Vector3<double> *ig, int *ig2fftc)
 {
     //=================================================================
     // set ig2fftc & ig2fftw with the correct fft correspondence
@@ -369,23 +369,14 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
     // see ggen.f90, set ig2fftc ith the correct fft correspondence Page 4/6
 
     ModuleBase::GlobalFunc::ZEROS(ig2fftc, ngmc);
-    ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
-    ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
-    ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
 
     ModuleBase::Memory::record("PW_complement","ig2fftc",ngmc,"int");
-    ModuleBase::Memory::record("PW_complement","ig1",ngmc,"int");
-    ModuleBase::Memory::record("PW_complement","ig2",ngmc,"int");
-    ModuleBase::Memory::record("PW_complement","ig3",ngmc,"int");
 
     for (int i = 0; i < ngmc;i++)
     {
         int n1 = int(ig[i].x);//ig --> f --> (i,j,k)
         int n2 = int(ig[i].y);
         int n3 = int(ig[i].z);
-        ig1[i] = n1 + ncx;
-        ig2[i] = n2 + ncy;
-        ig3[i] = n3 + ncz;
         if (n1 < 0)n1 = n1 + ncx;
         if (n2 < 0)n2 = n2 + ncy;
         if (n3 < 0)n3 = n3 + ncz;

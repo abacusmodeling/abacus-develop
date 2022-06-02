@@ -33,7 +33,7 @@ wavefunc::~wavefunc()
 void wavefunc::allocate_ekb_wg(const int nks)
 {
     ModuleBase::TITLE("wavefunc","init_local");
-    this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
+    this->npwx = GlobalC::wfcpw->npwk_max;
 
 	// band energies
 	this->ekb = new double*[nks];
@@ -56,21 +56,13 @@ psi::Psi<std::complex<double>>* wavefunc::allocate(const int nks)
 {	
 	ModuleBase::TITLE("wavefunc","allocate");
 
-	this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
+	this->npwx = GlobalC::wfcpw->npwk_max;
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
 
 	assert(npwx > 0);
 	assert(nks > 0);
 
 	// allocate for kinetic energy
-	delete[] g2kin;
-	this->g2kin = new double[npwx];
-#ifdef __CUDA
-	cudaFree(this->d_g2kin);
-	cudaMalloc((void**)&this->d_g2kin, npwx*sizeof(double));
-#endif
-	ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
-	ModuleBase::Memory::record("wavefunc","g2kin",npwx,"double");
 
 	// if use spin orbital, do not double nks but double allocate evc and wanf2.
 	int prefactor = 1;
@@ -253,7 +245,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 	//-------------------------------------------------------------
 	// (2) diago to get GlobalC::wf.ekb, then the weights can be calculated.
 	//-------------------------------------------------------------
-    GlobalC::hm.hpw.allocate(this->npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
+    GlobalC::hm.hpw.allocate(this->npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::wfcpw->nrxx);
 	GlobalC::hm.hpw.init_k(ik);
 
 	//GlobalC::hm.diagH_subspace(ik ,GlobalV::NLOCAL, GlobalV::NBANDS, wvf, wvf, ekb[ik]);
@@ -312,18 +304,18 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, psi::Psi<std::complex<double>> 
 		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
 		if( init_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
 		{
-			this->atomicrandom(wfcatom,0,starting_nw,ik);
+			this->atomicrandom(wfcatom,0,starting_nw,ik, GlobalC::wfcpw);
 		}
 
 		//====================================================
 		// If not enough atomic wfc are available, complete
 		// with random wfcs
 		//====================================================
-		this->random(wfcatom, GlobalC::ucell.natomwfc, nbands, ik);
+		this->random(wfcatom, GlobalC::ucell.natomwfc, nbands, ik, GlobalC::wfcpw);
 	}
 	else if(init_wfc=="random")
 	{
-		this->random(wfcatom,0,nbands,ik);
+		this->random(wfcatom,0,nbands,ik, GlobalC::wfcpw);
 	}
 
 	// (7) Diago with cg method.
@@ -543,7 +535,7 @@ void wavefunc::wfcinit_k(psi::Psi<std::complex<double>>* psi_in)
 						{
 							for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)    // loop over ig
 							{
-								gkqg = GlobalC::pw.get_GPlusK_cartesian(ik, GlobalC::wf.igk(ik, ig)) + qg;
+								gkqg = GlobalC::wfcpw->getgpluskcar(ik,ig) + qg;
 								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
 								{
 									arg = gkqg * Rcar[iw1][iw2][ir] * ModuleBase::TWO_PI;
@@ -783,15 +775,6 @@ void wavefunc::init_after_vc(const int nks, psi::Psi<std::complex<double>>* psi_
     assert(nks > 0);
     assert(GlobalV::NBANDS > 0);
 
-    delete[] g2kin;
-    this->g2kin = new double[this->npwx];   // [npw],kinetic energy
-#ifdef __CUDA
-	cudaFree(this->d_g2kin);
-	cudaMalloc((void**)&this->d_g2kin, this->npwx*sizeof(double));
-#endif
-	ModuleBase::GlobalFunc::ZEROS(g2kin, this->npwx);
-    ModuleBase::Memory::record("wavefunc","g2kin",this->npwx,"double");
-    if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"g2kin allocation","Done");
 
     this->ekb = new double*[nks];
     for(int ik=0; ik<nks; ik++)
@@ -862,18 +845,18 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
 		if( init_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
 		{
-			this->atomicrandom(wfcatom,0,starting_nw,ik);
+			this->atomicrandom(wfcatom,0,starting_nw,ik, GlobalC::wfcpw);
 		}
 
 		//====================================================
 		// If not enough atomic wfc are available, complete
 		// with random wfcs
 		//====================================================
-		this->random(wfcatom, GlobalC::ucell.natomwfc, GlobalV::NBANDS, ik);
+		this->random(wfcatom, GlobalC::ucell.natomwfc, GlobalV::NBANDS, ik, GlobalC::wfcpw);
 	}
 	else if(init_wfc=="random")
 	{
-		this->random(wfcatom,0,GlobalV::NBANDS,ik);
+		this->random(wfcatom,0,GlobalV::NBANDS,ik, GlobalC::wfcpw);
 	}
 
 	// (7) Diago with cg method.

@@ -320,7 +320,7 @@ TEST_F(EState,RhoPW)
     std::stringstream ssw;
     ssw <<GlobalV::global_out_dir<< "WAVEFUNC";
     // we need to supply out_wfc_pw here
-    read_wfc2(ssw.str(), psi[0], GlobalC::pw.gcar);
+    read_wfc2(ssw.str(), psi[0], GlobalC::rhopw->gcar);
 
     // copy data from old wf.evc to new evc(an object of Psi)
     evc.resize(GlobalC::kv.nks,GlobalV::NBANDS,GlobalC::wf.npwx);

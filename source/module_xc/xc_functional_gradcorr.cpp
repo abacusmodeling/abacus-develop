@@ -439,33 +439,33 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, 
 	return;
 }
 
-void XC_Functional::grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw )
+void XC_Functional::grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, ModulePW::PW_Basis_K *wfc_basis)
 {
 	double *kplusg;
-	kplusg = new double[npw];
-	ModuleBase::GlobalFunc::ZEROS(kplusg, npw);
+	const int npw_k = wfc_basis->npwk[ik];
+	kplusg = new double[npw_k];
+	ModuleBase::GlobalFunc::ZEROS(kplusg, npw_k);
 
-	std::complex<double> *Porter = GlobalC::UFFT.porter;
+	std::complex<double> *Porter = new std::complex<double> [wfc_basis->nmaxgr];
 
 	for(int ipol=0; ipol<3; ipol++)
 	{
 		// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
-		for(int ig=0; ig<npw; ig++)
-			kplusg[ig] = GlobalC::pw.get_GPlusK_cartesian_projection(ik,GlobalC::wf.igk(ik,ig), ipol) * GlobalC::ucell.tpiba;
-
-		ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
+		for(int ig=0; ig<npw_k; ++ig)
+			kplusg[ig] = wfc_basis->getgpluskcar(ik,ig)[ipol] * GlobalC::ucell.tpiba;
 
 		// calculate the charge density gradient in reciprocal space.
-		for(int ig=0; ig<npw; ig++)
-			Porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig) ]] = complex<double>(0.0,kplusg[ig]) * rhog[ig];
+		for(int ig=0; ig<npw_k; ig++)
+			Porter[ig] = complex<double>(0.0,kplusg[ig]) * rhog[ig];
 
 		// bring the gdr from G --> R
-		GlobalC::pw.FFT_wfc.FFT3D(Porter, 1);
+		wfc_basis->recip2real(Porter, Porter, ik);
 
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<wfc_basis->nrxx; ++ir)
 			grad[ir][ipol]= Porter[ir];
 	}//end loop ipol
 	delete[] kplusg;
+	delete[] Porter;
 	return;
 }
 

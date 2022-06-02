@@ -6,18 +6,20 @@ ntype			1
 symmetry		0
 pseudo_dir      ../tools/PP_ORB/
 
-nbands			0
-nbands_sto		10
+kpar            2
+bndpar          1
+
+nbands			3
+nbands_sto		0
 
 nche_sto		120
-seed_sto        -20000
-kpar            1
+seed_sto        20000
 cal_force       1
 cal_stress      1
 
 #Parameters (2.Iteration)
 ecutwfc			20
-scf_thr			1e-4
+scf_thr			1e-6
 scf_nmax		20
 
 

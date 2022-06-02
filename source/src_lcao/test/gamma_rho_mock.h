@@ -251,7 +251,7 @@ void Use_FFT::allocate()
 void wavefunc::allocate_ekb_wg(const int nks)
 {
     ModuleBase::TITLE("wavefunc", "init_local");
-    this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
+    this->npwx = GlobalC::wfcpw->npwk_max;
     this->ekb = new double *[nks];
     for (int ik = 0; ik < nks; ik++)
     {

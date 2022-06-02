@@ -463,8 +463,8 @@ void Electrons::c_bands(const int &istep)
 		// Replace 10.29
 		if (precondition_type == 1)
 		{
-			CHECK_CUDA(
-				hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
+			// CHECK_CUDA(
+			// 	hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
 			int thread = 512;
 			int block = (GlobalC::wf.npw + thread - 1) / thread;
 			hipLaunchKernelGGL(kernel_pred1, dim3(block), dim3(thread), 0, 0, h_diag, GlobalC::wf.npw);
@@ -479,8 +479,8 @@ void Electrons::c_bands(const int &istep)
 		}
 		else if (precondition_type == 2)
 		{
-			CHECK_CUDA(
-				hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
+			// CHECK_CUDA(
+			// 	hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
 			int thread = 512;
 			int block = (GlobalC::wf.npw + thread - 1) / thread;
 			hipLaunchKernelGGL(kernel_pred2, dim3(block), dim3(thread), 0, 0, h_diag, GlobalC::wf.npw);

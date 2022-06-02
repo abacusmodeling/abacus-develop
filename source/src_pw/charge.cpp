@@ -745,9 +745,9 @@ void Charge::sum_band_k(void)
 	ModuleBase::TITLE("Charge","sum_band_k");
 	GlobalC::en.eband = 0.0;
 
-	std::complex<double>* porter = GlobalC::UFFT.porter;
+	std::complex<double>* porter = new std::complex<double> [GlobalC::wfcpw->nmaxgr];
 	std::complex<double>* porter1 = nullptr;
-	if(GlobalV::NSPIN==4) porter1 = new std::complex<double>[GlobalC::pw.nrxx];//added by zhengdy-soc
+	if(GlobalV::NSPIN==4) porter1 = new std::complex<double>[GlobalC::wfcpw->nrxx];//added by zhengdy-soc
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
@@ -764,27 +764,16 @@ void Charge::sum_band_k(void)
 				///
 				if(GlobalC::wf.wg(ik, ibnd)<ModuleBase::threshold_wg) continue;
 				GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
-				ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
-				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
- 				{
-					porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig);
-				}
-				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
-				if(GlobalV::NPOL ==2)
-				{
-					ModuleBase::GlobalFunc::ZEROS( porter1, GlobalC::pw.nrxx );
-					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
-					{
-						porter1[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig + GlobalC::wf.npwx);
-					}
-					GlobalC::pw.FFT_wfc.FFT3D(porter1, 1);
-				}
+				
+				GlobalC::wfcpw->recip2real(&GlobalC::wf.evc[ik](ibnd, 0), porter, ik);
+				GlobalC::wfcpw->recip2real(&GlobalC::wf.evc[ik](ibnd, GlobalC::wf.npwx), porter1, ik);
+				
 				const double w1 = GlobalC::wf.wg(ik, ibnd) / GlobalC::ucell.omega;
 
 				// Increment the charge density in chr.rho for real space
 				if (w1 != 0.0)
 				{
-					for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+					for (int ir=0; ir<GlobalC::wfcpw->nrxx; ir++)
 					{
 						rho[0][ir]+=w1* (norm( porter[ir])+ norm(porter1[ir]));
 					}
@@ -792,7 +781,7 @@ void Charge::sum_band_k(void)
 				// In this case, calculate the three components of the magnetization
 				if(GlobalV::DOMAG){
 					if(w1 != 0.0)
-						for(int ir= 0;ir<GlobalC::pw.nrxx;ir++)
+						for(int ir= 0;ir<GlobalC::wfcpw->nrxx;ir++)
 						{
 							rho[1][ir] += w1 * 2.0 * (porter[ir].real()* porter1[ir].real()
 								+ porter[ir].imag()* porter1[ir].imag());
@@ -803,7 +792,7 @@ void Charge::sum_band_k(void)
 				}
 				else if(GlobalV::DOMAG_Z){
 					if(w1 != 0.0)
-						for(int ir= 0;ir<GlobalC::pw.nrxx;ir++)
+						for(int ir= 0;ir<GlobalC::wfcpw->nrxx;ir++)
 						{
 							rho[1][ir] = 0;
 							rho[2][ir] = 0;
@@ -811,7 +800,7 @@ void Charge::sum_band_k(void)
 						}
 				}
 				else for(int is= 1;is<4;is++)
-					for(int ir = 0;ir<GlobalC::pw.nrxx;ir++) rho[is][ir] = 0;
+					for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++) rho[is][ir] = 0;
 			}
 		}
 		else
@@ -824,18 +813,13 @@ void Charge::sum_band_k(void)
 			GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
 			//std::cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
 
-			ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
-			for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
-			{
-				porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig);
-			}
-			GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
+			GlobalC::wfcpw->recip2real(&GlobalC::wf.evc[ik](ibnd, 0), porter, ik);
 
 			const double w1 = GlobalC::wf.wg(ik, ibnd) / GlobalC::ucell.omega;
 
 			if (w1 != 0.0)
 			{
-				for (int ir=0; ir<GlobalC::pw.nrxx; ir++) 
+				for (int ir=0; ir<GlobalC::wfcpw->nrxx; ir++) 
 				{
 					rho[GlobalV::CURRENT_SPIN][ir]+=w1* norm( porter[ir] );
 				}
@@ -846,14 +830,14 @@ void Charge::sum_band_k(void)
 			{
 				for (int j=0; j<3; j++)
 				{
-					ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
+					ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::wfcpw->nrxx );
 					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
-						double fact = GlobalC::pw.get_GPlusK_cartesian_projection(ik,GlobalC::wf.igk(ik,ig),j) * GlobalC::ucell.tpiba;
-						porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig) * complex<double>(0.0,fact);
+						double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * GlobalC::ucell.tpiba;
+						porter[ig] = GlobalC::wf.evc[ik](ibnd, ig) * complex<double>(0.0,fact);
 					}
-					GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
-					for (int ir=0; ir<GlobalC::pw.nrxx; ir++) 
+					GlobalC::wfcpw->recip2real(porter, porter, ik);
+					for (int ir=0; ir<GlobalC::wfcpw->nrxx; ir++) 
 					{
 						kin_r[GlobalV::CURRENT_SPIN][ir]+=w1* norm( porter[ir] );
 					}
@@ -862,6 +846,7 @@ void Charge::sum_band_k(void)
 		}
 	} // END DO k_loop
 	if(GlobalV::NSPIN==4) delete[] porter1;
+	delete[] porter;
 
 #ifdef __MPI
 	this->rho_mpi();
@@ -888,7 +873,6 @@ void Charge::sum_band_k(void)
 	}
 	std::cout << "\n sum=" << sum * GlobalC::ucell.omega / GlobalC::pw.nrxx << std::endl;
 	*/
-
     return;
 }
 

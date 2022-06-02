@@ -211,17 +211,17 @@ void Sto_Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 				if (ipol==0)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].x;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).x;
 				}
 				if (ipol==1)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].y;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).y;
 				}
 				if (ipol==2)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].z;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).z;
 				}
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -362,17 +362,17 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
 				if (ipol==0)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].x;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).x;
 				}
 				if (ipol==1)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].y;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).y;
 				}
 				if (ipol==2)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].z;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).z;
 				}
 			}
             for (int ib=0; ib<nchip[ik]; ib++)

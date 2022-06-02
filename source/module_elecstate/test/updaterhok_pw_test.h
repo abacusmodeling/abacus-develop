@@ -136,7 +136,7 @@ void Use_FFT::allocate()
 
 psi::Psi<complex<double>>* wavefunc::allocate(const int nks)
 {
-	this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
+	this->npwx = GlobalC::wfcpw->npwk_max;
 	this->wg.create(nks,GlobalV::NBANDS);
 	this->ekb = new double*[nks];
 	psi::Psi<std::complex<double>>* psi = new psi::Psi<std::complex<double>>(nks, GlobalV::NBANDS,npwx, nullptr);

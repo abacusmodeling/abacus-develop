@@ -152,7 +152,7 @@ void Exx_Lip::cal_exx()
 }
 */
 
-void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_in, ModulePW::PW_Basis *p_basis_in, Use_FFT *UFFT_ptr_in, UnitCell_pseudo *ucell_ptr_in)
+void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in,  ModulePW::PW_Basis_K *wfc_basis_in, ModulePW::PW_Basis *rho_basis_in, UnitCell_pseudo *ucell_ptr_in)
 {
 	ModuleBase::TITLE("Exx_Lip","init");
 	try
@@ -160,9 +160,8 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 		k_pack = new k_package;
 		k_pack->kv_ptr = kv_ptr_in;
 		k_pack->wf_ptr = wf_ptr_in;
-		old_pwptr = pw_ptr_in;
-		rho_basis = p_basis_in;
-		UFFT_ptr = UFFT_ptr_in;
+		wfc_basis = wfc_basis_in;
+		rho_basis = rho_basis_in;
 		ucell_ptr = ucell_ptr_in;
 
 		int gzero_judge(-1);
@@ -331,29 +330,28 @@ void Exx_Lip::wf_wg_cal()
 
 void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 {
+	std::complex<double> *porter = new std::complex<double> [wfc_basis->nrxx];
 	for( int iw=0; iw< GlobalV::NLOCAL; ++iw)
 	{
-		ModuleBase::GlobalFunc::ZEROS( UFFT_ptr->porter, rho_basis->nrxx );
-		for( int ig=0; ig<kq_pack->kv_ptr->ngk[ikq]; ++ig)
-			UFFT_ptr->porter[ old_pwptr->ig2fftw[kq_pack->wf_ptr->igk(ikq,ig)] ] = kq_pack->wf_ptr->wanf2[ikq](iw,ig);
-		old_pwptr->FFT_wfc.FFT3D(UFFT_ptr->porter,1);
+		wfc_basis->recip2real(&kq_pack->wf_ptr->wanf2[ikq](iw,0), porter, ikq);
 		int ir(0);
-		for( int ix=0; ix<old_pwptr->ncx; ++ix)
+		for( int ix=0; ix<rho_basis->nx; ++ix)
 		{
-			const double phase_x = kq_pack->kv_ptr->kvec_d[ikq].x * ix / old_pwptr->ncx;
-			for( int iy=0; iy<old_pwptr->ncy; ++iy)
+			const double phase_x = kq_pack->kv_ptr->kvec_d[ikq].x * ix / rho_basis->nx;
+			for( int iy=0; iy<rho_basis->ny; ++iy)
 			{
-				const double phase_xy = phase_x + kq_pack->kv_ptr->kvec_d[ikq].y * iy / old_pwptr->ncy;
-				for( int iz=old_pwptr->nczp_start; iz<old_pwptr->nczp_start+old_pwptr->nczp; ++iz)
+				const double phase_xy = phase_x + kq_pack->kv_ptr->kvec_d[ikq].y * iy / rho_basis->ny;
+				for( int iz=rho_basis->startz_current; iz<rho_basis->startz_current+rho_basis->nplane; ++iz)
 				{
-					const double phase_xyz = phase_xy + kq_pack->kv_ptr->kvec_d[ikq].z * iz / old_pwptr->ncz;
+					const double phase_xyz = phase_xy + kq_pack->kv_ptr->kvec_d[ikq].z * iz / rho_basis->nz;
 					const std::complex<double> exp_tmp = exp(phase_xyz*ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT);
-					phi[iw][ir] = UFFT_ptr->porter[ir]*exp_tmp;
+					phi[iw][ir] =porter[ir]*exp_tmp;
 					++ir;
 				}
 			}
 		}
 	}
+	delete [] porter;
 }
 
 void Exx_Lip::psi_cal()
@@ -361,34 +359,32 @@ void Exx_Lip::psi_cal()
 	ModuleBase::TITLE("Exx_Lip","psi_cal");
 	if (GlobalC::pot.init_chg=="atomic")
 	{
+		std::complex<double> *porter = new std::complex<double> [wfc_basis->nrxx];
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int ib = 0; ib < GlobalV::NBANDS; ++ib)
 			{
-				ModuleBase::GlobalFunc::ZEROS( UFFT_ptr->porter, rho_basis->nrxx );
-				for( int ig = 0; ig < q_pack->kv_ptr->ngk[iq] ; ++ig)
-				{
-					UFFT_ptr->porter[ old_pwptr->ig2fftw[q_pack->wf_ptr->igk(iq,ig)] ] = q_pack->wf_ptr->evc[iq](ib,ig);
-				}
-				old_pwptr->FFT_wfc.FFT3D(UFFT_ptr->porter,1);
+				wfc_basis->recip2real(&q_pack->wf_ptr->evc[iq](ib,0), porter, iq);
+
 				int ir(0);
-				for( int ix=0; ix<old_pwptr->ncx; ++ix)
+				for( int ix=0; ix<rho_basis->nx; ++ix)
 				{
-					const double phase_x = q_pack->kv_ptr->kvec_d[iq].x * ix / old_pwptr->ncx;
-					for( int iy=0; iy<old_pwptr->ncy; ++iy)
+					const double phase_x = q_pack->kv_ptr->kvec_d[iq].x * ix / rho_basis->nx;
+					for( int iy=0; iy<rho_basis->ny; ++iy)
 					{
-						const double phase_xy = phase_x + q_pack->kv_ptr->kvec_d[iq].y * iy / old_pwptr->ncy;
-						for( int iz=old_pwptr->nczp_start; iz<old_pwptr->nczp_start+old_pwptr->nczp; ++iz)
+						const double phase_xy = phase_x + q_pack->kv_ptr->kvec_d[iq].y * iy / rho_basis->ny;
+						for( int iz=rho_basis->startz_current; iz<rho_basis->startz_current+rho_basis->nplane; ++iz)
 						{
-							const double phase_xyz = phase_xy + q_pack->kv_ptr->kvec_d[iq].z * iz / old_pwptr->ncz;
+							const double phase_xyz = phase_xy + q_pack->kv_ptr->kvec_d[iq].z * iz / rho_basis->nz;
 							const std::complex<double> exp_tmp = exp(phase_xyz*ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT);
-							psi[iq][ib][ir] = UFFT_ptr->porter[ir]*exp_tmp;
+							psi[iq][ib][ir] = porter[ir]*exp_tmp;
 							++ir;
 						}
 					}
 				}
 			}
 		}
+		delete[] porter;
 	}
 	else if(GlobalC::pot.init_chg=="file")
 	{
@@ -439,7 +435,7 @@ void Exx_Lip::qkg2_exp(int ik, int iq)
 {
 	for( int ig=0; ig<rho_basis->npw; ++ig)
 	{
-		const double qkg2 = ( (q_pack->kv_ptr->kvec_c[iq] - k_pack->kv_ptr->kvec_c[ik] + old_pwptr->gcar[ig]) *(ModuleBase::TWO_PI/ucell_ptr->lat0)).norm2();
+		const double qkg2 = ( (q_pack->kv_ptr->kvec_c[iq] - k_pack->kv_ptr->kvec_c[ik] + rho_basis->gcar[ig]) *(ModuleBase::TWO_PI/ucell_ptr->lat0)).norm2();
 		if( (Exx_Global::Hybrid_Type::PBE0==info.hybrid_type) || (Exx_Global::Hybrid_Type::HF==info.hybrid_type) )
 		{
 			if( abs(qkg2)<1e-10 )
@@ -464,15 +460,15 @@ void Exx_Lip::b_cal( int ik, int iq, int ib)
 {
 	const ModuleBase::Vector3<double> q_minus_k = q_pack->kv_ptr->kvec_d[iq] - k_pack->kv_ptr->kvec_d[ik];
 	std::vector<std::complex<double> > mul_tmp(rho_basis->nrxx);
-	for( size_t ir=0,ix=0; ix<old_pwptr->ncx; ++ix)
+	for( size_t ir=0,ix=0; ix<rho_basis->nx; ++ix)
 	{
-		const double phase_x = q_minus_k.x*ix/old_pwptr->ncx;
-		for( size_t iy=0; iy<old_pwptr->ncy; ++iy)
+		const double phase_x = q_minus_k.x*ix/rho_basis->nx;
+		for( size_t iy=0; iy<rho_basis->ny; ++iy)
 		{
-			const double phase_xy = phase_x + q_minus_k.y*iy/old_pwptr->ncy;
-			for( size_t iz=old_pwptr->nczp_start; iz<old_pwptr->nczp_start+old_pwptr->nczp; ++iz)
+			const double phase_xy = phase_x + q_minus_k.y*iy/rho_basis->ny;
+			for( size_t iz=rho_basis->startz_current; iz<rho_basis->startz_current+rho_basis->nplane; ++iz)
 			{
-				const double phase_xyz = phase_xy + q_minus_k.z*iz/old_pwptr->ncz;
+				const double phase_xyz = phase_xy + q_minus_k.z*iz/rho_basis->nz;
 				mul_tmp[ir] = exp(-phase_xyz*ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT);
 				mul_tmp[ir] *= psi[iq][ib][ir];
 				++ir;

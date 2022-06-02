@@ -5,6 +5,7 @@
 #include "src_lcao/gint_k.h"
 #include "src_pw/pw_basis.h"
 #include "module_psi/psi.h"
+#include "module_pw/pw_basis_k.h"
 
 class IState_Envelope
 {
@@ -20,7 +21,7 @@ public:
 private:
     bool* bands_picked;
 
-    void set_pw_wfc(PW_Basis& pwb,
+    void set_pw_wfc(ModulePW::PW_Basis_K* wfc_basis,
         const int& ik, const int& ib,
         const int& nspin,
         const double* const* const rho,

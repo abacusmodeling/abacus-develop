@@ -6,6 +6,7 @@
 #include "../module_base/complexmatrix.h"
 #include "wf_igk.h"
 #include "module_psi/psi.h"
+#include "module_pw/pw_basis_k.h"
 
 class WF_atomic : public WF_igk
 {
@@ -47,10 +48,13 @@ class WF_atomic : public WF_igk
     // Calculate random wave functions
     // as trial wave functions
     //==================================
-    void random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
-    void atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
+    void atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik, ModulePW::PW_Basis_K* wfc_basis)const;
+    void random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik, ModulePW::PW_Basis_K* wfc_basis);
 
     void check_evc()const;
 
 };
+#ifdef __MPI
+	void stick_to_pool(double *stick, const int &ir, double *out, ModulePW::PW_Basis_K* wfc_basis);
+#endif
 #endif 

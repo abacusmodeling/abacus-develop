@@ -267,7 +267,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     {
         for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
         {
-            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1,GlobalC::wfcpw);
             for (int L=0; L< lmax+1; L++)
             {
                 GlobalV::ofs_running << " " << std::setw(5) << ik+1

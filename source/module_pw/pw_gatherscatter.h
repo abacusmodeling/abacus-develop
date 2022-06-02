@@ -76,7 +76,7 @@ void PW_Basis:: gatherp_scatters(std::complex<T> *in, std::complex<T> *out)
 template<typename T>
 void PW_Basis:: gathers_scatterp(std::complex<T> *in, std::complex<T> *out)
 {
-    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
+    ModuleBase::timer::tick("PW_Basis", "gathers_scatterp");
     
     if(this->poolnproc == 1) //In this case nrxx=fftnx*fftny*nz, nst = nstot, 
     {
@@ -126,7 +126,7 @@ void PW_Basis:: gathers_scatterp(std::complex<T> *in, std::complex<T> *out)
 	}
 
 #endif
-    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
+    ModuleBase::timer::tick("PW_Basis", "gathers_scatterp");
     return;
 }
 

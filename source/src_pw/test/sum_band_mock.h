@@ -134,7 +134,7 @@ void Use_FFT::allocate()
 
 void wavefunc::allocate(const int nks)
 {
-	this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
+	this->npwx = GlobalC::wfcpw->npwk_max;
 	this->wg.create(nks,GlobalV::NBANDS);
 	this->evc=new ModuleBase::ComplexMatrix[nks];
 	this->ekb = new double*[nks];

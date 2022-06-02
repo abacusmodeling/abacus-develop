@@ -27,10 +27,13 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 	
 	//---------------------------------------------------
 
-	int npwx = GlobalC::wf.npwx;
-	int npw = GlobalC::wf.npw;
-	int npm = GlobalV::NPOL * m;
-	int inc = 1;
+	const int npwx = GlobalC::wf.npwx;
+	const int npw = GlobalC::wf.npw;
+	const int npm = GlobalV::NPOL * m;
+	const int inc = 1;
+	const int ik = this->current_ik;
+	const double tpiba2 = GlobalC::ucell.tpiba2;
+	const int nrxx = GlobalC::rhopw->nrxx;
 	//------------------------------------
 	//(1) the kinetical energy.
 	//------------------------------------
@@ -42,7 +45,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 		{
 			for (int ig = 0; ig < npw; ++ig)
 			{
-				hchibg[ig] = GlobalC::wf.g2kin[ig] * chibg[ig];
+				hchibg[ig] = GlobalC::wfcpw->getgk2(ik,ig) * tpiba2 * chibg[ig];
 			}
 			chibg += npwx;
 			hchibg += npwx;
@@ -53,23 +56,26 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 	//(2) the local potential.
 	//------------------------------------
 	ModuleBase::timer::tick("Stochastic_hchi","vloc");
+	std::complex<double>* porter = new std::complex<double>[nrxx];
 	if(GlobalV::VL_IN_H)
 	{
 		chibg = chig;
 		hchibg = hchig;
 		for(int ib = 0 ; ib < m ; ++ib)
 		{
-			ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-			GlobalC::UFFT.RoundTrip( chibg, GlobalC::pot.vr_eff1, GlobalC::hm.hpw.GR_index, GlobalC::UFFT.porter );
-			for (int ig = 0; ig < npw; ++ig)
+			GlobalC::wfcpw->recip2real(chibg, porter, ik);
+			for (int ir=0; ir< nrxx; ir++)
 			{
-				hchibg[ig] += GlobalC::UFFT.porter[ GlobalC::hm.hpw.GR_index[ig] ];
+				porter[ir] *=  GlobalC::pot.vr_eff1[ir];
 			}
+			GlobalC::wfcpw->real2recip(porter, hchibg, ik, true);
+			
 			chibg += npwx;
 			hchibg += npwx;
 		}
 			
 	}
+	delete[] porter;
 	ModuleBase::timer::tick("Stochastic_hchi","vloc");
 
 

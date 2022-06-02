@@ -140,9 +140,9 @@ void Sto_Stress_PW::sto_stress_kin(ModuleBase::matrix& sigma, Stochastic_WF& sto
 	//       }
 		for(i=0;i<npw;i++)
 		{
-			gk[0][i]=(GlobalC::kv.kvec_c[ik].x+GlobalC::pw.gcar[GlobalC::wf.igk(ik, i)].x)*factor;
-			gk[1][i]=(GlobalC::kv.kvec_c[ik].y+GlobalC::pw.gcar[GlobalC::wf.igk(ik, i)].y)*factor;
-			gk[2][i]=(GlobalC::kv.kvec_c[ik].z+GlobalC::pw.gcar[GlobalC::wf.igk(ik, i)].z)*factor;
+			gk[0][i]=(GlobalC::kv.kvec_c[ik].x+GlobalC::wfcpw->getgcar(ik,i).x)*factor;
+			gk[1][i]=(GlobalC::kv.kvec_c[ik].y+GlobalC::wfcpw->getgcar(ik,i).y)*factor;
+			gk[2][i]=(GlobalC::kv.kvec_c[ik].z+GlobalC::wfcpw->getgcar(ik,i).z)*factor;
 		}
 
 		//kinetic contribution

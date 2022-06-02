@@ -1,12 +1,11 @@
 #include "wf_igk.h"
 
-#include "global.h"
+#include "../src_pw/global.h"
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
 
 WF_igk::WF_igk()
 {
-	g2kin = new double[1];
 }
 
 WF_igk::~WF_igk()
@@ -15,41 +14,16 @@ WF_igk::~WF_igk()
 	{
 		std::cout << " ~WF_igk()" << std::endl;
 	}
-	delete[] g2kin;
-#ifdef __CUDA
-	if (this->d_g2kin)
-	{
-		cudaFree(this->d_g2kin);
-	}
-#endif
 }
 
 
 //--------------------------------------------------------
 // Compute kinetic energy for each k-point
 //--------------------------------------------------------
-void WF_igk::ekin(const int ik)
-{
-	ModuleBase::timer::tick("WF_igk", "ekin");
-	ModuleBase::GlobalFunc::ZEROS(g2kin, this->npwx);
-
-	for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
-	{
-		//--------------------------------------------------------
-		// EXPLAIN : Put the correct units on the kinetic energy
-		//--------------------------------------------------------
-		this->g2kin[ig] = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2() * GlobalC::ucell.tpiba2;
-	}
-#ifdef __CUDA
-	cudaMemcpy(this->d_g2kin, this->g2kin, GlobalC::kv.ngk[ik] * sizeof(double), cudaMemcpyHostToDevice);
-#endif
-	ModuleBase::timer::tick("WF_igk", "ekin");
-	return;
-}
 
 ModuleBase::Vector3<double> WF_igk::get_1qvec_cartesian(const int ik, const int ig) const
 {
-	ModuleBase::Vector3<double> qvec = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+	ModuleBase::Vector3<double> qvec = GlobalC::wfcpw->getgpluskcar(ik,ig);
 
 	/*
 	if(igk(ik,ig)==0)
@@ -72,24 +46,33 @@ double *WF_igk::get_qvec_cartesian(const int &ik)
 	{
 		// cartesian coordinate
 		// modulus, in GlobalC::ucell.tpiba unit.
-		const double q2 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2();
+		const double q2 = GlobalC::wfcpw->getgk2(ik,ig);
 		qmod[ig] = GlobalC::ucell.tpiba * sqrt(q2); // sqrt(q2) * GlobalC::ucell.tpiba;
 	}
 	return qmod;
 }
 
-std::complex<double> *WF_igk::get_sk(const int ik, const int it, const int ia) const
+std::complex<double> *WF_igk::get_sk(const int ik, const int it, const int ia, ModulePW::PW_Basis_K* wfc_basis) const
 {
 	ModuleBase::timer::tick("WF_igk", "get_sk");
 	const double arg = (GlobalC::kv.kvec_c[ik] * GlobalC::ucell.atoms[it].tau[ia]) * ModuleBase::TWO_PI;
 	const std::complex<double> kphase = std::complex<double>(cos(arg), -sin(arg));
 	std::complex<double> *sk = new std::complex<double>[GlobalC::kv.ngk[ik]];
-	for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
+	const int nx = wfc_basis->nx, ny = wfc_basis->ny, nz = wfc_basis->nz;
+	for(int igl = 0; igl < GlobalC::kv.ngk[ik]; ++igl)
 	{
-		const int iig = this->igk(ik, ig);
+		const int isz = wfc_basis->getigl2isz(ik,igl);
+    	int iz = isz % nz;
+    	const int is = isz / nz;
+		const int ixy = wfc_basis->is2fftixy[is];
+    	int ix = ixy / wfc_basis->fftny;
+    	int iy = ixy % wfc_basis->fftny;
+		if (ix < int(nx/2) + 1) ix += nx;
+        if (iy < int(ny/2) + 1) iy += ny;
+        if (iz < int(nz/2) + 1) iz += nz;
 		const int iat = GlobalC::ucell.itia2iat(it, ia);
-		sk[ig] = kphase * GlobalC::pw.eigts1(iat, GlobalC::pw.ig1[iig]) * GlobalC::pw.eigts2(iat, GlobalC::pw.ig2[iig])
-				 * GlobalC::pw.eigts3(iat, GlobalC::pw.ig3[iig]);
+		sk[igl] = kphase * GlobalC::pw.eigts1(iat, ix) * GlobalC::pw.eigts2(iat, iy)
+				 * GlobalC::pw.eigts3(iat, iz);
 	}
 	ModuleBase::timer::tick("WF_igk", "get_sk");
 	return sk;
@@ -104,7 +87,7 @@ std::complex<double> *WF_igk::get_skq(int ik,
 
 	for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 	{
-		ModuleBase::Vector3<double> qkq = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)) + q;
+		ModuleBase::Vector3<double> qkq = GlobalC::wfcpw->getgpluskcar(ik,ig) + q;
 		double arg = (qkq * GlobalC::ucell.atoms[it].tau[ia]) * ModuleBase::TWO_PI;
 		skq[ig] = std::complex<double>(cos(arg), -sin(arg));
 	}
