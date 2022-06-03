@@ -18,7 +18,7 @@
 #include "src_parallel/ft.h"
 #include "src_pw/use_fft.h"
 #include "src_pw/pw_complement.h"
-#include "src_pw/pw_basis.h"
+#include "src_pw/structure_factor.h"
 #include "src_pw/VNL_in_pw.h"
 #include "src_pw/hamilt.h"
 #include "src_parallel/ft.h"
@@ -27,6 +27,7 @@
 #include "src_pw/energy.h"
 #include "module_xc/xc_functional.h"
 #include "module_pw/pw_basis.h"
+#include "src_parallel/parallel_pw.h"
 
 bool ModuleSymmetry::Symmetry::symm_flag;
 
@@ -108,7 +109,7 @@ UnitCell_pseudo ucell;
 ModuleSymmetry::Symmetry symm;
 Parallel_Grid Pgrid;
 Use_FFT UFFT;
-PW_Basis pw;
+Structure_Factor sf;
 ModulePW::PW_Basis* rhopw;
 pseudopot_cell_vnl ppcell;
 Hamilt hm;
@@ -229,7 +230,7 @@ bool Occupy::use_gaussian_broadening=false;
 bool Occupy::use_tetrahedron_method = false;
 double Magnetism::get_nelup(){return 0;}
 double Magnetism::get_neldw(){return 0;}
-void PW_Basis::bspline_sf(const int norder, ModulePW::PW_Basis* rho_basis){}
+void Structure_Factor::bspline_sf(const int norder, ModulePW::PW_Basis* rho_basis){}
 
 bool ModuleSymmetry::Symmetry_Basic::equal(double const&m, double const&n) const{return false;}
 

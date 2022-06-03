@@ -38,12 +38,12 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	bool** cal_flag;
 	if(max_size!=0) 
 	{
-		dr = new double**[GlobalC::pw.bxyz];
-		distance = new double*[GlobalC::pw.bxyz];
-		psir_ylm = new double**[GlobalC::pw.bxyz];
-		cal_flag = new bool*[GlobalC::pw.bxyz];
+		dr = new double**[GlobalC::bigpw->bxyz];
+		distance = new double*[GlobalC::bigpw->bxyz];
+		psir_ylm = new double**[GlobalC::bigpw->bxyz];
+		cal_flag = new bool*[GlobalC::bigpw->bxyz];
 
-		for(int i=0; i<GlobalC::pw.bxyz; i++)
+		for(int i=0; i<GlobalC::bigpw->bxyz; i++)
 		{
 			dr[i] = new double*[max_size];
 			distance[i] = new double[max_size];
@@ -64,11 +64,11 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	}
 
 	double mt[3]={0,0,0};
-	double *vldr3 = new double[GlobalC::pw.bxyz];
+	double *vldr3 = new double[GlobalC::bigpw->bxyz];
 	double v1 = 0.0;
-	int* vindex=new int[GlobalC::pw.bxyz];
-	ModuleBase::GlobalFunc::ZEROS(vldr3, GlobalC::pw.bxyz);
-	ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::pw.bxyz);
+	int* vindex=new int[GlobalC::bigpw->bxyz];
+	ModuleBase::GlobalFunc::ZEROS(vldr3, GlobalC::bigpw->bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::bigpw->bxyz);
 	double phi=0.0;
 
 	const int nbx = GlobalC::GridT.nbx;
@@ -112,7 +112,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 					mt[1] = GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
 					mt[2] = GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2];
 
-					for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+					for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 					{
 						// meshcell_pos: z is the fastest
 						dr[ib][id][0] = GlobalC::GridT.meshcell_pos[ib][0] + mt[0]; 
@@ -219,7 +219,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								double *rhop = GlobalC::CHR.rho[is];
-								for (int ib=0; ib<GlobalC::pw.bxyz; ib++)
+								for (int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 								{
 									if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 									{
@@ -277,7 +277,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	
 	if(max_size!=0) 
 	{
-		for(int i=0; i<GlobalC::pw.bxyz; i++)
+		for(int i=0; i<GlobalC::bigpw->bxyz; i++)
 		{
 			for(int j=0; j<max_size; j++) 
 			{

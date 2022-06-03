@@ -411,7 +411,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion, ModulePW::PW_Basis* rho_
         for (int ig = 0; ig < rho_basis->npw; ig++)
         {
             if(ig == rho_basis->ig_gge0)   continue;
-            aux[ig] += static_cast<double>(GlobalC::ucell.atoms[it].zv) * conj(GlobalC::pw.strucFac(it, ig));
+            aux[ig] += static_cast<double>(GlobalC::ucell.atoms[it].zv) * conj(GlobalC::sf.strucFac(it, ig));
         }
     }
 

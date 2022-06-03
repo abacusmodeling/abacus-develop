@@ -328,7 +328,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in, ModulePW::P
 				{
 					for (int ig=0; ig< rho_basis->npw ;ig++)
 					{
-						rho_g3d(0, ig) += GlobalC::pw.strucFac(it, ig) * rho_lgl[ rho_basis->ig2igg[ig] ];
+						rho_g3d(0, ig) += GlobalC::sf.strucFac(it, ig) * rho_lgl[ rho_basis->ig2igg[ig] ];
 					}
 				}
 				// mohan add 2011-06-14, initialize the charge density according to each atom 
@@ -338,7 +338,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in, ModulePW::P
 					{
 						for (int ig = 0; ig < rho_basis->npw ; ig++)
 						{
-							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[rho_basis->ig2igg[ig]];
+							const std::complex<double> swap = GlobalC::sf.strucFac(it, ig)* rho_lgl[rho_basis->ig2igg[ig]];
 							//rho_g3d(0, ig) += swap * GlobalC::ucell.magnet.nelup_percent(it);
 							//rho_g3d(1, ig) += swap * GlobalC::ucell.magnet.neldw_percent(it);
 							const double up = 0.5 * ( 1 + GlobalC::ucell.magnet.start_magnetization[it] / atom->zv );
@@ -382,7 +382,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in, ModulePW::P
 					{
 						for (int ig = 0; ig < rho_basis->npw ; ig++)
 						{
-							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[rho_basis->ig2igg[ig]];
+							const std::complex<double> swap = GlobalC::sf.strucFac(it, ig)* rho_lgl[rho_basis->ig2igg[ig]];
 							rho_g3d(0, ig) += swap ;
 							if(GlobalV::DOMAG)
 							{
@@ -622,8 +622,8 @@ void Charge::set_rho_core(
     double rhoneg = 0.0;
     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
     {
-        rhoneg += min(0.0, GlobalC::UFFT.porter[ir].real());
-        rhoima += abs(GlobalC::UFFT.porter[ir].imag());
+        rhoneg += min(0.0, GlobalC::rhopw->ft.aux1[ir].real());
+        rhoima += abs(GlobalC::rhopw->ft.aux1[ir].imag());
         // NOTE: Core charge is computed in reciprocal space and brought to real
         // space by FFT. For non smooth core charges (or insufficient cut-off)
         // this may result in negative values in some grid points.
@@ -904,7 +904,7 @@ void Charge::rho_mpi(void)
     //=================================================
     int *num_z = new int[GlobalV::NPROC_IN_POOL];
     ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-    for (iz=0;iz<GlobalC::pw.nbz;iz++)
+    for (iz=0;iz<GlobalC::bigpw->nbz;iz++)
     {
         ip = iz % GlobalV::NPROC_IN_POOL;
         num_z[ip]++;
@@ -913,7 +913,7 @@ void Charge::rho_mpi(void)
 	// mohan update 2011-04-26
 	for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
 	{
-		num_z[ip]*=GlobalC::pw.bz;
+		num_z[ip]*=GlobalC::bigpw->bz;
 	}
 
     //=======================================
@@ -1072,10 +1072,10 @@ void Charge::rho_mpi(void)
         {
             for (iz=0;iz<num_z[GlobalV::RANK_IN_POOL];iz++)
             {
-                this->rho[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = rho_tot[GlobalC::rhopw->nz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
+                this->rho[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = rho_tot[GlobalC::rhopw->nz*ir + GlobalC::rhopw->startz_current + iz ];
 				if(XC_Functional::get_func_type() == 3)
 				{
-                	this->kin_r[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = tau_tot[GlobalC::rhopw->nz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
+                	this->kin_r[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = tau_tot[GlobalC::rhopw->nz*ir + GlobalC::rhopw->startz_current + iz ];
 				}	
             }
         }

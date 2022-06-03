@@ -254,7 +254,6 @@ TEST_F(LCAOTest,GammaRho)
 	LOC.ParaV = &ParaV;
 	//
         GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
-        GlobalC::UFFT.allocate();
 	// Grid Technique
 	set_matrix_grid();
 
@@ -374,6 +373,8 @@ int main(int argc, char **argv)
     ENVEnvironment* const env = new ENVEnvironment;
     testing::AddGlobalTestEnvironment(env);
     Check (RunAllTests(env,&ENVP)==0,"");
+	delete GlobalC::rhopw;
+	delete GlobalC::wfcpw;
 #ifdef __MPI
     MPI_Finalize();
 #endif

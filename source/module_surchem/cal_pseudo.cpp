@@ -1,10 +1,11 @@
 #include "surchem.h"
+#include "../src_pw/global.h"
 
 // atom_in surchem::GetAtom;
 
 void surchem::gauss_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, complex<double> *N)
 {
-    GlobalC::pw.setup_structure_factor(rho_basis); // call strucFac(ntype,ngmc)
+    GlobalC::sf.setup_structure_factor(&GlobalC::ucell, rho_basis); // call strucFac(ntype,ngmc)
     for (int it = 0; it < cell.ntype; it++)
     {
         double RCS = GetAtom.atom_RCS[cell.atoms[it].psd];
@@ -18,10 +19,10 @@ void surchem::gauss_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, 
             gg = gg * cell.tpiba2;
 
             N[ig].real(N[ig].real()
-                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * GlobalC::pw.strucFac(it, ig).real()
+                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * GlobalC::sf.strucFac(it, ig).real()
                              * exp(-0.5 * gg * (sigma_rc_k * sigma_rc_k)));
             N[ig].imag(N[ig].imag()
-                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * GlobalC::pw.strucFac(it, ig).imag()
+                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * GlobalC::sf.strucFac(it, ig).imag()
                              * exp(-0.5 * gg * (sigma_rc_k * sigma_rc_k)));
         }
     }

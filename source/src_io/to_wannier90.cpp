@@ -386,9 +386,9 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 	// 		ModuleBase::GlobalFunc::ZEROS(porter, GlobalC::rhopw->nrxx);
 	// 		for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 	// 		{
-	// 			porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
+	// 			porter[GlobalC::sf.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
 	// 		}
-	// 		GlobalC::pw.FFT_wfc.FFT3D(porter, 1);
+	// 		GlobalC::sf.FFT_wfc.FFT3D(porter, 1);
 			
 	// 		for(int k=0; k<GlobalC::rhopw->nz; k++)
 	// 		{
@@ -431,10 +431,10 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 	// num_z: how many planes on processor 'ip'
 	int *num_z = new int[GlobalV::NPROC_IN_POOL];
 	ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-	for (int iz=0;iz<GlobalC::pw.nbz;iz++)
+	for (int iz=0;iz<GlobalC::bigpw->nbz;iz++)
 	{
 		int ip = iz % GlobalV::NPROC_IN_POOL;
-		num_z[ip] += GlobalC::pw.bz;
+		num_z[ip] += GlobalC::bigpw->bz;
 	}	
 
 	// start_z: start position of z in 
@@ -515,7 +515,7 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 					{
 						for(int ir=0; ir<nxy; ir++)
 						{
-							zpiece[ir] = porter[ir*GlobalC::wfcpw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
+							zpiece[ir] = porter[ir*GlobalC::wfcpw->nplane+iz-GlobalC::wfcpw->startz_current];
 						}
 					}
 					// case 2: > first part rho: send the rho to 
@@ -524,7 +524,7 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 					{
 						for(int ir=0; ir<nxy; ir++)
 						{
-							zpiece[ir] = porter[ir*GlobalC::wfcpw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
+							zpiece[ir] = porter[ir*GlobalC::wfcpw->nplane+iz-GlobalC::wfcpw->startz_current];
 						}
 						MPI_Send(zpiece, nxy, MPI_DOUBLE_COMPLEX, 0, tag, POOL_WORLD);
 					}

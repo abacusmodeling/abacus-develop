@@ -38,9 +38,9 @@ void Stress_Func::stress_loc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_
 		for (int ig=0; ig<rho_basis->npw; ig++)
 		{
 			if(rho_basis->ig_gge0==ig)
-				evloc += GlobalC::ppcell.vloc(it, rho_basis->ig2igg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(aux[ig])).real();
+				evloc += GlobalC::ppcell.vloc(it, rho_basis->ig2igg[ig]) * (GlobalC::sf.strucFac(it,ig) * conj(aux[ig])).real();
 			else
-				evloc += GlobalC::ppcell.vloc(it, rho_basis->ig2igg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(aux[ig]) * fact).real();
+				evloc += GlobalC::ppcell.vloc(it, rho_basis->ig2igg[ig]) * (GlobalC::sf.strucFac(it,ig) * conj(aux[ig]) * fact).real();
 		}
 	}
 	for(int nt = 0;nt< GlobalC::ucell.ntype; nt++)
@@ -72,7 +72,7 @@ void Stress_Func::stress_loc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_
 			{
 				for (int m = 0; m<l+1;m++)
 				{
-					sigma(l, m) = sigma(l, m) + (conj(aux[ig]) * GlobalC::pw.strucFac(nt, ig)).real() 
+					sigma(l, m) = sigma(l, m) + (conj(aux[ig]) * GlobalC::sf.strucFac(nt, ig)).real() 
 						* 2.0 * dvloc[rho_basis->ig2igg[ig]] * GlobalC::ucell.tpiba2 * 
 						rho_basis->gcar[ig][l] * rho_basis->gcar[ig][m] * fact;
 				}

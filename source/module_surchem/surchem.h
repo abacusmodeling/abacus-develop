@@ -7,7 +7,7 @@
 #include "../module_cell/unitcell.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../src_pw/global.h"
-#include "../src_pw/pw_basis.h"
+#include "../src_pw/structure_factor.h"
 #include "../src_pw/use_fft.h"
 #include "atom_in.h"
 #include "../module_pw/pw_basis.h"

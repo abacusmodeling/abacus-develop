@@ -41,7 +41,7 @@ void Potential::set_vrs_tddft(const int istep)
                 i     = index / yz; // get the z, z is the fastest
                 index = index - yz * i;// get (x,y)
                 j     = index / GlobalC::rhopw->nplane;// get y
-                k     = index - GlobalC::rhopw->nplane*j + GlobalC::pw.nczp_start;// get x
+                k     = index - GlobalC::rhopw->nplane*j + GlobalC::rhopw->startz_current;// get x
 
                 if(ELEC_evolve::td_vext_dire == 1)
                 {

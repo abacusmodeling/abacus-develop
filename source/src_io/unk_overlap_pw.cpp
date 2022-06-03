@@ -230,16 +230,16 @@ std::complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_
 // void unkOverlap_pw::test_for_unkOverlap_pw()
 // {
 	
-// 	const int number_pw = GlobalC::pw.ngmw;
-// 	GlobalV::ofs_running << "the GlobalC::pw.ngmw is " << number_pw << std::endl;
+// 	const int number_pw = GlobalC::sf.ngmw;
+// 	GlobalV::ofs_running << "the GlobalC::sf.ngmw is " << number_pw << std::endl;
 // 	std::complex<double> *unk_L = new std::complex<double>[number_pw];
 // 	for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
 // 	{
 // 		unk_L[GlobalC::wf.igk(0,ig)] = GlobalC::wf.evc[0](0, ig);
 // 	}
-// 	for (int ig = 0; ig < GlobalC::pw.ngmw; ig++)
+// 	for (int ig = 0; ig < GlobalC::sf.ngmw; ig++)
 // 	{
-// 		GlobalV::ofs_running << GlobalC::pw.gdirect[ig].x << "," << GlobalC::pw.gdirect[ig].y << "," << GlobalC::pw.gdirect[ig].z << "  = " << unk_L[ig] << std::endl;
+// 		GlobalV::ofs_running << GlobalC::sf.gdirect[ig].x << "," << GlobalC::sf.gdirect[ig].y << "," << GlobalC::sf.gdirect[ig].z << "  = " << unk_L[ig] << std::endl;
 // 	}	
 	
 // }

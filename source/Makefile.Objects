@@ -358,8 +358,7 @@ dmft.o \
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
-pw_basis_old.o\
-bspline_sf.o\
+structure_factor.o\
 hamilt.o \
 pw_complement.o\
 wf_local.o \

@@ -22,17 +22,19 @@
 #include "src_pw/wavefunc.h"
 #include "src_pw/VNL_in_pw.h"
 #include "src_pw/energy.h"
+#include "src_pw/structure_factor.h"
 #include "module_neighbor/sltk_atom_arrange.h"
 #include "module_pw/pw_basis_k.h"
+#include "module_xc/xc_functional.h"
+#include "module_xc/exx_global.h"
+#include "src_parallel/parallel_pw.h"
 
 Magnetism::Magnetism(){}
 Magnetism::~Magnetism(){}
 K_Vectors::K_Vectors(){}
 K_Vectors::~K_Vectors(){}
-PW_Basis::PW_Basis(){}
-PW_Basis::~PW_Basis(){}
-FFT::FFT(){}
-FFT::~FFT(){}
+Structure_Factor::Structure_Factor(){}
+Structure_Factor::~Structure_Factor(){}
 Parallel_PW::Parallel_PW(){}
 Parallel_PW::~Parallel_PW(){}
 LCAO_Hamilt::LCAO_Hamilt(){}
@@ -58,19 +60,19 @@ energy::~energy(){}
 namespace GlobalC
 {
     energy en;
-    PW_Basis pw;
+    Structure_Factor sf;
     K_Vectors kv;
     UnitCell_pseudo ucell;
     pseudopot_cell_vnl ppcell;
     ModulePW::PW_Basis* rhopw;
+    ModulePW::PW_Basis_Big *bigpw = static_cast<ModulePW::PW_Basis_Big*>(rhopw);
     ModulePW::PW_Basis_K* wfcpw;
     wavefunc wf;
     Charge CHR;
     Grid_Driver GridD(GlobalV::test_deconstructor, GlobalV::test_grid_driver,GlobalV::test_grid);
 }
 
-#include "module_xc/xc_functional.h"
-#include "module_xc/exx_global.h"
+
 XC_Functional::XC_Functional(){}
 XC_Functional::~XC_Functional(){}
 int XC_Functional::get_func_type(){return 0;}
@@ -103,7 +105,6 @@ Use_FFT::Use_FFT(){}
 Use_FFT::~Use_FFT(){}
 void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;}
 void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;};
-void FFT::FFT3D(std::complex<double> *psi,const int sign) {};
 bool Occupy::use_gaussian_broadening = false;
 bool Occupy::use_tetrahedron_method = false;
 double Magnetism::get_nelup(void) {return 0;}
@@ -114,28 +115,28 @@ void set_pw()
     GlobalC::rhopw->nx = 36; //should be only divided by 2,3,5
     GlobalC::rhopw->ny = 36;
     GlobalC::rhopw->nz = 36;
-    GlobalC::pw.bx = 2; 
-    GlobalC::pw.by = 2; 
-    GlobalC::pw.bz = 2;
-	GlobalC::pw.nbx = GlobalC::rhopw->nx/GlobalC::pw.bx; 
-    GlobalC::pw.nby = GlobalC::rhopw->nx/GlobalC::pw.bx; 
-    GlobalC::pw.nbz = GlobalC::rhopw->nx/GlobalC::pw.bx;
-    GlobalC::pw.bxyz = GlobalC::pw.bx * GlobalC::pw.by * GlobalC::pw.bz;
+    GlobalC::bigpw->bx = 2; 
+    GlobalC::bigpw->by = 2; 
+    GlobalC::bigpw->bz = 2;
+	GlobalC::bigpw->nbx = GlobalC::rhopw->nx/GlobalC::bigpw->bx; 
+    GlobalC::bigpw->nby = GlobalC::rhopw->nx/GlobalC::bigpw->bx; 
+    GlobalC::bigpw->nbz = GlobalC::rhopw->nx/GlobalC::bigpw->bx;
+    GlobalC::bigpw->bxyz = GlobalC::bigpw->bx * GlobalC::bigpw->by * GlobalC::bigpw->bz;
     GlobalC::rhopw->nxyz = GlobalC::rhopw->nx * GlobalC::rhopw->ny * GlobalC::rhopw->nz;
 	 
-    if (GlobalV::MY_RANK < (GlobalC::pw.nbz % GlobalV::DSIZE))
+    if (GlobalV::MY_RANK < (GlobalC::bigpw->nbz % GlobalV::DSIZE))
     {
-        GlobalC::pw.nbzp = GlobalC::pw.nbz/GlobalV::DSIZE + 1;
-        GlobalC::pw.nbzp_start = (GlobalC::pw.nbz/GlobalV::DSIZE + 1) * GlobalV::MY_RANK;
+        GlobalC::bigpw->nbzp = GlobalC::bigpw->nbz/GlobalV::DSIZE + 1;
+        GlobalC::bigpw->nbzp_start = (GlobalC::bigpw->nbz/GlobalV::DSIZE + 1) * GlobalV::MY_RANK;
     }
     else
     {
-        GlobalC::pw.nbzp = GlobalC::pw.nbz/GlobalV::DSIZE;
-        GlobalC::pw.nbzp_start = (GlobalC::pw.nbz/GlobalV::DSIZE) * GlobalV::MY_RANK + (GlobalC::pw.nbz % GlobalV::DSIZE); 
+        GlobalC::bigpw->nbzp = GlobalC::bigpw->nbz/GlobalV::DSIZE;
+        GlobalC::bigpw->nbzp_start = (GlobalC::bigpw->nbz/GlobalV::DSIZE) * GlobalV::MY_RANK + (GlobalC::bigpw->nbz % GlobalV::DSIZE); 
     }
-    GlobalC::rhopw->nplane = GlobalC::pw.nbzp * GlobalC::pw.bz;
-    GlobalC::pw.nczp_start = GlobalC::pw.nbzp_start * GlobalC::pw.bz;
-    GlobalC::pw.nbxx = GlobalC::pw.nbzp*GlobalC::pw.nbx*GlobalC::pw.nby;
+    GlobalC::rhopw->nplane = GlobalC::bigpw->nbzp * GlobalC::bigpw->bz;
+    GlobalC::rhopw->startz_current = GlobalC::bigpw->nbzp_start * GlobalC::bigpw->bz;
+    GlobalC::bigpw->nbxx = GlobalC::bigpw->nbzp*GlobalC::bigpw->nbx*GlobalC::bigpw->nby;
     GlobalC::rhopw->nrxx = GlobalC::rhopw->nplane*GlobalC::rhopw->nx*GlobalC::rhopw->ny;
 }
 
@@ -164,7 +165,11 @@ void init()
     GlobalV::KS_SOLVER = "genelpa";
     GlobalV::NSPIN = 1;
     GlobalC::wf.init_wfc="atomic";
-    GlobalC::rhopw = new ModulePW::PW_Basis_K();
+    GlobalC::rhopw = new ModulePW::PW_Basis_Big();
+    GlobalC::bigpw = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
+    GlobalC::wfcpw = new ModulePW::PW_Basis_K_Big(); 
+    ModulePW::PW_Basis_K_Big* tmp2 = static_cast<ModulePW::PW_Basis_K_Big*>(GlobalC::wfcpw);
+    tmp2->setbxyz(GlobalC::bigpw->bx,GlobalC::bigpw->by,GlobalC::bigpw->bz);
 
     //GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
     GlobalC::ucell.setup("test", 1, 2, false, "None");
@@ -388,9 +393,9 @@ class ElecStateLCAOPrepare
         int* nz = new int[GlobalV::NPROC];
         for(int i=0;i<GlobalV::NPROC;i++)
         {
-            nz[i] = GlobalC::pw.nbz/GlobalV::NPROC;
-            if (i < (GlobalC::pw.nbz % GlobalV::NPROC)) nz[i] += 1;
-            nz[i] *= GlobalC::pw.bz;
+            nz[i] = GlobalC::bigpw->nbz/GlobalV::NPROC;
+            if (i < (GlobalC::bigpw->nbz % GlobalV::NPROC)) nz[i] += 1;
+            nz[i] *= GlobalC::bigpw->bz;
         }
 
         for(int is = 0; is < GlobalV::NSPIN; is++)
@@ -480,9 +485,9 @@ class ElecStateLCAOPrepare
 
         GlobalC::GridT.set_pbc_grid(
 			GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
-			GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
-			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
-			GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
+			GlobalC::bigpw->bx, GlobalC::bigpw->by, GlobalC::bigpw->bz,
+			GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbz,
+			GlobalC::bigpw->nbxx, GlobalC::bigpw->nbzp_start, GlobalC::bigpw->nbzp);
         if (!GlobalV::GAMMA_ONLY_LOCAL)
         {
             GlobalC::GridT.cal_nnrg(&(orb_con.ParaV));
@@ -552,6 +557,7 @@ int main(int argc, char **argv)
 
     int result = RUN_ALL_TESTS();
     delete GlobalC::rhopw;
+    delete GlobalC::wfcpw;
     if (GlobalV::MY_RANK == 0 && result != 0)
     {
         std::cout << "ERROR:some tests are not passed" << std::endl;

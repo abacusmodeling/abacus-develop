@@ -114,7 +114,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, ModulePW::PW_Basis* rho_bas
         std::complex<double> rhon = ModuleBase::ZERO;
         for (int it=0; it<cell.ntype; it++)
         {
-            rhon += static_cast<double>( cell.atoms[it].zv ) * conj( GlobalC::pw.strucFac(it, ig));
+            rhon += static_cast<double>( cell.atoms[it].zv ) * conj( GlobalC::sf.strucFac(it, ig));
         }
         ewaldg += fact * abs(rhon) * abs(rhon)
                   * exp(- rho_basis->gg[ig] * cell.tpiba2 / alpha / 4.0 ) / rho_basis->gg[ig] / cell.tpiba2;

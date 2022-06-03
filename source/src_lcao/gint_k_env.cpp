@@ -22,12 +22,12 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
     const int max_size = GlobalC::GridT.max_atom;
     if (max_size != 0)
     {
-        dr = new double** [GlobalC::pw.bxyz];
-        distance = new double* [GlobalC::pw.bxyz];
-        psir_ylm = new double** [GlobalC::pw.bxyz];
-        cal_flag = new bool* [GlobalC::pw.bxyz];
+        dr = new double** [GlobalC::bigpw->bxyz];
+        distance = new double* [GlobalC::bigpw->bxyz];
+        psir_ylm = new double** [GlobalC::bigpw->bxyz];
+        cal_flag = new bool* [GlobalC::bigpw->bxyz];
 
-        for (int i = 0; i < GlobalC::pw.bxyz; i++)
+        for (int i = 0; i < GlobalC::bigpw->bxyz; i++)
         {
             dr[i] = new double* [max_size];
             distance[i] = new double[max_size];
@@ -48,11 +48,11 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
     }
 
     double mt[3] = { 0,0,0 };
-    double* vldr3 = new double[GlobalC::pw.bxyz];
+    double* vldr3 = new double[GlobalC::bigpw->bxyz];
     double v1 = 0.0;
-    int* vindex = new int[GlobalC::pw.bxyz];
-    ModuleBase::GlobalFunc::ZEROS(vldr3, GlobalC::pw.bxyz);
-    ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::pw.bxyz);
+    int* vindex = new int[GlobalC::bigpw->bxyz];
+    ModuleBase::GlobalFunc::ZEROS(vldr3, GlobalC::bigpw->bxyz);
+    ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::bigpw->bxyz);
     double phi = 0.0;
 
     const int nbx = GlobalC::GridT.nbx;
@@ -99,7 +99,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
                     mt[1] = GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
                     mt[2] = GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2];
 
-                    for (int ib = 0; ib < GlobalC::pw.bxyz; ib++)
+                    for (int ib = 0; ib < GlobalC::bigpw->bxyz; ib++)
                     {
                         // meshcell_pos: z is the fastest
                         dr[ib][id][0] = GlobalC::GridT.meshcell_pos[ib][0] + mt[0];
@@ -110,17 +110,17 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
                         //dr=r-\tau-R  =>  R= r-\tau-dr
                         //now the eight in one bigcell are same but different with R form index2ucell.
                         // const double Rx1 = (double)i * (GlobalC::ucell.a1[0] + GlobalC::ucell.a2[0] + GlobalC::ucell.a3[0])
-                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::pw.nbx    //r
+                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::bigpw->nbx    //r
                         //     + GlobalC::GridT.meshcell_pos[ib][0]
                         //     - GlobalC::ucell.atoms[it].tau[ia].x * GlobalC::ucell.lat0
                         //     - dr[ib][id][0];
                         // const double Ry1 = (double)j * (GlobalC::ucell.a1[1] + GlobalC::ucell.a2[1] + GlobalC::ucell.a3[1])
-                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::pw.nby
+                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::bigpw->nby
                         //     + GlobalC::GridT.meshcell_pos[ib][1]
                         //     - GlobalC::ucell.atoms[it].tau[ia].y * GlobalC::ucell.lat0
                         //     - dr[ib][id][1];
                         // const double Rz1 = (double)k * (GlobalC::ucell.a1[2] + GlobalC::ucell.a2[2] + GlobalC::ucell.a3[2])
-                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::pw.nbz
+                        //     * GlobalC::ucell.lat0 /  (double)GlobalC::bigpw->nbz
                         //     + GlobalC::GridT.meshcell_pos[ib][2]
                         //     - GlobalC::ucell.atoms[it].tau[ia].z * GlobalC::ucell.lat0
                         //     - dr[ib][id][2];
@@ -202,15 +202,15 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 
                 int bindex = 0;
                 // z is the fastest, 
-                for (int ii = 0; ii < GlobalC::pw.bx; ii++)
+                for (int ii = 0; ii < GlobalC::bigpw->bx; ii++)
                 {
-                    const int ipart = (i * GlobalC::pw.bx + ii) * GlobalC::rhopw->ny * GlobalC::rhopw->nplane;
-                    for (int jj = 0; jj < GlobalC::pw.by; jj++)
+                    const int ipart = (i * GlobalC::bigpw->bx + ii) * GlobalC::rhopw->ny * GlobalC::rhopw->nplane;
+                    for (int jj = 0; jj < GlobalC::bigpw->by; jj++)
                     {
-                        const int jpart = (j * GlobalC::pw.by + jj) * GlobalC::rhopw->nplane;
-                        for (int kk = 0; kk < GlobalC::pw.bz; kk++)
+                        const int jpart = (j * GlobalC::bigpw->by + jj) * GlobalC::rhopw->nplane;
+                        for (int kk = 0; kk < GlobalC::bigpw->bz; kk++)
                         {
-                            vindex[bindex] = (k * GlobalC::pw.bz + kk - GlobalC::pw.nczp_start) + jpart + ipart;
+                            vindex[bindex] = (k * GlobalC::bigpw->bz + kk - GlobalC::rhopw->startz_current) + jpart + ipart;
                             //	assert(vindex[bindex] < GlobalC::rhopw->nrxx);
                             ++bindex;
                         }
@@ -241,7 +241,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 
                     // get the start index of local orbitals.
                     const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                    for (int ib = 0; ib < GlobalC::pw.bxyz; ib++)
+                    for (int ib = 0; ib < GlobalC::bigpw->bxyz; ib++)
                     {
                         if (cal_flag[ib][ia1])
                         {
@@ -281,7 +281,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 
     if (max_size != 0)
     {
-        for (int i = 0; i < GlobalC::pw.bxyz; i++)
+        for (int i = 0; i < GlobalC::bigpw->bxyz; i++)
         {
             for (int j = 0; j < max_size; j++)
             {

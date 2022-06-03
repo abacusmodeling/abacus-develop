@@ -150,7 +150,7 @@ void Potential::write_potential(
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL] );
+                    zpiece[ir] = v(is, ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current );
                     //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
                 }
             }
@@ -160,7 +160,7 @@ void Potential::write_potential(
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]);
+                    zpiece[ir] = v(is, ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current);
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }
@@ -250,7 +250,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
     {
         v_efield.create(GlobalV::NSPIN, rho_basis->nrxx);
-        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::pw, GlobalV::NSPIN, GlobalC::CHR.rho);
+        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, GlobalC::CHR.rho);
     }
 
     //==========================================
@@ -371,10 +371,10 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         //    int ip = iz % GlobalV::NPROC_IN_POOL;
         //    num_z[ip]++;
         //}
-        for (int iz=0;iz<GlobalC::pw.nbz;iz++)
+        for (int iz=0;iz<GlobalC::bigpw->nbz;iz++)
         {
             int ip = iz % GlobalV::NPROC_IN_POOL;
-            num_z[ip] += GlobalC::pw.bz;
+            num_z[ip] += GlobalC::bigpw->bz;
         }
 
         // start_z: start position of z in
@@ -423,7 +423,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL] ];
+                    zpiece[ir] = v_elecstat[ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current ];
                     //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
                 }
             }
@@ -433,7 +433,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
+                    zpiece[ir] = v_elecstat[ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current];
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }

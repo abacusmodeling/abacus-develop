@@ -12,7 +12,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
     int istep = 1;
-    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
     fvl_dphi.zero_out();
     svl_dphi.zero_out();
     for(int is=0; is<GlobalV::NSPIN; ++is)

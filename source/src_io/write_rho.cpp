@@ -117,10 +117,10 @@ void Charge::write_rho(
 		// num_z: how many planes on processor 'ip'
     	int *num_z = new int[GlobalV::NPROC_IN_POOL];
     	ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-    	for (int iz=0;iz<GlobalC::pw.nbz;iz++)
+    	for (int iz=0;iz<GlobalC::bigpw->nbz;iz++)
     	{
         	int ip = iz % GlobalV::NPROC_IN_POOL;
-        	num_z[ip] += GlobalC::pw.bz;
+        	num_z[ip] += GlobalC::bigpw->bz;
     	}	
 
 		// start_z: start position of z in 
@@ -175,7 +175,7 @@ void Charge::write_rho(
 					// mohan change to rho_save on 2012-02-10
 					// because this can make our next restart calculation lead
 					// to the same scf_thr as the one saved.
-					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
+					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current];
 					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
 				}
 			}
@@ -186,7 +186,7 @@ void Charge::write_rho(
 				for(int ir=0; ir<nxy; ir++)
 				{
 					//						zpiece[ir] = rho[is][ir*num_z[GlobalV::RANK_IN_POOL]+iz];
-					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
+					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current];
 					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
 				}
 				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);

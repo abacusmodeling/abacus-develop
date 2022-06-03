@@ -49,8 +49,8 @@ void Cal_Test::test_memory(void)
 {
 	ModuleBase::TITLE("Cal_Test","test_memory");
 
-	const int ngmw = Cal_Test::cal_np(GlobalC::pw.ggwfc2, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
-	const int ngmc = Cal_Test::cal_np(GlobalC::pw.ggchg, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
+	const int ngmw = Cal_Test::cal_np(GlobalC::wfcpw->ggecut, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
+	const int ngmc = Cal_Test::cal_np(GlobalC::rhopw->ggecut, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
 
 	std::cout << " number of atoms = " << GlobalC::ucell.nat << std::endl;
 	std::cout << " plane wave number for wave functions = " << ngmw << std::endl;

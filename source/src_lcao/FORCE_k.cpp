@@ -1118,7 +1118,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	int istep = 1;
 
 	// if Vna potential is not used.
-	GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+	GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
 
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
@@ -1172,7 +1172,7 @@ void Force_LCAO_k::cal_fvl_dphi_k_new(
 	int istep = 1;
 
 	// if Vna potential is not used.
-	GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+	GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
 
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)

@@ -118,7 +118,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
             }
 
             // reset local potential
-            GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
+            GlobalC::pot.init_pot(verlet->step_, GlobalC::sf.strucFac);
 
             // update force and virial due to the update of atom positions
             MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);

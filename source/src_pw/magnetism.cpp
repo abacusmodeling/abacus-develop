@@ -106,9 +106,9 @@ double Magnetism::get_nelup(void)
     // nelup = ( nelec + mcons(3,1) ) * 0.5D0
 
 //	double nelup = 0.0;
-//	for(int i=0; i<GlobalC::pw.ntype; i++)
+//	for(int i=0; i<GlobalC::sf.ntype; i++)
 //	{
-//		nelup += GlobalC::CHR.nelec * (1.0+start_magnetization[i])/2.0/GlobalC::pw.ntype;
+//		nelup += GlobalC::CHR.nelec * (1.0+start_magnetization[i])/2.0/GlobalC::sf.ntype;
 //	}
 //	return nelup;
 }
@@ -131,9 +131,9 @@ double Magnetism::get_neldw(void)
     return neldw ;
 
 //	double neldw = 0.0;
-//	for(int i=0; i<GlobalC::pw.ntype; i++)
+//	for(int i=0; i<GlobalC::sf.ntype; i++)
 //	{
-//		neldw += GlobalC::pw.nelec * (1.0-start_magnetization[i])/2.0/GlobalC::pw.ntype;
+//		neldw += GlobalC::sf.nelec * (1.0-start_magnetization[i])/2.0/GlobalC::sf.ntype;
 //	}
 //	return neldw;
 }

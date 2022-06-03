@@ -288,7 +288,7 @@ bool LOOP_ions::force_stress(
                 }
                 else
                 {
-                    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+                    GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
                 }
             }
             ModuleBase::timer::tick("LOOP_ions", "force_stress");
@@ -307,7 +307,7 @@ bool LOOP_ions::force_stress(
         // force calculations.
 
         //xiaohui modify 2014-08-09
-        //GlobalC::pw.setup_structure_factor();
+        //GlobalC::sf.setup_structure_factor();
 
         // charge extrapolation if istep>0.
         //xiaohui modify 2014-08-09
@@ -352,7 +352,7 @@ xiaohui modify 2014-08-09*/
             else
             {
                 Variable_Cell::init_after_vc(p_esolver);
-                GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
+                GlobalC::pot.init_pot(stress_step, GlobalC::sf.strucFac);
 
                 ++stress_step;
                 ModuleBase::timer::tick("LOOP_ions", "force_stress");
@@ -397,7 +397,7 @@ xiaohui modify 2014-08-09*/
                     else
                     {
                         Variable_Cell::init_after_vc(p_esolver);
-                        GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
+                        GlobalC::pot.init_pot(stress_step, GlobalC::sf.strucFac);
 
                         ++stress_step;
                         ModuleBase::timer::tick("LOOP_ions", "force_stress");
@@ -421,7 +421,7 @@ xiaohui modify 2014-08-09*/
                 }
                 else
                 {
-                    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+                    GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
                 }
                 ++force_step;
                 ModuleBase::timer::tick("LOOP_ions", "force_stress");

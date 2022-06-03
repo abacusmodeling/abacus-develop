@@ -4,7 +4,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/intarray.h"
-#include "pw_basis.h"
+#include "structure_factor.h"
 #include "module_pw/pw_basis_k.h"
 
 class WF_igk 

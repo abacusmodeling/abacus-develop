@@ -11,7 +11,7 @@
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
 #include "../src_pw/pw_complement.h"
-#include "../src_pw/pw_basis.h"
+#include "../src_pw/structure_factor.h"
 #include "../src_pw/symmetry_rho.h"
 #include "../src_io/print_info.h"
 #include "../src_pw/H_Ewald_pw.h"
@@ -71,7 +71,6 @@ namespace ModuleESolver
 
         // cout<<GlobalC::rhopw->nrxx<<endl;
         // cout<<"before ufft allocate"<<endl;
-        GlobalC::UFFT.allocate();
 
         // cout<<"after ufft allocate"<<endl;
 
@@ -101,7 +100,7 @@ namespace ModuleESolver
         //=========================================================
         // calculate the total local pseudopotential in real space
         //=========================================================
-        GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
+        GlobalC::pot.init_pot(0, GlobalC::sf.strucFac); //atomic_rho, v_of_rho, set_vrs
 
         GlobalC::pot.newd();
 

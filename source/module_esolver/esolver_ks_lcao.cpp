@@ -74,7 +74,6 @@ namespace ModuleESolver
 
         // Initialize the FFT.
         // this function belongs to cell LOOP
-        GlobalC::UFFT.allocate();
 
         // output is GlobalC::ppcell.vloc 3D local pseudopotentials
         // without structure factors
@@ -85,7 +84,7 @@ namespace ModuleESolver
         // if ion_step==0, read in/initialize the potentials
         // this function belongs to ions LOOP
         int ion_step = 0;
-        GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
+        GlobalC::pot.init_pot(ion_step, GlobalC::sf.strucFac);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");      
 
         //------------------init Basis_lcao----------------------

@@ -23,11 +23,6 @@ class Use_FFT
 
 	Use_FFT();
 	~Use_FFT();
-
-	std::complex<double> *porter;
-
-	void allocate(void);
-
 	//---------------------------------------------------------------------
 	
 	// From G space to real space. ModuleBase::ComplexMatrix

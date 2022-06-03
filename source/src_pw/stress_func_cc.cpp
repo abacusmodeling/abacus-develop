@@ -87,9 +87,9 @@ void Stress_Func::stress_cc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_b
 			for(int ig = 0;ig< rho_basis->npw;ig++)
 			{
 				if(rho_basis->ig_gge0==ig)
-					sigmadiag += conj(psic[ig] ) * GlobalC::pw.strucFac (nt, ig) * rhocg[rho_basis->ig2igg[ig]];
+					sigmadiag += conj(psic[ig] ) * GlobalC::sf.strucFac (nt, ig) * rhocg[rho_basis->ig2igg[ig]];
 				else
-					sigmadiag += conj(psic[ig] ) * GlobalC::pw.strucFac (nt, ig) * rhocg[rho_basis->ig2igg[ig]] * fact;
+					sigmadiag += conj(psic[ig] ) * GlobalC::sf.strucFac (nt, ig) * rhocg[rho_basis->ig2igg[ig]] * fact;
 			}
 			this->deriv_drhoc (
 				GlobalC::ppcell.numeric,
@@ -108,7 +108,7 @@ void Stress_Func::stress_cc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_b
 				{
 					for (int m = 0;m< 3;m++)
 					{
-						const std::complex<double> t = conj(psic[ig]) * GlobalC::pw.strucFac(nt, ig) * rhocg[rho_basis->ig2igg[ig]] * GlobalC::ucell.tpiba *
+						const std::complex<double> t = conj(psic[ig]) * GlobalC::sf.strucFac(nt, ig) * rhocg[rho_basis->ig2igg[ig]] * GlobalC::ucell.tpiba *
 												  rho_basis->gcar[ig][l] * rho_basis->gcar[ig][m] / norm_g * fact;
 						//						sigmacc [l][ m] += t.real();
 						sigma(l,m) += t.real();

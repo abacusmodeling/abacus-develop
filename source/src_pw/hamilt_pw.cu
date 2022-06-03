@@ -216,7 +216,7 @@ void Hamilt_PW::init_k(const int ik)
     // int *GR_index_tmp = new int[GlobalC::wfc->nrxx];
 //     for (int ig = 0;ig < GlobalC::wf.npw;ig++)
 //     {
-//         GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
+//         GR_index[ig] = GlobalC::sf.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
 //     }
 //     // cout<<"init_K"<<endl;
 // #ifdef __CUDA

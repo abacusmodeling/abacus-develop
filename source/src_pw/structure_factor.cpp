@@ -1,7 +1,128 @@
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "structure_factor.h"
+#include "../module_base/constants.h"
 #include "global.h"
 #include "../module_base/math_bspline.h"
-using namespace std;
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
+
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+Structure_Factor::Structure_Factor()
+{
+
+}
+
+Structure_Factor::~Structure_Factor()
+{
+}
+
+// called in input.cpp
+void Structure_Factor::set
+(
+    const int &nbspline_in
+)
+{
+    ModuleBase::TITLE("PW_Basis","set");
+    this->nbspline = nbspline_in;
+    return;
+}
+
+
+
+
+//  Calculate structure factor
+void Structure_Factor::setup_structure_factor(UnitCell_pseudo* Ucell, ModulePW::PW_Basis* rho_basis)			// Peize Lin optimize and add OpenMP 2021.04.01
+{
+    ModuleBase::TITLE("PW_Basis","setup_structure_factor");
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
+    const std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
+
+    this->strucFac.create(Ucell->ntype, rho_basis->npw);
+    ModuleBase::Memory::record("PW_Basis","struc_fac", Ucell->ntype*rho_basis->npw,"complexmatrix");
+
+//	std::string outstr;
+//	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
+//	std::ofstream ofs( outstr.c_str() ) ;
+    bool usebspline;
+    if(nbspline > 0)   usebspline = true;
+    else    usebspline = false;
+    
+    if(usebspline)
+    {
+        nbspline = int((nbspline+1)/2)*2; // nbspline must be a positive even number.
+        this->bspline_sf(nbspline,Ucell, rho_basis);
+    }
+    else
+    {
+        for (int it=0; it<Ucell->ntype; it++)
+        {
+	    	const int na = Ucell->atoms[it].na;
+	    	const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
+#ifdef _OPENMP
+		    #pragma omp parallel for schedule(static)
+#endif
+            for (int ig=0; ig<rho_basis->npw; ig++)
+            {
+		    	const ModuleBase::Vector3<double> gcar_ig = rho_basis->gcar[ig];
+                std::complex<double> sum_phase = ModuleBase::ZERO;
+                for (int ia=0; ia<na; ia++)
+                {
+                    // e^{-i G*tau}
+                    sum_phase += exp( ci_tpi * (gcar_ig * tau[ia]) );
+                }
+                this->strucFac(it,ig) = sum_phase;
+            }
+        }
+    }
+
+//	ofs.close();
+
+    int i,j; //ng;
+    this->eigts1.create(Ucell->nat, 2*rho_basis->nx + 1);
+    this->eigts2.create(Ucell->nat, 2*rho_basis->ny + 1);
+    this->eigts3.create(Ucell->nat, 2*rho_basis->nz + 1);
+
+    ModuleBase::Memory::record("PW_Basis","eigts1",Ucell->nat*2*rho_basis->nx + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts2",Ucell->nat*2*rho_basis->ny + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts3",Ucell->nat*2*rho_basis->nz + 1,"complexmatrix");
+
+    ModuleBase::Vector3<double> gtau;
+    int inat = 0;
+    for (i = 0; i < Ucell->ntype; i++)
+    {
+        if (GlobalV::test_pw > 1)
+        {
+            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigts",i);
+        }
+        for (j = 0; j < Ucell->atoms[i].na;j++)
+        {
+            gtau = Ucell->G * Ucell->atoms[i].tau[j];  //HLX: fixed on 10/13/2006
+            for (int n1 = -rho_basis->nx; n1 <= rho_basis->nx;n1++)
+            {
+                double arg = n1 * gtau.x;
+                this->eigts1(inat, n1 + rho_basis->nx) = exp( ci_tpi*arg  );
+            }
+            for (int n2 = -rho_basis->ny; n2 <= rho_basis->ny;n2++)
+            {
+                double arg = n2 * gtau.y;
+                this->eigts2(inat, n2 + rho_basis->ny) = exp( ci_tpi*arg );
+            }
+            for (int n3 = -rho_basis->nz; n3 <= rho_basis->nz;n3++)
+            {
+                double arg = n3 * gtau.z;
+                this->eigts3(inat, n3 + rho_basis->nz) = exp( ci_tpi*arg );
+            }
+            inat++;
+        }
+    }
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor"); 
+    return;
+}
 
 //
 //DESCRIPTION:
@@ -106,7 +227,7 @@ void Structure_Factor::bspline_sf(const int norder,UnitCell_pseudo* Ucell,Module
     return;
 }
 
-void PW_Basis:: bsplinecoef(complex<double> *b1, complex<double> *b2, complex<double> *b3, 
+void Structure_Factor:: bsplinecoef(complex<double> *b1, complex<double> *b2, complex<double> *b3, 
                         const int nx, const int ny, const int nz, const int norder)
 {
     const std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;

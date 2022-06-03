@@ -20,8 +20,8 @@ void get_total_pw(double* ig2sort, ModuleBase::Vector3<double> *igsort,
                   int& ngm); // number of total plane waves.
 
 // output nx, ny, nz according to input: latve and ggcut.
-void get_FFT_dimension(const ModuleBase::Matrix3& latvec, const double &ggcut, int &nx, int &ny, int &nz,
-const int &bx, const int &by, const int &bz);
+// void get_FFT_dimension(const ModuleBase::Matrix3& latvec, const double &ggcut, int &nx, int &ny, int &nz,
+// const int &bx, const int &by, const int &bz);
 
 //==========================================================
 // MEMBER FUNCTION :

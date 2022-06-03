@@ -21,7 +21,7 @@
 #include "src_pw/magnetism.h"
 #include "src_pw/occupy.h"
 #include "src_pw/potential.h"
-#include "src_pw/pw_basis.h"
+#include "src_pw/structure_factor.h"
 #include "src_pw/pw_complement.h"
 #include "src_pw/use_fft.h"
 #include "src_pw/wavefunc.h"
@@ -218,8 +218,9 @@ UnitCell_pseudo ucell;
 ModuleSymmetry::Symmetry symm;
 Parallel_Grid Pgrid;
 Use_FFT UFFT;
-PW_Basis pw;
+Structure_Factor sf;
 ModulePW::PW_Basis* rhopw;
+ModulePW::PW_Basis_Big *bigpw = static_cast<ModulePW::PW_Basis_Big*>(rhopw);
 ModulePW::PW_Basis_K* wfcpw;
 pseudopot_cell_vnl ppcell;
 Hamilt hm;
@@ -240,13 +241,6 @@ void Occupy::calculate_weights()
     GlobalC::wf.wg(0, 1) = 0.0;
     GlobalC::wf.wg(0, 2) = 0.0;
     GlobalC::wf.wg(0, 3) = 0.0;
-}
-
-void Use_FFT::allocate()
-{
-    delete[] porter;
-    porter = new std::complex<double>[GlobalC::rhopw->nrxx];
-    return;
 }
 
 void wavefunc::allocate_ekb_wg(const int nks)
@@ -434,9 +428,6 @@ double Magnetism::get_nelup()
 double Magnetism::get_neldw()
 {
     return 0;
-}
-void PW_Basis::bspline_sf(const int norder, ModulePW::PW_Basis* rho_basis)
-{
 }
 
 bool ModuleSymmetry::Symmetry_Basic::equal(double const &m, double const &n) const
@@ -796,44 +787,28 @@ void UnitCell_pseudo::check_dtau(void)
 
 void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
 {
-    GlobalC::pw.set(INPUT.gamma_only,
-                    INPUT.ecutwfc,
-                    INPUT.ecutrho,
-                    INPUT.nx,
-                    INPUT.ny,
-                    INPUT.nz,
-                    INPUT.ncx,
-                    INPUT.ncy,
-                    INPUT.ncz,
-                    INPUT.bx,
-                    INPUT.by,
-                    INPUT.bz,
-                    INPUT.pw_seed,
-                    INPUT.nbspline);
+    GlobalC::sf.set(INPUT.nbspline);
     GlobalC::ucell.setup_cell(GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
     GlobalC::kv.set(GlobalC::symm,
                     GlobalV::global_kpoint_card,
                     GlobalV::NSPIN,
                     GlobalC::ucell.G,
                     GlobalC::ucell.latvec);
-    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
 
 	// pw_rho = new ModuleBase::PW_Basis();
     //temporary, it will be removed
-    GlobalC::rhopw = new ModulePW::PW_Basis_Big(); 
-    ModulePW::PW_Basis_Big* tmp = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
-    tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
-	 GlobalC::wfcpw = new ModulePW::PW_Basis_K_Big(); 
+    GlobalC::rhopw = new ModulePW::PW_Basis_Big();
+    GlobalC::bigpw = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
+	GlobalC::bigpw->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
+    GlobalC::wfcpw = new ModulePW::PW_Basis_K_Big(); 
     ModulePW::PW_Basis_K_Big* tmp2 = static_cast<ModulePW::PW_Basis_K_Big*>(GlobalC::wfcpw);
     tmp2->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
     GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc, 1, 0);
-    GlobalC::rhopw->initparameters(false, INPUT.ecutrho);
+    GlobalC::rhopw->initparameters(false, 4 * INPUT.ecutwfc);
 	GlobalC::rhopw->setuptransform();
 	GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
                                 1, 0);
     GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
-    GlobalC::wfcpw->setuptransform();
-    for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)   GlobalC::kv.ngk[ik] = GlobalC::wfcpw->npwk[ik];
 	
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
 
@@ -1201,15 +1176,15 @@ void set_matrix_grid()
     GlobalC::GridT.set_pbc_grid(GlobalC::rhopw->nx,
                                 GlobalC::rhopw->ny,
                                 GlobalC::rhopw->nz,
-                                GlobalC::pw.bx,
-                                GlobalC::pw.by,
-                                GlobalC::pw.bz,
-                                GlobalC::pw.nbx,
-                                GlobalC::pw.nby,
-                                GlobalC::pw.nbz,
-                                GlobalC::pw.nbxx,
-                                GlobalC::pw.nbzp_start,
-                                GlobalC::pw.nbzp);
+                                GlobalC::bigpw->bx,
+                                GlobalC::bigpw->by,
+                                GlobalC::bigpw->bz,
+                                GlobalC::bigpw->nbx,
+                                GlobalC::bigpw->nby,
+                                GlobalC::bigpw->nbz,
+                                GlobalC::bigpw->nbxx,
+                                GlobalC::bigpw->nbzp_start,
+                                GlobalC::bigpw->nbzp);
     // std::cout << "GridT.max_atom in set_matrix_grid " << GlobalC::GridT.max_atom << std::endl;
 }
 //#endif

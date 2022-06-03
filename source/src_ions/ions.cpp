@@ -325,7 +325,7 @@ void Ions::reset_after_relax(const int& istep)
 {
 	ModuleBase::TITLE("Ions","reset_after_relax");
 	GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
-	GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
+	GlobalC::sf.setup_structure_factor(&GlobalC::ucell,GlobalC::rhopw);
 
 	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
 	// charge extrapolation if istep>0.
@@ -335,7 +335,7 @@ void Ions::reset_after_relax(const int& istep)
 	GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
 	// calculate the new potential accordint to
 	// the new charge density.
-	GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
+	GlobalC::pot.init_pot( istep, GlobalC::sf.strucFac );
 
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
 	//GlobalC::wf.wfcinit();
@@ -344,7 +344,7 @@ void Ions::reset_after_cellrelax(int& f_step, int& s_step, ModuleESolver::ESolve
 {
 	ModuleBase::TITLE("Ions","reset_after_cellrelax");
 	Variable_Cell::init_after_vc(p_esolver);
-	GlobalC::pot.init_pot(s_step, GlobalC::pw.strucFac); //LiuXh add 20180619
+	GlobalC::pot.init_pot(s_step, GlobalC::sf.strucFac); //LiuXh add 20180619
 
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
 	GlobalC::wf.wfcinit(p_esolver->psi); //LiuXh add 20180619

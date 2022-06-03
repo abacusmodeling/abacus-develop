@@ -23,7 +23,6 @@ void Variable_Cell::init_after_vc(ModuleESolver::ESolver *p_esolver)
     GlobalC::kv.set_after_vc(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
 
-    GlobalC::pw.update_gvectors(GlobalV::ofs_running, GlobalC::ucell);
     
     //only G-vector and K-vector are changed due to the change of lattice vector
     //FFT grids do not change!!
@@ -36,7 +35,7 @@ void Variable_Cell::init_after_vc(ModuleESolver::ESolver *p_esolver)
     GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
     GlobalC::wfcpw->collect_local_pw(); 
 
-    GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
+    GlobalC::sf.setup_structure_factor(&GlobalC::ucell,GlobalC::rhopw);
 
     if(GlobalV::BASIS_TYPE=="pw")
     {

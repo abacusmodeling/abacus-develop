@@ -5,7 +5,6 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "../module_cell/unitcell.h"
-#include "pw_basis.h"
 #include "use_fft.h"
 #include "module_pw/pw_basis.h"
 
@@ -34,12 +33,12 @@ class H_Hartree_pw
 
     static void eps_pot(const complex<double> *PS_TOTN,
                         const complex<double> *phi,
-                        PW_Basis &pw,
+                        ModulePW::PW_Basis* rho_basis,
                         double *d_eps,
                         double *vwork);
 
     static void test_res(const UnitCell &ucell,
-                         PW_Basis &pwb,
+                         ModulePW::PW_Basis* rho_basis,
                          const complex<double> *tot_N,
                          complex<double> *phi,
                          double *d_eps);

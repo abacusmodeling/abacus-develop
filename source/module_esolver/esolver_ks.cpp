@@ -3,6 +3,9 @@
 #include <algorithm>
 #include "time.h"
 #include "../src_io/print_info.h"
+#ifdef __MPI
+#include "mpi.h"
+#endif
 
 //--------------Temporary----------------
 #include "../module_base/global_variable.h"
@@ -28,6 +31,7 @@ namespace ModuleESolver
         // pw_rho = new ModuleBase::PW_Basis();
         //temporary, it will be removed
         pw_wfc = new ModulePW::PW_Basis_K_Big(); 
+        GlobalC::wfcpw = this->pw_wfc; //Temporary
         ModulePW::PW_Basis_K_Big* tmp = static_cast<ModulePW::PW_Basis_K_Big*>(pw_wfc);
         tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
     }
@@ -66,26 +70,25 @@ namespace ModuleESolver
         // mohan add 2021-01-30
         Print_Info::setup_parameters(ucell, GlobalC::kv);
 
-        // Initalize the plane wave basis set
-        GlobalC::pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT PLANEWAVE");
-        std::cout << " UNIFORM GRID DIM     : " << GlobalC::rhopw->nx << " * " << GlobalC::rhopw->ny << " * " << GlobalC::rhopw->nz << std::endl;
-        std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx << " * " << GlobalC::pw.nby << " * " << GlobalC::pw.nbz << std::endl;
         //new plane wave basis
         this->pw_wfc->initgrids(ucell.lat0, ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
                                 GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
         this->pw_wfc->initparameters(false, inp.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+#ifdef __MPI
+        if(INPUT.pw_seed > 0)    MPI_Allreduce(MPI_IN_PLACE, &this->pw_wfc->ggecut, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
+        //qianrui add 2021-8-13 to make different kpar parameters can get the same results
+#endif
         this->pw_wfc->setuptransform();
         for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)   GlobalC::kv.ngk[ik] = this->pw_wfc->npwk[ik];
         this->pw_wfc->collect_local_pw(); 
-        GlobalC::wfcpw = this->pw_wfc; //Temporary
+        print_wfcfft(inp, GlobalV::ofs_running);
 
         // initialize the real-space uniform grid for FFT and parallel
         // distribution of plane waves
         GlobalC::Pgrid.init(GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, GlobalC::rhopw->nplane,
-            GlobalC::rhopw->nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+            GlobalC::rhopw->nrxx, GlobalC::bigpw->nbz, GlobalC::bigpw->bz); // mohan add 2010-07-22, update 2011-05-04
         // Calculate Structure factor
-        GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
+        GlobalC::sf.setup_structure_factor(&GlobalC::ucell, GlobalC::rhopw);
 
         // Inititlize the charge density.
         GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
@@ -103,6 +106,23 @@ namespace ModuleESolver
         //hamilt2density() and use:
         //this->phsol->solve(this->phamilt, this->pes, this->wf, ETHR);
         ModuleBase::timer::tick(this->classname, "hamilt2density");
+    }
+
+    void ESolver_KS::print_wfcfft(Input& inp, ofstream &ofs)
+    {
+        ofs << "\n SETUP PLANE WAVES FOR WAVE FUNCTIONS" << std::endl;
+        ModuleBase::GlobalFunc::OUT(ofs,"number of plane waves",this->pw_wfc->npwtot);
+	    ModuleBase::GlobalFunc::OUT(ofs,"number of sticks", this->pw_wfc->nstot);
+
+        GlobalV::ofs_running << "\n PARALLEL PW FOR WAVE FUNCTIONS" << std::endl;
+        GlobalV::ofs_running <<" "<< std::setw(8)  << "PROC"<< std::setw(15) << "COLUMNS(POT)"<< std::setw(15) << "PW" << std::endl;
+        for (int i = 0; i < GlobalV::NPROC_IN_POOL ; ++i)
+        {
+            GlobalV::ofs_running <<" "<<std::setw(8)<< i+1 << std::setw(15) << this->pw_wfc->nst_per[i] << std::setw(15) << this->pw_wfc->npw_per[i] << std::endl;
+        }
+        GlobalV::ofs_running << " --------------- sum -------------------" << std::endl;
+        GlobalV::ofs_running << " " << std::setw(8)  << GlobalV::NPROC_IN_POOL << std::setw(15) << this->pw_wfc->nstot << std::setw(15) << this->pw_wfc->npwtot << std::endl;
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT PLANEWAVE");
     }
 
 

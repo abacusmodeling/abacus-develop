@@ -16,18 +16,18 @@ namespace Gint_Tools
 		const int jby,
 		const int kbz)
 	{
-		int *vindex = (int*)malloc(GlobalC::pw.bxyz*sizeof(int));
+		int *vindex = (int*)malloc(GlobalC::bigpw->bxyz*sizeof(int));
 		int bindex=0;
 		// z is the fastest,
 		// ipart can be obtained by using a previously stored array
-		for(int ii=0; ii<GlobalC::pw.bx; ii++)
+		for(int ii=0; ii<GlobalC::bigpw->bx; ii++)
 		{
 			const int ipart = (ibx+ii)*ncyz;
-			for(int jj=0; jj<GlobalC::pw.by; jj++)
+			for(int jj=0; jj<GlobalC::bigpw->by; jj++)
 			{
 				// jpart can be obtained by using a previously stored array
 				const int jpart = (jby+jj)*GlobalC::rhopw->nplane + ipart;
-				for(int kk=0; kk<GlobalC::pw.bz; kk++)
+				for(int kk=0; kk<GlobalC::bigpw->bz; kk++)
 				{
 					vindex[bindex] = kbz+kk + jpart;
 					++bindex;
@@ -48,8 +48,8 @@ namespace Gint_Tools
 	{
 		// set the index for obtaining local potentials
 		int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
-		double *vldr3 = (double*)malloc(GlobalC::pw.bxyz*sizeof(double));					
-		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+		double *vldr3 = (double*)malloc(GlobalC::bigpw->bxyz*sizeof(double));					
+		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 		{
 			vldr3[ib]=vlocal[vindex[ib]] * dv;
 		}
@@ -120,8 +120,8 @@ namespace Gint_Tools
 		const int na_grid, 			// number of atoms on this grid 
 		const int grid_index)		// 1d index of FFT index (i,j,k) 
 	{
-		bool** cal_flag = (bool**)malloc(GlobalC::pw.bxyz*sizeof(bool*));
-		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+		bool** cal_flag = (bool**)malloc(GlobalC::bigpw->bxyz*sizeof(bool*));
+		for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 			cal_flag[ib] = (bool*)malloc(na_grid*sizeof(bool));
 
 		for (int id=0; id<na_grid; id++)
@@ -145,7 +145,7 @@ namespace Gint_Tools
 				GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1],
 				GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2]};
 
-			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+			for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 			{
 				// meshcell_pos: z is the fastest
 				const double dr[3] = {
@@ -170,7 +170,7 @@ namespace Gint_Tools
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
 		const bool*const*const cal_flag,
-		double*const*const psir_ylm) 	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		double*const*const psir_ylm) 	// cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 	{
 		for (int id=0; id<na_grid; id++)
 		{
@@ -196,7 +196,7 @@ namespace Gint_Tools
 				GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2]};
 
 			// number of grids in each big cell (bxyz)
-			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+			for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 			{
 				double *p=&psir_ylm[ib][block_index[id]];
 				if(!cal_flag[ib][id]) 
@@ -264,7 +264,7 @@ namespace Gint_Tools
 		const double delta_r, 				// delta_r of the uniform FFT grid
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
-		const bool*const*const cal_flag,    // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 		double*const*const psir_ylm,
 		double*const*const dpsir_ylm_x,
 		double*const*const dpsir_ylm_y,
@@ -285,7 +285,7 @@ namespace Gint_Tools
 				GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1],
 				GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2]};
 
-			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+			for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 			{
 				double*const p_psi=&psir_ylm[ib][block_index[id]];
 				double*const p_dpsi_x=&dpsir_ylm_x[ib][block_index[id]];
@@ -385,7 +385,7 @@ namespace Gint_Tools
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
-		const bool*const*const cal_flag,    // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 		double*const*const dpsir_ylm_x,
 		double*const*const dpsir_ylm_y,
 		double*const*const dpsir_ylm_z,
@@ -409,7 +409,7 @@ namespace Gint_Tools
 				GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1],
 				GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2]};
 
-			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+			for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 			{
 				double*const p_dpsi_x=&dpsir_ylm_x[ib][block_index[id]];
 				double*const p_dpsi_y=&dpsir_ylm_y[ib][block_index[id]];
@@ -455,17 +455,17 @@ namespace Gint_Tools
 	}
 
 	// atomic basis sets
-	// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+	// psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
 		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
-		const double*const*const psir_ylm)		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
+		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const vldr3,			    	// vldr3[GlobalC::bigpw->bxyz]
+		const double*const*const psir_ylm)		    // psir_ylm[GlobalC::bigpw->bxyz][LD_pool]
 	{
-		Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
-		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+		Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::bigpw->bxyz, LD_pool);
+		for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 		{
 			for(int ia=0; ia<na_grid; ++ia)
 			{
@@ -495,8 +495,8 @@ namespace Gint_Tools
 		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
 		const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
 		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
 		const double*const*const DM)
 	{
 		constexpr char side='L', uplo='U';
@@ -504,8 +504,8 @@ namespace Gint_Tools
 		constexpr double alpha_symm=1, alpha_gemm=1, beta=1;    
 		constexpr int inc=1;
 
-		Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::pw.bxyz, LD_pool);
-		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+		Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::bigpw->bxyz, LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
 
 		for (int ia1=0; ia1<na_grid; ia1++)
 		{
@@ -513,7 +513,7 @@ namespace Gint_Tools
 			for (int ia2=0; ia2<na_grid; ia2++)
 			{
 				int first_ib=0, last_ib=0;
-				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+				for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 				{
 					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 					{
@@ -521,7 +521,7 @@ namespace Gint_Tools
 						break;
 					}
 				}
-				for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
+				for(int ib=GlobalC::bigpw->bxyz-1; ib>=0; --ib)
 				{
 					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 					{

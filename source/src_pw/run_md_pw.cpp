@@ -100,7 +100,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
             }
 
             // reset local potential and initial wave function
-            GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
+            GlobalC::pot.init_pot(verlet->step_, GlobalC::sf.strucFac);
             
             // new wave functions
             //GlobalC::wf.wfcinit();

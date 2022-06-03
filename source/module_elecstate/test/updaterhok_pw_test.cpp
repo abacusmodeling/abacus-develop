@@ -34,7 +34,7 @@ using::testing::Assign;
  * The inputs and output files were taken from an integrated test:
  * abacus-develop/tests/integrate/801_PW_LT_sc. Note: the output files 
  * WAVEFUNC1.txt and SPIN1_CHG were obtained by using ABACUS without MPI 
- * (ABACUC.fp.x). This is because the GlobalC::pw.gdirect_global indexes 
+ * (ABACUC.fp.x). This is because the GlobalC::sf.gdirect_global indexes 
  * are different with and without MPI.
  *
  * The mpi env. is currently invalid in this UT.
@@ -271,25 +271,11 @@ TEST_F(EState,RhoPW)
                     GlobalV::NSPIN,
                     GlobalC::ucell.G,
                     GlobalC::ucell.latvec);
-    // here we use GlobalC::pw directly
-    GlobalC::pw.set(INPUT.gamma_only,
-                    INPUT.ecutwfc,
-                    INPUT.ecutrho,
-                    INPUT.nx,
-                    INPUT.ny,
-                    INPUT.nz,
-                    INPUT.ncx,
-                    INPUT.ncy,
-                    INPUT.ncz,
-                    INPUT.bx,
-                    INPUT.by,
-                    INPUT.bz,
-                    INPUT.pw_seed,
-                    INPUT.nbspline);
+    // here we use GlobalC::sf directly
+    GlobalC::sf.set(INPUT.nbspline);
     // ecut is needed here in setup_gg()
     // the first parameter GlobalV::ofs_running is not necessarily needed
     // because GlobalV::ofs_running is used inside the function anyway.
-    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
 
     // pw_rho = new ModuleBase::PW_Basis();
     //temporary, it will be removed
@@ -317,14 +303,12 @@ TEST_F(EState,RhoPW)
     EXPECT_TRUE((GlobalC::rhopw->nz + 1) % 2 == 0 || (GlobalC::rhopw->nz + 1) % 3 == 0 || (GlobalC::rhopw->nz + 1) % 5 == 0);
 
     // Calculate Structure factor
-    // GlobalC::pw.setup_structure_factor();
     // init charge/potential/wave functions
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
     // GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
     // we need to supply NBANDS here
     psi::Psi<std::complex<double>>* psi = GlobalC::wf.allocate(GlobalC::kv.nks);
     // std::cout<<"npwx "<<GlobalC::wf.npwx<<std::endl;
-    GlobalC::UFFT.allocate();
 
     //====== read wavefunction ==========================================
     std::stringstream ssw;

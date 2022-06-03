@@ -278,19 +278,10 @@ void Epsilon0_vasp:: Cal_b(int ik)
 			{
 				for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 				{
-					/*b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].x)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].y)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].z)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);*/
 					b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[0] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[1] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[2] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 
-					/*for(int ir=0; ir<GlobalC::wfcpw->nrxx; ir++)
-					{
-						b_core[ib1][ib2][0] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][0]/GlobalC::wfcpw->nrxx;
-						b_core[ib1][ib2][1] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][1]/GlobalC::wfcpw->nrxx;
-						b_core[ib1][ib2][2] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][2]/GlobalC::wfcpw->nrxx;
-					}*/
 				}
 			}
 	}
@@ -301,9 +292,6 @@ void Epsilon0_vasp:: Cal_b(int ik)
 			{
 				for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 				{
-					/*b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].x)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].y)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].z)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);*/
 					b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[0] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[1] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[2] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
@@ -315,9 +303,6 @@ void Epsilon0_vasp:: Cal_b(int ik)
 			{
 				for(int ig =GlobalC::wf.npwx; ig< GlobalC::wf.npwx + GlobalC::kv.ngk[ik]; ig++)
 				{
-					/*b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].x)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].y)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].z)*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);*/
 					b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig-GlobalC::wf.npwx)[0] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig-GlobalC::wf.npwx)[1] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig-GlobalC::wf.npwx)[2] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);

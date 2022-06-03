@@ -32,7 +32,7 @@ void Stress_Func::stress_har(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_
 	{
 		const double g2 = rho_basis->gg[ig];
 		if(g2 < 1e-8) continue;
-		//const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
+		//const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::sf.gg [ig]);
 		//ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
 		//vh_g[ig] = fac * Porter[j];
 		shart= ( conj( aux[ig] ) * aux[ig] ).real()/(GlobalC::ucell.tpiba2 * g2);

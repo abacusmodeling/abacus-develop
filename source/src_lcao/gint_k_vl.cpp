@@ -63,7 +63,7 @@ void Gint_k::cal_meshball_vlocal(
 	double alpha=1, beta=1;
 	int allnw=block_index[na_grid];
 
-	int k=GlobalC::pw.bxyz;
+	int k=GlobalC::bigpw->bxyz;
 	for(int ia1=0; ia1<na_grid; ++ia1)
 	{
 		//if(all_out_of_range[ia1]) continue;
@@ -85,7 +85,7 @@ void Gint_k::cal_meshball_vlocal(
 			if (iat1 <= iat2)
 			{
     			int cal_num=0;
-    			for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+    			for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
     			{
     				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
     				    ++cal_num;
@@ -104,9 +104,9 @@ void Gint_k::cal_meshball_vlocal(
 
 				const int iatw = DM_start + GlobalC::GridT.find_R2st[iat1][offset];
 
-			    if(cal_num>GlobalC::pw.bxyz/4)
+			    if(cal_num>GlobalC::bigpw->bxyz/4)
 			    {
-					k=GlobalC::pw.bxyz;
+					k=GlobalC::bigpw->bxyz;
 					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
 						&psir_vlbr3[0][idx2], &LD_pool,
 						&psir_ylm[0][idx1], &LD_pool,
@@ -114,7 +114,7 @@ void Gint_k::cal_meshball_vlocal(
 				}
     			else
     			{
-					for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+					for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 					{
 						if(cal_flag[ib][ia1]&&cal_flag[ib][ia2])
 						{
@@ -179,14 +179,14 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 #endif
 			for(int i=0; i<nbx; i++)
 			{
-				const int ibx=i*GlobalC::pw.bx;
+				const int ibx=i*GlobalC::bigpw->bx;
 				for(int j=0; j<nby; j++)
 				{
-					const int jby=j*GlobalC::pw.by;
+					const int jby=j*GlobalC::bigpw->by;
 					// count the z according to big box.
 					for(int k=nbz_start; k<nbz_start+nbz; k++)
 					{
-						const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; //mohan add 2012-03-25
+						const int kbz = k*GlobalC::bigpw->bz-GlobalC::rhopw->startz_current; //mohan add 2012-03-25
 
 						const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 
@@ -208,7 +208,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 						// set up band matrix psir_ylm and psir_DM
 						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 
-						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
                         Gint_Tools::cal_psir_ylm(
 							na_grid, grid_index, delta_r,
 							block_index, block_size,
@@ -239,7 +239,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
                         delete[] block_index;
                         delete[] block_size;
 
-						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+						for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 							free(cal_flag[ib]);
 						free(cal_flag);			cal_flag=nullptr;
 					}// int k

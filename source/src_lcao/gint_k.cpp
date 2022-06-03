@@ -897,7 +897,7 @@ void Gint_k::set_ijk_atom(
         mt[1] = GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
         mt[2] = GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2];
 
-        for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+        for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
         {
             // meshcell_pos: z is the fastest
             dr[ib][id][0] = GlobalC::GridT.meshcell_pos[ib][0] + mt[0];

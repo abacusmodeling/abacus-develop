@@ -28,11 +28,11 @@ ModuleBase::Vector3<double> WF_igk::get_1qvec_cartesian(const int ik, const int 
 	/*
 	if(igk(ik,ig)==0)
 	{
-		std::cout << " g add = " << GlobalC::pw.gcar << std::endl;
+		std::cout << " g add = " << GlobalC::sf.gcar << std::endl;
 		std::cout << "\n igk = " << igk(ik,ig);
 		std::cout << " k=" << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " <<
-	GlobalC::kv.kvec_c[ik].z; std::cout << " g=" << GlobalC::pw.gcar[ this->igk(ik, ig) ].x << " " << GlobalC::pw.gcar[
-	this->igk(ik, ig) ].y << " " << GlobalC::pw.gcar[ this->igk(ik, ig) ].z;
+	GlobalC::kv.kvec_c[ik].z; std::cout << " g=" << GlobalC::sf.gcar[ this->igk(ik, ig) ].x << " " << GlobalC::sf.gcar[
+	this->igk(ik, ig) ].y << " " << GlobalC::sf.gcar[ this->igk(ik, ig) ].z;
 	}
 	*/
 
@@ -71,8 +71,8 @@ std::complex<double> *WF_igk::get_sk(const int ik, const int it, const int ia, M
         if (iy < int(ny/2) + 1) iy += ny;
         if (iz < int(nz/2) + 1) iz += nz;
 		const int iat = GlobalC::ucell.itia2iat(it, ia);
-		sk[igl] = kphase * GlobalC::pw.eigts1(iat, ix) * GlobalC::pw.eigts2(iat, iy)
-				 * GlobalC::pw.eigts3(iat, iz);
+		sk[igl] = kphase * GlobalC::sf.eigts1(iat, ix) * GlobalC::sf.eigts2(iat, iy)
+				 * GlobalC::sf.eigts3(iat, iz);
 	}
 	ModuleBase::timer::tick("WF_igk", "get_sk");
 	return sk;

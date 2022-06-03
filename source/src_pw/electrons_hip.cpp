@@ -63,7 +63,7 @@ void Electrons::self_consistent(const int &istep)
 	ModuleBase::timer::tick("Electrons", "self_consistent");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
 
 	set_pw_diag_thr();
 
@@ -322,7 +322,7 @@ void Electrons::self_consistent(const int &istep)
 			// WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
 			// mohan update 2011-02-21
 			// qianrui update 2020-10-17
-			//WF_io::write_wfc(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+			//WF_io::write_wfc(ssw.str(), GlobalC::wf.evc, GlobalC::sf.gcar);
 			// ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
 		}
 
