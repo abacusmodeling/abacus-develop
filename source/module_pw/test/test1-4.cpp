@@ -116,8 +116,8 @@ TEST_F(PWTEST,test1_4)
         complex<double> * rhogout = new complex<double> [npwk];
         for(int ig = 0 ; ig < npwk ; ++ig)
         {
-            rhog[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ik*npwk_max + ig].x+1) + 1);
-            rhogr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ik*npwk_max + ig].x+1) + 1);
+            rhog[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.getgdirect(ik,ig).x+1) + 1);
+            rhogr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.getgdirect(ik,ig).x+1) + 1);
         }    
 
         pwtest.recip2real(rhog,rhor,ik); //check out-of-place transform

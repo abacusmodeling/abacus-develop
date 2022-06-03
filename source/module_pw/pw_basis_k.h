@@ -37,7 +37,13 @@ namespace ModulePW
  * pwtest.real2recip(wfr,wfg,ik); //wfr to wfg
  * //4. Generate the wave vector for planewaves
  * pwtest.collect_local_pw(); 
- * //then we can use pwtest.gg, pwtest.gdirect, pwtest.gcar, (unit in lat0^-1 or lat0^-2)
+ * //then we can use pwtest.gk2, pwtest.gcar, (unit in lat0^-1 or lat0^-2)
+ * //getgk2(ik,ig) : get pwtest.gk2: (G+K)^2
+ * //getgcar(ik,ig): get pwtest.gcar: G
+ * //getgdirect(ik,ig)：get pwtest.gcar: latvec * G
+ * //getgpluskcar(ik.ig):   get G+K
+ * //getigl2isz(ik,ig): get pwtest.igl2isz_k
+ * //getigl2ig(ik,ig):  get pwtest.igl2ig_k
  * 
  */
 class PW_Basis_K : public PW_Basis
@@ -101,6 +107,8 @@ public:
     double& getgk2(const int ik, const int igl) const;
     //get G
     ModuleBase::Vector3<double>& getgcar(const int ik, const int igl) const;
+    //get G-direct
+    ModuleBase::Vector3<double> getgdirect(const int ik, const int igl) const;
     //get (G+K)
     ModuleBase::Vector3<double> getgpluskcar(const int ik, const int igl) const;
     //get igl2isz_k

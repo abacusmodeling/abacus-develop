@@ -116,10 +116,8 @@ void PW_Basis_K::setuptransform()
 void PW_Basis_K::collect_local_pw()
 {
     if(gk2 != nullptr) delete[] gk2;
-    if(gdirect != nullptr) delete[] gdirect;
     if(gcar != nullptr) delete[] gcar;
     this->gk2 = new double[this->npwk_max * this->nks];
-    this->gdirect = new ModuleBase::Vector3<double>[this->npwk_max * this->nks];
     this->gcar = new ModuleBase::Vector3<double>[this->npwk_max * this->nks];
 
     ModuleBase::Vector3<double> f;
@@ -142,7 +140,6 @@ void PW_Basis_K::collect_local_pw()
             f.z = iz;
 
             this->gk2[ik * npwk_max + igl] = (f+kv) * (this->GGT * (f+kv));
-            this->gdirect[ik * npwk_max + igl] = f;
             this->gcar[ik * npwk_max + igl] = f * this->G;
         }
     }
@@ -175,6 +172,16 @@ ModuleBase::Vector3<double>& PW_Basis_K::getgcar(const int ik, const int igl) co
 {
     return this->gcar[ik * this->npwk_max + igl];
 }
+
+ModuleBase::Vector3<double> PW_Basis_K::getgdirect(const int ik, const int igl) const
+{
+    ModuleBase::Vector3<double> f = this->latvec * this->gcar[ik * this->npwk_max + igl];
+    f.x = floor(f.x+0.1);
+    f.y = floor(f.y+0.1);
+    f.z = floor(f.z+0.1);
+    return f;
+}
+
 
 ModuleBase::Vector3<double> PW_Basis_K::getgpluskcar(const int ik, const int igl) const
 {
