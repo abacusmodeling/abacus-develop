@@ -60,7 +60,7 @@ Charge_Broyden::~Charge_Broyden()
 			delete[] w;
 			delete[] dRR;
 
-			// dimension of rho_save2(GlobalV::NSPIN, GlobalC::pw.nrxx)
+			// dimension of rho_save2(GlobalV::NSPIN, GlobalC::rhopw->nrxx)
 			for (int is=0; is<GlobalV::NSPIN; is++)
 			{
 				delete[] rho_save2[is];
@@ -105,7 +105,7 @@ double Charge_Broyden::get_drho()
 	double scf_thr2 = 0.0;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			scf_thr2 += abs( rho[is][ir] - rho_save[is][ir] );
 		}
@@ -114,8 +114,8 @@ double Charge_Broyden::get_drho()
 	Parallel_Reduce::reduce_double_pool( scf_thr2 );
 	assert( nelec != 0);
 	assert( GlobalC::ucell.omega > 0);
-	assert( GlobalC::pw.ncxyz > 0);
-	scf_thr2 *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+	assert( GlobalC::rhopw->nxyz > 0);
+	scf_thr2 *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
 	scf_thr2 /= nelec;
 	if(GlobalV::test_charge)GlobalV::ofs_running << " scf_thr from real space grid is " << scf_thr2 << std::endl;
 
@@ -140,9 +140,9 @@ void Charge_Broyden::mix_rho
 	double **rho123 = new double*[GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
-		rho123[is] = new double[GlobalC::pw.nrxx];
-		ModuleBase::GlobalFunc::ZEROS(rho123[is], GlobalC::pw.nrxx);
-		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+		rho123[is] = new double[GlobalC::rhopw->nrxx];
+		ModuleBase::GlobalFunc::ZEROS(rho123[is], GlobalC::rhopw->nrxx);
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ++ir)
 		{
 			rho123[is][ir] = this->rho[is][ir];
 		}
@@ -189,14 +189,14 @@ void Charge_Broyden::mix_rho
 	// rho_save is the charge before mixing
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ++ir)
 		{
 			rho_save[is][ir] = rho123[is][ir];
 		}
     }
 
 //	for(int is=0; is<GlobalV::NSPIN; ++is)
-  //	ModuleBase::GlobalFunc::DCOPY(rho[is],rho_save[is],GlobalC::pw.nrxx);
+  //	ModuleBase::GlobalFunc::DCOPY(rho[is],rho_save[is],GlobalC::rhopw->nrxx);
 	//2014-06-22
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
@@ -461,11 +461,11 @@ void Charge_Broyden::allocate_Broyden()
     	    	this->Rrho[is] = new double*[rstep];
     	    	for (int i=0; i<rstep; i++)
     	    	{
-    	        	this->Rrho[is][i] = new double[GlobalC::pw.nrxx];
-    	        	ModuleBase::GlobalFunc::ZEROS(Rrho[is][i],GlobalC::pw.nrxx);
+    	        	this->Rrho[is][i] = new double[GlobalC::rhopw->nrxx];
+    	        	ModuleBase::GlobalFunc::ZEROS(Rrho[is][i],GlobalC::rhopw->nrxx);
     	    	}	
     		}
-    		ModuleBase::Memory::record("Charge_Broyden","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","Rrho", GlobalV::NSPIN*rstep*GlobalC::rhopw->nrxx,"double");
 
     		// (2) allocate dRrho[i]: Rrho[i+1] - Rrho[i]
     		this->dRrho = new double**[GlobalV::NSPIN];
@@ -475,18 +475,18 @@ void Charge_Broyden::allocate_Broyden()
     		{
     	    	dRrho[is] = new double*[dstep];
     	    	drho[is] = new double*[dstep];
-    	    	rho_save2[is] = new double[GlobalC::pw.nrxx];
+    	    	rho_save2[is] = new double[GlobalC::rhopw->nrxx];
     	    	for (int i=0; i<dstep; i++)
     	    	{
-    	        	dRrho[is][i] = new double[GlobalC::pw.nrxx];
-    	        	drho[is][i] = new double[GlobalC::pw.nrxx];
-    	        	ModuleBase::GlobalFunc::ZEROS( dRrho[is][i], GlobalC::pw.nrxx );
-    	        	ModuleBase::GlobalFunc::ZEROS( drho[is][i], GlobalC::pw.nrxx);
+    	        	dRrho[is][i] = new double[GlobalC::rhopw->nrxx];
+    	        	drho[is][i] = new double[GlobalC::rhopw->nrxx];
+    	        	ModuleBase::GlobalFunc::ZEROS( dRrho[is][i], GlobalC::rhopw->nrxx );
+    	        	ModuleBase::GlobalFunc::ZEROS( drho[is][i], GlobalC::rhopw->nrxx);
     	    	}
     		}
-    		ModuleBase::Memory::record("Charge_Broyden","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    		ModuleBase::Memory::record("Charge_Broyden","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    		ModuleBase::Memory::record("Charge_Broyden","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","dRrho", GlobalV::NSPIN*dstep*GlobalC::rhopw->nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","drho", GlobalV::NSPIN*dstep*GlobalC::rhopw->nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","rho_save2", GlobalV::NSPIN*GlobalC::rhopw->nrxx,"double");
 
 			this->dRR = new double[dstep];
 			ModuleBase::GlobalFunc::ZEROS(dRR, dstep);
@@ -632,7 +632,7 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 	}
 	//std::cout << std::endl;
 	
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+	for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 	{
 		this->rho[is][ir] = this->rho_save[is][ir] + mixp * this->Rrho[is][m][ir];
 	
@@ -645,12 +645,12 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 	/*
 	std::cout << "\n check E: " << std::endl;
 	
-	double* rhot = new double[GlobalC::pw.nrxx];
-	ModuleBase::GlobalFunc::ZEROS(rhot, GlobalC::pw.nrxx);
+	double* rhot = new double[GlobalC::rhopw->nrxx];
+	ModuleBase::GlobalFunc::ZEROS(rhot, GlobalC::rhopw->nrxx);
 
 	for(int i=0; i<dstep; i++)
 	{
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			rhot[ir] = this->drho[is][i][ir] + gamma[i] * this->dRrho[is][i][ir];
 		}
@@ -662,7 +662,7 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 	delete[] rhot;
 	*/
 
-	ModuleBase::GlobalFunc::DCOPY(rho[is], rho_save[is], GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::DCOPY(rho[is], rho_save[is], GlobalC::rhopw->nrxx);
 
 	delete[] gamma;
 	return;

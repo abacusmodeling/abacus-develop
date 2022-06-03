@@ -118,14 +118,14 @@ void Epsilon0_vasp:: Init()
 	psi = new std::complex<double> *[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi[ib] = new std::complex<double>[GlobalC::pw.nrxx];
+		psi[ib] = new std::complex<double>[GlobalC::wfcpw->nrxx];
 	}
 
 	psi_nabla =new std::complex<double> **[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_nabla[ib] = new std::complex<double> *[GlobalC::pw.nrxx];
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		psi_nabla[ib] = new std::complex<double> *[GlobalC::wfcpw->nrxx];
+		for(int ir=0; ir<GlobalC::wfcpw->nrxx; ir++)
 		{
 			psi_nabla[ib][ir] = new std::complex<double>[3];
 		}
@@ -182,7 +182,7 @@ void Epsilon0_vasp:: Delete()
 
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::wfcpw->nrxx; ir++)
 		{
 			delete[] psi_nabla[ib][ir];
 		}
@@ -285,11 +285,11 @@ void Epsilon0_vasp:: Cal_b(int ik)
 					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[1] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::wfcpw->getgpluskcar(ik,ig)[2] * (ModuleBase::TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 
-					/*for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+					/*for(int ir=0; ir<GlobalC::wfcpw->nrxx; ir++)
 					{
-						b_core[ib1][ib2][0] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][0]/GlobalC::pw.nrxx;
-						b_core[ib1][ib2][1] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][1]/GlobalC::pw.nrxx;
-						b_core[ib1][ib2][2] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][2]/GlobalC::pw.nrxx;
+						b_core[ib1][ib2][0] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][0]/GlobalC::wfcpw->nrxx;
+						b_core[ib1][ib2][1] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][1]/GlobalC::wfcpw->nrxx;
+						b_core[ib1][ib2][2] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][2]/GlobalC::wfcpw->nrxx;
 					}*/
 				}
 			}

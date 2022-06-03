@@ -162,7 +162,7 @@ void Gint_k::fvl_k_RealSpace(
 							const int iii = i*GlobalC::pw.bx + ii;
 							const int jjj = j*GlobalC::pw.by + jj;
 							const int kkk = k*GlobalC::pw.bz + kk;
-							vl_index = (kkk-GlobalC::pw.nczp_start) + jjj*GlobalC::pw.nczp + iii*GlobalC::pw.ncy*GlobalC::pw.nczp;
+							vl_index = (kkk-GlobalC::pw.nczp_start) + jjj*GlobalC::rhopw->nplane + iii*GlobalC::rhopw->ny*GlobalC::rhopw->nplane;
 							vldr3[bindex] = vl[ vl_index ] * dv;
 							//        vldr3[bindex] = dv; // for overlap test
 

@@ -69,7 +69,7 @@ namespace ModuleESolver
 
         this->psi = GlobalC::wf.allocate(GlobalC::kv.nks);
 
-        // cout<<GlobalC::pw.nrxx<<endl;
+        // cout<<GlobalC::rhopw->nrxx<<endl;
         // cout<<"before ufft allocate"<<endl;
         GlobalC::UFFT.allocate();
 
@@ -84,7 +84,7 @@ namespace ModuleESolver
         // init hamiltonian
         // only allocate in the beginning of ELEC LOOP!
         //=====================
-        GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
+        GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::rhopw->nrxx);
 
         //=================================
         // initalize local pseudopotential
@@ -306,7 +306,7 @@ namespace ModuleESolver
         {
             for (int is = 0; is < GlobalV::NSPIN; ++is)
             {
-                for (int ir = 0; ir < GlobalC::pw.nrxx; ++ir)
+                for (int ir = 0; ir < GlobalC::rhopw->nrxx; ++ir)
                 {
                     GlobalC::pot.vnew(is, ir) = GlobalC::pot.vr(is, ir);
                 }

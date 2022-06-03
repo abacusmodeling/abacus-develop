@@ -33,7 +33,7 @@ void Magnetism::compute_magnetization()
 
 		//GlobalC::CHR.check_ne(GlobalC::CHR.rho[0]);
 		//GlobalC::CHR.check_ne(GlobalC::CHR.rho[1]);
-        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
         {
             double diff = GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho[1][ir];
             this->tot_magnetization += diff;
@@ -42,8 +42,8 @@ void Magnetism::compute_magnetization()
 
         Parallel_Reduce::reduce_double_pool( this->tot_magnetization );
         Parallel_Reduce::reduce_double_pool( this->abs_magnetization );
-        this->tot_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
-        this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+        this->tot_magnetization *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
+        this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
 
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
@@ -66,7 +66,7 @@ void Magnetism::compute_magnetization()
 	{
 		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] = 0.00;
 		this->abs_magnetization = 0.00;
-		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			double diff = sqrt(pow(GlobalC::CHR.rho[1][ir], 2) + pow(GlobalC::CHR.rho[2][ir], 2) +pow(GlobalC::CHR.rho[3][ir], 2));
  
@@ -76,8 +76,8 @@ void Magnetism::compute_magnetization()
 		Parallel_Reduce::reduce_double_pool( this->tot_magnetization_nc, 3 );
 		Parallel_Reduce::reduce_double_pool( this->abs_magnetization );
 
-		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
-		this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
+		this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
 		GlobalV::ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 	}

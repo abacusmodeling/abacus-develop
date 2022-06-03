@@ -376,41 +376,41 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 		
 	// 	std::ofstream unkfile(name.str());
 		
-	// 	unkfile << std::setw(12) << GlobalC::pw.ncx << std::setw(12) << GlobalC::pw.ncy << std::setw(12) << GlobalC::pw.ncz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
+	// 	unkfile << std::setw(12) << GlobalC::rhopw->nx << std::setw(12) << GlobalC::rhopw->ny << std::setw(12) << GlobalC::rhopw->nz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
 		
 	// 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	// 	{
 	// 		if(!tag_cal_band[ib]) continue;
 	// 		//std::complex<double> *porter = GlobalC::UFFT.porter;
 	// 		//  u_k in real space
-	// 		ModuleBase::GlobalFunc::ZEROS(porter, GlobalC::pw.nrxx);
+	// 		ModuleBase::GlobalFunc::ZEROS(porter, GlobalC::rhopw->nrxx);
 	// 		for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 	// 		{
 	// 			porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
 	// 		}
 	// 		GlobalC::pw.FFT_wfc.FFT3D(porter, 1);
 			
-	// 		for(int k=0; k<GlobalC::pw.ncz; k++)
+	// 		for(int k=0; k<GlobalC::rhopw->nz; k++)
 	// 		{
-	// 			for(int j=0; j<GlobalC::pw.ncy; j++)
+	// 			for(int j=0; j<GlobalC::rhopw->ny; j++)
 	// 			{
-	// 				for(int i=0; i<GlobalC::pw.ncx; i++)
+	// 				for(int i=0; i<GlobalC::rhopw->nx; i++)
 	// 				{
 	// 					if(!gamma_only_wannier)
 	// 					{
-	// 						unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].real()
-	// 								<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
+	// 						unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k].real()
+	// 								<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k].imag() 
 	// 								//jingan test
-	// 								//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+	// 								//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k])
 	// 								<< std::endl;
 	// 					}
 	// 					else
 	// 					{
 	// 						double zero = 0.0;
-	// 						unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs( porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k] )
+	// 						unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs( porter[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k] )
 	// 								<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zero
 	// 								//jingan test
-	// 								//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+	// 								//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k])
 	// 								<< std::endl;
 	// 					}
 	// 				}

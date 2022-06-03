@@ -140,7 +140,7 @@ void Diago_CG_CUDA<T, T2>::diag
 )
 {
 
-    // cout<<"begin diago fft dim"<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
+    // cout<<"begin diago fft dim"<<GlobalC::rhopw->nx<<" "<<GlobalC::rhopw->ny<<" "<<GlobalC::rhopw->nz<<endl;
     // cout << &GlobalC::pw << endl;
     if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","diag");
     ModuleBase::timer::tick("Diago_CG_CUDA","diag");

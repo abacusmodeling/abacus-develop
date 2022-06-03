@@ -26,7 +26,7 @@ namespace Gint_Tools
 			for(int jj=0; jj<GlobalC::pw.by; jj++)
 			{
 				// jpart can be obtained by using a previously stored array
-				const int jpart = (jby+jj)*GlobalC::pw.nczp + ipart;
+				const int jpart = (jby+jj)*GlobalC::rhopw->nplane + ipart;
 				for(int kk=0; kk<GlobalC::pw.bz; kk++)
 				{
 					vindex[bindex] = kbz+kk + jpart;

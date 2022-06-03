@@ -22,12 +22,12 @@ void Use_FFT::allocate(void)
     ModuleBase::TITLE("Use_FFT","allocate");
 
     delete[] porter;
-    porter = new std::complex<double>[GlobalC::pw.nrxx];
+    porter = new std::complex<double>[GlobalC::rhopw->nrxx];
 #ifdef __CUDA
-    cufftPlan3d(&fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(double2));
+    cufftPlan3d(&fft_handle, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, CUFFT_Z2Z);
+    cudaMalloc((void**)&d_porter, GlobalC::rhopw->nrxx * sizeof(double2));
 #endif
-    ModuleBase::Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
+    ModuleBase::Memory::record("Use_FFT","porter",GlobalC::rhopw->nrxx,"complexmatrix");
     return;
 }
 
@@ -39,7 +39,7 @@ void Use_FFT::ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, double *
 
 // void Use_FFT::ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir)
 // {
-// 	ModuleBase::GlobalFunc::ZEROS(psir, GlobalC::pw.nrxx);
+// 	ModuleBase::GlobalFunc::ZEROS(psir, GlobalC::rhopw->nrxx);
 // 	for(int ig=0; ig<GlobalC::wf.npw; ig++)
 // 	{
 // 		psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = psig[ig];
@@ -54,7 +54,7 @@ void Use_FFT::ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, double *
 // void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir)
 // {
 // 	// (1) set value
-//     ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::pw.nrxx );
+//     ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::rhopw->nrxx );
 //     for (int ig=0; ig<GlobalC::wf.npw; ig++)
 //     {
 //         psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = evc(ib, ig);

@@ -371,7 +371,7 @@ double energy::delta_e(void)
 
     double deband_aux = 0.0;
 
-    for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     {
     	deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
 		if(XC_Functional::get_func_type() == 3)
@@ -382,7 +382,7 @@ double energy::delta_e(void)
 
     if (GlobalV::NSPIN == 2)
     {
-    	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     	{
     		deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
 			if(XC_Functional::get_func_type() == 3)
@@ -393,7 +393,7 @@ double energy::delta_e(void)
     }
     else if(GlobalV::NSPIN == 4)
     {
-        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
         {
             deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
             deband_aux -= GlobalC::CHR.rho[2][ir] * GlobalC::pot.vr(2, ir);
@@ -407,7 +407,7 @@ double energy::delta_e(void)
     deband0 = deband_aux;
 #endif
 
-    deband0 *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+    deband0 *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
 	
 	// \int rho(r) v_{exx}(r) dr = 2 E_{exx}[rho]
 	deband0 -= 2*exx;				// Peize Lin add 2017-10-16
@@ -427,7 +427,7 @@ void energy::delta_escf(void)
 	// because in "deband" the energy is calculated from "output" charge density,
 	// so here is the correction.
 
-    for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     {
 		this->descf -= ( GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho_save[0][ir] ) * GlobalC::pot.vr(0, ir);
 		if(XC_Functional::get_func_type() == 3)
@@ -438,7 +438,7 @@ void energy::delta_escf(void)
 
     if (GlobalV::NSPIN==2)
     {
-       	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+       	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
        	{
            	this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
 			if(XC_Functional::get_func_type() == 3)
@@ -449,7 +449,7 @@ void energy::delta_escf(void)
     }
     if (GlobalV::NSPIN==4)
     {
-        for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+        for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
         {
             this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
             this->descf -= ( GlobalC::CHR.rho[2][ir] - GlobalC::CHR.rho_save[2][ir] ) * GlobalC::pot.vr(2, ir);
@@ -459,7 +459,7 @@ void energy::delta_escf(void)
 
     Parallel_Reduce::reduce_double_pool( descf );
 
-    this->descf *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+    this->descf *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
     return;
 }
 

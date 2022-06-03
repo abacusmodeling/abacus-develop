@@ -102,7 +102,7 @@ private:
 		const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
 		const int*const vindex,							// vindex[GlobalC::pw.bxyz]
 		const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-		Charge* chr) const;		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
+		Charge* chr) const;		// rho[GlobalV::NSPIN][GlobalC::rhopw->nrxx]
 
 	void cal_meshball_force(
 		const int grid_index,

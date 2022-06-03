@@ -69,7 +69,7 @@ namespace ModuleESolver
         // Initalize the plane wave basis set
         GlobalC::pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT PLANEWAVE");
-        std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx << " * " << GlobalC::pw.ny << " * " << GlobalC::pw.nz << std::endl;
+        std::cout << " UNIFORM GRID DIM     : " << GlobalC::rhopw->nx << " * " << GlobalC::rhopw->ny << " * " << GlobalC::rhopw->nz << std::endl;
         std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx << " * " << GlobalC::pw.nby << " * " << GlobalC::pw.nbz << std::endl;
         //new plane wave basis
         this->pw_wfc->initgrids(ucell.lat0, ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
@@ -82,16 +82,16 @@ namespace ModuleESolver
 
         // initialize the real-space uniform grid for FFT and parallel
         // distribution of plane waves
-        GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
-            GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+        GlobalC::Pgrid.init(GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, GlobalC::rhopw->nplane,
+            GlobalC::rhopw->nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
         // Calculate Structure factor
         GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
 
         // Inititlize the charge density.
-        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::rhopw->npw);
+        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
         // Initializee the potential.
-        GlobalC::pot.allocate(GlobalC::pw.nrxx);
+        GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
     }
 
     void ESolver_KS::hamilt2density(const int istep, const int iter, const double ethr)
@@ -178,7 +178,7 @@ namespace ModuleESolver
 #ifdef __MPI
 		        MPI_Bcast(&drho, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
 		        MPI_Bcast(&this->conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
-		        MPI_Bcast(GlobalC::CHR.rho[0], GlobalC::pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
+		        MPI_Bcast(GlobalC::CHR.rho[0], GlobalC::rhopw->nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
 #endif
 
                 // Hamilt should be used after it is constructed.

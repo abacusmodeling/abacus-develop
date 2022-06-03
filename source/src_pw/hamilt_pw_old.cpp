@@ -63,7 +63,7 @@ void Hamilt_PW::init_k(const int ik)
 	this->current_ik = ik;
 
 	// (2) Take the local potential.
-	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 	{
 		GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}

@@ -320,7 +320,7 @@ TEST_F(EState,RhoPW)
     // GlobalC::pw.setup_structure_factor();
     // init charge/potential/wave functions
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
-    // GlobalC::pot.allocate(GlobalC::pw.nrxx);
+    // GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
     // we need to supply NBANDS here
     psi::Psi<std::complex<double>>* psi = GlobalC::wf.allocate(GlobalC::kv.nks);
     // std::cout<<"npwx "<<GlobalC::wf.npwx<<std::endl;

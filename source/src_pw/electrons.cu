@@ -297,7 +297,7 @@ void Electrons::self_consistent(const int &istep)
             // mohan add 2012-06-05
             for(int is=0; is<GlobalV::NSPIN; ++is)
             {
-                for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+                for(int ir=0; ir<GlobalC::rhopw->nrxx; ++ir)
                 {
                     GlobalC::pot.vnew(is,ir) = GlobalC::pot.vr(is,ir);
                 }

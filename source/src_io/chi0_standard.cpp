@@ -385,13 +385,13 @@ void Chi0_standard:: Init()
 	psi_r1 = new std::complex<double>*[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_r1[ib] = new std::complex<double>[GlobalC::pw.nrxx];
+		psi_r1[ib] = new std::complex<double>[GlobalC::wfcpw->nrxx];
 	}
 
 	psi_r2 = new std::complex<double>*[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_r2[ib] = new std::complex<double>[GlobalC::pw.nrxx];
+		psi_r2[ib] = new std::complex<double>[GlobalC::wfcpw->nrxx];
 	}
 	std::cout << "psi OK" <<std::endl;
 

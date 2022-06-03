@@ -217,7 +217,7 @@ void Gint_k::cal_rho_k(double** DM_R_in, Charge* chr)
 			const int nbz_start = GlobalC::GridT.nbzp_start;
 			const int nbz = GlobalC::GridT.nbzp;
 		
-			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
+			const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
 			
 			// it's a uniform grid to save orbital values, so the delta_r is a constant.
 			const double delta_r = GlobalC::ORB.dr_uniform;	

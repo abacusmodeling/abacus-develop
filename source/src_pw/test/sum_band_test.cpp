@@ -280,7 +280,7 @@ TEST_F(CHGTest, SumBand)
     //GlobalC::pw.setup_structure_factor();
     // init charge/potential/wave functions
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
-    //GlobalC::pot.allocate(GlobalC::pw.nrxx);
+    //GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
     // we need to supply NBANDS here
     GlobalC::wf.allocate(GlobalC::kv.nks);
     GlobalC::UFFT.allocate();

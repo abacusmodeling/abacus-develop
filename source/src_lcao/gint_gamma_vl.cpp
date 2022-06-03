@@ -281,7 +281,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 		const int nbz_start=GlobalC::GridT.nbzp_start;
 		const int nbz=GlobalC::GridT.nbzp;
 
-		const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
+		const int ncyz=GlobalC::rhopw->ny*GlobalC::rhopw->nplane;
 
 		const int lgd_now=GlobalC::GridT.lgd;
 		if(max_size>0 && lgd_now>0)
@@ -294,7 +294,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 			ModuleBase::Memory::record("Gint_Gamma","GridVlocal_therad",lgd_now*lgd_now,"double");
 
 			const int LD_pool = max_size*GlobalC::ucell.nwmax;
-            const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
+            const double dv = GlobalC::ucell.omega/GlobalC::rhopw->nxyz;
 
 #ifdef _OPENMP
 			#pragma omp for

@@ -191,7 +191,7 @@ std::complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_
 	GlobalC::wfcpw->recip2real(&evc[0](ik_L,iband_L,0), psi_up, ik_L);
 	GlobalC::wfcpw->recip2real(&evc[0](ik_L,iband_L,npwx), psi_down, ik_L);
 
-	for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+	for (int ir = 0; ir < GlobalC::wfcpw->nrxx; ir++)
 	{
 		psi_up[ir] = psi_up[ir] * phase[ir];
 		psi_down[ir] = psi_down[ir] * phase[ir];

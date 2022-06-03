@@ -41,7 +41,7 @@ void Numerical_Descriptor::output_descriptor(const psi::Psi<std::complex<double>
     int ne = 0; 
 	
     // 0 stands for : 'Faln' is not used.
-    this->bessel_basis.init( 0, GlobalC::pw.ecutwfc, GlobalC::ucell.ntype, this->lmax );
+    this->bessel_basis.init( 0, INPUT.ecutwfc, GlobalC::ucell.ntype, this->lmax );
 	this->nmax = Numerical_Descriptor::bessel_basis.get_ecut_number();
     this->init_mu_index();
     this->init_label = true;

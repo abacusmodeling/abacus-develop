@@ -28,9 +28,9 @@ void Gint_Gamma::cal_force(double*** DM_in, const double*const vlocal,
         const int nby = GlobalC::GridT.nby;
         const int nbz_start = GlobalC::GridT.nbzp_start;
         const int nbz = GlobalC::GridT.nbzp;
-        const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
+        const double dv = GlobalC::ucell.omega/GlobalC::rhopw->nxyz;
     
-        const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
+        const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
 
         for (int i=0; i<nbx; i++)
         {

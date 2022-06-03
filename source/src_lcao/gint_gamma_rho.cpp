@@ -31,7 +31,7 @@ void Gint_Gamma::cal_band_rho(
     const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
     const int*const vindex,							// vindex[GlobalC::pw.bxyz]
     const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-    Charge* chr) const		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
+    Charge* chr) const		// rho[GlobalV::NSPIN][GlobalC::rhopw->nrxx]
 {
     //parameters for dsymm, dgemm and ddot
     constexpr char side='L', uplo='U';
@@ -185,7 +185,7 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 			const int nbz_start = GlobalC::GridT.nbzp_start;
 			const int nbz = GlobalC::GridT.nbzp;
 		
-			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
+			const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
             
             // it's a uniform grid to save orbital values, so the delta_r is a constant.
             const double delta_r = GlobalC::ORB.dr_uniform;		

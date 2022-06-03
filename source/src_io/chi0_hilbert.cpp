@@ -700,7 +700,7 @@ void Chi0_hilbert::Init()
 		psi_r[iq] = new std::complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r[iq][ib] = new std::complex<double>[GlobalC::pw.nrxx];
+			psi_r[iq][ib] = new std::complex<double>[GlobalC::wfcpw->nrxx];
 		}
 	}*/
 
@@ -709,13 +709,13 @@ void Chi0_hilbert::Init()
 		psi_r1 = new std::complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r1[ib] = new std::complex<double>[GlobalC::pw.nrxx];
+			psi_r1[ib] = new std::complex<double>[GlobalC::wfcpw->nrxx];
 		}
 
 		psi_r2 = new std::complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r2[ib] = new std::complex<double>[GlobalC::pw.nrxx];
+			psi_r2[ib] = new std::complex<double>[GlobalC::wfcpw->nrxx];
 		}
 	}
 	//std::cout << "psi1 OK" <<std::endl;
@@ -1377,15 +1377,15 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin, ModulePW::PW_Basis 
         //            for(int ig=0; ig<dim; ig++)
         //            {
         //                int ir=0;
-        //                for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+        //                for(int ix=0; ix<GlobalC::rhopw->nx; ix++)
         //                {
-        //                        phase_x = (q.x + GlobalC::pw.gdirect[ig].x)*ix/GlobalC::pw.ncx;
-        //                        for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+        //                        phase_x = (q.x + GlobalC::pw.gdirect[ig].x)*ix/GlobalC::rhopw->nx;
+        //                        for(int iy=0; iy<GlobalC::rhopw->ny; iy++)
         //                        {
-        //                                phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
-        //                                for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
+        //                                phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::rhopw->ny;
+        //                                for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::rhopw->nplane; ++iz)
         //                                {
-        //                                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
+        //                                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::rhopw->nz) *ModuleBase::TWO_PI;
         //                                        exp_tmp.real() = cos(-phase_xyz);
         //                                        exp_tmp.imag() = sin(-phase_xyz);
         //                                        b[ig][ib1][ib2] = b[ig][ib1][ib2] +  conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
@@ -1402,15 +1402,15 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin, ModulePW::PW_Basis 
         for(int ig=0;ig<dim;ig++)
         {
             int ir=0;
-            for(int ix=0;ix<GlobalC::pw.ncx;ix++)
+            for(int ix=0;ix<GlobalC::rhopw->nx;ix++)
             {
-                phase_x = (q.x + GlobalC::pw.gdirect[ig].x)*ix/GlobalC::pw.ncx;
-                for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+                phase_x = (q.x + GlobalC::pw.gdirect[ig].x)*ix/GlobalC::rhopw->nx;
+                for(int iy=0; iy<GlobalC::rhopw->ny; iy++)
                 {
-                    phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
-                    for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
+                    phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::rhopw->ny;
+                    for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::rhopw->nplane; ++iz)
                     {
-                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
+                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::rhopw->nz) *ModuleBase::TWO_PI;
                         exp_tmp.real() = cos(-phase_xyz);
                         exp_tmp.imag() = sin(-phase_xyz);
                         for(int ib1=0;ib1<oband;ib1++)
@@ -1431,7 +1431,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin, ModulePW::PW_Basis 
             for(int ib2=0;ib2<GlobalV::NBANDS; ib2++)
                 for(int ig=0;ig<dim;ig++)
                 {
-                    b[ig][ib1][ib2] = b[ig][ib1][ib2]/GlobalC::pw.ncxyz;
+                    b[ig][ib1][ib2] = b[ig][ib1][ib2]/GlobalC::rhopw->nxyz;
                 }
 
         return;
@@ -2438,13 +2438,13 @@ std::complex<double> Chi0_hilbert:: Cal_g(int iq)
 {
     std::complex<double> g;
     double L = GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0;
-    double dz = L/GlobalC::pw.ncz;
+    double dz = L/GlobalC::rhopw->nz;
     double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2());
     
     g = std::complex<double>(0.0,0.0);
 
-    for(int z0=0;z0<GlobalC::pw.ncz;z0++)
-        for(int z1=0;z1<GlobalC::pw.ncz;z1++)
+    for(int z0=0;z0<GlobalC::rhopw->nz;z0++)
+        for(int z1=0;z1<GlobalC::rhopw->nz;z1++)
         {
             double exp_phase = exp(-q*(z0+z1)*dz);
             g += chi_para[z0][z1] * exp_phase * dz * dz;

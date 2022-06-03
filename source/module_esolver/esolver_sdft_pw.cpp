@@ -135,7 +135,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 			{
 				for(int is=0; is < GlobalV::NSPIN; is++)
 				{
-					ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+					ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
 				}
 			}
 			MPI_Bcast(&GlobalC::en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
@@ -144,7 +144,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 		{
 			for(int is=0; is < GlobalV::NSPIN; is++)
 			{
-				ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
 			}
 		}
 	// calculate stochastic rho

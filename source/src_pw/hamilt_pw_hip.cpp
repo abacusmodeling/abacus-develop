@@ -177,9 +177,9 @@ void Hamilt_PW::init_k(const int ik)
 	}
 
 	// (3) Take the local potential.
-	// cout<<"nrxx="<<GlobalC::pw.nrxx<<endl;
+	// cout<<"nrxx="<<GlobalC::wfcpw->nrxx<<endl;
 
-	for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+	for (int ir = 0; ir < GlobalC::wfcpw->nrxx; ir++)
 	{
 		GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir); // mohan add 2007-11-12
 	}
@@ -196,14 +196,14 @@ void Hamilt_PW::init_k(const int ik)
 	GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
 	// (6) The index of plane waves.
-	// int *GR_index_tmp = new int[GlobalC::pw.nrxx];
+	// int *GR_index_tmp = new int[GlobalC::wfcpw->nrxx];
 	// cout<<"npw:"<<GlobalC::wf.npw<<endl;
 	// cout<<"npwx:"<<GlobalC::wf.npwx<<endl;
 	for (int ig = 0; ig < GlobalC::wf.npw; ig++)
 	{
-		// GR_index[ig] = GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)];
+		// GR_index[ig] = GlobalC::wfcpw->ig2fftw[GlobalC::wf.igk(ik, ig)];
 		// if(ig<20){
-		// 	cout<<GR_index[ig]<<" "<< GlobalC::wf.igk(ik, ig) <<" "<<GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig)
+		// 	cout<<GR_index[ig]<<" "<< GlobalC::wf.igk(ik, ig) <<" "<<GlobalC::wfcpw->ig2fftw[ GlobalC::wf.igk(ik, ig)
 		// ]<<endl;
 		// }
 	}
@@ -942,16 +942,16 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
 		hipblasComplex *f_porter;
 
 		// CHECK_CUDA(hipMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int)));
-		CHECK_CUDA(hipMalloc((void **)&d_vr_eff1, GlobalC::pw.nrxx * sizeof(double)));
-		CHECK_CUDA(hipMalloc((void **)&f_vr_eff1, GlobalC::pw.nrxx * sizeof(float)));
-		CHECK_CUDA(hipMalloc((void **)&f_porter, GlobalC::pw.nrxx * sizeof(hipblasComplex)));
+		CHECK_CUDA(hipMalloc((void **)&d_vr_eff1, GlobalC::wfcpw->nrxx * sizeof(double)));
+		CHECK_CUDA(hipMalloc((void **)&f_vr_eff1, GlobalC::wfcpw->nrxx * sizeof(float)));
+		CHECK_CUDA(hipMalloc((void **)&f_porter, GlobalC::wfcpw->nrxx * sizeof(hipblasComplex)));
 
 		CHECK_CUDA(
-			hipMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx * sizeof(double), hipMemcpyHostToDevice));
+			hipMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::wfcpw->nrxx * sizeof(double), hipMemcpyHostToDevice));
 
 		int thread2 = 512;
-		int block2 = (GlobalC::pw.nrxx + thread2 - 1) / thread2;
-		hipLaunchKernelGGL(cast_d2f, dim3(block2), dim3(thread2), 0, 0, f_vr_eff1, d_vr_eff1, GlobalC::pw.nrxx);
+		int block2 = (GlobalC::wfcpw->nrxx + thread2 - 1) / thread2;
+		hipLaunchKernelGGL(cast_d2f, dim3(block2), dim3(thread2), 0, 0, f_vr_eff1, d_vr_eff1, GlobalC::wfcpw->nrxx);
 
 		// cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
 		for (int ib = 0; ib < m; ++ib)
@@ -959,7 +959,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
 			// cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
 			// if(NSPIN!=4){
 			// ZEROS( UFFT.porter, pw.nrxx);
-			CHECK_CUDA(hipMemset(f_porter, 0, GlobalC::pw.nrxx * sizeof(hipblasComplex)));
+			CHECK_CUDA(hipMemset(f_porter, 0, GlobalC::wfcpw->nrxx * sizeof(hipblasComplex)));
 
 			// todo
 			// GlobalC::UFFT.RoundTrip(tmpsi_in, f_vr_eff1, GR_index_d, f_porter);
@@ -1202,18 +1202,18 @@ void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in,
 		hipblasDoubleComplex *d_porter;
 
 		// CHECK_CUDA(hipMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int)));
-		CHECK_CUDA(hipMalloc((void **)&d_vr_eff1, GlobalC::pw.nrxx * sizeof(double)));
-		CHECK_CUDA(hipMalloc((void **)&d_porter, GlobalC::pw.nrxx * sizeof(hipblasDoubleComplex)));
+		CHECK_CUDA(hipMalloc((void **)&d_vr_eff1, GlobalC::wfcpw->nrxx * sizeof(double)));
+		CHECK_CUDA(hipMalloc((void **)&d_porter, GlobalC::wfcpw->nrxx * sizeof(hipblasDoubleComplex)));
 
 		CHECK_CUDA(
-			hipMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx * sizeof(double), hipMemcpyHostToDevice));
+			hipMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::wfcpw->nrxx * sizeof(double), hipMemcpyHostToDevice));
 		// cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
 		for (int ib = 0; ib < m; ++ib)
 		{
 			// cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
 			// if(NSPIN!=4){
 			// ZEROS( UFFT.porter, pw.nrxx);
-			CHECK_CUDA(hipMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(hipblasDoubleComplex)));
+			CHECK_CUDA(hipMemset(d_porter, 0, GlobalC::wfcpw->nrxx * sizeof(hipblasDoubleComplex)));
 			// cout<<"m:"<<m<<endl;
 			// cout<<"grindex:"<<endl;
 			// int *GR_index_h = new int[10];

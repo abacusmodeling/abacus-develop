@@ -101,10 +101,10 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	}
 
 	//this->nqx = 10000;		// calculted in allocate_nlpot.f90
-	//GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ); //LiuXh modify 20180515
-	//GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ) + 1000; //LiuXh add 20180515
-	//GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ) * 10; //LiuXh add 20180515
-	GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ) * cell_factor; //LiuXh add 20180619
+	//GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ); //LiuXh modify 20180515
+	//GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ) + 1000; //LiuXh add 20180515
+	//GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ) * 10; //LiuXh add 20180515
+	GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ) * cell_factor; //LiuXh add 20180619
 	// nqx = (sqrt(ecutwfc)/dq+4)*cell_factor;
 
 	

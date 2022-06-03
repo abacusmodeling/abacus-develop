@@ -45,7 +45,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
         this->calculate_STNR_k();
 
         // calculate the grid integration of 'Vl' matrix for l-points algorithms.
-        this->GK.init(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz, this->LM);
+        this->GK.init(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::rhopw->nxyz, this->LM);
     }
 
     // initial the overlap matrix is done.	

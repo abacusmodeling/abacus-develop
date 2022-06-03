@@ -61,7 +61,7 @@ void Potential::write_potential(
                     << " " << GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
             }
         }
-        ofs << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
+        ofs << GlobalC::rhopw->nx << " " << GlobalC::rhopw->ny << " " << GlobalC::rhopw->nz;
         ofs << std::setprecision(precision);
         ofs << scientific; 
         if(!ofs)
@@ -72,23 +72,23 @@ void Potential::write_potential(
 
 #ifndef __MPI
     int count=0;
-    for(int k=0; k<GlobalC::pw.ncz; k++)
+    for(int k=0; k<GlobalC::rhopw->nz; k++)
     {
         ofs << "\n" << k << " iz";
         double value = 0.0;
         double ave = 0.0;
-        for(int j=0; j<GlobalC::pw.ncy; j++)
+        for(int j=0; j<GlobalC::rhopw->ny; j++)
         {
-            for(int i=0; i<GlobalC::pw.ncx; i++)
+            for(int i=0; i<GlobalC::rhopw->nx; i++)
             {
                 if(count%8==0) ofs << "\n";
-                value = v(is, i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k);
+                value = v(is, i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k);
                 ofs << " " << value;
                 ave += value;
                 ++count;
             }
         }
-        ofs << "\n" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy << " average";
+        ofs << "\n" << ave/GlobalC::rhopw->nx/GlobalC::rhopw->ny << " average";
     }
 #else
     MPI_Barrier(MPI_COMM_WORLD);
@@ -98,7 +98,7 @@ void Potential::write_potential(
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
         ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-        for (int iz=0;iz<GlobalC::pw.ncz;iz++)
+        for (int iz=0;iz<GlobalC::rhopw->nz;iz++)
         {
             int ip = iz % GlobalV::NPROC_IN_POOL;
             num_z[ip]++;
@@ -114,9 +114,9 @@ void Potential::write_potential(
         }
 
         // which_ip: found iz belongs to which ip.
-        int *which_ip = new int[GlobalC::pw.ncz];
-        ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
-        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+        int *which_ip = new int[GlobalC::rhopw->nz];
+        ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::rhopw->nz);
+        for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
             {
@@ -134,10 +134,10 @@ void Potential::write_potential(
             //GlobalV::ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
         }
         int count=0;
-        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
         double* zpiece = new double[nxy];
         // save the rho one z by one z.
-        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+        for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
         {
             //GlobalV::ofs_running << "\n" << iz << " iz"; //LiuXh modify 20200624
             // tag must be different for different iz.
@@ -150,8 +150,8 @@ void Potential::write_potential(
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] );
-                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
+                    zpiece[ir] = v(is, ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL] );
+                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
                 }
             }
             // case 2: > first part rho: send the rho to
@@ -160,7 +160,7 @@ void Potential::write_potential(
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]);
+                    zpiece[ir] = v(is, ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]);
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }
@@ -354,7 +354,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
                 ++count;
             }
         }
-        //ofs << "\n" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy << " average";
+        //ofs << "\n" << ave/GlobalC::rhopw->nx/GlobalC::rhopw->ny << " average";
         if(k==0) ofs_ave << "iz" << "\taverage";
         ofs_ave << "\n" << k << "\t" << ave/rho_basis->nx/rho_basis->ny;
     }
@@ -366,7 +366,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
         ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-        //for (int iz=0;iz<GlobalC::pw.ncz;iz++)
+        //for (int iz=0;iz<GlobalC::rhopw->nz;iz++)
         //{
         //    int ip = iz % GlobalV::NPROC_IN_POOL;
         //    num_z[ip]++;
@@ -423,8 +423,8 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] ];
-                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
+                    zpiece[ir] = v_elecstat[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL] ];
+                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
                 }
             }
             // case 2: > first part rho: send the rho to
@@ -433,7 +433,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+                    zpiece[ir] = v_elecstat[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }

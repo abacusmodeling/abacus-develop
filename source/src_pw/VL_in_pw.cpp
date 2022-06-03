@@ -147,7 +147,7 @@ void pseudopot_cell_vl::vloc_of_g(
 	ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vloc_1d[0] );
 	vloc_1d[0] *= 4*3.1415926;
 	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::rhopw->npw << std::endl;
-	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ncxyz << std::endl;
+	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::rhopw->nxyz << std::endl;
 	*/
 
 	// (1)

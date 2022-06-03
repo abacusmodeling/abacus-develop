@@ -156,7 +156,7 @@ double Charge::sum_rho(void) const
 	}
 
 	// multiply the sum of charge density by a factor
-    sum_rho *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+    sum_rho *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
     Parallel_Reduce::reduce_double_pool( sum_rho );
 
 	// mohan fixed bug 2010-01-18, 
@@ -620,7 +620,7 @@ void Charge::set_rho_core(
     // test on the charge and computation of the core energy
     double rhoima = 0.0;
     double rhoneg = 0.0;
-    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+    for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
     {
         rhoneg += min(0.0, GlobalC::UFFT.porter[ir].real());
         rhoima += abs(GlobalC::UFFT.porter[ir].imag());
@@ -642,8 +642,8 @@ void Charge::set_rho_core(
 
 	// mohan changed 2010-2-2, make this same as in atomic_rho.
 	// still lack something......
-    rhoneg /= GlobalC::pw.ncxyz * GlobalC::ucell.omega;
-    rhoima /= GlobalC::pw.ncxyz * GlobalC::ucell.omega;
+    rhoneg /= GlobalC::rhopw->nxyz * GlobalC::ucell.omega;
+    rhoima /= GlobalC::rhopw->nxyz * GlobalC::ucell.omega;
 
     // calculate core_only exch-corr energy etxcc=E_xc[rho_core] if required
     // The term was present in previous versions of the code but it shouldn't
@@ -726,10 +726,10 @@ void Charge::sum_band(void)
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::rhopw->nrxx);
 		if (XC_Functional::get_func_type() == 3)
 		{
-			ModuleBase::GlobalFunc::ZEROS(kin_r[is], GlobalC::pw.nrxx);	
+			ModuleBase::GlobalFunc::ZEROS(kin_r[is], GlobalC::rhopw->nrxx);	
 		}
 	}
 	
@@ -867,11 +867,11 @@ void Charge::sum_band_k(void)
 	// check how many electrons on this grid.
 	/*
 	double sum = 0.0;
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+	for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 	{
 		sum += rho1[ir];
 	}
-	std::cout << "\n sum=" << sum * GlobalC::ucell.omega / GlobalC::pw.nrxx << std::endl;
+	std::cout << "\n sum=" << sum * GlobalC::ucell.omega / GlobalC::rhopw->nrxx << std::endl;
 	*/
     return;
 }
@@ -933,7 +933,7 @@ void Charge::rho_mpi(void)
     //====================================================
     int *rec = new int[GlobalV::NPROC_IN_POOL];
 	ModuleBase::GlobalFunc::ZEROS(rec, GlobalV::NPROC_IN_POOL);
-    const int ncxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+    const int ncxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
     for (ip=0;ip<GlobalV::NPROC_IN_POOL;ip++)
     {
         rec[ip] = num_z[ip]*ncxy;
@@ -955,10 +955,10 @@ void Charge::rho_mpi(void)
     // ( according to different k distribution,
     // so the rho in each pool is different
     //==========================================
-    double *rho_tmp = new double[GlobalC::pw.nrxx];
-    double *rho_tot = new double[GlobalC::pw.ncxyz];
-    double *rho_tot_aux = new double[GlobalC::pw.ncxyz];
-	ModuleBase::GlobalFunc::ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
+    double *rho_tmp = new double[GlobalC::rhopw->nrxx];
+    double *rho_tot = new double[GlobalC::rhopw->nxyz];
+    double *rho_tot_aux = new double[GlobalC::rhopw->nxyz];
+	ModuleBase::GlobalFunc::ZEROS(rho_tot_aux, GlobalC::rhopw->nxyz);
 
 	double *tau_tmp;
 	double *tau_tot;
@@ -966,18 +966,18 @@ void Charge::rho_mpi(void)
 
 	if(XC_Functional::get_func_type() == 3)
 	{
-    	tau_tmp = new double[GlobalC::pw.nrxx];
-	    tau_tot = new double[GlobalC::pw.ncxyz];
-    	tau_tot_aux = new double[GlobalC::pw.ncxyz];
-		ModuleBase::GlobalFunc::ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
+    	tau_tmp = new double[GlobalC::rhopw->nrxx];
+	    tau_tot = new double[GlobalC::rhopw->nxyz];
+    	tau_tot_aux = new double[GlobalC::rhopw->nxyz];
+		ModuleBase::GlobalFunc::ZEROS(tau_tot_aux, GlobalC::rhopw->nxyz);
 	}
 
     for (int is=0; is< GlobalV::NSPIN; is++)
     {
-        ModuleBase::GlobalFunc::ZEROS(rho_tot, GlobalC::pw.ncxyz);
-		if(XC_Functional::get_func_type() == 3) ModuleBase::GlobalFunc::ZEROS(tau_tot, GlobalC::pw.ncxyz);
+        ModuleBase::GlobalFunc::ZEROS(rho_tot, GlobalC::rhopw->nxyz);
+		if(XC_Functional::get_func_type() == 3) ModuleBase::GlobalFunc::ZEROS(tau_tot, GlobalC::rhopw->nxyz);
 
-		for (ir=0;ir<GlobalC::pw.nrxx;ir++)
+		for (ir=0;ir<GlobalC::rhopw->nrxx;ir++)
 		{
 			rho_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
 			if(XC_Functional::get_func_type() == 3)
@@ -986,19 +986,19 @@ void Charge::rho_mpi(void)
 			}
 		}
 
-        MPI_Allgatherv(rho_tmp, GlobalC::pw.nrxx, MPI_DOUBLE, rho_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
+        MPI_Allgatherv(rho_tmp, GlobalC::rhopw->nrxx, MPI_DOUBLE, rho_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
 		if(XC_Functional::get_func_type() == 3)
 		{
-        	MPI_Allgatherv(tau_tmp, GlobalC::pw.nrxx, MPI_DOUBLE, tau_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
+        	MPI_Allgatherv(tau_tmp, GlobalC::rhopw->nrxx, MPI_DOUBLE, tau_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
 		}
         //=================================================================
         // Change the order of rho_tot in each pool , make them consistent
         // this is the most complicated part !!
         //=================================================================
-        ModuleBase::GlobalFunc::ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
+        ModuleBase::GlobalFunc::ZEROS(rho_tot_aux, GlobalC::rhopw->nxyz);
 		if(XC_Functional::get_func_type() == 3)
 		{
-        	ModuleBase::GlobalFunc::ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
+        	ModuleBase::GlobalFunc::ZEROS(tau_tot_aux, GlobalC::rhopw->nxyz);
 		}
 
         for (ip=0;ip<GlobalV::NPROC_IN_POOL;ip++)
@@ -1022,7 +1022,7 @@ void Charge::rho_mpi(void)
 					// rot_tot_aux : suitable among all pools.
 					// (1) the data save along z direction.
 					// (2) and each element number of group 'z data' 
-					// is 'GlobalC::pw.ncz'
+					// is 'GlobalC::rhopw->nz'
 					// (3) however, the data rearrange is occured
 					// between [ start_z[ip], start_z[ip]+num_z[ip] )
 					// (4) start_z[ip] + iz yields correct z coordiante.
@@ -1037,11 +1037,11 @@ void Charge::rho_mpi(void)
 					// have large 'start position', which we label
 					// start_z[ip] * ncxy.
 					// -------------------------------------------------
-                    rho_tot_aux[GlobalC::pw.ncz*ir    + start_z[ip]      + iz]
+                    rho_tot_aux[GlobalC::rhopw->nz*ir    + start_z[ip]      + iz]
                       = rho_tot[num_z[ip]*ir + start_z[ip]*ncxy + iz];
 					if(XC_Functional::get_func_type() == 3)
 					{
-                    	tau_tot_aux[GlobalC::pw.ncz*ir    + start_z[ip]      + iz]
+                    	tau_tot_aux[GlobalC::rhopw->nz*ir    + start_z[ip]      + iz]
                       	  = tau_tot[num_z[ip]*ir + start_z[ip]*ncxy + iz];
 					}	
                 }
@@ -1052,17 +1052,17 @@ void Charge::rho_mpi(void)
         //==================================
 		if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it temporarily.
 		{
-			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
+			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
 			if(XC_Functional::get_func_type() == 3)
 			{
-				MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
+				MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
 			}
 		}
 		else
-        MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+        MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		if(XC_Functional::get_func_type() == 3)
 		{
-   	    	MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+   	    	MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		}
         
 		//=====================================
@@ -1072,10 +1072,10 @@ void Charge::rho_mpi(void)
         {
             for (iz=0;iz<num_z[GlobalV::RANK_IN_POOL];iz++)
             {
-                this->rho[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = rho_tot[GlobalC::pw.ncz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
+                this->rho[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = rho_tot[GlobalC::rhopw->nz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
 				if(XC_Functional::get_func_type() == 3)
 				{
-                	this->kin_r[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = tau_tot[GlobalC::pw.ncz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
+                	this->kin_r[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = tau_tot[GlobalC::rhopw->nz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
 				}	
             }
         }
@@ -1105,8 +1105,8 @@ void Charge::save_rho_before_sum_band(void)
 {
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-    	ModuleBase::GlobalFunc::DCOPY( rho[is], rho_save[is], GlobalC::pw.nrxx);
-    	if(XC_Functional::get_func_type() == 3) ModuleBase::GlobalFunc::DCOPY( kin_r[is], kin_r_save[is], GlobalC::pw.nrxx);
+    	ModuleBase::GlobalFunc::DCOPY( rho[is], rho_save[is], GlobalC::rhopw->nrxx);
+    	if(XC_Functional::get_func_type() == 3) ModuleBase::GlobalFunc::DCOPY( kin_r[is], kin_r_save[is], GlobalC::rhopw->nrxx);
     }
     return;
 }
@@ -1115,12 +1115,12 @@ void Charge::save_rho_before_sum_band(void)
 double Charge::check_ne(const double *rho_in) const 
 {
 	double ne= 0.0;
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+	for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 	{
 		ne += rho_in[ir];
 	}
 	Parallel_Reduce::reduce_double_pool( ne );
-	ne = ne * GlobalC::ucell.omega / (double)GlobalC::pw.ncxyz;
+	ne = ne * GlobalC::ucell.omega / (double)GlobalC::rhopw->nxyz;
 	std::cout << std::setprecision(10);
 	std::cout << " check the electrons number from rho, ne =" << ne << std::endl;
 	std::cout << std::setprecision(6);
@@ -1138,7 +1138,7 @@ void Charge::init_final_scf()
     if (GlobalV::test_charge > 1)
     {
         std::cout << "\n spin_number = " << GlobalV::NSPIN
-             << " real_point_number = " << GlobalC::pw.nrxx;
+             << " real_point_number = " << GlobalC::rhopw->nrxx;
     }
 
 	// allocate memory
@@ -1149,28 +1149,28 @@ void Charge::init_final_scf()
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		rho[is] = new double[GlobalC::pw.nrxx];
+		rho[is] = new double[GlobalC::rhopw->nrxx];
 		rhog[is] = new std::complex<double>[GlobalC::rhopw->npw];
-		rho_save[is] = new double[GlobalC::pw.nrxx];
+		rho_save[is] = new double[GlobalC::rhopw->nrxx];
 		rhog_save[is] = new std::complex<double>[GlobalC::rhopw->npw];			
-		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::rhopw->nrxx);
 		ModuleBase::GlobalFunc::ZEROS(rhog[is], GlobalC::rhopw->npw);
-		ModuleBase::GlobalFunc::ZEROS(rho_save[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rho_save[is], GlobalC::rhopw->nrxx);
 		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], GlobalC::rhopw->npw);
 	}
 
-    ModuleBase::Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
-    ModuleBase::Memory::record("Charge","rho_save",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::rhopw->nrxx,"double");
+    ModuleBase::Memory::record("Charge","rho_save",GlobalV::NSPIN*GlobalC::rhopw->nrxx,"double");
     ModuleBase::Memory::record("Charge","rhog",GlobalV::NSPIN*GlobalC::rhopw->npw,"double");
     ModuleBase::Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::rhopw->npw,"double");
 
-    this->rho_core = new double[GlobalC::pw.nrxx]; // core charge in real space
-    ModuleBase::GlobalFunc::ZEROS( rho_core, GlobalC::pw.nrxx);
+    this->rho_core = new double[GlobalC::rhopw->nrxx]; // core charge in real space
+    ModuleBase::GlobalFunc::ZEROS( rho_core, GlobalC::rhopw->nrxx);
 
 	this->rhog_core = new std::complex<double>[GlobalC::rhopw->npw]; // reciprocal core charge
 	ModuleBase::GlobalFunc::ZEROS( rhog_core, GlobalC::rhopw->npw);
 
-    ModuleBase::Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rho_core",GlobalC::rhopw->nrxx,"double");
     ModuleBase::Memory::record("Charge","rhog_core",GlobalC::rhopw->npw,"double");
 
 	this->allocate_rho_final_scf = true;

@@ -1198,9 +1198,9 @@ void set_matrix_grid()
                          GlobalC::ucell,
                          GlobalV::SEARCH_RADIUS,
                          GlobalV::test_atom_input);
-    GlobalC::GridT.set_pbc_grid(GlobalC::pw.ncx,
-                                GlobalC::pw.ncy,
-                                GlobalC::pw.ncz,
+    GlobalC::GridT.set_pbc_grid(GlobalC::rhopw->nx,
+                                GlobalC::rhopw->ny,
+                                GlobalC::rhopw->nz,
                                 GlobalC::pw.bx,
                                 GlobalC::pw.by,
                                 GlobalC::pw.bz,

@@ -64,17 +64,17 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 	// mohan modify 2010-02-05
 	// after mixing, the charge density become 
 	// the input charge density of next iteration.
-    //double* rho_tmp = new double[GlobalC::pw.nrxx];
-    //ModuleBase::GlobalFunc::DCOPY( rho, rho_tmp, GlobalC::pw.nrxx);
+    //double* rho_tmp = new double[GlobalC::rhopw->nrxx];
+    //ModuleBase::GlobalFunc::DCOPY( rho, rho_tmp, GlobalC::rhopw->nrxx);
 
 //xiaohui add 2014-12-09
 	if(this->mixing_gg0 > 0.0)
 	{
-		double* Rrho = new double[GlobalC::pw.nrxx];
+		double* Rrho = new double[GlobalC::rhopw->nrxx];
 		std::complex<double> *kerpulay = new std::complex<double>[GlobalC::rhopw->npw];
-		double* kerpulayR = new double[GlobalC::pw.nrxx];
+		double* kerpulayR = new double[GlobalC::rhopw->nrxx];
 
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			Rrho[ir] = rho[ir] - rho_save_in[ir];
 		}
@@ -92,7 +92,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 		}
 		set_rhor(kerpulay, kerpulayR);
 
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			Rrho[ir] = Rrho[ir] - kerpulayR[ir];
 			rho[ir] = Rrho[ir] * mixing_beta + rho_save_in[ir];
@@ -105,13 +105,13 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 	}
 	else
 	{
-		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			rho[ir] = rho[ir]*mixing_beta + mix_old*rho_save_in[ir];
 		}
 	}
 
-	ModuleBase::GlobalFunc::DCOPY( rho, rho_save_in, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::DCOPY( rho, rho_save_in, GlobalC::rhopw->nrxx);
 //    delete[] rho_tmp;
 
     return;
@@ -161,7 +161,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *resi
 
     // (5)
 	// mohan change the order of (4) (5), 2010-02-05
-    ModuleBase::GlobalFunc::DCOPY(rho, rho_save, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::DCOPY(rho, rho_save, GlobalC::rhopw->nrxx);
 
     //this->renormalize_rho();
 

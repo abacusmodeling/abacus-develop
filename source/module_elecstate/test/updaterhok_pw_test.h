@@ -197,26 +197,26 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	ModuleBase::CHECK_INT(ifs, GlobalV::NSPIN);
 	ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef);
 
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncx);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncy);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncz);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nx);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->ny);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nz);	
 
-	const int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+	const int nxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
 	double *zpiece = new double[nxy];
-	for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+	for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 	{
 		ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
-		for(int j=0; j<GlobalC::pw.ncy; j++)
+		for(int j=0; j<GlobalC::rhopw->ny; j++)
 		{
-			for(int i=0; i<GlobalC::pw.ncx; i++)
+			for(int i=0; i<GlobalC::rhopw->nx; i++)
 			{
-				ifs >> zpiece[ i*GlobalC::pw.ncy + j ];
+				ifs >> zpiece[ i*GlobalC::rhopw->ny + j ];
 			}
 		}
 
 		for(int ir=0; ir<nxy; ir++)
 		{
-			rho[ir*GlobalC::pw.nczp+iz] = zpiece[ir];
+			rho[ir*GlobalC::rhopw->nplane+iz] = zpiece[ir];
 		}
 	}// iz
 	delete[] zpiece;

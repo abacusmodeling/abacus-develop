@@ -58,7 +58,7 @@ namespace ModuleESolver
 
         // (3) Periodic condition search for each grid.
         GlobalC::GridT.set_pbc_grid(
-            GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+            GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
             GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
             GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
             GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
@@ -118,7 +118,7 @@ namespace ModuleESolver
         {
             for (int is = 0; is < GlobalV::NSPIN; is++)
             {
-                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
                 std::stringstream ssd;
                 ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM";
                 // reading density matrix,

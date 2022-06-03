@@ -31,18 +31,18 @@ void Charge::write_rho_cube(
 
 		ofs << GlobalC::ucell.nat << " 0.0 0.0 0.0 " << std::endl;
 		double fac=GlobalC::ucell.lat0;
-		ofs << GlobalC::pw.ncx 
-			<< " " << fac*GlobalC::ucell.latvec.e11/double(GlobalC::pw.ncx) 
-			<< " " << fac*GlobalC::ucell.latvec.e12/double(GlobalC::pw.ncx) 
-			<< " " << fac*GlobalC::ucell.latvec.e13/double(GlobalC::pw.ncx) << std::endl;
-		ofs << GlobalC::pw.ncy 
-			<< " " << fac*GlobalC::ucell.latvec.e21/double(GlobalC::pw.ncy) 
-			<< " " << fac*GlobalC::ucell.latvec.e22/double(GlobalC::pw.ncy) 
-			<< " " << fac*GlobalC::ucell.latvec.e23/double(GlobalC::pw.ncy) << std::endl;
-		ofs << GlobalC::pw.ncz 
-			<< " " << fac*GlobalC::ucell.latvec.e31/double(GlobalC::pw.ncz) 
-			<< " " << fac*GlobalC::ucell.latvec.e32/double(GlobalC::pw.ncz) 
-			<< " " << fac*GlobalC::ucell.latvec.e33/double(GlobalC::pw.ncz) << std::endl;
+		ofs << GlobalC::rhopw->nx 
+			<< " " << fac*GlobalC::ucell.latvec.e11/double(GlobalC::rhopw->nx) 
+			<< " " << fac*GlobalC::ucell.latvec.e12/double(GlobalC::rhopw->nx) 
+			<< " " << fac*GlobalC::ucell.latvec.e13/double(GlobalC::rhopw->nx) << std::endl;
+		ofs << GlobalC::rhopw->ny 
+			<< " " << fac*GlobalC::ucell.latvec.e21/double(GlobalC::rhopw->ny) 
+			<< " " << fac*GlobalC::ucell.latvec.e22/double(GlobalC::rhopw->ny) 
+			<< " " << fac*GlobalC::ucell.latvec.e23/double(GlobalC::rhopw->ny) << std::endl;
+		ofs << GlobalC::rhopw->nz 
+			<< " " << fac*GlobalC::ucell.latvec.e31/double(GlobalC::rhopw->nz) 
+			<< " " << fac*GlobalC::ucell.latvec.e32/double(GlobalC::rhopw->nz) 
+			<< " " << fac*GlobalC::ucell.latvec.e33/double(GlobalC::rhopw->nz) << std::endl;
 
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
@@ -63,7 +63,7 @@ void Charge::write_rho_cube(
 			}
 		}
 
-//		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
+//		ofs << "\n  " << GlobalC::rhopw->nx << " " << GlobalC::rhopw->ny << " " << GlobalC::rhopw->nz << std::endl;
 
 		ofs << std::setprecision(precision);
 		ofs << scientific;
@@ -73,26 +73,26 @@ void Charge::write_rho_cube(
 	
 #ifndef __MPI
 	int count=0;
-	for(int i=0; i<GlobalC::pw.ncx; i++)
+	for(int i=0; i<GlobalC::rhopw->nx; i++)
 	{
-		for(int j=0; j<GlobalC::pw.ncy; j++)
+		for(int j=0; j<GlobalC::rhopw->ny; j++)
 		{
-			for(int k=0; k<GlobalC::pw.ncz; k++)
+			for(int k=0; k<GlobalC::rhopw->nz; k++)
 			{
 				if(count%6==0) ofs << "\n";
-				ofs << " " << rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k];
+				ofs << " " << rho_save[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k];
 				++count;
 			}
 		}
 	}
 #else
-//	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
+//	for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++) chr.rho[0][ir]=1; // for testing
 //	ofs_running << "\n RANK_IN_POOL = " << RANK_IN_POOL;
 	
 	// only do in the first pool.
 	if(GlobalV::MY_POOL==0)
 	{
-		int nxyz = GlobalC::pw.ncx * GlobalC::pw.ncy * GlobalC::pw.ncz;
+		int nxyz = GlobalC::rhopw->nx * GlobalC::rhopw->ny * GlobalC::rhopw->nz;
 		double* wfc = new double[nxyz];
 		ModuleBase::GlobalFunc::ZEROS(wfc, nxyz);
 
@@ -116,9 +116,9 @@ void Charge::write_rho_cube(
 		delete[] num_z;
 
 		// which_ip: found iz belongs to which ip.
-		int *which_ip = new int[GlobalC::pw.ncz];
-		ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
-		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+		int *which_ip = new int[GlobalC::rhopw->nz];
+		ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::rhopw->nz);
+		for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 		{
 			for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
 			{
@@ -136,11 +136,11 @@ void Charge::write_rho_cube(
 //			ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
 		}
 
-		int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+		int nxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
 		double* zpiece = new double[nxy];
 
 		// save the rho one z by one z.
-		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+		for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 		{
 			//	std::cout << "\n iz=" << iz << std::endl;
 			// tag must be different for different iz.
@@ -156,8 +156,8 @@ void Charge::write_rho_cube(
 					// mohan change to rho_save on 2012-02-10
 					// because this can make our next restart calculation lead
 					// to the same scf_thr as the one saved.
-					zpiece[ir] = rho_save[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
-					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
+					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
+					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
 				}
 			}
 			// case 2: > first part rho: send the rho to 
@@ -167,8 +167,8 @@ void Charge::write_rho_cube(
 				for(int ir=0; ir<nxy; ir++)
 				{
 					//						zpiece[ir] = rho[is][ir*num_z[RANK_IN_POOL]+iz];
-					zpiece[ir] = rho_save[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
-					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
+					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
+					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
 				}
 				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
 			}
@@ -198,14 +198,14 @@ void Charge::write_rho_cube(
 			// mohan update 2011-03-30
 			//int count=0;
 
-			for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+			for(int ix=0; ix<GlobalC::rhopw->nx; ix++)
 			{
-				for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+				for(int iy=0; iy<GlobalC::rhopw->ny; iy++)
 				{
-					for (int iz=0; iz<GlobalC::pw.ncz; iz++)
+					for (int iz=0; iz<GlobalC::rhopw->nz; iz++)
 					{
-						ofs << " " << wfc[iz*GlobalC::pw.ncx*GlobalC::pw.ncy+ix*GlobalC::pw.ncy+iy];
-						if(iz%6==5 && iz!=GlobalC::pw.ncz-1) ofs << "\n";
+						ofs << " " << wfc[iz*GlobalC::rhopw->nx*GlobalC::rhopw->ny+ix*GlobalC::rhopw->ny+iy];
+						if(iz%6==5 && iz!=GlobalC::rhopw->nz-1) ofs << "\n";
 						//++count;
 					}
 					ofs << "\n";

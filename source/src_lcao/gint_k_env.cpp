@@ -204,14 +204,14 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
                 // z is the fastest, 
                 for (int ii = 0; ii < GlobalC::pw.bx; ii++)
                 {
-                    const int ipart = (i * GlobalC::pw.bx + ii) * GlobalC::pw.ncy * GlobalC::pw.nczp;
+                    const int ipart = (i * GlobalC::pw.bx + ii) * GlobalC::rhopw->ny * GlobalC::rhopw->nplane;
                     for (int jj = 0; jj < GlobalC::pw.by; jj++)
                     {
-                        const int jpart = (j * GlobalC::pw.by + jj) * GlobalC::pw.nczp;
+                        const int jpart = (j * GlobalC::pw.by + jj) * GlobalC::rhopw->nplane;
                         for (int kk = 0; kk < GlobalC::pw.bz; kk++)
                         {
                             vindex[bindex] = (k * GlobalC::pw.bz + kk - GlobalC::pw.nczp_start) + jpart + ipart;
-                            //	assert(vindex[bindex] < GlobalC::pw.nrxx);
+                            //	assert(vindex[bindex] < GlobalC::rhopw->nrxx);
                             ++bindex;
                         }
                     }

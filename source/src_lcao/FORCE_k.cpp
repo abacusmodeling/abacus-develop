@@ -1129,7 +1129,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 //		ZEROS (this->UHM->LM->DHloc_fixedR_z, pv->nnr);
 //		std::cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << std::endl;
 
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
 		}
@@ -1178,7 +1178,7 @@ void Force_LCAO_k::cal_fvl_dphi_k_new(
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		GlobalV::CURRENT_SPIN = is;
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 		{
 			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
 		}

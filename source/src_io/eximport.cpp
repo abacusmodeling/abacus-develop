@@ -536,9 +536,9 @@ void eximport::out_input(std::ofstream &out_data)
 
 /*
 	out_data << std::setw(20) << tr2 << std::endl;                 //1.5
-	out_data << std::setw(20) << GlobalC::pw.nx 
-			 << std::setw(20) << GlobalC::pw.ny 
-			 << std::setw(20) << GlobalC::pw.nz 
+	out_data << std::setw(20) << GlobalC::rhopw->nx 
+			 << std::setw(20) << GlobalC::rhopw->ny 
+			 << std::setw(20) << GlobalC::rhopw->nz 
 			 << std::setw(20) << GlobalC::pw.nxyz << std::endl;//1.6
 	out_data << std::setw(20) << GlobalC::pot.startingpot << std::endl;//1.7
 	out_data << std::setw(20) << GlobalC::CHR.mixing_beta << std::endl;//1.8
@@ -846,9 +846,9 @@ void eximport::out_charge(std::ofstream &out_data)
 	GlobalV::ofs_running << "\n Output charge file." << std::endl;
 	out_data << std::setw(20) << "CHARGE" << std::endl;	//7.0
 	out_data << std::setw(20) << GlobalC::pw.omega << std::endl;	//7.1
-	out_data << std::setw(20) << GlobalC::pw.ncx 
-			 << std::setw(20) << GlobalC::pw.ncy 
-			 << std::setw(20) << GlobalC::pw.ncz << std::endl;		//7.2
+	out_data << std::setw(20) << GlobalC::rhopw->nx 
+			 << std::setw(20) << GlobalC::rhopw->ny 
+			 << std::setw(20) << GlobalC::rhopw->nz << std::endl;		//7.2
 	out_data << std::setw(20) << GlobalC::CHR.rho.nr			//7.3 
 			 << std::setw(20) << GlobalC::CHR.rho.nc << std::endl;
 

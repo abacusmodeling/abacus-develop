@@ -111,17 +111,17 @@ double Magnetism::get_neldw(void) {return 0;}
 
 void set_pw()
 {
-    GlobalC::pw.ncx = 36; //should be only divided by 2,3,5
-    GlobalC::pw.ncy = 36;
-    GlobalC::pw.ncz = 36;
+    GlobalC::rhopw->nx = 36; //should be only divided by 2,3,5
+    GlobalC::rhopw->ny = 36;
+    GlobalC::rhopw->nz = 36;
     GlobalC::pw.bx = 2; 
     GlobalC::pw.by = 2; 
     GlobalC::pw.bz = 2;
-	GlobalC::pw.nbx = GlobalC::pw.ncx/GlobalC::pw.bx; 
-    GlobalC::pw.nby = GlobalC::pw.ncx/GlobalC::pw.bx; 
-    GlobalC::pw.nbz = GlobalC::pw.ncx/GlobalC::pw.bx;
+	GlobalC::pw.nbx = GlobalC::rhopw->nx/GlobalC::pw.bx; 
+    GlobalC::pw.nby = GlobalC::rhopw->nx/GlobalC::pw.bx; 
+    GlobalC::pw.nbz = GlobalC::rhopw->nx/GlobalC::pw.bx;
     GlobalC::pw.bxyz = GlobalC::pw.bx * GlobalC::pw.by * GlobalC::pw.bz;
-    GlobalC::pw.ncxyz = GlobalC::pw.ncx * GlobalC::pw.ncy * GlobalC::pw.ncz;
+    GlobalC::rhopw->nxyz = GlobalC::rhopw->nx * GlobalC::rhopw->ny * GlobalC::rhopw->nz;
 	 
     if (GlobalV::MY_RANK < (GlobalC::pw.nbz % GlobalV::DSIZE))
     {
@@ -133,10 +133,10 @@ void set_pw()
         GlobalC::pw.nbzp = GlobalC::pw.nbz/GlobalV::DSIZE;
         GlobalC::pw.nbzp_start = (GlobalC::pw.nbz/GlobalV::DSIZE) * GlobalV::MY_RANK + (GlobalC::pw.nbz % GlobalV::DSIZE); 
     }
-    GlobalC::pw.nczp = GlobalC::pw.nbzp * GlobalC::pw.bz;
+    GlobalC::rhopw->nplane = GlobalC::pw.nbzp * GlobalC::pw.bz;
     GlobalC::pw.nczp_start = GlobalC::pw.nbzp_start * GlobalC::pw.bz;
     GlobalC::pw.nbxx = GlobalC::pw.nbzp*GlobalC::pw.nbx*GlobalC::pw.nby;
-    GlobalC::pw.nrxx = GlobalC::pw.nczp*GlobalC::pw.ncx*GlobalC::pw.ncy;
+    GlobalC::rhopw->nrxx = GlobalC::rhopw->nplane*GlobalC::rhopw->nx*GlobalC::rhopw->ny;
 }
 
 void init()
@@ -164,6 +164,7 @@ void init()
     GlobalV::KS_SOLVER = "genelpa";
     GlobalV::NSPIN = 1;
     GlobalC::wf.init_wfc="atomic";
+    GlobalC::rhopw = new ModulePW::PW_Basis_K();
 
     //GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
     GlobalC::ucell.setup("test", 1, 2, false, "None");
@@ -174,7 +175,7 @@ void init()
                                 out_mat_r,GlobalV::CAL_FORCE,GlobalV::MY_RANK);
     ModuleBase::Ylm::set_coefficients();   
     set_pw();
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, 0);                             
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, 0);                             
 }
 
 namespace elecstate
@@ -354,7 +355,7 @@ class ElecStateLCAOPrepare
     {
         //rho is parallel along ncz, but store is ncz_rank:ncy:ncx
         this->rho_ref = new double* [GlobalV::NSPIN];
-        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_ref[is] = new double[GlobalC::pw.ncxyz];
+        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_ref[is] = new double[GlobalC::rhopw->nxyz];
         if(GlobalV::MY_RANK == 0)
         {
             std::ifstream ifs;
@@ -363,7 +364,7 @@ class ElecStateLCAOPrepare
 
             for(int is = 0; is < GlobalV::NSPIN; is++)
             {
-                for(int i=0;i<GlobalC::pw.ncxyz;i++)
+                for(int i=0;i<GlobalC::rhopw->nxyz;i++)
                 {
                     ifs >> this->rho_ref[is][i];
                 }
@@ -375,14 +376,14 @@ class ElecStateLCAOPrepare
     void gather_rho(Charge* charge)
     {
         this->rho_cal = new double* [GlobalV::NSPIN];
-        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_cal[is] = new double[GlobalC::pw.ncxyz];
+        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_cal[is] = new double[GlobalC::rhopw->nxyz];
 
 #ifdef __MPI
         MPI_Status ierror;
-        int ncx = GlobalC::pw.ncx;
-        int ncy = GlobalC::pw.ncy;
-        int ncz = GlobalC::pw.ncz;
-        int nczp = GlobalC::pw.nczp;
+        int ncx = GlobalC::rhopw->nx;
+        int ncy = GlobalC::rhopw->ny;
+        int ncz = GlobalC::rhopw->nz;
+        int nczp = GlobalC::rhopw->nplane;
 
         int* nz = new int[GlobalV::NPROC];
         for(int i=0;i<GlobalV::NPROC;i++)
@@ -421,7 +422,7 @@ class ElecStateLCAOPrepare
 #else
         for(int is = 0; is < GlobalV::NSPIN; is++)
         {
-            for(int i=0;i<GlobalC::pw.ncxyz;i++)
+            for(int i=0;i<GlobalC::rhopw->nxyz;i++)
                 rho_cal[is][i] = charge->rho[is][i];            
         }
 #endif
@@ -478,7 +479,7 @@ class ElecStateLCAOPrepare
             GlobalV::test_atom_input);
 
         GlobalC::GridT.set_pbc_grid(
-			GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+			GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
 			GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
 			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
 			GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
@@ -505,7 +506,7 @@ class ElecStateLCAOPrepare
             double error; 
             for (int is = 0; is < GlobalV::NSPIN; is++)
             {
-                for(int i=0;i<GlobalC::pw.ncxyz;i++)
+                for(int i=0;i<GlobalC::rhopw->nxyz;i++)
                 {
                     error = abs(this->rho_cal[is][i] - this->rho_ref[is][i]);
                     if ( error > THRESHOLD)
@@ -550,6 +551,7 @@ int main(int argc, char **argv)
     }
 
     int result = RUN_ALL_TESTS();
+    delete GlobalC::rhopw;
     if (GlobalV::MY_RANK == 0 && result != 0)
     {
         std::cout << "ERROR:some tests are not passed" << std::endl;
