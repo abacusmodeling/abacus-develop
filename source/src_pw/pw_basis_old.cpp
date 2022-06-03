@@ -36,9 +36,6 @@ PW_Basis::PW_Basis()
     // ggs = nullptr;
     // ig2ngg = nullptr;
 
-    ig1 = nullptr;
-    ig2 = nullptr;
-    ig3 = nullptr;
 
     this->nczp_start = 0;
     gg_global0 = nullptr; //LiuXh 20180515
@@ -72,10 +69,6 @@ PW_Basis::~PW_Basis()
 
     // delete [] ggs;
     // delete [] ig2ngg;
-
-    delete [] ig1;
-    delete [] ig2;
-    delete [] ig3;
 }
 
 // called in input.cpp
@@ -578,34 +571,10 @@ void PW_Basis::divide_fft_grid(void)
 }
 
 
-//////////////////////////////////  EXPLAIN    //////////////////////////////////
-//  M. Gong has made mistakes during calculating the effective structure factor
-//  ig1[i], ig2[i], ig3[i] store the $G$ points using Cartesian coordinate,
-//  where  -ncx <= ig1[] <= ncx, -ncy <= ig2[] <= ncy and -ncz <= ig3[] <= ncz
-//  ngmc > ngmw. ig1, ig2 and ig3 is a mapping between (k+G) <-> G
-//////////////////////////////////  EXPLAIN    //////////////////////////////////
-
 
 void PW_Basis::get_MPI_GVectors(void)
 {
     if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_MPI_GVectors");
-
-    delete[] ig1;
-    delete[] ig2;
-    delete[] ig3;
-    this->ig1 = new int[ngmc];
-    this->ig2 = new int[ngmc];
-    this->ig3 = new int[ngmc];
-	ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
-	ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
-	ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
-
-    for (int i = 0; i < ngmc;i++)
-    {
-        this->ig1[i] = int(this->gdirect[i].x) + ncx;
-        this->ig2[i] = int(this->gdirect[i].y) + ncy;
-        this->ig3[i] = int(this->gdirect[i].z) + ncz;
-    }
 
 //	for( int i = 0; i < ngmc; ++i)
 //	{
@@ -654,18 +623,9 @@ void PW_Basis::get_GVectors(void)
     // (2) calculate ig2fftc
     assert(ngmc>0);
     delete[] ig2fftc;
-    delete[] ig1;
-    delete[] ig2;
-    delete[] ig3;
     this->ig2fftc = new int[ngmc];
-    this->ig1 = new int[ngmc];
-    this->ig2 = new int[ngmc];
-    this->ig3 = new int[ngmc];
 	ModuleBase::GlobalFunc::ZEROS(ig2fftc, ngmc);
-	ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
-	ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
-	ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
-    PW_complement::get_ig2fftc(ngmc, ncx, ncy, ncz, gdirect, ig1, ig2, ig3, ig2fftc);
+    PW_complement::get_ig2fftc(ngmc, ncx, ncy, ncz, gdirect, ig2fftc);
 
     // (3) calculate ngmw: number of plane wave to describe wave functions.
     PW_complement::get_ngmw(ngmc, ggwfc2, gg_global, ngmw);
@@ -761,7 +721,7 @@ void PW_Basis::setup_structure_factor(ModulePW::PW_Basis* rho_basis)			// Peize 
             for (int n2 = -rho_basis->ny; n2 <= rho_basis->ny;n2++)
             {
                 double arg = n2 * gtau.y;
-                this->eigts2(inat, n2 + ncy) = exp( ci_tpi*arg );
+                this->eigts2(inat, n2 + rho_basis->ny) = exp( ci_tpi*arg );
             }
             for (int n3 = -rho_basis->nz; n3 <= rho_basis->nz;n3++)
             {
@@ -1123,53 +1083,53 @@ int PW_Basis::setupIndGk(ModuleBase::IntArray& igk, std::vector<int>& ngk)
 	//----------------------------------------------------------
 	// EXPLAIN : correspondence K + G <- -> G
 	//----------------------------------------------------------
-	igk.create(this->Klist->nks, npw_max);
-	ModuleBase::Memory::record("PW_Basis", "igk", this->Klist->nks * npw_max, "int");
+	// igk.create(this->Klist->nks, npw_max);
+	// ModuleBase::Memory::record("PW_Basis", "igk", this->Klist->nks * npw_max, "int");
 
 	//----------------------------------------------------------
 	// EXPLAIN : Calculate again ! (Not a smart job)
 	//----------------------------------------------------------
-	for (int ik = 0; ik < this->Klist->nks; ik++)
-	{
-		int ng = 0;
-		for (int ig = 0; ig < this->ngmw; ig++)
-		{
-			const double gk2 = this->get_GPlusK_cartesian(ik, ig).norm2();
-			const double k2 = this->Klist->kvec_c[ik].norm2();
-			if (sqrt(this->gg[ig]) > sqrt(this->ggpsi) + sqrt(k2))
-			{
-				break;
-			}
-			if (gk2 <= this->ggpsi)
-			{
-				igk(ik, ng) = ig;
-				ng++;
-			}
-		}
-	}
+	// for (int ik = 0; ik < this->Klist->nks; ik++)
+	// {
+	// 	int ng = 0;
+	// 	for (int ig = 0; ig < this->ngmw; ig++)
+	// 	{
+	// 		const double gk2 = this->get_GPlusK_cartesian(ik, ig).norm2();
+	// 		const double k2 = this->Klist->kvec_c[ik].norm2();
+	// 		if (sqrt(this->gg[ig]) > sqrt(this->ggpsi) + sqrt(k2))
+	// 		{
+	// 			break;
+	// 		}
+	// 		if (gk2 <= this->ggpsi)
+	// 		{
+	// 			igk(ik, ng) = ig;
+	// 			ng++;
+	// 		}
+	// 	}
+	// }
 
-	bool out_gk = 0; // DIY! mohan 2011-10-03
-	if (out_gk)
-	{
-		std::stringstream ss;
-		ss << GlobalV::global_out_dir << "PW_GK" << GlobalV::MY_RANK + 1 << ".dat";
-		std::ofstream ofs(ss.str().c_str());
-		ofs << this->ggpsi << " (ggpsi, Ry)" << std::endl;
-		ofs << this->ggwfc << " (ggwfc, Ry)" << std::endl;
-		ofs << this->ggwfc2 << " (ggwfc2, Ry)" << std::endl;
-		ModuleBase::Vector3<double> f;
-		for (int ik = 0; ik < this->Klist->nks; ++ik)
-		{
-			ofs << ik + 1 << " (Index of k)" << std::endl;
-			ofs << this->ngmw << " (Number of plane waves)" << std::endl;
-			for (int ig = 0; ig < this->ngmw; ++ig)
-			{
-				f = this->get_GPlusK_cartesian(ik, ig);
-				ofs << f.x << " " << f.y << " " << f.z << " " << f.norm() << std::endl;
-			}
-		}
-		ofs.close();
-	}
+	// bool out_gk = 0; // DIY! mohan 2011-10-03
+	// if (out_gk)
+	// {
+	// 	std::stringstream ss;
+	// 	ss << GlobalV::global_out_dir << "PW_GK" << GlobalV::MY_RANK + 1 << ".dat";
+	// 	std::ofstream ofs(ss.str().c_str());
+	// 	ofs << this->ggpsi << " (ggpsi, Ry)" << std::endl;
+	// 	ofs << this->ggwfc << " (ggwfc, Ry)" << std::endl;
+	// 	ofs << this->ggwfc2 << " (ggwfc2, Ry)" << std::endl;
+	// 	ModuleBase::Vector3<double> f;
+	// 	for (int ik = 0; ik < this->Klist->nks; ++ik)
+	// 	{
+	// 		ofs << ik + 1 << " (Index of k)" << std::endl;
+	// 		ofs << this->ngmw << " (Number of plane waves)" << std::endl;
+	// 		for (int ig = 0; ig < this->ngmw; ++ig)
+	// 		{
+	// 			f = this->get_GPlusK_cartesian(ik, ig);
+	// 			ofs << f.x << " " << f.y << " " << f.z << " " << f.norm() << std::endl;
+	// 		}
+	// 	}
+	// 	ofs.close();
+	// }
 
 	ModuleBase::timer::tick("PW_Basis", "setupIndGk");
 	return npw_max;

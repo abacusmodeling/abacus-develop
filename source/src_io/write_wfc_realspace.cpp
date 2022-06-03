@@ -90,13 +90,10 @@ namespace Write_Wfc_Realspace
 	std::vector<std::complex<double>> cal_wfc_r(const psi::Psi<std::complex<double>> &wfc_g, const int ik, const int ib)
 	{
 		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
-		ModuleBase::GlobalFunc::ZEROS(GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+		
 		std::vector<std::complex<double>> wfc_r(GlobalC::pw.nrxx);
-		for(int ig=0; ig<wfc_g.get_current_nbas(); ++ig)
-			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig)] ] = wfc_g(ib,ig);
-		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
-		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
-			wfc_r[ir] = GlobalC::UFFT.porter[ir];
+		GlobalC::wfcpw->recip2real(&wfc_g(ib,0), wfc_r.data(),ik);
+
 		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
 		return wfc_r;
 	}

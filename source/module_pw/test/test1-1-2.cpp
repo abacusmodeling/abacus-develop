@@ -12,7 +12,7 @@ using namespace std;
 
 TEST_F(PWTEST,test1_1_2)
 {
-    cout<<"dividemthd 1, gamma_only: on, check gcar,gdirect,gg,istot2bigixy,ig2isz"<<endl;
+    cout<<"dividemthd 1, gamma_only: on, check gcar,gdirect,gg,istot2ixy,ig2isz"<<endl;
     //--------------------------------------------------
     ModuleBase::Matrix3 latvec(1,2,0,2,1,1,0,0,5);
     bool gamma_only = true;
@@ -38,10 +38,10 @@ TEST_F(PWTEST,test1_1_2)
     //ref
     const int totnpw_ref = 5012;
     const int totnst_ref = 176;
-    const int nx_ref = 24;
-    const int bigny_ref = 27;
-    const int ny_ref = 14;
-    const int nz_ref = 54;
+    const int fftnx_ref = 24;
+    const int ny_ref = 27;
+    const int fftny_ref = 14;
+    const int fftnz_ref = 54;
     //some results for different number of processors
     int npw_per_ref[12][12]={
         {5012},
@@ -106,22 +106,22 @@ TEST_F(PWTEST,test1_1_2)
 #else
     tot_npw = pwtest.npw;
 #endif
-    ASSERT_EQ(pwtest.nx, nx_ref);
+    ASSERT_EQ(pwtest.fftnx, fftnx_ref);
+    ASSERT_EQ(pwtest.fftny, fftny_ref);
     ASSERT_EQ(pwtest.ny, ny_ref);
-    ASSERT_EQ(pwtest.bigny, bigny_ref);
-    ASSERT_EQ(pwtest.nz, nz_ref);
+    ASSERT_EQ(pwtest.fftnz, fftnz_ref);
     ASSERT_EQ(tot_npw, totnpw_ref);
     ASSERT_EQ(pwtest.npwtot, totnpw_ref);
     ASSERT_EQ(pwtest.nstot,totnst_ref);
-    ASSERT_EQ(pwtest.bignxyz, nx_ref*bigny_ref*nz_ref);
+    ASSERT_EQ(pwtest.nxyz, fftnx_ref*ny_ref*fftnz_ref);
 
 
-    int *tmpx = new int[pwtest.nx*pwtest.ny*pwtest.nz];
-    int *tmpy = new int[pwtest.nx*pwtest.ny*pwtest.nz];
-    int *tmpz = new int[pwtest.nx*pwtest.ny*pwtest.nz];
-    ModuleBase::GlobalFunc::ZEROS(tmpx,pwtest.nx*pwtest.ny*pwtest.nz);
-    ModuleBase::GlobalFunc::ZEROS(tmpy,pwtest.nx*pwtest.ny*pwtest.nz);
-    ModuleBase::GlobalFunc::ZEROS(tmpz,pwtest.nx*pwtest.ny*pwtest.nz);
+    int *tmpx = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
+    int *tmpy = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
+    int *tmpz = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
+    ModuleBase::GlobalFunc::ZEROS(tmpx,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
+    ModuleBase::GlobalFunc::ZEROS(tmpy,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
+    ModuleBase::GlobalFunc::ZEROS(tmpz,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
     
     int * startnst = new int [nproc_in_pool];
     startnst[0] = 0;
@@ -132,43 +132,43 @@ TEST_F(PWTEST,test1_1_2)
 
     for(int ig = 0 ; ig < pwtest.npw; ++ig)
     {
-        int istot = pwtest.ig2isz[ig] / pwtest.nz + startnst[rank_in_pool];
-        // int is = pwtest.ig2isz[ig] / pwtest.nz;
-        int iz = pwtest.ig2isz[ig] % pwtest.nz;
-        int iy = pwtest.istot2bigixy[istot] % pwtest.bigny;
-        int ix = pwtest.istot2bigixy[istot] / pwtest.bigny;
-        // int iy = pwtest.is2ixy[is] % pwtest.ny;
-        // int ix = pwtest.is2ixy[is] / pwtest.ny;
+        int istot = pwtest.ig2isz[ig] / pwtest.fftnz + startnst[rank_in_pool];
+        // int is = pwtest.ig2isz[ig] / pwtest.fftnz;
+        int iz = pwtest.ig2isz[ig] % pwtest.fftnz;
+        int iy = pwtest.istot2ixy[istot] % pwtest.ny;
+        int ix = pwtest.istot2ixy[istot] / pwtest.ny;
+        // int iy = pwtest.is2fftixy[is] % pwtest.fftny;
+        // int ix = pwtest.is2fftixy[is] / pwtest.fftny;
 
-        tmpx[iz+(iy+ix*pwtest.ny)*pwtest.nz] = int(pwtest.gdirect[ig].x);
-        tmpy[iz+(iy+ix*pwtest.ny)*pwtest.nz] = int(pwtest.gdirect[ig].y);
-        tmpz[iz+(iy+ix*pwtest.ny)*pwtest.nz] = int(pwtest.gdirect[ig].z);
+        tmpx[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].x);
+        tmpy[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].y);
+        tmpz[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].z);
     }
 #ifdef __MPI
-    MPI_Allreduce(MPI_IN_PLACE,tmpx,pwtest.nxyz,MPI_INT,MPI_SUM,POOL_WORLD);
-    MPI_Allreduce(MPI_IN_PLACE,tmpy,pwtest.nxyz,MPI_INT,MPI_SUM,POOL_WORLD);
-    MPI_Allreduce(MPI_IN_PLACE,tmpz,pwtest.nxyz,MPI_INT,MPI_SUM,POOL_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE,tmpx,pwtest.fftnxyz,MPI_INT,MPI_SUM,POOL_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE,tmpy,pwtest.fftnxyz,MPI_INT,MPI_SUM,POOL_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE,tmpz,pwtest.fftnxyz,MPI_INT,MPI_SUM,POOL_WORLD);
 #endif
     if(rank_in_pool==0)
     {
-        for(int iz = 0 ; iz < pwtest.nz; ++iz)
+        for(int iz = 0 ; iz < pwtest.fftnz; ++iz)
         {
-            for(int iy = 0 ; iy < pwtest.ny ; ++iy)
+            for(int iy = 0 ; iy < pwtest.fftny ; ++iy)
             {
-                for(int ix = 0 ; ix < pwtest.nx ; ++ix)
+                for(int ix = 0 ; ix < pwtest.fftnx ; ++ix)
                 {
                     ModuleBase::Vector3<double> f;
                     f.x = ix;
                     f.y = iy;
                     f.z = iz;
-                    if(iz >= int(pwtest.nz/2) +1) f.z -= pwtest.nz;
-                    if(ix >= int(pwtest.nx/2) +1) f.x -= pwtest.nx;
+                    if(iz >= int(pwtest.fftnz/2) +1) f.z -= pwtest.fftnz;
+                    if(ix >= int(pwtest.fftnx/2) +1) f.x -= pwtest.fftnx;
                     double modulus = f * (GGT * f);
                     if (modulus <= ggecut)
                     {
-                        EXPECT_EQ(tmpx[iz + iy*pwtest.nz + ix*pwtest.ny*pwtest.nz], int(f.x));
-                        EXPECT_EQ(tmpy[iz + iy*pwtest.nz + ix*pwtest.ny*pwtest.nz], int(f.y));
-                        EXPECT_EQ(tmpz[iz + iy*pwtest.nz + ix*pwtest.ny*pwtest.nz], int(f.z));
+                        EXPECT_EQ(tmpx[iz + iy*pwtest.fftnz + ix*pwtest.fftny*pwtest.fftnz], int(f.x));
+                        EXPECT_EQ(tmpy[iz + iy*pwtest.fftnz + ix*pwtest.fftny*pwtest.fftnz], int(f.y));
+                        EXPECT_EQ(tmpz[iz + iy*pwtest.fftnz + ix*pwtest.fftny*pwtest.fftnz], int(f.z));
                     }
                     
                 }

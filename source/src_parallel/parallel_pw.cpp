@@ -667,37 +667,3 @@ void Parallel_PW::fft_map_final_scf(
 
 	return;
 }
-
-#ifdef __MPI
-void Parallel_PW:: stick_to_pool(double *stick, const int &ir, double *out)
-{	
-	//ModuleBase::TITLE("Parallel_Grid","zpiece_to_all");
-	MPI_Status ierror;
-
-	const int is = isind[ir];
-	const int ip = index_ip[ir];
-
-	if(ip == 0 && GlobalV::RANK_IN_POOL ==0)
-	{
-		for(int iz=0; iz<n3; iz++)
-		{
-			out[is*n3+iz] = stick[iz];
-		}
-	}
-	else if(ip == GlobalV::RANK_IN_POOL )
-	{
-		MPI_Recv(stick, n3, MPI_DOUBLE, 0, ir, POOL_WORLD,&ierror);
-		for(int iz=0; iz<n3; iz++)
-		{
-			out[is*n3+iz] = stick[iz];
-		}
-	}
-	else if(GlobalV::RANK_IN_POOL==0)
-	{
-		MPI_Send(stick, n3, MPI_DOUBLE, ip, ir, POOL_WORLD);
-	}
-	
-
-	return;	
-}
-#endif

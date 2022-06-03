@@ -289,7 +289,7 @@ TEST_F(CHGTest, SumBand)
     std::stringstream ssw;
     ssw << "WAVEFUNC";
     // we need to supply out_wfc_pw here
-    read_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+    read_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::rhopw->gcar);
 
     //===== calculate occupation before sum_band ========================
     Occupy::calculate_weights();

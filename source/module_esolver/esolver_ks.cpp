@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include "time.h"
+#include "../src_io/print_info.h"
 
 //--------------Temporary----------------
 #include "../module_base/global_variable.h"
@@ -23,6 +24,74 @@ namespace ModuleESolver
         maxniter = GlobalV::SCF_NMAX;
         niter = maxniter;
         out_freq_elec = GlobalV::OUT_FREQ_ELEC;
+
+        // pw_rho = new ModuleBase::PW_Basis();
+        //temporary, it will be removed
+        pw_wfc = new ModulePW::PW_Basis_K_Big(); 
+        ModulePW::PW_Basis_K_Big* tmp = static_cast<ModulePW::PW_Basis_K_Big*>(pw_wfc);
+        tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
+    }
+
+    void ESolver_KS::Init(Input& inp, UnitCell_pseudo& ucell)
+    {
+        ESolver_FP::Init(inp,ucell);
+        // Yu Liu add 2021-07-03
+        GlobalC::CHR.cal_nelec();
+
+        // it has been established that that
+        // xc_func is same for all elements, therefore
+        // only the first one if used
+        if (ucell.atoms[0].xc_func == "HSE" || ucell.atoms[0].xc_func == "PBE0")
+        {
+            XC_Functional::set_xc_type("pbe");
+        }
+        else
+        {
+            XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
+        }
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+
+        // symmetry analysis should be performed every time the cell is changed
+        if (ModuleSymmetry::Symmetry::symm_flag)
+        {
+            GlobalC::symm.analy_sys(ucell, GlobalV::ofs_running);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
+        }
+
+        // Setup the k points according to symmetry.
+        GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
+
+        // print information
+        // mohan add 2021-01-30
+        Print_Info::setup_parameters(ucell, GlobalC::kv);
+
+        // Initalize the plane wave basis set
+        GlobalC::pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT PLANEWAVE");
+        std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx << " * " << GlobalC::pw.ny << " * " << GlobalC::pw.nz << std::endl;
+        std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx << " * " << GlobalC::pw.nby << " * " << GlobalC::pw.nbz << std::endl;
+        //new plane wave basis
+        this->pw_wfc->initgrids(ucell.lat0, ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
+                                GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+        this->pw_wfc->initparameters(false, inp.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+        this->pw_wfc->setuptransform();
+        for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)   GlobalC::kv.ngk[ik] = this->pw_wfc->npwk[ik];
+        this->pw_wfc->collect_local_pw(); 
+        GlobalC::wfcpw = this->pw_wfc; //Temporary
+
+        // initialize the real-space uniform grid for FFT and parallel
+        // distribution of plane waves
+        GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+            GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+        // Calculate Structure factor
+        GlobalC::pw.setup_structure_factor(GlobalC::rhopw);
+
+        // Inititlize the charge density.
+        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::rhopw->npw);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
+        // Initializee the potential.
+        GlobalC::pot.allocate(GlobalC::pw.nrxx);
     }
 
     void ESolver_KS::hamilt2density(const int istep, const int iter, const double ethr)
@@ -37,7 +106,7 @@ namespace ModuleESolver
     }
 
 
-    void ESolver_KS::Run(const int istep, UnitCell_pseudo& cell)
+    void ESolver_KS::Run(const int istep, UnitCell_pseudo& ucell)
     {
         if (!(GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md"
             || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax" || GlobalV::CALCULATION.substr(0,3) == "sto")

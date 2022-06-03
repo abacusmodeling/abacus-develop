@@ -96,6 +96,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 			GlobalC::hm.hpw.init_k(ik); 
 			//In fact, hm.hpw.init_k has been done in wf.wfcinit();
 		}
+		stoiter.stohchi.current_ik = ik;
 		
 #ifdef __MPI
 			if(GlobalV::NBANDS > 0)
@@ -112,6 +113,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 		{
 			//init k
 			if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
+			stoiter.stohchi.current_ik = ik;
 			stoiter.sumpolyval_k(ik, this->stowf);
 		}
 		delete [] h_diag;
@@ -159,7 +161,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 			Symmetry_rho srho;
 			for(int is=0; is < GlobalV::NSPIN; is++)
 			{
-				srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+				srho.begin(is, GlobalC::CHR,GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
 			}
 		}
 		else
@@ -189,7 +191,8 @@ void ESolver_SDFT_PW:: c_bands_k(const int ik, double* h_diag, const int istep, 
     {
         for (int ig = 0;ig < GlobalC::wf.npw; ++ig)
 		{
-			h_diag[ig] = std::max(1.0, GlobalC::wf.g2kin[ig]);
+			double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::wfcpw->tpiba2;
+			h_diag[ig] = std::max(1.0, g2kin);
 			if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
 		}
     }
@@ -197,7 +200,8 @@ void ESolver_SDFT_PW:: c_bands_k(const int ik, double* h_diag, const int istep, 
     {
         for (int ig = 0;ig < GlobalC::wf.npw; ig++)
 		{
-			h_diag[ig] = 1 + GlobalC::wf.g2kin[ig] + sqrt( 1 + (GlobalC::wf.g2kin[ig] - 1) * (GlobalC::wf.g2kin[ig] - 1));
+			double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::wfcpw->tpiba2;
+			h_diag[ig] = 1 + g2kin + sqrt( 1 + (g2kin - 1) * (g2kin - 1));
 			if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
 		}
     }

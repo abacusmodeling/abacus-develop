@@ -358,76 +358,75 @@ void toWannier90::outEIG()
 void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 {
 
-	/*
-	std::complex<double> *porter = new std::complex<double>[GlobalC::pw.nrxx];
 	
-	for(int ik = start_k_index; ik < (cal_num_kpts+start_k_index); ik++)
-	{
-		std::stringstream name;
-		if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
-		{
-			name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1 << ".1" ;
-		}
-		else if(GlobalV::NSPIN==2)
-		{
-			if(wannier_spin=="up") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".1" ;
-			else if(wannier_spin=="down") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".2" ;
-		}
+	// std::complex<double> *porter = new std::complex<double>[GlobalC::wfcpw->nrxx];
+	
+	// for(int ik = start_k_index; ik < (cal_num_kpts+start_k_index); ik++)
+	// {
+	// 	std::stringstream name;
+	// 	if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
+	// 	{
+	// 		name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1 << ".1" ;
+	// 	}
+	// 	else if(GlobalV::NSPIN==2)
+	// 	{
+	// 		if(wannier_spin=="up") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".1" ;
+	// 		else if(wannier_spin=="down") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".2" ;
+	// 	}
 		
-		std::ofstream unkfile(name.str());
+	// 	std::ofstream unkfile(name.str());
 		
-		unkfile << std::setw(12) << GlobalC::pw.ncx << std::setw(12) << GlobalC::pw.ncy << std::setw(12) << GlobalC::pw.ncz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
+	// 	unkfile << std::setw(12) << GlobalC::pw.ncx << std::setw(12) << GlobalC::pw.ncy << std::setw(12) << GlobalC::pw.ncz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
 		
-		for(int ib = 0; ib < GlobalV::NBANDS; ib++)
-		{
-			if(!tag_cal_band[ib]) continue;
-			//std::complex<double> *porter = GlobalC::UFFT.porter;
-			//  u_k in real space
-			ModuleBase::GlobalFunc::ZEROS(porter, GlobalC::pw.nrxx);
-			for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
-			{
-				porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
-			}
-			GlobalC::pw.FFT_wfc.FFT3D(porter, 1);
+	// 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
+	// 	{
+	// 		if(!tag_cal_band[ib]) continue;
+	// 		//std::complex<double> *porter = GlobalC::UFFT.porter;
+	// 		//  u_k in real space
+	// 		ModuleBase::GlobalFunc::ZEROS(porter, GlobalC::pw.nrxx);
+	// 		for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
+	// 		{
+	// 			porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
+	// 		}
+	// 		GlobalC::pw.FFT_wfc.FFT3D(porter, 1);
 			
-			for(int k=0; k<GlobalC::pw.ncz; k++)
-			{
-				for(int j=0; j<GlobalC::pw.ncy; j++)
-				{
-					for(int i=0; i<GlobalC::pw.ncx; i++)
-					{
-						if(!gamma_only_wannier)
-						{
-							unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].real()
-									<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
-									//jingan test
-									//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
-									<< std::endl;
-						}
-						else
-						{
-							double zero = 0.0;
-							unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs( porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k] )
-									<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zero
-									//jingan test
-									//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
-									<< std::endl;
-						}
-					}
-				}
-			}
+	// 		for(int k=0; k<GlobalC::pw.ncz; k++)
+	// 		{
+	// 			for(int j=0; j<GlobalC::pw.ncy; j++)
+	// 			{
+	// 				for(int i=0; i<GlobalC::pw.ncx; i++)
+	// 				{
+	// 					if(!gamma_only_wannier)
+	// 					{
+	// 						unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].real()
+	// 								<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
+	// 								//jingan test
+	// 								//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+	// 								<< std::endl;
+	// 					}
+	// 					else
+	// 					{
+	// 						double zero = 0.0;
+	// 						unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs( porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k] )
+	// 								<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zero
+	// 								//jingan test
+	// 								//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+	// 								<< std::endl;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
 			
 			
-		}
+	// 	}
 
 		
-		unkfile.close();
+	// 	unkfile.close();
 		
-	}
+	// }
 	
-	delete[] porter;
-	*/
-	
+	// delete[] porter;
+
 #ifdef __MPI
 	// num_z: how many planes on processor 'ip'
 	int *num_z = new int[GlobalV::NPROC_IN_POOL];
@@ -448,9 +447,9 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 	}	
 
 	// which_ip: found iz belongs to which ip.
-	int *which_ip = new int[GlobalC::pw.ncz];
-	ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
-	for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+	int *which_ip = new int[GlobalC::wfcpw->nz];
+	ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::wfcpw->nz);
+	for(int iz=0; iz<GlobalC::wfcpw->nz; iz++)
 	{
 		for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
 		{
@@ -469,8 +468,8 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 	
 	
 	// only do in the first pool.
-	std::complex<double> *porter = new std::complex<double>[GlobalC::pw.nrxx];
-	int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+	std::complex<double> *porter = new std::complex<double>[GlobalC::wfcpw->nrxx];
+	int nxy = GlobalC::wfcpw->nx * GlobalC::wfcpw->ny;
 	std::complex<double> *zpiece = new std::complex<double>[nxy];
 	
 	if(GlobalV::MY_POOL==0)
@@ -494,22 +493,17 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 				
 				unkfile.open(name.str(),ios::out);
 				
-				unkfile << std::setw(12) << GlobalC::pw.ncx << std::setw(12) << GlobalC::pw.ncy << std::setw(12) << GlobalC::pw.ncz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
+				unkfile << std::setw(12) << GlobalC::wfcpw->nx << std::setw(12) << GlobalC::wfcpw->ny << std::setw(12) << GlobalC::wfcpw->nz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
 			}
 			
 			for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
 				if(!tag_cal_band[ib]) continue;
 				
-				ModuleBase::GlobalFunc::ZEROS(porter, GlobalC::pw.nrxx);
-				for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
-				{
-					porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw(ik, ib, ig);
-				}
-				GlobalC::pw.FFT_wfc.FFT3D(porter, 1);
+				GlobalC::wfcpw->recip2real(&wfc_pw(ik, ib, 0), porter, ik);
 
 				// save the rho one z by one z.
-				for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+				for(int iz=0; iz<GlobalC::wfcpw->nz; iz++)
 				{
 					// tag must be different for different iz.
 					ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
@@ -521,7 +515,7 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 					{
 						for(int ir=0; ir<nxy; ir++)
 						{
-							zpiece[ir] = porter[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+							zpiece[ir] = porter[ir*GlobalC::wfcpw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
 						}
 					}
 					// case 2: > first part rho: send the rho to 
@@ -530,7 +524,7 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 					{
 						for(int ir=0; ir<nxy; ir++)
 						{
-							zpiece[ir] = porter[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+							zpiece[ir] = porter[ir*GlobalC::wfcpw->nplane+iz-start_z[GlobalV::RANK_IN_POOL]];
 						}
 						MPI_Send(zpiece, nxy, MPI_DOUBLE_COMPLEX, 0, tag, POOL_WORLD);
 					}
@@ -545,12 +539,12 @@ void toWannier90::writeUNK(const psi::Psi<std::complex<double>>& wfc_pw)
 					// write data	
 					if(GlobalV::MY_RANK==0)
 					{
-						for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+						for(int iy=0; iy<GlobalC::wfcpw->ny; iy++)
 						{
-							for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+							for(int ix=0; ix<GlobalC::wfcpw->nx; ix++)
 							{
-								unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].real()
-										<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].imag() 
+								unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::wfcpw->ny+iy].real()
+										<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::wfcpw->ny+iy].imag() 
 										<< std::endl;
 							}
 						}
@@ -727,7 +721,7 @@ void toWannier90::cal_Mmn(const psi::Psi<std::complex<double>>& wfc_pw)
 						// test by jingan
 						//GlobalV::ofs_running << __FILE__ << __LINE__ << "cal_ik = " << cal_ik << "cal_ikb = " << cal_ikb << std::endl;
 						// test by jingan
-						//std::complex<double> *unk_L_r = new std::complex<double>[GlobalC::pw.nrxx];
+						//std::complex<double> *unk_L_r = new std::complex<double>[GlobalC::wfcpw->nrxx];
 						//ToRealSpace(cal_ik,n,wfc_pw,unk_L_r,phase_G);				
 						//mmn = unkdotb(unk_L_r,cal_ikb,m,wfc_pw);
 						mmn = unkdotkb(cal_ik,cal_ikb,n,m,phase_G,wfc_pw);
@@ -1477,103 +1471,95 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 }
 
 
-void toWannier90::ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const ModuleBase::Vector3<double> G)
-{
-	// (1) set value
-	std::complex<double> *phase = GlobalC::UFFT.porter;
-    ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::pw.nrxx );
-	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::pw.nrxx);
+// void toWannier90::ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const ModuleBase::Vector3<double> G)
+// {
+// 	// (1) set value
+// 	std::complex<double> *phase = GlobalC::UFFT.porter;
+//     ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::wfcpw->nrxx );
+// 	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::wfcpw->nrxx);
 
 
-    for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
-    {
-        psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik,ig) ] ] = evc[ik](ib, ig);
-    }
+//     for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
+//     {
+//         psir[ GlobalC::wfcpw->ng2fftw[ GlobalC::wf.igk(ik,ig) ] ] = evc[ik](ib, ig);
+//     }
 	
-	// get the phase value in realspace
-	for (int ig = 0; ig < GlobalC::pw.ngmw; ig++)
-	{
-		if (GlobalC::pw.gdirect[ig] == G)
-		{
-			phase[ GlobalC::pw.ig2fftw[ig] ] = std::complex<double>(1.0,0.0);
-			break;
-		}
-	}
-	// (2) fft and get value
-    GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
-	GlobalC::pw.FFT_wfc.FFT3D(phase, 1);
+// 	// get the phase value in realspace
+// 	for (int ig = 0; ig < GlobalC::wfcpw->ngmw; ig++)
+// 	{
+// 		if (GlobalC::wfcpw->ndirect[ig] == G)
+// 		{
+// 			phase[ GlobalC::wfcpw->ng2fftw[ig] ] = std::complex<double>(1.0,0.0);
+// 			break;
+// 		}
+// 	}
+// 	// (2) fft and get value
+//     GlobalC::wfcpw->nFT_wfc.FFT3D(psir, 1);
+// 	GlobalC::wfcpw->nFT_wfc.FFT3D(phase, 1);
 	
 
 	
-	for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-	{
-		psir[ir] = psir[ir] * phase[ir];
-	}
-    return;
-}
+// 	for (int ir = 0; ir < GlobalC::wfcpw->nrxx; ir++)
+// 	{
+// 		psir[ir] = psir[ir] * phase[ir];
+// 	}
+//     return;
+// }
 
-std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, const int ikb, const int bandindex, const ModuleBase::ComplexMatrix *wfc_pw)
-{
-	std::complex<double> result(0.0,0.0);
-	int knumber = GlobalC::kv.ngk[ikb];
-	std::complex<double> *porter = GlobalC::UFFT.porter;
-	ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx);
-	for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-	{
-		porter[ir] = psir[ir];
-	}
-	GlobalC::pw.FFT_wfc.FFT3D( porter, -1);
+// std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, const int ikb, const int bandindex, const ModuleBase::ComplexMatrix *wfc_pw)
+// {
+// 	std::complex<double> result(0.0,0.0);
+// 	int knumber = GlobalC::kv.ngk[ikb];
+// 	std::complex<double> *porter = GlobalC::UFFT.porter;
+// 	ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::wfcpw->nrxx);
+// 	for (int ir = 0; ir < GlobalC::wfcpw->nrxx; ir++)
+// 	{
+// 		porter[ir] = psir[ir];
+// 	}
+// 	GlobalC::wfcpw->nFT_wfc.FFT3D( porter, -1);
 	
 	
-	for (int ig = 0; ig < knumber; ig++)
-	{
-		result = result + conj( porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ikb, ig)] ] ) * wfc_pw[ikb](bandindex,ig);	
+// 	for (int ig = 0; ig < knumber; ig++)
+// 	{
+// 		result = result + conj( porter[ GlobalC::wfcpw->ng2fftw[GlobalC::wf.igk(ikb, ig)] ] ) * wfc_pw[ikb](bandindex,ig);	
 		
-	}
-	return result;
-}
+// 	}
+// 	return result;
+// }
 
 std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const ModuleBase::Vector3<double> G, const psi::Psi<std::complex<double>>& wfc_pw)
 {
 	// (1) set value
 	std::complex<double> result(0.0,0.0);
-	std::complex<double> *psir = new std::complex<double>[GlobalC::pw.nrxx];
-	std::complex<double> *phase = GlobalC::UFFT.porter;
-    ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::pw.nrxx );
-	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::pw.nrxx);
-
-
-    for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
-    {
-        psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik,ig) ] ] = wfc_pw(ik, iband_L, ig);
-    }
+	std::complex<double> *psir = new std::complex<double>[GlobalC::wfcpw->nmaxgr];
+	std::complex<double> *phase = new std::complex<double>[GlobalC::rhopw->nmaxgr];
 	
 	// get the phase value in realspace
-	for (int ig = 0; ig < GlobalC::pw.ngmw; ig++)
+	for (int ig = 0; ig < GlobalC::rhopw->npw; ig++)
 	{
-		if (GlobalC::pw.gdirect[ig] == G)
+		if (GlobalC::rhopw->gdirect[ig] == G) //It should be used carefully. We cannot judge if two double are equal.
 		{
-			phase[ GlobalC::pw.ig2fftw[ig] ] = std::complex<double>(1.0,0.0);
+			phase[ig] = std::complex<double>(1.0,0.0);
 			break;
 		}
 	}
 	
 	// (2) fft and get value
-    GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
-	GlobalC::pw.FFT_wfc.FFT3D(phase, 1);
+	GlobalC::rhopw->recip2real(phase, phase);
+	GlobalC::wfcpw->recip2real(&wfc_pw(ik,iband_L,0), psir, ik);
 		
-	for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+	for (int ir = 0; ir < GlobalC::wfcpw->nrxx; ir++)
 	{
-		psir[ir] = psir[ir] * phase[ir];
+		psir[ir] *= phase[ir];
 	}
 
-	GlobalC::pw.FFT_wfc.FFT3D( psir, -1);
+	GlobalC::wfcpw->real2recip(psir, psir, ik);
 	
 	std::complex<double> result_tem(0.0,0.0);
 	
 	for (int ig = 0; ig < GlobalC::kv.ngk[ikb]; ig++)
 	{
-		result_tem = result_tem + conj( psir[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ikb, ig)] ] ) * wfc_pw(ikb, iband_R,ig);	
+		result_tem = result_tem + conj( psir[ig]) * wfc_pw(ikb, iband_R,ig);	
 		
 	}
 #ifdef __MPI
@@ -1582,67 +1568,68 @@ std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const 
 	result=result_tem;
 #endif
 	delete[] psir;	
+	delete[] phase;
 	return result;	
 	
 }
 
-std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const ModuleBase::Vector3<double> G)
-{
-	std::complex<double> *phase = new std::complex<double>[GlobalC::pw.nrxx];
-	std::complex<double> *psir = new std::complex<double>[GlobalC::pw.nrxx];
-	std::complex<double> *psir_2 = new std::complex<double>[GlobalC::pw.nrxx];
-	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::pw.nrxx);
-	ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::pw.nrxx);
-	ModuleBase::GlobalFunc::ZEROS( psir_2, GlobalC::pw.nrxx);
+// std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const ModuleBase::Vector3<double> G)
+// {
+// 	std::complex<double> *phase = new std::complex<double>[GlobalC::wfcpw->nrxx];
+// 	std::complex<double> *psir = new std::complex<double>[GlobalC::wfcpw->nrxx];
+// 	std::complex<double> *psir_2 = new std::complex<double>[GlobalC::wfcpw->nrxx];
+// 	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::wfcpw->nrxx);
+// 	ModuleBase::GlobalFunc::ZEROS( psir, GlobalC::wfcpw->nrxx);
+// 	ModuleBase::GlobalFunc::ZEROS( psir_2, GlobalC::wfcpw->nrxx);
 
-    for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
-    {
-        //psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig) ] ] = wfc_pw[0](ib_L, ig);
-		psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig) ] ] = std::complex<double> ( abs(wfc_pw[0](ib_L, ig)), 0.0 );
-    }
+//     for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
+//     {
+//         //psir[ GlobalC::wfcpw->ng2fftw[ GlobalC::wf.igk(0,ig) ] ] = wfc_pw[0](ib_L, ig);
+// 		psir[ GlobalC::wfcpw->ng2fftw[ GlobalC::wf.igk(0,ig) ] ] = std::complex<double> ( abs(wfc_pw[0](ib_L, ig)), 0.0 );
+//     }
 	
-	// get the phase value in realspace
-	for (int ig = 0; ig < GlobalC::pw.ngmw; ig++)
-	{
-		if (GlobalC::pw.gdirect[ig] == G)
-		{
-			phase[ GlobalC::pw.ig2fftw[ig] ] = std::complex<double>(1.0,0.0);
-			break;
-		}
-	}
-	// (2) fft and get value
-    GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
-	GlobalC::pw.FFT_wfc.FFT3D(phase, 1);
+// 	// get the phase value in realspace
+// 	for (int ig = 0; ig < GlobalC::wfcpw->ngmw; ig++)
+// 	{
+// 		if (GlobalC::wfcpw->ndirect[ig] == G)
+// 		{
+// 			phase[ GlobalC::wfcpw->ng2fftw[ig] ] = std::complex<double>(1.0,0.0);
+// 			break;
+// 		}
+// 	}
+// 	// (2) fft and get value
+//     GlobalC::wfcpw->nFT_wfc.FFT3D(psir, 1);
+// 	GlobalC::wfcpw->nFT_wfc.FFT3D(phase, 1);
 	
-	for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-	{
-		psir_2[ir] = conj(psir[ir]) * phase[ir];
-	}
+// 	for (int ir = 0; ir < GlobalC::wfcpw->nrxx; ir++)
+// 	{
+// 		psir_2[ir] = conj(psir[ir]) * phase[ir];
+// 	}
 	
-		for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-	{
-		psir[ir] = psir[ir] * phase[ir];
-	}
+// 		for (int ir = 0; ir < GlobalC::wfcpw->nrxx; ir++)
+// 	{
+// 		psir[ir] = psir[ir] * phase[ir];
+// 	}
 	
-	GlobalC::pw.FFT_wfc.FFT3D( psir, -1);
-	GlobalC::pw.FFT_wfc.FFT3D( psir_2, -1);
+// 	GlobalC::wfcpw->nFT_wfc.FFT3D( psir, -1);
+// 	GlobalC::wfcpw->nFT_wfc.FFT3D( psir_2, -1);
 	
-	std::complex<double> result(0.0,0.0);
+// 	std::complex<double> result(0.0,0.0);
 	
-	for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
-	{
-		//result = result + conj(psir_2[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(0,ig)] ]) * wfc_pw[0](ib_R,ig) + psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig)] ] * conj(wfc_pw[0](ib_R,ig));
-		//std::complex<double> tem = std::complex<double>( abs(wfc_pw[0](ib_R,ig)), 0.0 );
-		result = result +  conj(psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig)] ]);// * tem;
-	}
+// 	for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
+// 	{
+// 		//result = result + conj(psir_2[ GlobalC::wfcpw->ng2fftw[GlobalC::wf.igk(0,ig)] ]) * wfc_pw[0](ib_R,ig) + psir[ GlobalC::wfcpw->ng2fftw[ GlobalC::wf.igk(0,ig)] ] * conj(wfc_pw[0](ib_R,ig));
+// 		//std::complex<double> tem = std::complex<double>( abs(wfc_pw[0](ib_R,ig)), 0.0 );
+// 		result = result +  conj(psir[ GlobalC::wfcpw->ng2fftw[ GlobalC::wf.igk(0,ig)] ]);// * tem;
+// 	}
 	
-	delete[] phase;
-	delete[] psir;
-	delete[] psir_2;
+// 	delete[] phase;
+// 	delete[] psir;
+// 	delete[] psir_2;
 	
-	return result;
+// 	return result;
 	
-}
+// }
 
 //ʹ��lcao_in_pw������lcao����ת��pw����
 #ifdef __LCAO

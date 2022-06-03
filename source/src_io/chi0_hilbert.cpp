@@ -1047,34 +1047,30 @@ void Chi0_hilbert::Cal_Psi(int iq, std::complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
 	std::complex<double> exp_tmp;
+	std::complex<double>* porter = new std::complex<double> [GlobalC::wfcpw->nrxx];
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
-		for(int ig = 0; ig < GlobalC::kv.ngk[iq] ; ig++)
-		{
-			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(iq,ig)] ] = GlobalC::wf.evc[iq](ib,ig);
-		}
+		GlobalC::wfcpw->recip2real(&GlobalC::wf.evc[iq](ib,0), porter, iq);
 
-		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		int ir=0;
-		for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+		for(int ix=0; ix<GlobalC::wfcpw->nx; ix++)
 		{
-			phase_x = GlobalC::kv.kvec_d[iq].x*ix/GlobalC::pw.ncx;
-			for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+			phase_x = GlobalC::kv.kvec_d[iq].x*ix/GlobalC::wfcpw->nx;
+			for(int iy=0; iy<GlobalC::wfcpw->ny; iy++)
 			{
-				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
-				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
+				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::wfcpw->ny;
+				for(int iz=GlobalC::wfcpw->startz_current; iz<GlobalC::wfcpw->startz_current+GlobalC::wfcpw->nplane; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::wfcpw->nz) *ModuleBase::TWO_PI;
 					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
-					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
+					psi_r[ib][ir] = porter[ir]*exp_tmp;
 					ir++;
 				}
 
 			}
 		}
 	}
-
+	delete[] porter;
 	return;
 }
 
@@ -1083,34 +1079,30 @@ void Chi0_hilbert::Cal_Psi_down(int iq, std::complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
 	std::complex<double> exp_tmp;
+	std::complex<double>* porter = new std::complex<double> [GlobalC::wfcpw->nrxx];
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
-		for(int ig = GlobalC::wf.npwx; ig < GlobalC::wf.npwx + GlobalC::kv.ngk[iq] ; ig++)
-		{
-			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(iq,ig - GlobalC::wf.npwx)] ] = GlobalC::wf.evc[iq](ib,ig);
-		}
+		GlobalC::wfcpw->recip2real(&GlobalC::wf.evc[iq](ib, GlobalC::wf.npwx), porter, iq);
 
-		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		int ir=0;
-		for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+		for(int ix=0; ix<GlobalC::wfcpw->nx; ix++)
 		{
-			phase_x = GlobalC::kv.kvec_d[iq].x*ix/GlobalC::pw.ncx;
-			for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+			phase_x = GlobalC::kv.kvec_d[iq].x*ix/GlobalC::wfcpw->nx;
+			for(int iy=0; iy<GlobalC::wfcpw->ny; iy++)
 			{
-				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
-				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
+				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::wfcpw->ny;
+				for(int iz=GlobalC::wfcpw->startz_current; iz<GlobalC::wfcpw->startz_current+GlobalC::wfcpw->nplane; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::wfcpw->nz) *ModuleBase::TWO_PI;
 					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
-					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
+					psi_r[ib][ir] = porter[ir]*exp_tmp;
 					ir++;
 				}
 
 			}
 		}
 	}
-
+	delete[] porter;
 	return;
 }
 
@@ -1274,7 +1266,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin, ModulePW::PW_Basis 
 		Cal_Psi_down(iqk, psi_r2);
 	}
 
-	const int startz = rho_basis->startz[GlobalV::RANK_IN_POOL]; 
+	const int startz = rho_basis->startz_current; 
 	const int nplane = rho_basis->nplane;
 
 	for(int ib1=0; ib1< oband; ib1++)
@@ -2335,7 +2327,7 @@ int Chi0_hilbert::parallel_g()
 	for(int i=0;i<dim;i++)
 	{
 		std::cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
-		std::cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<std::endl;
+		std::cout <<"G_direct["<<i<<"] = "<<GlobalC::rhopw->gdirect[i].x<<" "<<GlobalC::rhopw->gdirect[i].y<<" "<<GlobalC::rhopw->gdirect[i].z<<std::endl;
 		std::cout <<"flag1["<<i<<"] = "<<flag1[i]<<std::endl;
 		std::cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<std::endl;
 	}

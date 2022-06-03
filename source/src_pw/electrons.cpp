@@ -81,7 +81,7 @@ void Electrons::self_consistent(const int &istep)
     Symmetry_rho srho;
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+        srho.begin(is, GlobalC::CHR,GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
     }
 
     // conv_elec is a member of Threshold_Elec
@@ -197,7 +197,7 @@ void Electrons::self_consistent(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+			srho.begin(is, GlobalC::CHR,GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
@@ -310,7 +310,7 @@ void Electrons::self_consistent(const int &istep)
             //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
-            WF_io::write_wfc2( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+            WF_io::write_wfc( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
             //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
@@ -447,7 +447,8 @@ void Electrons::c_bands(const int &istep)
         {
             for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = std::max(1.0, GlobalC::wf.g2kin[ig]);
+                double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2;
+                h_diag[ig] = std::max(1.0, g2kin);
                 if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }
@@ -455,7 +456,8 @@ void Electrons::c_bands(const int &istep)
         {
             for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = 1 + GlobalC::wf.g2kin[ig] + sqrt( 1 + (GlobalC::wf.g2kin[ig] - 1) * (GlobalC::wf.g2kin[ig] - 1));
+                double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2;
+                h_diag[ig] = 1 + g2kin + sqrt( 1 + (g2kin - 1) * (g2kin - 1));
                 if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }

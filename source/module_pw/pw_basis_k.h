@@ -53,56 +53,64 @@ public:
         const double ecut_in,
         const int nk_in, //number of k points in this pool
         const ModuleBase::Vector3<double> *kvec_d, // Direct coordinates of k points
-        const int distribution_type_in
+        const int distribution_type_in = 1
     );
 
 
 public:
-    int nks;//number of k points in this pool
-    ModuleBase::Vector3<double> *kvec_d; // Direct coordinates of k points
-    ModuleBase::Vector3<double> *kvec_c; // Cartesian coordinates of k points
-    int *npwk; //[nks] number of plane waves of different k-points
-    int npwk_max; //max npwk among all nks k-points, it may be smaller than npw
+    int nks=0;//number of k points in this pool
+    ModuleBase::Vector3<double> *kvec_d=nullptr; // Direct coordinates of k points
+    ModuleBase::Vector3<double> *kvec_c=nullptr; // Cartesian coordinates of k points
+    int *npwk=nullptr; //[nks] number of plane waves of different k-points
+    int npwk_max=0; //max npwk among all nks k-points, it may be smaller than npw
                   //npw cutoff: (|g|+|k|)^2, npwk in the the npw ball, thus is smaller
-    double gk_ecut; //Energy cut off for (g+k)^2/2
+    double gk_ecut=0; //Energy cut off for (g+k)^2/2
 
 public:
     //prepare for transforms between real and reciprocal spaces
     void setuptransform();
 
-    int *igl2isz_k; //[npwk_max*nks] map (ig,ik) to (is,iz) 
+    int *igl2isz_k=nullptr; //[npwk_max*nks] map (igl,ik) to (is,iz) 
+    int *igl2ig_k=nullptr;//[npwk_max*nks] map (igl,ik) to ig
 
-    //create Direct coordinate, Cartesian coordinate, norm2 of plane waves in each processor
+    double *gk2=nullptr; // modulus (G+K)^2 of G vectors [npwk_max*nks]
+
     void collect_local_pw();
 
 private:
     //create igl2isz_k map array for fft
     void setupIndGk();
+    ModuleBase::Vector3<double> cal_GplusK_cartesian(const int ik, const int ig) const;
 
 public:
-    void real2recip(double * in, std::complex<double> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void real2recip(std::complex<double> * in, std::complex<double> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void recip2real(std::complex<double> * in, double *out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
-    void recip2real(std::complex<double> * in, std::complex<double> * out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void real2recip(const double* in, std::complex<double>* out, const int ik, const bool add = false, const double factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(const std::complex<double>* in, std::complex<double>* out, const int ik, const bool add = false, const double factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(const std::complex<double>* in, double* out, const int ik, const bool add = false, const double factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(const std::complex<double>* in, std::complex<double> * out, const int ik, const bool add = false, const double factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
 
 #ifdef __MIX_PRECISION
-    void real2recip(float * in, std::complex<float> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void real2recip(std::complex<float> * in, std::complex<float> * out, int ik); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void recip2real(std::complex<float> * in, float *out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
-    void recip2real(std::complex<float> * in, std::complex<float> * out, int ik); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void real2recip(const float* in, std::complex<float>* out, const int ik, const bool add = false, const float factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(const std::complex<float>* in, std::complex<float>* out, const int ik, const bool add = false, const float factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(const std::complex<float>* in, float* out, const int ik, const bool add = false, const float factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(const std::complex<float>* in, std::complex<float>* out, const int ik, const bool add = false, const float factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
 #endif
 
 public:
     //operator:
-
-    //calculate g+k
-    ModuleBase::Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const;
-    //calculate g+k.x/y/z
-    double get_GPlusK_cartesian_projection(const int ik, const int ig, const int axis) const;
-    //calculate (g+k)^2
-    double get_SquareGPlusK_cartesian(const int ik, const int ig) const;
+    //get (G+K)^2:
+    double& getgk2(const int ik, const int igl) const;
+    //get G
+    ModuleBase::Vector3<double>& getgcar(const int ik, const int igl) const;
+    //get (G+K)
+    ModuleBase::Vector3<double> getgpluskcar(const int ik, const int igl) const;
+    //get igl2isz_k
+    int& getigl2isz(const int ik, const int igl) const;
+    //get igl2ig_k or igk(ik,ig) in older ABACUS
+    int& getigl2ig(const int ik, const int igl) const;
 };
 
 }
 #endif //PlaneWave_K class
+
+#include "./pw_basis_k_big.h" //temporary it will be removed
 

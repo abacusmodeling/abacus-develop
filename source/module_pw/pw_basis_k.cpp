@@ -5,11 +5,6 @@ namespace ModulePW
 
 PW_Basis_K::PW_Basis_K()
 {
-    nks = 1;
-    kvec_d = nullptr;
-    kvec_c = nullptr;
-    npwk = nullptr;
-    igl2isz_k = nullptr;
 }
 PW_Basis_K::~PW_Basis_K()
 {
@@ -17,6 +12,8 @@ PW_Basis_K::~PW_Basis_K()
     if(kvec_c != nullptr)    delete[] kvec_c;
     if(npwk != nullptr)      delete[] npwk;
     if(igl2isz_k != nullptr) delete[] igl2isz_k;
+    if(igl2ig_k != nullptr)  delete[] igl2ig_k;
+    if(gk2 != nullptr)       delete[] gk2;
 }
 
 void PW_Basis_K:: initparameters(
@@ -40,16 +37,17 @@ void PW_Basis_K:: initparameters(
         if(kmod > kmaxmod)  kmaxmod = kmod;
     }
     // MPI_Allreduce(MPI_IN_PLACE, &kmaxmod, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
-    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
-    this->gk_ecut = gk_ecut_in/tpiba2;
+    this->gk_ecut = gk_ecut_in/this->tpiba2;
     this->ggecut = pow(sqrt(this->gk_ecut) + kmaxmod, 2);
 
     this->gamma_only = gamma_only_in;
     if(kmaxmod > 0)     this->gamma_only = false; //if it is not the gamma point, we do not use gamma_only
-    if (this->gamma_only)   this->ny = int(this->bigny / 2) + 1;
-    else                    this->ny = bigny;
-    this->nxy = this->nx * this->ny;
-    this->nxyz = this->nxy * this->nz;
+    if (this->gamma_only)   this->fftny = int(this->ny / 2) + 1;
+    else                    this->fftny = ny;
+    this->fftnx = this->nx;
+    this->fftnz = this->nz;
+    this->fftnxy = this->fftnx * this->fftny;
+    this->fftnxyz = this->fftnxy * this->fftnz;
 
     this->distribution_type = distribution_type_in;
     return;
@@ -63,9 +61,9 @@ void PW_Basis_K::setupIndGk()
     for (int ik = 0; ik < this->nks; ik++)
     {
         int ng = 0;
-        for (int ig = 0; ig < npw ; ig++)
+        for (int ig = 0; ig < this->npw ; ig++)
         {
-            const double gk2 = this->get_GPlusK_cartesian(ik, ig).norm2();       
+            const double gk2 = this->cal_GplusK_cartesian(ik, ig).norm2();       
             if (gk2 <= this->gk_ecut)
             {
                 ++ng;
@@ -78,24 +76,23 @@ void PW_Basis_K::setupIndGk()
         }
     }
 
-    //get igl2isz_k
+    //get igl2isz_k and igl2ig_k
     if(this->igl2isz_k!=nullptr) delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
+    if(this->igl2ig_k!=nullptr) delete[] igl2ig_k; this->igl2ig_k = new int [this->nks * this->npwk_max];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int igl = 0;
-        for (int ig = 0; ig < npw ; ig++)
+        for (int ig = 0; ig < this->npw ; ig++)
         {
-            const double gk2 = this->get_GPlusK_cartesian(ik, ig).norm2();       
+            const double gk2 = this->cal_GplusK_cartesian(ik, ig).norm2();       
             if (gk2 <= this->gk_ecut)
             {
                 this->igl2isz_k[ik*npwk_max + igl] = this->ig2isz[ig];
+                this->igl2ig_k[ik*npwk_max + igl] = ig;
                 ++igl;
             }
         }
     }
-
-    delete[] this->ig2isz;
-    this->ig2isz = NULL;
 
     return;
 }
@@ -112,45 +109,84 @@ void PW_Basis_K::setuptransform()
     this->getstartgr();
     this->setupIndGk();
     this->ft.clear();
-    this->ft.initfft(this->nx,this->bigny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
+    this->ft.initfft(this->nx,this->ny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
 }
 
 void PW_Basis_K::collect_local_pw()
 {
-    if(gg != NULL) delete[] gg;
-    if(gdirect != NULL) delete[] gdirect;
-    if(gcar != NULL) delete[] gcar;
-    this->gg = new double[this->npwk_max * this->nks];
+    if(gk2 != nullptr) delete[] gk2;
+    if(gdirect != nullptr) delete[] gdirect;
+    if(gcar != nullptr) delete[] gcar;
+    this->gk2 = new double[this->npwk_max * this->nks];
     this->gdirect = new ModuleBase::Vector3<double>[this->npwk_max * this->nks];
     this->gcar = new ModuleBase::Vector3<double>[this->npwk_max * this->nks];
 
     ModuleBase::Vector3<double> f;
     for(int ik = 0 ; ik < this->nks ; ++ik)
     {
+        ModuleBase::Vector3<double> kv = this->kvec_d[ik];
         for(int igl = 0 ; igl < this-> npwk[ik] ; ++igl)
         {
             int isz = this->igl2isz_k[ik * npwk_max + igl];
             int iz = isz % this->nz;
             int is = isz / this->nz;
-            int ixy = this->is2ixy[is];
-            int ix = ixy / this->ny;
-            int iy = ixy % this->ny;
+            int ixy = this->is2fftixy[is];
+            int ix = ixy / this->fftny;
+            int iy = ixy % this->fftny;
             if (ix >= int(this->nx/2) + 1) ix -= this->nx;
-            if (iy >= int(this->bigny/2) + 1) iy -= this->bigny;
+            if (iy >= int(this->ny/2) + 1) iy -= this->ny;
             if (iz >= int(this->nz/2) + 1) iz -= this->nz;
             f.x = ix;
             f.y = iy;
             f.z = iz;
-            this->gg[ik * npwk_max + igl] = f * (this->GGT * f);
+
+            this->gk2[ik * npwk_max + igl] = (f+kv) * (this->GGT * (f+kv));
             this->gdirect[ik * npwk_max + igl] = f;
             this->gcar[ik * npwk_max + igl] = f * this->G;
         }
     }
 }
 
+ModuleBase::Vector3<double> PW_Basis_K:: cal_GplusK_cartesian(const int ik, const int ig) const {
+    int isz = this->ig2isz[ig];
+    int iz = isz % this->nz;
+    int is = isz / this->nz;
+    int ix = this->is2fftixy[is] / this->fftny;
+    int iy = this->is2fftixy[is] % this->fftny;
+    if (ix >= int(this->nx/2) + 1) ix -= this->nx;
+    if (iy >= int(this->ny/2) + 1) iy -= this->ny;
+    if (iz >= int(this->nz/2) + 1) iz -= this->nz;
+    ModuleBase::Vector3<double> f;
+    f.x = ix;
+    f.y = iy;
+    f.z = iz;
+    f = f * this->G;
+    ModuleBase::Vector3<double> g_temp_ = this->kvec_c[ik] + f;
+    return g_temp_;
+}
 
+double& PW_Basis_K::getgk2(const int ik, const int igl) const
+{
+    return this->gk2[ik * this->npwk_max + igl];
+}
 
+ModuleBase::Vector3<double>& PW_Basis_K::getgcar(const int ik, const int igl) const
+{
+    return this->gcar[ik * this->npwk_max + igl];
+}
 
+ModuleBase::Vector3<double> PW_Basis_K::getgpluskcar(const int ik, const int igl) const
+{
+    return this->gcar[ik * this->npwk_max + igl]+this->kvec_c[ik];
+}
+int& PW_Basis_K::getigl2isz(const int ik, const int igl) const
+{
+    return this->igl2isz_k[ik*this->npwk_max + igl];
+}
+int& PW_Basis_K::getigl2ig(const int ik, const int igl) const
+{
+    return this->igl2ig_k[ik*this->npwk_max + igl];
+}
 
 }

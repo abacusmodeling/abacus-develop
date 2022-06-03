@@ -715,17 +715,17 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 				if (ipol==0)
 				{
 					for (int ig=0; ig<nbasis; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[0];
                 }
 				if (ipol==1)
 				{
 					for (int ig=0; ig<nbasis; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[1];
                 }
 				if (ipol==2)
 				{
 					for (int ig=0; ig<nbasis; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[2];
                 }
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)

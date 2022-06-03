@@ -14,14 +14,12 @@ Hamilt_PW::Hamilt_PW()
 {
     hpsi = new std::complex<double>[1];
     spsi = new std::complex<double>[1];
-    GR_index = new int[1];
 }
 
 Hamilt_PW::~Hamilt_PW()
 {
     delete[] hpsi;
     delete[] spsi;
-    delete[] GR_index;
 }
 
 
@@ -40,15 +38,12 @@ void Hamilt_PW::allocate(
 
     delete[] hpsi;
     delete[] spsi;
-    delete[] GR_index;
 
     this->hpsi = new std::complex<double> [npwx * npol];
     this->spsi = new std::complex<double> [npwx * npol];
-    this->GR_index = new int[nrxx];
 
     ModuleBase::GlobalFunc::ZEROS(this->hpsi, npwx * npol);
     ModuleBase::GlobalFunc::ZEROS(this->spsi, npwx * npol);
-    ModuleBase::GlobalFunc::ZEROS(this->GR_index, nrxx);
 
     return;
 }
@@ -65,31 +60,25 @@ void Hamilt_PW::init_k(const int ik)
 		GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 	}
 
-	// (2) Kinetic energy.
-	GlobalC::wf.ekin(ik);
+	this->current_ik = ik;
 
-	// (3) Take the local potential.
+	// (2) Take the local potential.
 	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
 		GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
 
-	// (4) Calculate nonlocal pseudopotential vkb
+	// (3) Calculate nonlocal pseudopotential vkb
 	//if (GlobalC::ppcell.nkb > 0 && !LINEAR_SCALING) xiaohui modify 2013-09-02
 	if(GlobalC::ppcell.nkb > 0 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
 	{
 		GlobalC::ppcell.getvnl(ik);
 	}
 
-	// (5) The number of wave functions.
+	// (4) The number of wave functions.
 	GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
-	// (6) The index of plane waves.
-    for (int ig = 0;ig < GlobalC::wf.npw;ig++)
-    {
-        this->GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
-    }
-
+	// (5) The index of plane waves.
 	// (7) ik
 	GlobalV::CURRENT_K = ik;
 
@@ -135,12 +124,10 @@ void Hamilt_PW::diagH_subspace(
 		dmax = GlobalC::wf.npwx*GlobalV::NPOL;
 	}
 
-	//qianrui improve this part 2021-3-14
 	std::complex<double> *aux=new std::complex<double> [dmax*nstart];
 	std::complex<double> *paux = aux;
 	std::complex<double> *ppsi = psi.c;
 
-	//qianrui replace it
 	this->h_psi(psi.c, aux, nstart);
 
 	char trans1 = 'C';
@@ -358,10 +345,15 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
     int i = 0;
     int j = 0;
     int ig= 0;
+	const int ik = this->current_ik;
+	const double tpiba2 = GlobalC::ucell.tpiba2;
+	const int npwx = GlobalC::wf.npwx;
+	const int npw = GlobalC::wf.npw;
+	const int nrxx = GlobalC::rhopw->nrxx;
 
-	//if(GlobalV::NSPIN!=4) ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npw);
+	//if(GlobalV::NSPIN!=4) ModuleBase::GlobalFunc::ZEROS(hpsi, npw);
 	//else ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
-	int dmax = GlobalC::wf.npwx * GlobalV::NPOL;
+	const int dmax = npwx * GlobalV::NPOL;
 
 	//------------------------------------
 	//(1) the kinetical energy.
@@ -374,28 +366,28 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		tmpsi_in = psi_in;
 		for(int ib = 0 ; ib < m; ++ib)
 		{
-			for(ig = 0;ig < GlobalC::wf.npw; ++ig)
+			for(ig = 0;ig < npw; ++ig)
 			{
-				tmhpsi[ig] = GlobalC::wf.g2kin[ig] * tmpsi_in[ig];
+				tmhpsi[ig] = GlobalC::wfcpw->getgk2(ik,ig) * tpiba2 * tmpsi_in[ig];
 			}
 			if(GlobalV::NSPIN==4){
-				for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
+				for(ig=npw; ig < npwx; ++ig)
 				{
 					tmhpsi[ig] = 0;
 				}
-				tmhpsi +=GlobalC::wf.npwx;
-				tmpsi_in += GlobalC::wf.npwx;
-				for (ig = 0;ig < GlobalC::wf.npw ;++ig)
+				tmhpsi +=npwx;
+				tmpsi_in += npwx;
+				for (ig = 0;ig < npw ;++ig)
 				{
-					tmhpsi[ig] = GlobalC::wf.g2kin[ig] * tmpsi_in[ig];
+					tmhpsi[ig] = GlobalC::wfcpw->getgk2(ik,ig) * tpiba2 * tmpsi_in[ig];
 				}
-				for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
+				for(ig=npw; ig < npwx; ++ig)
 				{
 					tmhpsi[ig] =0;
 				}
 			}
-			tmhpsi += GlobalC::wf.npwx;
-			tmpsi_in += GlobalC::wf.npwx;
+			tmhpsi += npwx;
+			tmpsi_in += npwx;
 		}
 	}
 
@@ -403,6 +395,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 	//(2) the local potential.
 	//-----------------------------------
 	ModuleBase::timer::tick("Hamilt_PW","vloc");
+	std::complex<double>* porter = new std::complex<double>[GlobalC::wfcpw->nmaxgr];
 	if(GlobalV::VL_IN_H)
 	{
 		tmhpsi = hpsi;
@@ -410,48 +403,33 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		for(int ib = 0 ; ib < m; ++ib)
 		{
 			if(GlobalV::NSPIN!=4){
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-				GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
-				for (j = 0;j < GlobalC::wf.npw;j++)
+				GlobalC::wfcpw->recip2real(tmpsi_in, porter, ik);
+				for (int ir=0; ir< nrxx; ir++)
 				{
-					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
+					porter[ir] *=  GlobalC::pot.vr_eff1[ir];
 				}
+				GlobalC::wfcpw->real2recip(porter, tmhpsi, ik, true);
 			}
 			else
 			{
-				std::complex<double>* porter1 = new std::complex<double>[GlobalC::pw.nrxx];
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-				ModuleBase::GlobalFunc::ZEROS( porter1, GlobalC::pw.nrxx);
-				for (int ig=0; ig< GlobalC::wf.npw; ig++)
-				{
-					GlobalC::UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
-					porter1[ GR_index[ig]  ] = tmpsi_in[ig + GlobalC::wf.npwx];
-				}
-				// (2) fft to real space and doing things.
-				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, 1);
-				GlobalC::pw.FFT_wfc.FFT3D( porter1, 1);
+				std::complex<double>* porter1 = new std::complex<double>[nrxx];
+				// fft to real space and doing things.
+				GlobalC::wfcpw->recip2real(tmpsi_in, porter, ik);
+				GlobalC::wfcpw->recip2real(tmpsi_in+npwx, porter1, ik);
 				std::complex<double> sup,sdown;
-				for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
+				for (int ir=0; ir< nrxx; ir++)
 				{
-					sup = GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(0,ir) + GlobalC::pot.vr_eff(3,ir)) +
+					sup = porter[ir] * (GlobalC::pot.vr_eff(0,ir) + GlobalC::pot.vr_eff(3,ir)) +
 						porter1[ir] * (GlobalC::pot.vr_eff(1,ir) - std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
 					sdown = porter1[ir] * (GlobalC::pot.vr_eff(0,ir) - GlobalC::pot.vr_eff(3,ir)) +
-					GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(1,ir) + std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
-					GlobalC::UFFT.porter[ir] = sup;
+					porter[ir] * (GlobalC::pot.vr_eff(1,ir) + std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
+					porter[ir] = sup;
 					porter1[ir] = sdown;
 				}
 				// (3) fft back to G space.
-				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, -1);
-				GlobalC::pw.FFT_wfc.FFT3D( porter1, -1);
+				GlobalC::wfcpw->real2recip(porter, tmhpsi, ik, true);
+				GlobalC::wfcpw->real2recip(porter1, tmhpsi+npwx, ik, true);
 
-				for (j = 0;j < GlobalC::wf.npw;j++)
-				{
-					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
-				}
-				for (j = 0;j < GlobalC::wf.npw;j++ )
-				{
-					tmhpsi[j+GlobalC::wf.npwx] += porter1[ GR_index[j] ];
-				}
 				delete[] porter1;
 			}
 			tmhpsi += dmax;
@@ -477,12 +455,12 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			if(m==1 && GlobalV::NPOL==1)
 			{
 				int inc = 1;
-				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ModuleBase::ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ModuleBase::ZERO, becp.c, &inc);
+				zgemv_(&transa, &npw, &nkb, &ModuleBase::ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ModuleBase::ZERO, becp.c, &inc);
 			}
 			else
 			{
 				int npm = GlobalV::NPOL * m;
-				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ModuleBase::ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ModuleBase::ZERO,becp.c,&nkb);
+				zgemm_(&transa,&transb,&nkb,&npm,&npw,&ModuleBase::ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ModuleBase::ZERO,becp.c,&nkb);
 				//add_nonlocal_pp is moddified, thus tranpose not needed here.
 				//if(GlobalV::NONCOLIN)
 				//{
@@ -510,7 +488,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			for (i=0;i< GlobalC::ppcell.nkb;i++)
 			{
 				const std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
-				const std::complex<double>* const p_end = p + GlobalC::wf.npw;
+				const std::complex<double>* const p_end = p + npw;
 				const std::complex<double>* psip = psi_in;
 				for (;p<p_end;++p,++psip)
 				{
@@ -540,29 +518,29 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		{
 			for(int j=0; j<3; j++)
 			{
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
-					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
-					GlobalC::UFFT.porter[ GR_index[ig] ] = tmpsi_in[ig] * complex<double>(0.0,fact);
+					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * tpiba2;
+					porter[ig] = tmpsi_in[ig] * complex<double>(0.0,fact);
 				}
+				
+				GlobalC::wfcpw->recip2real(porter,porter,ik);
 
-				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
-
-				for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+				for (int ir = 0; ir < nrxx; ir++)
 				{
-					GlobalC::UFFT.porter[ir] = GlobalC::UFFT.porter[ir] * GlobalC::pot.vofk(GlobalV::CURRENT_SPIN,ir);
+					porter[ir] *= GlobalC::pot.vofk(GlobalV::CURRENT_SPIN,ir);
 				}
-				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, -1);
+				GlobalC::wfcpw->real2recip(porter,porter,ik);
 
-				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
+				for (int ig = 0;ig < npw ; ig++)
 				{
-					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
-					tmhpsi[ig] = tmhpsi[ig] - complex<double>(0.0,fact) * GlobalC::UFFT.porter[ GR_index[ig] ];
+					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * tpiba2;
+					tmhpsi[ig] -= complex<double>(0.0,fact) * porter[ig];
 				}
 			}//x,y,z directions
 		}
 	}
+	delete[] porter;
 	ModuleBase::timer::tick("Hamilt_PW","meta");
     ModuleBase::timer::tick("Hamilt_PW","h_psi");
     return;

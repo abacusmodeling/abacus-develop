@@ -98,7 +98,7 @@ void Electrons::self_consistent(const int &istep)
 	Symmetry_rho srho;
 	for (int is = 0; is < GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+		srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
 	}
 
 	// conv_elec is a member of Threshold_Elec
@@ -207,7 +207,7 @@ void Electrons::self_consistent(const int &istep)
 		Symmetry_rho srho;
 		for (int is = 0; is < GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+			srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
 		}
 
 		//(7) compute magnetization, only for LSDA(spin==2)
@@ -322,7 +322,7 @@ void Electrons::self_consistent(const int &istep)
 			// WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
 			// mohan update 2011-02-21
 			// qianrui update 2020-10-17
-			//WF_io::write_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+			//WF_io::write_wfc(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
 			// ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
 		}
 
@@ -463,8 +463,8 @@ void Electrons::c_bands(const int &istep)
 		// Replace 10.29
 		if (precondition_type == 1)
 		{
-			CHECK_CUDA(
-				hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
+			// CHECK_CUDA(
+			// 	hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
 			int thread = 512;
 			int block = (GlobalC::wf.npw + thread - 1) / thread;
 			hipLaunchKernelGGL(kernel_pred1, dim3(block), dim3(thread), 0, 0, h_diag, GlobalC::wf.npw);
@@ -479,8 +479,8 @@ void Electrons::c_bands(const int &istep)
 		}
 		else if (precondition_type == 2)
 		{
-			CHECK_CUDA(
-				hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
+			// CHECK_CUDA(
+			// 	hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
 			int thread = 512;
 			int block = (GlobalC::wf.npw + thread - 1) / thread;
 			hipLaunchKernelGGL(kernel_pred2, dim3(block), dim3(thread), 0, 0, h_diag, GlobalC::wf.npw);

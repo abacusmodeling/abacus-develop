@@ -63,7 +63,7 @@ public:
     void initgrids(
         const double lat0_in,
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        const int nx_in, int bigny_in, int nz_in,
+        const int nx_in, int ny_in, int nz_in,
         const int poolnproc_in, // Number of processors in this pool
         const int poolrank_in // Rank in this pool
     );
@@ -81,37 +81,38 @@ public:
 public:
     //reciprocal-space
     // only on first proc.
-    int *startnsz_per;//useless // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
-    int *nstnz_per;//useless // nz * nst(number of sticks) on each core.
-    int *nst_per;// nst on each core
+    int *startnsz_per=nullptr;//useless // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
+    int *nstnz_per=nullptr;//useless // nz * nst(number of sticks) on each core.
+    int *nst_per=nullptr;// nst on each core
     // on all proc.
-    int *ig2isz; // map ig to (is, iz).
-    int *istot2bigixy; // istot2bigixy[is]: iy + ix * bigny of is^th stick among all sticks.
-    int *ixy2istot; //useless // ixy2istot[iy + ix * ny]: is of stick on (ix, iy) among all sticks.
-    int *is2ixy; // is2ixy[is]: iy + ix * bigny of is^th stick among sticks on current proc.
-    int *ixy2ip; // useless// ixy2ip[iy + ix * ny]: ip of proc which contains stick on (ix, iy).
-    int nst; //num. of sticks in current proc.
-    int nstnz; // nst * nz
-    int nstot; //num. of sticks in total.
-    int npw; //num. of plane waves in current proc.
-    int npwtot; // total num. of plane waves in all proc. in this pool
+    int *ig2isz=nullptr; // map ig to (is, iz).
+    int *istot2ixy=nullptr; // istot2ixy[is]: iy + ix * ny of is^th stick among all sticks.
+    int *fftixy2istot=nullptr; //useless // fftixy2istot[iy + ix * fftny]: is of stick on (ix, iy) among all sticks.
+    int *is2fftixy=nullptr; // is2fftixy[is]: iy + ix * ny of is^th stick among sticks on current proc.
+    int *fftixy2ip=nullptr; // useless// fftixy2ip[iy + ix * fftny]: ip of proc which contains stick on (ix, iy).
+    int nst=0; //num. of sticks in current proc.
+    int nstnz=0; // nst * nz
+    int nstot=0; //num. of sticks in total.
+    int npw=0; //num. of plane waves in current proc.
+    int npwtot=0; // total num. of plane waves in all proc. in this pool
 
     //real space
-    int nrxx; //num. of real space grids
-    int *startz; //startz[ip]: starting z plane in the ip-th proc. in current POOL_WORLD 
-	int *numz; //numz[ip]: num. of z planes in the ip-th proc. in current POOL_WORLD
-    int *numg; //numg[ip] :  nst_per[poolrank] * numz[ip] 
-    int *numr; //numr[ip] :  numz[poolrank] * nst_per[ip]
-    int *startg;  // startg[ip] = numg[ip-1] + startg[ip-1]
-    int *startr;  // startr[ip] = numr[ip-1] + startr[ip-1]
-    int nplane; //num. of planes in current proc.
+    int nrxx=0; //num. of real space grids
+    int *startz=nullptr; //startz[ip]: starting z plane in the ip-th proc. in current POOL_WORLD 
+	int *numz=nullptr; //numz[ip]: num. of z planes in the ip-th proc. in current POOL_WORLD
+    int *numg=nullptr; //numg[ip] :  nst_per[poolrank] * numz[ip] 
+    int *numr=nullptr; //numr[ip] :  numz[poolrank] * nst_per[ip]
+    int *startg=nullptr;  // startg[ip] = numg[ip-1] + startg[ip-1]
+    int *startr=nullptr;  // startr[ip] = numr[ip-1] + startr[ip-1]
+    int startz_current=0;
+    int nplane=0; //num. of planes in current proc.
 
-    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[npw]
-    ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
-    double *gg;       	// modulus (G^2) of G vectors [npw]
+    ModuleBase::Vector3<double> *gdirect=nullptr;		//(= *G1d) ; // ig = new Vector igc[npw]
+    ModuleBase::Vector3<double> *gcar=nullptr;   			//G vectors in cartesian corrdinate
+    double *gg=nullptr;       	// modulus (G^2) of G vectors [npw]
     //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
 	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
-    int ig_gge0;    //ig when gg == 0
+    int ig_gge0=-1;    //ig when gg == 0
 
     //distribute plane waves and grids and set up fft
     void setuptransform();
@@ -137,23 +138,25 @@ public:
     //     ModuleBase::Vector3<double> *gcar_global
     // ); 
 public:
-    int ngg; //number of different modulus (G^2) of G vectors
-    int *ig2igg;//[npw] map ig to igg(<ngg: the index of G^2)
-    double *gg_uniq; //[ngg] modulus (G^2) of G vectors of igg, each gg of igg is unique.
+    int ngg=0; //number of different modulus (G^2) of G vectors
+    int *ig2igg=nullptr;//[npw] map ig to igg(<ngg: the index of G^2)
+    double *gg_uniq=nullptr; //[ngg] modulus (G^2) of G vectors of igg, each gg of igg is unique.
     void collect_uniqgg();
    
 
 public:
-    bool gamma_only;	// only half g are used.
-    double ggecut;    //Energy cut off for g^2/2, unit in 1/lat0^2, ggecut=ecutwfc(Ry)*lat0^2/4pi^2
-    double lat0;     //unit length for lattice, unit in bohr
+    bool gamma_only=false;	// only half g are used.
+    double ggecut=0;    //Energy cut off for g^2/2, unit in 1/lat0^2, ggecut=ecutwfc(Ry)*lat0^2/4pi^2
+    double lat0=1;     //unit length for lattice, unit in bohr
+    double tpiba=1;    //  2pi/lat0
+    double tpiba2=1;   //  4pi^2/lat0^2
     ModuleBase::Matrix3 latvec; // Unitcell lattice vectors, unit in lat0
     ModuleBase::Matrix3 G; // reciprocal lattice vector, unit in 1/lat0
     ModuleBase::Matrix3 GT; // traspose of G
     ModuleBase::Matrix3 GGT; // GGT = G*GT
-    int distribution_type;
-    int poolnproc;
-    int poolrank;
+    int distribution_type=1;
+    int poolnproc=1;
+    int poolrank=0;
     //distribute plane waves to different processors
 
 protected:
@@ -161,9 +164,9 @@ protected:
     void distribution_method1(); 
     // Distribute sticks to cores in method 1.
     void divide_sticks_1(
-        int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j,          // y or y + ny (if y < 0) of stick.
-        int* st_length,     // the stick on (ix, iy) consists of st_length[ix*ny+iy] planewaves.
+        int* st_i,          // x or x + fftnx (if x < 0) of stick.
+        int* st_j,          // y or y + fftny (if y < 0) of stick.
+        int* st_length,     // the stick on (ix, iy) consists of st_length[ix*fftny+iy] planewaves.
         int* npw_per       // number of planewaves on each core.
     );
 
@@ -179,25 +182,25 @@ protected:
         int* st_bottom2D  // the z-coordinate of the bottom of stick on (x, y).
     );
 
-    //get ig2isz and is2ixy
-    void get_ig2isz_is2ixy(
+    //get ig2isz and is2fftixy
+    void get_ig2isz_is2fftixy(
         int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
-        int* st_length     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
+        int* st_length     // the stick on (x, y) consists of st_length[x*fftny+y] planewaves.
     );
 
     //Collect the x, y indexs, length of the sticks (in distributeg method1)
     void collect_st(
         int* st_length2D,                               // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
         int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
-        int* st_i,                                      // x or x + nx (if x < 0) of stick.
-        int* st_j,                                      // y or y + ny (if y < 0) of stick.
+        int* st_i,                                      // x or x + fftnx (if x < 0) of stick.
+        int* st_j,                                      // y or y + fftny (if y < 0) of stick.
         int* st_length                                 // number of planewaves in stick, stored in 1d array with tot_nst elements.
     );
 
-    //get istot2bigixy
-    void get_istot2bigixy(
-        int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j          // y or y + ny (if y < 0) of stick.
+    //get istot2ixy
+    void get_istot2ixy(
+        int* st_i,          // x or x + fftnx (if x < 0) of stick.
+        int* st_j          // y or y + fftny (if y < 0) of stick.
     );
 
     //Create the maps from ixy to (in method 2)
@@ -211,23 +214,23 @@ protected:
 //===============================================
 public:
 	// FFT dimensions for wave functions.
-	int nx, ny, nz, nxyz, nxy;
-    int bignx, bigny, bignz, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
-    int liy,riy;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
-    int nmaxgr; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
+	int fftnx=0, fftny=0, fftnz=0, fftnxyz=0, fftnxy=0;
+    int nx=0, ny=0, nz=0, nxyz=0, nxy=0; // Gamma_only: fftny = int(ny/2)-1 , others: fftny = ny
+    int liy=0,riy=0;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
+    int nmaxgr=0; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
                 // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data
     FFT ft;
     //The position of pointer in and out can be equal(in-place transform) or different(out-of-place transform).
-    void real2recip(double * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void real2recip(std::complex<double> * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void recip2real(std::complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
-    void recip2real(std::complex<double> * in, std::complex<double> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void real2recip(const double * in, std::complex<double> * out, const bool add = false, const double factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(const std::complex<double> * in, std::complex<double> * out, const bool add = false, const double factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(const std::complex<double> * in, double *out, const bool add = false, const double factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(const std::complex<double> * in, std::complex<double> * out, const bool add = false, const double factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
 
 #ifdef __MIX_PRECISION
-    void real2recip(float * in, std::complex<float> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void real2recip(std::complex<float> * in, std::complex<float> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void recip2real(std::complex<float> * in, float *out); //in:(nz, ns)  ; out(nplane,nx*ny)
-    void recip2real(std::complex<float> * in, std::complex<float> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void real2recip(const float * in, std::complex<float> * out, const bool add = false, const float factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(const std::complex<float> * in, std::complex<float> * out, const bool add = false, const float factor = 1.0); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(const std::complex<float> * in, float *out, const bool add = false, const float factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(const std::complex<float> * in, std::complex<float> * out, const bool add = false, const float factor = 1.0); //in:(nz, ns)  ; out(nplane,nx*ny)
 #endif
 protected:
     //gather planes and scatter sticks of all processors
