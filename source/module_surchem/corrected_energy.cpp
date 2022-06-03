@@ -1,11 +1,11 @@
 #include "surchem.h"
 
-double surchem::cal_Ael(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, const double *TOTN_real, const double *delta_phi_R)
+double surchem::cal_Ael(const UnitCell &cell, ModulePW::PW_Basis* rho_basis)
 {
     double Ael = 0.0;
     for (int ir = 0; ir < rho_basis->nrxx; ir++)
     {
-        Ael -= TOTN_real[ir] * delta_phi_R[ir];
+        Ael -= TOTN_real[ir] * delta_phi[ir];
     }
     Parallel_Reduce::reduce_double_pool(Ael);
     Ael = Ael * cell.omega * 0.5 / rho_basis->nxyz;
@@ -13,7 +13,7 @@ double surchem::cal_Ael(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, con
     return Ael;
 }
 
-double surchem::cal_Acav(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, double qs)
+double surchem::cal_Acav(const UnitCell &cell,  ModulePW::PW_Basis* rho_basis)
 {
     double Acav = 0.0;
     Acav = GlobalV::tau * qs;

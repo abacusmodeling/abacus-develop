@@ -31,7 +31,7 @@ void lapl_rho(const std::complex<double> *rhog, double *lapn, ModulePW::PW_Basis
 
 // calculates first derivative of the shape function in realspace
 // exp(-(log(n/n_c))^2 /(2 sigma^2)) /(sigma * sqrt(2*pi) )/n
-void shape_gradn(complex<double> *PS_TOTN, ModulePW::PW_Basis* rho_basis, double *eprime)
+void shape_gradn(const complex<double> *PS_TOTN, ModulePW::PW_Basis* rho_basis, double *eprime)
 {
 
     double *PS_TOTN_real = new double[rho_basis->nrxx];
@@ -51,7 +51,7 @@ void shape_gradn(complex<double> *PS_TOTN, ModulePW::PW_Basis* rho_basis, double
     delete[] PS_TOTN_real;
 }
 
-void createcavity(const UnitCell &ucell, ModulePW::PW_Basis* rho_basis, complex<double> *PS_TOTN, double *vwork)
+void surchem::createcavity(const UnitCell &ucell, ModulePW::PW_Basis* rho_basis, const complex<double> *PS_TOTN, double *vwork)
 {
     ModuleBase::Vector3<double> *nablan = new ModuleBase::Vector3<double>[rho_basis->nrxx];
     ModuleBase::GlobalFunc::ZEROS(nablan, rho_basis->nrxx);
@@ -100,7 +100,7 @@ void createcavity(const UnitCell &ucell, ModulePW::PW_Basis* rho_basis, complex<
     // quantum surface area, integral of (gamma*A / n) * |\nabla n|
     //=term1 * sqrt_nablan_2
     //-------------------------------------------------------------
-    double qs = 0;
+    qs = 0;
 
     for (int ir = 0; ir < rho_basis->nrxx; ir++)
     {
@@ -114,7 +114,7 @@ void createcavity(const UnitCell &ucell, ModulePW::PW_Basis* rho_basis, complex<
     // cavitation energy
     //-------------------------------------------------------------
 
-    double Ael = surchem::cal_Acav(ucell, rho_basis, qs);
+    // double Ael = cal_Acav(ucell, pwb);
 
     //  packs the real array into a complex one
     //  to G space
@@ -154,17 +154,17 @@ ModuleBase::matrix surchem::cal_vcav(const UnitCell &ucell, ModulePW::PW_Basis* 
     ModuleBase::TITLE("surchem", "cal_vcav");
     ModuleBase::timer::tick("surchem", "cal_vcav");
 
-    double *Vcav = new double[rho_basis->nrxx];
-    ModuleBase::GlobalFunc::ZEROS(Vcav, rho_basis->nrxx);
+    double *tmp_Vcav = new double[rho_basis->nrxx];
+    ModuleBase::GlobalFunc::ZEROS(tmp_Vcav, rho_basis->nrxx);
 
-    createcavity(ucell, rho_basis, PS_TOTN, Vcav);
+    createcavity(ucell, rho_basis, PS_TOTN, tmp_Vcav);
 
-    ModuleBase::matrix v(nspin, rho_basis->nrxx);
+     ModuleBase::GlobalFunc::ZEROS(Vcav.c, nspin * rho_basis->nrxx);
     if (nspin == 4)
     {
         for (int ir = 0; ir < rho_basis->nrxx; ir++)
         {
-            v(0, ir) += Vcav[ir];
+            Vcav(0, ir) += tmp_Vcav[ir];
         }
     }
     else
@@ -173,11 +173,12 @@ ModuleBase::matrix surchem::cal_vcav(const UnitCell &ucell, ModulePW::PW_Basis* 
         {
             for (int ir = 0; ir < rho_basis->nrxx; ir++)
             {
-                v(is, ir) += Vcav[ir];
+                Vcav(is, ir) += tmp_Vcav[ir];
             }
         }
     }
-    delete[] Vcav;
+
+    delete[] tmp_Vcav;
     ModuleBase::timer::tick("surchem", "cal_vcav");
-    return v;
+    return Vcav;
 }

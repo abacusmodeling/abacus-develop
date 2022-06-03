@@ -101,8 +101,8 @@ namespace WF_Local
 namespace GlobalC {Use_FFT UFFT;}
 Use_FFT::Use_FFT(){}
 Use_FFT::~Use_FFT(){}
-void Use_FFT::ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;}
-void Use_FFT::ToRealSpace(std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;};
+void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;}
+void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;};
 void FFT::FFT3D(std::complex<double> *psi,const int sign) {};
 bool Occupy::use_gaussian_broadening = false;
 bool Occupy::use_tetrahedron_method = false;

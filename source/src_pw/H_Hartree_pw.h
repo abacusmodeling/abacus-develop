@@ -30,7 +30,7 @@ class H_Hartree_pw
 
     static void lapl_rho(const std::complex<double> *rhog, double *lapn);
 
-    static void shape_gradn(complex<double> *PS_TOTN, ModulePW::PW_Basis* rho_basis, double *eprime);
+    static void shape_gradn(const complex<double> *PS_TOTN, ModulePW::PW_Basis* rho_basis, double *eprime);
 
     static void eps_pot(const complex<double> *PS_TOTN,
                         const complex<double> *phi,

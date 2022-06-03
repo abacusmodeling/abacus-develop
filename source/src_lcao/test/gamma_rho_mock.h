@@ -419,10 +419,10 @@ double Charge::sum_rho(void) const
 
 
 
-void Use_FFT::ToRealSpace(int const &is, ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis)
+void Use_FFT::ToRealSpace(int const &is, const ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
 }
-void Use_FFT::ToRealSpace(std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis)
+void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
 }
 bool Occupy::use_gaussian_broadening = false;

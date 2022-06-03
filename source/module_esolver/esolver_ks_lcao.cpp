@@ -552,10 +552,8 @@ namespace ModuleESolver
 
         // (11) calculate the total energy.
         GlobalC::en.calculate_etot();
-
-        GlobalC::en.etot_old = GlobalC::en.etot;
-
     }
+
     void ESolver_KS_LCAO::afterscf()
     {
         // if (this->conv_elec || iter == GlobalV::SCF_NMAX)

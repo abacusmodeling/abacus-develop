@@ -31,22 +31,22 @@ class Use_FFT
 	//---------------------------------------------------------------------
 	
 	// From G space to real space. ModuleBase::ComplexMatrix
-	void ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis);
+	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis);
 	// void ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir);
 	// void ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir);
 	
 	// From G space to real space. charge/MLWF
-	void ToRealSpace(std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis);
+	void ToRealSpace(const std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis);
 
 	// From G space to real space. wave functions.
-	void ToRealSpace(std::complex<double> *vg, std::complex<double> *vr, ModulePW::PW_Basis* rho_basis);
+	void ToRealSpace(const std::complex<double> *vg, std::complex<double> *vr, ModulePW::PW_Basis* rho_basis);
 
-	void ToRealSpace(const int &is, ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &v, ModulePW::PW_Basis* rho_basis);
+	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &v, ModulePW::PW_Basis* rho_basis);
 
 	//---------------------------------------------------------------------
 
 	// From real space to G space.
-	void ToReciSpace( double* vr, std::complex<double> *vg, ModulePW::PW_Basis* rho_basis);
+	void ToReciSpace( const double* vr, std::complex<double> *vg, ModulePW::PW_Basis* rho_basis);
 
 
 	//---------------------------------------------------------------------

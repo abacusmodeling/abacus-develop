@@ -1,6 +1,6 @@
 #include "surchem.h"
 
-atom_in surchem::GetAtom;
+// atom_in surchem::GetAtom;
 
 void surchem::gauss_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, complex<double> *N)
 {

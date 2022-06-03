@@ -81,7 +81,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
         if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
             // Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-            verlet->outputMD(GlobalV::ofs_running);
+            verlet->outputMD(GlobalV::ofs_running, GlobalV::CAL_STRESS);
 
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }

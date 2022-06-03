@@ -18,43 +18,60 @@ class surchem
     surchem();
     ~surchem();
 
-    static atom_in GetAtom;
+    double *TOTN_real;
+    double *delta_phi;
+    double *epspot;
+    ModuleBase::matrix Vcav;
+    ModuleBase::matrix Vel;
+    double qs;
 
-    static void cal_epsilon(ModulePW::PW_Basis* rho_basis, const double *PS_TOTN_real, double *epsilon, double *epsilon0);
+    // compensating charge params
+    double comp_q;
+    double comp_l;
+    double comp_center;
+    int comp_dim;
+    // get atom info
+    atom_in GetAtom;
 
-    static void cal_pseudo(const UnitCell &cell,
+    void allocate(const int &nrxx, const int &nspin);
+
+    void cal_epsilon(ModulePW::PW_Basis* rho_basis, const double *PS_TOTN_real, double *epsilon, double *epsilon0);
+
+    void cal_pseudo(const UnitCell &cell,
                            ModulePW::PW_Basis* rho_basis,
                            const complex<double> *Porter_g,
                            complex<double> *PS_TOTN);
 
-    static void gauss_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, complex<double> *N);
+    void gauss_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, complex<double> *N);
 
-    static void cal_totn(const UnitCell &cell,
+    void cal_totn(const UnitCell &cell,
                          ModulePW::PW_Basis* rho_basis,
                          const complex<double> *Porter_g,
                          complex<double> *N,
                          complex<double> *TOTN);
+    void createcavity(const UnitCell &ucell, ModulePW::PW_Basis* rho_basis, const complex<double> *PS_TOTN, double *vwork);
 
-    static ModuleBase::matrix cal_vcav(const UnitCell &ucell, ModulePW::PW_Basis* rho_basis, complex<double> *PS_TOTN, int nspin);
+    ModuleBase::matrix cal_vcav(const UnitCell &ucell, ModulePW::PW_Basis* rho_basis, complex<double> *PS_TOTN, int nspin);
 
-    static ModuleBase::matrix cal_vel(const UnitCell &cell,
+    ModuleBase::matrix cal_vel(const UnitCell &cell,
                                      ModulePW::PW_Basis* rho_basis,
                                       complex<double> *TOTN,
                                       complex<double> *PS_TOTN,
                                       int nspin);
+                            
 
-    static double cal_Ael(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, const double *TOTN_real, const double *delta_phi_R);
+    double cal_Ael(const UnitCell &cell, ModulePW::PW_Basis* rho_basis);
 
-    static double cal_Acav(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, double qs);
+    double cal_Acav(const UnitCell &cell, ModulePW::PW_Basis* rho_basis);
 
-    static void minimize_cg(const UnitCell &ucell,
+    void minimize_cg(const UnitCell &ucell,
                             ModulePW::PW_Basis* rho_basis,
                             double *d_eps,
                             const complex<double> *tot_N,
                             complex<double> *phi,
                             int &ncgsol);
 
-    static void Leps2(const UnitCell &ucell,
+    void Leps2(const UnitCell &ucell,
                       ModulePW::PW_Basis* rho_basis,
                       complex<double> *phi,
                       double *epsilon, // epsilon from shapefunc, dim=nrxx
@@ -64,12 +81,17 @@ class surchem
                       complex<double> *phi_work,
                       complex<double> *lp);
 
-    static ModuleBase::matrix v_correction(const UnitCell &cell,
+    ModuleBase::matrix v_correction(const UnitCell &cell,
                                            ModulePW::PW_Basis* rho_basis,
                                            const int &nspin,
                                            const double *const *const rho);
 
   private:
 };
+
+namespace GlobalC
+{
+  extern surchem solvent_model;
+}
 
 #endif

@@ -420,6 +420,11 @@ void Input::Default(void)
     sigma_k = 0.6;
     nc_k = 0.00037;
 
+    comp_q = 0.0;
+    comp_l = 1.0;
+    comp_center = 0.0;
+    comp_dim = 2;
+
     return;
 }
 
@@ -1494,6 +1499,22 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("nc_k", word) == 0)
         {
             read_value(ifs, nc_k);
+        }
+        else if (strcmp("comp_q", word) == 0)
+        {
+            read_value(ifs, comp_q);
+        }
+        else if (strcmp("comp_l", word) == 0)
+        {
+            read_value(ifs, comp_l);
+        }
+        else if (strcmp("comp_center", word) == 0)
+        {
+            read_value(ifs, comp_center);
+        }
+        else if (strcmp("comp_dim", word) == 0)
+        {
+            read_value(ifs, comp_dim);
         }
         //----------------------------------------------------------------------------------
         else
