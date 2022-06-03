@@ -21,7 +21,12 @@
 //-----force& stress-------------------
 #include "src_lcao/FORCE_STRESS.h"
 
-
+//-----HSolver ElecState Hamilt--------
+#include "module_hamilt/hamilt_lcao.h"
+#include "module_elecstate/elecstate_lcao.h"
+#include "module_hsolver/hsolver_lcao.h"
+//function used by deepks
+#include "module_elecstate/cal_dm.h"
 //---------------------------------------------------
 
 namespace ModuleESolver
@@ -188,15 +193,78 @@ namespace ModuleESolver
 
         if (INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, ucell);
 
-        //init Psi
-        if (GlobalV::GAMMA_ONLY_LOCAL)
-            this->LOWF.wfc_gamma.resize(GlobalV::NSPIN);
-        else
-            this->LOWF.wfc_k.resize(GlobalC::kv.nks);
         //pass Hamilt-pointer to Operator
         this->UHM.genH.LM = this->UHM.LM = &this->LM;
         //pass basis-pointer to EState and Psi
         this->LOC.ParaV = this->LOWF.ParaV = this->LM.ParaV;
+
+        //init Psi, HSolver, ElecState, Hamilt
+        if(this->phsol != nullptr)
+        {
+            if(this->phsol->classname != "HSolverLCAO")
+            {
+                delete this->phsol;
+                this->phsol = nullptr;
+            }
+        }
+        else
+        {
+            this->phsol = new hsolver::HSolverLCAO(this->LOWF.ParaV);
+            this->phsol->method = GlobalV::KS_SOLVER;
+        }
+        if(this->pelec != nullptr)
+        {
+            if(this->pelec->classname != "ElecStateLCAO")
+            {
+                delete this->pelec;
+                this->pelec = nullptr;
+            }
+        }
+        else
+        {
+            this->pelec = new elecstate::ElecStateLCAO(
+                    (Charge*)(&(GlobalC::CHR)),
+                    &(GlobalC::kv), 
+                    GlobalC::kv.nks,
+                    GlobalV::NBANDS,
+                    &(this->LOC),
+                    &(this->UHM),
+                    &(this->LOWF));
+        }
+        if(this->phami != nullptr)
+        {
+            if(this->phami->classname != "HamiltLCAO")
+            {
+                delete this->phami;
+                this->phami = nullptr;
+            }
+        }
+        else
+        {
+            // two cases for hamilt class
+            // Gamma_only case
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                this->phami = new hamilt::HamiltLCAO<double>(
+                    &(this->UHM.GG),
+                    &(this->UHM.genH),
+                    &(this->LM),
+                    &(this->UHM),
+                    &(this->LOWF),
+                    &(this->LOC) );
+            }
+            // multi_k case
+            else
+            {
+                this->phami = new hamilt::HamiltLCAO<std::complex<double>>(
+                    &(this->UHM.GK),
+                    &(this->UHM.genH),
+                    &(this->LM),
+                    &(this->UHM),
+                    &(this->LOWF),
+                    &(this->LOC) );
+            }
+        }
     }
 
     void ESolver_KS_LCAO::cal_Energy(energy& en)
@@ -211,7 +279,7 @@ namespace ModuleESolver
             Force_Stress_LCAO FSL(this->RA);
             FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
                 GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
-                this->LOC, this->LOWF, this->UHM, force, this->scs);
+                this->LOC, this->psid, this->psi, this->UHM, force, this->scs);
             //delete RA after cal_Force
             this->RA.delete_grid();
             this->have_force = true;
@@ -231,7 +299,7 @@ namespace ModuleESolver
 
     void ESolver_KS_LCAO::postprocess()
     {
-        GlobalC::en.perform_dos(this->LOWF, this->UHM);
+        GlobalC::en.perform_dos(this->psid, this->psi, this->UHM);
     }
 
     void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell_pseudo& ucell)
@@ -337,7 +405,7 @@ namespace ModuleESolver
         // mohan add iter > 1 on 2011-04-02
         // because the GlobalC::en.ekb has not value now.
         // so the smearing can not be done.
-        if (iter > 1)Occupy::calculate_weights();
+        //if (iter > 1)Occupy::calculate_weights();
 
         if (GlobalC::wf.init_wfc == "file")
         {
@@ -404,66 +472,81 @@ namespace ModuleESolver
     }
     void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
     {
-        // (1) calculate the bands.
-        // mohan add 2021-02-09
+        //when first called, init psi
         if (GlobalV::GAMMA_ONLY_LOCAL)
         {
-            ELEC_cbands_gamma::cal_bands(istep, this->UHM, this->LOWF, this->LOC.dm_gamma);
+            if(this->psid==nullptr)
+            {
+                int ncol = this->LOWF.ParaV->ncol_bands;
+                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="lapack_gvx"
+#ifdef __CUSOLVER_LCAO
+                ||GlobalV::KS_SOLVER=="cusolver"
+#endif
+                )
+                {
+                    ncol = this->LOWF.ParaV->ncol;
+                }
+                this->psid = new psi::Psi<double>(GlobalV::NSPIN, ncol, this->LOWF.ParaV->nrow, nullptr);
+            }
+        }
+        else
+        {   
+            if(this->psi == nullptr)
+            {
+                int ncol = this->LOWF.ParaV->ncol_bands;
+                if(ELEC_evolve::tddft
+#ifdef __CUSOLVER_LCAO
+                ||GlobalV::KS_SOLVER=="cusolver"
+#endif
+                )
+                {
+                    ncol = this->LOWF.ParaV->ncol;
+                }
+                this->psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, ncol, this->LOWF.ParaV->nrow, nullptr);
+            }
+        }
+
+        //save input rho 
+        GlobalC::CHR.save_rho_before_sum_band();
+
+        if (ELEC_evolve::tddft && istep >= 1 && iter > 1 && !GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            ELEC_evolve::evolve_psi(istep, this->UHM, this->LOWF, this->psi);
+        }
+        //using HSolverLCAO::solve()
+        else if(this->phsol != nullptr)
+        {
+            // reset energy 
+            this->pelec->eband  = 0.0;
+            this->pelec->demet  = 0.0;
+            this->pelec->ef     = 0.0;
+            GlobalC::en.ef_up  = 0.0;
+            GlobalC::en.ef_dw  = 0.0;
+            if(this->psi != nullptr)
+            {
+                this->phsol->solve(this->phami, this->psi[0], this->pelec, GlobalV::KS_SOLVER);
+            }
+            else if(this->psid != nullptr)
+            {
+                this->phsol->solve(this->phami, this->psid[0], this->pelec, GlobalV::KS_SOLVER);
+            }
+            
+
+            // transform energy for print
+            GlobalC::en.eband = this->pelec->eband;
+            GlobalC::en.demet = this->pelec->demet;
+            GlobalC::en.ef = this->pelec->ef;
         }
         else
         {
-            if (ELEC_evolve::tddft && istep >= 1 && iter > 1)
-            {
-                ELEC_evolve::evolve_psi(istep, this->UHM, this->LOWF);
-            }
-            else
-            {
-                ELEC_cbands_k::cal_bands(istep, this->UHM, this->LOWF, this->LOC.dm_k);
-            }
-        }
-        //-----------------------------------------------------------
-        // only deal with charge density after both wavefunctions.
-        // are calculated.
-        //-----------------------------------------------------------
-        if (GlobalV::GAMMA_ONLY_LOCAL && GlobalV::NSPIN == 2 && GlobalV::CURRENT_SPIN == 0) return;
-
-        GlobalC::en.eband = 0.0;
-        GlobalC::en.ef = 0.0;
-        GlobalC::en.ef_up = 0.0;
-        GlobalC::en.ef_dw = 0.0;
-
-        // demet is included into eband.
-        //if(GlobalV::DIAGO_TYPE!="selinv")
-        {
-            GlobalC::en.demet = 0.0;
+            ModuleBase::WARNING_QUIT("ESolver_KS_PW", "HSolver has not been initialed!");
         }
 
-        // (2)
-        GlobalC::CHR.save_rho_before_sum_band();
-
-        // (3) sum bands to calculate charge density
-        Occupy::calculate_weights();
-
-        if (GlobalV::ocp == 1)
-        {
-            for (int ik = 0; ik < GlobalC::kv.nks; ik++)
-            {
-                for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-                {
-                    GlobalC::wf.wg(ik, ib) = GlobalV::ocp_kb[ik * GlobalV::NBANDS + ib];
-                }
-            }
-        }
-
-
+        //print ekb for each k point and each band
         for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
         {
             GlobalC::en.print_band(ik);
         }
-
-        // if selinv is used, we need this to calculate the charge
-        // using density matrix.
-        this->LOC.sum_bands(this->UHM);
 
 #ifdef __MPI
         // add exx
@@ -608,11 +691,17 @@ namespace ModuleESolver
         // (11) calculate the total energy.
         GlobalC::en.calculate_etot();
 
-        GlobalC::en.etot_old = GlobalC::en.etot;
-
     }
     void ESolver_KS_LCAO::afterscf()
     {
+        for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
+        {
+            for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
+            {
+                GlobalC::wf.ekb[ik][ib] = this->pelec->ekb(ik, ib);
+                GlobalC::wf.wg(ik, ib) = this->pelec->wg(ik, ib);
+            }
+        }
         // if (this->conv_elec || iter == GlobalV::SCF_NMAX)
         // {
             //--------------------------------------
@@ -758,7 +847,7 @@ namespace ModuleESolver
 
                             std::vector<ModuleBase::matrix> dm_bandgap_gamma;
                             dm_bandgap_gamma.resize(GlobalV::NSPIN);
-                            this->LOC.cal_dm(wg_hl, this->LOWF.wfc_gamma, dm_bandgap_gamma);
+                            elecstate::cal_dm(this->LOWF.ParaV, wg_hl, this->psid[0], dm_bandgap_gamma);
 
 
                             GlobalC::ld.cal_orbital_precalc(dm_bandgap_gamma,

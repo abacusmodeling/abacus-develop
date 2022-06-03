@@ -5,6 +5,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_orbital/ORB_control.h" // mohan add 2021-05-24
+#include "module_psi/psi.h"
 
 class Local_Orbital_wfc
 {
@@ -37,7 +38,7 @@ public:
 
 
     void allocate_k(const int& lgd,
-        Local_Orbital_wfc &lowf);
+        psi::Psi<std::complex<double>>* psi);
 
     //=========================================
     // Init Cij, make it satisfy 2 conditions:

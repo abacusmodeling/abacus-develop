@@ -1,57 +1,12 @@
 #include "elecstate_lcao.h"
 
-#include "math_tools.h"
+#include "cal_dm.h"
 #include "module_base/timer.h"
 #include "src_lcao/grid_technique.h"
 
 namespace elecstate
 {
 int ElecStateLCAO::out_wfc_lcao = 0;
-
-// for gamma_only(double case) and multi-k(complex<double> case)
-template <typename T> void ElecStateLCAO::cal_dm(const ModuleBase::matrix& wg, const psi::Psi<T>& wfc, psi::Psi<T>& dm)
-{
-    ModuleBase::TITLE("ElecStateLCAO", "cal_dm");
-
-    dm.resize(wfc.get_nk(), this->loc->ParaV->ncol, this->loc->ParaV->nrow);
-    const int nbands_local = wfc.get_nbands();
-    const int nbasis_local = wfc.get_nbasis();
-
-    // dm = wfc.T * wg * wfc.conj()
-    // dm[is](iw1,iw2) = \sum_{ib} wfc[is](ib,iw1).T * wg(is,ib) * wfc[is](ib,iw2).conj()
-    for (int ik = 0; ik < wfc.get_nk(); ++ik)
-    {
-        wfc.fix_k(ik);
-        dm.fix_k(ik);
-        // wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-        psi::Psi<T> wg_wfc(wfc, 1);
-
-        int ib_global = 0;
-        for (int ib_local = 0; ib_local < nbands_local; ++ib_local)
-        {
-            while (ib_local != this->loc->ParaV->trace_loc_col[ib_global])
-            {
-                ++ib_global;
-                if (ib_global >= wg.nc)
-                {
-                    ModuleBase::WARNING_QUIT("ElecStateLCAO::cal_dm", "please check trace_loc_col!");
-                }
-            }
-            const double wg_local = wg(ik, ib_global);
-            T* wg_wfc_pointer = &(wg_wfc(0, ib_local, 0));
-            BlasConnector::scal(nbasis_local, wg_local, wg_wfc_pointer, 1);
-        }
-
-        // C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
-#ifdef __MPI
-        psiMulPsiMpi(wg_wfc, wfc, dm, this->loc->ParaV->desc_wfc, this->loc->ParaV->desc);
-#else
-        psiMulPsi(wg_wfc, wfc, dm);
-#endif
-    }
-
-    return;
-}
 
 // multi-k case
 void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
@@ -65,12 +20,12 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
 
     // this part for calculating dm_k in 2d-block format, not used for charge now
-    psi::Psi<std::complex<double>> dm_k_2d(psi.get_nk(), psi.get_nbasis(), psi.get_nbasis());
+//    psi::Psi<std::complex<double>> dm_k_2d();
 
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx"
         || GlobalV::KS_SOLVER == "lapack") // Peize Lin test 2019-05-15
     {
-        this->cal_dm(this->wg, psi, dm_k_2d);
+        cal_dm(this->loc->ParaV, this->wg, psi, this->loc->dm_k);
     }
 
     // this part for steps:
@@ -83,10 +38,28 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
         {
             psi.fix_k(ik);
             this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), this->lowf->wfc_k_grid[ik], ik);
+            //added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
+            if(GlobalV::NSPIN==4)
+            {
+                int row = GlobalC::GridT.lgd;
+                std::vector<std::complex<double>> tmp(row);
+                for(int ib=0; ib<GlobalV::NBANDS; ib++)
+                {
+                    for(int iw=0; iw<row / GlobalV::NPOL; iw++)
+                    {
+                        tmp[iw] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL];
+                        tmp[iw + row / GlobalV::NPOL] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL + 1];
+                    }
+                    for(int iw=0; iw<row; iw++)
+                    {
+                        this->lowf->wfc_k_grid[ik][ib][iw] = tmp[iw];
+                    }
+                }
+            }
         }
     }
 
-    this->loc->cal_dk_k(GlobalC::GridT);
+    this->loc->cal_dk_k(GlobalC::GridT, this->wg);
     for (int is = 0; is < GlobalV::NSPIN; is++)
     {
         ModuleBase::GlobalFunc::ZEROS(this->charge->rho[is], this->charge->nrxx); // mohan 2009-11-10
@@ -118,9 +91,9 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     {
         ModuleBase::timer::tick("ElecStateLCAO", "cal_dm_2d");
 
-        psi::Psi<double> dm_gamma_2d(psi.get_nk(), psi.get_nbasis(), psi.get_nbasis());
+        //psi::Psi<double> dm_gamma_2d;
         // caution:wfc and dm
-        this->cal_dm(this->wg, psi, dm_gamma_2d);
+        cal_dm(this->loc->ParaV, this->wg, psi, this->loc->dm_gamma);
 
         ModuleBase::timer::tick("ElecStateLCAO", "cal_dm_2d");
 
@@ -133,7 +106,8 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
                 double** wfc_grid = nullptr; // output but not do "2d-to-grid" conversion
                 this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), wfc_grid);
             }
-            this->loc->dm2dToGrid(dm_gamma_2d, this->loc->DM[ik]); // transform dm_gamma[is].c to this->loc->DM[is]
+            //this->loc->dm2dToGrid(this->loc->dm_gamma[ik], this->loc->DM[ik]); // transform dm_gamma[is].c to this->loc->DM[is]
+            this->loc->cal_dk_gamma_from_2D_pub();
         }
     }
 

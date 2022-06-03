@@ -46,7 +46,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, Local_Orbital_wfc &l
 	//lowf.ParaV->out_mat_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
 	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
-	HS_Matrix::saving_HS_complex(this->LM->Hloc2.data(), this->LM->Sloc2.data(), bit, this->out_mat_hs, "data-"+std::to_string(ik), *lowf.ParaV); //LiuXh, 2017-03-21
+	HS_Matrix::saving_HS(this->LM->Hloc2.data(), this->LM->Sloc2.data(), bit, this->out_mat_hs, "data-"+std::to_string(ik), *lowf.ParaV); //LiuXh, 2017-03-21
 	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 
 	this->diago_complex_begin(ik, lowf, this->LM->Hloc2.data(), this->LM->Sloc2.data(), this->LM->Sdiag2.data(), GlobalC::wf.ekb[ik]);

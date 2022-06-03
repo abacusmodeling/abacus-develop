@@ -20,6 +20,18 @@ void ElecState::calculate_weights()
 {
     ModuleBase::TITLE("ElecState", "calculate_weights");
 
+    if (GlobalV::ocp == 1)
+    {
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        {
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+            {
+                this->wg(ik, ib) = GlobalV::ocp_kb[ik * GlobalV::NBANDS + ib];
+            }
+        }
+        return;
+    }
+
     // for test
     //	std::cout << " gaussian_broadening = " << use_gaussian_broadening << std::endl;
     //	std::cout << " tetrahedron_method = " << use_tetrahedron_method << std::endl;
@@ -191,7 +203,7 @@ void ElecState::calculate_weights()
 
 void ElecState::calEBand()
 {
-    ModuleBase::TITLE("ElecStatePW", "calEBand");
+    ModuleBase::TITLE("ElecState", "calEBand");
     //calculate ebands using wg and ekb
     this->eband = 0.0;
     for (int ik = 0; ik < this->ekb.nr; ++ik)

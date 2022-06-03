@@ -4,8 +4,11 @@
 #include "hamilt.h"
 #include "src_lcao/LCAO_gen_fixedH.h"
 #include "src_lcao/LCAO_matrix.h"
+#include "src_lcao/LCAO_hamilt.h"
 #include "src_lcao/gint_gamma.h"
 #include "src_lcao/gint_k.h"
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 namespace hamilt
 {
@@ -15,21 +18,43 @@ namespace hamilt
 template <typename T> class HamiltLCAO : public Hamilt
 {
   public:
-    HamiltLCAO(Gint_Gamma* GG_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
+    HamiltLCAO(
+      Gint_Gamma* GG_in, 
+      LCAO_gen_fixedH* genH_in, 
+      LCAO_Matrix* LM_in, 
+      LCAO_Hamilt* uhm_in,
+      Local_Orbital_wfc* lowf_in,
+      Local_Orbital_Charge* loc_in)
     {
         this->GG = GG_in;
         this->genH = genH_in;
         this->LM = LM_in;
+        this->uhm = uhm_in;
+        this->lowf = lowf_in;
+        this->loc = loc_in;
         this->classname = "HamiltLCAO";
     }
-    HamiltLCAO(Gint_k* GK_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
+    HamiltLCAO(
+      Gint_k* GK_in, 
+      LCAO_gen_fixedH* genH_in, 
+      LCAO_Matrix* LM_in, 
+      LCAO_Hamilt* uhm_in,
+      Local_Orbital_wfc* lowf_in,
+      Local_Orbital_Charge* loc_in)
     {
         this->GK = GK_in;
         this->genH = genH_in;
         this->LM = LM_in;
+        this->uhm = uhm_in;
+        this->lowf = lowf_in;
+        this->loc = loc_in;
         this->classname = "HamiltLCAO";
     }
-    //~HamiltLCAO();
+    ~HamiltLCAO(){
+      if(allocated_smatrix) delete[] smatrix_k;
+    };
+
+    void constructHamilt() override;
 
     // for target K point, update consequence of hPsi() and matrix()
     void updateHk(const int ik) override;
@@ -47,20 +72,13 @@ template <typename T> class HamiltLCAO : public Hamilt
     void matrix(MatrixBlock<T> &hk_in, MatrixBlock<T> &sk_in) override;
 
   private:
-    void ch_mock();
-    void hk_fixed_mock(const int ik);
-    void hk_update_mock(const int ik);
-
     // specific code for matrix()
     void getMatrix(MatrixBlock<T>& hk_in, MatrixBlock<T>& sk_in);
 
     // there are H and S matrix for each k point in reciprocal space
     // type double for gamma_only case, type complex<double> for multi-k-points case
-    std::vector<T> hmatrix_k;
-    std::vector<T> smatrix_k;
-
-    void constructFixedReal();
-    void constructUpdateReal();
+    T* hmatrix_k = nullptr;
+    T* smatrix_k = nullptr;
 
     // temporary class members
     // used for gamma only algorithms.
@@ -73,6 +91,15 @@ template <typename T> class HamiltLCAO : public Hamilt
     LCAO_gen_fixedH* genH = nullptr;
 
     LCAO_Matrix* LM = nullptr;
+
+    LCAO_Hamilt* uhm = nullptr;
+
+    Local_Orbital_wfc* lowf;
+
+    Local_Orbital_Charge* loc;
+
+    //only used for Gamma_only case
+    bool allocated_smatrix = false;
 };
 
 } // namespace hamilt

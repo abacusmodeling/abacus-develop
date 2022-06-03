@@ -203,8 +203,8 @@ void ELEC_scf::scf(const int& istep,
         else
         {
             if (ELEC_evolve::tddft && istep >= 1 && iter > 1)
-            {
-                ELEC_evolve::evolve_psi(istep, uhm, lowf);
+            {//these code should be deleted
+                ELEC_evolve::evolve_psi(istep, uhm, lowf, nullptr);
             }
             else
             {

@@ -191,7 +191,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
 
 // allocate density kernel may change once the ion
 // positions change
-void Local_Orbital_Charge::allocate_gamma(const int& lgd)
+void Local_Orbital_Charge::allocate_gamma(const int& lgd, psi::Psi<double>* psid)
 {
      ModuleBase::TITLE("Local_Orbital_Charge","allocate_gamma");
 
@@ -255,15 +255,14 @@ void Local_Orbital_Charge::allocate_gamma(const int& lgd)
 	// Peize Lin test 2019-01-16
     this->init_dm_2d();
 
-	if(GlobalC::wf.init_wfc=="file")
-	{
-		this->gamma_file(*this->LOWF);
-	}
-
+    if(GlobalC::wf.init_wfc=="file")
+    {
+        this->gamma_file(psid, this->LOWF[0]);
+    }
     return;
 }
 
-void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
+void Local_Orbital_Charge::gamma_file(psi::Psi<double>* psid, Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("Local_Orbital_Charge","gamma_file");
 
@@ -272,14 +271,31 @@ void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
 
 	double **ctot;
 
+    //allocate psi
+    int ncol = this->ParaV->ncol_bands;
+    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="lapack_gvx"
+#ifdef __CUSOLVER_LCAO
+    ||GlobalV::KS_SOLVER=="cusolver"
+#endif
+    )
+    {
+        ncol = this->ParaV->ncol;
+    }
+    if(psid == nullptr)
+    {
+        psid = new psi::Psi<double>(GlobalV::NSPIN, ncol, this->ParaV->nrow, nullptr);
+    }
+    else
+    {
+        psid->resize(GlobalV::NSPIN, ncol, this->ParaV->nrow);
+    }
+    ModuleBase::GlobalFunc::ZEROS( psid->get_pointer(), psid->size() );
+
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 
-		lowf.wfc_gamma[is].create(this->ParaV->ncol, this->ParaV->nrow);
-		lowf.wfc_gamma[is].zero_out();
-
 		GlobalV::ofs_running << " Read in wave functions " << is << std::endl;
-		error = WF_Local::read_lowf( ctot , is, lowf);
+		error = WF_Local::read_lowf( ctot , is, this->ParaV, psid);
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
 #endif

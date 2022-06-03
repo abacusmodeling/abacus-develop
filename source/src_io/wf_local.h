@@ -17,15 +17,15 @@ namespace WF_Local
 	void distri_lowf_complex(std::complex<double>** ctot, std::complex<double> **cc);
 
     void distri_lowf_new(double** ctot, const int& is,
-        Local_Orbital_wfc &lowf);
+        const Parallel_Orbitals* ParaV, psi::Psi<double>* psid);
     void distri_lowf_complex_new(std::complex<double>** ctot, const int& ik,
-        Local_Orbital_wfc &lowf);
+        const Parallel_Orbitals* ParaV, psi::Psi<std::complex<double>>* psi);
 
     int read_lowf(double** ctot, const int& is,
-        Local_Orbital_wfc &lowf);
+        const Parallel_Orbitals* ParaV, psi::Psi<double>* psid);
 
     int read_lowf_complex(std::complex<double>** ctot, const int& ik,
-        Local_Orbital_wfc &lowf);
+        const Parallel_Orbitals* ParaV, psi::Psi<std::complex<double>>* psi);
 }
 
 #endif

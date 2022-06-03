@@ -455,7 +455,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 
 void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 {
-    ModuleBase::TITLE("Parallel_Orbitals","print_HSgamma");
+    ModuleBase::TITLE("LCAO_Matrix","print_HSgamma");
 
     GlobalV::ofs_running << " " << mtype << " matrix" << std::endl;
     GlobalV::ofs_running << " nrow=" << this->ParaV->nrow << std::endl;
@@ -530,6 +530,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 // becareful! Update Hloc, we add new members to it.
 void LCAO_Matrix::update_Hloc(void)
 {
+    ModuleBase::TITLE("LCAO_Matrix","update_Hloc");
     for (long i=0; i<this->ParaV->nloc; i++)
     {
         Hloc[i] += Hloc_fixed[i];
@@ -539,6 +540,7 @@ void LCAO_Matrix::update_Hloc(void)
 
 void LCAO_Matrix::update_Hloc2(const int &ik)
 {
+    ModuleBase::TITLE("LCAO_Matrix","update_Hloc2");
 	for (long i = 0; i < this->ParaV->nloc; i++)
 	{
 		Hloc2[i] += Hloc_fixed2[i];

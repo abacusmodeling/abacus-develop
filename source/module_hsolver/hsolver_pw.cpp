@@ -88,7 +88,7 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
     // it should be deleted before calculating charge
     if(this->method == "cg")
     {
-        delete pdiagh;
+        delete (DiagoCG*)pdiagh;
         pdiagh = nullptr;
     }
 

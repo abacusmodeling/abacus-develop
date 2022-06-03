@@ -41,7 +41,7 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 }
 
 void Local_Orbital_wfc::allocate_k(const int& lgd,
-    Local_Orbital_wfc &lowf)
+    psi::Psi<std::complex<double>>* psi)
 {
 	ModuleBase::TITLE("Local_Orbital_wfc","allocate_k");
 	if(GlobalV::NLOCAL < GlobalV::NBANDS)
@@ -98,11 +98,19 @@ void Local_Orbital_wfc::allocate_k(const int& lgd,
 	{
 		int error;
 		std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
+        if(psi == nullptr)
+        {
+            psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nkstot, this->ParaV->ncol_bands, this->ParaV->nrow, nullptr);
+        }
+        else
+        {
+            psi->resize(GlobalC::kv.nkstot, this->ParaV->ncol_bands, this->ParaV->nrow);
+        }
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
             GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
             std::complex<double>** ctot;
-            error = WF_Local::read_lowf_complex(ctot, ik, lowf);
+            error = WF_Local::read_lowf_complex(ctot, ik, this->ParaV, psi);
 #ifdef __MPI
             Parallel_Common::bcast_int(error);
 #endif

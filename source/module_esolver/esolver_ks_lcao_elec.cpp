@@ -18,6 +18,8 @@
 //
 #include "../src_ri/exx_abfs.h"
 #include "../src_ri/exx_opt_orb.h"
+#include "../src_io/berryphase.h"
+#include "../src_io/to_wannier90.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #include "../module_base/timer.h"
@@ -25,10 +27,6 @@
 #include "../module_deepks/LCAO_deepks.h"
 #endif
 #include "../src_pw/H_Ewald_pw.h"
-
-#include "module_hamilt/hamilt_lcao.h"
-#include "module_elecstate/elecstate_lcao.h"
-#include "module_hsolver/hsolver_lcao.h"
 
 namespace ModuleESolver
 {
@@ -101,7 +99,7 @@ namespace ModuleESolver
         // the force.
 
         // init density kernel and wave functions.
-        this->LOC.allocate_dm_wfc(GlobalC::GridT.lgd, this->LOWF);
+        this->LOC.allocate_dm_wfc(GlobalC::GridT.lgd, this->LOWF, this->psid, this->psi);
 
         //======================================
         // do the charge extrapolation before the density matrix is regenerated.
@@ -192,67 +190,7 @@ namespace ModuleESolver
             srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
         }
 
-        //init Psi, HSolver, ElecState, Hamilt
-        if(this->phsol != nullptr)
-        {
-            if(this->phsol->classname != "HSolverLCAO")
-            {
-                delete this->phsol;
-                this->phsol = nullptr;
-            }
-        }
-        else
-        {
-            this->phsol = new hsolver::HSolverLCAO();
-            this->phsol->method = GlobalV::KS_SOLVER;
-        }
-        if(this->pelec != nullptr)
-        {
-            if(this->pelec->classname != "ElecStateLCAO")
-            {
-                delete this->pelec;
-                this->pelec = nullptr;
-            }
-        }
-        else
-        {
-            this->pelec = new elecstate::ElecStateLCAO(
-                    (Charge*)(&(GlobalC::CHR)),
-                    &(GlobalC::kv), 
-                    GlobalC::kv.nks,
-                    GlobalV::NBANDS,
-                    &(this->LOC),
-                    &(this->UHM),
-                    &(this->LOWF));
-        }
-        if(this->phami != nullptr)
-        {
-            if(this->phami->classname != "HamiltLCAO")
-            {
-                delete this->phami;
-                this->phami = nullptr;
-            }
-        }
-        else
-        {
-            // two cases for hamilt class
-            // Gamma_only case
-            if(GlobalV::GAMMA_ONLY_LOCAL)
-            {
-                this->phami = new hamilt::HamiltLCAO<double>(
-                    &(this->UHM.GG),
-                    &(this->UHM.genH),
-                    &(this->LM) );
-            }
-            // multi_k case
-            else
-            {
-                this->phami = new hamilt::HamiltLCAO<std::complex<double>>(
-                    &(this->UHM.GK),
-                    &(this->UHM.genH),
-                    &(this->LM) );
-            }
-        }
+        phami->non_first_scf = istep;
 
         ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");
         return;
@@ -312,20 +250,20 @@ namespace ModuleESolver
         }
         else if (GlobalV::CALCULATION == "nscf")
         {
-            ELEC_nscf::nscf(this->UHM, this->LOC.dm_gamma, this->LOC.dm_k, this->LOWF);
+            this->nscf();
         }
         else if (GlobalV::CALCULATION == "istate")
         {
-            IState_Charge ISC(this->LOWF.wfc_gamma, this->LOC);
+            IState_Charge ISC(this->psid, this->LOC);
             ISC.begin(this->UHM.GG);
         }
         else if (GlobalV::CALCULATION == "ienvelope")
         {
             IState_Envelope IEP;
             if (GlobalV::GAMMA_ONLY_LOCAL)
-                IEP.begin(this->LOWF, this->UHM.GG, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
+                IEP.begin(this->psid, this->LOWF, this->UHM.GG, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
             else
-                IEP.begin(this->LOWF, this->UHM.GK, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
+                IEP.begin(this->psi, this->LOWF, this->UHM.GK, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
         }
         else
         {
@@ -333,6 +271,136 @@ namespace ModuleESolver
         }
 
         ModuleBase::timer::tick("ESolver_KS_LCAO", "othercalculation");
+        return;
+    }
+
+    void ESolver_KS_LCAO::nscf()
+    {
+        ModuleBase::TITLE("ESolver_KS_LCAO", "nscf");
+
+        std::cout << " NON-SELF CONSISTENT CALCULATIONS" << std::endl;
+
+        time_t time_start = std::time(NULL);
+
+    #ifdef __MPI
+        // Peize Lin add 2018-08-14
+        switch (GlobalC::exx_lcao.info.hybrid_type)
+        {
+        case Exx_Global::Hybrid_Type::HF:
+        case Exx_Global::Hybrid_Type::PBE0:
+        case Exx_Global::Hybrid_Type::HSE:
+            GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
+            break;
+        }
+    #endif
+
+        // mohan add 2021-02-09
+        // in LOOP_ions, istep starts from 1,
+        // then when the istep is a variable of scf or nscf,
+        // istep becomes istep-1, this should be fixed in future
+        int istep = 0;
+        //when first called, init psi
+        if (GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            if(this->psid==nullptr)
+            {
+                int ncol = this->LOWF.ParaV->ncol_bands;
+                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="lapack_gvx"
+#ifdef __CUSOLVER_LCAO
+                ||GlobalV::KS_SOLVER=="cusolver"
+#endif
+                )
+                {
+                    ncol = this->LOWF.ParaV->ncol;
+                }
+                this->psid = new psi::Psi<double>(GlobalV::NSPIN, ncol, this->LOWF.ParaV->nrow, nullptr);
+            }
+        }
+        else
+        {   
+            if(this->psi == nullptr)
+            {
+                int ncol = this->LOWF.ParaV->ncol_bands;
+#ifdef __CUSOLVER_LCAO
+                if(GlobalV::KS_SOLVER=="cusolver")
+                {
+                    ncol = this->LOWF.paraV->ncol;
+                }
+#endif
+                this->psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, ncol, this->LOWF.ParaV->nrow, nullptr);
+            }
+        }
+        if(this->phsol != nullptr)
+        {
+            if(this->psi != nullptr)
+            {
+                this->phsol->solve(this->phami, this->psi[0], this->pelec, GlobalV::KS_SOLVER, true);
+            }
+            else if(this->psid != nullptr)
+            {
+                this->phsol->solve(this->phami, this->psid[0], this->pelec, GlobalV::KS_SOLVER, true);
+            }
+            for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
+            {
+                for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
+                {
+                    GlobalC::wf.ekb[ik][ib] = this->pelec->ekb(ik, ib);
+                }
+            }
+        }
+        else
+        {
+            ModuleBase::WARNING_QUIT("ESolver_KS_PW", "HSolver has not been initialed!");
+        }
+
+        time_t time_finish = std::time(NULL);
+        ModuleBase::GlobalFunc::OUT_TIME("cal_bands", time_start, time_finish);
+
+        GlobalV::ofs_running << " end of band structure calculation " << std::endl;
+        GlobalV::ofs_running << " band eigenvalue in this processor (eV) :" << std::endl;
+
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        {
+            if (GlobalV::NSPIN == 2)
+            {
+                if (ik == 0)
+                {
+                    GlobalV::ofs_running << " spin up :" << std::endl;
+                }
+                if (ik == (GlobalC::kv.nks / 2))
+                {
+                    GlobalV::ofs_running << " spin down :" << std::endl;
+                }
+            }
+
+            GlobalV::ofs_running << " k-points"
+                << ik + 1 << "(" << GlobalC::kv.nkstot << "): "
+                << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
+
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+            {
+                GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik] + 1
+                    << "final_state " << ib + 1 << " "
+                    << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV
+                    << " " << GlobalC::wf.wg(ik, ib) * GlobalC::kv.nks << std::endl;
+            }
+            GlobalV::ofs_running << std::endl;
+        }
+
+        // add by jingan in 2018.11.7
+        if (GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
+        {
+            toWannier90 myWannier(GlobalC::kv.nkstot, GlobalC::ucell.G);
+            myWannier.init_wannier(nullptr);
+        }
+
+        // add by jingan
+        if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
+        {
+            berryphase bp(this->LOWF);
+            bp.Macroscopic_polarization(nullptr);
+        }
+
         return;
     }
 
