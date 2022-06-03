@@ -7,7 +7,7 @@ namespace ModulePW
 /// 
 /// distribute plane waves to different cores
 /// Known: G, GT, GGT, fftnx, fftny, nz, poolnproc, poolrank, ggecut
-/// output: ig2isz[ig], istot2ixy[is], fftixy2istot[ixy], is2fftixy[is], fftixy2ip[ixy], startnsz_per[ip], nstnz_per[ip], gg[ig], gcar[ig], gdirect[ig], nst, nstot
+/// output: ig2isz[ig], istot2ixy[is], is2fftixy[is], fftixy2ip[ixy], gg[ig], gcar[ig], gdirect[ig], nst, nstot
 /// 
 void PW_Basis::distribute_g()
 {
@@ -31,14 +31,15 @@ void PW_Basis::distribute_g()
 /// Meanwhile, we record the number of planewaves on (x, y) in st_length2D, and store the smallest z-coordinate of each stick in st_bottom2D,
 /// so that we can scan a much smaller area in step(2).
 /// known: fftnx, fftny, nz, ggecut, GGT
-/// output: tot_npw, this->nstot, st_length2D, st_bottom2D
+/// output: tot_npw, this->nstot, st_length2D, st_bottom2D, this->riy, this->liy
 ///
 void PW_Basis::count_pw_st(
-        int &tot_npw,     // total number of planewaves.
         int* st_length2D, // the number of planewaves that belong to the stick located on (x, y).
         int* st_bottom2D  // the z-coordinate of the bottom of stick on (x, y).
 )
 {
+    ModuleBase::GlobalFunc::ZEROS(st_length2D, this->fftnxy);
+    ModuleBase::GlobalFunc::ZEROS(st_bottom2D, this->fftnxy);
     int ibox[3] = {0, 0, 0};                            // an auxiliary vector, determine the boundary of the scanning area.
     ibox[0] = int(this->fftnx / 2) + 1;                    // scan x from -ibox[0] to ibox[0].
     ibox[1] = int(this->fftny / 2) + 1;                    // scan y from -ibox[1] to ibox[1], if not gamma-only.
@@ -54,6 +55,8 @@ void PW_Basis::count_pw_st(
         iy_end = this->fftny - 1;
     }
     this->liy = this->riy = 0;
+    this->npwtot = 0;
+    this->nstot = 0;
     for (int ix = -ibox[0]; ix <= ibox[0]; ++ix)
     {
         for (int iy = iy_start; iy <= iy_end; ++iy)
@@ -79,7 +82,7 @@ void PW_Basis::count_pw_st(
                 if (modulus <= this->ggecut)
                 {
                     if (length == 0) st_bottom2D[index] = iz; // length == 0 means this point is the bottom of stick (x, y).
-                    ++tot_npw;
+                    ++this->npwtot;
                     ++length;
                     if(iy < this->riy) this->riy = iy;
                     if(iy > this->liy) this->liy = iy;

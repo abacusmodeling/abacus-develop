@@ -48,7 +48,11 @@ public:
             this->numz[ip] = npbz*this->bz;
             if(ip < modbz)   this->numz[ip]+=this->bz;
             if(ip < this->poolnproc - 1)   this->startz[ip+1] = this->startz[ip] + numz[ip];
-            if(ip == this->poolrank) this->nplane = numz[ip];
+            if(ip == this->poolrank) 
+            {
+                this->nplane = numz[ip];
+                this->startz_current = startz[ip];
+            }
         }
         this->nrxx = this->numz[this->poolrank] * this->nxy;
         return;

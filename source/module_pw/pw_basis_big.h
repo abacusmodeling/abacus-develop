@@ -27,9 +27,15 @@ public:
         bx = bx_in;
         by = by_in;
         bz = bz_in;
+        bxyz = bx * by * bz;
     }
-    int bx,by,bz;
+    int bx,by,bz,bxyz;
     int nbx, nby, nbz;
+    int nbzp;
+    int nbxx;
+    int nbzp_start;
+
+
     virtual void initgrids(const double lat0_in,const ModuleBase::Matrix3 latvec_in,
         const double gridecut, const int poolnproc_in, const int poolrank_in){
         //init lattice
@@ -141,8 +147,41 @@ public:
     return;
 
     }
-    virtual void distribute_r()
+
+    virtual void initgrids(
+    const double lat0_in,
+    const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+    const int nx_in, int ny_in, int nz_in,
+    const int poolnproc_in,
+    const int poolrank_in
+    )
     {
+        this->lat0 = lat0_in;
+        this->tpiba = ModuleBase::TWO_PI / this->lat0;
+        this->tpiba2 = this->tpiba*this->tpiba;
+        this->latvec = latvec_in;
+        this->GT = latvec.Inverse();
+    	this->G  = GT.Transpose();
+    	this->GGT = G * GT;
+        this->nx = nx_in;
+        this->ny = ny_in;
+        this->nz = nz_in;
+        if(this->nx%this->nbx != 0) this->nx += (this->nbx - this->nx % this->nbx);
+        if(this->ny%this->nby != 0) this->ny += (this->nby - this->ny % this->nby);
+        if(this->nz%this->nbz != 0) this->nz += (this->nbz - this->nz % this->nbz);
+        this->nbx = this->nx / bx;
+        this->nby = this->ny / by;
+        this->nbz = this->nz / bz;
+        this->nxy = this->nx * this->ny;
+        this->nxyz = this->nxy * this->nz;
+        this->poolnproc = poolnproc_in;
+        this->poolrank = poolrank_in;
+
+        return;
+    }
+
+    virtual void distribute_r()
+    {   
        if(this->numz!=nullptr) delete[] this->numz; this->numz = new int[this->poolnproc];
        if(this->startz!=nullptr) delete[] this->startz; this->startz = new int[this->poolnproc];
         ModuleBase::GlobalFunc::ZEROS(this->numz, this->poolnproc);
@@ -156,9 +195,16 @@ public:
             this->numz[ip] = npbz*this->bz;
             if(ip < modbz)   this->numz[ip]+=this->bz;
             if(ip < this->poolnproc - 1)   this->startz[ip+1] = this->startz[ip] + numz[ip];
-            if(ip == this->poolrank) this->nplane = numz[ip];
+            if(ip == this->poolrank) 
+            {
+                this->nplane = numz[ip];
+                this->startz_current = startz[ip];
+            }
         }
+        this->nbzp = this->nplane / this->bz;
         this->nrxx = this->numz[this->poolrank] * this->nxy;
+        this->nbxx = this->nbzp * this->nbx * this->nby;
+        this->nbzp_start = this->startz[this->poolrank] / this->bz;
         return;
     }
 

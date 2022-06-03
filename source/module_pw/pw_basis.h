@@ -60,7 +60,7 @@ public:
         const int poolrank_in // Rank in this pool
     );
     //Init the grids for FFT
-    void initgrids(
+    virtual void initgrids(
         const double lat0_in,
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
         const int nx_in, int ny_in, int nz_in,
@@ -81,19 +81,17 @@ public:
 public:
     //reciprocal-space
     // only on first proc.
-    int *startnsz_per=nullptr;//useless // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
-    int *nstnz_per=nullptr;//useless // nz * nst(number of sticks) on each core.
-    int *nst_per=nullptr;// nst on each core
-    // on all proc.
+    
     int *ig2isz=nullptr; // map ig to (is, iz).
     int *istot2ixy=nullptr; // istot2ixy[is]: iy + ix * ny of is^th stick among all sticks.
-    int *fftixy2istot=nullptr; //useless // fftixy2istot[iy + ix * fftny]: is of stick on (ix, iy) among all sticks.
     int *is2fftixy=nullptr; // is2fftixy[is]: iy + ix * ny of is^th stick among sticks on current proc.
-    int *fftixy2ip=nullptr; // useless// fftixy2ip[iy + ix * fftny]: ip of proc which contains stick on (ix, iy).
+    int *fftixy2ip=nullptr; // fftixy2ip[iy + ix * fftny]: ip of proc which contains stick on (ix, iy). if no stick: -1
     int nst=0; //num. of sticks in current proc.
+    int *nst_per=nullptr;// nst on each core
     int nstnz=0; // nst * nz
     int nstot=0; //num. of sticks in total.
     int npw=0; //num. of plane waves in current proc.
+    int *npw_per=nullptr; //npw on each core
     int npwtot=0; // total num. of plane waves in all proc. in this pool
 
     //real space
@@ -118,6 +116,8 @@ public:
     void setuptransform();
 
 protected:
+    int *startnsz_per=nullptr;//useless intermediate variable// startnsz_per[ip]: starting is * nz stick in the ip^th proc.
+
     //distribute plane waves to different processors
     void distribute_g();
 
@@ -166,8 +166,7 @@ protected:
     void divide_sticks_1(
         int* st_i,          // x or x + fftnx (if x < 0) of stick.
         int* st_j,          // y or y + fftny (if y < 0) of stick.
-        int* st_length,     // the stick on (ix, iy) consists of st_length[ix*fftny+iy] planewaves.
-        int* npw_per       // number of planewaves on each core.
+        int* st_length     // the stick on (ix, iy) consists of st_length[ix*fftny+iy] planewaves.
     );
 
     //method 2: first consider number of sticks
@@ -177,7 +176,6 @@ protected:
    
     //Count the total number of planewaves (tot_npw) and sticks (this->nstot) (in distributeg method1 and method2)
     void count_pw_st(
-        int &tot_npw,     // total number of planewaves.
         int* st_length2D, // the number of planewaves that belong to the stick located on (x, y).
         int* st_bottom2D  // the z-coordinate of the bottom of stick on (x, y).
     );
@@ -205,8 +203,7 @@ protected:
 
     //Create the maps from ixy to (in method 2)
     void create_maps(
-        int* st_length2D,  // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
-        int* npw_per       // number of planewaves on each core.
+        int* st_length2D  // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
     );
 
 //===============================================

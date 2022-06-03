@@ -16,12 +16,10 @@ PW_Basis:: ~PW_Basis()
 {
     if(ig2isz != nullptr)           delete[] ig2isz;
     if(istot2ixy != nullptr)     delete[] istot2ixy;
-    if(fftixy2istot != nullptr)        delete[] fftixy2istot;
     if(is2fftixy != nullptr)           delete[] is2fftixy;
     if(fftixy2ip != nullptr)           delete[] fftixy2ip;
-    if(startnsz_per != nullptr)     delete[] startnsz_per;
-    if(nstnz_per != nullptr)        delete[] nstnz_per;
     if(nst_per != nullptr)          delete[] nst_per;
+    if(npw_per != nullptr)          delete[] npw_per;
     if(gdirect != nullptr)          delete[] gdirect;
     if(gcar != nullptr)             delete[] gcar;
     if(gg != nullptr)               delete[] gg;

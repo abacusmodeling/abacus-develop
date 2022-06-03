@@ -21,18 +21,20 @@ namespace ModulePW
 ///                             npw    approximate equal to  npw   approximate equal to...
 /// 
 /// Known: G, GT, GGT, fftny, fftnx, nz, poolnproc, poolrank, ggecut
-/// output: ig2isz[ig], istot2ixy[is], fftixy2istot[fftnxy], is2fftixy[is], fftixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
+/// output: ig2isz[ig], istot2ixy[is], is2fftixy[is], fftixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
 ///
 void PW_Basis::distribution_method1()
 {
     ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
 
     // initial the variables needed by all process
-    int tot_npw = 0;                     // total number of planewaves.
-    this->nstot = 0;                     // total number of sticks.
-    int *st_bottom2D = nullptr;             // st_bottom2D[ixy], minimum z of stick on (x, y).
-    int *st_length2D = nullptr;             // st_length2D[ixy], number of planewaves in stick on (x, y).
+    int *st_bottom2D = new int[fftnxy];             // st_bottom2D[ixy], minimum z of stick on (x, y).
+    int *st_length2D = new int[fftnxy];             // st_length2D[ixy], number of planewaves in stick on (x, y).
     if(this->nst_per!=nullptr) delete[] this->nst_per; this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
+    if(this->npw_per != nullptr) delete[] this->npw_per;   this->npw_per = new int[this->poolnproc];  // number of planewaves on each core.
+    if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains the stick on (x, y).
+    for (int ixy = 0; ixy < this->fftnxy; ++ixy)
+        this->fftixy2ip[ixy] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
     if (poolrank == 0)
     {
         // (1) Count the total number of planewaves (tot_npw) and sticks (this->nstot).                  
@@ -40,146 +42,68 @@ void PW_Basis::distribution_method1()
         // Actually we will scan [(2 * ibox[0] + 1) * (2 * ibox[1] + 1)] points on x-y plane,
         // but we define st_length2D with (fftny * fftnx) points here, because the diameter
         // of the sphere should be shorter than the sides of the cube.
-        st_length2D = new int[fftnxy];
-        st_bottom2D = new int[fftnxy];
-        ModuleBase::GlobalFunc::ZEROS(st_length2D, this->fftnxy);
-        ModuleBase::GlobalFunc::ZEROS(st_bottom2D, this->fftnxy);
+        // calculate this->nstot and this->npwtot, liy, riy
+        this->count_pw_st(st_length2D, st_bottom2D); 
+    }
+#ifdef __MPI
+    MPI_Bcast(&this->npwtot, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&liy, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&riy, 1, MPI_INT, 0, POOL_WORLD);
+#endif
+    if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
 
-        this->count_pw_st(tot_npw, st_length2D, st_bottom2D);
-        // for test --------------------------------------------------
-        // std::cout << "The first step done\n";
-        // std::cout << "tot_npw   " << tot_npw << '\n';
-        // std::cout << "this->nstot   " << this->nstot << '\n';
-        // for (int ix = 0; ix < fftnx; ++ix)
-        // {
-        //     for (int iy = 0; iy < fftny; ++iy)
-        //     {
-        //         std::cout << st_length2D[ix * fftny + iy] << std::setw(4);
-        //     }
-        //     std::cout << '\n';
-        // }
-        // ------------------------------------------------------------
-        ModuleBase::GlobalFunc::ZEROS(this->nst_per, poolnproc);
+    if(poolrank == 0)
+    {
 #ifdef __MPI
         // Parallel line
-
         // (2) Collect the x, y indexs, and length of the sticks.
         int* st_i = new int[this->nstot];                           // x or x + fftnx (if x < 0) of stick.
         int* st_j = new int[this->nstot];                           // y or y + fftny (if y < 0) of stick.
-        int* st_length = new int[this->nstot];                      // number of planewaves in stick.
-        
+        int* st_length = new int[this->nstot];                      // number of planewaves in stick.  
         this->collect_st(st_length2D, st_bottom2D, st_i, st_j, st_length);
 
-        // ------------------------------------------------------------
-        // std::cout << "\nThe second step done\n";
-        // ------------------------------------------------------------
-
         // (3) Distribute the sticks to cores.
-        int *npw_per = new int[this->poolnproc];  // number of planewaves on each core.
-        if(this->nstnz_per!=nullptr) delete[] this->nstnz_per; this->nstnz_per= new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
-        if(this->startnsz_per!=nullptr) delete[] this->startnsz_per; this->startnsz_per = new int[this->poolnproc];
-        ModuleBase::GlobalFunc::ZEROS(npw_per, poolnproc);
-        ModuleBase::GlobalFunc::ZEROS(this->nstnz_per, poolnproc);
-        ModuleBase::GlobalFunc::ZEROS(startnsz_per, poolnproc);
-        
-        if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains the stick on (x, y).
-        for (int ixy = 0; ixy < this->fftnxy; ++ixy)
-        {
-            this->fftixy2ip[ixy] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
-        }
-        this->divide_sticks_1(st_i, st_j, st_length, npw_per);
+        //get nst_per, npw_per, fftixy2ip, and startnsz_per
+        this->startnsz_per = new int[this->poolnproc];
+        this->divide_sticks_1(st_i, st_j, st_length);
         delete[] st_length;
 
-         // for test -----------------------------------------------------------------------------
-        // std::cout << "The 3-1 step done\n";
-        // std::cout << "st_i    ";
-        // for (int is = 0; is < this->nstot; ++is) cout << st_i[is] << setw(4) ;
-        // std::cout << std::endl;
-        // --------------------------------------------------------------------------------------
-
+        // (4) Get map from istot to (iy, ix)
         this->get_istot2ixy(st_i, st_j);
         delete[] st_i;
         delete[] st_j;
-        // for test -----------------------------------------------------------------------------
-        // std::cout << "The 3-2 step done\n";
-        // --------------------------------------------------------------------------------------
-
-        // (4) Send npw_per[ip], nst_per[ip] to all cores.
-        this->npw = npw_per[0];
-        this->nst = nst_per[0];
-
-        for (int ip = 1; ip < this->poolnproc; ++ip)
-        {
-            MPI_Send(&npw_per[ip], 1, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&nst_per[ip], 1, MPI_INT, ip, 0, POOL_WORLD);
-        }
-        delete[] npw_per;
-
+        //We do not need startnsz_per after it.
+        delete[] this->startnsz_per;
+        this->startnsz_per=nullptr;
 #else
         // Serial line
-        this->npw = tot_npw;
-        this->nst = this->nstot;
-
-        if(this->nstnz_per!=nullptr) delete[] this->nstnz_per; this->nstnz_per = new int[1];
-        this->nstnz_per[0] = this->nst * this->nz;
-        if(this->startnsz_per!=nullptr) delete[] this->startnsz_per; this->startnsz_per = new int[1];
-        this->startnsz_per[0] = 0;
-        this->nst_per[0] = this->nst;
-
-        if(this->fftixy2istot!=nullptr) delete[]this->fftixy2istot; this->fftixy2istot = new int[fftnxy];
-        if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
-        if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[fftnxy];
+        // get nst_per, npw_per, fftixy2ip, and istot2ixy
+        this->nst_per[0] = this->nstot;
+        this->npw_per[0] = this->npwtot;
         int st_move = 0;
         for (int ixy = 0; ixy < fftnxy; ++ixy)
         {
             if (st_length2D[ixy] > 0)
             {
-                this->fftixy2istot[ixy] = st_move;
                 this->istot2ixy[st_move] = ixy / fftny * ny + ixy % fftny;
                 this->fftixy2ip[ixy] = 0;
                 st_move++;
             }
-            else
-            {
-                fftixy2istot[ixy] = -1;
-                fftixy2ip[ixy] = -1;
-            }
         }
 #endif
     }
-    else
-    {
-#ifdef __MPI
-        MPI_Status ierror;
-        MPI_Recv(&npw, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);  // number of planewaves in current proc.
-        MPI_Recv(&nst, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
-        // std::cout << this->poolrank << " recive done.\n";
-#endif
-    }
-#ifdef __MPI
-    MPI_Bcast(&tot_npw, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&liy, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&riy, 1, MPI_INT, 0, POOL_WORLD);
-    if (this->poolrank != 0)
-    {
-        st_bottom2D = new int[this->fftnxy];                      // minimum z of stick.
-        st_length2D = new int[this->fftnxy];                      // number of planewaves in stick.
-        if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains stick on (x, y).
-        if(this->fftixy2istot!=nullptr) delete[]this->fftixy2istot; this->fftixy2istot = new int[this->fftnxy];
-        if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
-    }
 
+#ifdef __MPI
     MPI_Bcast(st_length2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(st_bottom2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->fftixy2ip, this->fftnxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->fftixy2istot, this->fftnxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
-
-    // std::cout << "Bcast done\n";
+    MPI_Bcast(this->npw_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
 #endif
-    this->npwtot = tot_npw;
+    this->npw = this->npw_per[this->poolrank];
+    this->nst = this->nst_per[this->poolrank];
     this->nstnz = this->nst * this->nz;
 
     // (5) Construct ig2isz and is2fftixy. 
@@ -187,9 +111,6 @@ void PW_Basis::distribution_method1()
 
     if (st_bottom2D != nullptr) delete[] st_bottom2D;
     if (st_length2D != nullptr) delete[] st_length2D;
-    // for test ----------------------------------------------
-    // if (poolrank==0) std::cout << "The fifth step done\n";
-    // -------------------------------------------------------
     ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
     return;
 }
@@ -301,17 +222,18 @@ void PW_Basis::collect_st(
 /// (3-1) Distribute sticks to cores according to the number of plane waves.
 /// We have rearranged sticks in the order of length decreasing, so that we will distribute the longest stick preferentially here.
 /// For each stick, we find the core that contains the least planewaves firstly, and distribute the stick to it,
-/// then update npw_per, this->nstnz_per, this->fftixy2ip, and this->startnsz_per.
+/// then update npw_per, this->fftixy2ip, and this->startnsz_per.
 /// known: tot_npw, this->nstot, st_i, st_j, st_length
-/// output: npw_per, nst_per, this->nstnz_per, this->fftixy2ip, this->startnsz_per
+/// output: npw_per, nst_per, this->fftixy2ip, this->startnsz_per
 ///
 void PW_Basis::divide_sticks_1(
     int* st_i,          // x or x + fftnx (if x < 0) of stick.
     int* st_j,          // y or y + fftny (if y < 0) of stick.
-    int* st_length,     // the stick on (x, y) consists of st_length[x*fftny+y] planewaves.
-    int* npw_per       // number of planewaves on each core.
+    int* st_length     // the stick on (x, y) consists of st_length[x*fftny+y] planewaves.
 )
 {
+    ModuleBase::GlobalFunc::ZEROS(this->nst_per, poolnproc);
+    ModuleBase::GlobalFunc::ZEROS(this->npw_per, poolnproc);
     int ipmin = 0; // The ip of core containing least number of planewaves.
     for (int is = 0; is < this->nstot; ++is)
     {
@@ -319,8 +241,8 @@ void PW_Basis::divide_sticks_1(
         for (int ip = 0; ip < this->poolnproc; ++ip)
         {
             //const int non_zero_grid = nst_per[ip] * this->nz;       // number of reciprocal planewaves on this core.
-            const int npwmin = npw_per[ipmin];
-            const int npw_ip = npw_per[ip];
+            const int npwmin = this->npw_per[ipmin];
+            const int npw_ip = this->npw_per[ip];
             const int nstmin = nst_per[ipmin];
             const int nst_ip = nst_per[ip];
 
@@ -348,19 +270,14 @@ void PW_Basis::divide_sticks_1(
             }
         }
         this->nst_per[ipmin]++;
-        this->nstnz_per[ipmin] += this->nz;
-        npw_per[ipmin] += st_length[is];
+        this->npw_per[ipmin] += st_length[is];
         this->fftixy2ip[st_i[is] * this->fftny + st_j[is]] = ipmin;
     }
-    // for test --------------------------------------------------------------------------
-    // for(int i = 0; i < this->poolnproc; ++i) std::cout<<this->nstnz_per[i]<<std::setw(4);
-    // std::cout<<"\n";
-    // for(int i = 0; i < this->poolnproc; ++i) std::cout<<nst_per[i]<<std::setw(4);
-    // std::cout<<"\n";
-    // -----------------------------------------------------------------------------------
+
+     this->startnsz_per[0] = 0;
     for (int ip = 1; ip < poolnproc; ++ip)
     {
-        this->startnsz_per[ip] = this->startnsz_per[ip - 1] + this->nstnz_per[ip - 1];
+        this->startnsz_per[ip] = this->startnsz_per[ip - 1] + this->nst_per[ip - 1] * this->nz;
     }
     return;
 }
@@ -369,9 +286,8 @@ void PW_Basis::divide_sticks_1(
 /// (3-2) Rearrange sticks in the order of the ip of core increasing, in each core, sticks are sorted in the order of ixy increasing.
 /// (st_start + st_move) is the new index of sticks.
 /// Then get istot2ixy (istot2ixy[is]: iy + ix * fftny of is^th stick among all sticks) on the first core
-/// and fftixy2istot (fftixy2istot[iy + ix * fftny]: is of stick on (iy, ix) among all sticks).
 /// known: this->nstot, st_i, st_j, this->startnsz_per
-/// output: istot2ixy, fftixy2istot
+/// output: istot2ixy
 ///
 void PW_Basis::get_istot2ixy(
     int* st_i,          // x or x + fftnx (if x < 0) of stick.
@@ -379,13 +295,7 @@ void PW_Basis::get_istot2ixy(
 )
 {
     assert(this->poolrank == 0);
-    if(this->fftixy2istot!=nullptr) delete[]this->fftixy2istot; this->fftixy2istot = new int[this->fftnx * this->fftny];
-    if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
     int* st_move = new int[this->poolnproc]; // st_move[ip]: this is the st_move^th stick on ip^th core.
-    for (int ixy = 0; ixy < this->fftnx * this->fftny; ++ixy)
-    {
-        this->fftixy2istot[ixy] = -1;
-    }
     ModuleBase::GlobalFunc::ZEROS(this->istot2ixy, this->nstot);
     ModuleBase::GlobalFunc::ZEROS(st_move, this->poolnproc);
 
@@ -395,7 +305,6 @@ void PW_Basis::get_istot2ixy(
         if (ip != -1)
         {        
             this->istot2ixy[this->startnsz_per[ip] / this->nz + st_move[ip]] = (ixy / fftny)*ny + ixy % fftny;
-            this->fftixy2istot[ixy] = this->startnsz_per[ip] / this->nz + st_move[ip];
             st_move[ip]++;
         }
     }
