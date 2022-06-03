@@ -192,14 +192,14 @@ void Hamilt_PW::init_k(const int ik)
 
 
 	// (3) Take the local potential.
-	// cout<<"nrxx="<<GlobalC::wfc->nrxx<<endl;
+	// cout<<"nrxx="<<GlobalC::rhopw->nrxx<<endl;
 
-	for (int ir=0; ir<GlobalC::wfc->nrxx; ir++)
+	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 	{
 		GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
 #ifdef __CUDA
-	cudaMemcpy(GlobalC::pot.d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::wfc->nrxx*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMemcpy(GlobalC::pot.d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::rhopw->nrxx*sizeof(double), cudaMemcpyHostToDevice);
 #endif
 
 	// (4) Calculate nonlocal pseudopotential vkb
@@ -213,14 +213,14 @@ void Hamilt_PW::init_k(const int ik)
 	GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
 	// (6) The index of plane waves.
-    // int *GR_index_tmp = new int[GlobalC::wfc->nrxx];
+    // int *GR_index_tmp = new int[GlobalC::rhopw->nrxx];
 //     for (int ig = 0;ig < GlobalC::wf.npw;ig++)
 //     {
 //         GR_index[ig] = GlobalC::sf.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
 //     }
 //     // cout<<"init_K"<<endl;
 // #ifdef __CUDA
-//     CHECK_CUDA(cudaMemcpy(this->GR_index_d, GR_index, GlobalC::wfc->nrxx*sizeof(int), cudaMemcpyHostToDevice));
+//     CHECK_CUDA(cudaMemcpy(this->GR_index_d, GR_index, GlobalC::rhopw->nrxx*sizeof(int), cudaMemcpyHostToDevice));
 //     // delete [] GR_index_tmp;
 // #endif
 
@@ -800,15 +800,15 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
         float2 *f_porter;
 
         // CHECK_CUDA(cudaMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int)));
-        CHECK_CUDA(cudaMalloc((void**)&d_vr_eff1, GlobalC::wfc->nrxx * sizeof(double)));
-		CHECK_CUDA(cudaMalloc((void**)&f_vr_eff1, GlobalC::wfc->nrxx * sizeof(float)));
-        CHECK_CUDA(cudaMalloc((void**)&f_porter, GlobalC::wfc->nrxx * sizeof(float2)));
+        CHECK_CUDA(cudaMalloc((void**)&d_vr_eff1, GlobalC::rhopw->nrxx * sizeof(double)));
+		CHECK_CUDA(cudaMalloc((void**)&f_vr_eff1, GlobalC::rhopw->nrxx * sizeof(float)));
+        CHECK_CUDA(cudaMalloc((void**)&f_porter, GlobalC::rhopw->nrxx * sizeof(float2)));
 
-        CHECK_CUDA(cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::wfc->nrxx*sizeof(double), cudaMemcpyHostToDevice));
+        CHECK_CUDA(cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::rhopw->nrxx*sizeof(double), cudaMemcpyHostToDevice));
         
 		int thread2 = 512;
-		int block2 = (GlobalC::wfc->nrxx + thread2 - 1) / thread2;
-		cast_d2f<<<block2, thread2>>>(f_vr_eff1, d_vr_eff1, GlobalC::wfc->nrxx);
+		int block2 = (GlobalC::rhopw->nrxx + thread2 - 1) / thread2;
+		cast_d2f<<<block2, thread2>>>(f_vr_eff1, d_vr_eff1, GlobalC::rhopw->nrxx);
 
 		// cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
         for(int ib = 0 ; ib < m; ++ib)
@@ -816,7 +816,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
             // cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
             // if(NSPIN!=4){
             // ZEROS( UFFT.porter, pw.nrxx);
-            CHECK_CUDA(cudaMemset(f_porter, 0, GlobalC::wfc->nrxx * sizeof(float2)));
+            CHECK_CUDA(cudaMemset(f_porter, 0, GlobalC::rhopw->nrxx * sizeof(float2)));
 
 			//todo
             // GlobalC::UFFT.RoundTrip( tmpsi_in, f_vr_eff1, GR_index_d, f_porter );
@@ -1009,7 +1009,7 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
         tmpsi_in = psi_in;
         for(int ib = 0 ; ib < m; ++ib)
         {
-            CHECK_CUDA(cudaMemset(GlobalC::UFFT.d_porter, 0, GlobalC::wfc->nrxx * sizeof(double2)));
+            CHECK_CUDA(cudaMemset(GlobalC::UFFT.d_porter, 0, GlobalC::rhopw->nrxx * sizeof(double2)));
             // GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.d_vr_eff1, GR_index_d, GlobalC::UFFT.d_porter );
 			// GlobalC::wfcpw->recip2real(tmpsi_in, f_porter, ik);
 			// for (int ir=0; ir< nrxx; ir++)
