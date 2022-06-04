@@ -36,11 +36,11 @@ namespace ModuleESolver
     {
         std::cout << " UNIFORM GRID DIM     : " << GlobalC::rhopw->nx << " * " << GlobalC::rhopw->ny << " * " << GlobalC::rhopw->nz << std::endl;
         std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::bigpw->nbx << " * " << GlobalC::bigpw->nby << " * " << GlobalC::bigpw->nbz << std::endl;
-        
+
         ofs << "\n\n\n\n";
 	    ofs << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 	    ofs << " |                                                                    |" << std::endl;
-	    ofs << " | Setup plane waves of charge/potential:                     |" << std::endl;
+	    ofs << " | Setup plane waves of charge/potential:                             |" << std::endl;
 	    ofs << " | Use the energy cutoff and the lattice vectors to generate the      |" << std::endl;
 	    ofs << " | dimensions of FFT grid. The number of FFT grid on each processor   |" << std::endl;
 	    ofs << " | is 'nrxx'. The number of plane wave basis in reciprocal space is   |" << std::endl;

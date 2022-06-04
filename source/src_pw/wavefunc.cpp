@@ -353,6 +353,11 @@ void wavefunc::wfcinit_k(psi::Psi<std::complex<double>>* psi_in)
 		return;
 	}
 
+	if(GlobalV::BASIS_TYPE=="pw") 
+	{
+		this->irindex = new int [GlobalC::wfcpw->fftnxy];
+		GlobalC::wfcpw->getfftixy2is(this->irindex);
+	}
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		if (GlobalV::BASIS_TYPE=="pw")
@@ -377,6 +382,10 @@ void wavefunc::wfcinit_k(psi::Psi<std::complex<double>>* psi_in)
 			this->LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
 		}
 #endif
+	}
+	if(GlobalV::BASIS_TYPE=="pw") 
+	{
+		delete[] this->irindex;		this->irindex=nullptr;
 	}
 
 	//---------------------------------------------------

@@ -486,19 +486,10 @@ void WF_atomic::atomic_wfc
 } //end subroutine atomic_wfc
 
 #ifdef __MPI
-void stick_to_pool(double *stick, const int &ir, double *out, ModulePW::PW_Basis_K* wfc_basis)
+void WF_atomic::stick_to_pool(double *stick, const int &ir, double *out, ModulePW::PW_Basis_K* wfc_basis) const
 {	
-	//ModuleBase::TITLE("Parallel_Grid","zpiece_to_all");
 	MPI_Status ierror;
-
-    int is = 0;
-    for(is = 0 ; is < wfc_basis->nst; ++is)
-    {
-        if(wfc_basis->is2fftixy[is] == ir)
-        {
-            break;
-        }
-    }
+    const int is = this->irindex[ir];
 	const int ip = wfc_basis->fftixy2ip[ir];
     const int nz = wfc_basis->nz;
 

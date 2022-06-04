@@ -32,6 +32,7 @@ class WF_atomic : public WF_igk
     void print_PAOs(void)const;
 
 	protected:
+    int *irindex = nullptr;
 
     void atomic_wfc
     (
@@ -52,9 +53,10 @@ class WF_atomic : public WF_igk
     void random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik, ModulePW::PW_Basis_K* wfc_basis);
 
     void check_evc()const;
+#ifdef __MPI
+	void stick_to_pool(double *stick, const int &ir, double *out, ModulePW::PW_Basis_K* wfc_basis) const;
+#endif
 
 };
-#ifdef __MPI
-	void stick_to_pool(double *stick, const int &ir, double *out, ModulePW::PW_Basis_K* wfc_basis);
-#endif
+
 #endif 
