@@ -879,7 +879,7 @@ namespace ModuleESolver
                             }
                             std::vector<ModuleBase::ComplexMatrix> dm_bandgap_k;
                             dm_bandgap_k.resize(GlobalC::kv.nks);
-                            this->LOC.cal_dm(wg_hl, this->LOWF.wfc_k, dm_bandgap_k);
+                            elecstate::cal_dm(this->LOWF.ParaV, wg_hl, this->psi[0], dm_bandgap_k);
                             GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *this->LOWF.ParaV, GlobalC::kv.nks);
 
                             GlobalC::ld.cal_orbital_precalc_k(dm_bandgap_k,
