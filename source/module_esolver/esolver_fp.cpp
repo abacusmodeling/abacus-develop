@@ -19,12 +19,11 @@ namespace ModuleESolver
     void ESolver_FP::Init(Input& inp, UnitCell_pseudo& cell)
     {
         // Initalize the plane wave basis set
-        std::cout << " UNIFORM GRID DIM     : " << GlobalC::rhopw->nx << " * " << GlobalC::rhopw->ny << " * " << GlobalC::rhopw->nz << std::endl;
-        std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::bigpw->nbx << " * " << GlobalC::bigpw->nby << " * " << GlobalC::bigpw->nbz << std::endl;
         if (inp.nx * inp.ny * inp.nz == 0)
             this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.ecutrho, GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
 	    else
             this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.nx, inp.ny, inp.nz, GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+        
         this->pw_rho->initparameters(false, inp.ecutrho);
         this->pw_rho->setuptransform();
         this->pw_rho->collect_local_pw(); 
@@ -35,6 +34,9 @@ namespace ModuleESolver
 
     void ESolver_FP::print_rhofft(Input&inp, ofstream &ofs)
     {
+        std::cout << " UNIFORM GRID DIM     : " << GlobalC::rhopw->nx << " * " << GlobalC::rhopw->ny << " * " << GlobalC::rhopw->nz << std::endl;
+        std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::bigpw->nbx << " * " << GlobalC::bigpw->nby << " * " << GlobalC::bigpw->nbz << std::endl;
+        
         ofs << "\n\n\n\n";
 	    ofs << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 	    ofs << " |                                                                    |" << std::endl;

@@ -166,9 +166,9 @@ public:
         this->nx = nx_in;
         this->ny = ny_in;
         this->nz = nz_in;
-        if(this->nx%this->nbx != 0) this->nx += (this->nbx - this->nx % this->nbx);
-        if(this->ny%this->nby != 0) this->ny += (this->nby - this->ny % this->nby);
-        if(this->nz%this->nbz != 0) this->nz += (this->nbz - this->nz % this->nbz);
+        if(this->nx%this->bx != 0) this->nx += (this->bx - this->nx % this->bx);
+        if(this->ny%this->by != 0) this->ny += (this->by - this->ny % this->by);
+        if(this->nz%this->bz != 0) this->nz += (this->bz - this->nz % this->bz);
         this->nbx = this->nx / bx;
         this->nby = this->ny / by;
         this->nbz = this->nz / bz;
