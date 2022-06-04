@@ -267,7 +267,6 @@ pw_distributeg_method1.o\
 pw_distributeg_method2.o\
 pw_distributer.o\
 pw_init.o\
-pw_operation.o\
 pw_transform.o\
 pw_transform_k.o
 
@@ -357,8 +356,7 @@ dmft.o \
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
-pw_basis_old.o\
-bspline_sf.o\
+structure_factor.o\
 hamilt.o \
 pw_complement.o\
 wf_local.o \

@@ -90,13 +90,10 @@ namespace Write_Wfc_Realspace
 	std::vector<std::complex<double>> cal_wfc_r(const psi::Psi<std::complex<double>> &wfc_g, const int ik, const int ib)
 	{
 		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
-		ModuleBase::GlobalFunc::ZEROS(GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-		std::vector<std::complex<double>> wfc_r(GlobalC::pw.nrxx);
-		for(int ig=0; ig<wfc_g.get_current_nbas(); ++ig)
-			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig)] ] = wfc_g(ib,ig);
-		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
-		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
-			wfc_r[ir] = GlobalC::UFFT.porter[ir];
+		
+		std::vector<std::complex<double>> wfc_r(GlobalC::wfcpw->nrxx);
+		GlobalC::wfcpw->recip2real(&wfc_g(ib,0), wfc_r.data(),ik);
+
 		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
 		return wfc_r;
 	}
@@ -139,7 +136,7 @@ namespace Write_Wfc_Realspace
 					ofs<<GlobalC::ucell.atoms[it].taud[ia].x<<" "<<GlobalC::ucell.atoms[it].taud[ia].y<<" "<<GlobalC::ucell.atoms[it].taud[ia].z<<std::endl;
 			ofs<<std::endl;
 			
-			ofs<<GlobalC::pw.ncx<<" "<<GlobalC::pw.ncy<<" "<<GlobalC::pw.ncz<<std::endl;
+			ofs<<GlobalC::wfcpw->nx<<" "<<GlobalC::wfcpw->ny<<" "<<GlobalC::wfcpw->nz<<std::endl;
 #ifdef  __MPI
 		}
 		else
@@ -151,14 +148,14 @@ namespace Write_Wfc_Realspace
 		}
 #endif
 		
-		assert(GlobalC::pw.ncx * GlobalC::pw.ncy * GlobalC::pw.nczp == chg_r.size());
-		for(int iz=0; iz<GlobalC::pw.nczp; ++iz)
+		assert(GlobalC::wfcpw->nx * GlobalC::wfcpw->ny * GlobalC::wfcpw->nplane == chg_r.size());
+		for(int iz=0; iz<GlobalC::wfcpw->nplane; ++iz)
 		{
-			for(int iy=0; iy<GlobalC::pw.ncy; ++iy)
+			for(int iy=0; iy<GlobalC::wfcpw->ny; ++iy)
 			{
-				for(int ix=0; ix<GlobalC::pw.ncx; ++ix)
+				for(int ix=0; ix<GlobalC::wfcpw->nx; ++ix)
 				{
-					const int ir = (ix*GlobalC::pw.ncy+iy)*GlobalC::pw.nczp+iz;
+					const int ir = (ix*GlobalC::wfcpw->ny+iy)*GlobalC::wfcpw->nplane+iz;
 					ofs<<chg_r[ir]<<" ";
 				}
 				ofs<<"\n";

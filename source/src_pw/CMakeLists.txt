@@ -17,8 +17,7 @@ list(APPEND objects
     magnetism.cpp
     occupy.cpp
     potential.cpp
-    pw_basis_old.cpp
-    bspline_sf.cpp
+    structure_factor.cpp
     pw_complement.cpp
     soc.cpp
     sto_iter.cpp

@@ -32,7 +32,7 @@ void Gint::cal_gint(Gint_inout *inout)
 #endif
 		{
             //prepare some constants
-			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
+			const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
 			const double dv = GlobalC::ucell.omega/this->ncxyz;
 			
 			// it's a uniform grid to save orbital values, so the delta_r is a constant.
@@ -92,7 +92,7 @@ void Gint::cal_gint(Gint_inout *inout)
     		#pragma omp for
 #endif
             // entering the main loop of grid points
-			for(int grid_index = 0; grid_index < GlobalC::pw.nbxx; grid_index++)
+			for(int grid_index = 0; grid_index < GlobalC::bigpw->nbxx; grid_index++)
 			{
 
 				// get the value: how many atoms has orbital value on this grid.

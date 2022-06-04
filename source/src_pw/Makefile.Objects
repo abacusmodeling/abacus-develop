@@ -89,7 +89,6 @@ occupy.o\
 potential.o \
 potential_libxc.o \
 pw_basis.o\
-bspline_sf.o\
 pw_complement.o\
 soc.o\
 sto_elec.o\

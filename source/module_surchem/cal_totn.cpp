@@ -1,18 +1,19 @@
 #include "surchem.h"
 
-void add_comp_chg(const UnitCell &cell, PW_Basis &pwb, double q, double l, double center, complex<double> *NG, int dim)
+void add_comp_chg(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, double q, double l, double center, complex<double> *NG, int dim)
 {
     // x dim
     if (dim == 0)
     {
         double L = cell.a1[0];
         q /= (cell.a2[1] * cell.a3[2] * l);
-        ModuleBase::GlobalFunc::ZEROS(NG, pwb.ngmc);
-        for (int ig = pwb.gstart; ig < pwb.ngmc; ig++)
+        ModuleBase::GlobalFunc::ZEROS(NG, rho_basis->npw);
+        for (int ig = 0; ig < rho_basis->npw; ig++)
         {
-            double GX = pwb.get_G_cartesian_projection(ig, 0);
-            double GY = pwb.get_G_cartesian_projection(ig, 1);
-            double GZ = pwb.get_G_cartesian_projection(ig, 2);
+            if(ig == rho_basis->ig_gge0) continue;
+            double GX = rho_basis->gcar[ig][0];
+            double GY = rho_basis->gcar[ig][1];
+            double GZ = rho_basis->gcar[ig][2];
             GX = GX * 2 * ModuleBase::PI;
             if (GY == 0 && GZ == 0 && GX != 0)
             {
@@ -26,12 +27,13 @@ void add_comp_chg(const UnitCell &cell, PW_Basis &pwb, double q, double l, doubl
     {
         double L = cell.a2[1];
         q /= (cell.a1[0] * cell.a3[2] * l);
-        ModuleBase::GlobalFunc::ZEROS(NG, pwb.ngmc);
-        for (int ig = pwb.gstart; ig < pwb.ngmc; ig++)
+        ModuleBase::GlobalFunc::ZEROS(NG, rho_basis->npw);
+        for (int ig = 0; ig < rho_basis->npw; ig++)
         {
-            double GX = pwb.get_G_cartesian_projection(ig, 0);
-            double GY = pwb.get_G_cartesian_projection(ig, 1);
-            double GZ = pwb.get_G_cartesian_projection(ig, 2);
+            if(ig == rho_basis->ig_gge0) continue;
+            double GX = rho_basis->gcar[ig][0];
+            double GY = rho_basis->gcar[ig][1];
+            double GZ = rho_basis->gcar[ig][2];
             GY = GY * 2 * ModuleBase::PI;
             if (GX == 0 && GZ == 0 && GY != 0)
             {
@@ -45,12 +47,13 @@ void add_comp_chg(const UnitCell &cell, PW_Basis &pwb, double q, double l, doubl
     {
         double L = cell.a3[2];
         q /= (cell.a1[0] * cell.a2[1] * l);
-        ModuleBase::GlobalFunc::ZEROS(NG, pwb.ngmc);
-        for (int ig = pwb.gstart; ig < pwb.ngmc; ig++)
+        ModuleBase::GlobalFunc::ZEROS(NG, rho_basis->npw);
+        for (int ig = 0; ig < rho_basis->npw; ig++)
         {
-            double GX = pwb.get_G_cartesian_projection(ig, 0);
-            double GY = pwb.get_G_cartesian_projection(ig, 1);
-            double GZ = pwb.get_G_cartesian_projection(ig, 2);
+            if(ig == rho_basis->ig_gge0) continue;
+            double GX = rho_basis->gcar[ig][0];
+            double GY = rho_basis->gcar[ig][1];
+            double GZ = rho_basis->gcar[ig][2];
             GZ = GZ * 2 * ModuleBase::PI;
             if (GX == 0 && GY == 0 && GZ != 0)
             {
@@ -61,22 +64,22 @@ void add_comp_chg(const UnitCell &cell, PW_Basis &pwb, double q, double l, doubl
     }
 }
 
-void test_sum(const UnitCell &cell, PW_Basis &pwb, double* NR)
+void test_sum(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, double* NR)
 {
     double sum = 0.0;
-    for (int i=0; i < pwb.nrxx; i++)
+    for (int i=0; i < rho_basis->nrxx; i++)
     {
         sum += NR[i];
     }
-    cout << sum * cell.omega / pwb.nrxx << endl;
+    cout << sum * cell.omega / rho_basis->nrxx << endl;
 }
 
-void surchem::cal_totn(const UnitCell &cell, PW_Basis &pwb,
+void surchem::cal_totn(const UnitCell &cell, ModulePW::PW_Basis* rho_basis,
                        const complex<double> *Porter_g, complex<double> *N,
                        complex<double> *TOTN) {
     /*
     // test compensating charge
-    complex<double> *comp_reci = new complex<double>[pwb.ngmc];
+    complex<double> *comp_reci = new complex<double>[rho_basis->npw];
     double *comp_real = new double[pwb.nrxx];
     add_comp_chg(cell, pwb, comp_q, comp_l, comp_center, comp_reci, comp_dim);
     GlobalC::UFFT.ToRealSpace(comp_reci, comp_real);
@@ -91,20 +94,16 @@ void surchem::cal_totn(const UnitCell &cell, PW_Basis &pwb,
     */
 
     // vloc to N
-    complex<double> *vloc_g = new complex<double>[pwb.ngmc];
-    ModuleBase::GlobalFunc::ZEROS(vloc_g, pwb.ngmc);
+    complex<double> *vloc_g = new complex<double>[rho_basis->npw];
+    ModuleBase::GlobalFunc::ZEROS(vloc_g, rho_basis->npw);
 
     // method 1
-    GlobalC::UFFT.ToReciSpace(GlobalC::pot.vltot,
-                              vloc_g); // now n is vloc in Recispace
-    for (int ig = pwb.gstart; ig < pwb.ngmc; ig++) {
-        if (pwb.gg[ig] >= 1.0e-12) // LiuXh 20180410
-        {
-            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI /
-                               (cell.tpiba2 * pwb.gg[ig]);
-
-            N[ig] = -vloc_g[ig] / fac;
-        }
+    GlobalC::UFFT.ToReciSpace(GlobalC::pot.vltot, vloc_g, rho_basis); // now n is vloc in Recispace
+    for (int ig = 0; ig < rho_basis->npw; ig++) {
+        if(rho_basis->ig_gge0==ig)    continue;
+        const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI /
+                           (cell.tpiba2 * rho_basis->gg[ig]);
+        N[ig] = -vloc_g[ig] / fac;
     }
 
     if (GlobalV::MY_RANK == 0) {
@@ -112,7 +111,7 @@ void surchem::cal_totn(const UnitCell &cell, PW_Basis &pwb,
         // cout << "Ng[0]" << N[0] << endl;
     }
 
-    for (int ig = 0; ig < pwb.ngmc; ig++) {
+    for (int ig = 0; ig < rho_basis->npw; ig++) {
         TOTN[ig] = N[ig] - Porter_g[ig];
     }
 

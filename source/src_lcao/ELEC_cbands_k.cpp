@@ -63,7 +63,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
             GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
         }
         GlobalC::wf.npw = GlobalC::kv.ngk[ik];
-        for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+        for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
@@ -95,7 +95,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
                 {
                     for (int is = 1;is < 4;is++)
                     {
-                        for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+                        for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                         {
                             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
                         }

@@ -33,7 +33,7 @@ void Dos::calculate_Mulliken(const std::string &fa, Gint_Gamma &gg)
 			{
 				for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
-					mulliken[is][iw] *= GlobalC::ucell.omega/GlobalC::pw.ncxyz;
+					mulliken[is][iw] *= GlobalC::ucell.omega/GlobalC::rhopw->nxyz;
 					if( abs(mulliken[is][iw]) < 1.0e-10 ) mulliken[is][iw] = 0.0; 
 				}
 			}

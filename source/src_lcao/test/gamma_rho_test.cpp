@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
+#ifdef __MPI
 #include "mpi.h"
+#endif
 #include <iostream>
 #include <fstream>
 #include <complex>
@@ -252,7 +254,6 @@ TEST_F(LCAOTest,GammaRho)
 	LOC.ParaV = &ParaV;
 	//
         GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
-        GlobalC::UFFT.allocate();
 	// Grid Technique
 	set_matrix_grid();
 
@@ -290,7 +291,7 @@ TEST_F(LCAOTest,GammaRho)
 	// read density matrix
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
 		std::stringstream ssd;
 		ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM_Gamma" ;
 		//std::cout<<"ssd "<<ssd.str()<<std::endl;
@@ -325,11 +326,11 @@ TEST_F(LCAOTest,GammaRho)
 	double totale = 0.0;
 	for (int is = 0; is < GlobalV::NSPIN; is++)
 	{
-	    rho_for_compare[is] = new double[GlobalC::pw.nrxx];
+	    rho_for_compare[is] = new double[GlobalC::rhopw->nrxx];
 	    std::stringstream ssc;
 	    ssc << GlobalV::global_out_dir<< "SPIN" << is + 1 << "_CHG_Gamma";
 	    GlobalC::CHR.read_rho(is, ssc.str(), rho_for_compare[is]);
-	    for (int ix = 0; ix < GlobalC::pw.nrxx; ix++)
+	    for (int ix = 0; ix < GlobalC::rhopw->nrxx; ix++)
 	    //for (int ix = 0; ix < 5; ix++)
 	    {
 	        totale += rho_for_compare[is][ix];
@@ -339,7 +340,7 @@ TEST_F(LCAOTest,GammaRho)
 	    }
 	}
 	// check total number of electrons
-	totale = totale * GlobalC::ucell.omega / GlobalC::pw.nrxx;
+	totale = totale * GlobalC::ucell.omega / GlobalC::rhopw->nrxx;
 	EXPECT_NEAR(totale, GlobalC::CHR.nelec, 1e-8);
 }
 
@@ -363,16 +364,20 @@ int RunAllTests(ENVEnvironment* env, ENVPrepare* ENVP)
 
 int main(int argc, char **argv)
 {
-
+#ifdef __MPI
     MPI_Init(&argc, &argv);
+#endif
 
     testing::InitGoogleTest(&argc, argv);
 
     ENVEnvironment* const env = new ENVEnvironment;
     testing::AddGlobalTestEnvironment(env);
     Check (RunAllTests(env,&ENVP)==0,"");
-
+	delete GlobalC::rhopw;
+	delete GlobalC::wfcpw;
+#ifdef __MPI
     MPI_Finalize();
+#endif
 
     return 0;
 }

@@ -35,7 +35,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatri
     if (!this->init_label)
     {
         // 1 stands for : start_from_file
-        this->bessel_basis.init( 1, GlobalC::pw.ecutwfc, GlobalC::ucell.ntype, GlobalC::ucell.lmax );
+        this->bessel_basis.init( 1, INPUT.ecutwfc, GlobalC::ucell.ntype, GlobalC::ucell.lmax );
         this->mu_index = this->init_mu_index();
         this->init_label = true;
     }
@@ -55,7 +55,7 @@ void Numerical_Basis::output_overlap( const psi::Psi<std::complex<double>> &psi)
     if (!this->init_label)
     {
         // 0 stands for : 'Faln' is not used.
-        this->bessel_basis.init( 0, GlobalC::pw.ecutwfc, GlobalC::ucell.ntype, GlobalC::ucell.lmax );
+        this->bessel_basis.init( 0, INPUT.ecutwfc, GlobalC::ucell.ntype, GlobalC::ucell.lmax );
         this->mu_index = this->init_mu_index();
         this->init_label = true;
     }
@@ -177,7 +177,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
         for (int I = 0; I < GlobalC::ucell.atoms[T].na; I++)
         {
             //OUT("I",I);
-            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T, I);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T, I,GlobalC::wfcpw);
             for (int L=0; L< GlobalC::ucell.atoms[T].nwl+1; L++)
             {
                 GlobalV::ofs_running << " " << std::setw(5) << ik+1
@@ -256,12 +256,12 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
     {
         for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++) // 1.2
         {
-            std::complex<double> *sk1 = GlobalC::wf.get_sk(ik, T1, I1);
+            std::complex<double> *sk1 = GlobalC::wf.get_sk(ik, T1, I1,GlobalC::wfcpw);
             for (int T2=0; T2<GlobalC::ucell.ntype; T2++) // 2.1
             {
                 for (int I2=0; I2<GlobalC::ucell.atoms[T2].na; I2++) // 2.2
                 {
-                    std::complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2);
+                    std::complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2,GlobalC::wfcpw);
                     for (int l1 = 0; l1 < GlobalC::ucell.atoms[T1].nwl+1; l1++) // 1.3
                     {
                         const std::complex<double> lphase1 = normalization * pow(ModuleBase::IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
@@ -457,7 +457,7 @@ void Numerical_Basis::numerical_atomic_wfc(
         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
             //OUT("ia",ia);
-            std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia,GlobalC::wfcpw);
             for (int l = 0; l < GlobalC::ucell.atoms[it].nwl+1; l++)
             {
                 //OUT("l",l);
@@ -515,7 +515,7 @@ void Numerical_Basis::output_info(
             }
         }
         // ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
-        ofs << GlobalC::pw.ecutwfc << " ecutwfc" << std::endl; // mohan add 2009-09-08
+        ofs << INPUT.ecutwfc << " ecutwfc" << std::endl; // mohan add 2009-09-08
 
         // this parameter determine the total number of jlq.
         ofs << bessel_basis.get_ecut() << " ecutwfc_jlq" << std::endl;//mohan modify 2009-09-08

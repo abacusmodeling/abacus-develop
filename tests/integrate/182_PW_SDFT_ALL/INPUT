@@ -5,9 +5,11 @@ calculation     sto-scf
 ntype			1
 symmetry		0
 pseudo_dir      ../tools/PP_ORB/
-nbands			0
 
+
+nbands			0
 nbands_sto		0
+
 nche_sto		120
 seed_sto        20000
 emax_sto              23.5079108951
@@ -15,8 +17,6 @@ emin_sto              -4.40353816868
 kpar            1
 cal_force       1
 cal_stress      1
-test_force      1
-test_stress     1
 
 #Parameters (2.Iteration)
 ecutwfc			20
@@ -26,7 +26,6 @@ scf_nmax		20
 
 #Parameters (3.Basis)
 basis_type		pw
-gamma_only		1
 
 #Parameters (4.Smearing)
 smearing_method		fd

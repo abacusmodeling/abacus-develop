@@ -77,7 +77,6 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 			//------------------------------------
 			//calculate the kinetic energy of ik.
 			//------------------------------------
-			GlobalC::wf.ekin(ik);
 
 			for(int i=0; i<GlobalV::NLOCAL; i++)
 			{
@@ -91,12 +90,12 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					std::complex<double> v = ModuleBase::ZERO;
 					for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++) 
 					{
-						v += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig) * GlobalC::wf.g2kin[ig];
+						v += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig) * GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2;
 					}
 					if(GlobalV::NSPIN==4)
 					for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 					{
-						v += conj(GlobalC::wf.wanf2[ik](mu, ig + GlobalC::wf.npwx)) * GlobalC::wf.wanf2[ik](nu, ig + GlobalC::wf.npwx) * GlobalC::wf.g2kin[ig];
+						v += conj(GlobalC::wf.wanf2[ik](mu, ig + GlobalC::wf.npwx)) * GlobalC::wf.wanf2[ik](nu, ig + GlobalC::wf.npwx) * GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2;
 					}
 					
 	//				std::cout << "i=" << i << " j=" << j << " v=" << v << std::endl;
@@ -121,14 +120,8 @@ void Build_ST_pw::set_local(const int &ik)
 	assert(!GlobalV::GAMMA_ONLY_LOCAL);
 
     const int npw = GlobalC::kv.ngk[ik];
-    std::complex<double> *psi_one = new std::complex<double>[npw];
     std::complex<double> *hpsi = new std::complex<double>[npw];
-	std::complex<double> *psic = new std::complex<double>[GlobalC::pw.nrxx];
-	int *fft_index = new int[npw];
-	for(int ig=0; ig<npw; ig++)
-	{
-		fft_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
-	}
+	std::complex<double> *psic = new std::complex<double>[GlobalC::wfcpw->nrxx];
 
 //	ModuleBase::ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
 
@@ -136,32 +129,15 @@ void Build_ST_pw::set_local(const int &ik)
 	{
 		if(GlobalV::NSPIN!=4)
 		{
-			for(int ig=0; ig<npw; ig++)
-			{
-				psi_one[ig] = GlobalC::wf.wanf2[ik](i, ig);
-			}
-
-			ModuleBase::GlobalFunc::ZEROS( psic, GlobalC::pw.nrxx);
-			// (1) set value
-			for (int ig=0; ig< npw; ig++)
-			{
-				psic[ fft_index[ig]  ] = psi_one[ig];
-			}
-
-			// (2) fft to real space and doing things.
-			GlobalC::pw.FFT_wfc.FFT3D( psic, 1);
-			for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
+			// fft to real space and doing things.
+			GlobalC::wfcpw->recip2real(&GlobalC::wf.wanf2[ik](i, 0), psic, ik);
+			for (int ir=0; ir< GlobalC::wfcpw->nrxx; ir++)
 			{
 				psic[ir] *= GlobalC::pot.vr_eff1[ir];
 			}
 
 			// (3) fft back to G space.
-			GlobalC::pw.FFT_wfc.FFT3D( psic, -1);
-
-			for(int ig=0; ig<npw; ig++)
-			{
-				hpsi[ig] = psic[ fft_index[ig] ];
-			}
+			GlobalC::wfcpw->real2recip(psic, hpsi, ik);
 
 			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
@@ -180,32 +156,15 @@ void Build_ST_pw::set_local(const int &ik)
 		}
 		else//noncolinear case
 		{
-			std::complex<double>* psi_down = new std::complex<double> [npw];
-			std::complex<double> *psic1 = new std::complex<double>[GlobalC::pw.nrxx];
+			std::complex<double> *psic1 = new std::complex<double>[GlobalC::wfcpw->nrxx];
 			delete[] hpsi;
 			hpsi = new std::complex<double> [GlobalC::wf.npwx*GlobalV::NPOL];
-			ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npwx*GlobalV::NPOL);
-			
-			for(int ig=0; ig<npw; ig++)
-			{
-				psi_one[ig] = GlobalC::wf.wanf2[ik](i, ig);
-				psi_down[ig] = GlobalC::wf.wanf2[ik](i, ig+ GlobalC::wf.npwx);
-			}
 
-			ModuleBase::GlobalFunc::ZEROS( psic, GlobalC::pw.nrxx);
-			ModuleBase::GlobalFunc::ZEROS( psic1, GlobalC::pw.nrxx);
-			// (1) set value
-			for (int ig=0; ig< npw; ig++)
-			{
-				psic[ fft_index[ig]  ] = psi_one[ig];
-				psic1[ fft_index[ig]  ] = psi_down[ig];
-			}
-
-			// (2) fft to real space and doing things.
-			GlobalC::pw.FFT_wfc.FFT3D( psic, 1);
-			GlobalC::pw.FFT_wfc.FFT3D( psic1, 1);
+			// fft to real space and doing things.
+			GlobalC::wfcpw->recip2real(&GlobalC::wf.wanf2[ik](i, 0), psic, ik);
+			GlobalC::wfcpw->recip2real(&GlobalC::wf.wanf2[ik](i, GlobalC::wf.npwx), psic1, ik);
 			std::complex<double> sup,sdown;
-			for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
+			for (int ir=0; ir< GlobalC::wfcpw->nrxx; ir++)
 			{
 				sup = psic[ir] * (GlobalC::pot.vr_eff(0,ir) + GlobalC::pot.vr_eff(3,ir)) +
 					psic1[ir] * (GlobalC::pot.vr_eff(1,ir) - std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
@@ -217,14 +176,8 @@ void Build_ST_pw::set_local(const int &ik)
 			}
 	
 			// (3) fft back to G space.
-			GlobalC::pw.FFT_wfc.FFT3D( psic, -1);
-			GlobalC::pw.FFT_wfc.FFT3D( psic1, -1);
-	
-			for(int ig=0; ig<npw; ig++)
-			{
-				hpsi[ig] = psic[ fft_index[ig] ];
-				hpsi[ig+GlobalC::wf.npwx] = psic1[ fft_index[ig] ];
-			}
+			GlobalC::wfcpw->real2recip(psic, hpsi, ik);
+			GlobalC::wfcpw->real2recip(psic, hpsi+GlobalC::wf.npwx, ik);
 
 			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
@@ -241,15 +194,12 @@ void Build_ST_pw::set_local(const int &ik)
 					this->LM->set_HSk(i,j,conj(v),'L');
 				}
 			}
-			delete[] psi_down;
 			delete[] psic1;
 		}
 	}
 
 //	out.printcm_norm("vij",vij,1.0e-5);
 
-	delete[] fft_index;			
-    delete[] psi_one;
     delete[] hpsi;
 	delete[] psic;
 	ModuleBase::timer::tick("Build_ST_pw","set_local");

@@ -19,7 +19,7 @@ pseudopot_cell_vl::~pseudopot_cell_vl()
 }
 
 
-void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
+void pseudopot_cell_vl::init_vloc(ModuleBase::matrix &vloc_in, ModulePW::PW_Basis* rho_basis)
 {
 	ModuleBase::TITLE("pseudopot_cell_vl","init_vloc");
 
@@ -27,8 +27,8 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 	// potential vloc(ig,it) for each type of atom
 	ModuleBase::timer::tick("ppcell_vl","init_vloc");
 
-	double *vloc1d = new double[nggm];
-	ModuleBase::GlobalFunc::ZEROS(vloc1d, nggm);
+	double *vloc1d = new double[rho_basis->ngg];
+	ModuleBase::GlobalFunc::ZEROS(vloc1d, rho_basis->ngg);
 
 	this->allocate();
 	
@@ -36,7 +36,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 	{
 		const Atom* atom = &GlobalC::ucell.atoms[it];
 
-		ModuleBase::GlobalFunc::ZEROS(vloc1d, nggm);
+		ModuleBase::GlobalFunc::ZEROS(vloc1d, rho_basis->ngg);
 
 		this->zp[it] = atom->zv;
 
@@ -49,7 +49,8 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 		          	atom->r, 
 					atom->vloc_at, // local potential in real space radial form.  
 		          	this->zp[it],
-					vloc1d);
+					vloc1d,
+					GlobalC::rhopw);
 		}
 		else
 		{
@@ -72,7 +73,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 void pseudopot_cell_vl::allocate(void)
 {
 	if(GlobalV::test_pp>0) ModuleBase::TITLE("pseudopot_cell_vl","allocate");
-	this->vloc.create(GlobalC::ucell.ntype, GlobalC::pw.nggm);
+	this->vloc.create(GlobalC::ucell.ntype, GlobalC::rhopw->ngg);
 
 	delete[] numeric;
 	this->numeric = new bool[GlobalC::ucell.ntype];
@@ -109,7 +110,7 @@ void pseudopot_cell_vl::vloc_of_g(
 		const double *r, 
 		const double *vloc_at, 
 		const double &zp_in, 
-		double *vloc_1d) const
+		double *vloc_1d, ModulePW::PW_Basis* rho_basis) const
 {
 	//----------------------------------------------------------------
 	//    This routine computes the Fourier transform of the local
@@ -145,12 +146,12 @@ void pseudopot_cell_vl::vloc_of_g(
 	}
 	ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vloc_1d[0] );
 	vloc_1d[0] *= 4*3.1415926;
-	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ngmc << std::endl;
-	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ncxyz << std::endl;
+	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::rhopw->npw << std::endl;
+	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::rhopw->nxyz << std::endl;
 	*/
 
 	// (1)
-	if(GlobalC::pw.ggs[0] < 1.0e-8)
+	if(rho_basis->gg_uniq[0] < 1.0e-8)
 	{
 		// first the g=0 term
 		for (ir=0; ir<msh; ir++) 
@@ -179,9 +180,9 @@ void pseudopot_cell_vl::vloc_of_g(
 
 	// here we perform the integral, after multiplying for the |G|
 	// dependent part
-	for (ig = igl0;ig < GlobalC::pw.nggm;ig++) 
+	for (ig = igl0;ig < rho_basis->ngg;ig++) 
 	{
-		double gx2= GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2;
+		double gx2= rho_basis->gg_uniq[ig] * GlobalC::ucell.tpiba2;
 		double gx = std::sqrt(gx2);
 		for (ir = 0;ir < msh;ir++) 
 		{
@@ -193,7 +194,7 @@ void pseudopot_cell_vl::vloc_of_g(
 	} // enddo
 
 	const double d_fpi_omega = ModuleBase::FOUR_PI/GlobalC::ucell.omega;//mohan add 2008-06-04
-	for (ig = 0;ig < GlobalC::pw.nggm; ig++)
+	for (ig = 0;ig < rho_basis->ngg; ig++)
 	{
 		vloc_1d[ig] *= d_fpi_omega;
 	}
@@ -215,9 +216,9 @@ void pseudopot_cell_vl::print_vloc(void)const
 			std::stringstream ss ;
 			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/v_loc_g.dat" ;
 			std::ofstream ofs_vg( ss.str().c_str() );
-			for(int ig=0;ig<GlobalC::pw.nggm;ig++)
+			for(int ig=0;ig<GlobalC::rhopw->ngg;ig++)
 			{
-				ofs_vg << std::setw(15) << GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2 
+				ofs_vg << std::setw(15) << GlobalC::rhopw->gg_uniq [ig] * GlobalC::ucell.tpiba2 
 				   	<< std::setw(15) << this->vloc(it, ig) << std::endl;
 			}
 			ofs_vg.close();

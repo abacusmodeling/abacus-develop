@@ -723,7 +723,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					if(Coordinate=="Direct")
 					{
 						// change v from direct to cartesian,
-						// the unit is GlobalC::pw.lat0
+						// the unit is GlobalC::sf.lat0
 						atoms[it].taud[ia] = v;
 						atoms[it].tau[ia] = v * latvec;
 					}
@@ -802,7 +802,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 	}// end scan_begin
 
 //check if any atom can move in MD
-	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
+	if(!this->if_atoms_can_move() && (GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="sto-md"))
 	{
 		ModuleBase::WARNING("read_atoms", "no atom can move in MD!");
 		return 0;
