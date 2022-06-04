@@ -4,29 +4,17 @@
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_reduce.h"
 
-#include "global_fp.h" // mohan add 2021-01-30
+#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
 #include "../module_base/ylm.h"
 #include "../module_base/timer.h"
-
-void Gint_Gamma::cal_mulliken(double** mulliken)
-{
-    ModuleBase::TITLE("Gint_Gamma","cal_mulliken");
-    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
-
-	this->max_size = GlobalC::GridT.max_atom;
-    this->gamma_mulliken(mulliken);
-
-    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
-    return;
-}
 
 // this subroutine lies in the heart of LCAO algorithms.
 // so it should be done very efficiently, very carefully.
 // I might repeat again to emphasize this: need to optimize
 // this code very efficiently, very carefully.
-void Gint_Gamma::gamma_mulliken(double** mulliken)
+void Gint_Gamma::cal_mulliken(double** mulliken)
 {
-    ModuleBase::TITLE("Grid_Integral","gamma_charge");
+    ModuleBase::TITLE("Grid_Integral","cal_mulliken");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = GlobalC::ORB.dr_uniform;
@@ -36,6 +24,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	double** distance; // distance between atom and grid: [bxyz, maxsize]
 	double*** psir_ylm;	
 	bool** cal_flag;
+	const int max_size = GlobalC::GridT.max_atom;
 	if(max_size!=0) 
 	{
 		dr = new double**[GlobalC::bigpw->bxyz];
@@ -82,10 +71,10 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
         {
             for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
             {
-                this->grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
+                const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 
                 // get the value: how many atoms has orbital value on this grid.
-                const int size = GlobalC::GridT.how_many_atoms[ this->grid_index ];
+                const int size = GlobalC::GridT.how_many_atoms[ grid_index ];
 				if(size==0) continue;
 
 				// (1) initialized the phi * Ylm.

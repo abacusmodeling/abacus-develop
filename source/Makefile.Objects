@@ -112,19 +112,17 @@ grid_meshcell.o\
 grid_bigcell.o\
 grid_meshball.o\
 gint_tools.o\
-gint_gamma.o\
-gint_gamma_fvl.o\
-gint_gamma_vl.o\
-gint_gamma_rho.o\
+gint_fvl.o\
+gint_gamma_env.o\
 gint_gamma_mull.o\
-gint_gamma_env.o \
-gint_k.o\
-gint_k_init.o\
-gint_k_vl.o\
-gint_k_rho.o\
-gint_k_fvl.o\
-gint_k_fvl_new.o\
-gint_k_env.o \
+gint_gamma_vl.o\
+gint_gamma.o\
+gint_k_env.o\
+gint_k_pvpr.o\
+gint_k_sparse.o\
+gint_rho.o\
+gint_vl.o\
+gint.o\
 ORB_control.o\
 ORB_read.o\
 ORB_atomic.o\

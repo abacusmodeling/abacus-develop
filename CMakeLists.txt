@@ -298,6 +298,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     io
     ions
     lcao
+    gint
     parallel
     mrrr
     pdiag

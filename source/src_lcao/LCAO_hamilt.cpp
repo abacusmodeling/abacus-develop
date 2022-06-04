@@ -36,7 +36,8 @@ void LCAO_Hamilt::set_lcao_matrices(void)
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {   
         // calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
-        this->calculate_STNR_gamma();	
+        this->calculate_STNR_gamma();
+        this->GG.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);	
 
     }
     else // multiple k-points
@@ -45,7 +46,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
         this->calculate_STNR_k();
 
         // calculate the grid integration of 'Vl' matrix for l-points algorithms.
-        this->GK.init(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz, this->LM);
+        this->GK.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);
     }
 
     // initial the overlap matrix is done.	
@@ -82,7 +83,8 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
         // calculate the 'Vl' matrix using gamma-algorithms.
         if(GlobalV::VL_IN_H)
         {	
-            this->GG.cal_vlocal(GlobalC::pot.vr_eff1, *this->LM);
+            Gint_inout inout(GlobalC::pot.vr_eff1, this->LM, Gint_Tools::job_type::vlocal);
+            this->GG.cal_vlocal(&inout);
 
         #ifdef __MPI //liyuanbo 2022/2/23
             // Peize Lin add 2016-12-03
@@ -226,27 +228,12 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
     if(GlobalV::VL_IN_H)
     {
-        //-------------------------
-        // set the local potential
-        // in plane wave basis.
-        //-------------------------
-//		Build_ST_pw bsp;
-//		bsp.set_local(ik);	
-//		this->LM->print_HSk('H','C',1.0e-5);
-
         //--------------------------
         // set the local potential
         // in LCAO basis.
         //--------------------------
 
-        if(GlobalV::NSPIN!=4) 
-        {
-            this->GK.folding_vl_k(ik);
-        }
-        else 
-        {
-            this->GK.folding_vl_k_nc(ik);
-        }
+        this->GK.folding_vl_k(ik, this->LM);
 
     #ifdef __MPI //liyuanbo 2022/2/23
         // Peize Lin add 2016-12-03
@@ -268,7 +255,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     #endif
     }
 
-
     //-----------------------------------------
     // folding matrix here: S(k) (SlocR->Sloc2)
     // folding matrix here: T(k)+Vnl(k)
@@ -276,22 +262,13 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     //-----------------------------------------
     this->LM->zeros_HSk('S');
     this->LM->zeros_HSk('T');
-//	std::cout << " after folding Hfixed k." << std::endl;
     this->LM->folding_fixedH(ik);
 
     //------------------------------------------
     // Add T(k)+Vnl(k)+Vlocal(k)
     // (Hloc2 += Hloc_fixed2), (std::complex matrix)
     //------------------------------------------
-//	std::cout << " Folding matrix here." << std::endl;
 	this->LM->update_Hloc2(ik);
-/*
-    if(GlobalV::NURSE)
-    {
-        this->LM->print_HSk('H','R',1.0e-5);
-//		this->LM->print_HSk('S','R',1.0e-5);
-    }
-    */
     
     ModuleBase::timer::tick("LCAO_Hamilt","calculate_Hk");
     return;
@@ -791,7 +768,7 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
 
     calculate_STN_R_sparse(current_spin, sparse_threshold);
 
-    GK.cal_vlocal_R_sparseMatrix(current_spin, sparse_threshold);
+    GK.cal_vlocal_R_sparseMatrix(current_spin, sparse_threshold, this->LM);
 
     if (INPUT.dft_plus_u)
     {

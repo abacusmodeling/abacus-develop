@@ -23,7 +23,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
-        this->UHM->GG.cal_force(DM_in, GlobalC::pot.vr_eff1, fvl_dphi, svl_dphi, isforce, isstress);
+        Gint_inout inout(DM_in, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
+
+        this->UHM->GG.cal_gint(&inout);
     }
 
     if(isstress)

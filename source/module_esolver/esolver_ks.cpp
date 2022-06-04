@@ -110,19 +110,33 @@ namespace ModuleESolver
 
     void ESolver_KS::print_wfcfft(Input& inp, ofstream &ofs)
     {
+        ofs << "\n\n\n\n";
+	    ofs << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+	    ofs << " |                                                                    |" << std::endl;
+	    ofs << " | Setup plane waves of wave functions:                               |" << std::endl;
+	    ofs << " | Use the energy cutoff and the lattice vectors to generate the      |" << std::endl;
+	    ofs << " | dimensions of FFT grid. The number of FFT grid on each processor   |" << std::endl;
+	    ofs << " | is 'nrxx'. The number of plane wave basis in reciprocal space is   |" << std::endl;
+	    ofs << " | different for charege/potential and wave functions. We also set    |" << std::endl;
+	    ofs << " | the 'sticks' for the parallel of FFT. The number of plane wave of  |" << std::endl;
+	    ofs << " | each k-point is 'npwk[ik]' in each processor                       |" << std::endl;
+	    ofs << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+	    ofs << "\n\n\n\n";
         ofs << "\n SETUP PLANE WAVES FOR WAVE FUNCTIONS" << std::endl;
+        ModuleBase::GlobalFunc::OUT(ofs,"energy cutoff for wavefunc (unit:Ry)",INPUT.ecutwfc);
+        ModuleBase::GlobalFunc::OUT(ofs,"fft grid for wave functions", this->pw_rho->nx,this->pw_rho->ny,this->pw_rho->nz);
         ModuleBase::GlobalFunc::OUT(ofs,"number of plane waves",this->pw_wfc->npwtot);
 	    ModuleBase::GlobalFunc::OUT(ofs,"number of sticks", this->pw_wfc->nstot);
 
-        GlobalV::ofs_running << "\n PARALLEL PW FOR WAVE FUNCTIONS" << std::endl;
-        GlobalV::ofs_running <<" "<< std::setw(8)  << "PROC"<< std::setw(15) << "COLUMNS(POT)"<< std::setw(15) << "PW" << std::endl;
+        ofs << "\n PARALLEL PW FOR WAVE FUNCTIONS" << std::endl;
+        ofs <<" "<< std::setw(8)  << "PROC"<< std::setw(15) << "COLUMNS(POT)"<< std::setw(15) << "PW" << std::endl;
         for (int i = 0; i < GlobalV::NPROC_IN_POOL ; ++i)
         {
-            GlobalV::ofs_running <<" "<<std::setw(8)<< i+1 << std::setw(15) << this->pw_wfc->nst_per[i] << std::setw(15) << this->pw_wfc->npw_per[i] << std::endl;
+            ofs <<" "<<std::setw(8)<< i+1 << std::setw(15) << this->pw_wfc->nst_per[i] << std::setw(15) << this->pw_wfc->npw_per[i] << std::endl;
         }
-        GlobalV::ofs_running << " --------------- sum -------------------" << std::endl;
-        GlobalV::ofs_running << " " << std::setw(8)  << GlobalV::NPROC_IN_POOL << std::setw(15) << this->pw_wfc->nstot << std::setw(15) << this->pw_wfc->npwtot << std::endl;
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT PLANEWAVE");
+        ofs << " --------------- sum -------------------" << std::endl;
+        ofs << " " << std::setw(8)  << GlobalV::NPROC_IN_POOL << std::setw(15) << this->pw_wfc->nstot << std::setw(15) << this->pw_wfc->npwtot << std::endl;
+        ModuleBase::GlobalFunc::DONE(ofs, "INIT PLANEWAVE");
     }
 
 

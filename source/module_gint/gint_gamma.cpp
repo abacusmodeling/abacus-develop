@@ -2,6 +2,14 @@
 #include "../src_pw/global.h"
 #include "../module_base/ylm.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
+#include "../module_base/timer.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
 
 Gint_Gamma::Gint_Gamma()
 {
