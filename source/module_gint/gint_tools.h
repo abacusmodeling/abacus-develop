@@ -3,8 +3,105 @@
 //=========================================================
 #ifndef GINT_TOOLS_H
 #define GINT_TOOLS_H
-
+#include "grid_technique.h"
 #include <cstdlib>
+#include "../src_pw/charge.h"
+#include "../src_lcao/LCAO_matrix.h"
+
+namespace Gint_Tools
+{
+    enum class job_type{vlocal, rho, force};
+}
+
+//the class used to pass input/output variables
+//into the unified interface gint
+class Gint_inout
+{
+    public:
+    //input
+        double** DM_R;
+        double*** DM;
+        double* vl;
+        bool isforce;
+        bool isstress;
+        int ispin;
+		LCAO_Matrix *lm;
+
+    //output
+        Charge* chr;
+        ModuleBase::matrix* fvl_dphi;
+        ModuleBase::matrix* svl_dphi;
+
+        Gint_Tools::job_type job;
+
+	// electron density, multi-k
+        Gint_inout(double **DM_R_in, Charge* chr_in, Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            chr = chr_in;
+            job = job_in;
+        }
+
+	// force, multi-k
+        Gint_inout(double** DM_R_in, double* vl_in,
+            bool isforce_in, bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in,
+            ModuleBase::matrix* svl_dphi_in,
+            Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            vl = vl_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
+	// vlocal, multi-k
+        Gint_inout(double* vl_in,
+            int ispin_in,
+            Gint_Tools::job_type job_in)
+        {
+            vl = vl_in;
+            ispin = ispin_in;
+            job = job_in;
+        }
+
+	// electron density, gamma point
+        Gint_inout(double ***DM_in, Charge* chr_in, Gint_Tools::job_type job_in)
+        {
+            DM = DM_in;
+            chr = chr_in;
+            job = job_in;
+        }
+
+	// force, gamma point
+        Gint_inout(double*** DM_in, double* vl_in,
+            const bool isforce_in, const bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in,
+            ModuleBase::matrix* svl_dphi_in,
+            Gint_Tools::job_type job_in)
+        {
+            DM = DM_in;
+            vl = vl_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
+	// vlocal, gamma point
+		Gint_inout(double* vl_in,
+            LCAO_Matrix *lm_in,
+            Gint_Tools::job_type job_in)
+        {
+            vl = vl_in;
+            lm = lm_in;
+            job = job_in;
+        }
+};
 
 namespace Gint_Tools
 {
@@ -27,6 +124,10 @@ namespace Gint_Tools
 		const int ibx,
 		const int jby,
 		const int kbz);
+	
+	int* get_vindex(
+		const int start_ind,
+		const int ncyz);
 
 	// extract the local potentials.
 	// vldr3[GlobalC::pw.bxyz]
@@ -38,35 +139,27 @@ namespace Gint_Tools
 		const int kbz,
 		const double dv);
 
+    double* get_vldr3(
+		const double* const vlocal,
+		const int start_ind,
+		const int ncyz,
+		const double dv);
+
 	//------------------------------------------------------
 	// na_grid : #. atoms for this group of grids
 	// block_iw : size na_grid, index of the first orbital on this atom
 	// block_size : size na_grid, number of orbitals on this atom
 	// block_index : size na_grid+1, start from 0, accumulates block_size
+	// cal_flag : whether the atom-grid distance is larger than cutoff
 	//------------------------------------------------------
-	void get_block_info(
-		const int na_grid,
-		const int grid_index,
-		int * &block_iw,
-		int * &block_index,
-		int * &block_size
-	);
-
 	void get_block_info(
 		const int na_grid,
 		const int grid_index,
 		int * &block_iw,
 		int * &block_index,
 		int * &block_size,
-		int * &at,
-		int * &uc
-	);
-
-	// whether the atom-grid distance is larger than cutoff
-	// cal_flag[pw.bxyz][na_grid]
-	bool** get_cal_flag(
-		const int na_grid, 		// number of atoms on this grid 
-		const int grid_index);		
+		bool** &cal_flag
+	);		
 
 	// psir_ylm[pw.bxyz][LD_pool]
 	void cal_psir_ylm(
@@ -78,6 +171,7 @@ namespace Gint_Tools
 		const bool*const*const cal_flag,
 		double*const*const psir_ylm); // whether the atom-grid distance is larger than cutoff
 
+	// psir_ylm and dpsir_ylm, both[pw.bxyz][LD_pool]
 	void cal_dpsir_ylm(
 		const int na_grid, 					// number of atoms on this grid 
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
@@ -90,6 +184,7 @@ namespace Gint_Tools
 		double*const*const dpsir_ylm_y,
 		double*const*const dpsir_ylm_z);
 
+	// dpsir_ylm * (r-R), R is the atomic position
 	void cal_dpsirr_ylm(
 		const int na_grid, 					// number of atoms on this grid 
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
@@ -106,6 +201,7 @@ namespace Gint_Tools
 		double*const*const dpsir_ylm_yz,
 		double*const*const dpsir_ylm_zz);
 
+	// psir_ylm * vldr3
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -114,15 +210,31 @@ namespace Gint_Tools
 		const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
 		const double*const*const psir_ylm);		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
 
-	Gint_Tools::Array_Pool<double> get_psir_vlbr3_DM(
+	// sum_mu,nu rho_mu,nu psi_nu, for gamma point
+	void mult_psi_DM(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
 		const int LD_pool,
 		const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
 		const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
 		const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
 		const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const DM);
+		const double*const*const psi,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		double** psi_DM,
+		const double*const*const DM,
+		const int job);
+
+	// sum_mu,nu,R rho_mu,nu(R) psi_nu, for multi-k
+	void mult_psi_DMR(
+        const int &grid_index, 
+        const int &na_grid,
+        const int*const block_index, 
+        const int*const block_size,
+        bool** cal_flag,
+        const Grid_Technique &gt,
+        double** psi,
+		double** psi_DMR,
+        double* DMR,
+		const int job);
 }
 
 

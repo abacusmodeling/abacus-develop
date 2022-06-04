@@ -7,12 +7,12 @@
 #include "gamma_rho_mock.h"
 
 /***************************************************************
-*  unit test of functions in src_lcao/gint_gamma_rho.cpp
+*  unit test of functions in module_gint/gint_gamma_rho.cpp
 ****************************************************************/
 
 /**
  * This unit test is designed to test the functions in src_lcao/
- * gint_gamma_rho.cpp: Gint_Gamma::cal_rho(), Gint_Gamma::gamma_charge()
+ * gint_gamma_rho.cpp: Gint_Gamma::cal_gint_gamma(), Gint_Gamma::gamma_charge()
  * and sum_up_rho. 
  * It can make two comparisons:
  * (1) compare density matrix calculated from wavefunction with that read
@@ -313,8 +313,8 @@ TEST_F(LCAOTest,GammaRho)
 	// calculate the charge density
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		GG.cal_rho(LOC.DM, (Charge*)(&GlobalC::CHR));
-		//std::cout<<"number of elec: "<<nelec<<std::endl;
+		Gint_inout inout(LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+		GG.cal_gint(&inout);
 	}
 	//std::cout<<"rho in test "<<GlobalC::CHR.rho[0][0]<<std::endl;
 

@@ -19,11 +19,14 @@ AddTest(
             ../../src_parallel/parallel_global.cpp ../../src_parallel/parallel_common.cpp ../../src_parallel/parallel_reduce.cpp 
             ../../src_lcao/local_orbital_charge.cpp ../../src_lcao/DM_gamma.cpp ../../src_lcao/DM_k.cpp 
             ../../src_lcao/local_orbital_wfc.cpp 
-            ../../src_lcao/grid_technique.cpp ../../src_lcao/grid_meshball.cpp ../../src_lcao/grid_bigcell.cpp 
-            ../../src_lcao/grid_meshcell.cpp ../../src_lcao/grid_meshk.cpp
-            ../../src_lcao/gint_tools.cpp
-            ../../src_lcao/gint_k_rho.cpp ../../src_lcao/gint_gamma_rho.cpp ../../src_lcao/dm_2d.cpp
-            ../../src_lcao/record_adj.cpp  ../../src_lcao/LCAO_nnr.cpp ../../src_lcao/gint_gamma.cpp
+            ../../module_gint/grid_technique.cpp ../../module_gint/grid_meshball.cpp ../../module_gint/grid_bigcell.cpp 
+            ../../module_gint/grid_meshcell.cpp ../../module_gint/grid_meshk.cpp
+            ../../module_gint/gint_tools.cpp
+            ../../src_lcao/dm_2d.cpp
+            ../../src_lcao/record_adj.cpp  ../../src_lcao/LCAO_nnr.cpp
+            ../../module_gint/gint.cpp ../../module_gint/gint_gamma.cpp
+            ../../module_gint/gint_fvl.cpp ../../module_gint/gint_rho.cpp
+            ../../module_gint/gint_vl.cpp
             ../../src_pw/charge.cpp 
             ../../src_pdiag/pdiag_common.cpp
             ../../src_io/output.cpp ../../src_pw/soc.cpp
