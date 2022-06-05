@@ -1,6 +1,7 @@
 #include "pw_basis.h"
 #include "../module_base/tool_quit.h"
 #include "../module_base/global_function.h"
+#include "../module_base/timer.h"
 
 namespace ModulePW
 {
@@ -11,6 +12,7 @@ namespace ModulePW
 /// 
 void PW_Basis::distribute_g()
 {
+    ModuleBase::timer::tick(this->classname, "distributeg");
     if(this->distribution_type == 1)
     {
         this->distribution_method1();
@@ -23,6 +25,7 @@ void PW_Basis::distribute_g()
     {
         ModuleBase::WARNING_QUIT("divide", "No such division type.");
     }
+    ModuleBase::timer::tick(this->classname, "distributeg");
     return;
 }
 

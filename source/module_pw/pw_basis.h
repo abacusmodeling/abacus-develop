@@ -6,6 +6,7 @@
 #include "../module_base/vector3.h"
 #include <complex>
 #include "fft.h"
+#include <cstring>
 
 namespace ModulePW
 {
@@ -48,6 +49,7 @@ class PW_Basis
 {
 
 public:
+    std::string classname;
     PW_Basis();
     ~PW_Basis();
 

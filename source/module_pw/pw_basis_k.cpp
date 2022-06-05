@@ -6,6 +6,7 @@ namespace ModulePW
 
 PW_Basis_K::PW_Basis_K()
 {
+    classname="PW_Basis_K";
 }
 PW_Basis_K::~PW_Basis_K()
 {
@@ -105,7 +106,7 @@ void PW_Basis_K::setupIndGk()
 ///
 void PW_Basis_K::setuptransform()
 {
-    ModuleBase::timer::tick("PW_Basis_K", "setuptransform");
+    ModuleBase::timer::tick(this->classname, "setuptransform");
     this->distribute_r();
     this->distribute_g();
     this->getstartgr();
@@ -113,7 +114,7 @@ void PW_Basis_K::setuptransform()
     this->ft.clear();
     this->ft.initfft(this->nx,this->ny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
-    ModuleBase::timer::tick("PW_Basis_K", "setuptransform");
+    ModuleBase::timer::tick(this->classname, "setuptransform");
 }
 
 void PW_Basis_K::collect_local_pw()

@@ -20,7 +20,7 @@ namespace ModulePW
 /// 
 void PW_Basis:: real2recip(const std::complex<double> * in, std::complex<double> * out, const bool add, const double factor)
 {
-    ModuleBase::timer::tick("PW_Basis", "real2recip");
+    ModuleBase::timer::tick(this->classname, "real2recip");
 
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
@@ -43,7 +43,7 @@ void PW_Basis:: real2recip(const std::complex<double> * in, std::complex<double>
     {
         out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->nxyz);
     }
-    ModuleBase::timer::tick("PW_Basis", "real2recip");
+    ModuleBase::timer::tick(this->classname, "real2recip");
     return;
 }
 
@@ -54,7 +54,7 @@ void PW_Basis:: real2recip(const std::complex<double> * in, std::complex<double>
 ///
 void PW_Basis:: real2recip(const double * in, std::complex<double> * out, const bool add, const double factor)
 {
-    ModuleBase::timer::tick("PW_Basis", "real2recip");
+    ModuleBase::timer::tick(this->classname, "real2recip");
     if(this->gamma_only)
     {
         const int npy = this->ny * this->nplane;
@@ -92,7 +92,7 @@ void PW_Basis:: real2recip(const double * in, std::complex<double> * out, const 
     {
         out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->nxyz);
     }
-    ModuleBase::timer::tick("PW_Basis", "real2recip");
+    ModuleBase::timer::tick(this->classname, "real2recip");
     return;
 }
 
@@ -107,7 +107,7 @@ void PW_Basis:: real2recip(const double * in, std::complex<double> * out, const 
 /// 
 void PW_Basis:: recip2real(const std::complex<double> * in, std::complex<double> * out, const bool add, const double factor)
 {
-    ModuleBase::timer::tick("PW_Basis", "recip2real");
+    ModuleBase::timer::tick(this->classname, "recip2real");
     assert(this->gamma_only == false);
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
@@ -131,7 +131,7 @@ void PW_Basis:: recip2real(const std::complex<double> * in, std::complex<double>
     {
         out[ir] = this->ft.aux1[ir];
     }
-    ModuleBase::timer::tick("PW_Basis", "recip2real");
+    ModuleBase::timer::tick(this->classname, "recip2real");
 
     return;
 }
@@ -143,7 +143,7 @@ void PW_Basis:: recip2real(const std::complex<double> * in, std::complex<double>
 ///
 void PW_Basis:: recip2real(const std::complex<double> * in, double * out, const bool add, const double factor)
 {
-    ModuleBase::timer::tick("PW_Basis", "recip2real");
+    ModuleBase::timer::tick(this->classname, "recip2real");
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
@@ -195,7 +195,7 @@ void PW_Basis:: recip2real(const std::complex<double> * in, double * out, const 
             out[ir] = this->ft.aux1[ir].real();
         }
     }
-    ModuleBase::timer::tick("PW_Basis", "recip2real");
+    ModuleBase::timer::tick(this->classname, "recip2real");
     return;
 }
 
@@ -207,6 +207,7 @@ void PW_Basis:: recip2real(const std::complex<double> * in, double * out, const 
 ///
 void PW_Basis:: real2recip(const std::complex<float> * in, std::complex<float> * out, const bool add, const float factor)
 {
+    ModuleBase::timer::tick(this->classname, "real2recip");
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
@@ -228,6 +229,7 @@ void PW_Basis:: real2recip(const std::complex<float> * in, std::complex<float> *
     {
         out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->nxyz);
     }
+    ModuleBase::timer::tick(this->classname, "real2recip");
     return;
 }
 
@@ -238,6 +240,7 @@ void PW_Basis:: real2recip(const std::complex<float> * in, std::complex<float> *
 ///
 void PW_Basis:: real2recip(const float * in, std::complex<float> * out, const bool add, const float factor)
 {
+    ModuleBase::timer::tick(this->classname, "real2recip");
     if(this->gamma_only)
     {
         const int npy = this->ny * this->nplane;
@@ -276,6 +279,7 @@ void PW_Basis:: real2recip(const float * in, std::complex<float> * out, const bo
     {
         out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->nxyz);
     }
+    ModuleBase::timer::tick(this->classname, "real2recip");
     return;
 }
 
@@ -286,6 +290,7 @@ void PW_Basis:: real2recip(const float * in, std::complex<float> * out, const bo
 ///
 void PW_Basis:: recip2real(const std::complex<float> * in, std::complex<float> * out, const bool add, const float factor)
 {
+    ModuleBase::timer::tick(this->classname, "recip2real");
     assert(this->gamma_only == false);
     ModuleBase::GlobalFunc::ZEROS(ft.auxf1, this->nst * this->nz);
 
@@ -309,7 +314,7 @@ void PW_Basis:: recip2real(const std::complex<float> * in, std::complex<float> *
     {
         out[ir] = this->ft.auxf1[ir];
     }
-
+    ModuleBase::timer::tick(this->classname, "recip2real");
     return;
 }
 
@@ -320,6 +325,7 @@ void PW_Basis:: recip2real(const std::complex<float> * in, std::complex<float> *
 ///
 void PW_Basis:: recip2real(const std::complex<float> * in, float * out, const bool add, const float factor)
 {
+    ModuleBase::timer::tick(this->classname, "recip2real");
     ModuleBase::GlobalFunc::ZEROS(ft.auxf1, this->nst * this->nz);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
@@ -371,6 +377,7 @@ void PW_Basis:: recip2real(const std::complex<float> * in, float * out, const bo
             out[ir] = this->ft.auxf1[ir].real();
         }
     }
+    ModuleBase::timer::tick(this->classname, "recip2real");
     return;
 }
 

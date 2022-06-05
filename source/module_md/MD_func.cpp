@@ -301,7 +301,7 @@ void MD_func::force_virial(
 		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential !");
 	}
 
-	ModuleBase::timer::tick("MD_func", "md_force_stress");
+	ModuleBase::timer::tick("MD_func", "force_stress");
 }
 
 void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matrix &stress)

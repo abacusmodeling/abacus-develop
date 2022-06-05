@@ -10,6 +10,7 @@ namespace ModulePW
 
 PW_Basis::PW_Basis()
 {
+    classname="PW_Basis";
 }
 
 PW_Basis:: ~PW_Basis()
@@ -40,14 +41,14 @@ PW_Basis:: ~PW_Basis()
 ///
 void PW_Basis::setuptransform()
 {
-    ModuleBase::timer::tick("PW_Basis", "setuptransform");
+    ModuleBase::timer::tick(this->classname, "setuptransform");
     this->distribute_r();
     this->distribute_g();
     this->getstartgr();
     this->ft.clear();
     this->ft.initfft(this->nx,this->ny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
-    ModuleBase::timer::tick("PW_Basis", "setuptransform");
+    ModuleBase::timer::tick(this->classname, "setuptransform");
 }
 
 void PW_Basis::getstartgr()

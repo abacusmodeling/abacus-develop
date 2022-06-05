@@ -2,8 +2,6 @@
 #include "../module_base/mymath.h"
 #include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
-// #include "iostream"
-#include "../module_base/timer.h"
 
 
 namespace ModulePW
@@ -24,7 +22,6 @@ namespace ModulePW
 ///
 void PW_Basis::distribution_method2()
 {
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method2");
 
     // initial the variables needed by all proc.
     int *st_bottom2D = new int[fftnxy];             // st_bottom2D[ixy], minimum z of stick on (x, y).
@@ -101,7 +98,6 @@ void PW_Basis::distribution_method2()
 
     if (st_bottom2D != nullptr) delete[] st_bottom2D;
     if (st_length2D != nullptr) delete[] st_length2D;
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method2");
     return;
 }
 

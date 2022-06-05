@@ -2,8 +2,6 @@
 #include "../module_base/mymath.h"
 #include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
-// #include "iostream"
-#include "../module_base/timer.h"
 
 
 namespace ModulePW
@@ -25,8 +23,6 @@ namespace ModulePW
 ///
 void PW_Basis::distribution_method1()
 {
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
-
     // initial the variables needed by all process
     int *st_bottom2D = new int[fftnxy];             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = new int[fftnxy];             // st_length2D[ixy], number of planewaves in stick on (x, y).
@@ -111,7 +107,6 @@ void PW_Basis::distribution_method1()
 
     if (st_bottom2D != nullptr) delete[] st_bottom2D;
     if (st_length2D != nullptr) delete[] st_length2D;
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
     return;
 }
 
