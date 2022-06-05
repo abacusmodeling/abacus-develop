@@ -42,7 +42,7 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
             this->stowf.chiortho[ik].create(this->stowf.nchip[ik],GlobalC::wf.npwx,false);
         }
     }
-	stoiter.init(GlobalC::wf.npwx, this->stowf.nchip);
+	stoiter.init(GlobalC::wf.npwx, this->stowf.nchip, INPUT.method_sto, stowf);
 }
 
 void ESolver_SDFT_PW::beforescf(const int istep)
@@ -114,7 +114,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 			//init k
 			if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
 			stoiter.stohchi.current_ik = ik;
-			stoiter.sumpolyval_k(ik, this->stowf);
+			stoiter.calPn(ik, this->stowf);
 		}
 		delete [] h_diag;
 		GlobalC::en.eband  = 0.0;

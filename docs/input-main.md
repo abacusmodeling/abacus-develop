@@ -28,7 +28,7 @@
 
 - [Electronic structure (SDFT)](#electronic-structure-sdft)
 
-    [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto)
+    [method_sto](#method_sto) | [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto)
 
 - [Geometry relaxation](#geometry-relaxation)
 
@@ -463,7 +463,7 @@ calculations.
 #### nbands
 
 - **Type**: Integer
-- **Description**: Number of bands to calculate. It is recommended you setup this value, especially when you use smearing techniques, more bands should be included.
+- **Description**: Number of Kohn-Sham orbitals to calculate. It is recommended you setup this value, especially when you use smearing techniques, more bands should be included.
 - **Default**:
   - nspin=1: 1.2\*occupied_bands, occupied_bands+10)
   - nspin=2: max(1.2\*nelec, nelec+20)
@@ -573,12 +573,23 @@ calculations.
 
 This part of variables are used to control the parameters of stochastic DFT (SDFT),  mix stochastic-deterministic DFT (MDFT), or complete-basis Chebyshev method (CT).
 
+#### method_sto
+
+- **Type**: Integer
+- **Description**: 
+  - Different method to do SDFT.
+  - 1: SDFT calculates $T_n(\hat{h})\ket{\chi}$ twice, where $T_n(x)$ is the n-th order Chebyshev polynomial and $\hat{h}=\frac{\hat{H}-\bar{E}}{\Delta E}$ owning eigen-value $\in(-1,1)$. This method cost less memory but slow.
+  - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is fast but when memory is not enough. Only method 1 can be used.
+  - other: use 1
+- **Default**: 1
+
 #### nbands_sto
 
 - **Type**: Integer
 - **Description**: 
   - nbands_sto>0: Number of stochastic orbitals to calculate in SDFT and MDFT.  More bands obtain more precise results or smaller stochastic errors ($ \propto 1/\sqrt{N_{\chi}}$); 
   - nbands_sto=0: Complete basis will be used to replace stochastic orbitals with the Chebyshev method (CT) and it will get the results the same as KSDFT without stochastic errors.
+  - If you want to do MDFT. [nbands](#nbands) which represents the number of KS orbitals should be set.
 - **Default**: 0
 
 #### nche_sto

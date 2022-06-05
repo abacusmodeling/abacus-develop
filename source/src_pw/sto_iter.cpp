@@ -6,22 +6,23 @@
 #include "../module_base/tool_quit.h"
 #include "../module_base/timer.h"
 #include "../src_parallel/parallel_reduce.h"
+#include "../module_base/blas_connector.h"
 
 Stochastic_Iter::Stochastic_Iter()
 {
-    p_che = nullptr;
-    spolyv = new double [1];
     change = false;
     mu0 = 0;
+    method = 1;
 }
 
 Stochastic_Iter::~Stochastic_Iter()
 {
-    if(p_che != nullptr) delete p_che;
-    delete[] spolyv;
+    if(p_che != nullptr)        delete p_che;
+    if(spolyv != nullptr)       delete[] spolyv;
+    if(chiallorder != nullptr)  delete[] chiallorder;
 }
 
-void Stochastic_Iter::init(const int dim, int* nchip_in)
+void Stochastic_Iter::init(const int dim, int* nchip_in, const int method_in, Stochastic_WF& stowf)
 {
     p_che = new ModuleBase::Chebyshev<double>(INPUT.nche_sto);
     nchip = nchip_in;
@@ -32,6 +33,27 @@ void Stochastic_Iter::init(const int dim, int* nchip_in)
     spolyv = new double [norder];
     stofunc.Emin = INPUT.emin_sto;
     stofunc.Emax = INPUT.emax_sto;
+    this->method = method_in;
+    if(this->method == 2)
+    {
+        double tot  = 0;
+        for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)
+        {
+            tot += stowf.chi0[ik].nr * stowf.chi0[ik].nc * norder * 4; //each complex cost 4B memory
+        }
+#ifdef __MPI
+        MPI_Allreduce(MPI_IN_PLACE, &tot, 1, MPI_DOUBLE, MPI_SUM, POOL_WORLD);
+#endif
+        tot /= double(1073741824); //convert B to GB
+        assert(tot < 64);
+        this->chiallorder = new ModuleBase::ComplexMatrix[stowf.nks];
+        for (int ik =0 ; ik < GlobalC::kv.nks; ++ik)
+        {
+            const int nchip = stowf.chi0[ik].nr;
+            const int npwx = stowf.chi0[ik].nc;
+            chiallorder[ik].create(nchip * npwx, norder,false);
+        }
+    }
 }
 
 void Stochastic_Iter::orthog(const int& ik, Stochastic_WF& stowf)
@@ -248,21 +270,44 @@ void Stochastic_Iter::itermu(int &iter)
     return;
 }
 
-void Stochastic_Iter:: sumpolyval_k(const int& ik, Stochastic_WF& stowf)
+void Stochastic_Iter::calPn(const int& ik, Stochastic_WF& stowf)
 {
-    ModuleBase::TITLE("Stochastic_Iter","sumpolyval_k");
-    ModuleBase::timer::tick("Stochastic_Iter","sumpolyval");
+    ModuleBase::TITLE("Stochastic_Iter","calPn");
+    ModuleBase::timer::tick("Stochastic_Iter","calPn");
+
     const int norder = p_che->norder;
     if(ik==0)   ModuleBase::GlobalFunc::ZEROS(spolyv, norder);
     std::complex<double> * pchi;
     if(GlobalV::NBANDS > 0)  pchi = stowf.chiortho[ik].c; 
     else            pchi = stowf.chi0[ik].c;
-    p_che->tracepolyA(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, GlobalC::wf.npw, GlobalC::wf.npwx, nchip[ik]);
-    for(int i = 0 ; i < norder ; ++i)
+    
+    if(this->method == 2)
     {
-        spolyv[i] += p_che->polytrace[i] * GlobalC::kv.wk[ik];
+        p_che->calpolyvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, this->chiallorder[ik].c, GlobalC::wf.npw, GlobalC::wf.npwx, nchip[ik]);
+        double* vec_all= (double *) this->chiallorder[ik].c;
+        double* vec= (double *) pchi;
+        char transa = 'T';
+        double one = 1;
+        int inc = 1;
+        // double zero = 0;
+        int LDA = GlobalC::wf.npwx * nchip[ik] * 2;
+        int M = GlobalC::wf.npw * nchip[ik] * 2;
+        int N = norder;
+        dgemv_(&transa, &M, &N, &one, vec_all, &LDA, vec, &inc, &one, spolyv, &inc);
+        for(int i = 0 ; i < norder ; ++i)
+        {
+            spolyv[i] *= GlobalC::kv.wk[ik];
+        }   
     }
-    ModuleBase::timer::tick("Stochastic_Iter","sumpolyval");
+    else
+    {
+        p_che->tracepolyA(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, GlobalC::wf.npw, GlobalC::wf.npwx, nchip[ik]);
+        for(int i = 0 ; i < norder ; ++i)
+        {
+            spolyv[i] += p_che->polytrace[i] * GlobalC::kv.wk[ik];
+        }
+    }
+    ModuleBase::timer::tick("Stochastic_Iter","calPn");
     return;
 }
 
@@ -333,7 +378,6 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     //cal rho
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nroot_fd);
     
-    std::complex<double> * out, *hout;
     double *sto_rho = new double [nrxx];
     //int npwall = npwx * nchip;
 
@@ -343,7 +387,6 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     double sto_ne = 0;
     ModuleBase::GlobalFunc::ZEROS(sto_rho, nrxx);
 
-    std::complex<double> * pchi;
     std::complex<double>* porter = new std::complex<double>[nrxx];
     double out2;
 
@@ -361,17 +404,9 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
         if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
         stohchi.current_ik = ik;
 
-        const int npw = GlobalC::kv.ngk[ik];
-        double stok_eband;
-        out = stowf.shchi[ik].c;
-        if(GlobalV::NBANDS > 0)
-            pchi = stowf.chiortho[ik].c;
-        else
-            pchi = stowf.chi0[ik].c;
-        
-        p_che->calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, out, npw, GlobalC::wf.npwx, nchip[ik]);
+        this->calTnchi(ik, stowf);
 
-        std::complex<double> *tmpout = out;
+        std::complex<double> *tmpout = stowf.shchi[ik].c;
         for(int ichi = 0; ichi < nchip[ik] ; ++ichi)
         {
             GlobalC::wfcpw->recip2real(tmpout, porter, ik);
@@ -437,6 +472,39 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     delete [] sto_rho;
     ModuleBase::timer::tick("Stochastic_Iter","sum_stoband");
     return;
+}
+
+void Stochastic_Iter::calTnchi(const int& ik, Stochastic_WF& stowf)
+{
+    const int npw = GlobalC::kv.ngk[ik];
+    std::complex<double> * out = stowf.shchi[ik].c;
+    std::complex<double> * pchi;
+    if(GlobalV::NBANDS > 0)
+        pchi = stowf.chiortho[ik].c;
+    else
+        pchi = stowf.chi0[ik].c;
+    if(this->method==2)
+    {
+        char transa = 'N';
+        std::complex<double> one = 1;
+        int inc = 1;
+        std::complex<double> zero = 0;
+        int LDA = GlobalC::wf.npwx * nchip[ik];
+        int M = GlobalC::wf.npw * nchip[ik];
+        int N = p_che->norder;
+        std::complex<double> *coef_real = new std::complex<double> [p_che->norder];
+        for(int i = 0 ; i < p_che->norder; ++i)
+        {
+            coef_real[i] = p_che->coef_real[i];
+        }
+        zgemv_(&transa, &M, &N, &one, this->chiallorder[ik].c, &LDA, coef_real, &inc, &zero, out, &inc);
+        delete[] coef_real;
+    }
+    else
+    {
+        p_che->calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, out, npw, GlobalC::wf.npwx, nchip[ik]);
+    }
+    
 }
 
 

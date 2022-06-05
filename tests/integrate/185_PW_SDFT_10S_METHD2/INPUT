@@ -6,10 +6,11 @@ ntype			1
 symmetry		0
 pseudo_dir      ../tools/PP_ORB/
 
+nbands			0
 nbands_sto		10
 
 nche_sto		120
-seed_sto        -20000
+seed_sto        20000
 kpar            1
 cal_force       1
 cal_stress      1
@@ -28,5 +29,6 @@ smearing_method		fd
 smearing_sigma		0.6
 
 #Parameters (5.Mixing)
-mixing_type		plain
-mixing_beta		0.7
+mixing_type		broyden
+mixing_beta		0.4
+method_sto      2

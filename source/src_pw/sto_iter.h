@@ -22,7 +22,7 @@ class Stochastic_Iter
     Stochastic_Iter();
     ~Stochastic_Iter();
 
-    void init(const int, int* nchip_in);
+    void init(const int, int* nchip_in, const int method_in, Stochastic_WF& stowf);
     
     void sum_stoband(Stochastic_WF& stowf);
 
@@ -30,13 +30,11 @@ class Stochastic_Iter
 
     void itermu(int & iter);
 
-    void sumpolyval_k(const int &ik, Stochastic_WF& stowf);
-
     void orthog(const int &ik, Stochastic_WF& stowf);
 
     void checkemm(const int &ik, int &iter, Stochastic_WF& stowf);
 
-    ModuleBase::Chebyshev<double>* p_che;
+    ModuleBase::Chebyshev<double>* p_che = nullptr;
 
     Stochastic_hchi stohchi;
     Sto_Func<double> stofunc;
@@ -44,13 +42,20 @@ class Stochastic_Iter
 	double mu0; // chemical potential; unit in Ry
     bool change;
     double targetne;
-    double *spolyv;
+    double *spolyv = nullptr;
 
 	public:
     
-    int * nchip;
+    int * nchip = nullptr;
     double th_ne;
     double KS_ne;
+    public:
+    int method; //different methods 1: slow, less memory  2: fast, more memory
+    ModuleBase::ComplexMatrix* chiallorder = nullptr;
+    //cal Pn = \sum_\chi <\chi|Tn(\hat{h})|\chi>
+    void calPn(const int& ik, Stochastic_WF& stowf);
+    //cal Tnchi = \sum_n C_n*T_n(\hat{h})|\chi>
+    void calTnchi(const int& ik, Stochastic_WF& stowf);
 
 };
 

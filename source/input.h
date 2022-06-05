@@ -70,6 +70,7 @@ class Input
     double emin_sto;
     int bndpar; //parallel for stochastic/deterministic bands
     int initsto_freq; //frequency to init stochastic orbitals when running md
+    int method_sto; //different methods for sdft, 1: slow, less memory  2: fast, more memory
 
     //==========================================================
     // electrons / spin

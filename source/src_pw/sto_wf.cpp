@@ -23,12 +23,13 @@ Stochastic_WF::~Stochastic_WF()
     if(nchip != nullptr)     delete[] nchip;
 }
 
-void Stochastic_WF::init(const int nks)
+void Stochastic_WF::init(const int nks_in)
 {
-    chi0 = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
-    shchi = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
-    chiortho = new ModuleBase::ComplexMatrix[GlobalC::kv.nks];
-    nchip = new int [GlobalC::kv.nks];
+    chi0 = new ModuleBase::ComplexMatrix[nks_in];
+    shchi = new ModuleBase::ComplexMatrix[nks_in];
+    chiortho = new ModuleBase::ComplexMatrix[nks_in];
+    nchip = new int [nks_in];
+    this->nks = nks_in;
 }
 
 void Init_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in)
