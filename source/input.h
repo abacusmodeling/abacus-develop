@@ -69,6 +69,7 @@ class Input
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
     int bndpar; //parallel for stochastic/deterministic bands
+    int initsto_freq; //frequency to init stochastic orbitals when running md
 
     //==========================================================
     // electrons / spin
