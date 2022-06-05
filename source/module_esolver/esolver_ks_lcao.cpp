@@ -418,7 +418,25 @@ namespace ModuleESolver
 
                 // calculate the density matrix using read in wave functions
                 // and the ncalculate the charge density on grid.
-                this->LOC.sum_bands(this->UHM);
+
+                // transform wg and ekb to elecstate first
+                for(int ik=0;ik<this->pelec->ekb.nr; ++ik)
+                {
+                    for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
+                    {
+                        this->pelec->ekb(ik, ib) = GlobalC::wf.ekb[ik][ib];
+                        this->pelec->wg(ik, ib) = GlobalC::wf.wg(ik, ib);
+                    }
+                }
+                if(this->psi != nullptr)
+                {
+                    this->pelec->psiToRho(this->psi[0]);
+                }
+                else
+                {
+                    this->pelec->psiToRho(this->psid[0]);
+                }
+                
                 // calculate the local potential(rho) again.
                 // the grid integration will do in later grid integration.
 
@@ -512,6 +530,7 @@ namespace ModuleESolver
         if (ELEC_evolve::tddft && istep >= 1 && iter > 1 && !GlobalV::GAMMA_ONLY_LOCAL)
         {
             ELEC_evolve::evolve_psi(istep, this->UHM, this->LOWF, this->psi);
+            this->pelec->psiToRho(this->psi[0]);
         }
         //using HSolverLCAO::solve()
         else if(this->phsol != nullptr)
