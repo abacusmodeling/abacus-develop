@@ -7,8 +7,10 @@
 
 Vdwd2_Parameters::Vdwd2_Parameters()
 {
-	init_C6();
-	init_R0();
+	default_C6();
+	default_R0();
+	C6 = C6_default;
+	R0 = R0_default;
 }
 
 void Vdwd2_Parameters::initial_parameters(const Input &input)
@@ -48,6 +50,7 @@ void Vdwd2_Parameters::initset(const UnitCell_pseudo &ucell)
 
 void Vdwd2_Parameters::C6_input(const std::string &file, const std::string &unit)
 {
+	C6 = C6_default;
 	if( file != "default" )
 	{
 		std::ifstream ifs(file);
@@ -73,6 +76,7 @@ void Vdwd2_Parameters::C6_input(const std::string &file, const std::string &unit
 
 void Vdwd2_Parameters::R0_input(const std::string &file, const std::string &unit)
 {
+	R0 = R0_default;
 	if( file != "default" )
 	{
 		std::ifstream ifs(file.c_str());
@@ -94,9 +98,9 @@ void Vdwd2_Parameters::R0_input(const std::string &file, const std::string &unit
 	}
 }
 
-void Vdwd2_Parameters::init_C6()
+void Vdwd2_Parameters::default_C6()
 {
-	C6 =
+	C6_default =
 	{
 		{"H",	0.14     },
 		{"He",	0.08     },
@@ -187,9 +191,9 @@ void Vdwd2_Parameters::init_C6()
 	};	
 }
 
-void Vdwd2_Parameters::init_R0()
+void Vdwd2_Parameters::default_R0()
 {
-	R0 =
+	R0_default =
 	{
 		{"H",	1.001  },
 		{"He",	1.012  },
