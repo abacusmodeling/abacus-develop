@@ -39,7 +39,7 @@ namespace Gint_Tools
 		const int jby,
 		const int kbz)
 	{
-		int *vindex = new int[GlobalC::pw.bxyz*sizeof(int)];
+		int *vindex = new int[GlobalC::bigpw->bxyz*sizeof(int)];
 		int bindex=0;
 		// z is the fastest,
 		// ipart can be obtained by using a previously stored array
@@ -71,8 +71,8 @@ namespace Gint_Tools
 	{
 		// set the index for obtaining local potentials
 		int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
-		double *vldr3 = new double[GlobalC::pw.bxyz*sizeof(double)];
-		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+		double *vldr3 = new double[GlobalC::bigpw->bxyz*sizeof(double)];
+		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 		{
 			vldr3[ib]=vlocal[vindex[ib]] * dv;
 		}
@@ -88,8 +88,8 @@ namespace Gint_Tools
 	{
 		// set the index for obtaining local potentials
 		int* vindex = Gint_Tools::get_vindex(start_ind, ncyz);	
-		double *vldr3 = new double[GlobalC::pw.bxyz*sizeof(double)];
-		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
+		double *vldr3 = new double[GlobalC::bigpw->bxyz*sizeof(double)];
+		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 		{
 			vldr3[ib]=vlocal[vindex[ib]] * dv;
 		}
