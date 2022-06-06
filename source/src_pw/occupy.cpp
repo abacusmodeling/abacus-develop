@@ -395,7 +395,7 @@ void Occupy::efermig
     }
 
     eup += 2 * smearing_sigma;
-    elw -= 2 * smearing_sigma; //qianrui change 2 to 5 for high temerature
+    elw -= 2 * smearing_sigma;
 
 #ifdef __MPI
     // find min and max across pools
@@ -407,12 +407,15 @@ void Occupy::efermig
     //Bisection method
     //=================
     // call sumkg
+    int changetime = 0;
+    sumkg:
+
     const double sumkup = Occupy::sumkg(ekb, nband, nks, wk, smearing_sigma, ngauss, eup, is, isk);
     const double sumklw = Occupy::sumkg(ekb, nband, nks, wk, smearing_sigma, ngauss, elw, is, isk);
 
-    if ((sumkup - nelec) < -eps || (sumklw - nelec) > eps)
+    if(changetime > 1000)
     {
-		std::cout << " SOMETHING WRONG: " << std::endl;
+        std::cout << " SOMETHING WRONG: " << std::endl;
 		std::cout << " is = " << is << std::endl;
 		std::cout << " eup = " << eup << std::endl;
 		std::cout << " elw = " << elw << std::endl;
@@ -423,6 +426,18 @@ void Occupy::efermig
 		std::cout << " sumkup - nelec = " << sumkup - nelec << std::endl;
 		std::cout << " sumklw - nelec = " << sumklw - nelec << std::endl;
 		ModuleBase::WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
+    }
+    else if ((sumkup - nelec) < -eps)
+    {
+        eup += 2 * smearing_sigma;
+        ++changetime;
+        goto sumkg;
+    }
+    else if((sumklw - nelec) > eps)
+    {
+        elw -= 2 * smearing_sigma;
+        ++changetime;
+        goto sumkg;
     }
 
     for (int i = 0;i < maxiter;i++)
