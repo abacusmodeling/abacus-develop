@@ -29,9 +29,16 @@ extern "C"
 
 void Gint_Gamma::cal_vlocal(Gint_inout *inout)
 {
-	this->cal_gint(inout);
-	const int max_size = GlobalC::GridT.max_atom;
-	const int lgd = GlobalC::GridT.lgd;
+    const int max_size = GlobalC::GridT.max_atom;
+    const int lgd = GlobalC::GridT.lgd;
+
+    if(inout->job==Gint_Tools::job_type::vlocal && max_size>0 && lgd>0)
+    {
+        pvpR_grid = new double[lgd*lgd];
+        ModuleBase::GlobalFunc::ZEROS(pvpR_grid, lgd*lgd);
+    }
+
+    this->cal_gint(inout);
 
 	if(inout->job==Gint_Tools::job_type::vlocal)
 	{

@@ -174,8 +174,8 @@ void Grid_Technique::init_atoms_on_grid(void)
 	// (2) information about gloabl grid
 	// and local grid.
 	// mohan add 2010-07-02
-	int *ind_bigcell;
-	bool *bigcell_on_processor; // normal local form.
+	int *ind_bigcell = new int[nbxyz];
+    bool *bigcell_on_processor=new bool[nbxyz];
 	this->check_bigcell(ind_bigcell, bigcell_on_processor);
 
 	// (3) Find the atoms using
@@ -268,8 +268,6 @@ void Grid_Technique::check_bigcell(int* &ind_bigcell, bool* &bigcell_on_processo
 	int iz_now, ix, iy, iz, ind;
 	bool flag;
 
-	ind_bigcell = new int[nbxyz];
-	bigcell_on_processor=new bool[nbxyz];
 	for(int i=0;i<nbxyz;i++)
 	{
 		int iz_now = i % nbz;
@@ -309,8 +307,8 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	ModuleBase::Memory::record("Grid_Meshcell","index2ucell",this->nxyze,"int");	
 	this->grid_expansion_index(0,index2ucell);
 	
-	int *ind_bigcell;
-	bool *bigcell_on_processor; // normal local form.
+    int *ind_bigcell = new int[nbxyz];
+    bool *bigcell_on_processor=new bool[nbxyz];
 	this->check_bigcell(ind_bigcell, bigcell_on_processor);
 
 	//--------------------------------------

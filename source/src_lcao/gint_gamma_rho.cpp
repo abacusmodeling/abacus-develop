@@ -209,9 +209,12 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 						if(na_grid==0) continue;				
 						
 						// here vindex refers to local potentials
-						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
-						
-                        int * block_iw, * block_index, * block_size;
+                        int *vindex = new int[GlobalC::bigpw->bxyz];
+                        Gint_Tools::get_vindex(ncyz, ibx, jby, kbz, vindex);	
+
+                        int *block_iw = new int[na_grid];
+                        int *block_index = new int[na_grid+1];
+                        int *block_size = new int[na_grid];
                         Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 
 						//------------------------------------------------------
@@ -232,14 +235,16 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 						this->cal_band_rho(na_grid, LD_pool, block_iw, block_size, block_index,
 							cal_flag, psir_ylm.ptr_2D, vindex, DM_in, chr);
 
-						free(vindex);			vindex=nullptr;
+                        delete[] vindex;
                         delete[] block_iw;
                         delete[] block_index;
                         delete[] block_size;
-
-						for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
-							free(cal_flag[ib]);
-						free(cal_flag);			cal_flag=nullptr;
+                        
+                        for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
+                        {
+                            delete[] cal_flag[ib];
+                        }
+                        delete[] cal_flag;
 					}// k
 				}// j
 			}// i

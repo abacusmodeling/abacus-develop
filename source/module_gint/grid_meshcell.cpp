@@ -156,6 +156,7 @@ void Grid_MeshCell::init_meshcell_pos(void)
 		{
 			meshcell_pos[ib] = new double[3];
 		}
+        allocate_pos = true;
 	}
 
 	int index=0;
@@ -176,7 +177,6 @@ void Grid_MeshCell::init_meshcell_pos(void)
 			}
 		}
 	}
-	allocate_pos = true;
 
 	return;
 }

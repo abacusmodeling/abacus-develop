@@ -119,31 +119,35 @@ namespace Gint_Tools
 	};
 	
 	// vindex[pw.bxyz]
-	int* get_vindex(
+	void get_vindex(
 		const int ncyz,
 		const int ibx,
 		const int jby,
-		const int kbz);
+		const int kbz,
+        int* vindex);
 	
-	int* get_vindex(
+	void get_vindex(
 		const int start_ind,
-		const int ncyz);
+		const int ncyz,
+        int* vindex);
 
 	// extract the local potentials.
 	// vldr3[GlobalC::bigpw->bxyz]
-    double* get_vldr3(
+    void get_vldr3(
 		const double* const vlocal,
 		const int ncyz,
 		const int ibx,
 		const int jby,
 		const int kbz,
-		const double dv);
+		const double dv,
+        double* vldr3);
 
-    double* get_vldr3(
+    void get_vldr3(
 		const double* const vlocal,
 		const int start_ind,
 		const int ncyz,
-		const double dv);
+		const double dv,
+        double* vldr3);
 
 	//------------------------------------------------------
 	// na_grid : #. atoms for this group of grids

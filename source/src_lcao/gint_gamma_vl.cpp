@@ -320,7 +320,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						const int kbz=k*GlobalC::bigpw->bz-GlobalC::rhopw->startz_current;
 
-                        int * block_iw, * block_index, * block_size;
+                        int *block_iw = new int[na_grid];
+                        int *block_index = new int[na_grid+1];
+                        int *block_size = new int[na_grid];
                         Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 						//------------------------------------------------------
 						// whether the atom-grid distance is larger than cutoff
@@ -340,7 +342,8 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						// extract the local potentials.
 						//------------------------------------------------------------------
-						double *vldr3 = Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, dv);
+						double* vldr3 = new double[GlobalC::bigpw->bxyz];
+                        Gint_Tools::get_vldr3(vlocal, ncyz, ibx, jby, kbz, dv, vldr3);
 
                         const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
                                 na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
@@ -352,14 +355,16 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 							na_grid, LD_pool, block_iw, block_size, block_index, cal_flag,
 							vldr3, psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, lgd_now, GridVlocal_thread.ptr_2D);
 
-						free(vldr3);		vldr3=nullptr;
+                        delete[] vldr3;
                         delete[] block_iw;
                         delete[] block_index;
                         delete[] block_size;
-
-						for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
-							free(cal_flag[ib]);
-						free(cal_flag);			cal_flag=nullptr;
+                        
+                        for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
+                        {
+                            delete[] cal_flag[ib];
+                        }
+                        delete[] cal_flag;
 					}// k
 				}// j
 			}// i

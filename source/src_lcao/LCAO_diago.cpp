@@ -133,6 +133,8 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>
 		GlobalC::wf.ekb[ik][ib] = en[ib];
 	}
 
+    delete[] en;
+
 	return;
 }
 
