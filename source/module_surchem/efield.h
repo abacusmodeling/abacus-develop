@@ -1,8 +1,9 @@
 #ifndef EFIELD_H
 #define EFIELD_H
 
-#include "../src_pw/pw_basis.h"
+#include "../src_pw/structure_factor.h"
 #include "../module_cell/unitcell.h"
+#include "../module_pw/pw_basis.h"
 
 class Efield
 {
@@ -11,12 +12,12 @@ public:
     ~Efield();
 
     static ModuleBase::matrix add_efield(const UnitCell &cell, 
-                                            PW_Basis &pwb, 
+                                            ModulePW::PW_Basis *rho_basis, 
                                             const int &nspin, 
                                             const double *const *const rho);
 
     static double cal_elec_dipole(const UnitCell &cell, 
-                                PW_Basis &pwb, 
+                                ModulePW::PW_Basis *rho_basis, 
                                 const int &nspin, 
                                 const double *const *const rho,
                                 const double &h_inv);

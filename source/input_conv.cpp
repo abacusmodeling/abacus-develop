@@ -109,20 +109,7 @@ void Input_Conv::Convert(void)
     //----------------------------------------------------------
     // planewave (8/8)
     //----------------------------------------------------------
-    GlobalC::pw.set(INPUT.gamma_only,
-                    INPUT.ecutwfc,
-                    INPUT.ecutrho,
-                    INPUT.nx,
-                    INPUT.ny,
-                    INPUT.nz,
-                    INPUT.ncx,
-                    INPUT.ncy,
-                    INPUT.ncz,
-                    INPUT.bx,
-                    INPUT.by,
-                    INPUT.bz,
-                    INPUT.pw_seed,
-                    INPUT.nbspline);
+    GlobalC::sf.set(INPUT.nbspline);
     GlobalV::GAMMA_ONLY_LOCAL = INPUT.gamma_only_local;
 
     //----------------------------------------------------------

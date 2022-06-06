@@ -4,7 +4,8 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/intarray.h"
-#include "pw_basis.h"
+#include "structure_factor.h"
+#include "module_pw/pw_basis_k.h"
 
 class WF_igk 
 {
@@ -17,12 +18,10 @@ class WF_igk
 	// npwx: max npw
 	// npw
 	// igk: [nks, npw_max]
-    // g2kin: [npwx],kinetic energy for current k point
 	//---------------------------------------------------
     int npwx;
     int npw;
-    ModuleBase::IntArray igk;
-    double *g2kin;
+    // ModuleBase::IntArray igk;
 #ifdef __CUDA
     double *d_g2kin;
 #endif
@@ -30,13 +29,11 @@ class WF_igk
 	public:
 
     // Calculate kinetic energy
-    void ekin(const int ik);
-
     double* get_qvec_cartesian(const int &ik);
 
     ModuleBase::Vector3<double> get_1qvec_cartesian(const int ik,const int ig)const;
 
-    std::complex<double>* get_sk(const int ik, const int it, const int ia)const;
+    std::complex<double>* get_sk(const int ik, const int it, const int ia, ModulePW::PW_Basis_K* wfc_basis)const;
 
 	// pengfei 2016-11-23
     std::complex<double>* get_skq(int ik, int it, int ia, ModuleBase::Vector3<double> q);

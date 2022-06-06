@@ -21,9 +21,9 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 		const int nby = GlobalC::GridT.nby;
 		const int nbz_start = GlobalC::GridT.nbzp_start;
 		const int nbz = GlobalC::GridT.nbzp;
-		const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
+		const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
 			
-        for(int grid_index = 0; grid_index < GlobalC::pw.nbxx; grid_index++)
+        for(int grid_index = 0; grid_index < GlobalC::bigpw->nbxx; grid_index++)
         {
 
             // get the value: how many atoms has orbital value on this grid.
@@ -35,7 +35,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
             Gint_Tools::get_block_info(size, grid_index, block_iw, block_index, block_size, cal_flag);
 
             //evaluate psi on grids
-            Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+            Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
             Gint_Tools::cal_psir_ylm(
                 size, grid_index, delta_r,
                 block_index, block_size, 
@@ -68,7 +68,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 
                 // get the start index of local orbitals.
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                for (int ib = 0; ib < GlobalC::pw.bxyz; ib++)
+                for (int ib = 0; ib < GlobalC::bigpw->bxyz; ib++)
                 {
                     if (cal_flag[ib][ia1])
                     {
@@ -98,7 +98,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
             delete[] block_iw;
             delete[] block_index;
             delete[] block_size;
-            for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+            for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
             {
                 delete[] cal_flag[ib];
             }

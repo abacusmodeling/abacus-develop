@@ -6,14 +6,14 @@ namespace ModuleBase
 {
     Bspline::Bspline()
     {
-        bezier = NULL;
+        bezier = nullptr;
         norder = 0;
         xi = 0;
         Dx = 1.0; 
     }
     Bspline::~Bspline()
     {
-        if(bezier!=NULL) delete[] bezier;
+        if(bezier!=nullptr) delete[] bezier;
     }
 
     void Bspline::init(int norderin, double Dxin, double xiin)

@@ -154,7 +154,7 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
 
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx ); // mohan 2009-11-10
+        ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------

@@ -74,39 +74,39 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	{
 		ModuleBase::WARNING_QUIT("read_rho","check nspin!");
 	}
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncx);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncy);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncz);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nx);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->ny);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nz);	
 
 #ifndef __MPI
 	GlobalV::ofs_running << " Read SPIN = " << is+1 << " charge now." << std::endl;
-	for(int k=0; k<GlobalC::pw.ncz; k++)
+	for(int k=0; k<GlobalC::rhopw->nz; k++)
 	{
 		// consistent with the write_rho, something is
 		// wrong.... but it works now.
-		for(int j=0; j<GlobalC::pw.ncy; j++)
+		for(int j=0; j<GlobalC::rhopw->ny; j++)
 		{
-			for(int i=0; i<GlobalC::pw.ncx; i++)
+			for(int i=0; i<GlobalC::rhopw->nx; i++)
 			{
-				ifs >> rho[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz +k];
+				ifs >> rho[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz +k];
 			}
 		}
 	}
 #else
 	
-	const int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+	const int nxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
 	double *zpiece = new double[nxy];
-	for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+	for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 	{
 		ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
 		if(GlobalV::MY_RANK==0||(GlobalV::CALCULATION.substr(0,3) == "sto"&&GlobalV::RANK_IN_STOGROUP==0))
 		{
 			//				GlobalV::ofs_running << " Read charge density iz=" << iz << std::endl;
-			for(int j=0; j<GlobalC::pw.ncy; j++)
+			for(int j=0; j<GlobalC::rhopw->ny; j++)
 			{
-				for(int i=0; i<GlobalC::pw.ncx; i++)
+				for(int i=0; i<GlobalC::rhopw->nx; i++)
 				{
-					ifs >> zpiece[ i*GlobalC::pw.ncy + j ];
+					ifs >> zpiece[ i*GlobalC::rhopw->ny + j ];
 				}
 			}
 		}

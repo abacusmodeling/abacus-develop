@@ -1,45 +1,46 @@
 #include "surchem.h"
+#include "../src_pw/global.h"
 
 // atom_in surchem::GetAtom;
 
-void surchem::gauss_charge(const UnitCell &cell, PW_Basis &pwb, complex<double> *N)
+void surchem::gauss_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, complex<double> *N)
 {
-    pwb.setup_structure_factor(); // call strucFac(ntype,ngmc)
+    GlobalC::sf.setup_structure_factor(&GlobalC::ucell, rho_basis); // call strucFac(ntype,ngmc)
     for (int it = 0; it < cell.ntype; it++)
     {
         double RCS = GetAtom.atom_RCS[cell.atoms[it].psd];
         // double RCS = GetAtom.get_RCS(cell.atoms[it].psd);
         double sigma_rc_k = RCS / 2.5;
         double sigma_nc_k = RCS / 10.0;
-        for (int ig = 0; ig < pwb.ngmc; ig++)
+        for (int ig = 0; ig < rho_basis->npw; ig++)
         {
             // G^2
-            double gg = pwb.get_NormG_cartesian(ig);
+            double gg = rho_basis->gg[ig];
             gg = gg * cell.tpiba2;
 
             N[ig].real(N[ig].real()
-                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * pwb.strucFac(it, ig).real()
+                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * GlobalC::sf.strucFac(it, ig).real()
                              * exp(-0.5 * gg * (sigma_rc_k * sigma_rc_k)));
             N[ig].imag(N[ig].imag()
-                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * pwb.strucFac(it, ig).imag()
+                       + (GetAtom.atom_Z[cell.atoms[it].psd] - cell.atoms[it].zv) * GlobalC::sf.strucFac(it, ig).imag()
                              * exp(-0.5 * gg * (sigma_rc_k * sigma_rc_k)));
         }
     }
-    for (int ig = 0; ig < pwb.ngmc; ig++)
+    for (int ig = 0; ig < rho_basis->npw; ig++)
     {
         N[ig] /= cell.omega;
     }
 }
 
-void surchem::cal_pseudo(const UnitCell &cell, PW_Basis &pwb, const complex<double> *Porter_g, complex<double> *PS_TOTN)
+void surchem::cal_pseudo(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, const complex<double> *Porter_g, complex<double> *PS_TOTN)
 {
-    complex<double> *N = new complex<double>[pwb.ngmc];
-    ModuleBase::GlobalFunc::ZEROS(N, pwb.ngmc);
-    ModuleBase::GlobalFunc::ZEROS(PS_TOTN, pwb.ngmc);
+    complex<double> *N = new complex<double>[rho_basis->npw];
+    ModuleBase::GlobalFunc::ZEROS(N, rho_basis->npw);
+    ModuleBase::GlobalFunc::ZEROS(PS_TOTN, rho_basis->npw);
 
-    gauss_charge(cell, pwb, N);
+    gauss_charge(cell, rho_basis, N);
 
-    for (int ig = 0; ig < pwb.ngmc; ig++)
+    for (int ig = 0; ig < rho_basis->npw; ig++)
     {
         PS_TOTN[ig] = N[ig] + Porter_g[ig];
     }

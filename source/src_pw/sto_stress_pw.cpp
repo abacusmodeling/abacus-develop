@@ -26,10 +26,10 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
 	sigmakin = sigmakin + sto_sigmakin;
 	
 	//hartree contribution
-	stress_har(sigmahar, 1);
+	stress_har(sigmahar, GlobalC::rhopw, 1);
 
     //ewald contribution
-    stress_ewa(sigmaewa, 1);
+    stress_ewa(sigmaewa, GlobalC::rhopw, 1);
 
     //xc contribution: add gradient corrections(non diagonal)
     for(int i=0;i<3;i++)
@@ -39,10 +39,10 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
     stress_gga(sigmaxc);
 
     //local contribution
-    stress_loc(sigmaloc, 1);
+    stress_loc(sigmaloc, GlobalC::rhopw, 1);
     
     //nlcc
-    stress_cc(sigmaxcc, 1);
+    stress_cc(sigmaxcc, GlobalC::rhopw, 1);
    
     //nonlocal
 	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_nl(sigmanl);
@@ -140,9 +140,9 @@ void Sto_Stress_PW::sto_stress_kin(ModuleBase::matrix& sigma, Stochastic_WF& sto
 	//       }
 		for(i=0;i<npw;i++)
 		{
-			gk[0][i]=(GlobalC::kv.kvec_c[ik].x+GlobalC::pw.gcar[GlobalC::wf.igk(ik, i)].x)*factor;
-			gk[1][i]=(GlobalC::kv.kvec_c[ik].y+GlobalC::pw.gcar[GlobalC::wf.igk(ik, i)].y)*factor;
-			gk[2][i]=(GlobalC::kv.kvec_c[ik].z+GlobalC::pw.gcar[GlobalC::wf.igk(ik, i)].z)*factor;
+			gk[0][i]=(GlobalC::kv.kvec_c[ik].x+GlobalC::wfcpw->getgcar(ik,i).x)*factor;
+			gk[1][i]=(GlobalC::kv.kvec_c[ik].y+GlobalC::wfcpw->getgcar(ik,i).y)*factor;
+			gk[2][i]=(GlobalC::kv.kvec_c[ik].z+GlobalC::wfcpw->getgcar(ik,i).z)*factor;
 		}
 
 		//kinetic contribution

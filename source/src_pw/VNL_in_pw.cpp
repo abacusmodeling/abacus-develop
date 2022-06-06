@@ -101,10 +101,10 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	}
 
 	//this->nqx = 10000;		// calculted in allocate_nlpot.f90
-	//GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ); //LiuXh modify 20180515
-	//GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ) + 1000; //LiuXh add 20180515
-	//GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ) * 10; //LiuXh add 20180515
-	GlobalV::NQX = this->calculate_nqx(GlobalC::pw.ecutwfc,GlobalV::DQ) * cell_factor; //LiuXh add 20180619
+	//GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ); //LiuXh modify 20180515
+	//GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ) + 1000; //LiuXh add 20180515
+	//GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ) * 10; //LiuXh add 20180515
+	GlobalV::NQX = this->calculate_nqx(INPUT.ecutwfc,GlobalV::DQ) * cell_factor; //LiuXh add 20180619
 	// nqx = (sqrt(ecutwfc)/dq+4)*cell_factor;
 
 	
@@ -208,7 +208,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++) 
 		{
-			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia,GlobalC::wfcpw);
 			for (ih = 0;ih < nh;ih++)
 			{
 				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, nhtol(it, ih));	//?
@@ -536,7 +536,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++) 
 		{
-			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia,GlobalC::wfcpw);
 			for (ih = 0;ih < nh;ih++)
 			{
 				for (ig = 0;ig < npw;ig++)

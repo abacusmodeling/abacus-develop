@@ -23,10 +23,10 @@ void Gint::gint_kernel_force(
 	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, cal_flag);
 
     //evaluate psi and dpsi on grids
-	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
-	Gint_Tools::Array_Pool<double> dpsir_ylm_x(GlobalC::pw.bxyz, LD_pool);
-	Gint_Tools::Array_Pool<double> dpsir_ylm_y(GlobalC::pw.bxyz, LD_pool);
-	Gint_Tools::Array_Pool<double> dpsir_ylm_z(GlobalC::pw.bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> dpsir_ylm_x(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> dpsir_ylm_y(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> dpsir_ylm_z(GlobalC::bigpw->bxyz, LD_pool);
 
 	Gint_Tools::cal_dpsir_ylm(
 		na_grid, grid_index, delta_r,
@@ -42,8 +42,8 @@ void Gint::gint_kernel_force(
 	const Gint_Tools::Array_Pool<double> psir_vlbr3 
 		= Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
 
-	Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::pw.bxyz, LD_pool);
-	ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+	Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::bigpw->bxyz, LD_pool);
+	ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
 
 	//calculating g_mu(r) = sum_nu rho_mu,nu f_nu(r)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -82,12 +82,12 @@ void Gint::gint_kernel_force(
 	if(isstress)
 	{
         //calculating g_mu(r)*(r-R) where R is the location of atom
-		Gint_Tools::Array_Pool<double> dpsir_ylm_xx(GlobalC::pw.bxyz, LD_pool);
-		Gint_Tools::Array_Pool<double> dpsir_ylm_xy(GlobalC::pw.bxyz, LD_pool);
-		Gint_Tools::Array_Pool<double> dpsir_ylm_xz(GlobalC::pw.bxyz, LD_pool);
-		Gint_Tools::Array_Pool<double> dpsir_ylm_yy(GlobalC::pw.bxyz, LD_pool);
-		Gint_Tools::Array_Pool<double> dpsir_ylm_yz(GlobalC::pw.bxyz, LD_pool);
-		Gint_Tools::Array_Pool<double> dpsir_ylm_zz(GlobalC::pw.bxyz, LD_pool);
+		Gint_Tools::Array_Pool<double> dpsir_ylm_xx(GlobalC::bigpw->bxyz, LD_pool);
+		Gint_Tools::Array_Pool<double> dpsir_ylm_xy(GlobalC::bigpw->bxyz, LD_pool);
+		Gint_Tools::Array_Pool<double> dpsir_ylm_xz(GlobalC::bigpw->bxyz, LD_pool);
+		Gint_Tools::Array_Pool<double> dpsir_ylm_yy(GlobalC::bigpw->bxyz, LD_pool);
+		Gint_Tools::Array_Pool<double> dpsir_ylm_yz(GlobalC::bigpw->bxyz, LD_pool);
+		Gint_Tools::Array_Pool<double> dpsir_ylm_zz(GlobalC::bigpw->bxyz, LD_pool);
 		Gint_Tools::cal_dpsirr_ylm(
 			na_grid, grid_index,
 			block_index, block_size, 
@@ -118,7 +118,7 @@ void Gint::gint_kernel_force(
 	delete[] block_iw;
 	delete[] block_index;
 	delete[] block_size;
-	for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+	for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 	{
 		delete[] cal_flag[ib];
 	}
@@ -130,10 +130,10 @@ void Gint::cal_meshball_force(
     const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
 	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-	const double*const*const psir_vlbr3_DMR,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-    const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-    const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-    const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+	const double*const*const psir_vlbr3_DMR,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+    const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+    const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+    const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
     ModuleBase::matrix *force)
 {
 
@@ -143,7 +143,7 @@ void Gint::cal_meshball_force(
         const int mcell_index=GlobalC::GridT.bcell_start[grid_index] + ia1;
         const int iat=GlobalC::GridT.which_atom[mcell_index]; // index of atom
 
-        for(int ib=0;ib<GlobalC::pw.bxyz;ib++)
+        for(int ib=0;ib<GlobalC::bigpw->bxyz;ib++)
         {
             const double rx = ddot_(&block_size[ia1], &psir_vlbr3_DMR[ib][block_index[ia1]], &inc, &dpsir_x[ib][block_index[ia1]], &inc);
             force[0](iat,0)+=rx*2.0;
@@ -171,7 +171,7 @@ void Gint::cal_meshball_stress(
     ModuleBase::matrix *stress)
 {
     constexpr int inc=1;
-    for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+    for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
     {
         const double rxx = ddot_(&block_index[na_grid], psir_vlbr3_DMR[ib], &inc, dpsir_xx[ib], &inc);
         stress[0](0,0)+=rxx*2.0;

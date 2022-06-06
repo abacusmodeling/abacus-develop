@@ -37,7 +37,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
     {   
         // calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
         this->calculate_STNR_gamma();
-        this->GG.prep_grid(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz);	
+        this->GG.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);	
 
     }
     else // multiple k-points
@@ -46,7 +46,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
         this->calculate_STNR_k();
 
         // calculate the grid integration of 'Vl' matrix for l-points algorithms.
-        this->GK.prep_grid(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz);
+        this->GK.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);
     }
 
     // initial the overlap matrix is done.	

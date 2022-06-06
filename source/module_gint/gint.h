@@ -54,9 +54,9 @@ class Gint
 		const int*const block_iw,					// block_iw[na_grid],	index of wave functions for each block
 		const int*const block_size, 				// block_size[na_grid],	number of columns of a band
 		const int*const block_index,				// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag,			// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_ylm,			// psir_ylm[GlobalC::pw.bxyz][LD_pool]
-		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+		const bool*const*const cal_flag,			// cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_ylm,			// psir_ylm[GlobalC::bigpw->bxyz][LD_pool]
+		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
 		double* GridVlocal);		// GridVlocal[lgd_now][lgd_now]
 
     void cal_meshball_vlocal_k(
@@ -92,10 +92,10 @@ class Gint
         const int na_grid,  					    // how many atoms on this (i,j,k) grid
         const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
         const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-        const double*const*const psir_vlbr3_DMR,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-        const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-        const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
-        const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+        const double*const*const psir_vlbr3_DMR,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+        const double*const*const dpsir_x,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+        const double*const*const dpsir_y,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+        const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
         ModuleBase::matrix *force);
 
     void cal_meshball_stress(

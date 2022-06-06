@@ -340,7 +340,7 @@ void Stress_Func::get_dvnl1
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia,GlobalC::wfcpw);
 			for (ih = 0;ih < nh;ih++)
 			{
 				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
@@ -426,7 +426,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia,GlobalC::wfcpw);
 			for (ih = 0;ih < nh;ih++)
 			{
 				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?

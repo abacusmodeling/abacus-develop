@@ -41,7 +41,7 @@ GTESTOPTS = $GTESTOPTS
 EOF
 fi
 tail -n $tailn Makefile.intel >>Makefile
-make > /dev/null 2>&1
+make > /dev/null
 
 if ((i==0||i==1)) ;then
     ./pw_test.exe

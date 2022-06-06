@@ -9,7 +9,7 @@
 
 Stochastic_Iter::Stochastic_Iter()
 {
-    p_che = NULL;
+    p_che = nullptr;
     spolyv = new double [1];
     change = false;
     mu0 = 0;
@@ -17,7 +17,7 @@ Stochastic_Iter::Stochastic_Iter()
 
 Stochastic_Iter::~Stochastic_Iter()
 {
-    if(p_che != NULL) delete p_che;
+    if(p_che != nullptr) delete p_che;
     delete[] spolyv;
 }
 
@@ -50,7 +50,7 @@ void Stochastic_Iter::orthog(const int& ik, Stochastic_WF& stowf)
 	    }
 
 	    //orthogonal part
-	    complex<double> *sum = new complex<double> [GlobalV::NBANDS * nchipk];
+	    std::complex<double> *sum = new std::complex<double> [GlobalV::NBANDS * nchipk];
 	    char transC='C';
 	    char transN='N';
     
@@ -75,7 +75,7 @@ void Stochastic_Iter::checkemm(const int& ik, int &iter, Stochastic_WF& stowf)
 	}
         
     const int norder = p_che->norder;
-    complex<double> * pchi;
+    std::complex<double> * pchi;
     int ntest = 1;
 
     if (nchip[ik] < ntest) 
@@ -303,7 +303,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
 {  
     ModuleBase::TITLE("Stochastic_Iter","sum_stoband");
     ModuleBase::timer::tick("Stochastic_Iter","sum_stoband");
-    int nrxx = GlobalC::pw.nrxx;
+    int nrxx = GlobalC::wfcpw->nrxx;
     int npwx = GlobalC::wf.npwx;
     const int norder = p_che->norder;
 
@@ -333,18 +333,18 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     //cal rho
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nroot_fd);
     
-    complex<double> * out, *hout;
+    std::complex<double> * out, *hout;
     double *sto_rho = new double [nrxx];
     //int npwall = npwx * nchip;
 
-    double dr3 = GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+    double dr3 = GlobalC::ucell.omega / GlobalC::wfcpw->nxyz;
     double tmprho, tmpne;
-    complex<double> outtem;
+    std::complex<double> outtem;
     double sto_ne = 0;
     ModuleBase::GlobalFunc::ZEROS(sto_rho, nrxx);
 
-    complex<double> * pchi;
-    complex<double>* porter = GlobalC::UFFT.porter;
+    std::complex<double> * pchi;
+    std::complex<double>* porter = new std::complex<double>[nrxx];
     double out2;
 
     double *ksrho;
@@ -359,6 +359,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     {
         //init k
         if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
+        stohchi.current_ik = ik;
 
         const int npw = GlobalC::kv.ngk[ik];
         double stok_eband;
@@ -373,12 +374,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
         std::complex<double> *tmpout = out;
         for(int ichi = 0; ichi < nchip[ik] ; ++ichi)
         {
-            ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
-            for(int ig = 0; ig < npw; ++ig)
-            {
-                porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = tmpout[ig];
-            }
-            GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
+            GlobalC::wfcpw->recip2real(tmpout, porter, ik);
             for(int ir = 0 ; ir < nrxx ; ++ir)
             {
                 GlobalC::CHR.rho[0][ir] += norm(porter[ir]) * GlobalC::kv.wk[ik];
@@ -386,6 +382,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
             tmpout+=npwx;
         }
     }
+    delete[] porter;
    
     GlobalC::CHR.rho_mpi();
     for(int ir = 0; ir < nrxx ; ++ir)

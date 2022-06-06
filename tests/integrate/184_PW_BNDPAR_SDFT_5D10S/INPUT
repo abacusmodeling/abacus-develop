@@ -9,15 +9,13 @@ pseudo_dir      ../tools/PP_ORB/
 bndpar          2
 
 nbands			5
-
 nbands_sto		10
+
 nche_sto		120
 seed_sto        20000
 kpar            1
 cal_force       1
 cal_stress      1
-test_force      1
-test_stress     1
 
 #Parameters (2.Iteration)
 ecutwfc			20
@@ -27,7 +25,6 @@ scf_nmax		20
 
 #Parameters (3.Basis)
 basis_type		pw
-gamma_only		1
 
 #Parameters (4.Smearing)
 smearing_method		fd

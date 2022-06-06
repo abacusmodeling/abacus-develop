@@ -291,8 +291,8 @@ if ! test -z "$deepks_out_labels" && [ $deepks_out_labels -eq 1 ]; then
 fi
 
 if ! test -z "$deepks_bandgap" && [ $deepks_bandgap -eq 1 ]; then
-	odelta=`python get_odelta.py`
+	odelta=`python3 get_odelta.py`
 	echo "odelta $odelta" >>$1
-	oprec=`python get_oprec.py`
+	oprec=`python3 get_oprec.py`
 	echo "oprec $oprec" >> $1
 fi

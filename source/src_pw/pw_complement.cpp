@@ -104,124 +104,124 @@ void PW_complement::get_total_pw(
     return;
 }
 
-void PW_complement::get_FFT_dimension(
-    const ModuleBase::Matrix3 &latvec,
-    const double &ggcut,
-    int &nx_tmp,
-    int &ny_tmp,
-    int &nz_tmp,
-	const int &bx,
-	const int &by,
-	const int &bz)
-{
-    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_FFT_dimension");
-    // read in the FFT dimension (Nx, Ny, Nz) from INPUT,
-    // if Nx*Ny*Nz >0,use the input
-    // FFT grid, otherwise generate the FFT grid in the code.
+// void PW_complement::get_FFT_dimension(
+//     const ModuleBase::Matrix3 &latvec,
+//     const double &ggcut,
+//     int &nx_tmp,
+//     int &ny_tmp,
+//     int &nz_tmp,
+// 	const int &bx,
+// 	const int &by,
+// 	const int &bz)
+// {
+//     if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_FFT_dimension");
+//     // read in the FFT dimension (Nx, Ny, Nz) from INPUT,
+//     // if Nx*Ny*Nz >0,use the input
+//     // FFT grid, otherwise generate the FFT grid in the code.
 
-    int i = 0;
-    ModuleBase::Vector3<double> lat;
-    int ibox[3]={0,0,0};
+//     int i = 0;
+//     ModuleBase::Vector3<double> lat;
+//     int ibox[3]={0,0,0};
 
-    // ibox[i] are the minimal FFT dimensions,
-    lat.x = latvec.e11;
-    lat.y = latvec.e12;
-    lat.z = latvec.e13;
-    ibox[0] = 2 * int(sqrt(ggcut) * sqrt(lat * lat)) + 1;
+//     // ibox[i] are the minimal FFT dimensions,
+//     lat.x = latvec.e11;
+//     lat.y = latvec.e12;
+//     lat.z = latvec.e13;
+//     ibox[0] = 2 * int(sqrt(ggcut) * sqrt(lat * lat)) + 1;
 
-    lat.x = latvec.e21;
-    lat.y = latvec.e22;
-    lat.z = latvec.e23;
-    ibox[1] = 2 * int(sqrt(ggcut) * sqrt(lat * lat)) + 1;
+//     lat.x = latvec.e21;
+//     lat.y = latvec.e22;
+//     lat.z = latvec.e23;
+//     ibox[1] = 2 * int(sqrt(ggcut) * sqrt(lat * lat)) + 1;
 
-    lat.x = latvec.e31;
-    lat.y = latvec.e32;
-    lat.z = latvec.e33;
-    ibox[2] = 2 * int(sqrt(ggcut) * sqrt(lat * lat)) + 1;
-    //lat*lat=lat.x*lat.x+lat.y*lat.y+lat.z+lat.z
+//     lat.x = latvec.e31;
+//     lat.y = latvec.e32;
+//     lat.z = latvec.e33;
+//     ibox[2] = 2 * int(sqrt(ggcut) * sqrt(lat * lat)) + 1;
+//     //lat*lat=lat.x*lat.x+lat.y*lat.y+lat.z+lat.z
 
-    // Find the minimal FFT box size the factors into the primes (2,3,5,7).
-    for (i = 0; i < 3; i++)
-    {
-    	int b = 0;
-        int n2 = 0;
-        int n3 = 0;
-        int n5 = 0;
-        //int n7 = 0;
-        bool done_factoring = false;
+//     // Find the minimal FFT box size the factors into the primes (2,3,5,7).
+//     for (i = 0; i < 3; i++)
+//     {
+//     	int b = 0;
+//         int n2 = 0;
+//         int n3 = 0;
+//         int n5 = 0;
+//         //int n7 = 0;
+//         bool done_factoring = false;
 	
-		// mohan add 2011-04-22
-		int s;
-		if(i==0) s=bx;
-		else if(i==1) s=by;
-		else if(i==2) s=bz;
-		int ns = 0;
+// 		// mohan add 2011-04-22
+// 		int s;
+// 		if(i==0) s=bx;
+// 		else if(i==1) s=by;
+// 		else if(i==2) s=bz;
+// 		int ns = 0;
 
-        // increase ibox[i] by 1 until it is totally factorizable by (2,3,5,7) 
-        do
-        {
-			b = ibox[i];
+//         // increase ibox[i] by 1 until it is totally factorizable by (2,3,5,7) 
+//         do
+//         {
+// 			b = ibox[i];
 
-			// mohan add 2011-04-22            
-			if( ibox[i] % s != 0) 
-			{
-				b = -1; // meaning less
-			}
-			else
-			{
-				//n2 = n3 = n5 = n7 = 0;
-				n2 = n3 = n5 = ns = 0;
-				done_factoring = false;
+// 			// mohan add 2011-04-22            
+// 			if( ibox[i] % s != 0) 
+// 			{
+// 				b = -1; // meaning less
+// 			}
+// 			else
+// 			{
+// 				//n2 = n3 = n5 = n7 = 0;
+// 				n2 = n3 = n5 = ns = 0;
+// 				done_factoring = false;
 
-				while (!done_factoring)
-				{
-					if (b % 2 == 0) 
-					{
-						n2++;
-						b /= 2;
-						continue;
-					}
-					if (b % 3 == 0) 
-					{
-						n3++;
-						b /= 3;
-						continue;
-					}
-					if (b % 5 == 0) 
-					{
-						n5++;
-						b /= 5;
-						continue;
-					}
-					//if (b%7==0) { n7++; b /= 7; continue; }
-					done_factoring = true;
-				}
-			}//
-            ibox[i] += 1;
-        }
-        while (b != 1);
-        ibox[i] -= 1;
-        //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
-    }
+// 				while (!done_factoring)
+// 				{
+// 					if (b % 2 == 0) 
+// 					{
+// 						n2++;
+// 						b /= 2;
+// 						continue;
+// 					}
+// 					if (b % 3 == 0) 
+// 					{
+// 						n3++;
+// 						b /= 3;
+// 						continue;
+// 					}
+// 					if (b % 5 == 0) 
+// 					{
+// 						n5++;
+// 						b /= 5;
+// 						continue;
+// 					}
+// 					//if (b%7==0) { n7++; b /= 7; continue; }
+// 					done_factoring = true;
+// 				}
+// 			}//
+//             ibox[i] += 1;
+//         }
+//         while (b != 1);
+//         ibox[i] -= 1;
+//         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
+//     }
 
-    // Nx, Ny, Nz are the FFT dimensions
+//     // Nx, Ny, Nz are the FFT dimensions
 
-    nx_tmp = ibox[0];
-    ny_tmp = ibox[1];
-    nz_tmp = ibox[2];
+//     nx_tmp = ibox[0];
+//     ny_tmp = ibox[1];
+//     nz_tmp = ibox[2];
 
-    int nxyz_tmp = 0;
-    nxyz_tmp = nx_tmp * ny_tmp * nz_tmp;
+//     int nxyz_tmp = 0;
+//     nxyz_tmp = nx_tmp * ny_tmp * nz_tmp;
 
-    if (GlobalV::test_pw > 1)
-    {
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nx",nx_tmp);
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ny",ny_tmp);
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nz",nz_tmp);
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nxyz",nxyz_tmp);
-    }
-    return;
-}
+//     if (GlobalV::test_pw > 1)
+//     {
+//         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nx",nx_tmp);
+//         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ny",ny_tmp);
+//         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nz",nz_tmp);
+//         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nxyz",nxyz_tmp);
+//     }
+//     return;
+// }
 
 
 //==========================================================
@@ -241,7 +241,8 @@ void PW_complement::setup_GVectors(
     ModuleBase::Vector3<double>* ig,
     ModuleBase::Vector3<double>* g)
 {
-    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","setup_GVectors");
+    if(ngmc_g_in<=0) return; //qianrui fix a bug resulting in segment fault.
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_compleme nt","setup_GVectors");
     ModuleBase::timer::tick("PW_complement","setup_GVectors");
 
     int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G std::vector index
@@ -359,7 +360,7 @@ void PW_complement::get_ig2fftw(const int &ngmw, const int &nx, const int &ny, c
 
 
 void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy, const int &ncz,
-                                const ModuleBase::Vector3<double> *ig, int* ig1, int *ig2, int *ig3, int *ig2fftc)
+                                const ModuleBase::Vector3<double> *ig, int *ig2fftc)
 {
     //=================================================================
     // set ig2fftc & ig2fftw with the correct fft correspondence
@@ -368,23 +369,14 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
     // see ggen.f90, set ig2fftc ith the correct fft correspondence Page 4/6
 
     ModuleBase::GlobalFunc::ZEROS(ig2fftc, ngmc);
-    ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
-    ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
-    ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
 
     ModuleBase::Memory::record("PW_complement","ig2fftc",ngmc,"int");
-    ModuleBase::Memory::record("PW_complement","ig1",ngmc,"int");
-    ModuleBase::Memory::record("PW_complement","ig2",ngmc,"int");
-    ModuleBase::Memory::record("PW_complement","ig3",ngmc,"int");
 
     for (int i = 0; i < ngmc;i++)
     {
         int n1 = int(ig[i].x);//ig --> f --> (i,j,k)
         int n2 = int(ig[i].y);
         int n3 = int(ig[i].z);
-        ig1[i] = n1 + ncx;
-        ig2[i] = n2 + ncy;
-        ig3[i] = n3 + ncz;
         if (n1 < 0)n1 = n1 + ncx;
         if (n2 < 0)n2 = n2 + ncy;
         if (n3 < 0)n3 = n3 + ncz;
