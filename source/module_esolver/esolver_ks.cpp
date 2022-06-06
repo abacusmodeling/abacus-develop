@@ -38,10 +38,10 @@ namespace ModuleESolver
 
     ESolver_KS::~ESolver_KS()
     {
-        if(this->pw_wfc != nullptr)   delete this->pw_wfc;
-        if(this->pelec != nullptr)    delete this->pelec;
-        if(this->phami != nullptr)    delete this->phami;
-        if(this->phsol != nullptr)    delete this->phsol;
+        delete this->pw_wfc;
+        delete this->pelec;
+        delete this->phami;
+        delete this->phsol;
     }
 
     void ESolver_KS::Init(Input& inp, UnitCell_pseudo& ucell)
