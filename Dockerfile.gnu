@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git g++ gfortran libssl-dev make cmake vim wget bc unzip python\
+RUN apt-get update && apt-get install -y --no-install-recommends git g++ gfortran libssl-dev make cmake vim wget bc unzip python3-numpy\
     && apt-get install -y --no-install-recommends mpich libmpich-dev
 
 ENV GIT_SSL_NO_VERIFY=1 TERM=xterm-256color
