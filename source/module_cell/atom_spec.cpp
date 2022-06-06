@@ -15,6 +15,9 @@ Atom::Atom()
     taud = new ModuleBase::Vector3<double>[1];
     vel = new ModuleBase::Vector3<double>[1];
     mag = new double[1];
+    angle1 = new double[1];
+    angle2 = new double[1];
+    m_loc_ = new ModuleBase::Vector3<double>[1];
     l_nchi = new int[1];
     iw2l = new int[1];
     iw2n = new int[1];
@@ -29,6 +32,9 @@ Atom::~Atom()
     delete[] taud;
     delete[] vel;
     delete[] mag;
+    delete[] angle1;
+    delete[] angle2;
+    delete[] m_loc_;
     delete[] l_nchi;
     delete[] iw2l;
     delete[] iw2n;
@@ -137,6 +143,9 @@ void Atom::bcast_atom(void)
 		delete[] taud;
 	    delete[] vel;
         delete[] mag;
+        delete[] angle1;
+        delete[] angle2;
+        delete[] m_loc_;
         tau = new ModuleBase::Vector3<double>[na];
 		taud = new ModuleBase::Vector3<double>[na];
 	    vel = new ModuleBase::Vector3<double>[na];
