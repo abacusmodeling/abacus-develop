@@ -3,15 +3,16 @@
 // DATE : 2009-11-08
 //==========================================================
 #include "parallel_global.h"
+#include "mpi.h"
 #include "parallel_common.h"
 #include "parallel_reduce.h"
 #include "../module_base/global_function.h"
+#include <iostream>
 
 #ifdef _OPENMP
-#include <omp.h>					// Peize Lin add 2018-02-13
+#include <omp.h>
+#include <thread>
 #endif
-
-using namespace std;
 
 #if defined __MPI
 MPI_Datatype mpicomplex;
@@ -147,21 +148,7 @@ void Parallel_Global::split_grid_world(const int &diag_np)
 
 void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 {
-#if defined __MPI
-//for test
-/*
-    std::cout << "\n Hello! Test MPI NOW : argc = "<<argc<<std::endl;
-    for(int i=0;i<argc;i++)
-    {
-        std::cout<<"\n argv["<<i<<"]="<<argv[i];
-    }
-    std::cout<<std::endl;
-*/
-
-#ifdef _OPENMP
-//	omp_set_nested(true);					// Peize Lin add 2018-02-13
-#endif
-
+#ifdef __MPI
 #ifdef _OPENMP
 	int provided;
 	MPI_Init_thread(&argc,&argv,MPI_THREAD_SERIALIZED,&provided);
@@ -171,67 +158,71 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	// MPI_THREAD_FUNNELED is enough for ABACUS. Using MPI_THREAD_SERIALIZED for elpa.
 #else
 	MPI_Init(&argc,&argv);					// Peize Lin change 2018-07-12
-#endif
-//----------------------------------------------------------
-// int atoi ( const char * str );
-// atoi : Convert std::string to int type
-// atof : Convert std::string to double type
-// atol : Convert std::string to long int type
-//----------------------------------------------------------
-//  GlobalV::KPAR = atoi(argv[1]); // mohan abandon 2010-06-09
+#endif //_OPENMP
+
+    //  GlobalV::KPAR = atoi(argv[1]); // mohan abandon 2010-06-09
 
 	// get the size --> GlobalV::NPROC
 	// get the rank --> GlobalV::MY_RANK
 	MPI_Comm_size(MPI_COMM_WORLD,&GlobalV::NPROC);
-	MPI_Comm_rank(MPI_COMM_WORLD,&GlobalV::MY_RANK);
+    MPI_Comm_rank(MPI_COMM_WORLD, &GlobalV::MY_RANK);
 
+    // determining appropriate thread number for OpenMP
+#ifdef _OPENMP
+    const int max_thread_num = std::thread::hardware_concurrency(); // Consider Hyperthreading disabled.
+    int current_thread_num = omp_get_max_threads();
+    MPI_Comm shmcomm;
+    MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &shmcomm);
+    int process_num, local_rank;
+    MPI_Comm_size(shmcomm, &process_num);
+    MPI_Comm_rank(shmcomm, &local_rank);
+    MPI_Comm_free(&shmcomm);
+    int desired_thread_num = max_thread_num / process_num;
+    if (desired_thread_num != current_thread_num && current_thread_num == max_thread_num)
+    {
+        // OpenMP thread num not set
+        omp_set_num_threads(desired_thread_num);
+        current_thread_num = omp_get_max_threads();
+    }
+    if (current_thread_num * process_num != max_thread_num && local_rank==0)
+    {
+		// only output info in local rank 0
+        std::cerr << "WARNING: Total thread number on this node mismatches with hardware availability. "
+            "This may cause poor performance."<< std::endl;
+        std::cerr << "Info: Local MPI proc number: " << process_num << ","
+                  << "OpenMP thread number: " << current_thread_num << ","
+                  << "Total thread number: " << current_thread_num * process_num << ","
+                  << "Local thread limit: " << max_thread_num << std::endl;
+    }
+#endif
 
+    if (GlobalV::MY_RANK == 0)
+    {
+        std::cout << " *********************************************************" << std::endl;
+        std::cout << " *                                                       *" << std::endl;
+        std::cout << " *                  WELCOME TO ABACUS                    *" << std::endl;
+        std::cout << " *                                                       *" << std::endl;
+        std::cout << " *            'Atomic-orbital Based Ab-initio            *" << std::endl;
+        std::cout << " *                  Computation at UStc'                 *" << std::endl;
+        std::cout << " *                                                       *" << std::endl;
+        std::cout << " *          Website: http://abacus.ustc.edu.cn/          *" << std::endl;
+        std::cout << " *                                                       *" << std::endl;
+        std::cout << " *********************************************************" << std::endl;
+        time_t time_now = time(NULL);
+        std::cout << " " << ctime(&time_now);
+    }
 
-	// for test
+    // for test
+    /*
 	for (int i=0; i<GlobalV::NPROC; i++)
     {
         if (GlobalV::MY_RANK == i)
         {
-			if(i==0)
-			{
-				/*
-				printf( "\n\e[33m%s\e[0m\n", " ===================================================");
-				printf( "\e[33m%s\e[0m", "               WELCOME");
-				printf( "\e[33m%s\e[0m", " TO");
-				printf( "\e[33m%s\e[0m", " ESP");
-				printf( "\e[33m%s\e[0m\n", " WORLD                 ");
-				printf( "\e[33m%s\e[0m\n", " ===================================================");
-				*/
-				//xiaohui modify 2015-03-25
-				/*
-				std::cout << " *********************************************************" << std::endl;
-				std::cout << " *                                                       *" << std::endl;
-				std::cout << " *                  WELCOME TO MESIA                     *" << std::endl;
-				std::cout << " *                                                       *" << std::endl;
-				std::cout << " *       'Massive Electronic simulation based on         *" << std::endl;
-				std::cout << " *        Systematically Improvable Atomic bases'        *" << std::endl;
-				std::cout << " *                                                       *" << std::endl;
-				std::cout << " *********************************************************" << std::endl;
-				*/
-				std::cout << " *********************************************************" << std::endl;
-				std::cout << " *                                                       *" << std::endl;
-				std::cout << " *                  WELCOME TO ABACUS                    *" << std::endl;
-				std::cout << " *                                                       *" << std::endl;
-				std::cout << " *            'Atomic-orbital Based Ab-initio            *" << std::endl;
-				std::cout << " *                  Computation at UStc'                 *" << std::endl;
-				std::cout << " *                                                       *" << std::endl;
-                std::cout << " *          Website: http://abacus.ustc.edu.cn/          *" << std::endl;
-                std::cout << " *                                                       *" << std::endl;
-				std::cout << " *********************************************************" << std::endl;
-
-				//std::cout << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
-    			time_t  time_now = time(NULL);
-    			std::cout << " " << ctime(&time_now);
-			}
-//            std::cout << " PROCESSOR " << std::setw(4) << GlobalV::MY_RANK+1 << " IS READY." << std::endl;
+            std::cout << " PROCESSOR " << std::setw(4) << GlobalV::MY_RANK+1 << " IS READY." << std::endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }
+    */
 
 	// This section can be chosen !!
 	// mohan 2011-03-15
@@ -260,6 +251,6 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	MPI_Type_commit(&mpicomplex);
 	MPI_Op_create((MPI_User_function *)Parallel_Global::myProd,1,&myOp);
 
-#endif
+#endif //__MPI
     return;
 }
