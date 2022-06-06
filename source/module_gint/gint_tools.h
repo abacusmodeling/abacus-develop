@@ -247,8 +247,8 @@ namespace Gint_Tools
 	template<typename T>
 	Array_Pool<T>::Array_Pool(const int nr, const int nc)	// Attention: uninitialized
 	{
-		ptr_1D = (T*)malloc(nr*nc*sizeof(T));
-		ptr_2D = (T**)malloc(nr*sizeof(T*));
+		ptr_1D = new T[nr*nc];
+		ptr_2D = new T*[nr];
 		for (int ir=0; ir<nr; ++ir)
 			ptr_2D[ir] = &ptr_1D[ir*nc];
 	}
@@ -258,15 +258,15 @@ namespace Gint_Tools
 	{
 		ptr_1D = array.ptr_1D;
 		ptr_2D = array.ptr_2D;
-		free(array.ptr_2D);		array.ptr_2D=nullptr;
-		free(array.ptr_1D);		array.ptr_1D=nullptr;
+		delete[] array.ptr_2D;
+		delete[] array.ptr_1D;
 	}
 
 	template<typename T>
 	Array_Pool<T>::~Array_Pool()
 	{
-		free(ptr_2D);
-		free(ptr_1D);
+		delete[] ptr_2D;
+		delete[] ptr_1D;
 	}
 }
 
