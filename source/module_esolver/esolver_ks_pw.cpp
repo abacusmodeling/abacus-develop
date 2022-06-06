@@ -48,18 +48,6 @@ namespace ModuleESolver
     }
     ESolver_KS_PW::~ESolver_KS_PW()
     {
-        if(this->pelec!=nullptr)
-        {
-            delete this->pelec;
-        }
-        if(this->phami!=nullptr)
-        {
-            delete this->phami;
-        }
-        if(this->phsol!=nullptr)
-        {
-            delete this->phsol;
-        }
     }
 
     void ESolver_KS_PW::Init(Input& inp, UnitCell_pseudo& ucell)

@@ -14,7 +14,7 @@ namespace ModuleESolver
     }
     ESolver_FP::~ESolver_FP()
     {
-        if(pw_rho!=NULL)    delete pw_rho;
+        if(pw_rho!=nullptr)    delete pw_rho;
     }
     void ESolver_FP::Init(Input& inp, UnitCell_pseudo& cell)
     {
