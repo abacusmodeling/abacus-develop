@@ -243,8 +243,8 @@ namespace Gint_Tools
 	template<typename T>
 	Array_Pool<T>::Array_Pool(const int nr, const int nc)	// Attention: uninitialized
 	{
-		ptr_1D = new T[nr*nc*sizeof(T)];
-		ptr_2D = new T*[nr*sizeof(T*)];
+		ptr_1D = new T[nr*nc];
+		ptr_2D = new T*[nr];
 		for (int ir=0; ir<nr; ++ir)
 			ptr_2D[ir] = &ptr_1D[ir*nc];
 	}
