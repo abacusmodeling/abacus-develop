@@ -16,6 +16,7 @@ namespace ModuleESolver
     {
     public:
         ESolver_KS();
+        virtual ~ESolver_KS();
         // HSolver* phsol;
         double diag_ethr; // diag threshold
         double scf_thr;   // scf threshold
