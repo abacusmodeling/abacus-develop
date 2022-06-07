@@ -9,8 +9,6 @@
 #include "input_update.h"
 #include "src_pw/occupy.h"
 #include "src_lcao/ELEC_evolve.h"
-#include "src_lcao/ELEC_cbands_gamma.h"
-#include "src_lcao/ELEC_cbands_k.h"
 #include "src_pw/symmetry_rho.h"
 #include "src_io/chi0_hilbert.h"
 #include "src_pw/threshold_elec.h"
@@ -916,6 +914,32 @@ namespace ModuleESolver
             this->output_HS_R(); //LiuXh add 2019-07-15
         }
 
+    }
+
+    bool ESolver_KS_LCAO::do_after_converge(int& iter)
+    {
+#ifdef __MPI
+        if(Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type)
+        {
+            if (!GlobalC::exx_global.info.separate_loop) 
+            {
+                GlobalC::exx_global.info.hybrid_step = 1;
+            }
+            //exx converged or get max exx steps
+            if(this->two_level_step == GlobalC::exx_global.info.hybrid_step || (iter==1 && this->two_level_step!=0))
+            {
+                return true;
+            }
+            //update exx and redo scf
+            XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
+            GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
+            
+            iter = 0;
+            this->two_level_step++;
+            return false;
+        }
+#endif // __MPI
+        return true;
     }
 
 }

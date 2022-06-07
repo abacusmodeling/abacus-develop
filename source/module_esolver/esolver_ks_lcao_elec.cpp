@@ -10,10 +10,6 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../src_io/istate_charge.h"
 #include "../src_io/istate_envelope.h"
-#include "src_lcao/ELEC_scf.h"
-#include "src_lcao/ELEC_nscf.h"
-#include "src_lcao/ELEC_cbands_gamma.h"
-#include "src_lcao/ELEC_cbands_k.h"
 #include "src_lcao/ELEC_evolve.h"
 //
 #include "../src_ri/exx_abfs.h"
@@ -205,7 +201,27 @@ namespace ModuleESolver
             }
         }
 #endif
+
+//Peize Lin add 2016-12-03
+#ifdef __MPI
+        if(Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type)
+        {
+            if (Exx_Global::Hybrid_Type::HF == GlobalC::exx_lcao.info.hybrid_type
+                || Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type
+                || Exx_Global::Hybrid_Type::HSE == GlobalC::exx_lcao.info.hybrid_type)
+            {
+                GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
+            }
+            if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
+            {
+                Exx_Opt_Orb exx_opt_orb;
+                exx_opt_orb.generate_matrix();
+                ModuleBase::timer::tick("LOOP_ions", "opt_ions");
+                return;
+            }
+        }
     }
+#endif
 
     void ESolver_KS_LCAO::beforescf(int istep)
     {
@@ -226,6 +242,9 @@ namespace ModuleESolver
 
         phami->non_first_scf = istep;
 
+        // for exx two_level scf
+        this->two_level_step = 0;
+
         ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");
         return;
     }
@@ -236,53 +255,7 @@ namespace ModuleESolver
         ModuleBase::timer::tick("ESolver_KS_LCAO", "othercalculation");
         this->beforesolver(istep);
         // self consistent calculations for electronic ground state
-        if (GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md"
-            || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax") //pengfei 2014-10-13
-        {
-#ifdef __MPI
-            //Peize Lin add 2016-12-03
-            if (Exx_Global::Hybrid_Type::HF == GlobalC::exx_lcao.info.hybrid_type
-                || Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type
-                || Exx_Global::Hybrid_Type::HSE == GlobalC::exx_lcao.info.hybrid_type)
-            {
-                GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
-            }
-            if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
-            {
-                Exx_Opt_Orb exx_opt_orb;
-                exx_opt_orb.generate_matrix();
-            }
-            else    // Peize Lin add 2016-12-03
-            {
-#endif // __MPI
-                ELEC_scf es;
-                es.scf(istep, this->LOC, this->LOWF, this->UHM);
-#ifdef __MPI
-                if (GlobalC::exx_global.info.separate_loop)
-                {
-                    for (size_t hybrid_step = 0; hybrid_step != GlobalC::exx_global.info.hybrid_step; ++hybrid_step)
-                    {
-                        XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-                        GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
-
-                        ELEC_scf es;
-                        es.scf(istep, this->LOC, this->LOWF, this->UHM);
-                        if (ELEC_scf::iter == 1)     // exx converge
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-                    ELEC_scf es;
-                    es.scf(istep, this->LOC, this->LOWF, this->UHM);
-                }
-            }
-#endif // __MPI
-        }
-        else if (GlobalV::CALCULATION == "nscf")
+        if (GlobalV::CALCULATION == "nscf")
         {
             this->nscf();
         }

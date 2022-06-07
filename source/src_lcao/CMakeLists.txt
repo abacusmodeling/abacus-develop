@@ -1,11 +1,7 @@
 list(APPEND objects
     DM_gamma.cpp
     DM_k.cpp
-    ELEC_cbands_gamma.cpp
-    ELEC_cbands_k.cpp
     ELEC_evolve.cpp
-    ELEC_nscf.cpp
-    ELEC_scf.cpp
     exx_lip.cpp
     FORCE_STRESS.cpp
     FORCE_gamma.cpp

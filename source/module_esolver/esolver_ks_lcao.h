@@ -32,6 +32,8 @@ namespace ModuleESolver
         virtual void updatepot(const int istep, const int iter) override;
         virtual void eachiterfinish(const int iter) override;
         virtual void afterscf() override;
+        virtual bool do_after_converge(int& iter) override;
+        int two_level_step = 0;
 
         virtual void othercalculation(const int istep)override;
         ORB_control orb_con;    //Basis_LCAO

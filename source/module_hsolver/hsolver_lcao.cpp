@@ -3,6 +3,7 @@
 #include "diago_blas.h"
 #include "diago_elpa.h"
 #include "src_io/write_HS.h"
+#include "module_base/timer.h"
 
 namespace hsolver
 {
@@ -11,6 +12,7 @@ template <typename T>
 void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge)
 {
     ModuleBase::TITLE("HSolverLCAO", "solve");
+    ModuleBase::timer::tick("HSolverLCAO", "solve");
     // select the method of diagonalization
     this->method = method_in;
     if (this->method == "genelpa")
@@ -78,11 +80,16 @@ void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt, psi::Psi<T>& psi, elecs
     }
 
     //used in nscf calculation
-    if(skip_charge) return;
+    if(skip_charge) 
+    {
+        ModuleBase::timer::tick("HSolverLCAO", "solve");
+        return;
+    }
 
     //calculate charge by psi
     //called in scf calculation
     pes->psiToRho(psi);
+    ModuleBase::timer::tick("HSolverLCAO", "solve");
 }
 
 int HSolverLCAO::out_mat_hs = 0;

@@ -49,6 +49,8 @@ namespace ModuleESolver
         virtual void afterscf() {};
         // <Temporary> It should be replaced by a function in Hamilt Class
         virtual void updatepot(const int istep, const int iter) {};
+        // choose strategy when charge density convergence achieved
+        virtual bool do_after_converge(int& iter){this->niter = iter; return true;}
 
 
         //TOOLS:

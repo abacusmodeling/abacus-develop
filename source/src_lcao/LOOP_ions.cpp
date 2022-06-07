@@ -9,7 +9,6 @@
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../src_ri/exx_abfs.h"
 #include "../src_ri/exx_opt_orb.h"
-#include "ELEC_scf.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
@@ -142,7 +141,6 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
         }
 
         // solve electronic structures in terms of LCAO
-        // mohan add 2021-02-09
         p_esolver->Run(this->istep - 1, GlobalC::ucell);
 
         time_t eend = time(NULL);
@@ -190,7 +188,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
 
             std::cout << std::setiosflags(ios::scientific)
                 << " " << std::setw(7) << ss.str()
-                << std::setw(5) << ELEC_scf::iter
+                << std::setw(5) << p_esolver->getniter()
                 << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV;
 
             std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)

@@ -55,6 +55,7 @@ template <> void HamiltLCAO<double>::matrix(MatrixBlock<double> &hk_in, MatrixBl
 template <> void HamiltLCAO<double>::updateHk(const int ik)
 {
     ModuleBase::TITLE("HamiltLCAO", "updateHk");
+    ModuleBase::timer::tick("HamiltLCAO", "updateHk");
     //this->hk_fixed_mock(ik);
     //this->hk_update_mock(ik);
 
@@ -121,6 +122,7 @@ template <> void HamiltLCAO<double>::updateHk(const int ik)
         BlasConnector::copy(this->LM->Sloc.size(), this->LM->Sloc.data(), inc, this->smatrix_k, inc);
         hsolver::DiagoElpa::is_already_decomposed = false;
     }
+    ModuleBase::timer::tick("HamiltLCAO", "updateHk");
     return;
 }
 
@@ -136,7 +138,7 @@ void HamiltLCAO<double>::constructHamilt()
 template <> void HamiltLCAO<std::complex<double>>::updateHk(const int ik)
 {
     ModuleBase::TITLE("HamiltLCAO", "updateHk");
-    ModuleBase::timer::tick("Efficience", "each_k");
+    ModuleBase::timer::tick("HamiltLCAO", "each_k");
     //-----------------------------------------
     //(1) prepare data for this k point.
     // copy the local potential from array.
@@ -200,8 +202,8 @@ template <> void HamiltLCAO<std::complex<double>>::updateHk(const int ik)
     //--------------------------------------------
 
     // with k points
-    ModuleBase::timer::tick("Efficience", "each_k");
-    ModuleBase::timer::tick("Efficience", "H_k");
+    ModuleBase::timer::tick("HamiltLCAO", "each_k");
+    ModuleBase::timer::tick("HamiltLCAO", "H_k");
     this->uhm->calculate_Hk(ik);
 
     // Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
