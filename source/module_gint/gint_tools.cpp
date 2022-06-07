@@ -39,7 +39,7 @@ namespace Gint_Tools
 		const int jby,
 		const int kbz)
 	{
-		int *vindex = (int*)malloc(GlobalC::bigpw->bxyz*sizeof(int));
+		int *vindex = new int[GlobalC::bigpw->bxyz];
 		int bindex=0;
 		// z is the fastest,
 		// ipart can be obtained by using a previously stored array
@@ -71,12 +71,12 @@ namespace Gint_Tools
 	{
 		// set the index for obtaining local potentials
 		int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
-		double *vldr3 = (double*)malloc(GlobalC::bigpw->bxyz*sizeof(double));					
+		double *vldr3 = new double[GlobalC::bigpw->bxyz];
 		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 		{
 			vldr3[ib]=vlocal[vindex[ib]] * dv;
 		}
-		free(vindex);	vindex=nullptr;
+		delete[] vindex;
 		return vldr3;
 	}
 
@@ -88,12 +88,12 @@ namespace Gint_Tools
 	{
 		// set the index for obtaining local potentials
 		int* vindex = Gint_Tools::get_vindex(start_ind, ncyz);	
-		double *vldr3 = (double*)malloc(GlobalC::bigpw->bxyz*sizeof(double));					
+		double *vldr3 = new double[GlobalC::bigpw->bxyz];
 		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 		{
 			vldr3[ib]=vlocal[vindex[ib]] * dv;
 		}
-		free(vindex);	vindex=nullptr;
+		delete[] vindex;
 		return vldr3;
 	}
 
