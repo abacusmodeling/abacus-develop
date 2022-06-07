@@ -13,17 +13,17 @@ Grid_Technique GridT;
 
 Grid_Technique::Grid_Technique()
 {
-    this->nlocdimg = new int[1];	
-	this->nlocstartg = new int[1];
-	this->nad = new int[1];
-    this->how_many_atoms = new int[1];
-	this->start_ind = new int[1];
-	this->which_atom = new int[1];
-	this->which_bigcell = new int[1];
-	this->which_unitcell = new int[1];
-	this->bcell_start = new int[1];
-	this->in_this_processor = new bool[1];
-	this->trace_lo = new int[1];
+    this->nlocdimg = nullptr;	
+	this->nlocstartg = nullptr;
+	this->nad = nullptr;
+    this->how_many_atoms = nullptr;
+	this->start_ind = nullptr;
+	this->which_atom = nullptr;
+	this->which_bigcell = nullptr;
+	this->which_unitcell = nullptr;
+	this->bcell_start = nullptr;
+	this->in_this_processor = nullptr;
+	this->trace_lo = nullptr;
 
 	this->total_atoms_on_grid = 0;
     allocate_find_R2 = false;

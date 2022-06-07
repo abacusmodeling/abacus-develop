@@ -13,20 +13,20 @@ Parallel_PW::Parallel_PW()
 	this->ngm_i_record = 0;
 	this->allocate_igl2g = false;
 
-	this->npps = new int[1];
-	this->st_start = new int[1];
-	this->nst_per = new int[1];
-	this->npw_per = new int[1];
+	this->npps = nullptr;
+	this->st_start = nullptr;
+	this->nst_per = nullptr;
+	this->npw_per = nullptr;
 
-	this->ig_l2g = new int[1];
+	this->ig_l2g = nullptr;
 	
-	this->index = new bool[1];
-	this->index_ip = new int[1];
+	this->index = nullptr;
+	this->index_ip = nullptr;
 
-	this->isind = new int[1];
-	this->ismap = new int[1];
+	this->isind = nullptr;
+	this->ismap = nullptr;
 
-    this->ngm_i_number = new int[1];
+    this->ngm_i_number = nullptr;
     this->ngm_i2 = 0;
     this->ngm_i_record2 = 0;
     this->allocate_igl2g_final_scf = false; //LiuXh add 20180619

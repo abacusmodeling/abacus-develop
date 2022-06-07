@@ -14,13 +14,13 @@ Atom::Atom()
     tau = new ModuleBase::Vector3<double>[1];
     taud = new ModuleBase::Vector3<double>[1];
     vel = new ModuleBase::Vector3<double>[1];
-    mag = new double[1];
-    l_nchi = new int[1];
-    iw2l = new int[1];
-    iw2n = new int[1];
-    iw2m = new int[1];
-	iw2_ylm = new int[1];
-	iw2_new = new bool[1];
+    mag = nullptr;
+    l_nchi = nullptr;
+    iw2l = nullptr;
+    iw2n = nullptr;
+    iw2m = nullptr;
+	iw2_ylm = nullptr;
+	iw2_new = nullptr;
 }
 
 Atom::~Atom()

@@ -9,8 +9,8 @@ int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
     this->nbeta = 0;
     delete[] kkbeta;
     delete[] lll;
-    this->kkbeta = new int[1];
-    this->lll = new int[1];
+    this->kkbeta = nullptr;
+    this->lll = nullptr;
     this->beta.create(1, 1);
     this->dion.create(1, 1);
 
@@ -18,9 +18,9 @@ int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
     delete[] nn;
     delete[] jchi;
     delete[] jjj;
-    this->nn = new int[1];
-    this->jchi = new double[1];
-    this->jjj = new double[1];
+    this->nn = nullptr;
+    this->jchi = nullptr;
+    this->jjj = nullptr;
     ModuleBase::GlobalFunc::ZEROS(nn, 1);
     ModuleBase::GlobalFunc::ZEROS(jchi, 1);
     ModuleBase::GlobalFunc::ZEROS(jjj, 1);
