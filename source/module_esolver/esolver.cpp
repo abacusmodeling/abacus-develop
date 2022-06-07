@@ -45,10 +45,7 @@ namespace ModuleESolver
 
     void clean_esolver(ESolver*& pesolver)
     {
-        if (pesolver != NULL)
-        {
-            delete pesolver;
-        }
+        delete pesolver;
     }
 
 }
