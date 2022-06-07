@@ -1,6 +1,6 @@
 #include "../../module_base/inverse_matrix.h"
 #include "../../module_base/lapack_connector.h"
-#include "../../src_pw/pw_basis.h"
+#include "../../src_pw/structure_factor.h"
 #include "../../module_psi/psi.h"
 #include "../../module_hamilt/hamilt.h"
 #include "../../module_hamilt/hamilt_pw.h"

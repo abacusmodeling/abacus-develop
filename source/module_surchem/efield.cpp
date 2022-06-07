@@ -6,10 +6,10 @@
 
 double Efield::etotefield = 0.0;
 double Efield::tot_dipole = 0.0;
-int Efield::edir;
-double Efield::emaxpos;
-double Efield::eopreg;
-double Efield::eamp;
+int Efield::efield_dir;
+double Efield::efield_pos_max;
+double Efield::efield_pos_dec;
+double Efield::efield_amp ;
 double Efield::bvec[3];
 double Efield::bmod;
 
@@ -21,7 +21,7 @@ Efield::~Efield(){}
 // calculate dipole potential in surface calculations
 //=======================================================
 ModuleBase::matrix Efield::add_efield(const UnitCell &cell, 
-                                        PW_Basis &pwb, 
+                                        ModulePW::PW_Basis *rho_basis, 
                                         const int &nspin, 
                                         const double *const *const rho)
 {
@@ -29,21 +29,21 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
     ModuleBase::timer::tick("Efield", "add_efield");
 
     double latvec;    // latvec along the efield direction
-    if(edir == 0)
+    if(efield_dir == 0)
     {
         bvec[0] = cell.G.e11;
         bvec[1] = cell.G.e12; 
         bvec[2] = cell.G.e13; 
         latvec = cell.a1.norm();
     }
-    else if(edir == 1)
+    else if(efield_dir == 1)
     {
         bvec[0] = cell.G.e21;
         bvec[1] = cell.G.e22; 
         bvec[2] = cell.G.e23; 
         latvec = cell.a2.norm();
     }
-    else if(edir = 2)
+    else if(efield_dir == 2)
     {
         bvec[0] = cell.G.e31;
         bvec[1] = cell.G.e32; 
@@ -59,56 +59,56 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
     double ion_dipole = 0;
     double elec_dipole = 0;
 
-    if(GlobalV::DIPOLE)
+    if(GlobalV::DIP_COR_FLAG)
     {
         ion_dipole = cal_ion_dipole(cell, bmod);
-        elec_dipole = cal_elec_dipole(cell, pwb, nspin, rho, bmod);
+        elec_dipole = cal_elec_dipole(cell, rho_basis, nspin, rho, bmod);
         tot_dipole = ion_dipole - elec_dipole;
 
         // energy correction
-        etotefield = - ModuleBase::e2 * (eamp - 0.5 * tot_dipole) * tot_dipole * cell.omega / ModuleBase::FOUR_PI;
+        etotefield = - ModuleBase::e2 * (efield_amp  - 0.5 * tot_dipole) * tot_dipole * cell.omega / ModuleBase::FOUR_PI;
     }
     else
     {
         ion_dipole = cal_ion_dipole(cell, bmod);
 
         // energy correction
-        etotefield = - ModuleBase::e2 * eamp * ion_dipole * cell.omega / ModuleBase::FOUR_PI;
+        etotefield = - ModuleBase::e2 * efield_amp  * ion_dipole * cell.omega / ModuleBase::FOUR_PI;
     }
 
-    const double length = (1.0 - eopreg) * latvec * cell.lat0;
-    const double vamp = ModuleBase::e2 * (eamp - tot_dipole) * length;
+    const double length = (1.0 - efield_pos_dec) * latvec * cell.lat0;
+    const double vamp = ModuleBase::e2 * (efield_amp  - tot_dipole) * length;
 
     GlobalV::ofs_running << "\n\n Adding external electric field: " << std::endl;
-    if(GlobalV::DIPOLE)
+    if(GlobalV::DIP_COR_FLAG)
     {
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Computed dipole along edir", edir);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Computed dipole along efield_dir", efield_dir);
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Elec. dipole (Ry a.u.)", elec_dipole);
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Ion dipole (Ry a.u.)", ion_dipole);
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total dipole (Ry a.u.)", tot_dipole);
     }
-    if( abs(eamp) > 0.0) 
+    if( abs(efield_amp ) > 0.0) 
     {
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Amplitute of Efield (Hartree)", eamp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Amplitute of Efield (Hartree)", efield_amp );
     }
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Potential amplitute (Ry)", vamp);
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total length (Bohr)", length);
 
     // dipole potential
-    ModuleBase::matrix v(nspin, pwb.nrxx);
+    ModuleBase::matrix v(nspin, rho_basis->nrxx);
     const int nspin0 = (nspin == 2) ? 2 : 1;
 
-    for (int ir = 0; ir < pwb.nrxx; ++ir)
+    for (int ir = 0; ir < rho_basis->nrxx; ++ir)
     {
-        int i = ir / (pwb.ncy * pwb.nczp);
-        int j = ir / pwb.nczp - i * pwb.ncy;
-        int k = ir % pwb.nczp + pwb.nczp_start;
-        double x = (double)i / pwb.ncx;
-        double y = (double)j / pwb.ncy;
-        double z = (double)k / pwb.ncz;
+        int i = ir / (rho_basis->ny * rho_basis->nplane);
+        int j = ir / rho_basis->nplane - i * rho_basis->ny;
+        int k = ir % rho_basis->nplane + rho_basis->startz_current;
+        double x = (double)i / rho_basis->nx;
+        double y = (double)j / rho_basis->ny;
+        double z = (double)k / rho_basis->nz;
         ModuleBase::Vector3<double> pos(x, y, z);
 
-        double saw = saw_function(emaxpos, eopreg, pos[edir]);
+        double saw = saw_function(efield_pos_max, efield_pos_dec, pos[efield_dir]);
 
         for (int is = 0; is < nspin0; is++)
         {
@@ -116,7 +116,7 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
         }
     }
 
-    double fac = ModuleBase::e2 * (eamp - tot_dipole) * cell.lat0 / bmod;
+    double fac = ModuleBase::e2 * (efield_amp  - tot_dipole) * cell.lat0 / bmod;
 
     ModuleBase::timer::tick("Efield", "add_efield");
     return v * fac;
@@ -134,7 +134,7 @@ double Efield::cal_ion_dipole(const UnitCell &cell, const double &bmod)
         double sum = 0;
         for(int ia=0; ia<cell.atoms[it].na; ++ia)
         {
-            sum += saw_function(emaxpos, eopreg, cell.atoms[it].taud[ia][edir]);
+            sum += saw_function(efield_pos_max, efield_pos_dec, cell.atoms[it].taud[ia][efield_dir]);
         }
         ion_dipole += sum * cell.atoms[it].zv;
     }
@@ -144,7 +144,7 @@ double Efield::cal_ion_dipole(const UnitCell &cell, const double &bmod)
 }
 
 double Efield::cal_elec_dipole(const UnitCell &cell, 
-                            PW_Basis &pwb, 
+                            ModulePW::PW_Basis *rho_basis, 
                             const int &nspin, 
                             const double *const *const rho,
                             const double &bmod)
@@ -152,17 +152,17 @@ double Efield::cal_elec_dipole(const UnitCell &cell,
     double elec_dipole = 0;
     const int nspin0 = (nspin == 2) ? 2 : 1;
 
-    for (int ir = 0; ir < pwb.nrxx; ++ir)
+    for (int ir = 0; ir < rho_basis->nrxx; ++ir)
     {
-        int i = ir / (pwb.ncy * pwb.nczp);
-        int j = ir / pwb.nczp - i * pwb.ncy;
-        int k = ir % pwb.nczp + pwb.nczp_start;
-        double x = (double)i / pwb.ncx;
-        double y = (double)j / pwb.ncy;
-        double z = (double)k / pwb.ncz;
+        int i = ir / (rho_basis->ny * rho_basis->nplane);
+        int j = ir / rho_basis->nplane - i * rho_basis->ny;
+        int k = ir % rho_basis->nplane + rho_basis->startz_current;
+        double x = (double)i / rho_basis->nx;
+        double y = (double)j / rho_basis->ny;
+        double z = (double)k / rho_basis->nz;
         ModuleBase::Vector3<double> pos(x, y, z);
 
-        double saw = saw_function(emaxpos, eopreg, pos[edir]);
+        double saw = saw_function(efield_pos_max, efield_pos_dec, pos[efield_dir]);
 
         for (int is = 0; is < nspin0; is++)
         {
@@ -171,7 +171,7 @@ double Efield::cal_elec_dipole(const UnitCell &cell,
     }
 
     Parallel_Reduce::reduce_double_pool(elec_dipole);
-    elec_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / pwb.ncxyz;
+    elec_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / rho_basis->nxyz;
 
     return elec_dipole;
 }
@@ -183,7 +183,7 @@ double Efield::saw_function(const double &a, const double &b, const double &x)
 
     const double fac = 1 - b;
 
-    if( x < a )
+    if( x <= a )
     {
         return x - a + 0.5 * fac;
     }
@@ -199,7 +199,7 @@ double Efield::saw_function(const double &a, const double &b, const double &x)
 
 void Efield::compute_force(const UnitCell &cell, ModuleBase::matrix &fdip)
 {
-    if(GlobalV::DIPOLE)
+    if(GlobalV::DIP_COR_FLAG)
     {
         int iat = 0;
         for(int it=0; it<cell.ntype; ++it)
@@ -208,7 +208,7 @@ void Efield::compute_force(const UnitCell &cell, ModuleBase::matrix &fdip)
             {
                 for(int jj=0; jj<3; ++jj)
                 {
-                    fdip(iat, jj) = ModuleBase::e2 * (eamp - tot_dipole) * cell.atoms[it].zv * bvec[jj] / bmod;
+                    fdip(iat, jj) = ModuleBase::e2 * (efield_amp  - tot_dipole) * cell.atoms[it].zv * bvec[jj] / bmod;
                 }
                 ++iat;
             }
@@ -223,7 +223,7 @@ void Efield::compute_force(const UnitCell &cell, ModuleBase::matrix &fdip)
             {
                 for(int jj=0; jj<3; ++jj)
                 {
-                    fdip(iat, jj) = ModuleBase::e2 * eamp * cell.atoms[it].zv * bvec[jj] / bmod;
+                    fdip(iat, jj) = ModuleBase::e2 * efield_amp  * cell.atoms[it].zv * bvec[jj] / bmod;
                 }
                 ++iat;
             }

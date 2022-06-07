@@ -100,7 +100,7 @@ void Local_Orbital_wfc::allocate_k(const int& lgd,
 		std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
         if(psi == nullptr)
         {
-            psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nkstot, this->ParaV->ncol_bands, this->ParaV->nrow, nullptr);
+            ModuleBase::WARNING_QUIT("allocate_k","psi should be allocated first!");
         }
         else
         {
@@ -156,7 +156,12 @@ int Local_Orbital_wfc::localIndex(int globalindex, int nblk, int nprocs, int& my
 }
 
 #ifdef __MPI
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, const double* wfc_2d, double** wfc_grid)
+void Local_Orbital_wfc::wfc_2d_to_grid(
+    int out_wfc_lcao, 
+    const double* wfc_2d, 
+    double** wfc_grid, 
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg)
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
     ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
@@ -217,7 +222,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, const double* wfc_2d, d
     {
         std::stringstream ss;
         ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
-        WF_Local::write_lowf(ss.str(), ctot);
+        WF_Local::write_lowf(ss.str(), ctot, ekb, wg);
         for (int i = 0; i < GlobalV::NBANDS; i++)
         {
             delete[] ctot[i];
@@ -233,7 +238,9 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
     int out_wfc_lcao,
     const std::complex<double>* wfc_2d,
     std::complex<double>** wfc_grid,
-    int ik)
+    int ik, 
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg)
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
     ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
@@ -294,8 +301,8 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
     if (out_wfc_lcao && myid == 0)
     {
         std::stringstream ss;
-        ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";
-        WF_Local::write_lowf_complex(ss.str(), ctot, ik);
+        ss << GlobalV::global_readin_dir << "LOWF_K_" << ik + 1 << ".dat";
+        WF_Local::write_lowf_complex(ss.str(), ctot, ik, ekb, wg);
         for (int i = 0; i < GlobalV::NBANDS; i++)
         {
             delete[] ctot[i];

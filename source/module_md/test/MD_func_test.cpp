@@ -20,6 +20,7 @@ protected:
     void SetUp()
     {
         Setcell::setupcell(ucell);
+        Setcell::parameters();
         natom = ucell.nat;
         allmass = new double [natom];
         pos = new ModuleBase::Vector3<double> [natom];

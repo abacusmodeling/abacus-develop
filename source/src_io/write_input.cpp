@@ -229,12 +229,12 @@ void Input::Print(const std::string &fn) const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.md_damp,"damping parameter (time units) used to add force in Langevin method");
 
     ofs << "\n#Parameters (10.Electric field and dipole correction)" << std::endl;
-    ModuleBase::GlobalFunc::OUTP(ofs,"efield",efield,"add electric field");
-    ModuleBase::GlobalFunc::OUTP(ofs,"dipole",dipole,"dipole correction");
-    ModuleBase::GlobalFunc::OUTP(ofs,"edir",edir,"the direction of the electric field or dipole correction");
-    ModuleBase::GlobalFunc::OUTP(ofs,"emaxpos",emaxpos,"position of the maximum of the saw-like potential along crystal axis edir");
-    ModuleBase::GlobalFunc::OUTP(ofs,"eopreg",eopreg,"zone in the unit cell where the saw-like potential decreases");
-    ModuleBase::GlobalFunc::OUTP(ofs,"eamp",eamp,"amplitude of the electric field");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_flag",efield_flag,"add electric field");
+    ModuleBase::GlobalFunc::OUTP(ofs,"dip_cor_flag",dip_cor_flag,"dipole correction");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_dir",efield_dir,"the direction of the electric field or dipole correction");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_pos_max",efield_pos_max,"position of the maximum of the saw-like potential along crystal axis efield_dir");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_pos_dec",efield_pos_dec,"zone in the unit cell where the saw-like potential decreases");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_amp ",efield_amp ,"amplitude of the electric field");
 
     ofs << "\n#Parameters (11.Test)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "out_alllog", out_alllog, "output information for each processor, when parallel");
@@ -330,6 +330,11 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "tau", tau, "the effective surface tension parameter");
     ModuleBase::GlobalFunc::OUTP(ofs, "sigma_k", sigma_k, " the width of the diffuse cavity");
     ModuleBase::GlobalFunc::OUTP(ofs, "nc_k", nc_k, " the cut-off charge density");
+
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_q", comp_q, " total charge of compensating charge");
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_l", comp_l, " total length of compensating charge");
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_center", comp_center, " center of compensating charge on dim");
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_dim", comp_dim, " dimension of compensating charge(x, y or z)");
     ofs.close();
     return;
 }

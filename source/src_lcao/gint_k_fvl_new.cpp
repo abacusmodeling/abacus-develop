@@ -23,19 +23,19 @@ void Gint_k::cal_force_k(
         const int nby = GlobalC::GridT.nby;
         const int nbz_start = GlobalC::GridT.nbzp_start;
         const int nbz = GlobalC::GridT.nbzp;
-        const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
+        const double dv = GlobalC::ucell.omega/GlobalC::rhopw->nxyz;
     
-        const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
+        const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
 
         for (int i=0; i<nbx; i++)
         {
-            const int ibx = i*GlobalC::pw.bx;
+            const int ibx = i*GlobalC::bigpw->bx;
             for (int j=0; j<nby; j++)
             {
-                const int jby = j*GlobalC::pw.by;
+                const int jby = j*GlobalC::bigpw->by;
                 for (int k=nbz_start; k<nbz_start+nbz; k++)
                 {
-                    const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start;
+                    const int kbz = k*GlobalC::bigpw->bz-GlobalC::rhopw->startz_current;
     
                     const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
     
@@ -60,10 +60,10 @@ void Gint_k::cal_force_k(
                     // set up band matrix psir_ylm and psir_DM
                     const int LD_pool = max_size*GlobalC::ucell.nwmax;
 
-                    Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
-                    Gint_Tools::Array_Pool<double> dpsir_ylm_x(GlobalC::pw.bxyz, LD_pool);
-                    Gint_Tools::Array_Pool<double> dpsir_ylm_y(GlobalC::pw.bxyz, LD_pool);
-                    Gint_Tools::Array_Pool<double> dpsir_ylm_z(GlobalC::pw.bxyz, LD_pool);
+                    Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
+                    Gint_Tools::Array_Pool<double> dpsir_ylm_x(GlobalC::bigpw->bxyz, LD_pool);
+                    Gint_Tools::Array_Pool<double> dpsir_ylm_y(GlobalC::bigpw->bxyz, LD_pool);
+                    Gint_Tools::Array_Pool<double> dpsir_ylm_z(GlobalC::bigpw->bxyz, LD_pool);
 
                     Gint_Tools::cal_dpsir_ylm(
                         na_grid, grid_index, delta_r,
@@ -81,7 +81,7 @@ void Gint_k::cal_force_k(
 						block_index, cal_flag,
 						vldr3, psir_ylm.ptr_2D);
                     
-					Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::pw.bxyz, LD_pool);
+					Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::bigpw->bxyz, LD_pool);
                     if(isforce)
                     {
                     }
@@ -94,7 +94,7 @@ void Gint_k::cal_force_k(
                     delete[] block_index;
                     delete[] block_size;
 
-                    for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+                    for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
                         free(cal_flag[ib]);
                     free(cal_flag);			cal_flag=nullptr;
                 }//k

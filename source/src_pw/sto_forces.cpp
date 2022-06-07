@@ -27,19 +27,19 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 	ModuleBase::matrix forcenl(nat, 3);
     ModuleBase::matrix sto_forcenl(nat,3);
 	ModuleBase::matrix forcescc(nat, 3);
-    this->cal_force_loc(forcelc);
-    this->cal_force_ew(forceion);
+    this->cal_force_loc(forcelc, GlobalC::rhopw);
+    this->cal_force_ew(forceion, GlobalC::rhopw);
     if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0)  this->cal_force_nl(forcenl);
     this->cal_sto_force_nl(sto_forcenl,stowf);
     forcenl = forcenl + sto_forcenl;
-	this->cal_force_cc(forcecc);
-	this->cal_force_scc(forcescc);
+	this->cal_force_cc(forcecc, GlobalC::rhopw);
+	this->cal_force_scc(forcescc, GlobalC::rhopw);
 	
     //impose total force = 0
     int iat = 0;
 
 	ModuleBase::matrix force_e;
-	if(GlobalV::EFIELD)
+	if(GlobalV::EFIELD_FLAG)
 	{
 		force_e.create( GlobalC::ucell.nat, 3);
 		Efield::compute_force(GlobalC::ucell, force_e);
@@ -61,7 +61,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);																									   
 					
-				if(GlobalV::EFIELD)
+				if(GlobalV::EFIELD_FLAG)
 				{
 					force(iat,ipol) = force(iat, ipol) + force_e(iat, ipol);
 				}
@@ -136,7 +136,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 		Sto_Forces::print("NLCC     FORCE (Ry/Bohr)", forcecc);
 		Sto_Forces::print("ION      FORCE (Ry/Bohr)", forceion);
 		Sto_Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
-		if(GlobalV::EFIELD) Sto_Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
+		if(GlobalV::EFIELD_FLAG) Sto_Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
 	}
 	
 		
@@ -150,7 +150,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 		Sto_Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc,0);
 		Sto_Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Sto_Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
-		if(GlobalV::EFIELD) Sto_Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+		if(GlobalV::EFIELD_FLAG) Sto_Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
 	}
 	Sto_Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 	ModuleBase::timer::tick("Sto_Force","cal_force");
@@ -211,17 +211,17 @@ void Sto_Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 				if (ipol==0)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].x;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).x;
 				}
 				if (ipol==1)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].y;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).y;
 				}
 				if (ipol==2)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].z;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).z;
 				}
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -362,17 +362,17 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
 				if (ipol==0)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].x;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).x;
 				}
 				if (ipol==1)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].y;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).y;
 				}
 				if (ipol==2)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.gcar[ GlobalC::wf.igk(ik, ig) ].z;
+						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).z;
 				}
 			}
             for (int ib=0; ib<nchip[ik]; ib++)

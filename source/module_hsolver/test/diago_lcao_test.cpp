@@ -4,6 +4,7 @@
 #include "mpi.h"
 #include "string.h"
 #include "gtest/gtest.h"
+#include <vector>
 
 #define PASSTHRESHOLD 1e-10
 #define DETAILINFO    false

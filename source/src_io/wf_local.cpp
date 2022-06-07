@@ -63,7 +63,7 @@ int WF_Local::read_lowf_complex(std::complex<double>** ctot, const int& ik,
     std::stringstream ss;
 	// read wave functions
 	// write is in ../src_pdiag/pdiag_basic.cpp
-    ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 <<".dat";
+    ss << GlobalV::global_readin_dir << "LOWF_K_" << ik+1 <<".dat";
 //	std::cout << " name is = " << ss.str() << std::endl;
 
     std::ifstream ifs;
@@ -221,12 +221,12 @@ int WF_Local::read_lowf(double** ctot, const int& is,
 	{
 		// read wave functions
 		// write is in ../src_pdiag/pdiag_basic.cpp
-    	ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << is+1 <<".dat";
+    	ss << GlobalV::global_readin_dir << "LOWF_GAMMA_S" << is+1 <<".dat";
 		std::cout << " name is = " << ss.str() << std::endl;
 	}
 	else
 	{
-		ss << GlobalV::global_out_dir << "LOWF_K.dat";
+		ss << GlobalV::global_readin_dir << "LOWF_K.dat";
 	}
 
     std::ifstream ifs;
@@ -334,7 +334,7 @@ int WF_Local::read_lowf(double** ctot, const int& is,
     return 0;
 }
 
-void WF_Local::write_lowf(const std::string &name, double **ctot)
+void WF_Local::write_lowf(const std::string &name, double **ctot, const ModuleBase::matrix& ekb, const ModuleBase::matrix& wg)
 {
     ModuleBase::TITLE("WF_Local","write_lowf");
     ModuleBase::timer::tick("WF_Local","write_lowf");
@@ -357,8 +357,8 @@ void WF_Local::write_lowf(const std::string &name, double **ctot)
             // +1 to mean more clearly.
             // band index start from 1.
             ofs << "\n" << i+1 << " (band)";
-			ofs << "\n" << GlobalC::wf.ekb[GlobalV::CURRENT_SPIN][i] << " (Ry)"; //mohan add 2012-03-26
-			ofs << "\n" << GlobalC::wf.wg(GlobalV::CURRENT_SPIN,i) << " (Occupations)";
+			ofs << "\n" << ekb(GlobalV::CURRENT_SPIN, i) << " (Ry)"; //mohan add 2012-03-26
+			ofs << "\n" << wg(GlobalV::CURRENT_SPIN, i) << " (Occupations)";
             for (int j=0; j<GlobalV::NLOCAL; j++)
             {
                 if (j % 5 == 0) ofs << "\n";
@@ -372,7 +372,7 @@ void WF_Local::write_lowf(const std::string &name, double **ctot)
     return;
 }
 
-void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> **ctot, const int &ik)
+void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> **ctot, const int &ik, const ModuleBase::matrix& ekb, const ModuleBase::matrix& wg)
 {
     ModuleBase::TITLE("WF_Local","write_lowf_complex");
     ModuleBase::timer::tick("WF_Local","write_lowf_complex");
@@ -397,8 +397,8 @@ void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> 
             // +1 to mean more clearly.
             // band index start from 1.
             ofs << "\n" << i+1 << " (band)";
-			ofs << "\n" << GlobalC::wf.ekb[ik][i] << " (Ry)";
-			ofs << "\n" << GlobalC::wf.wg(ik,i) << " (Occupations)";
+			ofs << "\n" << ekb(ik, i) << " (Ry)";
+			ofs << "\n" << wg(ik,i) << " (Occupations)";
             for (int j=0; j<GlobalV::NLOCAL; j++)
             {
                 if (j % 5 == 0) ofs << "\n";

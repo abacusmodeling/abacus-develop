@@ -2,7 +2,7 @@
 
 #include "cal_dm.h"
 #include "module_base/timer.h"
-#include "src_lcao/grid_technique.h"
+#include "module_gint/grid_technique.h"
 
 namespace elecstate
 {
@@ -37,7 +37,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
         for (int ik = 0; ik < psi.get_nk(); ik++)
         {
             psi.fix_k(ik);
-            this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), this->lowf->wfc_k_grid[ik], ik);
+            this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), this->lowf->wfc_k_grid[ik], ik, this->ekb, this->wg);
             //added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
             if(GlobalV::NSPIN==4)
             {
@@ -70,7 +70,8 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     //------------------------------------------------------------
 
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GK.cal_rho_k(this->loc->DM_R, this->charge);
+    Gint_inout inout(this->loc->DM_R, this->charge, Gint_Tools::job_type::rho);
+    this->uhm->GK.cal_gint(&inout);
 
     this->charge->renormalize_rho();
 
@@ -104,7 +105,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
             {
                 psi.fix_k(ik);
                 double** wfc_grid = nullptr; // output but not do "2d-to-grid" conversion
-                this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), wfc_grid);
+                this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), wfc_grid, this->ekb, this->wg);
             }
             //this->loc->dm2dToGrid(this->loc->dm_gamma[ik], this->loc->DM[ik]); // transform dm_gamma[is].c to this->loc->DM[is]
             this->loc->cal_dk_gamma_from_2D_pub();
@@ -120,7 +121,8 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     // calculate the charge density on real space grid.
     //------------------------------------------------------------
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GG.cal_rho(this->loc->DM, this->charge);
+    Gint_inout inout(this->loc->DM, this->charge,Gint_Tools::job_type::rho);
+    this->uhm->GG.cal_gint(&inout);
 
     this->charge->renormalize_rho();
 

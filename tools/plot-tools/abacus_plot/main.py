@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from abacus_plot.band import Band, PBand
 from abacus_plot.dos import TDOS, PDOS
-from abacus_plot.utils import read_json
+from abacus_plot.utils import read_json, key2int
 
 
 class Show:
@@ -41,9 +41,9 @@ class Show:
             shift = text.pop("shift", False)
             figsize = text.pop("figsize", (12, 10))
             fig, ax = plt.subplots(figsize=figsize)
-            index = text.pop("index", [])
-            atom_index = text.pop("atom_index", [])
-            species = text.pop("species", [])
+            index = key2int(text.pop("index", None))    # keys of json must be dict, I convert them to int for `index` and `atom_index`
+            atom_index = key2int(text.pop("atom_index", None))
+            species = text.pop("species", None)
             outdir = text.pop("outdir", './')
             cmapname = text.pop("cmapname", 'jet')
             pband = PBand(bandfile, kptfile)
@@ -53,9 +53,9 @@ class Show:
             text = read_json(args.file)
             bandfile = text["bandfile"]
             kptfile = text["kptfile"]
-            index = text.pop("index", [])
-            atom_index = text.pop("atom_index", [])
-            species = text.pop("species", [])
+            index = key2int(text.pop("index", None))
+            atom_index = key2int(text.pop("atom_index", None))
+            species = text.pop("species", None)
             outdir = text.pop("outdir", './')
             pdos = PBand(bandfile, kptfile)
             pdos.write(index=index, atom_index=atom_index, species=species, outdir=outdir)
@@ -83,12 +83,19 @@ class Show:
             energy_range = text.pop("energy_range", [])
             dos_range = text.pop("dos_range", [])
             shift = text.pop("shift", False)
-            index = text.pop("index", [])
-            atom_index = text.pop("atom_index", [])
-            species = text.pop("species", [])
+            index = key2int(text.pop("index", None))
+            atom_index = key2int(text.pop("atom_index", None))
+            species = text.pop("species", None)
             figsize = text.pop("figsize", (12, 10))
-            fig, ax = plt.subplots(
-                len(species), 1, sharex=True, figsize=figsize)
+            if index:
+                fig, ax = plt.subplots(
+                    len(index), 1, sharex=True, figsize=figsize)
+            if atom_index:
+                fig, ax = plt.subplots(
+                    len(atom_index), 1, sharex=True, figsize=figsize)
+            if species:
+                fig, ax = plt.subplots(
+                    len(species), 1, sharex=True, figsize=figsize)
             prec = text.pop("prec", 0.01)
             pdos = PDOS(pdosfile)
             pdos.plot(fig=fig, ax=ax, index=index, atom_index=atom_index, species=species, efermi=efermi, shift=shift,
@@ -99,9 +106,9 @@ class Show:
         if args.dos and args.out:
             text = read_json(args.file)
             pdosfile = text.pop("pdosfile", '')
-            index = text.pop("index", [])
-            atom_index = text.pop("atom_index", [])
-            species = text.pop("species", [])
+            index = key2int(text.pop("index", None))
+            atom_index = key2int(text.pop("atom_index", None))
+            species = text.pop("species", None)
             outdir = text.pop("outdir", './')
             pdos = PDOS(pdosfile)
             pdos.write(index=index, atom_index=atom_index, species=species, outdir=outdir)

@@ -51,7 +51,7 @@ void ELEC_evolve::evolve_psi(
         }
         GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
-        for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+        for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
@@ -69,18 +69,20 @@ void ELEC_evolve::evolve_psi(
             uhm.GK.reset_spin(GlobalV::CURRENT_SPIN);
 
             // vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-            uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT);
+            Gint_inout inout(GlobalC::pot.vr_eff1, 0, Gint_Tools::job_type::vlocal);
+            uhm.GK.cal_gint(&inout);
             // added by zhengdy-soc, for non-collinear case
             // integral 4 times, is there any method to simplify?
             if (GlobalV::NSPIN == 4)
             {
                 for (int is = 1;is < 4;is++)
                 {
-                    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+                    for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                     {
                         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
                     }
-                    uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, is);
+                    Gint_inout inout(GlobalC::pot.vr_eff1, is, Gint_Tools::job_type::vlocal);
+                    uhm.GK.cal_gint(&inout);
                 }
             }
         }

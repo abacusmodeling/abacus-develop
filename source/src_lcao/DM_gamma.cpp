@@ -283,7 +283,7 @@ void Local_Orbital_Charge::gamma_file(psi::Psi<double>* psid, Local_Orbital_wfc 
     }
     if(psid == nullptr)
     {
-        psid = new psi::Psi<double>(GlobalV::NSPIN, ncol, this->ParaV->nrow, nullptr);
+        ModuleBase::WARNING_QUIT("gamma_file", "psid should be allocated first!");
     }
     else
     {

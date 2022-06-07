@@ -259,12 +259,12 @@ class Input
     // efield and dipole correction
     // Yu Liu add 2022-05-18
     //==========================================================
-    bool efield;        // add electric field
-    bool dipole;        // dipole correction
-    int edir;           // the direction of the electric field or dipole correction
-    double emaxpos;     // position of the maximum of the saw-like potential along crystal axis edir
-    double eopreg;      // zone in the unit cell where the saw-like potential decreases
-    double eamp;        // amplitude of the electric field
+    bool efield_flag;        // add electric field
+    bool dip_cor_flag;        // dipole correction
+    int efield_dir;           // the direction of the electric field or dipole correction
+    double efield_pos_max;     // position of the maximum of the saw-like potential along crystal axis efield_dir
+    double efield_pos_dec;      // zone in the unit cell where the saw-like potential decreases
+    double efield_amp ;        // amplitude of the electric field
 
     //==========================================================
     // vdw
@@ -399,6 +399,11 @@ class Input
     double tau;
     double sigma_k;
     double nc_k;
+    // gauss charge
+    double comp_q;
+    double comp_l;
+    double comp_center;
+    int comp_dim;
 
     //==========================================================
     // variables for test only

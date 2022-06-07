@@ -27,11 +27,11 @@ void Gint_Gamma::cal_band_rho(
     const int*const block_iw, 						// block_iw[na_grid],	index of wave functions for each block
     const int*const block_size, 					// block_size[na_grid],	band size: number of columns of a band
     const int*const block_index,					// block_index[na_grid+1], count total number of atomis orbitals
-    const bool*const*const cal_flag, 				// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-    const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
-    const int*const vindex,							// vindex[GlobalC::pw.bxyz]
+    const bool*const*const cal_flag, 				// cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+    const double*const*const psir_ylm,				// psir_ylm[GlobalC::bigpw->bxyz][LD_pool]
+    const int*const vindex,							// vindex[GlobalC::bigpw->bxyz]
     const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-    Charge* chr) const		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
+    Charge* chr) const		// rho[GlobalV::NSPIN][GlobalC::rhopw->nrxx]
 {
     //parameters for dsymm, dgemm and ddot
     constexpr char side='L', uplo='U';
@@ -41,8 +41,8 @@ void Gint_Gamma::cal_band_rho(
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        Gint_Tools::Array_Pool<double> psir_DM(GlobalC::pw.bxyz, LD_pool);
-        ModuleBase::GlobalFunc::ZEROS(psir_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+        Gint_Tools::Array_Pool<double> psir_DM(GlobalC::bigpw->bxyz, LD_pool);
+        ModuleBase::GlobalFunc::ZEROS(psir_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
 
         for (int ia1=0; ia1<na_grid; ++ia1)
         {
@@ -51,7 +51,7 @@ void Gint_Gamma::cal_band_rho(
             //ia1==ia2, diagonal part
             // find the first ib and last ib for non-zeros cal_flag
             int first_ib=0, last_ib=0;
-            for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+            for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
             {
                 if(cal_flag[ib][ia1])
                 {
@@ -59,7 +59,7 @@ void Gint_Gamma::cal_band_rho(
                     break;
                 }
             }
-            for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
+            for(int ib=GlobalC::bigpw->bxyz-1; ib>=0; --ib)
             {
                 if(cal_flag[ib][ia1])
                 {
@@ -102,7 +102,7 @@ void Gint_Gamma::cal_band_rho(
             for (int ia2=ia1+1; ia2<na_grid; ++ia2)
             {
                 int first_ib=0, last_ib=0;
-                for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+                for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
                 {
                     if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
                     {
@@ -110,7 +110,7 @@ void Gint_Gamma::cal_band_rho(
                         break;
                     }
                 }
-                for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
+                for(int ib=GlobalC::bigpw->bxyz-1; ib>=0; --ib)
                 {
                     if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
                     {
@@ -152,7 +152,7 @@ void Gint_Gamma::cal_band_rho(
         } // ia1
     
         double *rhop = chr->rho[is];
-        for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+        for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
         {
             const double r = ddot_(&block_index[na_grid], psir_ylm[ib], &inc, psir_DM.ptr_2D[ib], &inc);
             const int grid = vindex[ib];
@@ -185,7 +185,7 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 			const int nbz_start = GlobalC::GridT.nbzp_start;
 			const int nbz = GlobalC::GridT.nbzp;
 		
-			const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp; // mohan add 2012-03-25
+			const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
             
             // it's a uniform grid to save orbital values, so the delta_r is a constant.
             const double delta_r = GlobalC::ORB.dr_uniform;		
@@ -194,13 +194,13 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 #endif
 			for (int i=0; i<nbx; i++)
 			{
-				const int ibx = i*GlobalC::pw.bx;
+				const int ibx = i*GlobalC::bigpw->bx;
 				for (int j=0; j<nby; j++)
 				{
-					const int jby = j*GlobalC::pw.by;
+					const int jby = j*GlobalC::bigpw->by;
 					for (int k=nbz_start; k<nbz_start+nbz; k++)
 					{
-						const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start;
+						const int kbz = k*GlobalC::bigpw->bz-GlobalC::rhopw->startz_current;
 		
 						const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 		
@@ -222,7 +222,7 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
 						// set up band matrix psir_ylm and psir_DM
 						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 						
-						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
                         Gint_Tools::cal_psir_ylm(
 							na_grid, grid_index, delta_r,
 							block_index, block_size, 
@@ -237,7 +237,7 @@ void Gint_Gamma::cal_rho(double*** DM_in, Charge* chr)
                         delete[] block_index;
                         delete[] block_size;
 
-						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+						for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 							free(cal_flag[ib]);
 						free(cal_flag);			cal_flag=nullptr;
 					}// k

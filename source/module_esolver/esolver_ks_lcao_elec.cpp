@@ -56,10 +56,10 @@ namespace ModuleESolver
 
         // (3) Periodic condition search for each grid.
         GlobalC::GridT.set_pbc_grid(
-            GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
-            GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
-            GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
-            GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
+            GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
+            GlobalC::bigpw->bx, GlobalC::bigpw->by, GlobalC::bigpw->bz,
+            GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbz,
+            GlobalC::bigpw->nbxx, GlobalC::bigpw->nbzp_start, GlobalC::bigpw->nbzp);
 
         // (2)For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
@@ -98,6 +98,38 @@ namespace ModuleESolver
         // this information is used to calculate
         // the force.
 
+        // init psi
+        // init psi
+        if (GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            if(this->psid==nullptr)
+            {
+                int ncol = this->LOWF.ParaV->ncol_bands;
+                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="lapack_gvx"
+#ifdef __CUSOLVER_LCAO
+                ||GlobalV::KS_SOLVER=="cusolver"
+#endif
+                )
+                {
+                    ncol = this->LOWF.ParaV->ncol;
+                }
+                this->psid = new psi::Psi<double>(GlobalV::NSPIN, ncol, this->LOWF.ParaV->nrow, nullptr);
+            }
+        }
+        else
+        {   
+            if(this->psi == nullptr)
+            {
+                int ncol = this->LOWF.ParaV->ncol_bands;
+#ifdef __CUSOLVER_LCAO
+                if(GlobalV::KS_SOLVER=="cusolver")
+                {
+                    ncol = this->LOWF.paraV->ncol;
+                }
+#endif
+                this->psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, ncol, this->LOWF.ParaV->nrow, nullptr);
+            }
+        }
         // init density kernel and wave functions.
         this->LOC.allocate_dm_wfc(GlobalC::GridT.lgd, this->LOWF, this->psid, this->psi);
 
@@ -116,7 +148,7 @@ namespace ModuleESolver
         {
             for (int is = 0; is < GlobalV::NSPIN; is++)
             {
-                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
                 std::stringstream ssd;
                 ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM";
                 // reading density matrix,
@@ -126,18 +158,20 @@ namespace ModuleESolver
             // calculate the charge density
             if (GlobalV::GAMMA_ONLY_LOCAL)
             {
-                this->UHM.GG.cal_rho(this->LOC.DM, (Charge*)(&GlobalC::CHR));
+                Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+                this->UHM.GG.cal_gint(&inout);
             }
             else
             {
-                this->UHM.GK.cal_rho_k(this->LOC.DM_R, (Charge*)(&GlobalC::CHR));
+                Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+                this->UHM.GK.cal_gint(&inout);
             }
 
             // renormalize the charge density
             GlobalC::CHR.renormalize_rho();
 
             // initialize the potential
-            GlobalC::pot.init_pot(istep - 1, GlobalC::pw.strucFac);
+            GlobalC::pot.init_pot(istep - 1, GlobalC::sf.strucFac);
         }
 
 
@@ -180,14 +214,14 @@ namespace ModuleESolver
         this->beforesolver(istep);
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
 
         //2. the electron charge density should be symmetrized,
         // here is the initialization
         Symmetry_rho srho;
         for (int is = 0; is < GlobalV::NSPIN; is++)
         {
-            srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+            srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
         }
 
         phami->non_first_scf = istep;
@@ -259,7 +293,7 @@ namespace ModuleESolver
         }
         else if (GlobalV::CALCULATION == "ienvelope")
         {
-            IState_Envelope IEP;
+            IState_Envelope IEP(this->pelec);
             if (GlobalV::GAMMA_ONLY_LOCAL)
                 IEP.begin(this->psid, this->LOWF, this->UHM.GG, INPUT.out_wfc_pw, GlobalC::wf.out_wfc_r);
             else
@@ -299,37 +333,6 @@ namespace ModuleESolver
         // then when the istep is a variable of scf or nscf,
         // istep becomes istep-1, this should be fixed in future
         int istep = 0;
-        //when first called, init psi
-        if (GlobalV::GAMMA_ONLY_LOCAL)
-        {
-            if(this->psid==nullptr)
-            {
-                int ncol = this->LOWF.ParaV->ncol_bands;
-                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="lapack_gvx"
-#ifdef __CUSOLVER_LCAO
-                ||GlobalV::KS_SOLVER=="cusolver"
-#endif
-                )
-                {
-                    ncol = this->LOWF.ParaV->ncol;
-                }
-                this->psid = new psi::Psi<double>(GlobalV::NSPIN, ncol, this->LOWF.ParaV->nrow, nullptr);
-            }
-        }
-        else
-        {   
-            if(this->psi == nullptr)
-            {
-                int ncol = this->LOWF.ParaV->ncol_bands;
-#ifdef __CUSOLVER_LCAO
-                if(GlobalV::KS_SOLVER=="cusolver")
-                {
-                    ncol = this->LOWF.paraV->ncol;
-                }
-#endif
-                this->psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, ncol, this->LOWF.ParaV->nrow, nullptr);
-            }
-        }
         if(this->phsol != nullptr)
         {
             if(this->psi != nullptr)

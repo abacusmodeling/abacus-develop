@@ -33,10 +33,10 @@ void Gint_Gamma::cal_meshball_vlocal(
 	const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
 	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
 	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-	const bool*const*const cal_flag,	    	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-	const double*const vldr3,			    	// vldr3[GlobalC::pw.bxyz]
-	const double*const*const psir_ylm,		    // psir_ylm[GlobalC::pw.bxyz][LD_pool]
-	const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
+	const bool*const*const cal_flag,	    	// cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,			    	// vldr3[GlobalC::bigpw->bxyz]
+	const double*const*const psir_ylm,		    // psir_ylm[GlobalC::bigpw->bxyz][LD_pool]
+	const double*const*const psir_vlbr3,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
 	const int lgd_now,
 	double*const*const GridVlocal) const	    // GridVlocal[lgd_now][lgd_now]
 {
@@ -53,7 +53,7 @@ void Gint_Gamma::cal_meshball_vlocal(
 			if(iw1_lo<=iw2_lo)
 			{
                 int first_ib=0;
-                for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+                for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
                 {
                     if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
                     {
@@ -62,7 +62,7 @@ void Gint_Gamma::cal_meshball_vlocal(
                     }
                 }
                 int last_ib=0;
-                for(int ib=GlobalC::pw.bxyz-1; ib>=0; --ib)
+                for(int ib=GlobalC::bigpw->bxyz-1; ib>=0; --ib)
                 {
                     if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
                     {
@@ -281,7 +281,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 		const int nbz_start=GlobalC::GridT.nbzp_start;
 		const int nbz=GlobalC::GridT.nbzp;
 
-		const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
+		const int ncyz=GlobalC::rhopw->ny*GlobalC::rhopw->nplane;
 
 		const int lgd_now=GlobalC::GridT.lgd;
 		if(max_size>0 && lgd_now>0)
@@ -294,17 +294,17 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 			ModuleBase::Memory::record("Gint_Gamma","GridVlocal_therad",lgd_now*lgd_now,"double");
 
 			const int LD_pool = max_size*GlobalC::ucell.nwmax;
-            const double dv = GlobalC::ucell.omega/GlobalC::pw.ncxyz;
+            const double dv = GlobalC::ucell.omega/GlobalC::rhopw->nxyz;
 
 #ifdef _OPENMP
 			#pragma omp for
 #endif
 			for (int i=0; i< nbx; i++)
 			{
-				const int ibx=i*GlobalC::pw.bx;
+				const int ibx=i*GlobalC::bigpw->bx;
 				for (int j=0; j<nby; j++)
 				{
-					const int jby=j*GlobalC::pw.by;
+					const int jby=j*GlobalC::bigpw->by;
 					for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
 					{
 						const int grid_index = i*nby*nbz + j*nbz + (k-nbz_start);
@@ -318,7 +318,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						// kbz can be obtained using a previously stored array
 						//------------------------------------------------------------------
-						const int kbz=k*GlobalC::pw.bz-GlobalC::pw.nczp_start;
+						const int kbz=k*GlobalC::bigpw->bz-GlobalC::rhopw->startz_current;
 
                         int * block_iw, * block_index, * block_size;
                         Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
@@ -330,7 +330,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						// compute atomic basis phi(r) with both radial and angular parts
 						//------------------------------------------------------------------
-						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+						Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
                         Gint_Tools::cal_psir_ylm(
 							na_grid, grid_index, delta_r,
 							block_index, block_size, 
@@ -357,7 +357,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
                         delete[] block_index;
                         delete[] block_size;
 
-						for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+						for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
 							free(cal_flag[ib]);
 						free(cal_flag);			cal_flag=nullptr;
 					}// k

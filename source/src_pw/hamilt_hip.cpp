@@ -119,17 +119,17 @@ void Hamilt::diagH_pw(const int &istep, const int &iter, const int &ik, const do
 				if (iter < 0)
 				{
 					CHECK_CUFFT(hipfftPlan3d(&GlobalC::UFFT.fft_handle,
-											 GlobalC::pw.nx,
-											 GlobalC::pw.ny,
-											 GlobalC::pw.nz,
+											 GlobalC::rhopw->nx,
+											 GlobalC::rhopw->ny,
+											 GlobalC::rhopw->nz,
 											 HIPFFT_C2C));
 				}
 				else
 				{
 					CHECK_CUFFT(hipfftPlan3d(&GlobalC::UFFT.fft_handle,
-											 GlobalC::pw.nx,
-											 GlobalC::pw.ny,
-											 GlobalC::pw.nz,
+											 GlobalC::rhopw->nx,
+											 GlobalC::rhopw->ny,
+											 GlobalC::rhopw->nz,
 											 HIPFFT_Z2Z));
 				}
 
@@ -239,8 +239,8 @@ void Hamilt::diagH_pw(const int &istep, const int &iter, const int &ik, const do
 										   reinterpret_cast<float2 *>(f_vkb_c),
 										   reinterpret_cast<double2 *>(d_vkb_c),
 										   GlobalC::wf.npwx * nkb);
-						// CHECK_CUFFT(hipfftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny,
-						// GlobalC::pw.nz, HIPFFT_C2C)); cout<<"Do float CG ..."<<endl;
+						// CHECK_CUFFT(hipfftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::rhopw->nx, GlobalC::rhopw->ny,
+						// GlobalC::rhopw->nz, HIPFFT_C2C)); cout<<"Do float CG ..."<<endl;
 						f_cg_cuda.diag(f_wf_evc,
 									   f_wf_ekb,
 									   f_vkb_c,
@@ -275,8 +275,8 @@ void Hamilt::diagH_pw(const int &istep, const int &iter, const int &ik, const do
 					else
 					{
 						// cout<<"begin cg!!"<<endl;
-						// CHECK_CUFFT(hipfftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny,
-						// GlobalC::pw.nz, HIPFFT_Z2Z)); cout<<"Do double CG ..."<<endl;
+						// CHECK_CUFFT(hipfftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::rhopw->nx, GlobalC::rhopw->ny,
+						// GlobalC::rhopw->nz, HIPFFT_Z2Z)); cout<<"Do double CG ..."<<endl;
 						d_cg_cuda.diag(d_wf_evc,
 									   d_wf_ekb,
 									   d_vkb_c,
@@ -324,9 +324,9 @@ void Hamilt::diagH_pw(const int &istep, const int &iter, const int &ik, const do
 						hipMemcpy(d_precondition, precondition, DIM_CG_CUDA2 * sizeof(double), hipMemcpyHostToDevice));
 					// do things
 					CHECK_CUFFT(hipfftPlan3d(&GlobalC::UFFT.fft_handle,
-											 GlobalC::pw.nx,
-											 GlobalC::pw.ny,
-											 GlobalC::pw.nz,
+											 GlobalC::rhopw->nx,
+											 GlobalC::rhopw->ny,
+											 GlobalC::rhopw->nz,
 											 HIPFFT_Z2Z));
 
 					d_cg_cuda.diag(d_wf_evc,

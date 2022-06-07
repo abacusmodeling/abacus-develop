@@ -106,6 +106,7 @@ public:
     static void parameters()
     {
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
+        GlobalV::CAL_STRESS = 1;
         //ModuleBase::Global_File::open_log(GlobalV::ofs_running, "run.log");
 
         INPUT.mdp.md_restart = 0;

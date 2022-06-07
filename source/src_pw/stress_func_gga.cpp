@@ -46,7 +46,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 	{
 		for(int j=0;j<3;j++)
 		{
-			sigma(i,j) += sigma_gradcorr[i][j] / GlobalC::pw.ncxyz;
+			sigma(i,j) += sigma_gradcorr[i][j] / GlobalC::rhopw->nxyz;
 		}
 	}
 
