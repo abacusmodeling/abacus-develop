@@ -570,6 +570,9 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				delete[] atoms[it].vel;
        			delete[] atoms[it].mbl;
 				delete[] atoms[it].mag;
+                delete[] atoms[it].angle1;
+                delete[] atoms[it].angle2;
+                delete[] atoms[it].m_loc_;
        			atoms[it].tau = new ModuleBase::Vector3<double>[na];
        			atoms[it].taud = new ModuleBase::Vector3<double>[na];
 				atoms[it].vel = new ModuleBase::Vector3<double>[na];
