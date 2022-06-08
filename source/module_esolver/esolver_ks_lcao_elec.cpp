@@ -26,6 +26,10 @@
 #endif
 #include "../src_pw/H_Ewald_pw.h"
 
+#include "module_hamilt/hamilt_lcao.h"
+#include "module_elecstate/elecstate_lcao.h"
+#include "module_hsolver/hsolver_lcao.h"
+
 namespace ModuleESolver
 {
 
@@ -54,10 +58,10 @@ namespace ModuleESolver
 
         // (3) Periodic condition search for each grid.
         GlobalC::GridT.set_pbc_grid(
-            GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
-            GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
-            GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
-            GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
+            GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
+            GlobalC::bigpw->bx, GlobalC::bigpw->by, GlobalC::bigpw->bz,
+            GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbz,
+            GlobalC::bigpw->nbxx, GlobalC::bigpw->nbzp_start, GlobalC::bigpw->nbzp);
 
         // (2)For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
@@ -114,7 +118,7 @@ namespace ModuleESolver
         {
             for (int is = 0; is < GlobalV::NSPIN; is++)
             {
-                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+                ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
                 std::stringstream ssd;
                 ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM";
                 // reading density matrix,
@@ -124,18 +128,20 @@ namespace ModuleESolver
             // calculate the charge density
             if (GlobalV::GAMMA_ONLY_LOCAL)
             {
-                this->UHM.GG.cal_rho(this->LOC.DM, (Charge*)(&GlobalC::CHR));
+                Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+                this->UHM.GG.cal_gint(&inout);
             }
             else
             {
-                this->UHM.GK.cal_rho_k(this->LOC.DM_R, (Charge*)(&GlobalC::CHR));
+                Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+                this->UHM.GK.cal_gint(&inout);
             }
 
             // renormalize the charge density
             GlobalC::CHR.renormalize_rho();
 
             // initialize the potential
-            GlobalC::pot.init_pot(istep - 1, GlobalC::pw.strucFac);
+            GlobalC::pot.init_pot(istep - 1, GlobalC::sf.strucFac);
         }
 
 
@@ -178,14 +184,83 @@ namespace ModuleESolver
         this->beforesolver(istep);
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
 
         //2. the electron charge density should be symmetrized,
         // here is the initialization
         Symmetry_rho srho;
         for (int is = 0; is < GlobalV::NSPIN; is++)
         {
-            srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+            srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
+        }
+
+        //init Psi, HSolver, ElecState, Hamilt
+        if(this->phsol != nullptr)
+        {
+            if(this->phsol->classname != "HSolverLCAO")
+            {
+                delete this->phsol;
+                this->phsol = nullptr;
+            }
+        }
+        else
+        {
+            this->phsol = new hsolver::HSolverLCAO();
+            this->phsol->method = GlobalV::KS_SOLVER;
+        }
+        if(this->pelec != nullptr)
+        {
+            if(this->pelec->classname != "ElecStateLCAO")
+            {
+                delete this->pelec;
+                this->pelec = nullptr;
+            }
+        }
+        else
+        {
+            this->pelec = new elecstate::ElecStateLCAO(
+                    (Charge*)(&(GlobalC::CHR)),
+                    &(GlobalC::kv), 
+                    GlobalC::kv.nks,
+                    GlobalV::NBANDS,
+                    &(this->LOC),
+                    &(this->UHM),
+                    &(this->LOWF));
+        }
+        if(this->phami != nullptr)
+        {
+            if(this->phami->classname != "HamiltLCAO")
+            {
+                delete this->phami;
+                this->phami = nullptr;
+            }
+        }
+        else
+        {
+            // three cases for hamilt class
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                this->phami = new hamilt::HamiltLCAO<double, double>(
+                    &(this->UHM.GG),
+                    &(this->UHM.genH),
+                    &(this->LM) );
+            }
+            // non-collinear spin case would not use the second template now, 
+            // would add this feature in the future
+            /*else if(GlobalV::NSPIN==4)
+            {
+                this->phami = new hamilt::HamiltLCAO<std::complex<double>, std::complex<double>>(
+                    &(this->UHM.GK),
+                    &(this->UHM.genH),
+                    &(this->LM) );
+            }*/ 
+            else
+            {
+                this->phami = new hamilt::HamiltLCAO<std::complex<double>, double>(
+                    &(this->UHM.GK),
+                    &(this->UHM.genH),
+                    &(this->LM) );
+            }
         }
 
         ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");

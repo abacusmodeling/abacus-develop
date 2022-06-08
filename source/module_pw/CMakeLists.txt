@@ -9,7 +9,6 @@ add_library(
     pw_distributeg_method2.cpp
     pw_distributer.cpp 
     pw_init.cpp 
-    pw_operation.cpp 
     pw_transform.cpp 
     pw_transform_k.cpp 
 )

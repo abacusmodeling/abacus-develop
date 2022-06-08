@@ -5,6 +5,7 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_global.h"
+#include "../module_pw/pw_basis.h"
 
 //==========================================================
 // Electron Charge Density 
@@ -51,7 +52,7 @@ public:
 	// mohan update 2021-02-20
 	void allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in);
 
-    void atomic_rho(const int spin_number_need, double **rho_in)const;
+    void atomic_rho(const int spin_number_need, double **rho_in, ModulePW::PW_Basis* rho_basis)const;
 
     void set_rho_core(const ModuleBase::ComplexMatrix &structure_factor);
 
@@ -71,7 +72,8 @@ public:
         const double *r,
         const double *rab,
         const double *rhoc,
-        double *rhocg
+        double *rhocg,
+        ModulePW::PW_Basis* rho_basis
     );
 
 	double check_ne(const double *rho_in) const;

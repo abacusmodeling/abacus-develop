@@ -93,7 +93,7 @@ void Driver::atomic_world(void)
 	// lcao: linear combination of atomic orbitals
 	//--------------------------------------------------
 	string use_ensol;
-	ModuleESolver::ESolver *p_esolver;
+	ModuleESolver::ESolver *p_esolver = nullptr;
 	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{
 		if(GlobalV::CALCULATION.substr(0,3) == "sto")	use_ensol = "sdft_pw";

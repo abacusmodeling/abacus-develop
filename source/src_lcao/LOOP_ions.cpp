@@ -163,7 +163,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
             std::stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
         }
 
         time_t fstart = time(NULL);
@@ -288,7 +288,7 @@ bool LOOP_ions::force_stress(
                 }
                 else
                 {
-                    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+                    GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
                 }
             }
             ModuleBase::timer::tick("LOOP_ions", "force_stress");
@@ -307,7 +307,7 @@ bool LOOP_ions::force_stress(
         // force calculations.
 
         //xiaohui modify 2014-08-09
-        //GlobalC::pw.setup_structure_factor();
+        //GlobalC::sf.setup_structure_factor();
 
         // charge extrapolation if istep>0.
         //xiaohui modify 2014-08-09
@@ -351,8 +351,8 @@ xiaohui modify 2014-08-09*/
             }
             else
             {
-                Variable_Cell::init_after_vc();
-                GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
+                Variable_Cell::init_after_vc(p_esolver);
+                GlobalC::pot.init_pot(stress_step, GlobalC::sf.strucFac);
 
                 ++stress_step;
                 ModuleBase::timer::tick("LOOP_ions", "force_stress");
@@ -396,8 +396,8 @@ xiaohui modify 2014-08-09*/
                     }
                     else
                     {
-                        Variable_Cell::init_after_vc();
-                        GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
+                        Variable_Cell::init_after_vc(p_esolver);
+                        GlobalC::pot.init_pot(stress_step, GlobalC::sf.strucFac);
 
                         ++stress_step;
                         ModuleBase::timer::tick("LOOP_ions", "force_stress");
@@ -421,7 +421,7 @@ xiaohui modify 2014-08-09*/
                 }
                 else
                 {
-                    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+                    GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
                 }
                 ++force_step;
                 ModuleBase::timer::tick("LOOP_ions", "force_stress");

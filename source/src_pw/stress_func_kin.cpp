@@ -2,7 +2,7 @@
 #include "global.h"
 
 //calculate the kinetic stress in PW base
-void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
+void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in)
 {
 	double *kfac;
 	double **gk;
@@ -38,9 +38,9 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 		npw = GlobalC::kv.ngk[ik];
 		for(int i=0;i<npw;i++)
 		{
-			gk[0][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 0) * factor;
-			gk[1][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 1) * factor;
-			gk[2][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 2) * factor;
+			gk[0][i] = GlobalC::wfcpw->getgpluskcar(ik,i)[0] * factor;
+			gk[1][i] = GlobalC::wfcpw->getgpluskcar(ik,i)[1] * factor;
+			gk[2][i] = GlobalC::wfcpw->getgpluskcar(ik,i)[2] * factor;
 		}
 
 		//kinetic contribution
@@ -52,9 +52,9 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 				for(int ibnd=0;ibnd<GlobalV::NBANDS;ibnd++)
 				{
 					const std::complex<double>* ppsi=nullptr;
-					if(GlobalC::wf.psi!=nullptr)
+					if(psi_in!=nullptr)
 					{
-						ppsi = &(GlobalC::wf.psi[0](ik, ibnd, 0));
+						ppsi = &(psi_in[0](ik, ibnd, 0));
 					}
 					else
 					{

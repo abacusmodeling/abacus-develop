@@ -22,7 +22,7 @@ void Potential::set_vrs_tddft(const int istep)
         //const int timescale = 1;  // get the time that vext influences;
         if (istep >= ELEC_evolve::td_timescale)
         {
-            for (int i = 0;i < GlobalC::pw.nrxx;i++)
+            for (int i = 0;i < GlobalC::rhopw->nrxx;i++)
             {
                 this->vr_eff(is, i) = this->vltot[i] + this->vr(is, i);
             }
@@ -30,62 +30,62 @@ void Potential::set_vrs_tddft(const int istep)
         }
         else
         {
-            this->vextold = new double[GlobalC::pw.nrxx];
-            this->vext = new double[GlobalC::pw.nrxx];
-            const int yz = GlobalC::pw.ncy*GlobalC::pw.nczp;
+            this->vextold = new double[GlobalC::rhopw->nrxx];
+            this->vext = new double[GlobalC::rhopw->nrxx];
+            const int yz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane;
             int index, i, j, k;
 
-            for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+            for(int ir=0; ir<GlobalC::rhopw->nrxx; ++ir)
             {
                 index = ir;
                 i     = index / yz; // get the z, z is the fastest
                 index = index - yz * i;// get (x,y)
-                j     = index / GlobalC::pw.nczp;// get y
-                k     = index - GlobalC::pw.nczp*j + GlobalC::pw.nczp_start;// get x
+                j     = index / GlobalC::rhopw->nplane;// get y
+                k     = index - GlobalC::rhopw->nplane*j + GlobalC::rhopw->startz_current;// get x
 
                 if(ELEC_evolve::td_vext_dire == 1)
                 {
-                    if (k<GlobalC::pw.ncx*0.05)
+                    if (k<GlobalC::rhopw->nx*0.05)
 					{
-						this->vextold[ir] = (0.019447*k/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
+						this->vextold[ir] = (0.019447*k/GlobalC::rhopw->nx-0.001069585)*GlobalC::ucell.lat0;
 					}
-                    else if (k>=GlobalC::pw.ncx*0.05 && k<GlobalC::pw.ncx*0.95)
+                    else if (k>=GlobalC::rhopw->nx*0.05 && k<GlobalC::rhopw->nx*0.95)
 					{
-						this->vextold[ir] = -0.0019447*k/GlobalC::pw.ncx*GlobalC::ucell.lat0;
+						this->vextold[ir] = -0.0019447*k/GlobalC::rhopw->nx*GlobalC::ucell.lat0;
 					}
-                    else if (k>=GlobalC::pw.ncx*0.95)
+                    else if (k>=GlobalC::rhopw->nx*0.95)
 					{
-						this->vextold[ir] = (0.019447*(1.0*k/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*k/GlobalC::rhopw->nx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 2)
                 {
-                    if (j<GlobalC::pw.ncx*0.05)
+                    if (j<GlobalC::rhopw->nx*0.05)
 					{
-						this->vextold[ir] = (0.019447*j/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
+						this->vextold[ir] = (0.019447*j/GlobalC::rhopw->nx-0.001069585)*GlobalC::ucell.lat0;
 					}
-                    else if (j>=GlobalC::pw.ncx*0.05 && j<GlobalC::pw.ncx*0.95)
+                    else if (j>=GlobalC::rhopw->nx*0.05 && j<GlobalC::rhopw->nx*0.95)
 					{
-						this->vextold[ir] = -0.0019447*j/GlobalC::pw.ncx*GlobalC::ucell.lat0;
+						this->vextold[ir] = -0.0019447*j/GlobalC::rhopw->nx*GlobalC::ucell.lat0;
 					}
-                    else if (j>=GlobalC::pw.ncx*0.95)
+                    else if (j>=GlobalC::rhopw->nx*0.95)
 					{
-						this->vextold[ir] = (0.019447*(1.0*j/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*j/GlobalC::rhopw->nx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 3)
                 {
-                    if (i<GlobalC::pw.ncx*0.05)
+                    if (i<GlobalC::rhopw->nx*0.05)
 					{
-						this->vextold[ir] = (0.019447*i/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
+						this->vextold[ir] = (0.019447*i/GlobalC::rhopw->nx-0.001069585)*GlobalC::ucell.lat0;
 					}
-                    else if (i>=GlobalC::pw.ncx*0.05 && i<GlobalC::pw.ncx*0.95)
+                    else if (i>=GlobalC::rhopw->nx*0.05 && i<GlobalC::rhopw->nx*0.95)
 					{
-						this->vextold[ir] = -0.0019447*i/GlobalC::pw.ncx*GlobalC::ucell.lat0;
+						this->vextold[ir] = -0.0019447*i/GlobalC::rhopw->nx*GlobalC::ucell.lat0;
 					}
-                    else if (i>=GlobalC::pw.ncx*0.95)
+                    else if (i>=GlobalC::rhopw->nx*0.95)
 					{
-						this->vextold[ir] = (0.019447*(1.0*i/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*i/GlobalC::rhopw->nx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
 

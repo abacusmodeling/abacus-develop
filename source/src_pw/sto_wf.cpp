@@ -9,18 +9,18 @@
 
 Stochastic_WF::Stochastic_WF()
 {
-    chiortho  = NULL;
-	chi0  = NULL;
-    shchi = NULL;
-    nchip = NULL;
+    chiortho  = nullptr;
+	chi0  = nullptr;
+    shchi = nullptr;
+    nchip = nullptr;
 }
 
 Stochastic_WF::~Stochastic_WF()
 { 
-    if(chi0 != NULL)        delete[] chi0;
-    if(shchi != NULL)       delete[] shchi;
-    if(chiortho != NULL)    delete[] chiortho;
-    if(nchip != NULL)     delete[] nchip;
+    if(chi0 != nullptr)        delete[] chi0;
+    if(shchi != nullptr)       delete[] shchi;
+    if(chiortho != nullptr)    delete[] chiortho;
+    if(nchip != nullptr)     delete[] nchip;
 }
 
 void Stochastic_WF::init(const int nks)
@@ -34,7 +34,7 @@ void Stochastic_WF::init(const int nks)
 void Init_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in)
 {
     if(seed_in == 0 || seed_in == -1)
-        srand((unsigned)time(NULL)+GlobalV::MY_RANK*10000);
+        srand((unsigned)time(nullptr)+GlobalV::MY_RANK*10000);
     else
     {
         srand((unsigned)abs(seed_in)+GlobalV::MY_RANK*10000);

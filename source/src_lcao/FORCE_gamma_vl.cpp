@@ -12,18 +12,20 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
     int istep = 1;
-    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(istep, GlobalC::sf.strucFac);
     fvl_dphi.zero_out();
     svl_dphi.zero_out();
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
         GlobalV::CURRENT_SPIN = is;
-        for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+        for(int ir=0; ir<GlobalC::rhopw->nrxx; ++ir)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
-        this->UHM->GG.cal_force(DM_in, GlobalC::pot.vr_eff1, fvl_dphi, svl_dphi, isforce, isstress);
+        Gint_inout inout(DM_in, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
+
+        this->UHM->GG.cal_gint(&inout);
     }
 
     if(isstress)

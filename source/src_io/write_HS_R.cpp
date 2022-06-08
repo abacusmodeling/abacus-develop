@@ -45,7 +45,7 @@ void ESolver_KS_LCAO::output_HS_R(
                     GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
                 }
 
-                for(int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+                for(int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                 {
                     GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
                 }
@@ -54,8 +54,8 @@ void ESolver_KS_LCAO::output_HS_R(
                 {
                     if(GlobalV::VL_IN_H)
                     {
-                        //this->UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
-                        this->UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, GlobalV::CURRENT_SPIN);
+                        Gint_inout inout(GlobalC::pot.vr_eff1, GlobalV::CURRENT_SPIN, Gint_Tools::job_type::vlocal);
+                        this->UHM.GK.cal_gint(&inout);
                     }
                 }
 

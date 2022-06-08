@@ -124,8 +124,9 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
         }
         else if(GlobalV::CALCULATION=="nscf")
         {
-            elec.non_self_consistent(istep-1);
-			eiter = elec.iter;
+			p_esolver->nscf();
+            //elec.non_self_consistent(istep-1);
+			eiter = p_esolver->getniter();
         }
 
 		if(GlobalC::pot.out_pot == 2)
@@ -134,7 +135,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			std::stringstream ssp_ave;
 			ssp << GlobalV::global_out_dir << "ElecStaticPot";
 			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
 		}
 
 		time_t eend = time(NULL);
@@ -185,11 +186,6 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
 	}
 
-	if(GlobalC::wf.out_wfc_r == 1)				// Peize Lin add 2021.11.21
-	{
-		Write_Wfc_Realspace::write_wfc_realspace_1(GlobalC::wf.psi[0], "wfc_realspace", true);
-	}	
-
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
     return;
 }
@@ -236,7 +232,7 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 		//do cell relax calculation and generate next structure
 		bool converged = 0;
 		converged = this->do_cellrelax(stress_step, stress, GlobalC::en.etot);
-		if(!converged) this->reset_after_cellrelax(force_step, stress_step);
+		if(!converged) this->reset_after_cellrelax(force_step, stress_step, p_esolver);
 		return converged;
 	}
 
@@ -329,7 +325,7 @@ void Ions::reset_after_relax(const int& istep)
 {
 	ModuleBase::TITLE("Ions","reset_after_relax");
 	GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
-	GlobalC::pw.setup_structure_factor();
+	GlobalC::sf.setup_structure_factor(&GlobalC::ucell,GlobalC::rhopw);
 
 	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
 	// charge extrapolation if istep>0.
@@ -339,19 +335,19 @@ void Ions::reset_after_relax(const int& istep)
 	GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
 	// calculate the new potential accordint to
 	// the new charge density.
-	GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
+	GlobalC::pot.init_pot( istep, GlobalC::sf.strucFac );
 
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
 	//GlobalC::wf.wfcinit();
 }
-void Ions::reset_after_cellrelax(int& f_step, int& s_step)
+void Ions::reset_after_cellrelax(int& f_step, int& s_step, ModuleESolver::ESolver *p_esolver)
 {
 	ModuleBase::TITLE("Ions","reset_after_cellrelax");
-	Variable_Cell::init_after_vc();
-	GlobalC::pot.init_pot(s_step, GlobalC::pw.strucFac); //LiuXh add 20180619
+	Variable_Cell::init_after_vc(p_esolver);
+	GlobalC::pot.init_pot(s_step, GlobalC::sf.strucFac); //LiuXh add 20180619
 
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
-	GlobalC::wf.wfcinit(); //LiuXh add 20180619
+	GlobalC::wf.wfcinit(p_esolver->psi); //LiuXh add 20180619
 	f_step = 1;
 	++s_step;
 }

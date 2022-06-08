@@ -43,7 +43,7 @@ FFTW_INCLUDE_DIR = \${FFTW_DIR}/include
 FFTW_LIB         = -L\${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=\${FFTW_LIB_DIR}
 EOF
 tail -n $tailn Makefile.gnu >>Makefile
-make > /dev/null 2>&1
+make > /dev/null
 
 if ((i==0)) ;then
     echo "Test for Serial Version:"

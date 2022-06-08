@@ -9,7 +9,7 @@
 namespace ModulePW
 {
 /// 
-/// in: (nplane,ny,nx) out:(nz,nst)
+/// in: (nplane,fftny,fftnx) out:(nz,nst)
 /// in and out should be in different places 
 /// in[] will be changed
 /// 
@@ -22,25 +22,25 @@ void PW_Basis:: gatherp_scatters(std::complex<T> *in, std::complex<T> *out)
     {
         for(int is = 0 ; is < this->nst ; ++is)
         {
-            int bigixy = this->istot2bigixy[is];
-            //int bigixy = (ixy / ny)*bigny + ixy % ny;
+            int ixy = this->istot2ixy[is];
+            //int ixy = (ixy / fftny)*ny + ixy % fftny;
             for(int iz = 0 ; iz < this->nz ; ++iz)
             {
-                out[is*nz+iz] = in[bigixy*nz+iz];
+                out[is*nz+iz] = in[ixy*nz+iz];
             }
         }
         return;
     }
 #ifdef __MPI
-    //change (nplane nxy) to (nplane,nstot)
+    //change (nplane fftnxy) to (nplane,nstot)
     // Hence, we can send them at one time.  
 	for (int istot = 0;istot < nstot; ++istot)
 	{
-		int bigixy = this->istot2bigixy[istot];
-        //int bigixy = (ixy / ny)*bigny + ixy % ny;
+		int ixy = this->istot2ixy[istot];
+        //int ixy = (ixy / fftny)*ny + ixy % fftny;
 		for (int iz = 0; iz < nplane; ++iz)
 		{
-			out[istot*nplane+iz] = in[bigixy*nplane+iz];
+			out[istot*nplane+iz] = in[ixy*nplane+iz];
 		}
 	}
 
@@ -69,25 +69,25 @@ void PW_Basis:: gatherp_scatters(std::complex<T> *in, std::complex<T> *out)
 }
 
 /// 
-/// in: (nz,nst) out:(nplane,ny,nx)
+/// in: (nz,nst) out:(nplane,fftny,fftnx)
 /// in and out should be in different places 
 /// in[] will be changed
 /// 
 template<typename T>
 void PW_Basis:: gathers_scatterp(std::complex<T> *in, std::complex<T> *out)
 {
-    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
+    ModuleBase::timer::tick("PW_Basis", "gathers_scatterp");
     
-    if(this->poolnproc == 1) //In this case nrxx=nx*ny*nz, nst = nstot, 
+    if(this->poolnproc == 1) //In this case nrxx=fftnx*fftny*nz, nst = nstot, 
     {
         ModuleBase::GlobalFunc::ZEROS(out, this->nrxx);
         for(int is = 0 ; is < this->nst ; ++is)
         {
-            int bigixy = istot2bigixy[is];
-            //int bigixy = (ixy / ny)*bigny + ixy % ny;
+            int ixy = istot2ixy[is];
+            //int ixy = (ixy / fftny)*ny + ixy % fftny;
             for(int iz = 0 ; iz < this->nz ; ++iz)
             {
-                out[bigixy*nz+iz] = in[is*nz+iz];
+                out[ixy*nz+iz] = in[is*nz+iz];
             }
         }
         return;
@@ -114,19 +114,19 @@ void PW_Basis:: gathers_scatterp(std::complex<T> *in, std::complex<T> *out)
     else if(typeid(T) == typeid(float))
         MPI_Alltoallv(out, numg, startg, MPI_COMPLEX, in, numr, startr, MPI_COMPLEX, POOL_WORLD);
     ModuleBase::GlobalFunc::ZEROS(out, this->nrxx);
-    //change (nplane,nstot) to (nplane nxy)
+    //change (nplane,nstot) to (nplane fftnxy)
 	for (int istot = 0;istot < nstot; ++istot)
 	{
-		int bigixy = this->istot2bigixy[istot];
-        //int bigixy = (ixy / ny)*bigny + ixy % ny;
+		int ixy = this->istot2ixy[istot];
+        //int ixy = (ixy / fftny)*ny + ixy % fftny;
 		for (int iz = 0; iz < nplane; ++iz)
 		{
-			out[bigixy*nplane+iz] = in[istot*nplane+iz];
+			out[ixy*nplane+iz] = in[istot*nplane+iz];
 		}
 	}
 
 #endif
-    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
+    ModuleBase::timer::tick("PW_Basis", "gathers_scatterp");
     return;
 }
 

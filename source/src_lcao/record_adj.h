@@ -1,7 +1,7 @@
 #ifndef RECORD_ADJ_H
 #define RECORD_ADJ_H
 
-#include "grid_technique.h"
+#include "../module_gint/grid_technique.h"
 #include "module_orbital/parallel_orbitals.h"
 
 

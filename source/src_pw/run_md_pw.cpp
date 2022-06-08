@@ -96,11 +96,11 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
 
             if(cellchange)
             {
-                Variable_Cell::init_after_vc();
+                Variable_Cell::init_after_vc(p_esolver);
             }
 
             // reset local potential and initial wave function
-            GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
+            GlobalC::pot.init_pot(verlet->step_, GlobalC::sf.strucFac);
             
             // new wave functions
             //GlobalC::wf.wfcinit();
@@ -118,7 +118,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
             // Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-            verlet->outputMD(GlobalV::ofs_running);
+            verlet->outputMD(GlobalV::ofs_running, GlobalV::CAL_STRESS);
 
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
@@ -145,7 +145,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         std::stringstream ssp_ave;
         ssp << GlobalV::global_out_dir << "ElecStaticPot";
         ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(),GlobalC::rhopw); //output 'Hartree + local pseudopot'
     }
 
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");

@@ -16,5 +16,7 @@ if __name__ == "__main__":
         author='jiyuyang',
         author_email='jiyuyang@mail.ustc.edu.cn',
         url='None',
-        entry_points={'console_scripts': ['abacus-plot=abacus_plot.main:main']}
+        entry_points={'console_scripts': ['abacus-plot=abacus_plot.main:main']},
+        install_requires=['matplotlib', 'numpy', 'setuptools', 'lxml'],
+        python_requires='>=3.4'
     )

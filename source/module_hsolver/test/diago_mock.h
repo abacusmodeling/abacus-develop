@@ -157,7 +157,7 @@ class HPsi
     //ModuleBase::ComplexMatrix psi() {return psimatrix;}
     psi::Psi<std::complex<double>> psi()
     {
-        PW_Basis* pbas;
+        Structure_Factor* sf;
         int* ngk = nullptr;
         psi::Psi<std::complex<double>> psitmp(1,nband,npw,ngk);
         for(int i=0;i<nband;i++)
