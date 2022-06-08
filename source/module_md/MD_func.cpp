@@ -242,7 +242,6 @@ void MD_func::force_virial(
 
 	if(mdp.md_ensolver == "LJ")
 	{
-        GlobalV::CAL_STRESS = 1;
 		bool which_method = unit_in.judge_big_cell();
 		if(which_method)
 		{
@@ -276,7 +275,6 @@ void MD_func::force_virial(
 	}
 	else if(mdp.md_ensolver == "DP")
 	{
-        GlobalV::CAL_STRESS = 1;
 		DP_potential::DP_pot(unit_in, potential, force, stress);
 	}
 #ifndef __CMD
