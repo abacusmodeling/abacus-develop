@@ -43,7 +43,6 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     // ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgd_now",lgd_now);
     
     receiver_size=lgd_now*lgd_now;
-    delete[] receiver_size_process;
     receiver_size_process=new int[nprocs];
     delete[] receiver_displacement_process;
     receiver_displacement_process=new int[nprocs];

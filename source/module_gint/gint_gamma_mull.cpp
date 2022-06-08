@@ -263,7 +263,6 @@ void Gint_Gamma::cal_mulliken(double** mulliken)
     }// i
 
 	delete[] vldr3;
-    delete[] vindex;
 	
 	if(max_size!=0) 
 	{

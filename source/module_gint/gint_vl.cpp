@@ -26,15 +26,9 @@ void Gint::gint_kernel_vlocal(
 	double* pvpR_in)
 {
 	//prepare block information
-    int *block_iw = new int[na_grid];
-    int *block_index = new int[na_grid+1];
-    int *block_size = new int[na_grid];
-    bool **cal_flag = new bool* [GlobalC::bigpw->bxyz];
-    for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
-    {
-        cal_flag[ib] = new bool[na_grid];
-    }
-    Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, cal_flag);
+	int * block_iw, * block_index, * block_size;
+	bool** cal_flag;
+	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, cal_flag);
 	
 	//evaluate psi and dpsi on grids
 	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);

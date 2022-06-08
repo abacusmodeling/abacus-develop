@@ -148,7 +148,6 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(),GlobalC::rhopw); //output 'Hartree + local pseudopot'
     }
 
-    delete verlet;
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
     return;
 }

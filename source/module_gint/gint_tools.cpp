@@ -9,11 +9,11 @@
 
 namespace Gint_Tools
 {
-	void get_vindex(
+	int* get_vindex(
 		const int start_ind,
-		const int ncyz,
-        int *vindex)
+		const int ncyz)
 	{
+		int *vindex = new int[GlobalC::bigpw->bxyz];
 		int bindex = 0;
 
 		for(int ii=0; ii<GlobalC::bigpw->bx; ii++)
@@ -28,17 +28,18 @@ namespace Gint_Tools
 					++bindex;
 				}
 			}
-		}		
+		}
+		return vindex;		
 	}
 
 	// here vindex refers to local potentials
-	void get_vindex(
+	int* get_vindex(
 		const int ncyz,
 		const int ibx,
 		const int jby,
-		const int kbz,
-        int *vindex)
+		const int kbz)
 	{
+		int *vindex = new int[GlobalC::bigpw->bxyz];
 		int bindex=0;
 		// z is the fastest,
 		// ipart can be obtained by using a previously stored array
@@ -56,43 +57,44 @@ namespace Gint_Tools
 				}
 			}
 		}
+		return vindex;
 	}
 
 	// extract the local potentials.
-	void get_vldr3(
+	double* get_vldr3(
 		const double*const vlocal,		// vlocal[ir]
 		const int ncyz,
 		const int ibx,
 		const int jby,
 		const int kbz,
-		const double dv,
-        double *vldr3)
+		const double dv)
 	{
 		// set the index for obtaining local potentials
-        int *vindex = new int[GlobalC::bigpw->bxyz];
-		Gint_Tools::get_vindex(ncyz, ibx, jby, kbz, vindex);
+		int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
+		double *vldr3 = new double[GlobalC::bigpw->bxyz];
 		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 		{
 			vldr3[ib]=vlocal[vindex[ib]] * dv;
 		}
 		delete[] vindex;
+		return vldr3;
 	}
 
-	void get_vldr3(
+	double* get_vldr3(
 		const double*const vlocal,		// vlocal[ir]
 		const int start_ind,
 		const int ncyz,
-		const double dv,
-        double *vldr3)
+		const double dv)
 	{
 		// set the index for obtaining local potentials
-        int *vindex = new int[GlobalC::bigpw->bxyz];
-		Gint_Tools::get_vindex(start_ind, ncyz, vindex);
+		int* vindex = Gint_Tools::get_vindex(start_ind, ncyz);	
+		double *vldr3 = new double[GlobalC::bigpw->bxyz];
 		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 		{
 			vldr3[ib]=vlocal[vindex[ib]] * dv;
 		}
-        delete[] vindex;
+		delete[] vindex;
+		return vldr3;
 	}
 
 	void get_block_info(
@@ -104,6 +106,15 @@ namespace Gint_Tools
 		bool** &cal_flag
 	)
 	{
+		block_iw = new int[na_grid];
+		block_index = new int[na_grid+1];
+		block_size = new int[na_grid];
+		cal_flag = new bool* [GlobalC::bigpw->bxyz];
+		for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
+		{
+			cal_flag[ib] = new bool[na_grid];
+		}
+
 		block_index[0] = 0;
 		for (int id=0; id<na_grid; id++)
 		{

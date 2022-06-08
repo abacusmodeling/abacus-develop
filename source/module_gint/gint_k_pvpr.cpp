@@ -352,7 +352,6 @@ void Gint_k::folding_vl_k(const int &ik, LCAO_Matrix *LM)
             }
             delete[] pvp_nc[spin];
         }
-        delete[] pvp_nc;
     }
     ModuleBase::timer::tick("Gint_k","Distri");
 

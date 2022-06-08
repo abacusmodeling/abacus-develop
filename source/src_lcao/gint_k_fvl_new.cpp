@@ -44,11 +44,12 @@ void Gint_k::cal_force_k(
                     if(na_grid==0) continue;
 
                     // it's a uniform grid to save orbital values, so the delta_r is a constant.
-                    const double delta_r = GlobalC::ORB.dr_uniform;
+                    const double delta_r = GlobalC::ORB.dr_uniform;						
                     
-                    int *block_iw = new int[na_grid];
-                    int *block_index = new int[na_grid+1];
-                    int *block_size = new int[na_grid];
+                    // here vindex refers to local potentials
+                    int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
+                    
+                    int * block_iw, * block_index, * block_size;
                     Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
 
                     //------------------------------------------------------
@@ -74,8 +75,7 @@ void Gint_k::cal_force_k(
                         dpsir_ylm_z.ptr_2D
                     );
 
-                    double* vldr3 = new double[GlobalC::bigpw->bxyz];
-                    Gint_Tools::get_vldr3(vl, ncyz, ibx, jby, kbz, dv, vldr3);
+                    double *vldr3 = Gint_Tools::get_vldr3(vl, ncyz, ibx, jby, kbz, dv);
                     const Gint_Tools::Array_Pool<double> psir_vlbr3    = Gint_Tools::get_psir_vlbr3(
 						na_grid, LD_pool,
 						block_index, cal_flag,
@@ -89,16 +89,14 @@ void Gint_k::cal_force_k(
                     {
                     }
 
-                    delete[] vldr3;
+                    free(vldr3);		vldr3=nullptr;
                     delete[] block_iw;
                     delete[] block_index;
                     delete[] block_size;
 
                     for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
-                    {
-                        delete[] cal_flag[ib];
-                    }
-                    delete[] cal_flag;
+                        free(cal_flag[ib]);
+                    free(cal_flag);			cal_flag=nullptr;
                 }//k
             }//j
         }//i

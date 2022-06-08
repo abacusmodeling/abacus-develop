@@ -242,13 +242,10 @@ void Gint_k::cal_rho_k(double** DM_R_in, Charge* chr)
 						if(na_grid==0) continue;				
 						
 						// here vindex refers to local potentials
-                        int *vindex = new int[GlobalC::bigpw->bxyz];
-                        Gint_Tools::get_vindex(ncyz, ibx, jby, kbz, vindex);
+						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);
 
-                        int *block_iw = new int[na_grid];
-                        int *block_index = new int[na_grid+1];
-                        int *block_size = new int[na_grid];
-                        Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size);
+                        int * block_iw, * block_index, * block_size, * at, * uc;
+                        Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, at, uc);
 
 						//------------------------------------------------------
 						// whether the atom-grid distance is larger than cutoff
@@ -280,16 +277,14 @@ void Gint_k::cal_rho_k(double** DM_R_in, Charge* chr)
 							DM_R,
 							chr);
 						
-                        delete[] vindex;
+						free(vindex);			vindex=nullptr;
                         delete[] block_iw;
                         delete[] block_index;
                         delete[] block_size;
-                        
-                        for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
-                        {
-                            delete[] cal_flag[ib];
-                        }
-                        delete[] cal_flag;
+
+						for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
+							free(cal_flag[ib]);
+						free(cal_flag);			cal_flag=nullptr;
 					}// int k
 				}// int j
 			} // int i

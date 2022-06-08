@@ -50,6 +50,12 @@ void Gint::cal_gint(Gint_inout *inout)
                 }
             }
 
+            if(inout->job==Gint_Tools::job_type::vlocal && GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
+            {
+                this->pvpR_grid = new double[lgd*lgd];
+                ModuleBase::GlobalFunc::ZEROS(pvpR_grid, lgd*lgd);
+            }
+
             //perpare auxiliary arrays to store thread-specific values
 #ifdef _OPENMP
 			double* pvpR_thread;
@@ -96,15 +102,15 @@ void Gint::cal_gint(Gint_inout *inout)
 
 				if(inout->job == Gint_Tools::job_type::rho)
 				{
-                    int *vindex = new int[GlobalC::bigpw->bxyz];
-                    Gint_Tools::get_vindex(GlobalC::GridT.start_ind[grid_index], ncyz, vindex);
+					//int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);
+					int* vindex = Gint_Tools::get_vindex(GlobalC::GridT.start_ind[grid_index], ncyz);
 					this->gint_kernel_rho(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
 					delete[] vindex;
 				}
 				else if(inout->job == Gint_Tools::job_type::force)
 				{
-                    double* vldr3 = new double[GlobalC::bigpw->bxyz];
-                    Gint_Tools::get_vldr3(inout->vl, GlobalC::GridT.start_ind[grid_index], ncyz, dv, vldr3);
+					double* vldr3 = Gint_Tools::get_vldr3(inout->vl, GlobalC::GridT.start_ind[grid_index], ncyz, dv);
+					//double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
 					double** DM_in;
 					if(GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM[GlobalV::CURRENT_SPIN];
 					if(!GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM_R;
@@ -121,8 +127,8 @@ void Gint::cal_gint(Gint_inout *inout)
 				}
 				else if(inout->job==Gint_Tools::job_type::vlocal)
 				{
-                    double* vldr3 = new double[GlobalC::bigpw->bxyz];
-                    Gint_Tools::get_vldr3(inout->vl, GlobalC::GridT.start_ind[grid_index], ncyz, dv, vldr3);
+					double* vldr3 = Gint_Tools::get_vldr3(inout->vl, GlobalC::GridT.start_ind[grid_index], ncyz, dv);
+					//double* vldr3 = Gint_Tools::get_vldr3(inout->vl, ncyz, ibx, jby, kbz, dv);
 					#ifdef _OPENMP
 						if((GlobalV::GAMMA_ONLY_LOCAL && lgd>0) || !GlobalV::GAMMA_ONLY_LOCAL)
 						{

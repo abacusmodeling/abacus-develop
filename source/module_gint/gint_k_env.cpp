@@ -30,14 +30,8 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
             const int size = GlobalC::GridT.how_many_atoms[ grid_index ];
             if(size==0) continue;
 
-            int *block_iw = new int[size];
-            int *block_index = new int[size+1];
-            int *block_size = new int[size];
-            bool **cal_flag = new bool* [GlobalC::bigpw->bxyz];
-            for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
-            {
-                cal_flag[ib] = new bool[size];
-            }
+            int * block_iw, * block_index, * block_size;
+            bool** cal_flag;
             Gint_Tools::get_block_info(size, grid_index, block_iw, block_index, block_size, cal_flag);
 
             //evaluate psi on grids
@@ -48,8 +42,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
                 cal_flag,
                 psir_ylm.ptr_2D);
 
-            int *vindex = new int[GlobalC::bigpw->bxyz];
-            Gint_Tools::get_vindex(GlobalC::GridT.start_ind[grid_index], ncyz, vindex);
+            int* vindex = Gint_Tools::get_vindex(GlobalC::GridT.start_ind[grid_index], ncyz);
 
             for (int ia1 = 0; ia1 < size; ia1++)
             {
