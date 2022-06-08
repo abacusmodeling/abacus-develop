@@ -8,8 +8,8 @@
 
 pseudopot_cell_vl::pseudopot_cell_vl()
 {
-	numeric = new bool[1];
-	zp = new double[1]; 
+	numeric = nullptr;
+	zp = nullptr; 
 }
 
 pseudopot_cell_vl::~pseudopot_cell_vl()

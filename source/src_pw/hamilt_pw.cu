@@ -116,10 +116,10 @@ int Hamilt_PW::moved = 0;
 
 Hamilt_PW::Hamilt_PW()
 {
-    // hpsi = new complex<double>[1];
-    // spsi = new complex<double>[1];
-    // GR_index = new int[1];
-    // Bec = new complex<double>[1];
+    // hpsi = nullptr;
+    // spsi = nullptr;
+    // GR_index = nullptr;
+    // Bec = nullptr;
 #ifdef __CUDA
 	CHECK_CUBLAS(cublasCreate(&hpw_handle));
 #endif

@@ -19,17 +19,17 @@ FFT::FFT()
 	this->aux4plan = new std::complex<double>[1];
 
 #ifdef __MPI
-	this->plane = new int[1];
+	this->plane = nullptr;
 	this->aux = new std::complex<double>[1];
 	
 	
-	this->sentc = new int[1];
-	this->sdis = new int[1];
+	this->sentc = nullptr;
+	this->sdis = nullptr;
 	
-	this->recvc = new int[1];
-	this->rdis = new int[1];
+	this->recvc = nullptr;
+	this->rdis = nullptr;
 	
-	this->sum = new int[1];
+	this->sum = nullptr;
 #endif
 }
 
