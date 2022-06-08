@@ -216,6 +216,13 @@ TEST_F(PWTEST,test1_1_1)
     {
         EXPECT_NEAR(pwtest.gg[ig], pwtest.gg_uniq[pwtest.ig2igg[ig]],1e-8);
     }
+    int * irindex = new int [pwtest.fftnxy];
+    pwtest.getfftixy2is(irindex);
+    for(int is = 0 ; is < pwtest.nst ;++is)
+    {
+        EXPECT_EQ(irindex[pwtest.is2fftixy[is]],is);
+    }
+    delete[] irindex;
 
 
 }

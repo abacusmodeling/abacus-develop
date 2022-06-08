@@ -37,8 +37,8 @@ check_out() {
         cal=$(grep "$key" $outfile | awk '{printf "%.'$ca'f\n",$2}')
         ref=$(grep "$key" result.ref | awk '{printf "%.'$ca'f\n",$2}')
         deviation=$(awk 'BEGIN {x='$ref';y='$cal';if (x<y) {a=y-x} else {a=x-y};printf "%.'$ca'f\n",a}')
-        deviation1=$(awk 'BEGIN{print '$deviation'*(10**'$ca')}')
-
+        deviation1=$(awk 'BEGIN{print '$deviation'*(10^'$ca')}')
+        
         if [ $key == "totaltimeref" ]; then
             break
         fi

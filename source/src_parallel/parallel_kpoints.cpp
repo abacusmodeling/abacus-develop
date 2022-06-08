@@ -4,9 +4,9 @@
 
 Parallel_Kpoints::Parallel_Kpoints()
 {
-    nks_pool = new int[1];
-    startk_pool = new int[1];
-    whichpool = new int[1];
+    nks_pool = nullptr;
+    startk_pool = nullptr;
+    whichpool = nullptr;
 }
 
 Parallel_Kpoints::~Parallel_Kpoints()

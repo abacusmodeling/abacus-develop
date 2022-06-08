@@ -36,6 +36,14 @@ namespace ModuleESolver
         tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
     }
 
+    ESolver_KS::~ESolver_KS()
+    {
+        delete this->pw_wfc;
+        delete this->pelec;
+        delete this->phami;
+        delete this->phsol;
+    }
+
     void ESolver_KS::Init(Input& inp, UnitCell_pseudo& ucell)
     {
         ESolver_FP::Init(inp,ucell);
