@@ -1591,6 +1591,7 @@ bool Input::Read(const std::string &fn)
         while (ifs.good())
         {
             ifs >> word1;
+            if(ifs.eof() != 0) break;
             strtolower(word1, word); // convert uppercase std::string to lower case; word1 --> word
 
             if (strcmp("dftu_type", word) == 0)
