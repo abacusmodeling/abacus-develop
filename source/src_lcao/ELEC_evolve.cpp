@@ -1,14 +1,15 @@
 #include "ELEC_evolve.h"
-#include "LCAO_diago.h"
+
+#include "../module_base/timer.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "../src_pw/global.h"
 #include "../src_pw/symmetry_rho.h"
+#include "LCAO_diago.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
-#include "../src_parallel/parallel_reduce.h"
-#include "../module_base/timer.h"
 
-ELEC_evolve::ELEC_evolve() {};
-ELEC_evolve::~ELEC_evolve() {};
+ELEC_evolve::ELEC_evolve(){};
+ELEC_evolve::~ELEC_evolve(){};
 
 int ELEC_evolve::tddft;
 double ELEC_evolve::td_scf_thr;
@@ -25,10 +26,7 @@ int ELEC_evolve::td_vextout;
 int ELEC_evolve::td_dipoleout;
 
 // this routine only serves for TDDFT using LCAO basis set
-void ELEC_evolve::evolve_psi(
-    const int& istep,
-    LCAO_Hamilt& uhm,
-    Local_Orbital_wfc& lowf)
+void ELEC_evolve::evolve_psi(const int& istep, LCAO_Hamilt& uhm, Local_Orbital_wfc& lowf)
 {
     ModuleBase::TITLE("ELEC_evolve", "eveolve_psi");
     ModuleBase::timer::tick("ELEC_evolve", "evolve_psi");
@@ -61,7 +59,7 @@ void ELEC_evolve::evolve_psi(
         //--------------------------------------------
         if (GlobalV::CURRENT_SPIN == uhm.GK.get_spin())
         {
-            //GlobalV::ofs_running << " Same spin, same vlocal integration." << std::endl;
+            // GlobalV::ofs_running << " Same spin, same vlocal integration." << std::endl;
         }
         else
         {
@@ -74,7 +72,7 @@ void ELEC_evolve::evolve_psi(
             // integral 4 times, is there any method to simplify?
             if (GlobalV::NSPIN == 4)
             {
-                for (int is = 1;is < 4;is++)
+                for (int is = 1; is < 4; is++)
                 {
                     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                     {
@@ -85,7 +83,6 @@ void ELEC_evolve::evolve_psi(
                 }
             }
         }
-
 
         if (!uhm.init_s)
         {
@@ -122,7 +119,7 @@ void ELEC_evolve::evolve_psi(
         }
         ModuleBase::timer::tick("Efficience", "evolve_k");
         Evolve_LCAO_Matrix ELM(uhm.LM);
-        ELM.evolve_complex_matrix(ik, lowf);
+        ELM.evolve_complex_matrix(ik, lowf, GlobalC::wf.ekb[ik]);
         ModuleBase::timer::tick("Efficience", "evolve_k");
     } // end k
 

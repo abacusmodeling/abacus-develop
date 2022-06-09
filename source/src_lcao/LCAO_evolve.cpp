@@ -297,7 +297,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 	GlobalV::ofs_running <<std::endl;
 */
 
-/*
+///*
         //calculate energy level
         ModuleBase::ComplexMatrix Ematrix(GlobalV::NLOCAL,GlobalV::NLOCAL);
         Ematrix=conj(wfc_k)*Htmp*transpose(wfc_k,conjugate);
@@ -305,17 +305,18 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         {
                 ekb[i]=Ematrix.c[i*GlobalV::NBANDS+i].real();
         }
-*/
+//*/
 
-/*
+///*
         GlobalV::ofs_running<<endl;
-                        GlobalV::ofs_running<<"print ekb : "<<endl;
-                        for(int ib=0; ib<GlobalV::NBANDS; ++ib)
-                        {
-                        GlobalV::ofs_running<<"ekb[" << ib+1 << "]  " << ekb[ib] << std::endl;
-                        }
-                        GlobalV::ofs_running<<endl;
-*/
+        GlobalV::ofs_running<<"print ekb : "<<endl;
+        for(int ib=0; ib<GlobalV::NBANDS; ++ib)
+        {
+                //GlobalV::ofs_running<<"ekb[" << ib+1 << "]  " << ekb[ib] << std::endl;
+                GlobalV::ofs_running<<"ekb[" << ib+1 << "]  " << ekb[ib]*13.605693 << std::endl;
+        }
+        GlobalV::ofs_running<<endl;
+//*/
 /*
 cout<<"E matrix"<<endl;
 for(int i=0; i<GlobalV::NBANDS; i++)
@@ -487,7 +488,7 @@ void Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int& ik, std::complex<dou
 
 	//beta = (0.0, 0.5)*INPUT.md_dt;
 	beta = {0.0, 0.25*INPUT.mdp.md_dt}; // this need modify
-	cout<<"dt="<<INPUT.mdp.md_dt<<endl;
+	//cout<<"dt="<<INPUT.mdp.md_dt<<endl;
 
 	//cout << "*Htmp1: " << *Htmp1 << endl;
 	//cout << "Htmp2: " << *Htmp2 << endl;
