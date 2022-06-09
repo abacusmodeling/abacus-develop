@@ -217,7 +217,7 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, in
                 for (int i = 0;i < GlobalV::NBANDS;++i)
                 {
                     for (int j = 0;j < GlobalV::NLOCAL;++j)
-                        wfc_k_grid[ik][i][j] = lowf.wfc_k[ik](i, j);
+                        lowf.wfc_k_grid[ik][i][j] = lowf.wfc_k[ik](i, j);
                 }
 #endif
                 //deal with NSPIN=4
