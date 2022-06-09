@@ -11,8 +11,8 @@ namespace Test_Deepks
 		kvec_c = new ModuleBase::Vector3<double>[1];
 		kvec_d.resize(1);
 
-		wk = new double[1];
-		isk = new int[1];
+		wk = nullptr;
+		isk = nullptr;
 
 		nkstot = 0;
 	}

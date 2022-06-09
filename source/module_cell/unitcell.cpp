@@ -44,7 +44,7 @@ UnitCell::UnitCell()
     omega = 0.0;
 
     atom_label = new string[1];
-    atom_mass = new double[1];
+    atom_mass = nullptr;
     pseudo_fn = new string[1];
 }
 

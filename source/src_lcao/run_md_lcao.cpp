@@ -172,9 +172,9 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver* p_esolver)
     GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
-    // mohan update 2021-02-10
-
-    ModuleBase::timer::tick("Run_MD_LCAO", "opt_ions");
+	// mohan update 2021-02-10
+    delete verlet;
+    ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
 }
 

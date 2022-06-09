@@ -17,8 +17,8 @@
 
 Potential::Potential()
 {
-    vltot = new double[1];
-    vr_eff1 = new double[1];
+    vltot = nullptr;
+    vr_eff1 = nullptr;
     this->out_pot = 0;
 }
 

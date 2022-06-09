@@ -8,11 +8,11 @@ Magnetism::Magnetism()
 {
     this->tot_magnetization = 0.0;
     this->abs_magnetization = 0.0;
-    this->start_magnetization = new double[1];
+    this->start_magnetization = nullptr;
 
 	//m_loc_ = new ModuleBase::Vector3<double> [1];
-	//angle1_ = new double[1];
-	//angle2_ = new double[1];
+	//angle1_ = nullptr;
+	//angle2_ = nullptr;
 }
 
 Magnetism::~Magnetism()

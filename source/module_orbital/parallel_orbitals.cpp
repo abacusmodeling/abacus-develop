@@ -10,22 +10,22 @@ extern "C"
 #endif
 Parallel_Orbitals::Parallel_Orbitals()
 {
-    loc_sizes = new int[1];
-    trace_loc_row = new int[1];
-    trace_loc_col = new int[1];
+    loc_sizes = nullptr;
+    trace_loc_row = nullptr;
+    trace_loc_col = nullptr;
 
     testpb = 0;//mohan add 2011-03-16
 	alloc_Z_LOC = false; //xiaohui add 2014-12-22
     // default value of nb is 1,
 	// but can change to larger value from input.
     nb = 1;
-	MatrixInfo.row_set = new int[1];
-    MatrixInfo.col_set = new int[1];
+	MatrixInfo.row_set = nullptr;
+    MatrixInfo.col_set = nullptr;
 
     //in multi-k, 2D-block-division variables for FT (R<->k)
     nnr = 1;
-    nlocdim = new int[1];	
-	nlocstart = new int[1];
+    nlocdim = nullptr;	
+	nlocstart = nullptr;
 
 }
 

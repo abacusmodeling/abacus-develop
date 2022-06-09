@@ -8,7 +8,7 @@ Grid_MeshBall::Grid_MeshBall()
 
 	this->flag_mp = false;
 
-	this->index_ball = new int[1];
+	this->index_ball = nullptr;
 }
 
 Grid_MeshBall::~Grid_MeshBall()
