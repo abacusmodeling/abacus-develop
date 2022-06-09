@@ -1,7 +1,9 @@
 #include "esolver_ks_lcao_tddft.h"
 
 //--------------temporary----------------------------
+#include "../module_base/blas_connector.h"
 #include "../module_base/global_function.h"
+#include "../module_base/scalapack_connector.h"
 #include "../src_io/print_info.h"
 #include "../src_pw/global.h"
 #include "input_update.h"
@@ -26,84 +28,19 @@
 namespace ModuleESolver
 {
 
-ESolver_KS_LCAO::ESolver_KS_LCAO_TDDFT()
+ESolver_KS_LCAO_TDDFT::ESolver_KS_LCAO_TDDFT()
 {
     classname = "ESolver_KS_LCAO_TDDFT";
     basisname = "LCAO";
 }
-ESolver_KS_LCAO::~ESolver_KS_LCAO_TDDFT()
+ESolver_KS_LCAO_TDDFT::~ESolver_KS_LCAO_TDDFT()
 {
     this->orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::deepks_setorb, GlobalC::ucell.infoNL.nproj);
 }
 
 void ESolver_KS_LCAO_TDDFT::Init(Input& inp, UnitCell_pseudo& ucell)
 {
-    // setup GlobalV::NBANDS
-    // Yu Liu add 2021-07-03
-    GlobalC::CHR.cal_nelec();
-
-    // it has been established that that
-    // xc_func is same for all elements, therefore
-    // only the first one if used
-    if (ucell.atoms[0].xc_func == "HSE" || ucell.atoms[0].xc_func == "PBE0")
-    {
-        XC_Functional::set_xc_type("pbe");
-    }
-    else
-    {
-        XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
-    }
-
-    // ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::stru_file , GlobalV::ofs_running, GlobalV::NLOCAL,
-    // GlobalV::NBANDS);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
-
-    // symmetry analysis should be performed every time the cell is changed
-    if (ModuleSymmetry::Symmetry::symm_flag)
-    {
-        GlobalC::symm.analy_sys(ucell, GlobalV::ofs_running);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
-    }
-
-    // Setup the k points according to symmetry.
-    GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
-
-    // print information
-    // mohan add 2021-01-30
-    Print_Info::setup_parameters(ucell, GlobalC::kv);
-
-    //--------------------------------------
-    // cell relaxation should begin here
-    //--------------------------------------
-
-    // Initalize the plane wave basis set
-    GlobalC::pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT PLANEWAVE");
-    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx << " * " << GlobalC::pw.ny << " * " << GlobalC::pw.nz
-              << std::endl;
-    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx << " * " << GlobalC::pw.nby << " * " << GlobalC::pw.nbz
-              << std::endl;
-
-    // initialize the real-space uniform grid for FFT and parallel
-    // distribution of plane waves
-    GlobalC::Pgrid.init(GlobalC::pw.ncx,
-                        GlobalC::pw.ncy,
-                        GlobalC::pw.ncz,
-                        GlobalC::pw.nczp,
-                        GlobalC::pw.nrxx,
-                        GlobalC::pw.nbz,
-                        GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
-    // Calculate Structure factor
-    GlobalC::pw.setup_structure_factor();
-
-    // Inititlize the charge density.
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
-
-    // Initializee the potential.
-    GlobalC::pot.allocate(GlobalC::pw.nrxx);
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
+    ESolver_KS::Init(inp, ucell);
 
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
@@ -113,18 +50,18 @@ void ESolver_KS_LCAO_TDDFT::Init(Input& inp, UnitCell_pseudo& ucell)
 
     // Initialize the FFT.
     // this function belongs to cell LOOP
-    GlobalC::UFFT.allocate();
 
     // output is GlobalC::ppcell.vloc 3D local pseudopotentials
     // without structure factors
     // this function belongs to cell LOOP
-    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
+    GlobalC::ppcell.init_vloc(GlobalC::ppcell.vloc, GlobalC::rhopw);
 
     // Initialize the sum of all local potentials.
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step = 0;
-    GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(ion_step, GlobalC::sf.strucFac);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //------------------init Basis_lcao----------------------
     // Init Basis should be put outside of Ensolver.
@@ -192,7 +129,7 @@ void ESolver_KS_LCAO_TDDFT::eachiterinit(const int istep, const int iter)
     if (iter > 1 && istep <= 1 && GlobalV::ocp == 0)
         Occupy::calculate_weights();
 
-    if (istep <= 1 && GlobalV::ocp == 1)
+    if (istep >= 2 && GlobalV::ocp == 1)
     {
         for (int ik = 0; ik < GlobalC::kv.nks; ik++)
         {
@@ -291,7 +228,7 @@ void ESolver_KS_LCAO_TDDFT::hamilt2density(int istep, int iter, double ethr)
     GlobalC::CHR.save_rho_before_sum_band();
 
     // (3) sum bands to calculate charge density
-    if (istep <= 1 && istep <= 1 && GlobalV::ocp == 0)
+    if (istep <= 1 && istep <= 1)
         Occupy::calculate_weights();
 
     for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
@@ -308,10 +245,13 @@ void ESolver_KS_LCAO_TDDFT::hamilt2density(int istep, int iter, double ethr)
     GlobalC::en.calculate_harris(2);
 
     // (5) symmetrize the charge density
-    Symmetry_rho srho;
-    for (int is = 0; is < GlobalV::NSPIN; is++)
+    if (istep <= 1)
     {
-        srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+        Symmetry_rho srho;
+        for (int is = 0; is < GlobalV::NSPIN; is++)
+        {
+            srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
+        }
     }
 
     // (6) compute magnetization, only for spin==2
@@ -326,36 +266,6 @@ void ESolver_KS_LCAO_TDDFT::hamilt2density(int istep, int iter, double ethr)
 
     // (7) calculate delta energy
     GlobalC::en.deband = GlobalC::en.delta_e();
-
-    // (8) store wfc
-#ifdef __MPI
-    const Parallel_Orbitals* pv = this->LOWF.ParaV;
-    for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
-    {
-        this->LOWF.wfc_k_laststep[ik].create(pv->ncol_bands, pv->nrow);
-        this->LOWF.wfc_k_laststep[ik] = this->LOWF.wfc_k[ik];
-    }
-
-    if (istep > 1)
-        this->cal_edm_tddft();
-#else
-
-    for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
-    {
-        this->LOWF.wfc_k_laststep[ik].create(GlobalV::NBANDS, GlobalV::NLOCAL);
-        this->LOWF.wfc_k_laststep[ik] = this->LOWF.wfc_k[ik];
-    }
-    /*
-        this->LM_md.Hloc2_laststep.resize(GlobalV::NLOCAL*GlobalV::NLOCAL);
-    ModuleBase::GlobalFunc::ZEROS(this->LM_md.Hloc2_laststep.data(),GlobalV::NLOCAL*GlobalV::NLOCAL);
-        for (int i =0 ; i< GlobalV::NLOCAL*GlobalV::NLOCAL;++i)
-           {
-               this->LM_md.Hloc2_laststep[i]=this->LM_md.Hloc2[i];
-           }
-    */
-    if (istep > 1)
-        this->cal_edm_tddft();
-#endif
 }
 
 void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
@@ -391,9 +301,40 @@ void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
     {
         GlobalC::pot.set_vrs_tddft(istep);
     }
-}
 
-} // namespace ModuleESolver
+    // store wfc
+    if (this->conv_elec)
+    {
+#ifdef __MPI
+        const Parallel_Orbitals* pv = this->LOWF.ParaV;
+        for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
+        {
+            this->LOWF.wfc_k_laststep[ik].create(pv->ncol_bands, pv->nrow);
+            this->LOWF.wfc_k_laststep[ik] = this->LOWF.wfc_k[ik];
+        }
+
+        if (istep > 1)
+            this->cal_edm_tddft();
+#else
+
+        for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
+        {
+            this->LOWF.wfc_k_laststep[ik].create(GlobalV::NBANDS, GlobalV::NLOCAL);
+            this->LOWF.wfc_k_laststep[ik] = this->LOWF.wfc_k[ik];
+        }
+        /*
+            this->LM_md.Hloc2_laststep.resize(GlobalV::NLOCAL*GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(this->LM_md.Hloc2_laststep.data(),GlobalV::NLOCAL*GlobalV::NLOCAL);
+            for (int i =0 ; i< GlobalV::NLOCAL*GlobalV::NLOCAL;++i)
+               {
+                   this->LM_md.Hloc2_laststep[i]=this->LM_md.Hloc2[i];
+               }
+        */
+        if (istep > 1)
+            this->cal_edm_tddft();
+#endif
+    }
+}
 
 // use the original formula (Hamiltonian matrix) to calculate energy density matrix
 void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
@@ -403,30 +344,30 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
     {
 #ifdef __MPI
         this->LOC.edm_k_tddft[ik].create(this->LOC.ParaV->ncol, this->LOC.ParaV->nrow);
-        complex<double>* Htmp = new complex<double>[this->LM->ParaV->nloc];
-        complex<double>* Sinv = new complex<double>[this->LM->ParaV->nloc];
-        complex<double>* tmp1 = new complex<double>[this->LM->ParaV->nloc];
-        complex<double>* tmp2 = new complex<double>[this->LM->ParaV->nloc];
-        complex<double>* tmp3 = new complex<double>[this->LM->ParaV->nloc];
-        complex<double>* tmp4 = new complex<double>[this->LM->ParaV->nloc];
-        complex<double>* tmp5 = new complex<double>[this->LM->ParaV->nloc];
-        ModuleBase::GlobalFunc::ZEROS(Htmp, this->LM->ParaV->nloc);
-        ModuleBase::GlobalFunc::ZEROS(Sinv, this->LM->ParaV->nloc);
-        ModuleBase::GlobalFunc::ZEROS(tmp1, this->LM->ParaV->nloc);
-        ModuleBase::GlobalFunc::ZEROS(tmp2, this->LM->ParaV->nloc);
-        ModuleBase::GlobalFunc::ZEROS(tmp3, this->LM->ParaV->nloc);
-        ModuleBase::GlobalFunc::ZEROS(tmp4, this->LM->ParaV->nloc);
-        ModuleBase::GlobalFunc::ZEROS(tmp5, this->LM->ParaV->nloc);
+        complex<double>* Htmp = new complex<double>[this->LOC.ParaV->nloc];
+        complex<double>* Sinv = new complex<double>[this->LOC.ParaV->nloc];
+        complex<double>* tmp1 = new complex<double>[this->LOC.ParaV->nloc];
+        complex<double>* tmp2 = new complex<double>[this->LOC.ParaV->nloc];
+        complex<double>* tmp3 = new complex<double>[this->LOC.ParaV->nloc];
+        complex<double>* tmp4 = new complex<double>[this->LOC.ParaV->nloc];
+        complex<double>* tmp5 = new complex<double>[this->LOC.ParaV->nloc];
+        ModuleBase::GlobalFunc::ZEROS(Htmp, this->LOC.ParaV->nloc);
+        ModuleBase::GlobalFunc::ZEROS(Sinv, this->LOC.ParaV->nloc);
+        ModuleBase::GlobalFunc::ZEROS(tmp1, this->LOC.ParaV->nloc);
+        ModuleBase::GlobalFunc::ZEROS(tmp2, this->LOC.ParaV->nloc);
+        ModuleBase::GlobalFunc::ZEROS(tmp3, this->LOC.ParaV->nloc);
+        ModuleBase::GlobalFunc::ZEROS(tmp4, this->LOC.ParaV->nloc);
+        ModuleBase::GlobalFunc::ZEROS(tmp5, this->LOC.ParaV->nloc);
         const int inc = 1;
-        int nrow = this->LM->ParaV->nrow;
-        int ncol = this->LM->ParaV->ncol;
-        zcopy_(&this->LM->ParaV->nloc, this->LM->Hloc2.data(), &inc, Htmp, &inc);
-        zcopy_(&this->LM->ParaV->nloc, this->LM->Sloc2.data(), &inc, Sinv, &inc);
+        int nrow = this->LOC.ParaV->nrow;
+        int ncol = this->LOC.ParaV->ncol;
+        zcopy_(&this->LOC.ParaV->nloc, this->UHM.LM->Hloc2.data(), &inc, Htmp, &inc);
+        zcopy_(&this->LOC.ParaV->nloc, this->UHM.LM->Sloc2.data(), &inc, Sinv, &inc);
 
-        int* ipiv = new int[this->LM->ParaV->nloc];
+        int* ipiv = new int[this->LOC.ParaV->nloc];
         int info;
         const int one_int = 1;
-        pzgetrf_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, Sinv, &one_int, &one_int, this->LM->ParaV->desc, ipiv, &info);
+        pzgetrf_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, Sinv, &one_int, &one_int, this->LOC.ParaV->desc, ipiv, &info);
 
         int LWORK = -1, liWORK = -1;
         std::vector<std::complex<double>> WORK(1, 0);
@@ -436,7 +377,7 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                  Sinv,
                  &one_int,
                  &one_int,
-                 this->LM->ParaV->desc,
+                 this->LOC.ParaV->desc,
                  ipiv,
                  WORK.data(),
                  &LWORK,
@@ -453,7 +394,7 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                  Sinv,
                  &one_int,
                  &one_int,
-                 this->LM->ParaV->desc,
+                 this->LOC.ParaV->desc,
                  ipiv,
                  WORK.data(),
                  &LWORK,
@@ -473,16 +414,16 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                 this->LOC.dm_k[ik].c,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 Htmp,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 &zero_float[0],
                 tmp1,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc);
+                this->LOC.ParaV->desc);
 
         pzgemm_(&N_char,
                 &N_char,
@@ -493,16 +434,16 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                 tmp1,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 Sinv,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 &zero_float[0],
                 tmp2,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc);
+                this->LOC.ParaV->desc);
 
         pzgemm_(&N_char,
                 &T_char,
@@ -513,16 +454,16 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                 Sinv,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 Htmp,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 &zero_float[0],
                 tmp3,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc);
+                this->LOC.ParaV->desc);
 
         pzgemm_(&N_char,
                 &T_char,
@@ -533,16 +474,16 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                 tmp3,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 this->LOC.dm_k[ik].c,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc,
+                this->LOC.ParaV->desc,
                 &zero_float[0],
                 tmp4,
                 &one_int,
                 &one_int,
-                this->LM->ParaV->desc);
+                this->LOC.ParaV->desc);
 
         pzgeadd_(&N_char,
                  &GlobalV::NLOCAL,
@@ -551,12 +492,12 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                  tmp2,
                  &one_int,
                  &one_int,
-                 this->LM->ParaV->desc,
+                 this->LOC.ParaV->desc,
                  &half_float[0],
                  tmp4,
                  &one_int,
                  &one_int,
-                 this->LM->ParaV->desc);
+                 this->LOC.ParaV->desc);
 
         pztranu_(&GlobalV::NLOCAL,
                  &GlobalV::NLOCAL,
@@ -564,13 +505,13 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
                  tmp4,
                  &one_int,
                  &one_int,
-                 this->LM->ParaV->desc,
+                 this->LOC.ParaV->desc,
                  &zero_float[0],
                  tmp5,
                  &one_int,
                  &one_int,
-                 this->LM->ParaV->desc);
-        zcopy_(&this->LM->ParaV->nloc, tmp5, &inc, this->LOC.edm_k_tddft[ik].c, &inc);
+                 this->LOC.ParaV->desc);
+        zcopy_(&this->LOC.ParaV->nloc, tmp5, &inc, this->LOC.edm_k_tddft[ik].c, &inc);
 
         delete[] Htmp;
         delete[] Sinv;
@@ -606,3 +547,4 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
     }
     return;
 }
+} // namespace ModuleESolver
