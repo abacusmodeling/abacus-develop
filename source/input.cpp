@@ -1591,6 +1591,7 @@ bool Input::Read(const std::string &fn)
         while (ifs.good())
         {
             ifs >> word1;
+            if(ifs.eof() != 0) break;
             strtolower(word1, word); // convert uppercase std::string to lower case; word1 --> word
 
             if (strcmp("dftu_type", word) == 0)
@@ -2358,6 +2359,26 @@ void Input::Check(void)
             ModuleBase::WARNING_QUIT("Input::Check", "temperature of MD calculation should be set!");
         if (mdp.md_tlast < 0.0)
             mdp.md_tlast = mdp.md_tfirst;
+
+        if(mdp.md_tfreq == 0)
+        {
+            mdp.md_tfreq = 1.0/40.0/mdp.md_dt;
+        }
+        if(mdp.md_restart) 
+        {
+            init_vel = 1;
+        }
+        if(mdp.md_ensolver == "LJ" || mdp.md_ensolver == "DP" || mdp.md_type == 4)
+        {
+            cal_stress = 1;
+        }
+        if(mdp.md_type == 4)
+        {
+            if(mdp.msst_qmass <= 0)
+            {
+                ModuleBase::WARNING_QUIT("Input::Check", "msst_qmass must be greater than 0!");
+            }
+        }
         // if(mdp.md_tfirst!=mdp.md_tlast)
         // {
         //     std::ifstream file1;

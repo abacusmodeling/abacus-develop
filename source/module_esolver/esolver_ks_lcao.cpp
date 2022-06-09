@@ -216,16 +216,13 @@ namespace ModuleESolver
 
     void ESolver_KS_LCAO::cal_Force(ModuleBase::matrix& force)
     {
-        if (!this->have_force)
-        {
-            Force_Stress_LCAO FSL(this->RA);
-            FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
+        Force_Stress_LCAO FSL(this->RA);
+        FSL.getForceStress(GlobalV::CAL_FORCE, GlobalV::CAL_STRESS,
                 GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
                 this->LOC, this->psid, this->psi, this->UHM, force, this->scs);
-            //delete RA after cal_Force
-            this->RA.delete_grid();
-            this->have_force = true;
-        }
+        //delete RA after cal_Force
+        this->RA.delete_grid();
+        this->have_force = true;
     }
 
     void ESolver_KS_LCAO::cal_Stress(ModuleBase::matrix& stress)

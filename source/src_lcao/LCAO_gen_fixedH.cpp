@@ -1188,7 +1188,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new(double* HSloc) //update by liuyu 2
                 nlm_tot_thread.resize(adjs_all[iat].size());
             #else 
                 std::vector<std::unordered_map<int,std::vector<double>>> nlm_tot;
-                nlm_tot.resize(GlobalC::GridD.getAdjacentNum()+1);
+                nlm_tot.resize(adjs_all[iat].size());
             #endif 
 
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];

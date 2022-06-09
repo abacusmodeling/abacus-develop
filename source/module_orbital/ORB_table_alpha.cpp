@@ -22,11 +22,11 @@ ORB_table_alpha::ORB_table_alpha()
 	nlm = 0;
 	Rmesh = 0;
 
-	kpoint = new double[1];
-	r = new double[1];
-	rab = new double[1];
-	kab = new double[1];
-	DS_2Lplus1 = new int[1];
+	kpoint = nullptr;
+	r = nullptr;
+	rab = nullptr;
+	kab = nullptr;
+	DS_2Lplus1 = nullptr;
 }
 
 ORB_table_alpha::~ORB_table_alpha()

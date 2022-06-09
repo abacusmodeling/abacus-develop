@@ -7,9 +7,9 @@ namespace GlobalC
 
 surchem::surchem()
 {
-    TOTN_real = new double[1];
-    delta_phi = new double[1];
-    epspot = new double[1];
+    TOTN_real = nullptr;
+    delta_phi = nullptr;
+    epspot = nullptr;
     Vcav = ModuleBase::matrix();
     Vel = ModuleBase::matrix();
     qs = 0;

@@ -270,7 +270,8 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         std::cout << std::endl;
 */
 
-//	delete[] work;
+	delete[] work;
+	delete[] WORK;
 //	delete[] ipiv;
 
 	return;
@@ -450,7 +451,12 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, psi::Psi<std::com
 
         // the eigenvalues.
         //dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        delete[] Stmp;
+        delete[] Htmp1;
+        delete[] Htmp2;
+        delete[] Htmp3;
         delete[] eigen;
+        delete[] ipiv;
 
         // Z is delete in gath_eig
         //ModuleBase::timer::tick("Evolve_LCAO_Matrix","gath_eig_complex",'G');

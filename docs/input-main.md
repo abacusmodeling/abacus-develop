@@ -1114,7 +1114,7 @@ This part of variables are used to control the molecular dynamics calculations.
 
 - **Type**: Double
 - **Description**: This is the time step(fs) used in md simulation .
-- **Default**: 1
+- **Default**: 1.0
 
 #### md_tfirst & md_tlast
 
@@ -1178,23 +1178,23 @@ temperature will fluctuate violently; if it is too small, the temperature will t
 
 - **Type**: Real
 - **Description**: the velocity of shock wave ($\AA$/fs) for MSST.
-- **Default**: 0
+- **Default**: 0.0
 
 #### msst_vis
 
 - **Type**: Real
 - **Description**: artificial viscosity (mass/length/time) for MSST.
-- **Default**: 0
+- **Default**: 0.0
 
 #### msst_tscale
 
 - **Type**: Real
 - **Description**: reduction in initial temperature (0~1) used to compress volume in MSST.
-- **Default**: 0
+- **Default**: 0.01
 
 #### msst_qmass
 
-- **Type**: Double
+- **Type**: Real
 - **Description**: Inertia of extended system variable. Used only when md_type is 4, you should set a number which is larger than 0. Note that Qmass of NHC is set by md_tfreq.
 - **Default**: No default
 
@@ -1202,7 +1202,7 @@ temperature will fluctuate violently; if it is too small, the temperature will t
 
 - **Type**: Real
 - **Description**: damping parameter (fs) used to add force in Langevin method.
-- **Default**: 1
+- **Default**: 1.0
 
 ### DFT+U correction
 

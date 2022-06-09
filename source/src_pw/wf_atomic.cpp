@@ -257,7 +257,7 @@ void WF_atomic::atomic_wfc
     const int total_lm = (lmax_wfc + 1) * (lmax_wfc + 1);
     ModuleBase::matrix ylm(total_lm, np);
     std::complex<double> *aux = new std::complex<double>[np];
-    double *chiaux = new double[1];
+    double *chiaux = nullptr;
 
     ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3 <double> [np];
     for (int ig=0;ig<np;ig++)

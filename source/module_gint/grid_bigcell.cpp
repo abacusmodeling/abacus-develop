@@ -8,7 +8,7 @@
 Grid_BigCell::Grid_BigCell()
 {
 	this->flag_tib = false;
-	this->index_atom = new int[1];
+	this->index_atom = nullptr;
 	this->orbital_rmax = 0.0;
 	this->nxe = this->nye = this->nze = 0;	
 	this->bigcell_dx = 0.0;

@@ -3,9 +3,9 @@
 
 Grid_MeshK::Grid_MeshK()
 {
-	ucell_index2x = new int[1];
-	ucell_index2y = new int[1];
-	ucell_index2z = new int[1];
+	ucell_index2x = nullptr;
+	ucell_index2y = nullptr;
+	ucell_index2z = nullptr;
 }
 
 Grid_MeshK::~Grid_MeshK()

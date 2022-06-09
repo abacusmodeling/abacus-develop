@@ -11,11 +11,11 @@ public:
 		md_restart = 0;
 		md_type = 1;
         md_nstep = 10;
-		md_dt = 1;
-		md_tfirst = 0;
-		md_tlast = -1;
+		md_dt = 1.0;
+		md_tfirst = -1.0;
+		md_tlast = -1.0;
 		md_dumpfreq = 1;
-		md_restartfreq = 1;
+		md_restartfreq = 5;
 
 		// Classic MD 
 		md_ensolver = "FP";
@@ -25,17 +25,17 @@ public:
 
 		// MSST
 		msst_direction = 2;
-		msst_qmass = 1;
-		msst_vel = 0;
-		msst_vis = 0;
+		msst_qmass = -1.0;
+		msst_vel = 0.0;
+		msst_vis = 0.0;
 		msst_tscale = 0.01;
 
 		// NHC
-		md_tfreq = 0;
+		md_tfreq = 0.0;
 		md_mnhc = 4;
 
 		// Langevin
-		md_damp = 1;
+		md_damp = 1.0;
 	};
     ~MD_parameters(){};
 
