@@ -30,8 +30,8 @@
 
 
 
-Mulliken_Charge::Mulliken_Charge(std::vector<ModuleBase::matrix> *wfc_gamma_in,
-    std::vector<ModuleBase::ComplexMatrix> *wfc_k_in)
+Mulliken_Charge::Mulliken_Charge(const psi::Psi<double> *wfc_gamma_in,
+    const psi::Psi<std::complex<double>> *wfc_k_in)
 {
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -114,7 +114,8 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 			mud.resize(1);
 			mud[0].create(pv->ncol,pv->nrow);
 
-			ModuleBase::matrix Dwf = this->wfc_gamma->at(is);
+			this->wfc_gamma->fix_k(is);
+			const double* ppsi = this->wfc_gamma->get_pointer();
 			for (int i=0; i<GlobalV::NBANDS; ++i)		  
 			{     
 				ModuleBase::GlobalFunc::ZEROS(mug, GlobalV::NLOCAL);
@@ -130,7 +131,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 						&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 						&one_float,
 						uhm.LM->Sloc.data(), &one_int, &one_int, pv->desc,
-						Dwf.c, &one_int, &NB, pv->desc, &one_int,
+						ppsi, &one_int, &NB, pv->desc, &one_int,
 						&zero_float,
 						mud[0].c, &one_int, &NB, pv->desc,
 						&one_int);
@@ -145,7 +146,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 						const int ir = pv->trace_loc_row[j];
 						const int ic = pv->trace_loc_col[i];
 
-						mug[j] = mud[0](ic,ir)*this->wfc_gamma->at(is)(ic,ir);
+						mug[j] = mud[0](ic,ir)*this->wfc_gamma[0](ic,ir);
 
 						const double x = mug[j].real();
 
@@ -188,7 +189,14 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 					uhm.LM->allocate_HS_k(pv->nloc);
 					uhm.LM->zeros_HSk('S');
 					uhm.LM->folding_fixedH(ik);
-					ModuleBase::ComplexMatrix Dwf = conj(this->wfc_k->at(ik));
+
+					this->wfc_k->fix_k(ik);
+					psi::Psi<std::complex<double>> Dwfc(this->wfc_k[0], 1);
+					std::complex<double>* p_dwfc = Dwfc.get_pointer();
+					for(int index = 0; index < Dwfc.size(); ++index)
+					{
+						p_dwfc[index] = conj(p_dwfc[index]);
+					}
 
 					for (int i=0; i<GlobalV::NBANDS; ++i)		  
 					{     
@@ -208,7 +216,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 								&one_float[0],
 								uhm.LM->Sloc2.data(), &one_int, &one_int, pv->desc,
-								Dwf.c, &one_int, &NB, pv->desc, &one_int,
+								p_dwfc, &one_int, &NB, pv->desc, &one_int,
 								&zero_float[0],
 								mud[0].c, &one_int, &NB, pv->desc,
 								&one_int);
@@ -223,7 +231,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 								const int ir = pv->trace_loc_row[j];
 								const int ic = pv->trace_loc_col[i];
 
-								mug[j] = mud[0](ic,ir)*this->wfc_k->at(ik)(ic,ir);
+								mug[j] = mud[0](ic,ir)*this->wfc_k[0](ic,ir);
 								const double x = mug[j].real();
 								MecMulP[is][j] +=x*GlobalC::wf.wg(ik,i);
 								// std::cout <<   wavog[j] << std::endl; 

@@ -78,7 +78,9 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 
 
 void Local_Orbital_Charge::allocate_dm_wfc(const int& lgd,
-    Local_Orbital_wfc &lowf)
+    Local_Orbital_wfc &lowf, 
+    psi::Psi<double>* psid,
+    psi::Psi<std::complex<double>>* psi)
 {
     ModuleBase::TITLE("Local_Orbital_Charge", "allocate_dm_wfc");
 
@@ -86,11 +88,11 @@ void Local_Orbital_Charge::allocate_dm_wfc(const int& lgd,
     if (GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// here we reset the density matrix dimension.
-		this->allocate_gamma(lgd);
+		this->allocate_gamma(lgd, psid);
 	}
 	else
     {
-		lowf.allocate_k(lgd, lowf);
+		lowf.allocate_k(lgd, psi);
 		this->allocate_DM_k();
 	}
     
@@ -143,7 +145,7 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
     else
     {
         ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
-        this->cal_dk_k( GlobalC::GridT );
+        this->cal_dk_k( GlobalC::GridT, GlobalC::wf.wg );
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="lapack" || GlobalV::KS_SOLVER=="cusolver")        // Peize Lin test 2019-05-15
 		{
             this->cal_dm(GlobalC::wf.wg,

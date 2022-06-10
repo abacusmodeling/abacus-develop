@@ -6,6 +6,7 @@
 #include "LCAO_hamilt.h"
 #include "src_lcao/local_orbital_wfc.h"
 #include "module_esolver/esolver_ks_lcao.h"
+#include "module_psi/psi.h"
 
 //-----------------------------------------------------------
 // mohan add 2021-02-09
@@ -45,7 +46,7 @@ public:
 private:
 
     static void evolve_psi(const int& istep, LCAO_Hamilt& uhm,
-        Local_Orbital_wfc& lowf);
+        Local_Orbital_wfc& lowf, psi::Psi<std::complex<double>>* psi);
 
 };
 

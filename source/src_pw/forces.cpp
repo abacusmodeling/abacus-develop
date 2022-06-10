@@ -19,7 +19,7 @@ Forces::Forces()
 Forces::~Forces() {}
 
 #include "../module_base/mathzone.h"
-void Forces::init(ModuleBase::matrix& force, const psi::Psi<complex<double>>* psi_in)
+void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>>* psi_in)
 {
 	ModuleBase::TITLE("Forces", "init");
 	this->nat = GlobalC::ucell.nat;

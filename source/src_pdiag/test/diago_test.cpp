@@ -38,11 +38,19 @@ Charge::~Charge(){};
 namespace GlobalC {Charge_Broyden CHR;};
 Local_Orbital_wfc::Local_Orbital_wfc(){};
 Local_Orbital_wfc::~Local_Orbital_wfc(){};
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, const double *wfc_2d, double **wfc_grid){};
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao,
-                                       const std::complex<double> *wfc_2d,
-                                       std::complex<double> **wfc_grid,
-                                       int ik){};
+void Local_Orbital_wfc::wfc_2d_to_grid(
+    int out_wfc_lcao, 
+    const double *wfc_2d, 
+    double **wfc_grid, 
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg){};
+void Local_Orbital_wfc::wfc_2d_to_grid(
+    int out_wfc_lcao,
+    const std::complex<double> *wfc_2d,
+    std::complex<double> **wfc_grid,
+    int ik,
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg){};
 Occupy::Occupy(){};
 Occupy::~Occupy(){};
 void Occupy::calculate_weights(){};
