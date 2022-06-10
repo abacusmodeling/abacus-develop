@@ -14,9 +14,9 @@
 namespace Write_Wfc_Realspace
 {
 	// write ||wfc_r|| for all k-points and all bands
-	// Input: wfc_g[ik](ib,ig)
+	// Input: wfc_g(ik, ib, ig)
 	// loop order is for(z){for(y){for(x)}}
-	void write_wfc_realspace_1(const ModuleBase::ComplexMatrix*const wfc_g, const std::string &folder_name, const bool& square)
+	void write_wfc_realspace_1(const psi::Psi<std::complex<double>> &wfc_g, const std::string &folder_name, const bool& square)
 	{
 		ModuleBase::TITLE("Write_Wfc_Realspace", "write_wfc_realspace_1");
 		ModuleBase::timer::tick("Write_Wfc_Realspace", "write_wfc_realspace_1");
@@ -29,31 +29,42 @@ namespace Write_Wfc_Realspace
 #ifdef __MPI		
 		std::vector<MPI_Request> mpi_requests;
 #endif
-		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
+		for(int ik=0; ik<wfc_g.get_nk(); ++ik)
 		{
+			wfc_g.fix_k(ik);
 			const int ik_out = (GlobalV::NSPIN!=2)
 				? ik + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL]
 				: ik - GlobalC::kv.nks/2*GlobalC::kv.isk[ik] + GlobalC::kv.nkstot/2*GlobalC::kv.isk[ik] + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL];
-			for(int ib=0; ib<wfc_g[ik].nr; ++ib)
+			for(int ib=0; ib<wfc_g.get_nbands(); ++ib)
 			{
-				const std::vector<std::complex<double>> wfc_r = cal_wfc_r(wfc_g[ik], ik, ib);
+				const std::vector<std::complex<double>> wfc_r = cal_wfc_r(wfc_g, ik, ib);
 
-				std::vector<double> wfc_r2(wfc_r.size());
+                std::vector<double> wfc_r2(wfc_r.size());
+                std::vector<double> wfc_i2;
                 if (square)
                     for (int ir = 0; ir < wfc_r2.size(); ++ir)
                         wfc_r2[ir] = std::norm(wfc_r[ir]);   // "std::norm(z)" returns |z|^2 
                 else
+                {
+                    wfc_i2.resize(wfc_r.size());
                     for (int ir = 0; ir < wfc_r2.size(); ++ir)
-                        wfc_r2[ir] = std::abs(wfc_r[ir]);
-
+                    {
+                        wfc_r2[ir] = wfc_r[ir].real();
+                        wfc_i2[ir] = wfc_r[ir].imag();
+                    }
+                }
 				const std::string file_name = outdir + "wfc_realspace_"
 					+ ModuleBase::GlobalFunc::TO_STRING(ik_out)
 					+ "_" + ModuleBase::GlobalFunc::TO_STRING(ib);
 #ifdef __MPI
 				mpi_requests.push_back({});
-				write_charge_realspace_1(wfc_r2, file_name, mpi_requests.back());
+                write_charge_realspace_1(wfc_r2, file_name, mpi_requests.back());
+                if (!square)
+                    write_charge_realspace_1(wfc_i2, file_name + "_imag", mpi_requests.back());
 #else
-				write_charge_realspace_1(wfc_r2, file_name);
+                write_charge_realspace_1(wfc_r2, file_name);
+                if (!square)
+                    write_charge_realspace_1(wfc_i2, file_name + "_imag", mpi_requests.back());
 #endif
 			}
 		}
@@ -76,16 +87,13 @@ namespace Write_Wfc_Realspace
 
 	// Input: wfc_g(ib,ig)
 	// Output: wfc_r[ir]
-	std::vector<std::complex<double>> cal_wfc_r(const ModuleBase::ComplexMatrix &wfc_g, const int ik, const int ib)
+	std::vector<std::complex<double>> cal_wfc_r(const psi::Psi<std::complex<double>> &wfc_g, const int ik, const int ib)
 	{
 		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
-		ModuleBase::GlobalFunc::ZEROS(GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-		std::vector<std::complex<double>> wfc_r(GlobalC::pw.nrxx);
-		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ++ig)
-			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig)] ] = wfc_g(ib,ig);
-		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
-		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
-			wfc_r[ir] = GlobalC::UFFT.porter[ir];
+		
+		std::vector<std::complex<double>> wfc_r(GlobalC::wfcpw->nrxx);
+		GlobalC::wfcpw->recip2real(&wfc_g(ib,0), wfc_r.data(),ik);
+
 		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
 		return wfc_r;
 	}
@@ -128,7 +136,7 @@ namespace Write_Wfc_Realspace
 					ofs<<GlobalC::ucell.atoms[it].taud[ia].x<<" "<<GlobalC::ucell.atoms[it].taud[ia].y<<" "<<GlobalC::ucell.atoms[it].taud[ia].z<<std::endl;
 			ofs<<std::endl;
 			
-			ofs<<GlobalC::pw.ncx<<" "<<GlobalC::pw.ncy<<" "<<GlobalC::pw.ncz<<std::endl;
+			ofs<<GlobalC::wfcpw->nx<<" "<<GlobalC::wfcpw->ny<<" "<<GlobalC::wfcpw->nz<<std::endl;
 #ifdef  __MPI
 		}
 		else
@@ -140,14 +148,14 @@ namespace Write_Wfc_Realspace
 		}
 #endif
 		
-		assert(GlobalC::pw.ncx * GlobalC::pw.ncy * GlobalC::pw.nczp == chg_r.size());
-		for(int iz=0; iz<GlobalC::pw.nczp; ++iz)
+		assert(GlobalC::wfcpw->nx * GlobalC::wfcpw->ny * GlobalC::wfcpw->nplane == chg_r.size());
+		for(int iz=0; iz<GlobalC::wfcpw->nplane; ++iz)
 		{
-			for(int iy=0; iy<GlobalC::pw.ncy; ++iy)
+			for(int iy=0; iy<GlobalC::wfcpw->ny; ++iy)
 			{
-				for(int ix=0; ix<GlobalC::pw.ncx; ++ix)
+				for(int ix=0; ix<GlobalC::wfcpw->nx; ++ix)
 				{
-					const int ir = (ix*GlobalC::pw.ncy+iy)*GlobalC::pw.nczp+iz;
+					const int ir = (ix*GlobalC::wfcpw->ny+iy)*GlobalC::wfcpw->nplane+iz;
 					ofs<<chg_r[ir]<<" ";
 				}
 				ofs<<"\n";

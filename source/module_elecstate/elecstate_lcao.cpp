@@ -2,7 +2,7 @@
 
 #include "math_tools.h"
 #include "module_base/timer.h"
-#include "src_lcao/grid_technique.h"
+#include "module_gint/grid_technique.h"
 
 namespace elecstate
 {
@@ -59,6 +59,9 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     ModuleBase::TITLE("ElecStateLCAO", "psiToRho");
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
 
+    this->calculate_weights();
+    this->calEBand();
+
     ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
 
     // this part for calculating dm_k in 2d-block format, not used for charge now
@@ -94,7 +97,8 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     //------------------------------------------------------------
 
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GK.cal_rho_k(this->loc->DM_R);
+    Gint_inout inout(this->loc->DM_R, this->charge, Gint_Tools::job_type::rho);
+    this->uhm->GK.cal_gint(&inout);
 
     this->charge->renormalize_rho();
 
@@ -109,6 +113,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
 
     this->calculate_weights();
+    this->calEBand();
 
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack")
     {
@@ -142,7 +147,8 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     // calculate the charge density on real space grid.
     //------------------------------------------------------------
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GG.cal_rho(this->loc->DM);
+    Gint_inout inout(this->loc->DM, this->charge,Gint_Tools::job_type::rho);
+    this->uhm->GG.cal_gint(&inout);
 
     this->charge->renormalize_rho();
 

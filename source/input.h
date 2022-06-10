@@ -64,11 +64,11 @@ class Input
     // Stochastic DFT
     //==========================================================
     int nche_sto; // number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
+    int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
     int seed_sto; // random seed for sDFT
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
-    std::string stotype;
-    int nbands_sto; // number of stochastic bands //qianrui 2021-2-5
+    int bndpar; //parallel for stochastic/deterministic bands
 
     //==========================================================
     // electrons / spin
@@ -179,9 +179,9 @@ class Input
     //==========================================================
     // charge mixing
     //==========================================================
-    std::string mixing_mode; // "plain","broden",...
+    std::string mixing_mode; // "plain","broyden",...
     double mixing_beta; // 0 : no_mixing
-    int mixing_ndim; // used in Broden method
+    int mixing_ndim; // used in Broyden method
     double mixing_gg0; // used in kerker method. mohan add 2014-09-27
 
     //==========================================================
@@ -206,6 +206,7 @@ class Input
     int out_wfc_r; // 0: no; 1: yes
     int out_dos; // dos calculation. mohan add 20090909
     int out_band; // band calculation pengfei 2014-10-13
+    int out_proj_band; // projected band structure calculation jiyy add 2022-05-11
     int out_mat_hs; // output H matrix and S matrix in local basis.
     int out_mat_hs2; // LiuXh add 2019-07-16, output H(R) matrix and S(R) matrix in local basis.
     int out_mat_r; // jingan add 2019-8-14, output r(R) matrix.
@@ -253,6 +254,17 @@ class Input
         int md_fixtemperature;          //period to change temperature
         int md_msdstartTime;            //choose which step that msd be calculated */
     MD_parameters mdp;
+
+    //==========================================================
+    // efield and dipole correction
+    // Yu Liu add 2022-05-18
+    //==========================================================
+    bool efield_flag;        // add electric field
+    bool dip_cor_flag;        // dipole correction
+    int efield_dir;           // the direction of the electric field or dipole correction
+    double efield_pos_max;     // position of the maximum of the saw-like potential along crystal axis efield_dir
+    double efield_pos_dec;      // zone in the unit cell where the saw-like potential decreases
+    double efield_amp ;        // amplitude of the electric field
 
     //==========================================================
     // vdw
@@ -387,6 +399,11 @@ class Input
     double tau;
     double sigma_k;
     double nc_k;
+    // gauss charge
+    double comp_q;
+    double comp_l;
+    double comp_center;
+    int comp_dim;
 
     //==========================================================
     // variables for test only

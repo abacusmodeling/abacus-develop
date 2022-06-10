@@ -4,7 +4,7 @@
 #include "global.h"
 
 //calcualte the Ewald stress term in PW and LCAO
-void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
+void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw)
 {
     ModuleBase::timer::tick("Stress_Func","stress_ew");
 
@@ -25,14 +25,15 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
        alpha-=0.1;
        if(alpha==0.0)
           ModuleBase::WARNING_QUIT("stres_ew", "optimal alpha not found");
-       upperbound =ModuleBase::e2 * pow(charge,2) * sqrt( 2 * alpha / (ModuleBase::TWO_PI)) * erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
+       upperbound =ModuleBase::e2 * pow(charge,2) * sqrt( 2 * alpha / (ModuleBase::TWO_PI)) * erfc(sqrt(GlobalC::ucell.tpiba2 * rho_basis->ggecut / 4.0 / alpha));
     }
     while(upperbound>1e-7);
 
     //G-space sum here
     //Determine if this processor contains G=0 and set the constant term 
     double sdewald;
-    if(GlobalC::pw.gstart == 1)
+	const int ig0 = rho_basis->ig_gge0;
+    if( ig0 >= 0)
 	{
        sdewald = (ModuleBase::TWO_PI) * ModuleBase::e2 / 4.0 / alpha * pow(charge/GlobalC::ucell.omega,2);
     }
@@ -51,18 +52,17 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
     double arg;
     std::complex<double> rhostar;
     double sewald;
-    for(int ng=GlobalC::pw.gstart;ng<GlobalC::pw.ngmc;ng++)
+    for(int ig = 0; ig < rho_basis->npw; ig++)
 	{
-		g2 = GlobalC::pw.gg[ng]* GlobalC::ucell.tpiba2;
+		if(ig == ig0)  continue;
+		g2 = rho_basis->gg[ig]* GlobalC::ucell.tpiba2;
 		g2a = g2 /4.0/alpha;
 		rhostar=std::complex<double>(0.0,0.0);
 		for(int it=0; it < GlobalC::ucell.ntype; it++)
 		{
 			for(int i=0; i<GlobalC::ucell.atoms[it].na; i++)
 			{
-				arg = (GlobalC::pw.get_G_cartesian_projection(ng, 0) * GlobalC::ucell.atoms[it].tau[i].x + 
-					GlobalC::pw.get_G_cartesian_projection(ng, 1) * GlobalC::ucell.atoms[it].tau[i].y + 
-					GlobalC::pw.get_G_cartesian_projection(ng, 2) * GlobalC::ucell.atoms[it].tau[i].z) * (ModuleBase::TWO_PI);
+				arg = (rho_basis->gcar[ig] * GlobalC::ucell.atoms[it].tau[i]) * (ModuleBase::TWO_PI);
 				rhostar = rhostar + std::complex<double>(GlobalC::ucell.atoms[it].zv * cos(arg),GlobalC::ucell.atoms[it].zv * sin(arg));
 			}
 		}
@@ -73,7 +73,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
 		{
 			for(int m=0;m<l+1;m++)
 			{
-				sigma(l, m) += sewald * GlobalC::ucell.tpiba2 * 2.0 * GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) / g2 * (g2a + 1);
+				sigma(l, m) += sewald * GlobalC::ucell.tpiba2 * 2.0 * rho_basis->gcar[ig][l] * rho_basis->gcar[ig][m] / g2 * (g2a + 1);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
     double rmax=0.0;
     int nrm=0;
     double fac;
-	if(GlobalC::pw.gstart==1)
+	if(ig0 >= 0)
 	{
 		rmax = 4.0/sqrt(alpha)/GlobalC::ucell.lat0;
 		//with this choice terms up to ZiZj*erfc(5) are counted (erfc(5)=2*10^-1)

@@ -6,7 +6,7 @@
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_common.h"
-#include "grid_technique.h"
+#include "../module_gint/grid_technique.h"
 #include "src_lcao/record_adj.h"
 #include "src_lcao/local_orbital_wfc.h"
 #include "src_lcao/LCAO_hamilt.h"
@@ -20,7 +20,7 @@ class Local_Orbital_Charge
 	~Local_Orbital_Charge();
 
 	// mohan added 2021-02-08
-    void allocate_dm_wfc(const Grid_Technique& gt,
+    void allocate_dm_wfc(const int& lgd,
         Local_Orbital_wfc &lowf);
     // sum bands to compute the electron charge density
 	void sum_bands(LCAO_Hamilt &UHM);
@@ -28,10 +28,9 @@ class Local_Orbital_Charge
 	//-----------------
 	// in DM_gamma.cpp
 	//-----------------
-	void allocate_gamma(const Grid_Technique &gt);
+	void allocate_gamma(const int &lgd);
 
-    void gamma_file(const Grid_Technique& gt,
-        Local_Orbital_wfc &lowf);
+    void gamma_file(Local_Orbital_wfc &lowf);
     void cal_dk_gamma_from_2D_pub(void);
     //transformation from 2d block to grid, only gamma_only used it now
     //template<typename T>

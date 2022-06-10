@@ -43,6 +43,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     // ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgd_now",lgd_now);
     
     receiver_size=lgd_now*lgd_now;
+    delete[] receiver_size_process;
     receiver_size_process=new int[nprocs];
     delete[] receiver_displacement_process;
     receiver_displacement_process=new int[nprocs];
@@ -191,12 +192,12 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
 
 // allocate density kernel may change once the ion
 // positions change
-void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
+void Local_Orbital_Charge::allocate_gamma(const int& lgd)
 {
      ModuleBase::TITLE("Local_Orbital_Charge","allocate_gamma");
 
     // mohan fix serious bug 2010-09-06
-    this->lgd_now = gt.lgd;
+    this->lgd_now = lgd;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
     if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgd_last",lgd_last);
     if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgd_now",lgd_now);
@@ -257,14 +258,13 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 
 	if(GlobalC::wf.init_wfc=="file")
 	{
-		this->gamma_file(gt, *this->LOWF);
+		this->gamma_file(*this->LOWF);
 	}
 
     return;
 }
 
-void Local_Orbital_Charge::gamma_file(const Grid_Technique& gt,
-    Local_Orbital_wfc &lowf)
+void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("Local_Orbital_Charge","gamma_file");
 

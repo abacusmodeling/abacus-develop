@@ -128,7 +128,8 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 
 	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R", true, false))
 	{
-		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
+		ifs.ignore(150, '>');
+		// ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
 		this->read_pseudo_upf201_r(ifs);
 	}
 	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R>"))
@@ -139,7 +140,8 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 
     if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB", true, false))
 	{
-		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
+		ifs.ignore(150, '>');
+		// ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
 		this->read_pseudo_upf201_rab(ifs);
 	}
 	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB>"))
@@ -224,7 +226,8 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 
 	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ", true, false))
 	{
-		ModuleBase::GlobalFunc::READ_VALUE(ifs, word);  // type size columns
+		ifs.ignore(150, '>');
+		// ModuleBase::GlobalFunc::READ_VALUE(ifs, word);  // type size columns
 		this->read_pseudo_upf201_dij(ifs);
 	}
 	else if ( ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ>"))
@@ -289,7 +292,8 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 	//--------------------------------------
 	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM", true, false))
 	{
-		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
+    	ifs.ignore(150, '>');
+		// ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
 		this->read_pseudo_upf201_rhoatom(ifs);
 	}
 	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM>"))
@@ -527,10 +531,10 @@ void Pseudopot_upf::read_pseudo_upf201_dij(std::ifstream &ifs)
 		for(int j=0;j<nbeta;j++)
 		{
 			ifs >> dion(i,j);
-			if ( i != j  && dion(i,j) != 0.0 )
-			{
-				ModuleBase::WARNING_QUIT("read_pseudo_upf201","Error: for i != j, Dij of Pseudopotential must be 0.0");
-			}
+			// if ( i != j  && dion(i,j) != 0.0 )
+			// {
+			// 	ModuleBase::WARNING_QUIT("read_pseudo_upf201","Error: for i != j, Dij of Pseudopotential must be 0.0");
+			// }
 		}
 	}
 }

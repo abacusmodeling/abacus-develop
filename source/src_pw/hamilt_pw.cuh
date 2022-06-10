@@ -88,8 +88,9 @@ class Hamilt_PW
 
 	void h_psi(const std::complex<double> *psi, std::complex<double> *hpsi, const int m = 1);
 
-  private:
+  public:
 	int *GR_index;
+  private:
 
 #ifdef __CUDA
 	// vectors on device

@@ -23,7 +23,7 @@ Numerical_Descriptor::~Numerical_Descriptor()
 }
 
 
-void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *psi, const int &lmax_in)
+void Numerical_Descriptor::output_descriptor(const psi::Psi<std::complex<double>> &psi, const int &lmax_in)
 {
 	ModuleBase::TITLE("Numerical_Descriptor","output_descriptor");
 	ModuleBase::GlobalFunc::NEW_PART("DeepKS descriptor: D_{Inl}");
@@ -41,7 +41,7 @@ void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *ps
     int ne = 0; 
 	
     // 0 stands for : 'Faln' is not used.
-    this->bessel_basis.init( 0, GlobalC::pw.ecutwfc, GlobalC::ucell.ntype, this->lmax );
+    this->bessel_basis.init( 0, INPUT.ecutwfc, GlobalC::ucell.ntype, this->lmax );
 	this->nmax = Numerical_Descriptor::bessel_basis.get_ecut_number();
     this->init_mu_index();
     this->init_label = true;
@@ -90,7 +90,8 @@ void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *ps
         GlobalV::ofs_running << "\n " << std::setw(8) << ik+1 << std::setw(8) << npw << std::endl;
 		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
         // search for all k-points.
-        this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
+		psi.fix_k(ik);
+        this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"jlq3d_overlap");
 	}
 
@@ -233,7 +234,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     const int &ik_ibz,
     const int &ik,
     const int &np,
-    const ModuleBase::ComplexMatrix &psi)
+    const psi::Psi<std::complex<double>> &psi)
 {
     ModuleBase::TITLE("Numerical_Descriptor","jlq3d_overlap");
     ModuleBase::timer::tick("Numerical_Descriptor","jlq3d_overlap");
@@ -266,7 +267,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     {
         for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
         {
-            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1,GlobalC::wfcpw);
             for (int L=0; L< lmax+1; L++)
             {
                 GlobalV::ofs_running << " " << std::setw(5) << ik+1

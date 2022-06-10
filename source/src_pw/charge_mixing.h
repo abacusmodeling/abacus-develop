@@ -33,7 +33,7 @@ class Charge_Mixing: public Charge
     );//mohan add mixing_gg0_in 2014-09-27
 	
 	// also be used by namespace: GGA_pw
-    void set_rhog(const double *rho_in, std::complex<double> *rhog_in)const;
+    void set_rhog(double *rho_in, std::complex<double> *rhog_in)const;
 	
 	protected:
 

@@ -326,6 +326,16 @@ double ddot_real(
         const std::complex<double>* psi_R,
         const bool reduce = true) ;
 
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : IS_COLUMN_MAJOR_KS_SOLVER
+// check ks_solver requires column major or not
+//==========================================================
+static inline bool IS_COLUMN_MAJOR_KS_SOLVER()
+{
+    return GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="cusolver";
+}
+
 }//namespace GlobalFunc
 }//namespace ModuleBase
 

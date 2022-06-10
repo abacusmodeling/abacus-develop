@@ -10,22 +10,22 @@ extern "C"
 #endif
 Parallel_Orbitals::Parallel_Orbitals()
 {
-    loc_sizes = new int[1];
-    trace_loc_row = new int[1];
-    trace_loc_col = new int[1];
+    loc_sizes = nullptr;
+    trace_loc_row = nullptr;
+    trace_loc_col = nullptr;
 
     testpb = 0;//mohan add 2011-03-16
 	alloc_Z_LOC = false; //xiaohui add 2014-12-22
     // default value of nb is 1,
 	// but can change to larger value from input.
     nb = 1;
-	MatrixInfo.row_set = new int[1];
-    MatrixInfo.col_set = new int[1];
+	MatrixInfo.row_set = nullptr;
+    MatrixInfo.col_set = nullptr;
 
     //in multi-k, 2D-block-division variables for FT (R<->k)
     nnr = 1;
-    nlocdim = new int[1];	
-	nlocstart = new int[1];
+    nlocdim = nullptr;	
+	nlocstart = nullptr;
 
 }
 
@@ -98,7 +98,7 @@ void ORB_control::set_trace(std::ofstream& ofs_running)
 	}
 #ifdef __MPI
     else if(ks_solver=="scalpack" || ks_solver=="genelpa" || ks_solver=="hpseps" 
-		|| ks_solver=="selinv" || ks_solver=="scalapack_gvx") //xiaohui add 2013-09-02
+		|| ks_solver=="selinv" || ks_solver=="scalapack_gvx" || ks_solver=="cusolver") //xiaohui add 2013-09-02
     {
         // ofs_running << " nrow=" << nrow << std::endl;
         for (int irow=0; irow< pv->nrow; irow++)
@@ -209,6 +209,9 @@ void ORB_control::divide_HS_2d
 	// get the 2D index of computer.
 	pv->dim0 = (int)sqrt((double)dsize); //mohan update 2012/01/13
 	//while (GlobalV::NPROC_IN_POOL%dim0!=0)
+
+    if (ks_solver=="cusolver") pv->dim0 = 1; // Xu Shu add 2022-03-25
+
 	while (dsize%pv->dim0!=0)
 	{
 		pv->dim0 = pv->dim0 - 1;
@@ -231,6 +234,8 @@ void ORB_control::divide_HS_2d
 	{
 		pv->nb = nb2d; // mohan add 2010-06-28
 	}
+
+    if (ks_solver=="cusolver") pv->nb = 1; // Xu Shu add 2022-03-25
 	ModuleBase::GlobalFunc::OUT(ofs_running,"nb2d", pv->nb);
 
     this->set_parameters(ofs_running, ofs_warning);
@@ -256,7 +261,7 @@ void ORB_control::divide_HS_2d
 	pv->nloc = pv->MatrixInfo.col_num * pv->MatrixInfo.row_num;
 
 	// init blacs context for genelpa
-    if(ks_solver=="genelpa" || ks_solver=="scalapack_gvx")
+    if (ks_solver == "genelpa" || ks_solver == "scalapack_gvx" || ks_solver == "cusolver")
     {
         pv->blacs_ctxt = cart2blacs(pv->comm_2D, pv->dim0, pv->dim1,
             nlocal, nbands, pv->nb, pv->nrow, pv->desc, pv->desc_wfc,pv->desc_wfc1, pv->desc_Eij);

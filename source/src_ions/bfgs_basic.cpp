@@ -8,12 +8,12 @@ double BFGS_Basic::relax_bfgs_w2 = -1.0; // defalut is 0.05
 
 BFGS_Basic::BFGS_Basic()
 {
-	pos = new double[1];
-	pos_p = new double[1];
-	grad = new double[1];
-	grad_p = new double[1];
-	move = new double[1];
-	move_p = new double[1];
+	pos = nullptr;
+	pos_p = nullptr;
+	grad = nullptr;
+	grad_p = nullptr;
+	move = nullptr;
+	move_p = nullptr;
 
 	bfgs_ndim = 1;
 }

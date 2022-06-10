@@ -24,12 +24,13 @@ namespace Global_File
 	void make_dir_out(const std::string &suffix,
 		const std::string &calculation,
 		const int rank,
+        const bool &restart,
 		const bool out_alllog = false); 
 		//const bool linear_scaling = false, xiaohui modify 2013-09-02
 		//const bool out_alllog = false);
 	
 	void make_dir_atom(const std::string &label);
-	void open_log ( std::ofstream &ofs, const std::string &fn);
+	void open_log ( std::ofstream &ofs, const std::string &fn, const std::string &calculation, const bool &restart);
 	void close_log( std::ofstream &ofs, const std::string &fn);
 	void close_all_log(const int rank, const bool out_alllog = false);
 }

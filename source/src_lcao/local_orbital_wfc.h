@@ -1,7 +1,7 @@
 #ifndef LOCAL_ORBITAL_WFC
 #define LOCAL_ORBITAL_WFC
 
-#include "grid_technique.h"
+#include "../module_gint/grid_technique.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_orbital/ORB_control.h" // mohan add 2021-05-24
@@ -37,7 +37,7 @@ public:
     const Parallel_Orbitals *ParaV;
 
 
-    void allocate_k(const Grid_Technique& gt,
+    void allocate_k(const int& lgd,
         Local_Orbital_wfc &lowf);
 
     //=========================================

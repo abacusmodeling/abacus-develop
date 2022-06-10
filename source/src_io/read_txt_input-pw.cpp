@@ -36,7 +36,7 @@ namespace Read_Txt_Input
 			};
 			item.convert = [](const Input_Item &self)
 			{
-				// ?? GlobalC::pw.set()
+				// ?? GlobalC::sf.set()
 			};
 			this->add_item(item);
 		}

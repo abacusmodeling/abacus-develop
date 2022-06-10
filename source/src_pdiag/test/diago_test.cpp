@@ -216,7 +216,6 @@ class DiagoPrepare : public Pdiag_Double
         na_row = orb_con.ParaV.nrow;
         na_col = orb_con.ParaV.ncol;
         icontext = orb_con.ParaV.blacs_ctxt;
-        std::cout << "orb_con.ParaV.nb=" << orb_con.ParaV.nb << " " << GlobalV::NB2D<< std::endl;
         nb2d = orb_con.ParaV.nb;
     }
 
@@ -385,6 +384,7 @@ TEST_P(DiagoTest, LCAO)
     }
 }
 
+#ifndef __CUSOLVER_LCAO
 INSTANTIATE_TEST_SUITE_P(
     ElpaDoubleTest,
     DiagoTest,
@@ -395,7 +395,7 @@ INSTANTIATE_TEST_SUITE_P(
     ElpaComplexDoubleTest,
     DiagoTest,
     ::testing::Values( //int nlocal, int nbands, int nb2d, int sparsity, bool gamma_only, std::string ks_solver, bool readhs
-        DiagoPrepare(0, 0, 1, 0, false, "genelpa", "H-KPoints-large.dat", "S-KPoints-large.dat")));
+        DiagoPrepare(0, 0, 1, 0, false, "genelpa", "H-KPoints.dat", "S-KPoints.dat")));
 
 INSTANTIATE_TEST_SUITE_P(
     ScalapackDoubleTest,
@@ -414,6 +414,20 @@ INSTANTIATE_TEST_SUITE_P(
         DiagoPrepare(0, 0, 1, 0, false, "scalapack_gvx", "H-KPoints.dat", "S-KPoints.dat"),
         DiagoPrepare(0, 0, 1, 0, false, "scalapack_gvx", "H-KPoints-large.dat", "S-KPoints-large.dat")
         ));
+
+#else
+INSTANTIATE_TEST_SUITE_P(
+    CusolverDoubleTest,
+    DiagoTest,
+    ::testing::Values( //int nlocal, int nbands, int nb2d, int sparsity, bool gamma_only, std::string ks_solver, bool readhs
+        DiagoPrepare(0, 0, 1, 0, true, "cusolver", "H-GammaOnly-large.dat", "S-GammaOnly-large.dat")));
+
+INSTANTIATE_TEST_SUITE_P(
+    CusolverComplexTest,
+    DiagoTest,
+    ::testing::Values( //int nlocal, int nbands, int nb2d, int sparsity, bool gamma_only, std::string ks_solver, bool readhs
+        DiagoPrepare(0, 0, 1, 0, false, "cusolver", "H-KPoints-large.dat", "S-KPoints-large.dat")));
+#endif
 
 int main(int argc, char **argv)
 {

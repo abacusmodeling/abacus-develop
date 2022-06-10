@@ -131,12 +131,13 @@ void IState_Charge::begin(Gint_Gamma &gg)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 
 			// band.
-   			gg.cal_rho(this->loc->DM);
+			Gint_inout inout(this->loc->DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+   			gg.cal_gint(&inout);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			std::stringstream ss;
 			std::stringstream ss1;

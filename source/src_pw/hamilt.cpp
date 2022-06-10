@@ -24,21 +24,36 @@ void Hamilt::diagH_pw(
 	// but if mem_saver is used, ik0=0.
 	int ik0 = ik;
 
-	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
+	if(GlobalV::CALCULATION=="nscf")
 	{
 		if(GlobalV::BASIS_TYPE=="pw")
 		{
 			// generate PAOs first, then diagonalize to get
 			// inital wavefunctions.
-			GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);
+            if(GlobalC::wf.mem_saver==1)
+            {
+			    GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);
+                ik0 = 0;
+            }
+            else
+            {
+                GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[ik0]);
+            }
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[0]);
+            if(GlobalC::wf.mem_saver==1)
+            {
+			    GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[0]);
+                ik0 = 0;
+            }
+            else
+            {
+                GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik0]);
+            }
 		}
 #endif
-		ik0 = 0;
 	}
 
     if(GlobalV::BASIS_TYPE=="lcao_in_pw")

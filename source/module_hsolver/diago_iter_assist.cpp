@@ -14,6 +14,7 @@ namespace hsolver
 double DiagoIterAssist::avg_iter = 0.0;
 int DiagoIterAssist::PW_DIAG_NMAX = 30;
 double DiagoIterAssist::PW_DIAG_THR = 1.0e-2;
+bool DiagoIterAssist::need_subspace = false;
 
 //----------------------------------------------------------------------
 // Hamiltonian diagonalization in the subspace spanned

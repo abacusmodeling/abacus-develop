@@ -4,8 +4,8 @@
 #include "hamilt.h"
 #include "src_lcao/LCAO_gen_fixedH.h"
 #include "src_lcao/LCAO_matrix.h"
-#include "src_lcao/gint_gamma.h"
-#include "src_lcao/gint_k.h"
+#include "module_gint/gint_gamma.h"
+#include "module_gint/gint_k.h"
 
 namespace hamilt
 {
@@ -38,12 +38,19 @@ template <typename T> class LocalMatrix
 template <typename T, typename T1> class HamiltLCAO : public Hamilt
 {
   public:
-    HamiltLCAO(Gint_Gamma* GG_in, Gint_k* GK_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
+    HamiltLCAO(Gint_Gamma* GG_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
     {
         this->GG = GG_in;
+        this->genH = genH_in;
+        this->LM = LM_in;
+        this->classname = "HamiltLCAO";
+    }
+    HamiltLCAO(Gint_k* GK_in, LCAO_gen_fixedH* genH_in, LCAO_Matrix* LM_in)
+    {
         this->GK = GK_in;
         this->genH = genH_in;
         this->LM = LM_in;
+        this->classname = "HamiltLCAO";
     }
     //~HamiltLCAO();
 

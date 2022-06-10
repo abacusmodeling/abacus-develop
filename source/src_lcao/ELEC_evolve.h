@@ -4,6 +4,8 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "LCAO_hamilt.h"
+#include "module_esolver/esolver_ks_lcao.h"
+#include "module_esolver/esolver_ks_lcao_tddft.h"
 #include "src_lcao/local_orbital_wfc.h"
 
 //-----------------------------------------------------------
@@ -16,14 +18,15 @@
 class ELEC_evolve
 {
 
-	friend class ELEC_scf;
+    friend class ELEC_scf;
+    friend class ModuleESolver::ESolver_KS_LCAO;
+    friend class ModuleESolver::ESolver_KS_LCAO_TDDFT;
 
-	public:
+  public:
+    ELEC_evolve();
+    ~ELEC_evolve();
 
-	ELEC_evolve();
-	~ELEC_evolve();
-
-	// fuxiang add 2021-05-25
+    // fuxiang add 2021-05-25
 
     static int tddft;
     static double td_scf_thr;
@@ -34,17 +37,13 @@ class ELEC_evolve
     static int td_val_elec_03;
     static int td_vext;
     static int td_vext_dire;
-	static double td_timescale;
-	static int td_vexttype;
-	static int td_vextout;
-	static int td_dipoleout;
+    static double td_timescale;
+    static int td_vexttype;
+    static int td_vextout;
+    static int td_dipoleout;
 
-
-	private:
-
-    static void evolve_psi(const int& istep, LCAO_Hamilt& uhm,
-    Local_Orbital_wfc &lowf);
-
+  private:
+    static void evolve_psi(const int& istep, LCAO_Hamilt& uhm, Local_Orbital_wfc& lowf);
 };
 
 #endif
