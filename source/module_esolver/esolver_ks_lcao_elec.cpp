@@ -366,7 +366,7 @@ namespace ModuleESolver
         // add by jingan in 2018.11.7
         if (GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
         {
-            toWannier90 myWannier(GlobalC::kv.nkstot, GlobalC::ucell.G);
+            toWannier90 myWannier(GlobalC::kv.nkstot, GlobalC::ucell.G, this->LOWF.wfc_k_grid);
             myWannier.init_wannier(nullptr);
         }
 
