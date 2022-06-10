@@ -18,8 +18,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/${{ github.repository_owner }}
-            ${{ secrets.DP_HARBOR_REGISTRY }}/dplc
+            ghcr.io/${{ github.repository_owner }}/abacus
+            ${{ secrets.DP_HARBOR_REGISTRY }}/dplc/abacus
           tags: type=semver,pattern={{version}}
 
       - name: Setup Docker Buildx
@@ -45,3 +45,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           file: Dockerfile
           push: ${{ github.event_name == 'push' }}
+          labels: ${{ steps.meta.outputs.labels }}
