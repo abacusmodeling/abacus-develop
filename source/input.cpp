@@ -420,6 +420,11 @@ void Input::Default(void)
     sigma_k = 0.6;
     nc_k = 0.00037;
 
+    comp_q = 0.0;
+    comp_l = 1.0;
+    comp_center = 0.0;
+    comp_dim = 2;
+
     return;
 }
 
@@ -1495,6 +1500,22 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, nc_k);
         }
+        else if (strcmp("comp_q", word) == 0)
+        {
+            read_value(ifs, comp_q);
+        }
+        else if (strcmp("comp_l", word) == 0)
+        {
+            read_value(ifs, comp_l);
+        }
+        else if (strcmp("comp_center", word) == 0)
+        {
+            read_value(ifs, comp_center);
+        }
+        else if (strcmp("comp_dim", word) == 0)
+        {
+            read_value(ifs, comp_dim);
+        }
         //----------------------------------------------------------------------------------
         else
         {
@@ -2338,6 +2359,26 @@ void Input::Check(void)
             ModuleBase::WARNING_QUIT("Input::Check", "temperature of MD calculation should be set!");
         if (mdp.md_tlast < 0.0)
             mdp.md_tlast = mdp.md_tfirst;
+
+        if(mdp.md_tfreq == 0)
+        {
+            mdp.md_tfreq = 1.0/40.0/mdp.md_dt;
+        }
+        if(mdp.md_restart) 
+        {
+            init_vel = 1;
+        }
+        if(mdp.md_ensolver == "LJ" || mdp.md_ensolver == "DP" || mdp.md_type == 4)
+        {
+            cal_stress = 1;
+        }
+        if(mdp.md_type == 4)
+        {
+            if(mdp.msst_qmass <= 0)
+            {
+                ModuleBase::WARNING_QUIT("Input::Check", "msst_qmass must be greater than 0!");
+            }
+        }
         // if(mdp.md_tfirst!=mdp.md_tlast)
         // {
         //     std::ifstream file1;

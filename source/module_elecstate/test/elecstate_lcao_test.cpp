@@ -22,25 +22,25 @@
 #include "src_pw/wavefunc.h"
 #include "src_pw/VNL_in_pw.h"
 #include "src_pw/energy.h"
+#include "src_pw/structure_factor.h"
 #include "module_neighbor/sltk_atom_arrange.h"
+#include "module_pw/pw_basis_k.h"
+#include "module_xc/xc_functional.h"
+#include "module_xc/exx_global.h"
+#include "src_parallel/parallel_pw.h"
+
 Magnetism::Magnetism(){}
 Magnetism::~Magnetism(){}
 K_Vectors::K_Vectors(){}
 K_Vectors::~K_Vectors(){}
-PW_Basis::PW_Basis(){}
-PW_Basis::~PW_Basis(){}
-FFT::FFT(){}
-FFT::~FFT(){}
+Structure_Factor::Structure_Factor(){}
+Structure_Factor::~Structure_Factor(){}
 Parallel_PW::Parallel_PW(){}
 Parallel_PW::~Parallel_PW(){}
 LCAO_Hamilt::LCAO_Hamilt(){}
 LCAO_Hamilt::~LCAO_Hamilt(){}
 LCAO_gen_fixedH::LCAO_gen_fixedH(){}
 LCAO_gen_fixedH::~LCAO_gen_fixedH(){}
-Gint_k::Gint_k(){}
-Gint_k::~Gint_k(){}
-Gint_k_init::Gint_k_init(){}
-Gint_k_init::~Gint_k_init(){} 
 wavefunc::wavefunc(){}
 wavefunc::~wavefunc(){}
 WF_atomic::WF_atomic(){}
@@ -56,17 +56,19 @@ energy::~energy(){}
 namespace GlobalC
 {
     energy en;
-    PW_Basis pw;
+    Structure_Factor sf;
     K_Vectors kv;
     UnitCell_pseudo ucell;
     pseudopot_cell_vnl ppcell;
+    ModulePW::PW_Basis* rhopw;
+    ModulePW::PW_Basis_Big *bigpw = static_cast<ModulePW::PW_Basis_Big*>(rhopw);
+    ModulePW::PW_Basis_K* wfcpw;
     wavefunc wf;
     Charge CHR;
     Grid_Driver GridD(GlobalV::test_deconstructor, GlobalV::test_grid_driver,GlobalV::test_grid);
 }
 
-#include "module_xc/xc_functional.h"
-#include "module_xc/exx_global.h"
+
 XC_Functional::XC_Functional(){}
 XC_Functional::~XC_Functional(){}
 int XC_Functional::get_func_type(){return 0;}
@@ -85,10 +87,10 @@ namespace GlobalC
 
 namespace WF_Local
 {
-    int read_lowf(double** ctot, const int& is, Local_Orbital_wfc &lowf) {return 1;};
-    int read_lowf_complex(std::complex<double>** ctot, const int& ik, Local_Orbital_wfc &lowf) {return 1;}
-    void write_lowf(const std::string &name, double **ctot) {}
-    void write_lowf_complex(const std::string &name, std::complex<double>** ctot, const int &ik) {}
+    int read_lowf(double** ctot, const int& is, const Parallel_Orbitals* ParaV, psi::Psi<double>*) {return 1;};
+    int read_lowf_complex(std::complex<double>** ctot, const int& ik, const Parallel_Orbitals* ParaV, psi::Psi<std::complex<double> >*) {return 1;}
+    void write_lowf(const std::string &name, double **ctot, const ModuleBase::matrix& ekb, const ModuleBase::matrix& wg) {}
+    void write_lowf_complex(const std::string &name, std::complex<double>** ctot, const int &ik, const ModuleBase::matrix& ekb, const ModuleBase::matrix& wg) {}
 }
 
 //mock the unrelated functions in charge.cpp
@@ -97,9 +99,8 @@ namespace WF_Local
 namespace GlobalC {Use_FFT UFFT;}
 Use_FFT::Use_FFT(){}
 Use_FFT::~Use_FFT(){}
-void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr) {return;}
-void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr) {return;};
-void FFT::FFT3D(std::complex<double> *psi,const int sign) {};
+void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;}
+void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis) {return;};
 bool Occupy::use_gaussian_broadening = false;
 bool Occupy::use_tetrahedron_method = false;
 double Magnetism::get_nelup(void) {return 0;}
@@ -107,32 +108,32 @@ double Magnetism::get_neldw(void) {return 0;}
 
 void set_pw()
 {
-    GlobalC::pw.ncx = 36; //should be only divided by 2,3,5
-    GlobalC::pw.ncy = 36;
-    GlobalC::pw.ncz = 36;
-    GlobalC::pw.bx = 2; 
-    GlobalC::pw.by = 2; 
-    GlobalC::pw.bz = 2;
-	GlobalC::pw.nbx = GlobalC::pw.ncx/GlobalC::pw.bx; 
-    GlobalC::pw.nby = GlobalC::pw.ncx/GlobalC::pw.bx; 
-    GlobalC::pw.nbz = GlobalC::pw.ncx/GlobalC::pw.bx;
-    GlobalC::pw.bxyz = GlobalC::pw.bx * GlobalC::pw.by * GlobalC::pw.bz;
-    GlobalC::pw.ncxyz = GlobalC::pw.ncx * GlobalC::pw.ncy * GlobalC::pw.ncz;
+    GlobalC::rhopw->nx = 36; //should be only divided by 2,3,5
+    GlobalC::rhopw->ny = 36;
+    GlobalC::rhopw->nz = 36;
+    GlobalC::bigpw->bx = 2; 
+    GlobalC::bigpw->by = 2; 
+    GlobalC::bigpw->bz = 2;
+	GlobalC::bigpw->nbx = GlobalC::rhopw->nx/GlobalC::bigpw->bx; 
+    GlobalC::bigpw->nby = GlobalC::rhopw->nx/GlobalC::bigpw->bx; 
+    GlobalC::bigpw->nbz = GlobalC::rhopw->nx/GlobalC::bigpw->bx;
+    GlobalC::bigpw->bxyz = GlobalC::bigpw->bx * GlobalC::bigpw->by * GlobalC::bigpw->bz;
+    GlobalC::rhopw->nxyz = GlobalC::rhopw->nx * GlobalC::rhopw->ny * GlobalC::rhopw->nz;
 	 
-    if (GlobalV::MY_RANK < (GlobalC::pw.nbz % GlobalV::DSIZE))
+    if (GlobalV::MY_RANK < (GlobalC::bigpw->nbz % GlobalV::DSIZE))
     {
-        GlobalC::pw.nbzp = GlobalC::pw.nbz/GlobalV::DSIZE + 1;
-        GlobalC::pw.nbzp_start = (GlobalC::pw.nbz/GlobalV::DSIZE + 1) * GlobalV::MY_RANK;
+        GlobalC::bigpw->nbzp = GlobalC::bigpw->nbz/GlobalV::DSIZE + 1;
+        GlobalC::bigpw->nbzp_start = (GlobalC::bigpw->nbz/GlobalV::DSIZE + 1) * GlobalV::MY_RANK;
     }
     else
     {
-        GlobalC::pw.nbzp = GlobalC::pw.nbz/GlobalV::DSIZE;
-        GlobalC::pw.nbzp_start = (GlobalC::pw.nbz/GlobalV::DSIZE) * GlobalV::MY_RANK + (GlobalC::pw.nbz % GlobalV::DSIZE); 
+        GlobalC::bigpw->nbzp = GlobalC::bigpw->nbz/GlobalV::DSIZE;
+        GlobalC::bigpw->nbzp_start = (GlobalC::bigpw->nbz/GlobalV::DSIZE) * GlobalV::MY_RANK + (GlobalC::bigpw->nbz % GlobalV::DSIZE); 
     }
-    GlobalC::pw.nczp = GlobalC::pw.nbzp * GlobalC::pw.bz;
-    GlobalC::pw.nczp_start = GlobalC::pw.nbzp_start * GlobalC::pw.bz;
-    GlobalC::pw.nbxx = GlobalC::pw.nbzp*GlobalC::pw.nbx*GlobalC::pw.nby;
-    GlobalC::pw.nrxx = GlobalC::pw.nczp*GlobalC::pw.ncx*GlobalC::pw.ncy;
+    GlobalC::rhopw->nplane = GlobalC::bigpw->nbzp * GlobalC::bigpw->bz;
+    GlobalC::rhopw->startz_current = GlobalC::bigpw->nbzp_start * GlobalC::bigpw->bz;
+    GlobalC::bigpw->nbxx = GlobalC::bigpw->nbzp*GlobalC::bigpw->nbx*GlobalC::bigpw->nby;
+    GlobalC::rhopw->nrxx = GlobalC::rhopw->nplane*GlobalC::rhopw->nx*GlobalC::rhopw->ny;
 }
 
 void init()
@@ -160,6 +161,11 @@ void init()
     GlobalV::KS_SOLVER = "genelpa";
     GlobalV::NSPIN = 1;
     GlobalC::wf.init_wfc="atomic";
+    GlobalC::rhopw = new ModulePW::PW_Basis_Big();
+    GlobalC::bigpw = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
+    GlobalC::wfcpw = new ModulePW::PW_Basis_K_Big(); 
+    ModulePW::PW_Basis_K_Big* tmp2 = static_cast<ModulePW::PW_Basis_K_Big*>(GlobalC::wfcpw);
+    tmp2->setbxyz(GlobalC::bigpw->bx,GlobalC::bigpw->by,GlobalC::bigpw->bz);
 
     //GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
     GlobalC::ucell.setup("test", 1, 2, false, "None");
@@ -170,7 +176,7 @@ void init()
                                 out_mat_r,GlobalV::CAL_FORCE,GlobalV::MY_RANK);
     ModuleBase::Ylm::set_coefficients();   
     set_pw();
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);                             
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, 0);                             
 }
 
 namespace elecstate
@@ -350,7 +356,7 @@ class ElecStateLCAOPrepare
     {
         //rho is parallel along ncz, but store is ncz_rank:ncy:ncx
         this->rho_ref = new double* [GlobalV::NSPIN];
-        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_ref[is] = new double[GlobalC::pw.ncxyz];
+        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_ref[is] = new double[GlobalC::rhopw->nxyz];
         if(GlobalV::MY_RANK == 0)
         {
             std::ifstream ifs;
@@ -359,7 +365,7 @@ class ElecStateLCAOPrepare
 
             for(int is = 0; is < GlobalV::NSPIN; is++)
             {
-                for(int i=0;i<GlobalC::pw.ncxyz;i++)
+                for(int i=0;i<GlobalC::rhopw->nxyz;i++)
                 {
                     ifs >> this->rho_ref[is][i];
                 }
@@ -371,21 +377,21 @@ class ElecStateLCAOPrepare
     void gather_rho(Charge* charge)
     {
         this->rho_cal = new double* [GlobalV::NSPIN];
-        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_cal[is] = new double[GlobalC::pw.ncxyz];
+        for(int is = 0; is < GlobalV::NSPIN; is++) this->rho_cal[is] = new double[GlobalC::rhopw->nxyz];
 
 #ifdef __MPI
         MPI_Status ierror;
-        int ncx = GlobalC::pw.ncx;
-        int ncy = GlobalC::pw.ncy;
-        int ncz = GlobalC::pw.ncz;
-        int nczp = GlobalC::pw.nczp;
+        int ncx = GlobalC::rhopw->nx;
+        int ncy = GlobalC::rhopw->ny;
+        int ncz = GlobalC::rhopw->nz;
+        int nczp = GlobalC::rhopw->nplane;
 
         int* nz = new int[GlobalV::NPROC];
         for(int i=0;i<GlobalV::NPROC;i++)
         {
-            nz[i] = GlobalC::pw.nbz/GlobalV::NPROC;
-            if (i < (GlobalC::pw.nbz % GlobalV::NPROC)) nz[i] += 1;
-            nz[i] *= GlobalC::pw.bz;
+            nz[i] = GlobalC::bigpw->nbz/GlobalV::NPROC;
+            if (i < (GlobalC::bigpw->nbz % GlobalV::NPROC)) nz[i] += 1;
+            nz[i] *= GlobalC::bigpw->bz;
         }
 
         for(int is = 0; is < GlobalV::NSPIN; is++)
@@ -417,7 +423,7 @@ class ElecStateLCAOPrepare
 #else
         for(int is = 0; is < GlobalV::NSPIN; is++)
         {
-            for(int i=0;i<GlobalC::pw.ncxyz;i++)
+            for(int i=0;i<GlobalC::rhopw->nxyz;i++)
                 rho_cal[is][i] = charge->rho[is][i];            
         }
 #endif
@@ -474,16 +480,25 @@ class ElecStateLCAOPrepare
             GlobalV::test_atom_input);
 
         GlobalC::GridT.set_pbc_grid(
-			GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
-			GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
-			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
-			GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
+			GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
+			GlobalC::bigpw->bx, GlobalC::bigpw->by, GlobalC::bigpw->bz,
+			GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbz,
+			GlobalC::bigpw->nbxx, GlobalC::bigpw->nbzp_start, GlobalC::bigpw->nbzp);
         if (!GlobalV::GAMMA_ONLY_LOCAL)
         {
             GlobalC::GridT.cal_nnrg(&(orb_con.ParaV));
         }
-
-        loc.allocate_dm_wfc(GlobalC::GridT.lgd, lowf);
+        psi::Psi<double>* psigo = nullptr;
+        psi::Psi<std::complex<double>>* psik = nullptr;
+        if(GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            psigo = (psi::Psi<double>*)(&(this->psi));
+        }
+        else
+        {
+            psik = (psi::Psi<std::complex<double>>*)(&(this->psi));
+        }
+        loc.allocate_dm_wfc(GlobalC::GridT.lgd, lowf, psigo, psik);
 
         elecstate::MockElecStateLCAO mesl(&GlobalC::CHR,&GlobalC::kv,nk,nbands,&loc,&uhm,&lowf,this->wg);
 
@@ -501,7 +516,7 @@ class ElecStateLCAOPrepare
             double error; 
             for (int is = 0; is < GlobalV::NSPIN; is++)
             {
-                for(int i=0;i<GlobalC::pw.ncxyz;i++)
+                for(int i=0;i<GlobalC::rhopw->nxyz;i++)
                 {
                     error = abs(this->rho_cal[is][i] - this->rho_ref[is][i]);
                     if ( error > THRESHOLD)
@@ -546,6 +561,8 @@ int main(int argc, char **argv)
     }
 
     int result = RUN_ALL_TESTS();
+    delete GlobalC::rhopw;
+    delete GlobalC::wfcpw;
     if (GlobalV::MY_RANK == 0 && result != 0)
     {
         std::cout << "ERROR:some tests are not passed" << std::endl;

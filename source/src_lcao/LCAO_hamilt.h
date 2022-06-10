@@ -4,8 +4,8 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "LCAO_gen_fixedH.h"
-#include "gint_gamma.h"
-#include "gint_k.h"
+#include "../module_gint/gint_gamma.h"
+#include "../module_gint/gint_k.h"
 
 class LCAO_Hamilt
 {

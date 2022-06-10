@@ -29,6 +29,9 @@
 106_PW_PU_chargemixing
 107_PW_OB_outputbands
 107_PW_OD_outputdos
+107_PW_OBOD_MemSaver
+107_PW_outWfcR
+107_PW_outWfcPw
 108_PW_RE
 108_PW_RE_MB
 108_PW_RE_MG
@@ -81,7 +84,7 @@
 201_NO_KP_15_CF_CS_Si
 201_NO_KP_DJ_CF_CS_GaAs
 201_NO_KP_DJ_Si
-202_NO_KP_HP_hpseps
+#202_NO_KP_HP_hpseps
 203_NO_bspline
 203_NO_CF_CS_S1_smallg
 203_NO_CF_CS_S2_smallg
@@ -106,6 +109,9 @@
 211_NO_S2_elec_add
 211_NO_elec_minus
 211_NO_S2_elec_minus
+212_NO_wfc_out
+212_NO_wfc_ienvelope
+213_NO_mulliken
 220_NO_KP_MD_FIRE
 220_NO_KP_MD_NVE
 220_NO_KP_MD_NVT
@@ -129,6 +135,12 @@
 308_NO_GO_CS_CR
 311_NO_GO_elec_minus
 311_NO_GO_S2_elec_minus
+312_NO_GO_wfc_out
+312_NO_GO_wfc_file
+312_NO_GO_wfc_ienvelope
+312_NO_GO_wfc_istate
+313_NO_GO_mulliken
+314_NO_GO_dm_out
 320_NO_GO_MD_FIRE
 320_NO_GO_MD_NVE
 320_NO_GO_MD_NVT
@@ -137,7 +149,7 @@
 
 #401_NP_KP_sp
 #401_NP_KP_spd
-601_NO_TDDFT_N2_vel
+#601_NO_TDDFT_N2_vel
 601_NO_TDDFT_N2_occ
 #701_LJ_Ar
 

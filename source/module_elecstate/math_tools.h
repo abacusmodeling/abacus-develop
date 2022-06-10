@@ -1,11 +1,13 @@
 #include "module_base/blas_connector.h"
 #include "module_base/scalapack_connector.h"
 #include "module_psi/psi.h"
+#include "module_base/matrix.h"
+#include "module_base/complexmatrix.h"
 
 #ifdef __MPI
-void psiMulPsiMpi(const psi::Psi<double>& psi1,
+inline void psiMulPsiMpi(const psi::Psi<double>& psi1,
                   const psi::Psi<double>& psi2,
-                  psi::Psi<double>& dm_out,
+                  ModuleBase::matrix& dm_out,
                   const int* desc_psi,
                   const int* desc_dm)
 {
@@ -29,15 +31,15 @@ void psiMulPsiMpi(const psi::Psi<double>& psi1,
             &one_int,
             desc_psi,
             &zero_float,
-            dm_out.get_pointer(),
+            dm_out.c,
             &one_int,
             &one_int,
             desc_dm);
 }
 
-void psiMulPsiMpi(const psi::Psi<std::complex<double>>& psi1,
+inline void psiMulPsiMpi(const psi::Psi<std::complex<double>>& psi1,
                   const psi::Psi<std::complex<double>>& psi2,
-                  psi::Psi<std::complex<double>>& dm_out,
+                  ModuleBase::ComplexMatrix& dm_out,
                   const int* desc_psi,
                   const int* desc_dm)
 {
@@ -61,14 +63,14 @@ void psiMulPsiMpi(const psi::Psi<std::complex<double>>& psi1,
             &one_int,
             desc_psi,
             (const double*)(&zero_complex),
-            dm_out.get_pointer(),
+            dm_out.c,
             &one_int,
             &one_int,
             desc_dm);
 }
 
 #else
-void psiMulPsi(psi::Psi<double>& psi1, psi::Psi<double>& psi2, psi::Psi<double>& dm_out)
+inline void psiMulPsi(psi::Psi<double>& psi1, psi::Psi<double>& psi2, ModuleBase::matrix& dm_out)
 {
     const double one_float = 1.0, zero_float = 0.0;
     const int one_int = 1;
@@ -86,11 +88,11 @@ void psiMulPsi(psi::Psi<double>& psi1, psi::Psi<double>& psi2, psi::Psi<double>&
            psi2.get_pointer(),
            &nlocal,
            &zero_float,
-           dm_out.get_pointer(),
+           dm_out.c,
            &nlocal);
 }
 
-void psiMulPsi(psi::Psi<double>& psi1, psi::Psi<double>& psi2, psi::Psi<double>& dm_out)
+inline void psiMulPsi(psi::Psi<std::complex<double>>& psi1, psi::Psi<std::complex<double>>& psi2, ModuleBase::ComplexMatrix& dm_out)
 {
     const int one_int = 1;
     const char N_char = 'N', T_char = 'T';
@@ -108,7 +110,7 @@ void psiMulPsi(psi::Psi<double>& psi1, psi::Psi<double>& psi2, psi::Psi<double>&
            psi2.get_pointer(),
            &nlocal,
            &zero_complex,
-           dm_out.get_pointer(),
+           dm_out.c,
            &nlocal);
 }
 

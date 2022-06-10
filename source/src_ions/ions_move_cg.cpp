@@ -23,10 +23,10 @@ double Ions_Move_CG::RELAX_CG_THR =-1.0;  //default is 0.5
 
 Ions_Move_CG::Ions_Move_CG()
 {
-	this->pos0 = new double[1];
-	this->grad0 = new double[1];
-	this->cg_grad0 = new double[1];
- 	this->move0 = new double[1];
+	this->pos0 = nullptr;
+	this->grad0 = nullptr;
+	this->cg_grad0 = nullptr;
+ 	this->move0 = nullptr;
 }
 
 Ions_Move_CG::~Ions_Move_CG()

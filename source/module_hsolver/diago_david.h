@@ -24,7 +24,7 @@
 #else
 #include "src_pw/hamilt_pw.h"
 #endif
-#include "src_pw/pw_basis.h"
+#include "src_pw/structure_factor.h"
 
 namespace hsolver
 {

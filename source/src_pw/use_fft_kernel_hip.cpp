@@ -50,7 +50,7 @@ void RoundTrip_kernel(const hipblasComplex *psi, const float *vr, const int *fft
 	// (1) set value
 	int thread = 512;
 	int block = (GlobalC::wf.npw + thread - 1) / thread;
-	int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
+	int block2 = (GlobalC::rhopw->nrxx + thread - 1) / thread;
 	hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_set<float2>),
 					   dim3(block),
 					   dim3(thread),
@@ -68,21 +68,21 @@ void RoundTrip_kernel(const hipblasComplex *psi, const float *vr, const int *fft
 	hipDeviceSynchronize();
 	// CHECK_CUFFT(hipfftDestroy(cufftplan_gpu));
 
-	// int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
-	// hipLaunchKernelGGL(kernel_normalization, dim3(block3), dim3(thread), 0, 0, GlobalC::pw.nrxx, psic,
-	// (double)(GlobalC::pw.nrxx));
+	// int block3 = (GlobalC::rhopw->nrxx + thread - 1) / thread;
+	// hipLaunchKernelGGL(kernel_normalization, dim3(block3), dim3(thread), 0, 0, GlobalC::rhopw->nrxx, psic,
+	// (double)(GlobalC::rhopw->nrxx));
 
 	hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_roundtrip<float, float2>),
 					   dim3(block2),
 					   dim3(thread),
 					   0,
 					   0,
-					   GlobalC::pw.nrxx,
+					   GlobalC::rhopw->nrxx,
 					   reinterpret_cast<float2 *>(psic),
 					   vr);
 
 	// hipfftHandle cufftplan_gpu2;
-	// CHECK_CUFFT(hipfftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, HIPFFT_Z2Z));
+	// CHECK_CUFFT(hipfftPlan3d(&cufftplan_gpu, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, HIPFFT_Z2Z));
 	CHECK_CUFFT(hipfftExecC2C(GlobalC::UFFT.fft_handle,
 							  reinterpret_cast<hipfftComplex *>(psic),
 							  reinterpret_cast<hipfftComplex *>(psic),
@@ -92,15 +92,15 @@ void RoundTrip_kernel(const hipblasComplex *psi, const float *vr, const int *fft
 
 	// Reorder_psi_minus(psic, ordered_psi);
 
-	int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
+	int block3 = (GlobalC::rhopw->nrxx + thread - 1) / thread;
 	hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_normalization<float, float2>),
 					   dim3(block3),
 					   dim3(thread),
 					   0,
 					   0,
-					   GlobalC::pw.nrxx,
+					   GlobalC::rhopw->nrxx,
 					   reinterpret_cast<float2 *>(psic),
-					   (double)(GlobalC::pw.nrxx));
+					   (double)(GlobalC::rhopw->nrxx));
 
 	// CHECK_CUDA(hipFree(ordered_psi));
 
@@ -115,7 +115,7 @@ void RoundTrip_kernel(const hipblasDoubleComplex *psi,
 	// (1) set value
 	int thread = 512;
 	int block = (GlobalC::wf.npw + thread - 1) / thread;
-	int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
+	int block2 = (GlobalC::rhopw->nrxx + thread - 1) / thread;
 	hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_set<double2>),
 					   dim3(block),
 					   dim3(thread),
@@ -136,12 +136,12 @@ void RoundTrip_kernel(const hipblasDoubleComplex *psi,
 					   dim3(thread),
 					   0,
 					   0,
-					   GlobalC::pw.nrxx,
+					   GlobalC::rhopw->nrxx,
 					   reinterpret_cast<double2 *>(psic),
 					   vr);
 
 	// hipfftHandle cufftplan_gpu2;
-	// CHECK_CUFFT(hipfftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, HIPFFT_Z2Z));
+	// CHECK_CUFFT(hipfftPlan3d(&cufftplan_gpu, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, HIPFFT_Z2Z));
 	CHECK_CUFFT(hipfftExecZ2Z(GlobalC::UFFT.fft_handle,
 							  reinterpret_cast<hipfftDoubleComplex *>(psic),
 							  reinterpret_cast<hipfftDoubleComplex *>(psic),
@@ -151,15 +151,15 @@ void RoundTrip_kernel(const hipblasDoubleComplex *psi,
 
 	// Reorder_psi_minus(psic, ordered_psi);
 
-	int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
+	int block3 = (GlobalC::rhopw->nrxx + thread - 1) / thread;
 	hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_normalization<double, double2>),
 					   dim3(block3),
 					   dim3(thread),
 					   0,
 					   0,
-					   GlobalC::pw.nrxx,
+					   GlobalC::rhopw->nrxx,
 					   reinterpret_cast<double2 *>(psic),
-					   (double)(GlobalC::pw.nrxx));
+					   (double)(GlobalC::rhopw->nrxx));
 
 	// CHECK_CUDA(hipFree(ordered_psi));
 

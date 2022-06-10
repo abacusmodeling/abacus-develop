@@ -6,7 +6,7 @@
 
 SubGrid_oper::SubGrid_oper()
 {
-	trace_lo_tot = new int[1];	
+	trace_lo_tot = nullptr;	
 	lgd=0;
 	allocate_totwfc = false;
 }

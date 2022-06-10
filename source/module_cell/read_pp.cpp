@@ -12,22 +12,22 @@ using namespace std;
 Pseudopot_upf::Pseudopot_upf()
 {
 	this->els = new std::string[1];
-	this->lchi = new int[1];
-	this->oc = new double[1];
+	this->lchi = nullptr;
+	this->oc = nullptr;
 
-	this->r = new double[1];
-	this->rab = new double[1];
-	this->vloc = new double[1];
+	this->r = nullptr;
+	this->rab = nullptr;
+	this->vloc = nullptr;
 
-	this->kkbeta = new int[1];
-	this->lll = new int[1];
+	this->kkbeta = nullptr;
+	this->lll = nullptr;
 
-	this->rho_at = new double[1];
-	this->rho_atc = new double[1];
+	this->rho_at = nullptr;
+	this->rho_atc = nullptr;
 
-	this->nn = new int[1];//zhengdy-soc
-	this->jchi = new double[1];
-	this->jjj = new double[1];
+	this->nn = nullptr;//zhengdy-soc
+	this->jchi = nullptr;
+	this->jjj = nullptr;
 
 	functional_error = 0;//xiaohui add 2015-03-24
 }

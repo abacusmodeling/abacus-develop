@@ -23,7 +23,10 @@
 #endif
 #include <sys/time.h>
 
-void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
+void energy::perform_dos(
+	const psi::Psi<double> *psid, 
+	const psi::Psi<std::complex<double>> *psi, 
+	LCAO_Hamilt &uhm)
 {
 	ModuleBase::TITLE("energy","perform_dos");
 
@@ -179,7 +182,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 #ifdef __LCAO
 	if(GlobalV::out_mul == 1)
 	{
-		Mulliken_Charge   MC(&lowf.wfc_gamma, &lowf.wfc_k);
+		Mulliken_Charge   MC(psid, psi);
 		MC.stdout_mulliken(uhm);			
 	}//qifeng add 2019/9/10
 #endif
@@ -264,7 +267,8 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 				Mulk[0].create(pv->ncol,pv->nrow);
 
 
-				ModuleBase::matrix Dwf = lowf.wfc_gamma[is];
+				psid->fix_k(is);
+				const double* ppsi = psid->get_pointer();
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
 					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
@@ -291,7 +295,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
 							uhm.LM->Sloc.data(), &one_int, &one_int, pv->desc,
-							Dwf.c, &one_int, &NB, pv->desc, &one_int,
+							ppsi, &one_int, &NB, pv->desc, &one_int,
 							&zero_float,
 							Mulk[0].c, &one_int, &NB, pv->desc,
 							&one_int);
@@ -305,7 +309,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 							const int ir = pv->trace_loc_row[j];
 							const int ic = pv->trace_loc_col[i];
-							waveg[j] = Mulk[0](ic,ir)*lowf.wfc_gamma[is](ic,ir);
+							waveg[j] = Mulk[0](ic,ir) * psid[0](ic,ir);
 							const double x = waveg[j].real();
 							BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 						}
@@ -347,8 +351,13 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 						uhm.LM->zeros_HSk('S');
 						uhm.LM->folding_fixedH(ik);
 
-
-						ModuleBase::ComplexMatrix Dwfc = conj(lowf.wfc_k[ik]);
+						psi->fix_k(ik);
+						psi::Psi<std::complex<double>> Dwfc(psi[0], 1);
+						std::complex<double>* p_dwfc = Dwfc.get_pointer();
+						for(int index = 0; index < Dwfc.size(); ++index)
+						{
+							p_dwfc[index] = conj(p_dwfc[index]);
+						}
 
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
@@ -379,7 +388,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float[0],
 									uhm.LM->Sloc2.data(), &one_int, &one_int, pv->desc,
-									Dwfc.c, &one_int, &NB, pv->desc, &one_int,
+									p_dwfc, &one_int, &NB, pv->desc, &one_int,
 									&zero_float[0],
 									Mulk[0].c, &one_int, &NB, pv->desc,
 									&one_int);
@@ -395,7 +404,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									const int ir = pv->trace_loc_row[j];
 									const int ic = pv->trace_loc_col[i];
 
-									waveg[j] = Mulk[0](ic,ir)*lowf.wfc_k[ik](ic,ir);
+									waveg[j] = Mulk[0](ic,ir) * psi[0](ic,ir);
 									const double x = waveg[j].real();
 									BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 
@@ -662,8 +671,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 				Mulk.resize(1);
 				Mulk[0].create(pv->ncol,pv->nrow);
 
-
-				ModuleBase::matrix Dwf = lowf.wfc_gamma[is];
+				psid->fix_k(is);
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{  
 					const int NB= i+1;
@@ -678,7 +686,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
 							uhm.LM->Sloc.data(), &one_int, &one_int, pv->desc,
-							Dwf.c, &one_int, &NB, pv->desc, &one_int,
+							psid->get_pointer(), &one_int, &NB, pv->desc, &one_int,
 							&zero_float,
 							Mulk[0].c, &one_int, &NB, pv->desc,
 							&one_int);
@@ -692,7 +700,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 							const int ir = pv->trace_loc_row[j];
 							const int ic = pv->trace_loc_col[i];
-							weightk(is, i*GlobalV::NLOCAL+j) = Mulk[0](ic,ir)*lowf.wfc_gamma[is](ic,ir);
+							weightk(is, i*GlobalV::NLOCAL+j) = Mulk[0](ic,ir) * psid[0](ic,ir);
 						}
 					} 
 				}//ib
@@ -733,7 +741,13 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 						uhm.LM->folding_fixedH(ik);
 
 
-						ModuleBase::ComplexMatrix Dwfc = conj(lowf.wfc_k[ik]);
+						psi->fix_k(ik);
+						psi::Psi<std::complex<double>> Dwfc(psi[0], 1);
+						std::complex<double>* p_dwfc = Dwfc.get_pointer();
+						for(int index = 0; index < Dwfc.size(); ++index)
+						{
+							p_dwfc[index] = conj(p_dwfc[index]);
+						}
 
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
@@ -750,7 +764,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float[0],
 									uhm.LM->Sloc2.data(), &one_int, &one_int, pv->desc,
-									Dwfc.c, &one_int, &NB, pv->desc, &one_int,
+									p_dwfc, &one_int, &NB, pv->desc, &one_int,
 									&zero_float[0],
 									Mulk[0].c, &one_int, &NB, pv->desc,
 									&one_int);
@@ -766,7 +780,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									const int ir = pv->trace_loc_row[j];
 									const int ic = pv->trace_loc_col[i];
 
-									weightk(ik, i*GlobalV::NLOCAL+j) = Mulk[0](ic,ir)*lowf.wfc_k[ik](ic,ir);
+									weightk(ik, i*GlobalV::NLOCAL+j) = Mulk[0](ic,ir) * psi[0](ic,ir);
 								}
 							}                             
 

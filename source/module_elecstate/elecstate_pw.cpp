@@ -3,12 +3,15 @@
 #include "module_base/constants.h"
 #include "src_parallel/parallel_reduce.h"
 #include "src_pw/global.h"
+#include "module_base/timer.h"
 
 namespace elecstate
 {
 
 void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 {
+    ModuleBase::TITLE("ElecStatePW", "psiToRho");
+    ModuleBase::timer::tick("ElecStatePW", "psiToRho");
     this->calculate_weights();
 
     this->calEBand();
@@ -28,6 +31,7 @@ void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
         this->updateRhoK(psi);
     }
     this->parallelK();
+    ModuleBase::timer::tick("ElecStatePW", "psiToRho");
 }
 
 void ElecStatePW::updateRhoK(const psi::Psi<std::complex<double>>& psi)
@@ -69,7 +73,7 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
 
     // used for plane wavefunction FFT3D to real space
     static std::vector<std::complex<double>> wfcr;
-    wfcr.resize(this->charge->nrxx);
+    wfcr.resize(this->basis->nmaxgr);
     // used for plane wavefunction FFT3D to real space, non-collinear spin case
     static std::vector<std::complex<double>> wfcr_another_spin;
     if (GlobalV::NSPIN == 4)
@@ -80,16 +84,14 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
     int current_spin = 0;
     if (GlobalV::NSPIN == 2)
     {
-        current_spin = this->basis->Klist->isk[ik];
+        current_spin = this->klist->isk[ik];
     }
     int nbands = psi.get_nbands();
-    int* igk = &(GlobalC::wf.igk(ik, 0));
-
     //  here we compute the band energy: the sum of the eigenvalues
     if (GlobalV::NSPIN == 4)
     {
         int npwx = npw / 2;
-        npw = this->basis->Klist->ngk[ik];
+        npw = this->klist->ngk[ik];
         for (int ibnd = 0; ibnd < nbands; ibnd++)
         {
             ///
@@ -97,19 +99,11 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
             ///
             if (this->wg(ik, ibnd) < ModuleBase::threshold_wg)
                 continue;
-            ModuleBase::GlobalFunc::ZEROS(wfcr.data(), this->charge->nrxx);
-            for (int ig = 0; ig < npw; ig++)
-            {
-                wfcr[this->basis->ig2fftw[igk[ig]]] = psi(ibnd, ig);
-            }
-            const_cast<PW_Basis*>(this->basis)->FFT_wfc.FFT3D(wfcr.data(), 1);
 
-            ModuleBase::GlobalFunc::ZEROS(wfcr_another_spin.data(), this->charge->nrxx);
-            for (int ig = 0; ig < npw; ig++)
-            {
-                wfcr_another_spin[this->basis->ig2fftw[igk[ig]]] = psi(ibnd, ig + npwx);
-            }
-            const_cast<PW_Basis*>(this->basis)->FFT_wfc.FFT3D(wfcr_another_spin.data(), 1);
+
+            this->basis->recip2real(&psi(ibnd,0), wfcr.data(), ik);
+
+            this->basis->recip2real(&psi(ibnd,npwx), wfcr_another_spin.data(), ik);
 
             const double w1 = this->wg(ik, ibnd) / GlobalC::ucell.omega;
 
@@ -159,12 +153,7 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
             if (this->wg(ik, ibnd) < ModuleBase::threshold_wg)
                 continue;
 
-            ModuleBase::GlobalFunc::ZEROS(wfcr.data(), this->charge->nrxx);
-            for (int ig = 0; ig < npw; ig++)
-            {
-                wfcr[this->basis->ig2fftw[igk[ig]]] = psi(ibnd, ig);
-            }
-            const_cast<PW_Basis*>(this->basis)->FFT_wfc.FFT3D(wfcr.data(), 1);
+            this->basis->recip2real(&psi(ibnd,0), wfcr.data(), ik);
 
             const double w1 = this->wg(ik, ibnd) / GlobalC::ucell.omega;
 
@@ -185,10 +174,12 @@ void ElecStatePW::rhoBandK(const psi::Psi<std::complex<double>>& psi)
                     for (int ig = 0; ig < npw; ig++)
                     {
                         double fact
-                            = this->basis->get_GPlusK_cartesian_projection(ik, igk[ig], j) * GlobalC::ucell.tpiba;
-                        wfcr[this->basis->ig2fftw[igk[ig]]] = psi(ibnd, ig) * complex<double>(0.0, fact);
+                            = this->basis->getgpluskcar(ik, ig)[j] * GlobalC::ucell.tpiba;
+                        wfcr[ig] = psi(ibnd, ig) * complex<double>(0.0, fact);
                     }
-                    const_cast<PW_Basis*>(this->basis)->FFT_wfc.FFT3D(wfcr.data(), 1);
+
+                    this->basis->recip2real(wfcr.data(), wfcr.data(), ik);
+                    
                     for (int ir = 0; ir < this->charge->nrxx; ir++)
                     {
                         this->charge->kin_r[current_spin][ir] += w1 * norm(wfcr[ir]);

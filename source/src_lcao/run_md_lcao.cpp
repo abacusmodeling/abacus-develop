@@ -118,7 +118,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
             }
 
             // reset local potential
-            GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
+            GlobalC::pot.init_pot(verlet->step_, GlobalC::sf.strucFac);
 
             // update force and virial due to the update of atom positions
             MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
@@ -133,7 +133,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
         if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
             // Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-            verlet->outputMD(GlobalV::ofs_running);
+            verlet->outputMD(GlobalV::ofs_running, GlobalV::CAL_STRESS);
 
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
@@ -160,7 +160,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
         std::stringstream ssp_ave;
         ssp << GlobalV::global_out_dir << "ElecStaticPot";
         ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
     }
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
@@ -169,7 +169,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
 	// mohan update 2021-02-10
-
+    delete verlet;
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
 }
@@ -217,7 +217,6 @@ void Run_MD_LCAO::md_force_virial(
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
     p_esolver->cal_Force(fcs);
-    p_esolver->cal_Stress(virial);
     
     for (int ion = 0; ion < numIon; ++ion)
     {
@@ -226,7 +225,11 @@ void Run_MD_LCAO::md_force_virial(
 		force[ion].z = fcs(ion, 2)/2.0;
 	}
 
-    virial = 0.5 * virial;
+    if(GlobalV::CAL_STRESS)
+    {
+        p_esolver->cal_Stress(virial);
+        virial = 0.5 * virial;
+    }
 
     potential = GlobalC::en.etot/2;
 

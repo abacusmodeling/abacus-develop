@@ -7,6 +7,7 @@
 #include "../input_conv.h"
 #include "../src_pw/wavefunc.h"
 #include "../src_parallel/parallel_global.h"
+#include "../module_pw/pw_basis.h"
 
 class Chi0_hilbert 
 {
@@ -50,7 +51,7 @@ class Chi0_hilbert
 	void Cal_Psi(int iq, std::complex<double> **psi_r);
 	void Cal_Psi_down(int iq, std::complex<double> **psi_r);
 	void Cal_lcao_psi();
-	void Cal_b(int iq, int ik, int iqk, int ispin);
+	void Cal_b(int iq, int ik, int iqk, int ispin, ModulePW::PW_Basis *rho_basis);
 	void Cal_b_lcao( int iq, int ik, int iqk);
 	void Cal_Chi0s(int iq);
 	void Cal_T();

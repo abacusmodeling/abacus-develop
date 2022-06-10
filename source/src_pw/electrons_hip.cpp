@@ -63,7 +63,7 @@ void Electrons::self_consistent(const int &istep)
 	ModuleBase::timer::tick("Electrons", "self_consistent");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
 
 	set_pw_diag_thr();
 
@@ -98,7 +98,7 @@ void Electrons::self_consistent(const int &istep)
 	Symmetry_rho srho;
 	for (int is = 0; is < GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+		srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
 	}
 
 	// conv_elec is a member of Threshold_Elec
@@ -207,7 +207,7 @@ void Electrons::self_consistent(const int &istep)
 		Symmetry_rho srho;
 		for (int is = 0; is < GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+			srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
 		}
 
 		//(7) compute magnetization, only for LSDA(spin==2)
@@ -286,7 +286,7 @@ void Electrons::self_consistent(const int &istep)
 			// mohan add 2012-06-05
 			for (int is = 0; is < GlobalV::NSPIN; ++is)
 			{
-				for (int ir = 0; ir < GlobalC::pw.nrxx; ++ir)
+				for (int ir = 0; ir < GlobalC::rhopw->nrxx; ++ir)
 				{
 					GlobalC::pot.vnew(is, ir) = GlobalC::pot.vr(is, ir);
 				}
@@ -322,7 +322,7 @@ void Electrons::self_consistent(const int &istep)
 			// WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
 			// mohan update 2011-02-21
 			// qianrui update 2020-10-17
-			//WF_io::write_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+			//WF_io::write_wfc(ssw.str(), GlobalC::wf.evc, GlobalC::sf.gcar);
 			// ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
 		}
 
@@ -463,8 +463,8 @@ void Electrons::c_bands(const int &istep)
 		// Replace 10.29
 		if (precondition_type == 1)
 		{
-			CHECK_CUDA(
-				hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
+			// CHECK_CUDA(
+			// 	hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
 			int thread = 512;
 			int block = (GlobalC::wf.npw + thread - 1) / thread;
 			hipLaunchKernelGGL(kernel_pred1, dim3(block), dim3(thread), 0, 0, h_diag, GlobalC::wf.npw);
@@ -479,8 +479,8 @@ void Electrons::c_bands(const int &istep)
 		}
 		else if (precondition_type == 2)
 		{
-			CHECK_CUDA(
-				hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
+			// CHECK_CUDA(
+			// 	hipMemcpy(h_diag, &GlobalC::wf.g2kin[0], GlobalC::wf.npw * sizeof(double), hipMemcpyHostToDevice));
 			int thread = 512;
 			int block = (GlobalC::wf.npw + thread - 1) / thread;
 			hipLaunchKernelGGL(kernel_pred2, dim3(block), dim3(thread), 0, 0, h_diag, GlobalC::wf.npw);

@@ -14,6 +14,7 @@
 #include "src_ions/ions_move_basic.h"
 #include "src_pw/global.h"
 #include "src_pw/occupy.h"
+#include "module_surchem/surchem.h"
 #ifdef __EXX
 #include "src_ri/exx_abfs-jle.h"
 #endif
@@ -27,6 +28,9 @@
 #endif
 #include "module_base/timer.h"
 #include "module_surchem/efield.h"
+
+#include "module_elecstate/elecstate_lcao.h"
+#include "module_hsolver/hsolver_lcao.h"
 
 void Input_Conv::Convert(void)
 {
@@ -108,20 +112,7 @@ void Input_Conv::Convert(void)
     //----------------------------------------------------------
     // planewave (8/8)
     //----------------------------------------------------------
-    GlobalC::pw.set(INPUT.gamma_only,
-                    INPUT.ecutwfc,
-                    INPUT.ecutrho,
-                    INPUT.nx,
-                    INPUT.ny,
-                    INPUT.nz,
-                    INPUT.ncx,
-                    INPUT.ncy,
-                    INPUT.ncz,
-                    INPUT.bx,
-                    INPUT.by,
-                    INPUT.bz,
-                    INPUT.pw_seed,
-                    INPUT.nbspline);
+    GlobalC::sf.set(INPUT.nbspline);
     GlobalV::GAMMA_ONLY_LOCAL = INPUT.gamma_only_local;
 
     //----------------------------------------------------------
@@ -448,9 +439,9 @@ void Input_Conv::Convert(void)
     GlobalC::en.out_proj_band = INPUT.out_proj_band;
 #ifdef __LCAO
     Local_Orbital_Charge::out_dm = INPUT.out_dm;
-    Pdiag_Double::out_mat_hs = INPUT.out_mat_hs;
-    Pdiag_Double::out_mat_hsR = INPUT.out_mat_hs2; // LiuXh add 2019-07-16
-    Pdiag_Double::out_wfc_lcao = INPUT.out_wfc_lcao;
+    hsolver::HSolverLCAO::out_mat_hs = INPUT.out_mat_hs;
+    hsolver::HSolverLCAO::out_mat_hsR = INPUT.out_mat_hs2; // LiuXh add 2019-07-16
+    elecstate::ElecStateLCAO::out_wfc_lcao = INPUT.out_wfc_lcao;
 #endif
 
     GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;
@@ -501,6 +492,11 @@ void Input_Conv::Convert(void)
     GlobalV::tau = INPUT.tau;
     GlobalV::sigma_k = INPUT.sigma_k;
     GlobalV::nc_k = INPUT.nc_k;
+
+    GlobalC::solvent_model.comp_q = INPUT.comp_q;
+    GlobalC::solvent_model.comp_l = INPUT.comp_l;
+    GlobalC::solvent_model.comp_center = INPUT.comp_center;
+    GlobalC::solvent_model.comp_dim = INPUT.comp_dim;
     ModuleBase::timer::tick("Input_Conv", "Convert");
     return;
 }

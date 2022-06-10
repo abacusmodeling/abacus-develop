@@ -7,8 +7,8 @@ using namespace Ions_Move_Basic;
 Ions_Move_SD::Ions_Move_SD()
 {
 	this->energy_saved = 1.0e10;
-	this->grad_saved = new double[1];
-	this->pos_saved = new double[1];
+	this->grad_saved = nullptr;
+	this->pos_saved = nullptr;
 }
 Ions_Move_SD::~Ions_Move_SD()
 {

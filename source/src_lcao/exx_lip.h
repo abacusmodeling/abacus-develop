@@ -9,11 +9,10 @@
 #include "../module_base/vector3.h"
 #include "../src_pw/hamilt.h"
 #include "../module_xc/exx_global.h"
+#include "../module_pw/pw_basis_k.h"
 
 class K_Vectors;
 class wavefunc;
-class PW_Basis;
-class Use_FFT;
 class UnitCell_pseudo;
 
 class Exx_Lip
@@ -34,7 +33,7 @@ public:
 	};
 	Exx_Info info;
 
-	void init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_in, Use_FFT *UFFT_ptr_in, UnitCell_pseudo *ucell_ptr_in);
+	void init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, ModulePW::PW_Basis_K *wfc_basis_in, ModulePW::PW_Basis *rho_basis_in, UnitCell_pseudo *ucell_ptr_in);
 	void cal_exx();
 	const std::complex<double> * const * const * get_exx_matrix() const { return exx_matrix; }
 	double get_exx_energy() const { return exx_energy; }
@@ -92,8 +91,9 @@ private:
 	
 public:
 
-	PW_Basis *pw_ptr;
-	Use_FFT *UFFT_ptr;
+	ModulePW::PW_Basis *rho_basis;
+	ModulePW::PW_Basis_K *wfc_basis;
+
 	UnitCell_pseudo *ucell_ptr;
 };
 

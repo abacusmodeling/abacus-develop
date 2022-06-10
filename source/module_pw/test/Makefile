@@ -29,12 +29,12 @@ pw_distributeg_method1.o\
 pw_distributeg_method2.o\
 fft.o\
 pw_basis_k.o\
-pw_operation.o\
 pw_transform_k.o
 
 DOUBLEFILE=test1-1-1.o\
 test1-1-2.o\
 test1-2.o\
+test1-2-2.o\
 test1-3.o\
 test1-4.o\
 test2-1-1.o\
@@ -43,6 +43,7 @@ test2-2.o\
 test2-3.o
 
 FLOATFILE=test1-2f.o\
+test1-2-2f.o\
 test1-3f.o\
 test1-4f.o
 

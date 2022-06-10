@@ -18,12 +18,24 @@ void Variable_Cell::init_after_vc(ModuleESolver::ESolver *p_esolver)
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
+    
+
     GlobalC::kv.set_after_vc(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
 
-    GlobalC::pw.update_gvectors(GlobalV::ofs_running, GlobalC::ucell);
+    
+    //only G-vector and K-vector are changed due to the change of lattice vector
+    //FFT grids do not change!!
+    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, 
+                                GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+    GlobalC::rhopw->collect_local_pw(); 
+    GlobalC::rhopw->collect_uniqgg();
+    GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::wfcpw->nx, GlobalC::wfcpw->ny, GlobalC::wfcpw->nz,
+                                GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+    GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+    GlobalC::wfcpw->collect_local_pw(); 
 
-    GlobalC::pw.setup_structure_factor();
+    GlobalC::sf.setup_structure_factor(&GlobalC::ucell,GlobalC::rhopw);
 
     if(GlobalV::BASIS_TYPE=="pw")
     {
@@ -35,7 +47,7 @@ void Variable_Cell::init_after_vc(ModuleESolver::ESolver *p_esolver)
     //=================================
     // initalize local pseudopotential
     //=================================
-    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
+    GlobalC::ppcell.init_vloc(GlobalC::ppcell.vloc, GlobalC::rhopw);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
 
     //======================================

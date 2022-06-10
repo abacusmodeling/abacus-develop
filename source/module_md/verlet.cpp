@@ -25,15 +25,7 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp.md_dt /= ModuleBase::AU_to_FS;
     mdp.md_tfirst /= ModuleBase::Hartree_to_K;
     mdp.md_tlast /= ModuleBase::Hartree_to_K;
-
-    if(mdp.md_tfreq == 0)
-    {
-        mdp.md_tfreq = 1.0/40.0/mdp.md_dt;
-    }
-    else
-    {
-        mdp.md_tfreq *= ModuleBase::AU_to_FS;
-    }
+    mdp.md_tfreq *= ModuleBase::AU_to_FS;
 
     // LJ parameters
     mdp.lj_rcut *= ModuleBase::ANGSTROM_AU;
@@ -42,7 +34,6 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 
     step_ = 0;
     step_rst_ = 0;
-    if(mdp.md_restart) unit_in.init_vel = 1;
 
     MD_func::InitPos(ucell, pos);
     MD_func::InitVel(ucell, mdp.md_tfirst, allmass, frozen_freedom_, ionmbl, vel);
@@ -89,6 +80,7 @@ void Verlet::first_half()
     }
 #ifdef __MPI
     MPI_Bcast(pos , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(vel , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
 
     ucell.update_pos_tau(pos);
@@ -98,7 +90,6 @@ void Verlet::first_half()
 
 void Verlet::second_half()
 {
-    if(GlobalV::MY_RANK==0) //only first rank do md
     for(int i=0; i<ucell.nat; ++i)
     {
         for(int k=0; k<3; ++k)
@@ -111,7 +102,7 @@ void Verlet::second_half()
     }
 }
 
-void Verlet::outputMD(std::ofstream &ofs)
+void Verlet::outputMD(std::ofstream &ofs, bool cal_stress)
 {
     if(GlobalV::MY_RANK) return;
 
@@ -128,13 +119,21 @@ void Verlet::outputMD(std::ofstream &ofs)
     std::cout << " " << std::left << std::setw(20) << "Energy" 
             << std::left << std::setw(20) << "Potential" 
             << std::left << std::setw(20) << "Kinetic" 
-            << std::left << std::setw(20) << "Temperature" 
-            << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
+            << std::left << std::setw(20) << "Temperature";
+    if(cal_stress)
+    {
+        std::cout << std::left << std::setw(20) << "Pressure (KBAR)";
+    }
+    std::cout << std::endl;
     std::cout << " " << std::left << std::setw(20) << potential+kinetic
             << std::left << std::setw(20) << potential
             << std::left << std::setw(20) << kinetic
-            << std::left << std::setw(20) << temperature_
-            << std::left << std::setw(20) << press*unit_transform <<std::endl;
+            << std::left << std::setw(20) << temperature_;
+    if(cal_stress)
+    {
+        std::cout << std::left << std::setw(20) << press*unit_transform;
+    }
+    std::cout << std::endl;
 	std::cout << " ------------------------------------------------------------------------------------------------" << std::endl;
 
     ofs.unsetf(ios::fixed);
@@ -144,15 +143,26 @@ void Verlet::outputMD(std::ofstream &ofs)
 	ofs << " " << std::left << std::setw(20) << "Energy" 
         << std::left << std::setw(20) << "Potential" 
         << std::left << std::setw(20) << "Kinetic" 
-        << std::left << std::setw(20) << "Temperature" 
-        << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
+        << std::left << std::setw(20) << "Temperature"; 
+    if(cal_stress)
+    {
+        ofs << std::left << std::setw(20) << "Pressure (KBAR)";
+    }
+    ofs << std::endl;
     ofs << " " << std::left << std::setw(20) << potential+kinetic
         << std::left << std::setw(20) << potential
         << std::left << std::setw(20) << kinetic
-        << std::left << std::setw(20) << temperature_
-        << std::left << std::setw(20) << press*unit_transform <<std::endl;
+        << std::left << std::setw(20) << temperature_;
+    if(cal_stress)
+    {
+        ofs << std::left << std::setw(20) << press*unit_transform;
+    }
+    ofs << std::endl;
     ofs << " ------------------------------------------------------------------------------------------------" << std::endl;
-    MD_func::outStress(virial, stress);
+    if(cal_stress)
+    {
+        MD_func::outStress(virial, stress);
+    }
     ofs << std::endl;
     ofs << std::endl;
 }

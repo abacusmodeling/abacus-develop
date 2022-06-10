@@ -2,7 +2,7 @@ This test for:
 *SDFT
 *Si
 *kpoints 2*2*2
-*10 stochastic orbitals
+*All complete basis
 *mixing_type plain
 *mixing_beta 0.7
 *seed_sto > 0

@@ -2,6 +2,7 @@
 #define HSOLVERLCAO_H
 
 #include "hsolver.h"
+#include "module_orbital/parallel_orbitals.h"
 
 namespace hsolver
 {
@@ -9,7 +10,11 @@ namespace hsolver
 class HSolverLCAO : public HSolver
 {
   public:
-    HSolverLCAO(){this->classname = "HSolverPW";}
+    HSolverLCAO(const Parallel_Orbitals* ParaV_in)
+    {
+      this->classname = "HSolverPW"; 
+      this->ParaV = ParaV_in;
+      }
     /*void init(
         const Basis* pbas
         //const Input &in,
@@ -34,6 +39,7 @@ class HSolverLCAO : public HSolver
         psi::Psi<std::complex<double>>& psi,
         elecstate::ElecState* pes
     );*/
+    const Parallel_Orbitals* ParaV;
 };
 
 } // namespace hsolver

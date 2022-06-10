@@ -64,6 +64,7 @@ void FIRE::first_half()
     }
 #ifdef __MPI
     MPI_Bcast(pos , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(vel , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
 
     ucell.update_pos_tau(pos);
@@ -85,9 +86,9 @@ void FIRE::second_half()
     ModuleBase::timer::tick("FIRE", "second_half");
 }
 
-void FIRE::outputMD(std::ofstream &ofs)
+void FIRE::outputMD(std::ofstream &ofs, bool cal_stress)
 {
-    Verlet::outputMD(ofs);
+    Verlet::outputMD(ofs, cal_stress);
 
     ofs << " LARGEST GRAD (eV/A)  : " 
         << max * ModuleBase::Hartree_to_eV * ModuleBase::ANGSTROM_AU << std::endl;

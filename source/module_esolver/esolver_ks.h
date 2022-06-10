@@ -6,6 +6,7 @@
 #include "module_hsolver/hsolver.h"
 #include "module_hamilt/hamilt.h"
 #include "module_elecstate/elecstate.h"
+#include "module_pw/pw_basis_k.h"
 // #include "estates.h"
 // #include "h2e.h"
 namespace ModuleESolver
@@ -15,6 +16,7 @@ namespace ModuleESolver
     {
     public:
         ESolver_KS();
+        virtual ~ESolver_KS();
         // HSolver* phsol;
         double diag_ethr; // diag threshold
         double scf_thr;   // scf threshold
@@ -23,6 +25,7 @@ namespace ModuleESolver
         int niter;        // iter steps actually used in scf
         bool conv_elec;   // If electron density is converged in scf.
         int out_freq_elec;// frequency for output
+        virtual void Init(Input& inp, UnitCell_pseudo& cell) override;
 
         virtual void Run(const int istep, UnitCell_pseudo& cell) override;
 
@@ -46,6 +49,8 @@ namespace ModuleESolver
         virtual void afterscf() {};
         // <Temporary> It should be replaced by a function in Hamilt Class
         virtual void updatepot(const int istep, const int iter) {};
+        // choose strategy when charge density convergence achieved
+        virtual bool do_after_converge(int& iter){this->niter = iter; return true;}
 
 
         //TOOLS:
@@ -67,9 +72,12 @@ namespace ModuleESolver
     hsolver::HSolver* phsol = nullptr;
     elecstate::ElecState* pelec = nullptr;
     hamilt::Hamilt* phami = nullptr;
+    ModulePW::PW_Basis_K* pw_wfc = nullptr;
 
     protected:
         std::string basisname; //PW or LCAO
+    private:
+        void print_wfcfft(Input& inp, ofstream &ofs);
 
     };
 }

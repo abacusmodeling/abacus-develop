@@ -200,7 +200,7 @@ public:
 //==========================================================
 	void out_kpoints(std::ofstream &out);
 	void out_planewave(std::ofstream &out);
-	void out_igk(std::ofstream &out);
+	// void out_igk(std::ofstream &out);
 	void in_kpoints(std::ifstream &in);
 
 	int nks;

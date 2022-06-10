@@ -21,7 +21,7 @@ Efield::~Efield(){}
 // calculate dipole potential in surface calculations
 //=======================================================
 ModuleBase::matrix Efield::add_efield(const UnitCell &cell, 
-                                        PW_Basis &pwb, 
+                                        ModulePW::PW_Basis *rho_basis, 
                                         const int &nspin, 
                                         const double *const *const rho)
 {
@@ -43,7 +43,7 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
         bvec[2] = cell.G.e23; 
         latvec = cell.a2.norm();
     }
-    else if(efield_dir = 2)
+    else if(efield_dir == 2)
     {
         bvec[0] = cell.G.e31;
         bvec[1] = cell.G.e32; 
@@ -62,7 +62,7 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
     if(GlobalV::DIP_COR_FLAG)
     {
         ion_dipole = cal_ion_dipole(cell, bmod);
-        elec_dipole = cal_elec_dipole(cell, pwb, nspin, rho, bmod);
+        elec_dipole = cal_elec_dipole(cell, rho_basis, nspin, rho, bmod);
         tot_dipole = ion_dipole - elec_dipole;
 
         // energy correction
@@ -95,17 +95,17 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total length (Bohr)", length);
 
     // dipole potential
-    ModuleBase::matrix v(nspin, pwb.nrxx);
+    ModuleBase::matrix v(nspin, rho_basis->nrxx);
     const int nspin0 = (nspin == 2) ? 2 : 1;
 
-    for (int ir = 0; ir < pwb.nrxx; ++ir)
+    for (int ir = 0; ir < rho_basis->nrxx; ++ir)
     {
-        int i = ir / (pwb.ncy * pwb.nczp);
-        int j = ir / pwb.nczp - i * pwb.ncy;
-        int k = ir % pwb.nczp + pwb.nczp_start;
-        double x = (double)i / pwb.ncx;
-        double y = (double)j / pwb.ncy;
-        double z = (double)k / pwb.ncz;
+        int i = ir / (rho_basis->ny * rho_basis->nplane);
+        int j = ir / rho_basis->nplane - i * rho_basis->ny;
+        int k = ir % rho_basis->nplane + rho_basis->startz_current;
+        double x = (double)i / rho_basis->nx;
+        double y = (double)j / rho_basis->ny;
+        double z = (double)k / rho_basis->nz;
         ModuleBase::Vector3<double> pos(x, y, z);
 
         double saw = saw_function(efield_pos_max, efield_pos_dec, pos[efield_dir]);
@@ -144,7 +144,7 @@ double Efield::cal_ion_dipole(const UnitCell &cell, const double &bmod)
 }
 
 double Efield::cal_elec_dipole(const UnitCell &cell, 
-                            PW_Basis &pwb, 
+                            ModulePW::PW_Basis *rho_basis, 
                             const int &nspin, 
                             const double *const *const rho,
                             const double &bmod)
@@ -152,14 +152,14 @@ double Efield::cal_elec_dipole(const UnitCell &cell,
     double elec_dipole = 0;
     const int nspin0 = (nspin == 2) ? 2 : 1;
 
-    for (int ir = 0; ir < pwb.nrxx; ++ir)
+    for (int ir = 0; ir < rho_basis->nrxx; ++ir)
     {
-        int i = ir / (pwb.ncy * pwb.nczp);
-        int j = ir / pwb.nczp - i * pwb.ncy;
-        int k = ir % pwb.nczp + pwb.nczp_start;
-        double x = (double)i / pwb.ncx;
-        double y = (double)j / pwb.ncy;
-        double z = (double)k / pwb.ncz;
+        int i = ir / (rho_basis->ny * rho_basis->nplane);
+        int j = ir / rho_basis->nplane - i * rho_basis->ny;
+        int k = ir % rho_basis->nplane + rho_basis->startz_current;
+        double x = (double)i / rho_basis->nx;
+        double y = (double)j / rho_basis->ny;
+        double z = (double)k / rho_basis->nz;
         ModuleBase::Vector3<double> pos(x, y, z);
 
         double saw = saw_function(efield_pos_max, efield_pos_dec, pos[efield_dir]);
@@ -171,7 +171,7 @@ double Efield::cal_elec_dipole(const UnitCell &cell,
     }
 
     Parallel_Reduce::reduce_double_pool(elec_dipole);
-    elec_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / pwb.ncxyz;
+    elec_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / rho_basis->nxyz;
 
     return elec_dipole;
 }
@@ -183,7 +183,7 @@ double Efield::saw_function(const double &a, const double &b, const double &x)
 
     const double fac = 1 - b;
 
-    if( x < a )
+    if( x <= a )
     {
         return x - a + 0.5 * fac;
     }

@@ -38,11 +38,19 @@ Charge::~Charge(){};
 namespace GlobalC {Charge_Broyden CHR;};
 Local_Orbital_wfc::Local_Orbital_wfc(){};
 Local_Orbital_wfc::~Local_Orbital_wfc(){};
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, const double *wfc_2d, double **wfc_grid){};
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao,
-                                       const std::complex<double> *wfc_2d,
-                                       std::complex<double> **wfc_grid,
-                                       int ik){};
+void Local_Orbital_wfc::wfc_2d_to_grid(
+    int out_wfc_lcao, 
+    const double *wfc_2d, 
+    double **wfc_grid, 
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg){};
+void Local_Orbital_wfc::wfc_2d_to_grid(
+    int out_wfc_lcao,
+    const std::complex<double> *wfc_2d,
+    std::complex<double> **wfc_grid,
+    int ik,
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg){};
 Occupy::Occupy(){};
 Occupy::~Occupy(){};
 void Occupy::calculate_weights(){};
@@ -216,7 +224,6 @@ class DiagoPrepare : public Pdiag_Double
         na_row = orb_con.ParaV.nrow;
         na_col = orb_con.ParaV.ncol;
         icontext = orb_con.ParaV.blacs_ctxt;
-        std::cout << "orb_con.ParaV.nb=" << orb_con.ParaV.nb << " " << GlobalV::NB2D<< std::endl;
         nb2d = orb_con.ParaV.nb;
     }
 
@@ -385,6 +392,7 @@ TEST_P(DiagoTest, LCAO)
     }
 }
 
+#ifndef __CUSOLVER_LCAO
 INSTANTIATE_TEST_SUITE_P(
     ElpaDoubleTest,
     DiagoTest,
@@ -395,7 +403,7 @@ INSTANTIATE_TEST_SUITE_P(
     ElpaComplexDoubleTest,
     DiagoTest,
     ::testing::Values( //int nlocal, int nbands, int nb2d, int sparsity, bool gamma_only, std::string ks_solver, bool readhs
-        DiagoPrepare(0, 0, 1, 0, false, "genelpa", "H-KPoints-large.dat", "S-KPoints-large.dat")));
+        DiagoPrepare(0, 0, 1, 0, false, "genelpa", "H-KPoints.dat", "S-KPoints.dat")));
 
 INSTANTIATE_TEST_SUITE_P(
     ScalapackDoubleTest,
@@ -415,7 +423,7 @@ INSTANTIATE_TEST_SUITE_P(
         DiagoPrepare(0, 0, 1, 0, false, "scalapack_gvx", "H-KPoints-large.dat", "S-KPoints-large.dat")
         ));
 
-#ifdef __CUSOLVER_LCAO
+#else
 INSTANTIATE_TEST_SUITE_P(
     CusolverDoubleTest,
     DiagoTest,

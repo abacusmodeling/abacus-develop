@@ -27,7 +27,7 @@ class HamiltPW : public Hamilt
     }
 
     // construct Hamiltonian matrix with inputed electonic density
-    void constructHamilt(const int iter, const MatrixBlock<double> rho) override
+    void constructHamilt() override
     {
         this->ch_mock();
     }
