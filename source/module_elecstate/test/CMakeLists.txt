@@ -8,7 +8,7 @@ AddTest(
   TARGET EState_updaterhok_pw
   LIBS ${math_libs} planewave_serial base_serial
   SOURCES updaterhok_pw_test.cpp ../../src_pw/charge.cpp ../../src_parallel/parallel_reduce.cpp 
-          ../../src_parallel/ft.cpp ../../src_pw/structure_factor.cpp ../../src_pw/pw_complement.cpp 
+          ../../src_pw/structure_factor.cpp ../../src_pw/pw_complement.cpp 
           ../../src_pw/klist.cpp ../../src_parallel/parallel_kpoints.cpp ../../src_pw/occupy.cpp  
           ../../module_elecstate/elecstate_pw.cpp ../../module_elecstate/elecstate.cpp
 )

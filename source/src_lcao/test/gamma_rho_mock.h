@@ -9,7 +9,6 @@
 #include "module_symmetry/symmetry.h"
 #include "module_symmetry/symmetry_basic.h"
 #include "module_xc/xc_functional.h"
-#include "src_parallel/ft.h"
 #include "src_parallel/parallel_grid.h"
 #include "src_parallel/parallel_kpoints.h"
 #include "src_parallel/parallel_pw.h"

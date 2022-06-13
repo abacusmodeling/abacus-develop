@@ -223,7 +223,6 @@ parallel_kpoints.o\
 parallel_common.o\
 parallel_reduce.o\
 parallel_pw.o\
-ft.o\
 parallel_grid.o\
 
 OBJS_ESOLVER=esolver.o\
