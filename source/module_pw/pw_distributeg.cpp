@@ -43,24 +43,36 @@ void PW_Basis::count_pw_st(
 {
     ModuleBase::GlobalFunc::ZEROS(st_length2D, this->fftnxy);
     ModuleBase::GlobalFunc::ZEROS(st_bottom2D, this->fftnxy);
-    int ibox[3] = {0, 0, 0};                            // an auxiliary vector, determine the boundary of the scanning area.
-    ibox[0] = int(this->fftnx / 2) + 1;                    // scan x from -ibox[0] to ibox[0].
-    ibox[1] = int(this->fftny / 2) + 1;                    // scan y from -ibox[1] to ibox[1], if not gamma-only.
-    ibox[2] = int(this->nz / 2) + 1;                    // scan z from -ibox[2] to ibox[2].
-
     ModuleBase::Vector3<double> f;
 
-    int iy_start = -ibox[1]; // determine the scaning area along y-direct, if gamma-only, only positive axis is used.
-    int iy_end = ibox[1];
+    // determine the scaning area along x-direct, if gamma-only && halfx, only positive axis is used.
+    int ix_end = int(this->nx / 2) + 1;
+    int ix_start = -ix_end; 
+    // determine the scaning area along y-direct, if gamma-only && !halfx, only positive axis is used.
+    int iy_end = int(this->ny / 2) + 1;
+    int iy_start = -iy_end; 
+
+    int iz_end = int(this->nz / 2) + 1;
+    int iz_start = -iz_end;
     if (this->gamma_only)
     {
-        iy_start = 0;
-        iy_end = this->fftny - 1;
+        if(this->halfx)
+        {
+            ix_start = 0;
+            ix_end = this->fftnx - 1;
+        }
+        else
+        {
+            iy_start = 0;
+            iy_end = this->fftny - 1;
+        }
     }
+
     this->liy = this->riy = 0;
+    this->lix = this->rix = 0;
     this->npwtot = 0;
     this->nstot = 0;
-    for (int ix = -ibox[0]; ix <= ibox[0]; ++ix)
+    for (int ix = ix_start; ix <= ix_end; ++ix)
     {
         for (int iy = iy_start; iy <= iy_end; ++iy)
         {
@@ -71,12 +83,12 @@ void PW_Basis::count_pw_st(
             // so that its index in st_length and st_bottom is 9 * 10 + 2 = 92.
             int x = ix;
             int y = iy;
-            if (x < 0) x += this->fftnx;
-            if (y < 0) y += this->fftny;
+            if (x < 0) x += this->nx;
+            if (y < 0) y += this->ny;
             int index = x * this->fftny + y;
 
             int length = 0; // number of planewave on stick (x, y).
-            for (int iz = -ibox[2]; iz <= ibox[2]; ++iz)
+            for (int iz = iz_start; iz <= iz_end; ++iz)
             {
                 f.x = ix;
                 f.y = iy;
@@ -89,6 +101,8 @@ void PW_Basis::count_pw_st(
                     ++length;
                     if(iy < this->riy) this->riy = iy;
                     if(iy > this->liy) this->liy = iy;
+                    if(ix < this->rix) this->rix = ix;
+                    if(ix > this->lix) this->lix = ix;
                 }
             }
             if (length > 0)
@@ -98,7 +112,8 @@ void PW_Basis::count_pw_st(
             }
         }
     }
-    riy += this->fftny;
+    riy += this->ny;
+    rix += this->nx;
     return;
 }
 
@@ -117,16 +132,16 @@ void PW_Basis::get_ig2isz_is2fftixy(
 {
     if (this->npw == 0)
     {
-        if(this->ig2isz!=nullptr) delete[] this->ig2isz; this->ig2isz = new int[1]; // map ig to the z coordinate of this planewave.
+        delete[] this->ig2isz; this->ig2isz = new int[1]; // map ig to the z coordinate of this planewave.
         this->ig2isz[0] = 0;
-        if(this->is2fftixy!=nullptr) delete[] this->is2fftixy; this->is2fftixy = new int[1]; // map is (index of sticks) to ixy (iy + ix * fftny).
+        delete[] this->is2fftixy; this->is2fftixy = new int[1]; // map is (index of sticks) to ixy (iy + ix * fftny).
         this->is2fftixy[0] = -1;
         return;
     }
 
-    if(this->ig2isz!=nullptr) delete[] this->ig2isz; this->ig2isz = new int[this->npw]; // map ig to the z coordinate of this planewave.
+    delete[] this->ig2isz; this->ig2isz = new int[this->npw]; // map ig to the z coordinate of this planewave.
     ModuleBase::GlobalFunc::ZEROS(this->ig2isz, this->npw);
-    if(this->is2fftixy!=nullptr) delete[] this->is2fftixy; this->is2fftixy = new int[this->nst]; // map is (index of sticks) to ixy (iy + ix * fftny).
+    delete[] this->is2fftixy; this->is2fftixy = new int[this->nst]; // map is (index of sticks) to ixy (iy + ix * fftny).
     for (int is = 0; is < this->nst; ++is) 
     {
         this->is2fftixy[is] = -1;

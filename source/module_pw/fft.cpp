@@ -22,23 +22,26 @@ void FFT::clear()
 #endif
 }
 
-void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int liy_in, int riy_in, int ns_in, int nplane_in, int nproc_in, bool gamma_only_in, bool mpifft_in)
+void FFT:: initfft(int nx_in, int ny_in, int nz_in, int lixy_in, int rixy_in, int ns_in, int nplane_in, int nproc_in, bool gamma_only_in, bool halfx, bool mpifft_in)
 {
 	this->gamma_only = gamma_only_in;
-	this->nx = nx_in;
-	this->bigny = bigny_in;
-	if(this->gamma_only) this->ny = int(bigny/2) +1;
-	else	this->ny = this->bigny;
+	this->fftnx = this->nx = nx_in;
+	this->fftny = this->ny = ny_in;
+	if(this->gamma_only)
+	{
+		if(halfx) 	this->fftnx = int(nx/2) +1;
+		else		this->fftny = int(ny/2) +1;
+	} 
 	this->nz = nz_in;
 	this->ns = ns_in;
-	this->liy = liy_in;
-	this->riy = riy_in;
+	this->lixy = lixy_in;
+	this->rixy = rixy_in;
 	this->nplane = nplane_in;
 	this->nproc = nproc_in;
 	this->mpifft = mpifft_in;
 	this->nxy = this->nx * this-> ny;
-	this->bignxy = this->nx * this->bigny;
-	this->maxgrids = (this->nz * this->ns > this->bignxy * nplane) ? this->nz * this->ns : this->bignxy * nplane;
+	this->fftnxy = this->fftnx * this->fftny;
+	this->maxgrids = (this->nz * this->ns > this->nxy * nplane) ? this->nz * this->ns : this->nxy * nplane;
 	if(!this->mpifft)
 	{
 		aux1  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
@@ -122,14 +125,14 @@ void FFT :: initplan()
 		// 									r_rspace,   rankd,  this->nplane,   1,  FFTW_MEASURE);
 
 		// int npy = this->nplane * this->ny;
-		int bignpy = this->nplane * this->bigny;
-		this->planxfor1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (liy + 1),	 (fftw_complex *)aux2, 		  embed, bignpy,     1,
-				(fftw_complex *)aux2, 	 embed, bignpy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planxbac1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (liy + 1),	 (fftw_complex *)aux2, 		  embed, bignpy,     1,
-				(fftw_complex *)aux2, 	 embed, bignpy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
-		this->planyr2c  = fftw_plan_many_dft_r2c(  1, &this->bigny, this->nplane,	r_rspace , embed, this->nplane,      1,
+		int npy = this->nplane * this->ny;
+		this->planxfor1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (lixy + 1),	 (fftw_complex *)aux2, 		  embed, npy,     1,
+				(fftw_complex *)aux2, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+		this->planxbac1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (lixy + 1),	 (fftw_complex *)aux2, 		  embed, npy,     1,
+				(fftw_complex *)aux2, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+		this->planyr2c  = fftw_plan_many_dft_r2c(  1, &this->ny, this->nplane,	r_rspace , embed, this->nplane,      1,
 			(fftw_complex*)aux1, embed, this->nplane,		1,	FFTW_MEASURE   );
-		this->planyc2r  = fftw_plan_many_dft_c2r(  1, &this->bigny, this->nplane,	(fftw_complex*)aux1 , embed, this->nplane,      1,
+		this->planyc2r  = fftw_plan_many_dft_c2r(  1, &this->ny, this->nplane,	(fftw_complex*)aux1 , embed, this->nplane,      1,
 			r_rspace, embed, this->nplane,		1,			FFTW_MEASURE   );
 		
 		// int padnpy = npy * 2;
@@ -154,18 +157,18 @@ void FFT :: initplan()
 		// 						(fftw_complex*) aux2,   embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
 
 		//It is better to use in-place for stride > 1
-		int bignpy = this->nplane * this->bigny;
-		this->planxfor1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (liy + 1),	 (fftw_complex *)aux2, 		  embed, bignpy,     1,
-				(fftw_complex *)aux2, 	 embed, bignpy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planxbac1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (liy + 1),	 (fftw_complex *)aux2, 		  embed, bignpy,     1,
-				(fftw_complex *)aux2, 	 embed, bignpy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
-		this->planxfor2  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (bigny - riy),	 (fftw_complex *)aux2, 		  embed, bignpy,     1,
-				(fftw_complex *)aux2, 	 embed, bignpy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planxbac2  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (bigny - riy),	 (fftw_complex *)aux2, 		  embed, bignpy,     1,
-				(fftw_complex *)aux2, 	 embed, bignpy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
-		this->planyfor  = fftw_plan_many_dft(  1, &this->bigny, this->nplane,	(fftw_complex*)aux2 , embed, this->nplane,      1,
+		int npy = this->nplane * this->ny;
+		this->planxfor1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (lixy + 1),	 (fftw_complex *)aux2, 		  embed, npy,     1,
+				(fftw_complex *)aux2, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+		this->planxbac1  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (lixy + 1),	 (fftw_complex *)aux2, 		  embed, npy,     1,
+				(fftw_complex *)aux2, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+		this->planxfor2  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (ny - rixy),	 (fftw_complex *)aux2, 		  embed, npy,     1,
+				(fftw_complex *)aux2, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+		this->planxbac2  = fftw_plan_many_dft(  1, &this->nx,	this->nplane * (ny - rixy),	 (fftw_complex *)aux2, 		  embed, npy,     1,
+				(fftw_complex *)aux2, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+		this->planyfor  = fftw_plan_many_dft(  1, &this->ny, this->nplane,	(fftw_complex*)aux2 , embed, this->nplane,      1,
 			(fftw_complex*)aux2, embed, this->nplane,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planybac  = fftw_plan_many_dft(  1, &this->bigny, this->nplane,	(fftw_complex*)aux2 , embed, this->nplane,      1,
+		this->planybac  = fftw_plan_many_dft(  1, &this->ny, this->nplane,	(fftw_complex*)aux2 , embed, this->nplane,      1,
 			(fftw_complex*)aux2, embed, this->nplane,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
 	}
 
@@ -198,27 +201,27 @@ void FFT :: initplanf()
 	//---------------------------------------------------------
 	
 	int *embed = nullptr;
-	int bignpy = this->nplane * this->bigny;
-	this->planfxfor1  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (liy + 1),	 (fftwf_complex *)auxf2, 		  embed, bignpy,     1,
-			(fftwf_complex *)auxf2, 	 embed, bignpy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-	this->planfxbac1  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (liy + 1),	 (fftwf_complex *)auxf2, 		  embed, bignpy,     1,
-			(fftwf_complex *)auxf2, 	 embed, bignpy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+	int npy = this->nplane * this->ny;
+	this->planfxfor1  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (lixy + 1),	 (fftwf_complex *)auxf2, 		  embed, npy,     1,
+			(fftwf_complex *)auxf2, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+	this->planfxbac1  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (lixy + 1),	 (fftwf_complex *)auxf2, 		  embed, npy,     1,
+			(fftwf_complex *)auxf2, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
 	if(this->gamma_only)
 	{
-		this->planfyr2c  = fftwf_plan_many_dft_r2c(  1, &this->bigny, this->nplane,	rf_rspace , embed, this->nplane,      1,
+		this->planfyr2c  = fftwf_plan_many_dft_r2c(  1, &this->ny, this->nplane,	rf_rspace , embed, this->nplane,      1,
 			(fftwf_complex*)auxf1, embed, this->nplane,		1,	FFTW_MEASURE   );
-		this->planfyc2r  = fftwf_plan_many_dft_c2r(  1, &this->bigny, this->nplane,	(fftwf_complex*)auxf1 , embed, this->nplane,      1,
+		this->planfyc2r  = fftwf_plan_many_dft_c2r(  1, &this->ny, this->nplane,	(fftwf_complex*)auxf1 , embed, this->nplane,      1,
 			rf_rspace, embed, this->nplane,		1,			FFTW_MEASURE   );
 	}
 	else
 	{
-		this->planfxfor2  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (bigny - riy),	 (fftwf_complex *)auxf2, 		  embed, bignpy,     1,
-			(fftwf_complex *)auxf2, 	 embed, bignpy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planfxbac2  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (bigny - riy),	 (fftwf_complex *)auxf2, 		  embed, bignpy,     1,
-			(fftwf_complex *)auxf2, 	 embed, bignpy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
-		this->planfyfor  = fftwf_plan_many_dft(  1, &this->bigny, this->nplane,	(fftwf_complex*)auxf2 , embed, this->nplane,      1,
+		this->planfxfor2  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (this->ny - rixy),	 (fftwf_complex *)auxf2, 		  embed, npy,     1,
+			(fftwf_complex *)auxf2, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+		this->planfxbac2  = fftwf_plan_many_dft(  1, &this->nx,	this->nplane * (this->ny - rixy),	 (fftwf_complex *)auxf2, 		  embed, npy,     1,
+			(fftwf_complex *)auxf2, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+		this->planfyfor  = fftwf_plan_many_dft(  1, &this->ny, this->nplane,	(fftwf_complex*)auxf2 , embed, this->nplane,      1,
 			(fftwf_complex*)auxf2, embed, this->nplane,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planfybac  = fftwf_plan_many_dft(  1, &this->bigny, this->nplane,	(fftwf_complex*)auxf2 , embed, this->nplane,      1,
+		this->planfybac  = fftwf_plan_many_dft(  1, &this->ny, this->nplane,	(fftwf_complex*)auxf2 , embed, this->nplane,      1,
 			(fftwf_complex*)auxf2, embed, this->nplane,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
 	}
 	destroypf = false;
@@ -307,40 +310,40 @@ void FFT::fftzbac(std::complex<double>* & in, std::complex<double>* & out)
 
 void FFT::fftxyfor(std::complex<double>* & in, std::complex<double>* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 	for (int i=0; i<this->nx;++i)
 	{
-		fftw_execute_dft( this->planyfor, (fftw_complex *)&in[i*bignpy], (fftw_complex *)&out[i*bignpy]);
+		fftw_execute_dft( this->planyfor, (fftw_complex *)&in[i*npy], (fftw_complex *)&out[i*npy]);
 	}
 
 
 	fftw_execute_dft( this->planxfor1, (fftw_complex *)in, (fftw_complex *)out);
-	fftw_execute_dft( this->planxfor2, (fftw_complex *)&in[riy*nplane], (fftw_complex *)&out[riy*nplane]);
+	fftw_execute_dft( this->planxfor2, (fftw_complex *)&in[rixy*nplane], (fftw_complex *)&out[rixy*nplane]);
 	return;
 }
 
 void FFT::fftxybac(std::complex<double>* & in, std::complex<double>* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 	//x-direction
 	fftw_execute_dft( this->planxbac1, (fftw_complex *)in, (fftw_complex *)out);
-	fftw_execute_dft( this->planxbac2, (fftw_complex *)&in[riy*nplane], (fftw_complex *)&out[riy*nplane]);
+	fftw_execute_dft( this->planxbac2, (fftw_complex *)&in[rixy*nplane], (fftw_complex *)&out[rixy*nplane]);
 
 	////y-direction
 	for (int i=0; i<this->nx;++i)
 	{
-		fftw_execute_dft( this->planybac, (fftw_complex*)&in[i*bignpy], (fftw_complex*)&out[i*bignpy] );
+		fftw_execute_dft( this->planybac, (fftw_complex*)&in[i*npy], (fftw_complex*)&out[i*npy] );
 	}
 	return;
 }
 
 void FFT::fftxyr2c(double* &in, std::complex<double>* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 
 	for (int i=0; i<this->nx;++i)
 	{
-		fftw_execute_dft_r2c( this->planyr2c, &in[i*bignpy*2], (fftw_complex*)&out[i*bignpy] );
+		fftw_execute_dft_r2c( this->planyr2c, &in[i*npy*2], (fftw_complex*)&out[i*npy] );
 	}
 
 	fftw_execute_dft( this->planxfor1, (fftw_complex *)out, (fftw_complex *)out);
@@ -350,12 +353,12 @@ void FFT::fftxyr2c(double* &in, std::complex<double>* & out)
 
 void FFT::fftxyc2r(std::complex<double>* & in, double* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 	fftw_execute_dft( this->planxbac1, (fftw_complex *)in, (fftw_complex *)in);
 	
 	for (int i=0; i<this->nx;++i)
 	{
-		fftw_execute_dft_c2r( this->planyc2r, (fftw_complex*)&in[i*bignpy], &out[i*bignpy*2] );
+		fftw_execute_dft_c2r( this->planyc2r, (fftw_complex*)&in[i*npy], &out[i*npy*2] );
 	}
 	return;
 }
@@ -376,39 +379,39 @@ void FFT::fftfzbac(std::complex<float>* & in, std::complex<float>* & out)
 
 void FFT::fftfxyfor(std::complex<float>* & in, std::complex<float>* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 	for (int i=0; i<this->nx;++i)
 	{
-		fftwf_execute_dft( this->planfyfor, (fftwf_complex *)&in[i*bignpy], (fftwf_complex *)&out[i*bignpy]);
+		fftwf_execute_dft( this->planfyfor, (fftwf_complex *)&in[i*npy], (fftwf_complex *)&out[i*npy]);
 	}
 
 	fftwf_execute_dft( this->planfxfor1, (fftwf_complex *)in, (fftwf_complex *)out);
-	fftwf_execute_dft( this->planfxfor2, (fftwf_complex *)&in[riy*nplane], (fftwf_complex *)&out[riy*nplane]);
+	fftwf_execute_dft( this->planfxfor2, (fftwf_complex *)&in[rixy*nplane], (fftwf_complex *)&out[rixy*nplane]);
 	return;
 }
 
 void FFT::fftfxybac(std::complex<float>* & in, std::complex<float>* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 	//x-direction
 	fftwf_execute_dft( this->planfxbac1, (fftwf_complex *)in, (fftwf_complex *)out);
-	fftwf_execute_dft( this->planfxbac2, (fftwf_complex *)&in[riy*nplane], (fftwf_complex *)&out[riy*nplane]);
+	fftwf_execute_dft( this->planfxbac2, (fftwf_complex *)&in[rixy*nplane], (fftwf_complex *)&out[rixy*nplane]);
 
 	////y-direction
 	for (int i=0; i<this->nx;++i)
 	{
-		fftwf_execute_dft( this->planfybac, (fftwf_complex*)&in[i*bignpy], (fftwf_complex*)&out[i*bignpy] );
+		fftwf_execute_dft( this->planfybac, (fftwf_complex*)&in[i*npy], (fftwf_complex*)&out[i*npy] );
 	}
 	return;
 }
 
 void FFT::fftfxyr2c(float* &in, std::complex<float>* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 
 	for (int i=0; i<this->nx;++i)
 	{
-		fftwf_execute_dft_r2c( this->planfyr2c, &in[i*bignpy*2], (fftwf_complex*)&out[i*bignpy] );
+		fftwf_execute_dft_r2c( this->planfyr2c, &in[i*npy*2], (fftwf_complex*)&out[i*npy] );
 	}
 
 	fftwf_execute_dft( this->planfxfor1, (fftwf_complex *)out, (fftwf_complex *)out);
@@ -418,12 +421,12 @@ void FFT::fftfxyr2c(float* &in, std::complex<float>* & out)
 
 void FFT::fftfxyc2r(std::complex<float>* & in, float* & out)
 {
-	int bignpy = this->nplane * this-> bigny;
+	int npy = this->nplane * this-> ny;
 	fftwf_execute_dft( this->planfxbac1, (fftwf_complex *)in, (fftwf_complex *)in);
 
 	for (int i=0; i<this->nx;++i)
 	{
-		fftwf_execute_dft_c2r( this->planfyc2r, (fftwf_complex*)&in[i*bignpy], &out[i*bignpy*2] );
+		fftwf_execute_dft_c2r( this->planfyc2r, (fftwf_complex*)&in[i*npy], &out[i*npy*2] );
 	}
 	return;
 }

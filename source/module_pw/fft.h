@@ -30,8 +30,8 @@ public:
 	void clear(); //reset fft
 	
 	// init parameters of fft
-	void initfft(int nx_in, int bigny_in, int nz_in, int liy_in, int riy_in, int ns_in, int nplane_in, 
-				 int nproc_in, bool gamma_only_in, bool mpifft_in = false);
+	void initfft(int nx_in, int ny_in, int nz_in, int lixy_in, int rixy_in, int ns_in, int nplane_in, 
+				 int nproc_in, bool gamma_only_in, bool halfx_in = false, bool mpifft_in = false);
 
 	//init fftw_plans
 	void setupFFT(); 
@@ -67,11 +67,12 @@ public:
 #endif
 	
 public:
-	int nx=0,ny=0,nz=0;
+	int fftnx=0, fftny=0;
+	int fftnxy=0;
+	int ny=0, nx=0, nz=0;
 	int nxy=0;
-	int bigny=0;
-	int bignxy=0;
-	int liy=0,riy=0;// liy: the left edge of the pw ball in the y direction; riy: the right edge of the pw ball in the y direction
+	bool halfx = false;
+	int lixy=0,rixy=0;// lixy: the left edge of the pw ball in the y direction; rixy: the right edge of the pw ball in the x or y direction
 	int ns=0; //number of sticks
 	int nplane=0; //number of x-y planes
 	int maxgrids=0; // max between nz * ns and bignxy * nplane

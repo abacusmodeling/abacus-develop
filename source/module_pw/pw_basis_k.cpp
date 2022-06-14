@@ -10,12 +10,12 @@ PW_Basis_K::PW_Basis_K()
 }
 PW_Basis_K::~PW_Basis_K()
 {
-    if(kvec_d != nullptr)    delete[] kvec_d;
-    if(kvec_c != nullptr)    delete[] kvec_c;
-    if(npwk != nullptr)      delete[] npwk;
-    if(igl2isz_k != nullptr) delete[] igl2isz_k;
-    if(igl2ig_k != nullptr)  delete[] igl2ig_k;
-    if(gk2 != nullptr)       delete[] gk2;
+    delete[] kvec_d;
+    delete[] kvec_c;
+    delete[] npwk;
+    delete[] igl2isz_k;
+    delete[] igl2ig_k;
+    delete[] gk2;
 }
 
 void PW_Basis_K:: initparameters(
@@ -27,8 +27,8 @@ void PW_Basis_K:: initparameters(
 )
 {
     this->nks = nks_in;
-   if(this->kvec_d!=nullptr) delete[] this->kvec_d; this->kvec_d = new ModuleBase::Vector3<double> [nks];
-   if(this->kvec_c!=nullptr) delete[] this->kvec_c; this->kvec_c = new ModuleBase::Vector3<double> [nks];
+    delete[] this->kvec_d; this->kvec_d = new ModuleBase::Vector3<double> [nks];
+    delete[] this->kvec_c; this->kvec_c = new ModuleBase::Vector3<double> [nks];
 
     double kmaxmod = 0;
     for(int ik = 0 ; ik < this->nks ; ++ik)
@@ -59,7 +59,7 @@ void PW_Basis_K::setupIndGk()
 {
     //count npwk
     this->npwk_max = 0;
-    if(this->npwk!=nullptr) delete[] this->npwk; this->npwk = new int [this->nks];
+    delete[] this->npwk; this->npwk = new int [this->nks];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int ng = 0;
@@ -79,8 +79,8 @@ void PW_Basis_K::setupIndGk()
     }
 
     //get igl2isz_k and igl2ig_k
-    if(this->igl2isz_k!=nullptr) delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
-    if(this->igl2ig_k!=nullptr) delete[] igl2ig_k; this->igl2ig_k = new int [this->nks * this->npwk_max];
+    delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
+    delete[] igl2ig_k; this->igl2ig_k = new int [this->nks * this->npwk_max];
     for (int ik = 0; ik < this->nks; ik++)
     {
         int igl = 0;
@@ -119,8 +119,8 @@ void PW_Basis_K::setuptransform()
 
 void PW_Basis_K::collect_local_pw()
 {
-    if(gk2 != nullptr) delete[] gk2;
-    if(gcar != nullptr) delete[] gcar;
+    delete[] gk2;
+    delete[] gcar;
     this->gk2 = new double[this->npwk_max * this->nks];
     this->gcar = new ModuleBase::Vector3<double>[this->npwk_max * this->nks];
 

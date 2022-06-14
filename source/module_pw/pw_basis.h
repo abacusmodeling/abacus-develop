@@ -215,7 +215,9 @@ public:
 	// FFT dimensions for wave functions.
 	int fftnx=0, fftny=0, fftnz=0, fftnxyz=0, fftnxy=0;
     int nx=0, ny=0, nz=0, nxyz=0, nxy=0; // Gamma_only: fftny = int(ny/2)-1 , others: fftny = ny
-    int liy=0,riy=0;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
+    int liy=0, riy=0;// liy: the left edge of the pw ball; riy: the right edge of the pw ball in the y direction
+    int lix=0, rix=0;// lix: the left edge of the pw ball; rix: the right edge of the pw ball in the x direction
+    bool halfx = false;// true: we use half x for gamma_only; false: we use half y for gamma_only
     int nmaxgr=0; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
                 // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data
     FFT ft;

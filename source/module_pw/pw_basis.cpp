@@ -15,23 +15,23 @@ PW_Basis::PW_Basis()
 
 PW_Basis:: ~PW_Basis()
 {
-    if(ig2isz != nullptr)           delete[] ig2isz;
-    if(istot2ixy != nullptr)     delete[] istot2ixy;
-    if(is2fftixy != nullptr)           delete[] is2fftixy;
-    if(fftixy2ip != nullptr)           delete[] fftixy2ip;
-    if(nst_per != nullptr)          delete[] nst_per;
-    if(npw_per != nullptr)          delete[] npw_per;
-    if(gdirect != nullptr)          delete[] gdirect;
-    if(gcar != nullptr)             delete[] gcar;
-    if(gg != nullptr)               delete[] gg;
-    if(startz != nullptr)           delete[] startz;
-    if(numz != nullptr)             delete[] numz;
-    if(numg != nullptr)             delete[] numg;
-    if(numr != nullptr)             delete[] numr;
-    if(startg != nullptr)           delete[] startg;
-    if(startr != nullptr)           delete[] startr;
-    if(ig2igg != nullptr)           delete[] ig2igg;
-    if(gg_uniq != nullptr)          delete[] gg_uniq;
+    delete[] ig2isz;
+    delete[] istot2ixy;
+    delete[] is2fftixy;
+    delete[] fftixy2ip;
+    delete[] nst_per;
+    delete[] npw_per;
+    delete[] gdirect;
+    delete[] gcar;
+    delete[] gg;
+    delete[] startz;
+    delete[] numz;
+    delete[] numg;
+    delete[] numr;
+    delete[] startg;
+    delete[] startr;
+    delete[] ig2igg;
+    delete[] gg_uniq;
 }
 
 /// 
@@ -60,10 +60,10 @@ void PW_Basis::getstartgr()
     //---------------------------------------------
 	// sum : starting plane of FFT box.
 	//---------------------------------------------
-    if(this->numg!=nullptr) delete[] this->numg; this->numg = new int[poolnproc];
-	if(this->startg!=nullptr) delete[] this->startg; this->startg = new int[poolnproc];
-	if(this->startr!=nullptr) delete[] this->startr; this->startr = new int[poolnproc];
-	if(this->numr!=nullptr) delete[] this->numr; this->numr = new int[poolnproc];
+    delete[] this->numg; this->numg = new int[poolnproc];
+	delete[] this->startg; this->startg = new int[poolnproc];
+	delete[] this->startr; this->startr = new int[poolnproc];
+	delete[] this->numr; this->numr = new int[poolnproc];
 
 	// Each processor has a set of full sticks,
 	// 'rank_use' processor send a piece(npps[ip]) of these sticks(nst_per[rank_use])
@@ -95,9 +95,9 @@ void PW_Basis::getstartgr()
 /// 
 void PW_Basis::collect_local_pw()
 {
-   if(this->gg!=nullptr) delete[] this->gg; this->gg = new double[this->npw];
-   if(this->gdirect!=nullptr) delete[] this->gdirect; this->gdirect = new ModuleBase::Vector3<double>[this->npw];
-   if(this->gcar!=nullptr) delete[] this->gcar; this->gcar = new ModuleBase::Vector3<double>[this->npw];
+   delete[] this->gg; this->gg = new double[this->npw];
+   delete[] this->gdirect; this->gdirect = new ModuleBase::Vector3<double>[this->npw];
+   delete[] this->gcar; this->gcar = new ModuleBase::Vector3<double>[this->npw];
 
     ModuleBase::Vector3<double> f;
     for(int ig = 0 ; ig < this-> npw ; ++ig)
@@ -123,7 +123,7 @@ void PW_Basis::collect_local_pw()
 }
 void PW_Basis::collect_uniqgg()
 {
-    if(this->ig2igg!=nullptr) delete[] this->ig2igg; this->ig2igg = new int [this->npw];
+    delete[] this->ig2igg; this->ig2igg = new int [this->npw];
     int *sortindex = new int [this->npw];
     double *tmpgg = new double [this->npw];
     double *tmpgg2 = new double [this->npw];
@@ -177,7 +177,7 @@ void PW_Basis::collect_uniqgg()
         }
     }
     this->ngg = igg + 1;
-    if(this->gg_uniq!=nullptr) delete[] this->gg_uniq; this->gg_uniq = new double [this->ngg];
+    delete[] this->gg_uniq; this->gg_uniq = new double [this->ngg];
     for(int igg = 0 ; igg < this->ngg ; ++igg)
     {
             gg_uniq[igg] = tmpgg2[igg];
