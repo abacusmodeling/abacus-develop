@@ -696,9 +696,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
             {
                 const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
                 const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
+                std::complex<double>* pbecp = &becp(i,ib);
                 for (int ig=0; ig<nbasis; ig++)
                 {
-                    becp(i,ib) += ppsi[ig] * conj( pvkb[ig] );
+                    pbecp[0] += ppsi[ig] * conj( pvkb[ig] );
                 }
             }
         }
@@ -738,9 +739,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
                 {
                     const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
                     const std::complex<double>* pvkb1 = &(vkb1(i, 0));
+                    std::complex<double>* pdbecp = &dbecp(i,ib, ipol);
                     for (int ig=0; ig<nbasis; ig++)
                     {
-                        dbecp(i,ib, ipol) += conj( pvkb1[ig] ) * ppsi[ig] ;
+                        pdbecp[0] += conj( pvkb1[ig] ) * ppsi[ig] ;
                     }
                 }
             }
@@ -796,8 +798,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 
 							for (int ipol=0; ipol<3; ipol++)
 							{
-								const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib)
-										+ dbecp( jnkb, ib, ipol) * conj(becp( inkb, ib) ) ).real();
+								const double dbb = 2.0 * ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib) ).real();
 								//const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib) ).real();
 								forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
 								//cf[iat*3+ipol] += ps * fac * dbb;
