@@ -70,9 +70,10 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 					ppsi = &(GlobalC::wf.evc[ik](ib, 0));
 				}
 				const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
+				std::complex<double>* pbecp = &becp(i, ib);
                 for (int ig = 0; ig < GlobalC::wf.npw; ig++) 
 				{
-                    becp(i, ib) += ppsi[ig] * conj(pvkb[ig]);
+                    pbecp[0] += ppsi[ig] * conj(pvkb[ig]);
                 }
             }
         }
@@ -124,14 +125,26 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 				ModuleBase::ComplexMatrix dbecp_noevc(nkb, GlobalC::wf.npw);
 				for (int i = 0; i < nkb; i++) 
 				{
+					std::complex<double>* pdbecp_noevc = &dbecp_noevc(i, 0);
+					std::complex<double>* pvkb = &vkb1(i, 0);
+					// first term
 					for (int ig = 0; ig < GlobalC::wf.npw;ig++) 
 					{
-						// first term
-						dbecp_noevc(i, ig) -= 2.0 * conj(vkb1(i, ig));
-						// second termi
-						if (ipol == jpol)
-							dbecp_noevc(i, ig) -= conj( GlobalC::ppcell.vkb(i, ig));
-						// third term
+						pdbecp_noevc[ig] -= 2.0 * conj(pvkb[ig]);
+					}
+					// second termi
+					if (ipol == jpol)
+					{
+						pvkb = &GlobalC::ppcell.vkb(i, 0);
+						for (int ig = 0; ig < GlobalC::wf.npw;ig++) 
+						{
+							pdbecp_noevc[ig] -= conj( pvkb[ig]);
+						}
+					}
+					// third term
+					pvkb = &vkb2(i,0);
+					for (int ig = 0; ig < GlobalC::wf.npw;ig++) 
+					{
 						qvec =	GlobalC::wf.get_1qvec_cartesian(ik,ig);
 						qvec0[0] = qvec.x;
 						qvec0[1] = qvec.y;
@@ -139,7 +152,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 						double qm1;
 						if(qvec.norm2() > 1e-16) qm1 = 1.0 / qvec.norm(); 
 						else qm1 = 0; 
-						dbecp_noevc(i,ig)	-= 2.0 * conj(vkb2(i,ig)) * qvec0[ipol] * 
+						pdbecp_noevc[ig]	-= 2.0 * conj(pvkb[ig]) * qvec0[ipol] * 
 							qvec0[jpol] * qm1 *	GlobalC::ucell.tpiba;
 					} // end ig
 				}     // end i
@@ -164,10 +177,11 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 							ppsi = &(GlobalC::wf.evc[ik](ib, 0));
 						}
 						const std::complex<double>* pdbecp_noevc = &(dbecp_noevc(i, 0));
+						std::complex<double>* pdbecp = &dbecp(i,ib);
 						for (int ig=0; ig<GlobalC::wf.npw; ig++) 
 						{
 							//first term
-							dbecp(i,ib) += ppsi[ig] * pdbecp_noevc[ig];
+							pdbecp[0] += ppsi[ig] * pdbecp_noevc[ig];
 						}//end ig
 					}//end i
 				}//end ib
