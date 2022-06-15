@@ -50,10 +50,16 @@ namespace ModuleESolver
 	    ofs << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 	    ofs << "\n\n\n\n";
 	    ofs << "\n SETUP THE PLANE WAVE BASIS" << std::endl;
-        if(INPUT.ecutrho==0)    INPUT.ecutrho = 4 * INPUT.ecutwfc;
-        ModuleBase::GlobalFunc::OUT(ofs,"energy cutoff for charge/potential (unit:Ry)",INPUT.ecutrho);
-        if(inp.nx * inp.ny * inp.nz == 0)
-            ofs << " use input fft dimensions for wave functions." << std::endl;
+        double ecut = INPUT.ecutrho;
+        if(inp.nx * inp.ny * inp.nz > 0)
+        {
+            ecut = this->pw_rho->gridecut_lat * this->pw_rho->tpiba2;
+            ofs << "use input fft dimensions for wave functions." << std::endl;
+            ofs << "calculate energy cutoff from nx, ny, nz:" << std::endl;
+
+        }
+        ModuleBase::GlobalFunc::OUT(ofs,"energy cutoff for charge/potential (unit:Ry)", ecut);
+            
 	    ModuleBase::GlobalFunc::OUT(ofs,"fft grid for charge/potential", this->pw_rho->nx,this->pw_rho->ny,this->pw_rho->nz);
 	    ModuleBase::GlobalFunc::OUT(ofs,"fft grid division",GlobalC::bigpw->bx,GlobalC::bigpw->by,GlobalC::bigpw->bz);
 	    ModuleBase::GlobalFunc::OUT(ofs,"big fft grid for charge/potential",GlobalC::bigpw->nbx,GlobalC::bigpw->nby,GlobalC::bigpw->nbz);

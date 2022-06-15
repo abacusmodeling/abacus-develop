@@ -123,8 +123,15 @@ namespace ModuleESolver
 	    ofs << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 	    ofs << "\n\n\n\n";
         ofs << "\n SETUP PLANE WAVES FOR WAVE FUNCTIONS" << std::endl;
-        ModuleBase::GlobalFunc::OUT(ofs,"energy cutoff for wavefunc (unit:Ry)",INPUT.ecutwfc);
-        ModuleBase::GlobalFunc::OUT(ofs,"fft grid for wave functions", this->pw_rho->nx,this->pw_rho->ny,this->pw_rho->nz);
+        double ecut = INPUT.ecutwfc;
+        if(abs(ecut-this->pw_wfc->gk_ecut * this->pw_wfc->tpiba2) > 1e-6)
+        {
+            ecut = this->pw_wfc->gk_ecut * this->pw_wfc->tpiba2;
+            ofs<<"Energy cutoff for wavefunc is incompatible with nx, ny, nz and it will be reduced!"<<std::endl;
+
+        }  
+        ModuleBase::GlobalFunc::OUT(ofs,"energy cutoff for wavefunc (unit:Ry)", ecut);
+        ModuleBase::GlobalFunc::OUT(ofs,"fft grid for wave functions", this->pw_wfc->nx,this->pw_wfc->ny,this->pw_wfc->nz);
         ModuleBase::GlobalFunc::OUT(ofs,"number of plane waves",this->pw_wfc->npwtot);
 	    ModuleBase::GlobalFunc::OUT(ofs,"number of sticks", this->pw_wfc->nstot);
 

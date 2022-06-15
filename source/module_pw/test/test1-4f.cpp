@@ -36,7 +36,7 @@ TEST_F(PWTEST,test1_4f)
     int distribution_type = 1;
     //--------------------------------------------------
     //init
-    pwtest.initgrids(lat0,latvec,wfcecut, nproc_in_pool, rank_in_pool);
+    pwtest.initgrids(lat0,latvec,4*wfcecut, nproc_in_pool, rank_in_pool);
     //pwtest.initgrids(lat0,latvec,5,7,7);
     pwtest.initparameters(gamma_only,wfcecut,nks,kvec_d,distribution_type);
     pwtest.setuptransform();

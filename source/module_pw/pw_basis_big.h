@@ -2,6 +2,10 @@
 #define PW_BASIS_BIG_H
 #include "../module_base/constants.h"
 #include "../module_base/global_function.h"
+#ifdef __MPI
+#include "mpi.h"
+#include "../src_parallel/parallel_global.h"
+#endif
 
 // temporary class, because previous ABACUS consider big grid for fft grids 
 // which are used for grid integration in LCAO.
@@ -53,7 +57,7 @@ public:
     //------------------------------------------------------------
     this->tpiba = ModuleBase::TWO_PI / this->lat0;
     this->tpiba2 = this->tpiba * this->tpiba;
-    const double gridecut_lat = gridecut / tpiba2;
+    this->gridecut_lat = gridecut / tpiba2;
     ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];
     
@@ -176,6 +180,40 @@ public:
         this->nxyz = this->nxy * this->nz;
         this->poolnproc = poolnproc_in;
         this->poolrank = poolrank_in;
+
+        int *ibox = new int[3];
+        ibox[0] = int((this->nx-1)/2)+1;
+        ibox[1] = int((this->nx-1)/2)+1;
+        ibox[2] = int((this->nx-1)/2)+1;
+        this->gridecut_lat = 1e20;
+        int count = 0;
+        for(int igz = -ibox[2]; igz <= ibox[2]; ++igz)
+        {
+            for(int igy = -ibox[1]; igy <= ibox[1]; ++igy)
+            {
+                for(int igx = -ibox[0]; igx <= ibox[0]; ++igx)
+                {
+                    ++count;
+                    if(count%this->poolnproc != this->poolrank) continue;
+                    if(abs(igx)<=ibox[0]-1 && abs(igy)<=ibox[1]-1 && abs(igz)<=ibox[2]-1 ) continue;
+                    ModuleBase::Vector3<double> f;
+                    f.x = igx;
+                    f.y = igy;
+                    f.z = igz;
+                    double modulus = f * (this->GGT * f);
+                    if(modulus < this->gridecut_lat)
+                    {
+                        this->gridecut_lat = modulus;
+                    }
+                }
+            }
+        }
+#ifdef __MPI
+        MPI_Allreduce(MPI_IN_PLACE, &this->gridecut_lat, 1, MPI_DOUBLE, MPI_MIN , POOL_WORLD);
+#endif
+        this->gridecut_lat -= 1e-6;
+
+        delete[] ibox;
 
         return;
     }

@@ -241,7 +241,6 @@ void PW_Basis::divide_sticks_1(
         // find the ip of core containing the least planewaves.
         for (int ip = 0; ip < this->poolnproc; ++ip)
         {
-            //const int non_zero_grid = nst_per[ip] * this->nz;       // number of reciprocal planewaves on this core.
             const int npwmin = this->npw_per[ipmin];
             const int npw_ip = this->npw_per[ip];
             const int nstmin = nst_per[ipmin];
@@ -249,25 +248,16 @@ void PW_Basis::divide_sticks_1(
 
             if (npw_ip == 0)
             {
-                // if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
-                // {
-                    ipmin = ip;
-                    break;
-                // }
+                ipmin = ip;
+                break;
             }
             else if (npw_ip < npwmin)
             {
-                // if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
-                // {
-                    ipmin = ip;
-                // }
+                ipmin = ip;
             }
             else if (npw_ip == npwmin && nst_ip < nstmin)
             {
-                // if (non_zero_grid + nz < this->nrxx)
-                // {
-                    ipmin = ip;
-                // }
+                ipmin = ip;
             }
         }
         this->nst_per[ipmin]++;

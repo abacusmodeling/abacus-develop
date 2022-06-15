@@ -35,24 +35,24 @@ void PW_Basis:: initgrids(
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
     //-----------------------------------------------------------
-    const double gridecut_lat = gridecut / this->tpiba2;
+    this->gridecut_lat = gridecut / this->tpiba2;
     ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];// ibox[i] are the minimal FFT dimensions,
     
     lat.x = latvec.e11;
     lat.y = latvec.e12;
     lat.z = latvec.e13;
-    ibox[0] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
+    ibox[0] = int(sqrt(this->gridecut_lat) * sqrt(lat * lat)) + 1;
 
     lat.x = latvec.e21;
     lat.y = latvec.e22;
     lat.z = latvec.e23;
-    ibox[1] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
+    ibox[1] = int(sqrt(this->gridecut_lat) * sqrt(lat * lat)) + 1;
 
     lat.x = latvec.e31;
     lat.y = latvec.e32;
     lat.z = latvec.e33;
-    ibox[2] = int(sqrt(gridecut_lat) * sqrt(lat * lat)) + 1;
+    ibox[2] = int(sqrt(this->gridecut_lat) * sqrt(lat * lat)) + 1;
     
     int n1,n2,n3; 
     n1 = n2 = n3 = 0;
@@ -67,7 +67,7 @@ void PW_Basis:: initgrids(
                 f.y = igy;
                 f.z = igz;
                 double modulus = f * (this->GGT * f);
-                if(modulus <= gridecut_lat)
+                if(modulus <= this->gridecut_lat)
                 {
                     if(n1 < abs(igx)) n1 = abs(igx);
                     if(n2 < abs(igy)) n2 = abs(igy);
@@ -168,6 +168,39 @@ void PW_Basis:: initgrids(
     this->poolnproc = poolnproc_in;
     this->poolrank = poolrank_in;
 
+    int *ibox = new int[3];
+    ibox[0] = int((this->nx-1)/2)+1;
+    ibox[1] = int((this->nx-1)/2)+1;
+    ibox[2] = int((this->nx-1)/2)+1;
+    this->gridecut_lat = 1e20;
+    int count = 0;
+    for(int igz = -ibox[2]; igz <= ibox[2]; ++igz)
+    {
+        for(int igy = -ibox[1]; igy <= ibox[1]; ++igy)
+        {
+            for(int igx = -ibox[0]; igx <= ibox[0]; ++igx)
+            {
+                ++count;
+                if(count%this->poolnproc != this->poolrank) continue;
+                if(abs(igx)<=ibox[0]-1 && abs(igy)<=ibox[1]-1 && abs(igz)<=ibox[2]-1 ) continue;
+                ModuleBase::Vector3<double> f;
+                f.x = igx;
+                f.y = igy;
+                f.z = igz;
+                double modulus = f * (this->GGT * f);
+                if(modulus < this->gridecut_lat)
+                {
+                    this->gridecut_lat = modulus;
+                }
+            }
+        }
+    }
+#ifdef __MPI
+    MPI_Allreduce(MPI_IN_PLACE, &this->gridecut_lat, 1, MPI_DOUBLE, MPI_MIN , POOL_WORLD);
+#endif
+    this->gridecut_lat -= 1e-6;
+
+    delete[] ibox;
     return;
 }
 
@@ -190,6 +223,11 @@ void PW_Basis:: initparameters(
     this->fftnxyz = this->fftnxy * this->fftnz;
 
     this->ggecut = pwecut_in / this->tpiba2;
+    //ggecut should be no larger than gridecut
+    if(this->ggecut > this->gridecut_lat) 
+    {
+        this->ggecut = this->gridecut_lat;
+    }
     this->distribution_type = distribution_type_in;
 }
 

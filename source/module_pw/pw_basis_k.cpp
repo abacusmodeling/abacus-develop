@@ -41,6 +41,11 @@ void PW_Basis_K:: initparameters(
     // MPI_Allreduce(MPI_IN_PLACE, &kmaxmod, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
     this->gk_ecut = gk_ecut_in/this->tpiba2;
     this->ggecut = pow(sqrt(this->gk_ecut) + kmaxmod, 2);
+    if(this->ggecut > this->gridecut_lat)
+    {
+        this->ggecut = this->gridecut_lat;
+        this->gk_ecut = pow(sqrt(this->ggecut) - kmaxmod ,2);
+    }
 
     this->gamma_only = gamma_only_in;
     if(kmaxmod > 0)     this->gamma_only = false; //if it is not the gamma point, we do not use gamma_only
