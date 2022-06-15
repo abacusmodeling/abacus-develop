@@ -715,19 +715,6 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
             &ModuleBase::ZERO,
             becp.c,
             &nkb);
-        /*for (int ib=0; ib<GlobalV::NBANDS; ib++)
-        {
-            for (int i=0;i<nkb;i++)
-            {
-                const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
-                const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
-                std::complex<double>* pbecp = &becp(i,ib);
-                for (int ig=0; ig<nbasis; ig++)
-                {
-                    pbecp[0] += ppsi[ig] * conj( pvkb[ig] );
-                }
-            }
-        }*/
         Parallel_Reduce::reduce_complex_double_pool( becp.c, becp.size);
 
         //out.printcm_real("becp",becp,1.0e-4);
@@ -738,53 +725,38 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
         {
 			for (int i = 0;i < nkb;i++)
 			{
+                std::complex<double>* pvkb1 = &vkb1(i,0);
+                std::complex<double>* pvkb = &GlobalC::ppcell.vkb(i,0);
 				if (ipol==0)
 				{
 					for (int ig=0; ig<nbasis; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[0];
+                        pvkb1[ig] = pvkb[ig] * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[0];
                 }
 				if (ipol==1)
 				{
 					for (int ig=0; ig<nbasis; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[1];
+                        pvkb1[ig] = pvkb[ig] * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[1];
                 }
 				if (ipol==2)
 				{
 					for (int ig=0; ig<nbasis; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[2];
+                        pvkb1[ig] = pvkb[ig] * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[2];
                 }
 			}
             std::complex<double>* pdbecp = &dbecp(ipol, 0, 0);
             zgemm_(&transa,
-            &transb,
-            &nkb,
-            &npm,
-            &nbasis,
-            &ModuleBase::ONE,
-            vkb1.c,
-            &GlobalC::wf.npwx,
-            psi_in[0].get_pointer(),
-            &GlobalC::wf.npwx,
-            &ModuleBase::ZERO,
-            pdbecp,
-            &nkb);
-            /*for (int ib=0; ib<GlobalV::NBANDS; ib++)
-            {
-                ///
-                ///only occupied band should be calculated.
-                ///
-                if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
-                for (int i=0; i<nkb; i++)
-                {
-                    const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
-                    const std::complex<double>* pvkb1 = &(vkb1(i, 0));
-                    std::complex<double>* pdbecp = &dbecp(ipol, ib, i);
-                    for (int ig=0; ig<nbasis; ig++)
-                    {
-                        pdbecp[0] += conj( pvkb1[ig] ) * ppsi[ig] ;
-                    }
-                }
-            }*/
+                &transb,
+                &nkb,
+                &npm,
+                &nbasis,
+                &ModuleBase::ONE,
+                vkb1.c,
+                &GlobalC::wf.npwx,
+                psi_in[0].get_pointer(),
+                &GlobalC::wf.npwx,
+                &ModuleBase::ZERO,
+                pdbecp,
+                &nkb);
         }// end ipol
 
 //		don't need to reduce here, keep dbecp different in each processor,
