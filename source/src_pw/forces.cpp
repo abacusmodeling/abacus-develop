@@ -668,8 +668,8 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ModuleBase::ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
-    ModuleBase::ComplexMatrix becp( nkb, GlobalV::NBANDS);
+	ModuleBase::ComplexArray dbecp( 3, GlobalV::NBANDS, nkb);
+    ModuleBase::ComplexMatrix becp( GlobalV::NBANDS, nkb);
     
 	
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
@@ -690,18 +690,44 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 		// vkb: Beta(nkb,npw)
 		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
         becp.zero_out();
-        for (int ib=0; ib<GlobalV::NBANDS; ib++)
+        psi_in[0].fix_k(ik);
+        char transa = 'C';
+        char transb = 'N';
+        ///
+        ///only occupied band should be calculated.
+        ///
+        int nbands_occ = GlobalV::NBANDS;
+        while(GlobalC::wf.wg(ik, nbands_occ-1) < ModuleBase::threshold_wg)
+        {
+            nbands_occ--;
+        }
+        int npm = GlobalV::NPOL * nbands_occ;
+        zgemm_(&transa,
+            &transb,
+            &nkb,
+            &npm,
+            &nbasis,
+            &ModuleBase::ONE,
+            GlobalC::ppcell.vkb.c,
+            &GlobalC::wf.npwx,
+            psi_in[0].get_pointer(),
+            &GlobalC::wf.npwx,
+            &ModuleBase::ZERO,
+            becp.c,
+            &nkb);
+        /*for (int ib=0; ib<GlobalV::NBANDS; ib++)
         {
             for (int i=0;i<nkb;i++)
             {
                 const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
                 const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
+                std::complex<double>* pbecp = &becp(i,ib);
                 for (int ig=0; ig<nbasis; ig++)
                 {
-                    becp(i,ib) += ppsi[ig] * conj( pvkb[ig] );
+                    pbecp[0] += ppsi[ig] * conj( pvkb[ig] );
                 }
             }
-        }
+        }*/
         Parallel_Reduce::reduce_complex_double_pool( becp.c, becp.size);
 
         //out.printcm_real("becp",becp,1.0e-4);
@@ -728,7 +754,21 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
                         vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[2];
                 }
 			}
-            for (int ib=0; ib<GlobalV::NBANDS; ib++)
+            std::complex<double>* pdbecp = &dbecp(ipol, 0, 0);
+            zgemm_(&transa,
+            &transb,
+            &nkb,
+            &npm,
+            &nbasis,
+            &ModuleBase::ONE,
+            vkb1.c,
+            &GlobalC::wf.npwx,
+            psi_in[0].get_pointer(),
+            &GlobalC::wf.npwx,
+            &ModuleBase::ZERO,
+            pdbecp,
+            &nkb);
+            /*for (int ib=0; ib<GlobalV::NBANDS; ib++)
             {
                 ///
                 ///only occupied band should be calculated.
@@ -738,12 +778,13 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
                 {
                     const std::complex<double>* ppsi = &(psi_in[0](ik, ib, 0));
                     const std::complex<double>* pvkb1 = &(vkb1(i, 0));
+                    std::complex<double>* pdbecp = &dbecp(ipol, ib, i);
                     for (int ig=0; ig<nbasis; ig++)
                     {
-                        dbecp(i,ib, ipol) += conj( pvkb1[ig] ) * ppsi[ig] ;
+                        pdbecp[0] += conj( pvkb1[ig] ) * ppsi[ig] ;
                     }
                 }
-            }
+            }*/
         }// end ipol
 
 //		don't need to reduce here, keep dbecp different in each processor,
@@ -752,12 +793,8 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 
 //		double *cf = new double[GlobalC::ucell.nat*3];
 //		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
-		for (int ib=0; ib<GlobalV::NBANDS; ib++)
+		for (int ib=0; ib<nbands_occ; ib++)
 		{
-            ///
-			///only occupied band should be calculated.
-			///
-            if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
         	int iat = 0;
         	int sum = 0;
@@ -774,7 +811,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 
 						for (int ipol=0; ipol<3; ipol++)
 						{
-							const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( inkb, ib) ).real();
+							const double dbb = ( conj( dbecp( ipol, ib, inkb) ) * becp( ib, inkb) ).real();
 							forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
 							//cf[iat*3+ipol] += ps * fac * dbb;
 						}
@@ -796,8 +833,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 
 							for (int ipol=0; ipol<3; ipol++)
 							{
-								const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib)
-										+ dbecp( jnkb, ib, ipol) * conj(becp( inkb, ib) ) ).real();
+								const double dbb = 2.0 * ( conj( dbecp( ipol, ib, inkb) ) * becp( ib, jnkb) ).real();
 								//const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib) ).real();
 								forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
 								//cf[iat*3+ipol] += ps * fac * dbb;

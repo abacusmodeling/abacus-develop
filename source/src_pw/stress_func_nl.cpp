@@ -26,8 +26,8 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 	}
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ModuleBase::ComplexMatrix dbecp( nkb, GlobalV::NBANDS);
-	ModuleBase::ComplexMatrix becp( nkb, GlobalV::NBANDS);
+	ModuleBase::ComplexMatrix dbecp( GlobalV::NBANDS, nkb );
+	ModuleBase::ComplexMatrix becp( GlobalV::NBANDS, nkb );
 
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
 	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
@@ -52,7 +52,40 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
         ModuleBase::timer::tick("Stress", "cal_becp");
         becp.zero_out();
-		for (int ib=0; ib<GlobalV::NBANDS; ib++)
+		const std::complex<double>* ppsi=nullptr;
+		if(psi_in!=nullptr)
+		{
+			ppsi = &(psi_in[0](ik, 0, 0));
+		}
+		else
+		{
+			ppsi = &(GlobalC::wf.evc[ik](0, 0));
+		}
+		char transa = 'C';
+        char transb = 'N';
+        ///
+        ///only occupied band should be calculated.
+        ///
+        int nbands_occ = GlobalV::NBANDS;
+        while(GlobalC::wf.wg(ik, nbands_occ-1) < ModuleBase::threshold_wg)
+        {
+            nbands_occ--;
+        }
+        int npm = GlobalV::NPOL * nbands_occ;
+        zgemm_(&transa,
+            &transb,
+            &nkb,
+            &npm,
+            &GlobalC::wf.npw,
+            &ModuleBase::ONE,
+            GlobalC::ppcell.vkb.c,
+            &GlobalC::wf.npwx,
+            ppsi,
+            &GlobalC::wf.npwx,
+            &ModuleBase::ZERO,
+            becp.c,
+            &nkb);
+		/*for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			///
 			///only occupied band should be calculated.
@@ -75,7 +108,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
                     becp(i, ib) += ppsi[ig] * conj(pvkb[ig]);
                 }
             }
-        }
+        }*/
         ModuleBase::timer::tick("Stress", "cal_becp");
 		//becp calculate is over , now we should broadcast this data.
         ModuleBase::timer::tick("Stress", "reduce_complex_double_pool");
@@ -121,16 +154,16 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 				}//end nkb
 				ModuleBase::timer::tick("Stress", "get_vkb1");
 				ModuleBase::timer::tick("Stress", "dbecp_noevc");
-				ModuleBase::ComplexMatrix dbecp_noevc(nkb, GlobalC::wf.npw);
+				ModuleBase::ComplexMatrix dbecp_noevc(nkb, GlobalC::wf.npwx);
 				for (int i = 0; i < nkb; i++) 
 				{
 					for (int ig = 0; ig < GlobalC::wf.npw;ig++) 
 					{
 						// first term
-						dbecp_noevc(i, ig) -= 2.0 * conj(vkb1(i, ig));
+						dbecp_noevc(i, ig) -= 2.0 * vkb1(i, ig);
 						// second termi
 						if (ipol == jpol)
-							dbecp_noevc(i, ig) -= conj( GlobalC::ppcell.vkb(i, ig));
+							dbecp_noevc(i, ig) -=  GlobalC::ppcell.vkb(i, ig);
 						// third term
 						qvec =	GlobalC::wf.get_1qvec_cartesian(ik,ig);
 						qvec0[0] = qvec.x;
@@ -139,14 +172,27 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 						double qm1;
 						if(qvec.norm2() > 1e-16) qm1 = 1.0 / qvec.norm(); 
 						else qm1 = 0; 
-						dbecp_noevc(i,ig)	-= 2.0 * conj(vkb2(i,ig)) * qvec0[ipol] * 
+						dbecp_noevc(i,ig)	-= 2.0 * vkb2(i,ig) * qvec0[ipol] * 
 							qvec0[jpol] * qm1 *	GlobalC::ucell.tpiba;
 					} // end ig
 				}     // end i
 				ModuleBase::timer::tick("Stress", "dbecp_noevc");
 
 				ModuleBase::timer::tick("Stress", "get_dbecp");
-				for (int ib=0; ib<GlobalV::NBANDS; ib++)
+				zgemm_(&transa,
+					&transb,
+					&nkb,
+					&npm,
+					&GlobalC::wf.npw,
+					&ModuleBase::ONE,
+					dbecp_noevc.c,
+					&GlobalC::wf.npwx,
+					ppsi,
+					&GlobalC::wf.npwx,
+					&ModuleBase::ZERO,
+					dbecp.c,
+					&nkb);
+				/*for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
 					///
 					///only occupied band should be calculated.
@@ -170,7 +216,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 							dbecp(i,ib) += ppsi[ig] * pdbecp_noevc[ig];
 						}//end ig
 					}//end i
-				}//end ib
+				}//end ib*/
                 ModuleBase::timer::tick("Stress", "get_dbecp");
 
 				//              don't need to reduce here, keep
@@ -185,7 +231,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 				//              ModuleBase::GlobalFunc::ZEROS(cf,
 				//              GlobalC::ucell.nat);
 				ModuleBase::timer::tick("Stress", "get_final_step");
-				for (int ib=0; ib<GlobalV::NBANDS; ib++)
+				for (int ib=0; ib<nbands_occ; ib++)
 				{
 					///
 					///only occupied band should be calculated.
@@ -206,7 +252,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 								//out<<"\n ps = "<<ps;
 
 							 
-								const double dbb = ( conj( dbecp( inkb, ib) ) * becp( inkb, ib) ).real();
+								const double dbb = ( conj( dbecp( ib, inkb) ) * becp( ib, inkb) ).real();
 								sigmanlc[ipol][ jpol] -= ps * fac * dbb;
 							 
 							}//end ip
