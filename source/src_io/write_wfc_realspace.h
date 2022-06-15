@@ -11,6 +11,7 @@
 #include <vector>
 #include <complex>
 #include <string>
+#include "module_psi/psi.h"
 
 #ifdef __MPI
 #include "mpi.h"
@@ -21,11 +22,11 @@ namespace Write_Wfc_Realspace
 	// write ||wfc_r|| for all k-points and all bands
 	// Input: wfc_g[ik](ib,ig)
 	// loop order is for(z){for(y){for(x)}}
-    void write_wfc_realspace_1(const ModuleBase::ComplexMatrix*const wfc_g, const std::string &folder_name, const bool& square);
+    void write_wfc_realspace_1(const psi::Psi<std::complex<double>> &wfc_g, const std::string &folder_name, const bool& square);
 
 	// Input: wfc_g(ib,ig)
 	// Output: wfc_r[ir]
-    std::vector<std::complex<double>> cal_wfc_r(const ModuleBase::ComplexMatrix &wfc_g, const int ik, const int ib);
+    std::vector<std::complex<double>> cal_wfc_r(const psi::Psi<std::complex<double>> &wfc_g, const int ik, const int ib);
 
 	// Input: chg_r[ir]
 #ifdef __MPI

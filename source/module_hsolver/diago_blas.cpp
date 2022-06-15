@@ -23,6 +23,7 @@ namespace hsolver
 
 void DiagoBlas::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eigenvalue_in)
 {
+    ModuleBase::TITLE("DiagoElpa", "diag");
     matd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
     assert(h_mat.col == s_mat.col && h_mat.row == s_mat.row && h_mat.desc == s_mat.desc);
@@ -34,6 +35,7 @@ void DiagoBlas::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eige
 
 void DiagoBlas::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, double *eigenvalue_in)
 {
+    ModuleBase::TITLE("DiagoElpa", "diag");
     matcd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
     assert(h_mat.col == s_mat.col && h_mat.row == s_mat.row && h_mat.desc == s_mat.desc);

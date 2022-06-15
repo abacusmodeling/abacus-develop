@@ -80,7 +80,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 				ModuleBase::WARNING_QUIT("write_rho","check nspin!");
 			}
 		}
-		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
+		ofs << "\n  " << GlobalC::rhopw->nx << " " << GlobalC::rhopw->ny << " " << GlobalC::rhopw->nz << std::endl;
 
 		ofs << std::setprecision(precision);
 		ofs << scientific;
@@ -88,24 +88,24 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 
 #ifndef __MPI
 	double dipole_elec_x=0.0, dipole_elec_y=0.0, dipole_elec_z=0.0;
-	//std::cout << "GlobalC::pw.nrxx: " << GlobalC::pw.nrxx <<std::endl;
-	//std::cout << "GlobalC::pw.ncxyz: " << GlobalC::pw.ncxyz <<std::endl;
-	//std::cout << "GlobalC::pw.ncx: " << GlobalC::pw.ncx <<std::endl;
-	for(int k=0; k<GlobalC::pw.ncz; k++)
+	//std::cout << "GlobalC::rhopw->nrxx: " << GlobalC::rhopw->nrxx <<std::endl;
+	//std::cout << "GlobalC::rhopw->nxyz: " << GlobalC::rhopw->nxyz <<std::endl;
+	//std::cout << "GlobalC::rhopw->nx: " << GlobalC::rhopw->nx <<std::endl;
+	for(int k=0; k<GlobalC::rhopw->nz; k++)
 	{
-		for(int j=0; j<GlobalC::pw.ncy; j++)
+		for(int j=0; j<GlobalC::rhopw->ny; j++)
 		{
-			for(int i=0; i<GlobalC::pw.ncx; i++)
+			for(int i=0; i<GlobalC::rhopw->nx; i++)
 			{
-				dipole_elec_x += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*i*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;
-				dipole_elec_y += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*j*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;
-				dipole_elec_z += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*k*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;
+				dipole_elec_x += rho_save[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k]*i*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nx;
+				dipole_elec_y += rho_save[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k]*j*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->ny;
+				dipole_elec_z += rho_save[i*GlobalC::rhopw->ny*GlobalC::rhopw->nz + j*GlobalC::rhopw->nz + k]*k*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nz;
 			}
 		}
 	}
-	dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-	dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-	dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+	dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
+	dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
+	dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
 	Parallel_Reduce::reduce_double_pool( dipole_elec_x );
 	Parallel_Reduce::reduce_double_pool( dipole_elec_y );
 	Parallel_Reduce::reduce_double_pool( dipole_elec_z );
@@ -119,11 +119,11 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		<< "dipole_elec_z: " << dipole_elec_z;
 #else
 	double dipole_elec_x=0.0, dipole_elec_y=0.0, dipole_elec_z=0.0;
-	//std::cout << "GlobalC::pw.nrxx: " << GlobalC::pw.nrxx <<std::endl;
-	//std::cout << "GlobalC::pw.ncxyz: " << GlobalC::pw.ncxyz <<std::endl;
+	//std::cout << "GlobalC::rhopw->nrxx: " << GlobalC::rhopw->nrxx <<std::endl;
+	//std::cout << "GlobalC::rhopw->nxyz: " << GlobalC::rhopw->nxyz <<std::endl;
 	//std::cout << "GlobalC::ucell.omega: " << GlobalC::ucell.omega <<std::endl;
 
-//	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
+//	for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++) chr.rho[0][ir]=1; // for testing
 //	GlobalV::ofs_running << "\n GlobalV::RANK_IN_POOL = " << GlobalV::RANK_IN_POOL;
 	
 	// only do in the first pool.
@@ -132,10 +132,10 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		// num_z: how many planes on processor 'ip'
     	int *num_z = new int[GlobalV::NPROC_IN_POOL];
     	ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-    	for (int iz=0;iz<GlobalC::pw.nbz;iz++)
+    	for (int iz=0;iz<GlobalC::bigpw->nbz;iz++)
     	{
         	int ip = iz % GlobalV::NPROC_IN_POOL;
-        	num_z[ip] += GlobalC::pw.bz;
+        	num_z[ip] += GlobalC::bigpw->bz;
     	}	
 
 		// start_z: start position of z in 
@@ -148,9 +148,9 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
     	}	
 
 		// which_ip: found iz belongs to which ip.
-		int *which_ip = new int[GlobalC::pw.ncz];
-		ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
-		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+		int *which_ip = new int[GlobalC::rhopw->nz];
+		ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::rhopw->nz);
+		for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 		{
 			for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
 			{
@@ -169,11 +169,11 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		}
 		
 		//int count=0;
-		int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+		int nxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
 		double* zpiece = new double[nxy];
 
 		// save the rho one z by one z.
-		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+		for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 		{
 			//	std::cout << "\n iz=" << iz << std::endl;
 			// tag must be different for different iz.
@@ -189,8 +189,8 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 					// mohan change to rho_save on 2012-02-10
 					// because this can make our next restart calculation lead
 					// to the same scf_thr as the one saved.
-					zpiece[ir] = rho_save[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
-					//GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
+					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current];
+					//GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
 				}
 			}
 			// case 2: > first part rho: send the rho to 
@@ -200,8 +200,8 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 				for(int ir=0; ir<nxy; ir++)
 				{
 					//zpiece[ir] = rho[is][ir*num_z[GlobalV::RANK_IN_POOL]+iz];
-					zpiece[ir] = rho_save[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
-					//GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
+					zpiece[ir] = rho_save[ir*GlobalC::rhopw->nplane+iz-GlobalC::rhopw->startz_current];
+					//GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::rhopw->nplane+iz=" << ir*GlobalC::rhopw->nplane+iz;
 				}
 				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
 			}
@@ -219,27 +219,27 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 			{
 				//	ofs << "\niz=" << iz;
 				// mohan update 2011-03-30
-				for(int iy=0; iy<GlobalC::pw.ncy; iy++)
+				for(int iy=0; iy<GlobalC::rhopw->ny; iy++)
 				{
-					for(int ix=0; ix<GlobalC::pw.ncx; ix++)
+					for(int ix=0; ix<GlobalC::rhopw->nx; ix++)
 					{
 /*
-						if(ix<GlobalC::pw.ncx/2)
-							{dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*ix*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;}
+						if(ix<GlobalC::rhopw->nx/2)
+							{dipole_elec_x += zpiece[ix*GlobalC::rhopw->ny+iy]*ix*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nx;}
 						else
-							{dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*(ix-GlobalC::pw.ncx)*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;}
-						if(iy<GlobalC::pw.ncy/2)
-							{dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*iy*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;}
+							{dipole_elec_x += zpiece[ix*GlobalC::rhopw->ny+iy]*(ix-GlobalC::rhopw->nx)*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nx;}
+						if(iy<GlobalC::rhopw->ny/2)
+							{dipole_elec_y += zpiece[ix*GlobalC::rhopw->ny+iy]*iy*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->ny;}
 						else
-							{dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*(iy-GlobalC::pw.ncy)*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;}
-						if(iz<GlobalC::pw.ncz/2)
-							{dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*iz*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;}
+							{dipole_elec_y += zpiece[ix*GlobalC::rhopw->ny+iy]*(iy-GlobalC::rhopw->ny)*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->ny;}
+						if(iz<GlobalC::rhopw->nz/2)
+							{dipole_elec_z += zpiece[ix*GlobalC::rhopw->ny+iy]*iz*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nz;}
 						else
-							{dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*(iz-GlobalC::pw.ncz)*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;}
+							{dipole_elec_z += zpiece[ix*GlobalC::rhopw->ny+iy]*(iz-GlobalC::rhopw->nz)*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nz;}
 */
-						dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*ix*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;
-						dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*iy*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;
-						dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*iz*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;
+						dipole_elec_x += zpiece[ix*GlobalC::rhopw->ny+iy]*ix*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nx;
+						dipole_elec_y += zpiece[ix*GlobalC::rhopw->ny+iy]*iy*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->ny;
+						dipole_elec_z += zpiece[ix*GlobalC::rhopw->ny+iy]*iz*GlobalC::ucell.lat0*0.529177/GlobalC::rhopw->nz;
 
 					}
 				}
@@ -248,9 +248,9 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 
 		delete[] zpiece;
 
-		dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-		dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-		dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+		dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
+		dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
+		dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
 		//std::cout << std::setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<std::endl;
 		//std::cout << std::setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<std::endl;
 		//std::cout << std::setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<std::endl;

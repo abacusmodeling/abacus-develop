@@ -16,7 +16,7 @@
 #else
 #include "src_pw/hamilt_pw.h"
 #endif
-#include "src_pw/pw_basis.h"
+#include "src_pw/structure_factor.h"
 
 namespace hsolver
 {
@@ -34,8 +34,6 @@ class DiagoCG : public DiagH
 
     // this is the override function diag() for CG method
     void diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, double *eigenvalue_in) override;
-
-    static bool no_subspace;
 
   private:
     /// static variables, used for passing control variables

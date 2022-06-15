@@ -159,7 +159,7 @@ repo="$(realpath ..)/"
 if [ "$sanitize" == true ]; then
 	echo "Testing with Address Sanitizer..."
 	mkdir ../html
-	echo -e "# Address Sanitizer Diagnostics\n" > ../html/README.md
+	echo -e "# Address Sanitizer Diagnostics\n" >> ../html/README.md
 	report=$(realpath ../html/README.md)
 fi
 

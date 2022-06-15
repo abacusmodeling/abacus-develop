@@ -23,6 +23,9 @@ extern "C"
 
 #include "../src_external/src_test/test_function.h"
 
+#ifdef __CUSOLVER_LCAO
+#include "diag_cusolver.cuh"
+#endif
 
 #ifdef __MPI
 inline int set_elpahandle(elpa_t &handle, const int *desc,const int local_nrows,const int local_ncols, const int nbands)
@@ -64,6 +67,62 @@ inline bool ifElpaHandle(const bool& newIteration, const bool& ifNSCF)
 	if(ifNSCF) doHandle = true;
 	return doHandle;
 }
+
+#ifdef __CUSOLVER_LCAO
+template <typename T>
+void cusolver_helper_gather(const T* mat_loc, T* mat_glb, const Parallel_Orbitals* pv){
+	int rank = 0;
+    MPI_Comm_rank(pv->comm_2D, &rank);
+
+	int maxncol;
+	MPI_Allreduce(&pv->ncol, &maxncol, 1, MPI_INT, MPI_MAX, pv->comm_2D);
+
+    MPI_Datatype datatype = std::is_same<T, double>::value ? MPI_DOUBLE : MPI_DOUBLE_COMPLEX;
+	for(int i = 0; i < maxncol - 1; i++)
+    {
+		MPI_Gather(mat_loc + i*pv->nrow, pv->nrow, datatype,
+                   mat_glb + i * pv->dim1 * pv->nrow, pv->nrow,
+                   datatype, 0, pv->comm_2D);
+	}
+
+	int displs[pv->dim1], rcounts[pv->dim1];
+	for (int j = 0; j < pv->dim1; j++ )
+	{
+        if (GlobalV::NLOCAL % pv->dim1 && j >= GlobalV::NLOCAL % pv->dim1)
+        {
+            rcounts[j] = 0;
+            displs[j] = (GlobalV::NLOCAL % pv->dim1 ) * pv->nrow;
+        } else {
+            rcounts[j] = pv->nrow;
+            displs[j] = j * pv->nrow ;
+        }
+	}
+	MPI_Gatherv(mat_loc + (maxncol - 1) * pv->nrow, rcounts[rank], datatype,
+                mat_glb + (maxncol - 1) * pv->dim1 * pv->nrow, rcounts, displs,
+                datatype, 0, pv->comm_2D);
+}
+
+template<typename T>
+void cusolver_helper_scatter(const T* mat_glb, T* mat_loc, const Parallel_Orbitals* pv){
+    int rank = 0;
+    MPI_Comm_rank(pv->comm_2D, &rank);
+    MPI_Status status;
+    MPI_Datatype datatype = std::is_same<T, double>::value ? MPI_DOUBLE : MPI_DOUBLE_COMPLEX;
+
+	if (rank == 0){
+		for (int i =0; i < GlobalV::NLOCAL; i++){
+			if ((i % pv->dim1) == 0) continue;
+			MPI_Send(mat_glb + i*pv->nrow, pv->nrow, datatype, i%pv->dim1, i/pv->dim1, pv->comm_2D);
+		}
+		for (int i =0; i < GlobalV::NLOCAL; i+=pv->dim1)
+			memcpy(mat_loc + i/pv->dim1*pv->nrow, mat_glb + i*pv->nrow, pv->nrow*sizeof(T));
+	} else {
+		for (int i = 0; i < pv->ncol; i++)
+			MPI_Recv(mat_loc + i*pv->nrow, pv->nrow, datatype, 0, i, pv->comm_2D, &status);
+	}
+}
+#endif
+
 
 int Pdiag_Double::out_mat_hs = 0;
 int Pdiag_Double::out_mat_hsR = 0;
@@ -186,51 +245,6 @@ void Pdiag_Double::diago_double_begin(
         ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
         //delete[] Z; //LiuXh 20171109
 	}// HPSEPS method
-    else if(GlobalV::KS_SOLVER=="genelpa")
-    {
-        double *eigen = new double[GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
-
-        long maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
-        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
-        lowf.wfc_gamma[ik].create(pv->ncol, pv->nrow);			// Fortran order
-        
-        static elpa_t handle;
-        static bool has_set_elpa_handle = false;
-        if(! has_set_elpa_handle)
-        {
-            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol, GlobalV::NBANDS);
-            has_set_elpa_handle = true;
-        }
-
-        int is_already_decomposed;
-        if(ifElpaHandle(GlobalC::CHR.get_new_e_iteration(), (GlobalV::CALCULATION=="nscf")))
-        {
-            ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
-            BlasConnector::copy(pv->nloc, s_mat, inc, Stmp, inc);
-            is_already_decomposed=0;
-            ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
-        }
-        else
-        {
-            is_already_decomposed=1;
-        }
-
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
-        int elpa_error;
-        elpa_generalized_eigenvectors_d(handle, h_mat, Stmp, eigen, lowf.wfc_gamma[ik].c, is_already_decomposed, &elpa_error);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix", "elpa_solve");
-
-    	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
-        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
-        delete[] eigen;
-	    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
-
-        double** wfc_grid = nullptr;    //output but not do "2d-to-grid" conversion
-        lowf.wfc_2d_to_grid(this->out_wfc_lcao, lowf.wfc_gamma[ik].c, wfc_grid);
-        
-    } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="lapack_gv")
 	{
 		lowf.wfc_gamma[ik].create(pv->ncol_bands, pv->nrow, false);
@@ -305,15 +319,58 @@ void Pdiag_Double::diago_double_begin(
 		}
 
 	}
-	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
-	{
-        double *eigen = new double[GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
-		diag_scalapack_gvx.pdsygvx_diag(pv->desc, pv->ncol, pv->nrow, h_mat, s_mat, eigen, lowf.wfc_gamma[ik]);		// Peize Lin add 2021.11.02
-        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
-        delete[] eigen;
-	}
     //delete[] Stmp; //LiuXh 20171109
+#ifdef __CUSOLVER_LCAO
+	else if(GlobalV::KS_SOLVER=="cusolver")
+	{
+		int rank;
+		MPI_Comm_rank(pv->comm_2D, &rank);
+
+        lowf.wfc_gamma[ik].create(pv->ncol, pv->nrow);			// Fortran order
+		std::vector<double> ekb_tmp(GlobalV::NLOCAL,0);
+
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_HS");
+		double *htot, *stot, *vtot;
+		vtot = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
+		ModuleBase::Memory::record("Pdiag_Basic","vtot",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
+		if(rank==0)    // htot  NLOCAL * NLOCAL
+		{
+			htot = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
+			ModuleBase::Memory::record("Pdiag_Basic","htot",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
+
+			stot = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
+			ModuleBase::Memory::record("Pdiag_Basic","stot",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
+		}
+		cusolver_helper_gather<double>(h_mat, htot, pv);
+		cusolver_helper_gather<double>(s_mat, stot, pv);
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_HS");
+
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","cusolver_gvd_solve");
+		if (rank == 0){
+            static Diag_Cusolver_gvd* diag_cusolver_gvd = new Diag_Cusolver_gvd();
+			diag_cusolver_gvd->Dngvd_double(GlobalV::NLOCAL, GlobalV::NLOCAL, htot, stot, ekb_tmp.data(), vtot);
+		}
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","cusolver_gvd_solve");
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by cusolver");
+
+		if (rank == 0)	memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
+		MPI_Bcast(ekb, GlobalV::NBANDS, MPI_DOUBLE, 0, pv->comm_2D);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
+
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","DIVIDE_EIG");
+		cusolver_helper_scatter<double>(vtot, lowf.wfc_gamma[ik].c, this->ParaV);
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","DIVIDE_EIG");
+
+		double** wfc_grid = nullptr;    //output but not do "2d-to-grid" conversion
+        lowf.wfc_2d_to_grid(this->out_wfc_lcao, lowf.wfc_gamma[ik].c, wfc_grid);
+
+		if (rank == 0){
+			delete[] htot;
+			delete[] stot;
+		}
+		delete[] vtot;
+	}
+#endif	//__CUSOLVER_LCAO
 #endif
 
 #ifdef TEST_DIAG
@@ -454,46 +511,55 @@ void Pdiag_Double::diago_complex_begin(
         //delete[] Z; //LiuXh 20180329, fix bug of 'double free()'
         //this->gath_full_eig_complex(DIAG_WORLD, GlobalV::NLOCAL, c, Z);
 	} // HPSEPS method
-    else if(GlobalV::KS_SOLVER=="genelpa")
-    {
-        double *eigen = new double[GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
-        lowf.wfc_k[ik].create(pv->ncol_bands, pv->nrow);            // Fortran order
-
-        static elpa_t handle;
-        static bool has_set_elpa_handle = false;
-        if(! has_set_elpa_handle)
-        {
-            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol, GlobalV::NBANDS);
-            has_set_elpa_handle = true;
-        }
-
-        BlasConnector::copy(pv->nloc, cs_mat, inc, Stmp, inc);
-
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
-        int elpa_derror;
-        elpa_generalized_eigenvectors_dc(handle, reinterpret_cast<double _Complex*>(ch_mat),
-                                         reinterpret_cast<double _Complex*>(Stmp),
-                                         eigen, reinterpret_cast<double _Complex*>(lowf.wfc_k[ik].c), 0, &elpa_derror);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
-
-        // the eigenvalues.
-        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
-        delete[] eigen;
-
-        lowf.wfc_2d_to_grid(this->out_wfc_lcao, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
-        
-    } // GenELPA method
-	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
+#ifdef __CUSOLVER_LCAO
+	else if(GlobalV::KS_SOLVER=="cusolver")
 	{
-        double *eigen = new double[GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
-		diag_scalapack_gvx.pzhegvx_diag(pv->desc, pv->ncol, pv->nrow, ch_mat, cs_mat, eigen, lowf.wfc_k[ik]);		// Peize Lin add 2021.11.02       
-        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
-        delete[] eigen;
-        lowf.wfc_2d_to_grid(this->out_wfc_lcao, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
+		int rank;
+		MPI_Comm_rank(pv->comm_2D, &rank);
+        lowf.wfc_k[ik].create(pv->ncol, pv->nrow);            // Fortran order
+		std::vector<double> ekb_tmp(GlobalV::NLOCAL,0);
 
-    }
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_HS");
+		std::complex<double> *htot, *stot, *vtot;
+		vtot = new std::complex<double>[GlobalV::NLOCAL * GlobalV::NLOCAL];
+		ModuleBase::Memory::record("Pdiag_Basic","vtot",GlobalV::NLOCAL*GlobalV::NLOCAL,"cdouble");
+		if(rank==0)    // htot  NLOCAL * NLOCAL
+		{
+			htot = new std::complex<double>[GlobalV::NLOCAL * GlobalV::NLOCAL];
+			ModuleBase::Memory::record("Pdiag_Basic","htot",GlobalV::NLOCAL*GlobalV::NLOCAL,"cdouble");
+
+			stot = new std::complex<double>[GlobalV::NLOCAL * GlobalV::NLOCAL];
+			ModuleBase::Memory::record("Pdiag_Basic","stot",GlobalV::NLOCAL*GlobalV::NLOCAL,"cdouble");
+		}
+		cusolver_helper_gather<std::complex<double> >(ch_mat, htot, pv);
+		cusolver_helper_gather<std::complex<double> >(cs_mat, stot, pv);
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_HS");
+
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","cusolver_gvd_solve");
+		if (rank == 0){
+            static Diag_Cusolver_gvd* diag_cusolver_gvd = new Diag_Cusolver_gvd();
+			diag_cusolver_gvd->Dngvd_complex(GlobalV::NLOCAL, GlobalV::NLOCAL, htot, stot, ekb_tmp.data(), vtot);
+		}
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","cusolver_gvd_solve");
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by cusolver");
+
+		if (rank == 0)	memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
+		MPI_Bcast(ekb, GlobalV::NBANDS, MPI_DOUBLE, 0, pv->comm_2D);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
+
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","DIVIDE_EIG");
+		cusolver_helper_scatter<std::complex<double> >(vtot, lowf.wfc_k[ik].c, pv);
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","DIVIDE_EIG");
+
+		lowf.wfc_2d_to_grid(this->out_wfc_lcao, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
+
+		if (rank == 0){
+			delete[] htot;
+			delete[] stot;
+		}
+		delete[] vtot;
+	}
+#endif	//__CUSOLVER_LCAO
 
 #endif
 	return;
@@ -646,11 +712,11 @@ void Pdiag_Double::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **c
 	// this is a bad position to output wave functions.
 	// but it works!
 	std::stringstream ss;
-	ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
+	ss << GlobalV::global_readin_dir << "LOWF_K_" << ik+1 << ".dat";
     if(this->out_wfc_lcao)
 	{
 //		std::cout << " write the wave functions" << std::endl;
-		WF_Local::write_lowf_complex( ss.str(), ctot, ik );//mohan add 2010-09-09        
+		WF_Local::write_lowf_complex( ss.str(), ctot, ik, GlobalC::wf.wg/*ekb*/, GlobalC::wf.wg );//mohan add 2010-09-09        
 	}
 
 	// mohan add 2010-09-10
@@ -1079,7 +1145,7 @@ MPI_Barrier(comm);
 		// mohan add 2012-04-03, because we need the occupations for the
 		// first iteration. 
 		Occupy::calculate_weights();
-		WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09        
+		WF_Local::write_lowf( ss.str(), ctot, GlobalC::wf.wg/*ekb*/, GlobalC::wf.wg );//mohan add 2010-09-09        
 	}
 
 	// mohan add 2010-09-10

@@ -16,7 +16,8 @@ add_library(
     math_polyint.cpp
     math_sphbes.cpp
     math_ylmreal.cpp
-	  math_bspline.cpp
+	math_bspline.cpp
+    math_chebyshev.cpp
     mathzone.cpp
     mathzone_add1.cpp
     matrix.cpp

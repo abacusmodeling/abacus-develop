@@ -5,7 +5,7 @@
 #include "global.h"
 
 //calculate the nonlocal pseudopotential stress in PW
-void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
+void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in)
 {
 	ModuleBase::TITLE("Stress_Func","stres_nl");
 	ModuleBase::timer::tick("Stress_Func","stres_nl");
@@ -60,9 +60,19 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 			if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 			for (int i = 0; i < nkb; i++) 
 			{
-                for (int ig = 0; ig < GlobalC::wf.npw; ig++) {
-                    becp(i, ib) += GlobalC::wf.evc[ik](ib, ig) *
-                                           conj(GlobalC::ppcell.vkb(i, ig));
+				const std::complex<double>* ppsi=nullptr;
+				if(psi_in!=nullptr)
+				{
+					ppsi = &(psi_in[0](ik, ib, 0));
+				}
+				else
+				{
+					ppsi = &(GlobalC::wf.evc[ik](ib, 0));
+				}
+				const std::complex<double>* pvkb = &(GlobalC::ppcell.vkb(i, 0));
+                for (int ig = 0; ig < GlobalC::wf.npw; ig++) 
+				{
+                    becp(i, ib) += ppsi[ig] * conj(pvkb[ig]);
                 }
             }
         }
@@ -144,10 +154,20 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 					if(GlobalC::wf.wg(ik, ib) < ModuleBase::threshold_wg) continue;
 					for (int i=0; i<nkb; i++)
 					{
+						const std::complex<double>* ppsi=nullptr;
+						if(psi_in!=nullptr)
+						{
+							ppsi = &(psi_in[0](ik, ib, 0));
+						}
+						else
+						{
+							ppsi = &(GlobalC::wf.evc[ik](ib, 0));
+						}
+						const std::complex<double>* pdbecp_noevc = &(dbecp_noevc(i, 0));
 						for (int ig=0; ig<GlobalC::wf.npw; ig++) 
 						{
 							//first term
-							dbecp(i,ib) += GlobalC::wf.evc[ik](ib ,ig) * dbecp_noevc(i, ig);
+							dbecp(i,ib) += ppsi[ig] * pdbecp_noevc[ig];
 						}//end ig
 					}//end i
 				}//end ib
@@ -207,7 +227,10 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 			{
 				sigmanlc[l][m] = sigmanlc[m][l];
 			}
-			Parallel_Reduce::reduce_double_all( sigmanlc[l][m] ); //qianrui fix a bug for kpar > 1
+			if(GlobalV::CALCULATION.substr(0,3)=="sto")
+				MPI_Allreduce(MPI_IN_PLACE , &sigmanlc[l][m] , 1, MPI_DOUBLE , MPI_SUM , STO_WORLD);
+			else
+				Parallel_Reduce::reduce_double_all( sigmanlc[l][m] ); //qianrui fix a bug for kpar > 1
 		}
 	}
 
@@ -317,7 +340,7 @@ void Stress_Func::get_dvnl1
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia,GlobalC::wfcpw);
 			for (ih = 0;ih < nh;ih++)
 			{
 				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
@@ -403,7 +426,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia,GlobalC::wfcpw);
 			for (ih = 0;ih < nh;ih++)
 			{
 				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?

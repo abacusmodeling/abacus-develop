@@ -13,30 +13,27 @@ public:
 	Parallel_PW();
 	~Parallel_PW();
 
-	void init(
-		const double &gcut_in,
-		const int &n1_in,
-		const int &n2_in,
-		const int &n3_in,
-		const int &bz,
-		const int &nproc_in,
-		const int &rank_in);
+	// void init(
+	// 	const double &gcut_in,
+	// 	const int &n1_in,
+	// 	const int &n2_in,
+	// 	const int &n3_in,
+	// 	const int &bz,
+	// 	const int &nproc_in,
+	// 	const int &rank_in);
 
-	void columns_map();
-	void restore_st();
-	void columns_and_pw_distribution();
+	// void columns_map();
+	// void restore_st();
+	// void columns_and_pw_distribution();
 
 
-	void max_pw_column(int &pw,int &max_i,int &max_j);
-	void fft_dlay_set();
-	//void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in);
-    void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time);
-    void fft_map_final_scf(int *ig2fft,const int ngm, const int &ngmc_g_in); //LiuXh add 20180619
-	void print_data(std::ofstream &print)const;
-    void fft_map_after_vc(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time); //LiuXh add 20180515
-#ifdef __MPI
-	void stick_to_pool(double *stick, const int &ir, double *out);
-#endif
+	// void max_pw_column(int &pw,int &max_i,int &max_j);
+	// void fft_dlay_set();
+	// //void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in);
+    // void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time);
+    // void fft_map_final_scf(int *ig2fft,const int ngm, const int &ngmc_g_in); //LiuXh add 20180619
+	// void print_data(std::ofstream &print)const;
+    // void fft_map_after_vc(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time); //LiuXh add 20180515
 
 	int *isind; // map ir in the x-y plane to is of sticks in current processor 
 	int *ismap; // map istot of all sticks to ir in the x-y plane

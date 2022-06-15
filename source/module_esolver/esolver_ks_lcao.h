@@ -23,14 +23,17 @@ namespace ModuleESolver
         void cal_Force(ModuleBase::matrix& force) override;
         void cal_Stress(ModuleBase::matrix& stress) override;
         void postprocess() override;
+        void nscf() override;
 
     protected:
         virtual void beforescf(const int istep) override;
         virtual void eachiterinit(const int istep, const int iter) override;
         virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
-        virtual void updatepot(const int istep, const int iter, const bool conv) override;
-        virtual void eachiterfinish(const int iter, const bool conv) override;
-        virtual void afterscf(const int iter, const bool conv) override;
+        virtual void updatepot(const int istep, const int iter) override;
+        virtual void eachiterfinish(const int iter) override;
+        virtual void afterscf() override;
+        virtual bool do_after_converge(int& iter) override;
+        int two_level_step = 0;
 
         virtual void othercalculation(const int istep)override;
         ORB_control orb_con;    //Basis_LCAO

@@ -38,6 +38,7 @@ list(APPEND depend_files
   ../../module_neighbor/sltk_grid.cpp
   ../../module_neighbor/sltk_grid_driver.cpp
   ../../src_io/output.cpp
+  ../../src_io/print_info.cpp
 )
 
 AddTest(
