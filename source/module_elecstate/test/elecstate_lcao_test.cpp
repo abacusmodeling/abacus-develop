@@ -87,10 +87,10 @@ namespace GlobalC
 
 namespace WF_Local
 {
-    int read_lowf(double** ctot, const int& is, Local_Orbital_wfc &lowf) {return 1;};
-    int read_lowf_complex(std::complex<double>** ctot, const int& ik, Local_Orbital_wfc &lowf) {return 1;}
-    void write_lowf(const std::string &name, double **ctot) {}
-    void write_lowf_complex(const std::string &name, std::complex<double>** ctot, const int &ik) {}
+    int read_lowf(double** ctot, const int& is, const Parallel_Orbitals* ParaV, psi::Psi<double>*) {return 1;};
+    int read_lowf_complex(std::complex<double>** ctot, const int& ik, const Parallel_Orbitals* ParaV, psi::Psi<std::complex<double> >*) {return 1;}
+    void write_lowf(const std::string &name, double **ctot, const ModuleBase::matrix& ekb, const ModuleBase::matrix& wg) {}
+    void write_lowf_complex(const std::string &name, std::complex<double>** ctot, const int &ik, const ModuleBase::matrix& ekb, const ModuleBase::matrix& wg) {}
 }
 
 //mock the unrelated functions in charge.cpp
@@ -488,8 +488,17 @@ class ElecStateLCAOPrepare
         {
             GlobalC::GridT.cal_nnrg(&(orb_con.ParaV));
         }
-
-        loc.allocate_dm_wfc(GlobalC::GridT.lgd, lowf);
+        psi::Psi<double>* psigo = nullptr;
+        psi::Psi<std::complex<double>>* psik = nullptr;
+        if(GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            psigo = (psi::Psi<double>*)(&(this->psi));
+        }
+        else
+        {
+            psik = (psi::Psi<std::complex<double>>*)(&(this->psi));
+        }
+        loc.allocate_dm_wfc(GlobalC::GridT.lgd, lowf, psigo, psik);
 
         elecstate::MockElecStateLCAO mesl(&GlobalC::CHR,&GlobalC::kv,nk,nbands,&loc,&uhm,&lowf,this->wg);
 

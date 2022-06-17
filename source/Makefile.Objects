@@ -136,11 +136,7 @@ ORB_table_alpha.o\
 ORB_gen_tables.o\
 local_orbital_wfc.o\
 local_orbital_charge.o\
-ELEC_cbands_k.o\
-ELEC_cbands_gamma.o\
 ELEC_evolve.o\
-ELEC_scf.o\
-ELEC_nscf.o\
 LOOP_cell.o\
 LOOP_ions.o\
 run_md_lcao.o\

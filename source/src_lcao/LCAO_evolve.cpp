@@ -12,7 +12,7 @@ Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(LCAO_Matrix* lm) :
 {}
 Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix() {}
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, Local_Orbital_wfc &lowf)const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, psi::Psi<std::complex<double>>* psi)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -22,7 +22,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, Local_Orbital_wfc 
 	{
 ///*
 #ifdef __MPI
-		this->using_ScaLAPACK_complex(ik, lowf.wfc_k[ik]);
+		this->using_ScaLAPACK_complex(ik, psi);
 #else
 		//this->using_LAPACK_complex(ik, lowf.wfc_k_grid, lowf.wfc_k[ik]);
 #endif
@@ -278,7 +278,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 }
 
 #ifdef __MPI
-int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::ComplexMatrix &wfc_2d)const
+int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, psi::Psi<std::complex<double>>* psi)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","using_ScaLAPACK_complex");
 
@@ -442,9 +442,9 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
 		&alpha_1[0],
 		Htmp3, &one_int, &one_int, this->LM->ParaV->desc,
-		wfc_2d.c, &one_int, &one_int, this->LM->ParaV->desc, &one_int, 
+		psi->get_pointer(), &one_int, &one_int, this->LM->ParaV->desc, &one_int, 
 		&beta_1[0],
-		wfc_2d.c, &one_int, &one_int, this->LM->ParaV->desc, &one_int
+		psi->get_pointer(), &one_int, &one_int, this->LM->ParaV->desc, &one_int
         );
 
 

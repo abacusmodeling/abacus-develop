@@ -8,7 +8,7 @@
 #include <cassert>
 #include "module_base/global_variable.h"
 
-#include "../module_pw/pw_basis_k.h"
+#include <complex>
 
 namespace psi
 {
@@ -19,11 +19,6 @@ class Psi
 {
  public:
     Psi(void){};
-    Psi(ModulePW::PW_Basis_K* pbasis_in)
-    {
-        this->ngk = pbasis_in->npwk;
-        this->resize(pbasis_in->nks, GlobalV::NBANDS, pbasis_in->npwk_max);
-    }
     Psi(const int* ngk_in){this->ngk = ngk_in;}
     Psi(int nk_in, int nbd_in, int nbs_in, const int* ngk_in=nullptr)
     {

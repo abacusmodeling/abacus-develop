@@ -48,8 +48,6 @@ class ElecStateLCAO : public ElecState
     // calcualte rho for each k
     // void rhoBandK(const psi::Psi<std::complex<double>>& psi);
 
-    template <typename T> void cal_dm(const ModuleBase::matrix& wg, const psi::Psi<T>& wfc, psi::Psi<T>& dm);
-
     Local_Orbital_Charge* loc = nullptr;
     LCAO_Hamilt* uhm = nullptr;
     Local_Orbital_wfc* lowf = nullptr;

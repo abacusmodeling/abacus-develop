@@ -32,11 +32,11 @@ for i in `cat $allcase`;do
         encut=`grep "energy cutoff for wavefunc" ${i}/OUT.*/running*|awk '{print $NF}'`
         kpt=`grep -A 1 "KPOINTS" ${i}/result.log | tail -1 | awk '{print $2}'`
         nproc=`grep -A 1 "KPOINTS" ${i}/result.log | tail -1 | awk '{print $3}'`
-        niter=`sed -n '/ITER   ETOT(eV)/,/><><><><>/'p ${i}/result.log | wc -l|awk '{print $1-2}'`
+        niter=`grep "ELEC=" $i/OUT.*/running* | awk -F "=" '{print $3}'| awk -F "-" 'END{print $1}'`
         tottime=`awk '$1=="total"{printf"%.2f", $2}' ${i}/result.log`
-        scf1=`grep -A 1 "ITER   ETOT(eV)" ${i}/result.log | awk 'END{printf"%.2f", $NF}'`
+        scf1=`awk '{if($1 ~ /^CG1$|^DAV1$|^GE1$|^GV1$/) {printf"%.2f", $NF}}' ${i}/result.log`
         totalscf=`awk '$2=="Run"{print $3}' ${i}/result.log`
-        scfpiter=`awk -v a=$totalscf -v b=$scf1 -v c=$niter 'BEGIN{printf"%.2f",(a-b)/(c-1)}'`
+        scfpiter=`awk 'BEGIN{printf"%.2f",(ARGV[1]-ARGV[2])/(ARGV[3]-1)}' $totalscf $scf1 $niter`
         #fft=`awk '$2=="FFT3D"{printf"%.1f",$6}' ${i}/result.log`
         hpsi=`awk '$2=="h_psi"{printf"%.1f",$6}' ${i}/result.log`
         vloc=`awk '$2=="vloc"{printf"%.1f",$6}' ${i}/result.log`
@@ -51,11 +51,11 @@ for i in `cat $allcase`;do
         encut=`grep "energy cutoff for wavefunc" ${i}/OUT.*/running*|awk '{print $NF}'`
         kpt=`grep -A 1 "KPOINTS" ${i}/result.log | tail -1 | awk '{print $2}'`
         nproc=`grep -A 1 "KPOINTS" ${i}/result.log | tail -1 | awk '{print $3}'`
-        niter=`sed -n '/ITER   ETOT(eV)/,/><><><><>/'p ${i}/result.log | wc -l|awk '{print $1-2}'`
+        niter=`grep "ELEC=" $i/OUT.*/running* | awk -F "=" '{print $3}'| awk -F "-" 'END{print $1}'`
         tottime=`awk '$1=="total"{printf"%.2f", $2}' ${i}/result.log`
-        scf1=`grep -A 1 "ITER   ETOT(eV)" ${i}/result.log | awk 'END{printf"%.2f", $NF}'`
-        totalscf=`awk '$1=="Run"{print $3}' ${i}/result.log`
-        scfpiter=`awk -v a=$totalscf -v b=$scf1 -v c=$niter 'BEGIN{printf"%.2f",(a-b)/(c-1)}'`
+        scf1=`awk '{if($1 ~ /^CG1$|^DAV1$|^GE1$|^GV1$/) {printf"%.2f", $NF}}' ${i}/result.log`
+        totalscf=`awk '$2=="Run"{print $3}' ${i}/result.log`
+        scfpiter=`awk 'BEGIN{printf"%.2f",(ARGV[1]-ARGV[2])/(ARGV[3]-1)}' $totalscf $scf1 $niter`
         #fft="-"
         hpsi="-"
         vloc=`awk '$2=="vlocal"{printf"%.1f",$6}' ${i}/result.log`
@@ -70,6 +70,23 @@ for i in `cat $allcase`;do
         continue
     fi
     maxres=`grep "Maximum resident set size" ${i}/time.log | awk '{print $NF}'`
+
+    if [[ $solver == "" ]]; then solver="-";fi
+    if [[ $natoms == "" ]]; then natoms="-";fi
+    if [[ $encut == "" ]]; then encut="-";fi
+    if [[ $kpt == "" ]]; then kpt="-";fi
+    if [[ $nproc == "" ]]; then nproc="-";fi
+    if [[ $niter == "" ]]; then niter="-";fi
+    if [[ $tottime == "" ]]; then tottime="-";fi
+    if [[ $scf1 == "" ]]; then scf1="-";fi
+    if [[ $scfpiter == "" ]]; then scfpiter="-";fi
+    if [[ $sc == "" ]]; then sc="-";fi
+    if [[ $hpsi == "" ]]; then hpsi="-";fi
+    if [[ $vloc == "" ]]; then vloc="-";fi
+    if [[ $vnl == "" ]]; then vnl="-";fi
+    if [[ $stress == "" ]]; then stress="-";fi
+    if [[ $force == "" ]]; then force="-";fi
+    if [[ $maxres == "" ]]; then maxres="-";fi
 
     printf "%20s %15s %7s %8s %8s %6s %6s %8s %8s %8s %8s %8s %8s %8s %8s %8s %s\n" \
     $i $solver $natoms $encut $kpt $nproc $niter $tottime $scf1 $scfpiter $sc $hpsi $vloc $vnl \
