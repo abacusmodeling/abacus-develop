@@ -11,6 +11,11 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
     ucell(unit_in)
 {
+    if(mdp.md_seed >= 0)
+    {
+        srand(mdp.md_seed);
+    }
+
     stop = false;
 
     allmass = new double [ucell.nat];
