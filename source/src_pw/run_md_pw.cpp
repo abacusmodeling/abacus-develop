@@ -41,6 +41,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
     CE.allocate_ions();
 
     // determine the md_type
+    srand(time(0));
     Verlet *verlet;
     if(INPUT.mdp.md_type == -1)
     {
