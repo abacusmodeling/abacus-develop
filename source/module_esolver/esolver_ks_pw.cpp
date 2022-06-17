@@ -163,7 +163,7 @@ namespace ModuleESolver
         }
         else
         {
-            this->phami = new hamilt::HamiltPW(&(GlobalC::hm.hpw));
+            this->phami = new hamilt::HamiltPW();
         }
 
     }

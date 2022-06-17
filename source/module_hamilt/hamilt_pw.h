@@ -2,17 +2,6 @@
 #define HAMILTPW_H
 
 #include "hamilt.h"
-#if ((defined __CUDA) || (defined __ROCM))
-
-#ifdef __CUDA
-#include "src_pw/hamilt_pw.cuh"
-#else
-#include "src_pw/hamilt_pw_hip.h"
-#endif
-
-#else
-#include "src_pw/hamilt_pw.h"
-#endif
 
 namespace hamilt
 {
@@ -20,9 +9,8 @@ namespace hamilt
 class HamiltPW : public Hamilt
 {
   public:
-    HamiltPW(Hamilt_PW* hpw_in)
+    HamiltPW()
     {
-      this->hpw = hpw_in;
       this->classname = "HamiltPW";
     }
 
@@ -36,7 +24,6 @@ class HamiltPW : public Hamilt
 
 
   private:
-    Hamilt_PW* hpw;
 
     int current_ik=0;
 
