@@ -28,3 +28,5 @@ md_tfreq         0.1
 md_tfirst        10
 md_dt            1
 md_restart         0
+
+init_vel         1

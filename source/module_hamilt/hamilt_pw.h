@@ -26,31 +26,32 @@ class HamiltPW : public Hamilt
       this->classname = "HamiltPW";
     }
 
-    // construct Hamiltonian matrix with inputed electonic density
-    void constructHamilt() override
-    {
-        this->ch_mock();
-    }
-
     // for target K point, update consequence of hPsi() and matrix()
-    void updateHk(const int ik) override
-    {
-        this->hk_mock(ik);
-    };
+    void updateHk(const int ik) override;
 
     // core function: for solving eigenvalues of Hamiltonian with iterative method
-    virtual void hPsi(const psi::Psi<std::complex<double>>& psi, psi::Psi<std::complex<double>>& hpsi) const override
-    {
-        this->hpsi_mock(psi, hpsi);
-    };
+    virtual void hPsi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const override;
+    virtual void sPsi(const std::complex<double> *psi_in, std::complex<double> *spsi, const size_t size) const override;
 
 
 
   private:
     Hamilt_PW* hpw;
-    void ch_mock();
-    void hk_mock(const int ik);
-    void hpsi_mock(const psi::Psi<std::complex<double>>& psi, psi::Psi<std::complex<double>>& hpsi) const;
+
+    int current_ik=0;
+
+    int current_spin=0;
+
+    int current_npw=0;
+
+    int max_npw=0;
+
+    const double* current_veff = nullptr;
+
+    void add_nonlocal_pp(
+      std::complex<double> *hpsi_in,
+      const std::complex<double> *becp,
+      const int m) const;
 };
 
 } // namespace hamilt

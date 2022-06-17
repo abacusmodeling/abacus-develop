@@ -16,10 +16,11 @@ class Hamilt
     virtual void constructHamilt() {return;}
 
     // for target K point, update consequence of hPsi() and matrix()
-    virtual void updateHk(const int ik) = 0;
+    virtual void updateHk(const int ik){return;}
 
     // core function: for solving eigenvalues of Hamiltonian with iterative method
-    virtual void hPsi(const psi::Psi<std::complex<double>>& psi, psi::Psi<std::complex<double>>& hpsi) const{return;}
+    virtual void hPsi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const{return;}
+    virtual void sPsi(const std::complex<double> *psi_in, std::complex<double> *spsi, const size_t size) const{return;}
 
     // core function: return H(k) and S(k) matrixs for direct solving eigenvalues.
     virtual void matrix(MatrixBlock<std::complex<double>> &hk_in, MatrixBlock<std::complex<double>> &sk_in){return;}
