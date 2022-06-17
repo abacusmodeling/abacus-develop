@@ -30,7 +30,6 @@ void Run_MD_CLASSIC::classic_md_line(void)
 	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // determine the md_type
-    srand(time(0));
     Verlet *verlet;
     if(INPUT.mdp.md_type == -1)
     {

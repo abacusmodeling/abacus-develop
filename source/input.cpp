@@ -1115,6 +1115,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, mdp.md_restartfreq);
         }
+        else if (strcmp("md_seed", word) == 0)
+        {
+            read_value(ifs, mdp.md_seed);
+        }
         else if (strcmp("md_restart", word) == 0)
         {
             read_value(ifs, mdp.md_restart);
@@ -2047,6 +2051,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double(mdp.md_tlast);
     Parallel_Common::bcast_int(mdp.md_dumpfreq);
     Parallel_Common::bcast_int(mdp.md_restartfreq);
+    Parallel_Common::bcast_int(mdp.md_seed);
     Parallel_Common::bcast_bool(mdp.md_restart);
     Parallel_Common::bcast_double(mdp.lj_rcut);
     Parallel_Common::bcast_double(mdp.lj_epsilon);
