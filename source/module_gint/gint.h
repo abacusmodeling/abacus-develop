@@ -133,9 +133,9 @@ class Gint
     // dimension: [GlobalC::LNNR.nnrg] 
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.
     bool pvpR_alloc_flag = false;
-    double** pvpR_reduced; //stores Hamiltonian in reduced format, for multi-l
+    double** pvpR_reduced = nullptr; //stores Hamiltonian in reduced format, for multi-l
     
-	double* pvpR_grid; //stores Hamiltonian in grid format, for gamma-point
+	double* pvpR_grid = nullptr; //stores Hamiltonian in grid format, for gamma-point
 };
 
 #endif
