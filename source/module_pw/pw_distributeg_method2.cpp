@@ -46,6 +46,8 @@ void PW_Basis::distribution_method2()
     MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(&liy, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(&riy, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&lix, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&rix, 1, MPI_INT, 0, POOL_WORLD);
 #endif
     delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
 

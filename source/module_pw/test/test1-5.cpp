@@ -12,9 +12,9 @@
 #include "pw_test.h"
 
 using namespace std;
-TEST_F(PWTEST,test1_4)
+TEST_F(PWTEST,test1_5)
 {
-    cout<<"dividemthd 1, gamma_only: off, xprime: false, 2 kpoints, check fft"<<endl;
+    cout<<"dividemthd 1, gamma_only: on, xprime: false, gamma kpoint, check fft"<<endl;
     ModulePW::PW_Basis_K pwtest;
     ModuleBase::Matrix3 latvec;
     int nx,ny,nz;  //f*G
@@ -24,29 +24,20 @@ TEST_F(PWTEST,test1_4)
     ModuleBase::Vector3<double> *kvec_d;
     int nks;
     //--------------------------------------------------
-    lat0 = 2;
-    ModuleBase::Matrix3 la(1, 1, 0, 0, 2, 0, 0, 0, 2);
-    nks = 2;
+    lat0 = 2.7;
+    ModuleBase::Matrix3 la(1, 0.3, 0, 0, 2, 0, 0, 0, 2);
+    nks = 1;
     kvec_d = new ModuleBase::Vector3<double>[nks];
-    kvec_d[0].set(0,0,0.5);
-    kvec_d[1].set(0.5,0.5,0.5);
+    kvec_d[0].set(0,0,0);
     latvec = la;
     wfcecut = 10;
-    gamma_only = false;
+    gamma_only = true;
     int distribution_type = 1;
     bool xprime = false;
     //--------------------------------------------------
-    //Useless, only to test reinit function.
-    pwtest.initgrids(2, latvec, 4,4,4 ,nproc_in_pool, rank_in_pool);
-    pwtest.initparameters(true, 200, nks, kvec_d, 2,xprime);
-    pwtest.setuptransform();
-    pwtest.collect_local_pw();
-    EXPECT_EQ(pwtest.nstot,5);
-
 
     //init //real parameter
     pwtest.initgrids(lat0,latvec,4*wfcecut, nproc_in_pool, rank_in_pool);
-    //pwtest.initgrids(lat0,latvec,5,7,7);
     pwtest.initparameters(gamma_only,wfcecut,nks,kvec_d,distribution_type, xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
@@ -65,10 +56,10 @@ TEST_F(PWTEST,test1_4)
 	G  = GT.Transpose();
 	GGT = G * GT;
     complex<double> *tmp = new complex<double> [nx*ny*nz];
-    complex<double> * rhor = new complex<double> [nrxx];
     complex<double> * rhogr = new complex<double> [nmaxgr];
+    double * rhor = new double [nrxx];
 #ifdef __MIX_PRECISION
-    complex<float> * rhofr = new complex<float> [nrxx];
+    float * rhofr = new float [nrxx];
     complex<float> * rhofgr = new complex<float> [nmaxgr];
 #endif
     for(int ik  = 0; ik < nks; ++ik)
@@ -92,7 +83,9 @@ TEST_F(PWTEST,test1_4)
                         double modulusgk = (v+kk) * (GGT * (v+kk));
                         if (modulusgk <= ggecut)
                         {
-                            tmp[ix*ny*nz + iy*nz + iz]=1.0/(modulusgk+1) + ModuleBase::IMAG_UNIT / (abs(v.x+1) + 1);
+                            tmp[ix*ny*nz + iy*nz + iz]=1.0/(modulusgk+1);
+                            if(vy > 0) tmp[ix*ny*nz + iy*nz + iz]+=ModuleBase::IMAG_UNIT / (abs(v.x+1) + 1);
+                            else if(vy < 0) tmp[ix*ny*nz + iy*nz + iz]-=ModuleBase::IMAG_UNIT / (abs(-v.x+1) + 1);
                         }
                     }
                 }   
@@ -126,25 +119,37 @@ TEST_F(PWTEST,test1_4)
 #endif
         for(int ig = 0 ; ig < npwk ; ++ig)
         {
-            rhog[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.getgdirect(ik,ig).x+1) + 1);
-            rhogr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.getgdirect(ik,ig).x+1) + 1);
+            rhog[ig] = 1.0/(pwtest.getgk2(ik,ig)+1); 
+            rhogr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1);
+            ModuleBase::Vector3<double> f = pwtest.getgdirect(ik,ig);
+            if(f.y > 0) 
+            {
+                rhog[ig]+=ModuleBase::IMAG_UNIT / (abs(f.x+1) + 1);
+                rhogr[ig]+=ModuleBase::IMAG_UNIT / (abs(f.x+1) + 1);
+            }
         }    
 #ifdef __MIX_PRECISION
         for(int ig = 0 ; ig < npwk ; ++ig)
         {
-            rhofg[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.getgdirect(ik,ig).x+1) + 1);
-            rhofgr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.getgdirect(ik,ig).x+1) + 1);
+            rhofg[ig] = 1.0/(pwtest.getgk2(ik,ig)+1); 
+            rhofgr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1);
+            ModuleBase::Vector3<double> f = pwtest.getgdirect(ik,ig);
+            if(f.y > 0) 
+            {
+                rhofg[ig]+=ModuleBase::IMAG_UNIT / (abs(f.x+1) + 1);
+                rhofgr[ig]+=ModuleBase::IMAG_UNIT / (abs(f.x+1) + 1);
+            }
         }  
 #endif
 
         pwtest.recip2real(rhog,rhor,ik); //check out-of-place transform
 
-        pwtest.recip2real(rhogr,rhogr,ik); //check in-place transform
+        pwtest.recip2real(rhogr,(double*)rhogr,ik); //check in-place transform
 
 #ifdef __MIX_PRECISION
         pwtest.recip2real(rhofg,rhofr,ik); //check out-of-place transform
 
-        pwtest.recip2real(rhofgr,rhofgr,ik); //check in-place transform
+        pwtest.recip2real(rhofgr,(float*)rhofgr,ik); //check in-place transform
 #endif
 
         int startiz = pwtest.startz_current;
@@ -152,26 +157,23 @@ TEST_F(PWTEST,test1_4)
         {
             for(int iz = 0 ; iz < nplane ; ++iz)
             {
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz].real(),1e-6);
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhor[ixy*nplane+iz].imag(),1e-6);
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhogr[ixy*nplane+iz].real(),1e-6);
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhogr[ixy*nplane+iz].imag(),1e-6);
+                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz],1e-6);
+                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),((double*)rhogr)[ixy*nplane+iz],1e-6);
 #ifdef __MIX_PRECISION
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhofr[ixy*nplane+iz].real(),1e-4);
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhofr[ixy*nplane+iz].imag(),1e-4);
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhofgr[ixy*nplane+iz].real(),1e-4);
-                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].imag(),rhofgr[ixy*nplane+iz].imag(),1e-4);
+                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhofr[ixy*nplane+iz],1e-4);
+                EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),((float*)rhofgr)[ixy*nplane+iz],1e-4);
 #endif
             }
         }
 
         pwtest.real2recip(rhor,rhogout,ik);
 
-        pwtest.real2recip(rhogr,rhogr,ik);
+        pwtest.real2recip((double*)rhogr,rhogr,ik);
+
 #ifdef __MIX_PRECISION
         pwtest.real2recip(rhofr,rhofgout,ik);
 
-        pwtest.real2recip(rhofgr,rhofgr,ik);
+        pwtest.real2recip((float*)rhofgr,rhofgr,ik);
 #endif
 
         for(int ig = 0 ; ig < npwk ; ++ig)
@@ -181,10 +183,10 @@ TEST_F(PWTEST,test1_4)
             EXPECT_NEAR(rhog[ig].real(),rhogr[ig].real(),1e-6);
             EXPECT_NEAR(rhog[ig].imag(),rhogr[ig].imag(),1e-6);
 #ifdef __MIX_PRECISION
-            EXPECT_NEAR(rhofg[ig].real(),rhofgout[ig].real(),1e-4);
-            EXPECT_NEAR(rhofg[ig].imag(),rhofgout[ig].imag(),1e-4);
-            EXPECT_NEAR(rhofg[ig].real(),rhofgr[ig].real(),1e-4);
-            EXPECT_NEAR(rhofg[ig].imag(),rhofgr[ig].imag(),1e-4);
+            EXPECT_NEAR(rhofg[ig].real(),rhofgout[ig].real(),1e-6);
+            EXPECT_NEAR(rhofg[ig].imag(),rhofgout[ig].imag(),1e-6);
+            EXPECT_NEAR(rhofg[ig].real(),rhofgr[ig].real(),1e-6);
+            EXPECT_NEAR(rhofg[ig].imag(),rhofgr[ig].imag(),1e-6);
 #endif
         }
 
@@ -195,7 +197,6 @@ TEST_F(PWTEST,test1_4)
         delete [] rhofg;
         delete [] rhofgout;
 #endif
-
         //check igl2ig
         for(int igl = 0; igl < npwk ; ++igl)
         {        

@@ -46,6 +46,8 @@ void PW_Basis::distribution_method1()
     MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(&liy, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(&riy, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&lix, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&rix, 1, MPI_INT, 0, POOL_WORLD);
 #endif
     delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
 
@@ -140,7 +142,7 @@ void PW_Basis::collect_st(
     int iy_start = -iy_end; 
     if (this->gamma_only)
     {
-        if(this->halfx)
+        if(this->xprime)
         {
             ix_start = 0;
             ix_end = this->fftnx - 1;
@@ -163,8 +165,8 @@ void PW_Basis::collect_st(
             // so that its index in st_length and st_bottom is 9 * 10 + 2 = 92.
             int x = ix;
             int y = iy;
-            if (x < 0) x += fftnx;
-            if (y < 0) y += fftny;
+            if (x < 0) x += nx;
+            if (y < 0) y += ny;
             int index = x * this->fftny + y;
             if (st_length2D[index] > 0) // meaning there is a stick on (x, y) point.
             {
@@ -179,7 +181,7 @@ void PW_Basis::collect_st(
                     {
                         find_stick = true;
                         break;
-                    }                  
+                    }
                 }
                 if (find_stick)
                 {

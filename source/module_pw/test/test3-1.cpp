@@ -10,16 +10,16 @@
 extern int nproc_in_pool,rank_in_pool;
 using namespace std;
 
-TEST_F(PWTEST,test1_1_2)
+TEST_F(PWTEST,test3_1)
 {
-    cout<<"dividemthd 1, gamma_only: on, xprime: false, check gcar,gdirect,gg,istot2ixy,ig2isz"<<endl;
+    cout<<"dividemthd 1, gamma_only: on, xprime: true, check gcar,gdirect,gg,istot2ixy,ig2isz"<<endl;
     //--------------------------------------------------
     ModuleBase::Matrix3 latvec(1,2,0,2,1,1,0,0,5);
     bool gamma_only = true;
     double wfcecut = 70;
     double lat0 = 4;
     int distribution_type = 1;
-    bool xprime = false;
+    bool xprime = true;
     //--------------------------------------------------
 
     ModulePW::PW_Basis pwtest;
@@ -37,40 +37,41 @@ TEST_F(PWTEST,test1_1_2)
     double ggecut = wfcecut / tpiba2;
 
     //ref
-    const int totnpw_ref = 5012;
+    const int totnpw_ref = 5037;
     const int totnst_ref = 176;
-    const int fftnx_ref = 24;
+    const int nx_ref = 24;
+    const int fftnx_ref = 13;
     const int ny_ref = 27;
-    const int fftny_ref = 14;
-    const int fftnz_ref = 54;
+    const int fftny_ref = 27;
+    const int nz_ref = 54;
     //some results for different number of processors
     int npw_per_ref[12][12]={
-        {5012},
-        {2506,2506},
-        {1672,1670,1670},
-        {1253,1253,1251,1255},
-        {1002,1002,1002,1003,1003},
-        {835,837,835,836,835,834},
-        {716,717,716,716,716,716,715},
-        {627,627,628,626,626,627,625,626},
-        {556,559,555,555,555,557,559,559,557},
-        {502,502,501,499,498,502,502,503,503,500},
-        {457,457,454,458,458,454,456,455,452,455,456},
-        {419,419,419,418,417,418,416,416,416,420,416,418}
+        {5037},
+        {2518,2519},
+        {1679,1679,1679},
+        {1259,1261,1258,1259},
+        {1008,1009,1006,1007,1007},
+        {842,839,838,839,840,839},
+        {719,719,719,722,719,719,720},
+        {630,629,628,629,632,631,629,629},
+        {560,560,561,558,561,561,557,562,557},
+        {506,503,504,504,504,503,504,501,505,503},
+        {459,460,456,460,460,456,454,458,458,458,458},
+        {419,421,420,418,418,422,418,418,420,423,420,420}
     };
     int nst_per_ref[12][12]={
         {176},
         {88,88},
-        {59,59,58},
+        {58,59,59},
         {44,44,44,44},
         {35,35,35,36,35},
-        {29,30,30,29,29,29},
-        {25,25,25,25,26,25,25},
+        {29,30,29,29,30,29},
+        {25,25,26,25,25,25,25},
         {22,22,22,22,22,22,22,22},
-        {20,19,19,19,19,20,20,20,20},
-        {17,17,18,18,17,17,18,18,18,18},
+        {20,20,19,20,20,19,19,20,19},
+        {18,18,17,17,17,18,18,18,18,17},
         {16,16,16,16,16,16,16,16,16,16,16},
-        {15,15,15,15,15,15,14,14,14,15,14,15}
+        {15,15,15,14,14,15,14,14,15,15,15,15}
     };
     int *npw_per = nullptr;
     if(rank_in_pool == 0)
@@ -110,19 +111,19 @@ TEST_F(PWTEST,test1_1_2)
     EXPECT_EQ(pwtest.fftnx, fftnx_ref);
     EXPECT_EQ(pwtest.fftny, fftny_ref);
     EXPECT_EQ(pwtest.ny, ny_ref);
-    EXPECT_EQ(pwtest.fftnz, fftnz_ref);
+    EXPECT_EQ(pwtest.fftnz, nz_ref);
     EXPECT_EQ(tot_npw, totnpw_ref);
     EXPECT_EQ(pwtest.npwtot, totnpw_ref);
     EXPECT_EQ(pwtest.nstot,totnst_ref);
-    EXPECT_EQ(pwtest.nxyz, fftnx_ref*ny_ref*fftnz_ref);
+    EXPECT_EQ(pwtest.nxyz, nx_ref*ny_ref*nz_ref);
 
 
-    int *tmpx = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
-    int *tmpy = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
-    int *tmpz = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
-    ModuleBase::GlobalFunc::ZEROS(tmpx,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
-    ModuleBase::GlobalFunc::ZEROS(tmpy,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
-    ModuleBase::GlobalFunc::ZEROS(tmpz,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
+    int *tmpx = new int[pwtest.fftnxyz];
+    int *tmpy = new int[pwtest.fftnxyz];
+    int *tmpz = new int[pwtest.fftnxyz];
+    ModuleBase::GlobalFunc::ZEROS(tmpx,pwtest.fftnxyz);
+    ModuleBase::GlobalFunc::ZEROS(tmpy,pwtest.fftnxyz);
+    ModuleBase::GlobalFunc::ZEROS(tmpz,pwtest.fftnxyz);
     
     int * startnst = new int [nproc_in_pool];
     startnst[0] = 0;
@@ -134,12 +135,9 @@ TEST_F(PWTEST,test1_1_2)
     for(int ig = 0 ; ig < pwtest.npw; ++ig)
     {
         int istot = pwtest.ig2isz[ig] / pwtest.fftnz + startnst[rank_in_pool];
-        // int is = pwtest.ig2isz[ig] / pwtest.fftnz;
         int iz = pwtest.ig2isz[ig] % pwtest.fftnz;
         int iy = pwtest.istot2ixy[istot] % pwtest.ny;
         int ix = pwtest.istot2ixy[istot] / pwtest.ny;
-        // int iy = pwtest.is2fftixy[is] % pwtest.fftny;
-        // int ix = pwtest.is2fftixy[is] / pwtest.fftny;
 
         tmpx[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].x);
         tmpy[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].y);

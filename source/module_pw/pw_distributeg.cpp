@@ -45,10 +45,10 @@ void PW_Basis::count_pw_st(
     ModuleBase::GlobalFunc::ZEROS(st_bottom2D, this->fftnxy);
     ModuleBase::Vector3<double> f;
 
-    // determine the scaning area along x-direct, if gamma-only && halfx, only positive axis is used.
+    // determine the scaning area along x-direct, if gamma-only && xprime, only positive axis is used.
     int ix_end = int(this->nx / 2) + 1;
     int ix_start = -ix_end; 
-    // determine the scaning area along y-direct, if gamma-only && !halfx, only positive axis is used.
+    // determine the scaning area along y-direct, if gamma-only && !xprime, only positive axis is used.
     int iy_end = int(this->ny / 2) + 1;
     int iy_start = -iy_end; 
 
@@ -56,7 +56,7 @@ void PW_Basis::count_pw_st(
     int iz_start = -iz_end;
     if (this->gamma_only)
     {
-        if(this->halfx)
+        if(this->xprime)
         {
             ix_start = 0;
             ix_end = this->fftnx - 1;

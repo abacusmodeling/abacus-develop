@@ -31,7 +31,7 @@ public:
 	
 	// init parameters of fft
 	void initfft(int nx_in, int ny_in, int nz_in, int lixy_in, int rixy_in, int ns_in, int nplane_in, 
-				 int nproc_in, bool gamma_only_in, bool halfx_in = false, bool mpifft_in = false);
+				 int nproc_in, bool gamma_only_in, bool xprime_in = false, bool mpifft_in = false);
 
 	//init fftw_plans
 	void setupFFT(); 
@@ -71,7 +71,8 @@ public:
 	int fftnxy=0;
 	int ny=0, nx=0, nz=0;
 	int nxy=0;
-	bool halfx = false;
+	bool xprime = false; // true: when do recip2real, x-fft will be done last and when doing real2recip, x-fft will be done first; false: y-fft
+                         // For gamma_only, true: we use half x; false: we use half y
 	int lixy=0,rixy=0;// lixy: the left edge of the pw ball in the y direction; rixy: the right edge of the pw ball in the x or y direction
 	int ns=0; //number of sticks
 	int nplane=0; //number of x-y planes
@@ -87,14 +88,9 @@ public:
 
 private:
 	bool gamma_only=false;
-	bool destroyp=true;
 	bool mpifft=false; // if use mpi fft, only used when define __FFTW3_MPI
-	// fftw_plan plan2r2c;
-	// fftw_plan plan2c2r;
-	// fftw_plan plan1for;
-	// fftw_plan plan1bac;
-	// fftw_plan plan2for;
-	// fftw_plan plan2bac;
+
+	bool destroyp=true;
 	fftw_plan planzfor;
 	fftw_plan planzbac;
 	fftw_plan planxfor1;
@@ -103,6 +99,8 @@ private:
 	fftw_plan planxbac2;
 	fftw_plan planyfor;
 	fftw_plan planybac;
+	fftw_plan planxr2c;
+	fftw_plan planxc2r;
 	fftw_plan planyr2c;
 	fftw_plan planyc2r;
 #ifdef __MIX_PRECISION
@@ -115,6 +113,8 @@ private:
 	fftwf_plan planfxbac2;
 	fftwf_plan planfyfor;
 	fftwf_plan planfybac;
+	fftwf_plan planfxr2c;
+	fftwf_plan planfxc2r;
 	fftwf_plan planfyr2c;
 	fftwf_plan planfyc2r;
 #endif

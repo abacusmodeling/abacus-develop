@@ -12,9 +12,9 @@
 #include "pw_test.h"
 
 using namespace std;
-TEST_F(PWTEST,test1_4)
+TEST_F(PWTEST,test4_4)
 {
-    cout<<"dividemthd 1, gamma_only: off, xprime: false, 2 kpoints, check fft"<<endl;
+    cout<<"dividemthd 2, gamma_only: off, xprime: true, 2 kpoints, check fft"<<endl;
     ModulePW::PW_Basis_K pwtest;
     ModuleBase::Matrix3 latvec;
     int nx,ny,nz;  //f*G
@@ -24,30 +24,22 @@ TEST_F(PWTEST,test1_4)
     ModuleBase::Vector3<double> *kvec_d;
     int nks;
     //--------------------------------------------------
-    lat0 = 2;
-    ModuleBase::Matrix3 la(1, 1, 0, 0, 2, 0, 0, 0, 2);
+    lat0 = 4;
+    ModuleBase::Matrix3 la(1, 5, 0, 0, 1, 0, 0, 0, 1);
     nks = 2;
     kvec_d = new ModuleBase::Vector3<double>[nks];
-    kvec_d[0].set(0,0,0.5);
-    kvec_d[1].set(0.5,0.5,0.5);
+    kvec_d[0].set(0,0,0);
+    kvec_d[1].set(0,0.5,0.5);
     latvec = la;
-    wfcecut = 10;
+    wfcecut = 40;
     gamma_only = false;
-    int distribution_type = 1;
-    bool xprime = false;
+    int distribution_type = 2;
+    bool xprime = true;
     //--------------------------------------------------
-    //Useless, only to test reinit function.
-    pwtest.initgrids(2, latvec, 4,4,4 ,nproc_in_pool, rank_in_pool);
-    pwtest.initparameters(true, 200, nks, kvec_d, 2,xprime);
-    pwtest.setuptransform();
-    pwtest.collect_local_pw();
-    EXPECT_EQ(pwtest.nstot,5);
-
 
     //init //real parameter
     pwtest.initgrids(lat0,latvec,4*wfcecut, nproc_in_pool, rank_in_pool);
-    //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,nks,kvec_d,distribution_type, xprime);
+    pwtest.initparameters(gamma_only,wfcecut,nks,kvec_d,distribution_type,xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
@@ -137,12 +129,14 @@ TEST_F(PWTEST,test1_4)
         }  
 #endif
 
-        pwtest.recip2real(rhog,rhor,ik); //check out-of-place transform
+        ModuleBase::GlobalFunc::ZEROS(rhor, nrxx);
+        pwtest.recip2real(rhog,rhor,ik, true, 1); //check out-of-place transform
 
         pwtest.recip2real(rhogr,rhogr,ik); //check in-place transform
 
 #ifdef __MIX_PRECISION
-        pwtest.recip2real(rhofg,rhofr,ik); //check out-of-place transform
+        ModuleBase::GlobalFunc::ZEROS(rhofr, nrxx);
+        pwtest.recip2real(rhofg,rhofr,ik, true, 1); //check out-of-place transform
 
         pwtest.recip2real(rhofgr,rhofgr,ik); //check in-place transform
 #endif
@@ -165,11 +159,14 @@ TEST_F(PWTEST,test1_4)
             }
         }
 
-        pwtest.real2recip(rhor,rhogout,ik);
+        ModuleBase::GlobalFunc::ZEROS(rhogout, npwk);
+        pwtest.real2recip(rhor,rhogout,ik, true, 1);
 
         pwtest.real2recip(rhogr,rhogr,ik);
+
 #ifdef __MIX_PRECISION
-        pwtest.real2recip(rhofr,rhofgout,ik);
+        ModuleBase::GlobalFunc::ZEROS(rhofgout, npwk);
+        pwtest.real2recip(rhofr,rhofgout,ik, true, 1);
 
         pwtest.real2recip(rhofgr,rhofgr,ik);
 #endif

@@ -23,7 +23,8 @@ void PW_Basis_K:: initparameters(
     const double gk_ecut_in,
     const int nks_in, //number of k points in this pool
     const ModuleBase::Vector3<double> *kvec_d_in, // Direct coordinates of k points
-    const int distribution_type_in
+    const int distribution_type_in,
+    const bool xprime_in
 )
 {
     this->nks = nks_in;
@@ -49,13 +50,17 @@ void PW_Basis_K:: initparameters(
 
     this->gamma_only = gamma_only_in;
     if(kmaxmod > 0)     this->gamma_only = false; //if it is not the gamma point, we do not use gamma_only
-    if (this->gamma_only)   this->fftny = int(this->ny / 2) + 1;
-    else                    this->fftny = ny;
+    this->xprime = xprime_in;
+    this->fftny = this->ny;
     this->fftnx = this->nx;
+    if (this->gamma_only)   
+    {
+        if(this->xprime) this->fftnx = int(this->nx / 2) + 1;
+        else            this->fftny = int(this->ny / 2) + 1;
+    }
     this->fftnz = this->nz;
     this->fftnxy = this->fftnx * this->fftny;
     this->fftnxyz = this->fftnxy * this->fftnz;
-
     this->distribution_type = distribution_type_in;
     return;
 }
@@ -77,6 +82,10 @@ void PW_Basis_K::setupIndGk()
             }
         }
         this->npwk[ik] = ng;
+        if(ng == 0)
+        {
+            std::cout<<"Some proc has no plane waves. You can reduce the number of proc to avoid waste!"<<std::endl;
+        }
         if ( this->npwk_max < ng)
         {
             this->npwk_max = ng;
@@ -117,7 +126,8 @@ void PW_Basis_K::setuptransform()
     this->getstartgr();
     this->setupIndGk();
     this->ft.clear();
-    this->ft.initfft(this->nx,this->ny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
+    if(this->xprime)    this->ft.initfft(this->nx,this->ny,this->nz,this->lix,this->rix,this->nst,this->nplane,this->poolnproc,this->gamma_only, this->xprime);
+    else                this->ft.initfft(this->nx,this->ny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only, this->xprime);
     this->ft.setupFFT();
     ModuleBase::timer::tick(this->classname, "setuptransform");
 }

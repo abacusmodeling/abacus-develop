@@ -209,15 +209,22 @@ void PW_Basis:: initgrids(
 void PW_Basis:: initparameters(
     const bool gamma_only_in,
     const double pwecut_in,
-    const int distribution_type_in
+    const int distribution_type_in,
+    const bool xprime_in
 )
 {
+    this->xprime = xprime_in;
     this->gamma_only = gamma_only_in;
     // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
     // we have F(-k) = F(k)*, so that only half of planewaves are needed.
-    if (this->gamma_only)   this->fftny = int(this->ny / 2) + 1;
-    else                    this->fftny = ny;
+    this->fftny = this->ny;
     this->fftnx = this->nx;
+    if (this->gamma_only)   
+    {
+        if(this->xprime) this->fftnx = int(this->nx / 2) + 1;
+        else            this->fftny = int(this->ny / 2) + 1;
+    }      
+    
     this->fftnz = this->nz;
     this->fftnxy = this->fftnx * this->fftny;
     this->fftnxyz = this->fftnxy * this->fftnz;

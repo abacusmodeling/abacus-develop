@@ -37,15 +37,12 @@ test1-2.o\
 test1-2-2.o\
 test1-3.o\
 test1-4.o\
+test1-5.o\
 test2-1-1.o\
 test2-1-2.o\
 test2-2.o\
 test2-3.o
 
-FLOATFILE=test1-2f.o\
-test1-2-2f.o\
-test1-3f.o\
-test1-4f.o
 
 TESTFILE0 = ${DOUBLEFILE} 
 
@@ -76,7 +73,6 @@ GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
 
 #Mix Precision
 # HONG = -D__MIX_PRECISION -D__NORMAL
-# TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 # CPLUSPLUS = g++
 
 #Only MPI
@@ -84,14 +80,12 @@ GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
 
 #MPI + Mix Precision
 HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
-TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 
 #Cuda
 #HONG = -D__MPI -D__CUDA -D__NORMAL
 
 #Cuda & Mix Precision
 #HONG = -D__MPI -D__CUDA -D__MIX_PRECISION -D__NORMAL
-# TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 
 
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
@@ -109,7 +103,7 @@ TESTFILE=$(patsubst %.o, ${OBJ_DIR}/%.o, ${TESTFILE0})
 
 #LIBS = ${FFTW_LIB} ${CUDA_LIB} -ltcmalloc -lprofiler
 LIBS = ${FFTW_LIB} ${CUDA_LIB}
-OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g 
+OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g -fsanitize=address -fno-omit-frame-pointer
 #==========================
 # MAKING OPTIONS
 #==========================

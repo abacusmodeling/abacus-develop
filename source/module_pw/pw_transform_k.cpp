@@ -62,11 +62,10 @@ void PW_Basis_K:: real2recip(const double * in, std::complex<double> * out, cons
     const int npy = this->ny * this->nplane;
     for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        const int ixpy2 = ix*npy*2;
         const int ixpy = ix*npy;
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            this->ft.r_rspace[ixpy2 + ipy] = in[ixpy + ipy];
+            this->ft.r_rspace[ixpy + ipy] = in[ixpy + ipy];
         }
     }
 
@@ -163,21 +162,19 @@ void PW_Basis_K:: recip2real(const std::complex<double> * in, double * out, cons
     if(add)
     for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        const int ixpy2 = ix*npy*2;
         const int ixpy = ix*npy;
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            out[ixpy + ipy] += factor * this->ft.r_rspace[ixpy2 + ipy];
+            out[ixpy + ipy] += factor * this->ft.r_rspace[ixpy + ipy];
         }
     }
     else
     for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        const int ixpy2 = ix*npy*2;
         const int ixpy = ix*npy;
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            out[ixpy + ipy] = this->ft.r_rspace[ixpy2 + ipy];
+            out[ixpy + ipy] = this->ft.r_rspace[ixpy + ipy];
         }
     }
     ModuleBase::timer::tick(this->classname, "recip2real");
@@ -232,11 +229,10 @@ void PW_Basis_K:: real2recip(const float * in, std::complex<float> * out, const 
     const int npy = this->ny * this->nplane;
     for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        const int ixpy2 = ix*npy*2;
         const int ixpy = ix*npy;
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            this->ft.rf_rspace[ixpy2 + ipy] = in[ixpy + ipy];
+            this->ft.rf_rspace[ixpy + ipy] = in[ixpy + ipy];
         }
     }
 
@@ -326,21 +322,19 @@ void PW_Basis_K:: recip2real(const std::complex<float> * in, float * out, const 
     if(add)
     for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        const int ixpy2 = ix*npy*2;
         const int ixpy = ix*npy;
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            out[ixpy + ipy] += factor * this->ft.rf_rspace[ixpy2 + ipy];
+            out[ixpy + ipy] += factor * this->ft.rf_rspace[ixpy + ipy];
         }
     }
     else
     for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        const int ixpy2 = ix*npy*2;
         const int ixpy = ix*npy;
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            out[ixpy + ipy] = this->ft.rf_rspace[ixpy2 + ipy];
+            out[ixpy + ipy] = this->ft.rf_rspace[ixpy + ipy];
         }
     }
     ModuleBase::timer::tick(this->classname, "recip2real");
