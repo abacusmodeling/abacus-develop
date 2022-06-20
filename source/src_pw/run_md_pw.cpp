@@ -71,14 +71,13 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
     // md cycle
     while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::MD_NSTEP && !verlet->stop)
     {
-        Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-
         if(verlet->step_ == 0)
         {
             verlet->setup(p_esolver);
         }
         else
         {
+            Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
             CE.update_all_pos(GlobalC::ucell);
 
             verlet->first_half();
@@ -97,11 +96,11 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
 
             if(cellchange)
             {
-                Variable_Cell::init_after_vc();
+                Variable_Cell::init_after_vc(p_esolver);
             }
 
             // reset local potential and initial wave function
-            GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
+            GlobalC::pot.init_pot(verlet->step_, GlobalC::sf.strucFac);
             
             // new wave functions
             //GlobalC::wf.wfcinit();
@@ -119,7 +118,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         if((verlet->step_ + verlet->step_rst_) % verlet->mdp.md_dumpfreq == 0)
         {
             // Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
-            verlet->outputMD(GlobalV::ofs_running);
+            verlet->outputMD(GlobalV::ofs_running, GlobalV::CAL_STRESS);
 
             MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
         }
@@ -128,7 +127,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         {
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
-            file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_ + verlet->step_rst_;
+            file << GlobalV::global_stru_dir << "STRU_MD_" << verlet->step_ + verlet->step_rst_;
 #ifdef __LCAO
             verlet->ucell.print_stru_file(GlobalC::ORB, file.str(), 1, 1);
 #else
@@ -146,9 +145,10 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
         std::stringstream ssp_ave;
         ssp << GlobalV::global_out_dir << "ElecStaticPot";
         ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(),GlobalC::rhopw); //output 'Hartree + local pseudopot'
     }
 
+    delete verlet;
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
     return;
 }
@@ -206,7 +206,7 @@ void Run_MD_PW::md_force_virial(
 
     // mohan added eiter to count for the electron iteration number, 2021-01-28
     int eiter = 0;
-    if (GlobalV::CALCULATION == "md")
+    if (GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
     {
         Electrons elec;
 #ifdef __LCAO

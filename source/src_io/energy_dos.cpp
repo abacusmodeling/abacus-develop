@@ -23,13 +23,16 @@
 #endif
 #include <sys/time.h>
 
-void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
+void energy::perform_dos(
+	const psi::Psi<double> *psid, 
+	const psi::Psi<std::complex<double>> *psi, 
+	LCAO_Hamilt &uhm)
 {
 	ModuleBase::TITLE("energy","perform_dos");
 
     const Parallel_Orbitals* pv = uhm.LM->ParaV;
 
-    if(out_dos !=0 || out_band !=0)
+    if(out_dos !=0 || out_band !=0 || out_proj_band !=0)
     {
         GlobalV::ofs_running << "\n\n\n\n";
         GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
@@ -179,7 +182,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 #ifdef __LCAO
 	if(GlobalV::out_mul == 1)
 	{
-		Mulliken_Charge   MC(&lowf.wfc_gamma, &lowf.wfc_k);
+		Mulliken_Charge   MC(psid, psi);
 		MC.stdout_mulliken(uhm);			
 	}//qifeng add 2019/9/10
 #endif
@@ -264,7 +267,8 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 				Mulk[0].create(pv->ncol,pv->nrow);
 
 
-				ModuleBase::matrix Dwf = lowf.wfc_gamma[is];
+				psid->fix_k(is);
+				const double* ppsi = psid->get_pointer();
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
 					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
@@ -291,7 +295,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
 							uhm.LM->Sloc.data(), &one_int, &one_int, pv->desc,
-							Dwf.c, &one_int, &NB, pv->desc, &one_int,
+							ppsi, &one_int, &NB, pv->desc, &one_int,
 							&zero_float,
 							Mulk[0].c, &one_int, &NB, pv->desc,
 							&one_int);
@@ -305,7 +309,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 							const int ir = pv->trace_loc_row[j];
 							const int ic = pv->trace_loc_col[i];
-							waveg[j] = Mulk[0](ic,ir)*lowf.wfc_gamma[is](ic,ir);
+							waveg[j] = Mulk[0](ic,ir) * psid[0](ic,ir);
 							const double x = waveg[j].real();
 							BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 						}
@@ -347,8 +351,13 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 						uhm.LM->zeros_HSk('S');
 						uhm.LM->folding_fixedH(ik);
 
-
-						ModuleBase::ComplexMatrix Dwfc = conj(lowf.wfc_k[ik]);
+						psi->fix_k(ik);
+						psi::Psi<std::complex<double>> Dwfc(psi[0], 1);
+						std::complex<double>* p_dwfc = Dwfc.get_pointer();
+						for(int index = 0; index < Dwfc.size(); ++index)
+						{
+							p_dwfc[index] = conj(p_dwfc[index]);
+						}
 
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
@@ -379,7 +388,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float[0],
 									uhm.LM->Sloc2.data(), &one_int, &one_int, pv->desc,
-									Dwfc.c, &one_int, &NB, pv->desc, &one_int,
+									p_dwfc, &one_int, &NB, pv->desc, &one_int,
 									&zero_float[0],
 									Mulk[0].c, &one_int, &NB, pv->desc,
 									&one_int);
@@ -395,7 +404,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									const int ir = pv->trace_loc_row[j];
 									const int ic = pv->trace_loc_col[i];
 
-									waveg[j] = Mulk[0](ic,ir)*lowf.wfc_k[ik](ic,ir);
+									waveg[j] = Mulk[0](ic,ir) * psi[0](ic,ir);
 									const double x = waveg[j].real();
 									BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 
@@ -461,34 +470,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 			 out.close();
 		 }
 
-		 std::string Name_Angular[5][11];
 		 /* decomposed Mulliken charge */
-
-		 Name_Angular[0][0] = "s          ";
-		 Name_Angular[1][0] = "px         ";
-		 Name_Angular[1][1] = "py         ";
-		 Name_Angular[1][2] = "pz         ";
-		 Name_Angular[2][0] = "d3z^2-r^2  ";
-		 Name_Angular[2][1] = "dxy        ";
-		 Name_Angular[2][2] = "dxz        ";
-		 Name_Angular[2][3] = "dx^2-y^2   ";
-		 Name_Angular[2][4] = "dyz        ";
-		 Name_Angular[3][0] = "f5z^2-3r^2 ";
-		 Name_Angular[3][1] = "f5xz^2-xr^2";
-		 Name_Angular[3][2] = "f5yz^2-yr^2";
-		 Name_Angular[3][3] = "fzx^2-zy^2 ";
-		 Name_Angular[3][4] = "fxyz       ";
-		 Name_Angular[3][5] = "fx^3-3*xy^2";
-		 Name_Angular[3][6] = "f3yx^2-y^3 ";
-		 Name_Angular[4][0] = "g1         ";
-		 Name_Angular[4][1] = "g2         ";
-		 Name_Angular[4][2] = "g3         ";
-		 Name_Angular[4][3] = "g4         ";
-		 Name_Angular[4][4] = "g5         ";
-		 Name_Angular[4][5] = "g6         ";
-		 Name_Angular[4][6] = "g7         ";
-		 Name_Angular[4][7] = "g8         ";
-		 Name_Angular[4][8] = "g9         ";
 
 		 {std::stringstream as;
 			 as << GlobalV::global_out_dir << "PDOS";
@@ -563,34 +545,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 			 out << "<"<<"/"<<"pdos"<<">" <<std::endl;
 			 out.close();}
-		 {  std::stringstream os;
-			 os<<GlobalV::global_out_dir<<"Orbital";
-			 std::ofstream out(os.str().c_str());
-			 out<< std::setw(5)<<"io"<< std::setw(8) <<"spec" <<std::setw(5)<<"l"<<std::setw(5)<<"m"<<std::setw(5)<<"z"<<std::setw(5)<<"sym"<<std::endl;
-
-
-			 for (int i=0; i<GlobalC::ucell.nat; i++)
-			 {
-				 int   t = GlobalC::ucell.iat2it[i];
-				 Atom* atom1 = &GlobalC::ucell.atoms[t];  
-				 for(int j=0; j<atom1->nw; ++j)
-				 {
-					 const int L1 = atom1->iw2l[j];
-					 const int N1 = atom1->iw2n[j];
-					 const int m1 = atom1->iw2m[j];
-					 out <<std::setw(5) << i << std::setw(8) 
-						<< GlobalC::ucell.atoms[t].label <<std::setw(5)
-							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< Name_Angular[L1][m1] << std::endl;
-				 }
-			 }
-			 out <<std::endl<<std::endl;
-			 out <<std::setw(5)<< "io"<<std::setw(2)<<"="<<std::setw(2)<<"Orbital index in supercell"<<std::endl;
-			 out <<std::setw(5)<< "spec"<<std::setw(2)<<"="<<std::setw(2)<<"Atomic species label"<<std::endl;
-			 out <<std::setw(5)<< "l"<<std::setw(2)<<"="<<std::setw(2)<<"Angular mumentum quantum number"<<std::endl;
-			 out <<std::setw(5)<< "m"<<std::setw(2)<<"="<<std::setw(2)<<"Magnetic quantum number"<<std::endl;
-			 out <<std::setw(5)<< "z"<<std::setw(2)<<"="<<std::setw(2)<<"Zeta index of orbital"<<std::endl;
-			 out <<std::setw(5)<< "sym"<<std::setw(2)<<"="<<std::setw(2)<<"Symmetry name of real orbital"<<std::endl;
-			 out.close();}
+		this->print_orbital_file();
 
 	 }       
 	 delete[] pdos;
@@ -675,9 +630,308 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
 			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
 			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);
+
+		}
+	}//out_band
+
+	if(this->out_proj_band) // Projeced band structure added by jiyy-2022-4-20
+	{
+		int nks=0;
+		if(nspin0==1) 
+		{
+			nks = GlobalC::kv.nkstot;
+		}
+		else if(nspin0==2) 
+		{
+			nks = GlobalC::kv.nkstot/2;
 		}
 
-	}
+		ModuleBase::ComplexMatrix weightk;
+		ModuleBase::matrix weight;
+		int NUM = 0;
+		if(GlobalV::GAMMA_ONLY_LOCAL)
+		{
+			NUM=GlobalV::NLOCAL*GlobalV::NBANDS*nspin0;
+			weightk.create(nspin0, GlobalV::NBANDS*GlobalV::NLOCAL, true);
+			weight.create(nspin0, GlobalV::NBANDS*GlobalV::NLOCAL, true);
+		}
+		else
+		{
+			NUM=GlobalV::NLOCAL*GlobalV::NBANDS*GlobalC::kv.nks;
+			weightk.create(GlobalC::kv.nks, GlobalV::NBANDS*GlobalV::NLOCAL, true);
+			weight.create(GlobalC::kv.nks, GlobalV::NBANDS*GlobalV::NLOCAL, true);
+		}
+
+		for(int is=0; is<nspin0; is++)
+		{
+
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				std::vector<ModuleBase::matrix>   Mulk;
+				Mulk.resize(1);
+				Mulk[0].create(pv->ncol,pv->nrow);
+
+				psid->fix_k(is);
+				for (int i=0; i<GlobalV::NBANDS; ++i)		  
+				{  
+					const int NB= i+1;
+
+					const double one_float=1.0, zero_float=0.0;
+					const int one_int=1;
+
+				#ifdef __MPI
+					const char T_char='T';		
+					pdgemv_(
+							&T_char,
+							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
+							&one_float,
+							uhm.LM->Sloc.data(), &one_int, &one_int, pv->desc,
+							psid->get_pointer(), &one_int, &NB, pv->desc, &one_int,
+							&zero_float,
+							Mulk[0].c, &one_int, &NB, pv->desc,
+							&one_int);
+				#endif
+
+					for (int j=0; j<GlobalV::NLOCAL; ++j)
+					{
+
+						if ( pv->in_this_processor(j,i) )
+						{
+
+							const int ir = pv->trace_loc_row[j];
+							const int ic = pv->trace_loc_col[i];
+							weightk(is, i*GlobalV::NLOCAL+j) = Mulk[0](ic,ir) * psid[0](ic,ir);
+						}
+					} 
+				}//ib
+			}//if
+			else
+			{
+				GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+					GlobalV::ofs_running,
+					GlobalV::OUT_LEVEL,
+					GlobalC::ORB.get_rcutmax_Phi(), 
+					GlobalC::ucell.infoNL.get_rcutmax_Beta(), 
+					GlobalV::GAMMA_ONLY_LOCAL);
+
+				atom_arrange::search(
+					GlobalV::SEARCH_PBC,
+					GlobalV::ofs_running,
+					GlobalC::GridD, 
+					GlobalC::ucell, 
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input);//qifeng-2019-01-21
+
+				uhm.LM->allocate_HS_R(pv->nnr);
+				uhm.LM->zeros_HSR('S');
+				uhm.genH.calculate_S_no(uhm.LM->SlocR.data());
+				uhm.genH.build_ST_new('S', false, GlobalC::ucell, uhm.LM->SlocR.data());
+				std::vector<ModuleBase::ComplexMatrix> Mulk;
+				Mulk.resize(1);
+				Mulk[0].create(pv->ncol,pv->nrow);
+
+
+				for(int ik=0;ik<GlobalC::kv.nks;ik++)
+				{
+
+					if(is == GlobalC::kv.isk[ik])
+					{
+						uhm.LM->allocate_HS_k(pv->nloc);
+						uhm.LM->zeros_HSk('S');
+						uhm.LM->folding_fixedH(ik);
+
+
+						psi->fix_k(ik);
+						psi::Psi<std::complex<double>> Dwfc(psi[0], 1);
+						std::complex<double>* p_dwfc = Dwfc.get_pointer();
+						for(int index = 0; index < Dwfc.size(); ++index)
+						{
+							p_dwfc[index] = conj(p_dwfc[index]);
+						}
+
+						for (int i=0; i<GlobalV::NBANDS; ++i)		  
+						{     
+							const int NB= i+1;
+
+							const double one_float[2]={1.0, 0.0}, zero_float[2]={0.0, 0.0};
+							const int one_int=1;
+							//   const int two_int=2;
+							const char T_char='T';		// N_char='N',U_char='U'
+
+						#ifdef __MPI
+							pzgemv_(
+									&T_char,
+									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
+									&one_float[0],
+									uhm.LM->Sloc2.data(), &one_int, &one_int, pv->desc,
+									p_dwfc, &one_int, &NB, pv->desc, &one_int,
+									&zero_float[0],
+									Mulk[0].c, &one_int, &NB, pv->desc,
+									&one_int);
+						#endif
+
+
+							for (int j=0; j<GlobalV::NLOCAL; ++j)
+							{
+
+								if ( pv->in_this_processor(j,i) )
+								{
+
+									const int ir = pv->trace_loc_row[j];
+									const int ic = pv->trace_loc_col[i];
+
+									weightk(ik, i*GlobalV::NLOCAL+j) = Mulk[0](ic,ir) * psi[0](ic,ir);
+								}
+							}                             
+
+						}//ib
+
+					}//if                       
+				}//ik
+#ifdef __MPI
+				atom_arrange::delete_vector(
+					GlobalV::ofs_running,
+					GlobalV::SEARCH_PBC, 
+					GlobalC::GridD, 
+					GlobalC::ucell, 
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input);
+#endif
+			}//else
+		#ifdef __MPI
+		MPI_Reduce(weightk.real().c, weight.c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
+		#endif
+
+		if(GlobalV::MY_RANK == 0)
+		{
+			std::stringstream ps2;
+			ps2 << GlobalV::global_out_dir << "PBANDS_" << is+1;
+			GlobalV::ofs_running << "\n Output projected bands in file: " << ps2.str() << std::endl;
+			std::ofstream out(ps2.str().c_str());
+
+			out << "<"<<"pband"<<">" <<std::endl;
+			out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< std::endl;
+			if (GlobalV::NSPIN==4)
+				out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL/2<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			else
+				out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			out << "<"<<"band_structure nkpoints="<<"\""<<nks<<"\""<<" nbands="<<"\""<<GlobalV::NBANDS<<"\""<<" units=\"eV\""<<">" <<std::endl;
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				for(int ib = 0; ib < GlobalV::NBANDS; ib++)
+						out << " " << (GlobalC::wf.ekb[is*nks][ib]) * ModuleBase::Ry_to_eV;
+				out << std::endl;
+			}
+			else
+			{
+				for(int ik=0;ik<nks;ik++)
+				{
+					for(int ib = 0; ib < GlobalV::NBANDS; ib++)
+						out << " " << (GlobalC::wf.ekb[ik+is*nks][ib]) * ModuleBase::Ry_to_eV;
+					out << std::endl;
+				}
+			}
+			out << "<"<<"/"<<"band_structure"<<">"<<std::endl;
+
+			for (int i=0; i<GlobalC::ucell.nat; i++)
+			{   
+				int a = GlobalC::ucell.iat2ia[i];
+				int t = GlobalC::ucell.iat2it[i];
+				Atom* atom1 = &GlobalC::ucell.atoms[t];
+				const int s0 = GlobalC::ucell.itiaiw2iwt(t, a, 0);
+				for(int j=0; j<atom1->nw; ++j)
+				{
+					const int L1 = atom1->iw2l[j];
+					const int N1 = atom1->iw2n[j];
+					const int m1 = atom1->iw2m[j];
+					const int w = GlobalC::ucell.itiaiw2iwt(t, a, j);
+
+					//out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<std::endl;
+					out << "<"<<"orbital" <<std::endl;
+					out <<std::setw(6)<< "index"<<"="<<"\""<<std::setw(40) <<w+1<<"\""<<std::endl;
+					out <<std::setw(5)<< "atom"<<"_"<<"index"<<"="<<"\""<<std::setw(40) <<i+1<<"\""<<std::endl;
+					out <<std::setw(8)<< "species"<<"="<<"\""<<GlobalC::ucell.atoms[t].label<<"\""<<std::endl;
+					out<<std::setw(2)<< "l"<<"="<<"\""<<std::setw(40)<<L1<<"\""<<std::endl;
+					out <<std::setw(2)<< "m"<<"="<<"\""<<std::setw(40)<<m1<<"\""<<std::endl;
+					out <<std::setw(2)<< "z"<<"="<<"\""<<std::setw(40)<<N1+1<<"\""<<std::endl;
+					out << ">" <<std::endl;
+					out << "<"<<"data"<<">" <<std::endl;
+					if(GlobalV::GAMMA_ONLY_LOCAL)
+					{
+						for(int ib=0;ib<GlobalV::NBANDS;ib++)
+						{
+							if (GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
+								out <<std::setw(13)<< weight(is, ib*GlobalV::NLOCAL+w);
+							else if (GlobalV::NSPIN==4)
+							{
+								int w0 = w-s0;
+								out <<std::setw(13)<< weight(is, ib*GlobalV::NLOCAL+s0+2*w0)+weight(is, ib*GlobalV::NLOCAL+s0+2*w0+1);
+							}
+						}
+						out <<std::endl;
+					}
+					else
+					{
+						for(int ik=0;ik<nks;ik++)
+						{
+							for(int ib=0;ib<GlobalV::NBANDS;ib++)
+							{
+								if (GlobalV::NSPIN==1)
+									out <<std::setw(13)<< weight(ik, ib*GlobalV::NLOCAL+w);
+								else if(GlobalV::NSPIN==2)
+									out <<std::setw(13)<< weight(ik+nks*is, ib*GlobalV::NLOCAL+w);
+								else if (GlobalV::NSPIN==4)
+								{
+									int w0 = w-s0;
+									out <<std::setw(13)<< weight(ik, ib*GlobalV::NLOCAL+s0+2*w0)+weight(ik, ib*GlobalV::NLOCAL+s0+2*w0+1);
+								}
+							}
+							out <<std::endl;
+						}
+					}
+					out << "<"<<"/"<<"data"<<">" <<std::endl;
+					out << "<"<<"/"<<"orbital"<<">" <<std::endl;
+				}//j
+			}//i
+
+			out << "<"<<"/"<<"pband"<<">" <<std::endl;
+			out.close();}
+		}//is
+		this->print_orbital_file();
+	}//out_proj_band
 	return;
 }
 
+void energy::print_orbital_file(void)
+{  
+	std::stringstream os;
+	os<<GlobalV::global_out_dir<<"Orbital";
+	std::ofstream out(os.str().c_str());
+	out<< std::setw(5)<<"io"<< std::setw(8) <<"spec" <<std::setw(5)<<"l"<<std::setw(5)<<"m"<<std::setw(5)<<"z"<<std::setw(5)<<"sym"<<std::endl;
+
+
+	for (int i=0; i<GlobalC::ucell.nat; i++)
+	{
+		int   t = GlobalC::ucell.iat2it[i];
+		Atom* atom1 = &GlobalC::ucell.atoms[t];  
+		for(int j=0; j<atom1->nw; ++j)
+		{
+			const int L1 = atom1->iw2l[j];
+			const int N1 = atom1->iw2n[j];
+			const int m1 = atom1->iw2m[j];
+			out <<std::setw(5) << i << std::setw(8) 
+				<< GlobalC::ucell.atoms[t].label <<std::setw(5)
+					<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< GlobalC::en.Name_Angular[L1][m1] << std::endl;
+		}
+	}
+	out <<std::endl<<std::endl;
+	out <<std::setw(5)<< "io"<<std::setw(2)<<"="<<std::setw(2)<<"Orbital index in supercell"<<std::endl;
+	out <<std::setw(5)<< "spec"<<std::setw(2)<<"="<<std::setw(2)<<"Atomic species label"<<std::endl;
+	out <<std::setw(5)<< "l"<<std::setw(2)<<"="<<std::setw(2)<<"Angular mumentum quantum number"<<std::endl;
+	out <<std::setw(5)<< "m"<<std::setw(2)<<"="<<std::setw(2)<<"Magnetic quantum number"<<std::endl;
+	out <<std::setw(5)<< "z"<<std::setw(2)<<"="<<std::setw(2)<<"Zeta index of orbital"<<std::endl;
+	out <<std::setw(5)<< "sym"<<std::setw(2)<<"="<<std::setw(2)<<"Symmetry name of real orbital"<<std::endl;
+	out.close();
+
+	return;
+}

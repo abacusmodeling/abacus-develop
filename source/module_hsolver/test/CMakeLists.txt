@@ -5,14 +5,14 @@ AddTest(
   LIBS ${math_libs} base 
   SOURCES diago_cg_test.cpp ../diago_cg.cpp  ../diago_iter_assist.cpp ../../module_hamilt/hamilt_pw.cpp 
           ../../module_psi/psi.cpp  ../../src_parallel/parallel_reduce.cpp
-          ../../src_parallel/parallel_global.cpp ../../module_pw/unittest/test_tool.cpp
+          ../../src_parallel/parallel_global.cpp ../../module_pw/test/test_tool.cpp
 )
 AddTest(
   TARGET HSolver_dav
   LIBS ${math_libs} base 
   SOURCES diago_david_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp ../../module_hamilt/hamilt_pw.cpp 
           ../../module_psi/psi.cpp  ../../src_parallel/parallel_reduce.cpp ../../src_parallel/parallel_global.cpp 
-          ../../module_pw/unittest/test_tool.cpp
+          ../../module_pw/test/test_tool.cpp
 )
 AddTest(
   TARGET HSolver_LCAO

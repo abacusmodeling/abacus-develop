@@ -21,11 +21,12 @@
 #include "src_pw/magnetism.h"
 #include "src_pw/occupy.h"
 #include "src_pw/potential.h"
-#include "src_pw/pw_basis.h"
+#include "src_pw/structure_factor.h"
 #include "src_pw/pw_complement.h"
 #include "src_pw/use_fft.h"
 #include "src_pw/wavefunc.h"
 #include "src_pw/wf_atomic.h"
+#include "module_pw/pw_basis_k.h"
 
 #ifdef __LCAO
 #include "module_neighbor/sltk_atom_arrange.h"
@@ -42,14 +43,13 @@
 #include "module_orbital/parallel_orbitals.h"
 #include "run_lcao.h"
 #include "src_io/wf_local.h"
-#include "src_lcao/gint_gamma.h"
-#include "src_lcao/gint_tools.h"
-#include "src_lcao/grid_base_beta.h"
-#include "src_lcao/grid_bigcell.h"
-#include "src_lcao/grid_meshball.h"
-#include "src_lcao/grid_meshcell.h"
-#include "src_lcao/grid_meshk.h"
-#include "src_lcao/grid_technique.h"
+#include "module_gint/gint_gamma.h"
+#include "module_gint/gint_tools.h"
+#include "module_gint/grid_bigcell.h"
+#include "module_gint/grid_meshball.h"
+#include "module_gint/grid_meshcell.h"
+#include "module_gint/grid_meshk.h"
+#include "module_gint/grid_technique.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/local_orbital_wfc.h"
 #include "src_parallel/parallel_global.h"
@@ -218,7 +218,10 @@ UnitCell_pseudo ucell;
 ModuleSymmetry::Symmetry symm;
 Parallel_Grid Pgrid;
 Use_FFT UFFT;
-PW_Basis pw;
+Structure_Factor sf;
+ModulePW::PW_Basis* rhopw;
+ModulePW::PW_Basis_Big *bigpw = static_cast<ModulePW::PW_Basis_Big*>(rhopw);
+ModulePW::PW_Basis_K* wfcpw;
 pseudopot_cell_vnl ppcell;
 Hamilt hm;
 energy en;
@@ -240,17 +243,10 @@ void Occupy::calculate_weights()
     GlobalC::wf.wg(0, 3) = 0.0;
 }
 
-void Use_FFT::allocate()
-{
-    delete[] porter;
-    porter = new std::complex<double>[GlobalC::pw.nrxx];
-    return;
-}
-
 void wavefunc::allocate_ekb_wg(const int nks)
 {
     ModuleBase::TITLE("wavefunc", "init_local");
-    this->npwx = GlobalC::pw.setupIndGk(this->igk, GlobalC::kv.ngk);
+    this->npwx = GlobalC::wfcpw->npwk_max;
     this->ekb = new double *[nks];
     for (int ik = 0; ik < nks; ik++)
     {
@@ -305,26 +301,26 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	ModuleBase::CHECK_INT(ifs, GlobalV::NSPIN);
 	ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef);
 
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncx);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncy);	
-	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncz);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nx);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->ny);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::rhopw->nz);	
 
-	const int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+	const int nxy = GlobalC::rhopw->nx * GlobalC::rhopw->ny;
 	double *zpiece = new double[nxy];
-	for(int iz=0; iz<GlobalC::pw.ncz; iz++)
+	for(int iz=0; iz<GlobalC::rhopw->nz; iz++)
 	{
 		ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
-		for(int j=0; j<GlobalC::pw.ncy; j++)
+		for(int j=0; j<GlobalC::rhopw->ny; j++)
 		{
-			for(int i=0; i<GlobalC::pw.ncx; i++)
+			for(int i=0; i<GlobalC::rhopw->nx; i++)
 			{
-				ifs >> zpiece[ i*GlobalC::pw.ncy + j ];
+				ifs >> zpiece[ i*GlobalC::rhopw->ny + j ];
 			}
 		}
 
 		for(int ir=0; ir<nxy; ir++)
 		{
-			rho[ir*GlobalC::pw.nczp+iz] = zpiece[ir];
+			rho[ir*GlobalC::rhopw->nplane+iz] = zpiece[ir];
 		}
 	}// iz
 	delete[] zpiece;
@@ -402,7 +398,7 @@ double Charge::sum_rho(void) const
 	}
 
 	// multiply the sum of charge density by a factor
-    sum_rho *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+    sum_rho *= GlobalC::ucell.omega / static_cast<double>( GlobalC::rhopw->nxyz );
 
 	// mohan fixed bug 2010-01-18,
 	// sum_rho may be smaller than 1, like Na bcc.
@@ -417,10 +413,10 @@ double Charge::sum_rho(void) const
 
 
 
-void Use_FFT::ToRealSpace(int const &is, ModuleBase::ComplexMatrix const &vg, double *vr)
+void Use_FFT::ToRealSpace(int const &is, const ModuleBase::ComplexMatrix &vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
 }
-void Use_FFT::ToRealSpace(std::complex<double> const *vg, double *vr)
+void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr, ModulePW::PW_Basis* rho_basis)
 {
 }
 bool Occupy::use_gaussian_broadening = false;
@@ -432,9 +428,6 @@ double Magnetism::get_nelup()
 double Magnetism::get_neldw()
 {
     return 0;
-}
-void PW_Basis::bspline_sf(const int norder)
-{
 }
 
 bool ModuleSymmetry::Symmetry_Basic::equal(double const &m, double const &n) const
@@ -794,28 +787,30 @@ void UnitCell_pseudo::check_dtau(void)
 
 void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
 {
-    GlobalC::pw.set(INPUT.gamma_only,
-                    INPUT.ecutwfc,
-                    INPUT.ecutrho,
-                    INPUT.nx,
-                    INPUT.ny,
-                    INPUT.nz,
-                    INPUT.ncx,
-                    INPUT.ncy,
-                    INPUT.ncz,
-                    INPUT.bx,
-                    INPUT.by,
-                    INPUT.bz,
-                    INPUT.pw_seed,
-                    INPUT.nbspline);
+    GlobalC::sf.set(INPUT.nbspline);
     GlobalC::ucell.setup_cell(GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
     GlobalC::kv.set(GlobalC::symm,
                     GlobalV::global_kpoint_card,
                     GlobalV::NSPIN,
                     GlobalC::ucell.G,
                     GlobalC::ucell.latvec);
-    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+
+	// pw_rho = new ModuleBase::PW_Basis();
+    //temporary, it will be removed
+    GlobalC::rhopw = new ModulePW::PW_Basis_Big();
+    GlobalC::bigpw = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
+	GlobalC::bigpw->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
+    GlobalC::wfcpw = new ModulePW::PW_Basis_K_Big(); 
+    ModulePW::PW_Basis_K_Big* tmp2 = static_cast<ModulePW::PW_Basis_K_Big*>(GlobalC::wfcpw);
+    tmp2->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
+    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc, 1, 0);
+    GlobalC::rhopw->initparameters(false, 4 * INPUT.ecutwfc);
+	GlobalC::rhopw->setuptransform();
+	GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
+                                1, 0);
+    GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+	
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
 
     ORB_control orb_con(GlobalV::GAMMA_ONLY_LOCAL,
                         GlobalV::NLOCAL,
@@ -983,7 +978,7 @@ void UnitCell::set_iat2itia(void)
  * because of lack of codes without mpi
  * in WF_Local::distri_lowf_new() called by WF_Local::read_lowf()
  ******************************/
-void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt, Local_Orbital_wfc &lowf)
+void Local_Orbital_Charge::gamma_file(psi::Psi<double>* psid, Local_Orbital_wfc &lowf)
 {
     for (int is = 0; is < GlobalV::NSPIN; ++is)
     {
@@ -1035,9 +1030,8 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt, Local_Orbital_wf
     }
 }
 
-void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
+void Local_Orbital_Charge::allocate_gamma(const int& lgd, psi::Psi<double>* psid)
 {
-    int lgd = gt.lgd;
     this->DM = new double **[GlobalV::NSPIN];
     this->DM_pool = new double *[GlobalV::NSPIN];
     for (int is = 0; is < GlobalV::NSPIN; is++)
@@ -1179,18 +1173,18 @@ void set_matrix_grid()
                          GlobalC::ucell,
                          GlobalV::SEARCH_RADIUS,
                          GlobalV::test_atom_input);
-    GlobalC::GridT.set_pbc_grid(GlobalC::pw.ncx,
-                                GlobalC::pw.ncy,
-                                GlobalC::pw.ncz,
-                                GlobalC::pw.bx,
-                                GlobalC::pw.by,
-                                GlobalC::pw.bz,
-                                GlobalC::pw.nbx,
-                                GlobalC::pw.nby,
-                                GlobalC::pw.nbz,
-                                GlobalC::pw.nbxx,
-                                GlobalC::pw.nbzp_start,
-                                GlobalC::pw.nbzp);
+    GlobalC::GridT.set_pbc_grid(GlobalC::rhopw->nx,
+                                GlobalC::rhopw->ny,
+                                GlobalC::rhopw->nz,
+                                GlobalC::bigpw->bx,
+                                GlobalC::bigpw->by,
+                                GlobalC::bigpw->bz,
+                                GlobalC::bigpw->nbx,
+                                GlobalC::bigpw->nby,
+                                GlobalC::bigpw->nbz,
+                                GlobalC::bigpw->nbxx,
+                                GlobalC::bigpw->nbzp_start,
+                                GlobalC::bigpw->nbzp);
     // std::cout << "GridT.max_atom in set_matrix_grid " << GlobalC::GridT.max_atom << std::endl;
 }
 //#endif
@@ -1904,7 +1898,7 @@ void LCAO_Orbitals::read_orb_file(
 InfoNonlocal::InfoNonlocal()
 {
     this->Beta = new Numerical_Nonlocal[1];
-	this->nproj = new int[1];
+	this->nproj = nullptr;
     this->nprojmax = 0;
     this->rcutmax_Beta = 0.0;
 }
@@ -2204,22 +2198,22 @@ using namespace std;
 Pseudopot_upf::Pseudopot_upf()
 {
 	this->els = new std::string[1];
-	this->lchi = new int[1];
-	this->oc = new double[1];
+	this->lchi = nullptr;
+	this->oc = nullptr;
 
-	this->r = new double[1];
-	this->rab = new double[1];
-	this->vloc = new double[1];
+	this->r = nullptr;
+	this->rab = nullptr;
+	this->vloc = nullptr;
 
-	this->kkbeta = new int[1];
-	this->lll = new int[1];
+	this->kkbeta = nullptr;
+	this->lll = nullptr;
 
-	this->rho_at = new double[1];
-	this->rho_atc = new double[1];
+	this->rho_at = nullptr;
+	this->rho_atc = nullptr;
 
-	this->nn = new int[1];//zhengdy-soc
-	this->jchi = new double[1];
-	this->jjj = new double[1];
+	this->nn = nullptr;//zhengdy-soc
+	this->jchi = nullptr;
+	this->jjj = nullptr;
 
 	functional_error = 0;//xiaohui add 2015-03-24
 }

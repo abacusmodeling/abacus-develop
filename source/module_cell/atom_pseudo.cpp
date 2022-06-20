@@ -6,8 +6,8 @@ Atom_pseudo::Atom_pseudo()
 	pseudo_fn = "not_init";
 	mass = 0.0;
 
-	for(int is=0;is<4;is++) this->index1_soc[is] = new int[1];
-	for(int is=0;is<4;is++) this->index2_soc[is] = new int[1];
+	for(int is=0;is<4;is++) this->index1_soc[is] = nullptr;
+	for(int is=0;is<4;is++) this->index2_soc[is] = nullptr;
 
 }
 

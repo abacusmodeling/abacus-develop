@@ -40,8 +40,8 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 
 }
 
-void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
-    Local_Orbital_wfc &lowf)
+void Local_Orbital_wfc::allocate_k(const int& lgd,
+    psi::Psi<std::complex<double>>* psi)
 {
 	ModuleBase::TITLE("Local_Orbital_wfc","allocate_k");
 	if(GlobalV::NLOCAL < GlobalV::NBANDS)
@@ -67,20 +67,20 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 		this->complex_flag = false;
 	}
 	// allocate the second part.
-	//if(gt.lgd != 0) xiaohui modify 2015-02-04, fixed memory bug
-	//if(gt.lgd != 0 && this->complex_flag == false)
-	if(gt.lgd != 0)
+	//if(lgd != 0) xiaohui modify 2015-02-04, fixed memory bug
+	//if(lgd != 0 && this->complex_flag == false)
+	if(lgd != 0)
 	{
-		//std::cout<<"gt.lgd="<<gt.lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<std::endl; //delete 2015-09-06, xiaohui
-		const int page=GlobalV::NBANDS*gt.lgd;
+		//std::cout<<"lgd="<<lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<std::endl; //delete 2015-09-06, xiaohui
+		const int page=GlobalV::NBANDS*lgd;
 		this->wfc_k_grid2=new std::complex<double> [GlobalC::kv.nks*page];
 		ModuleBase::GlobalFunc::ZEROS(wfc_k_grid2, GlobalC::kv.nks*page);
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
-				this->wfc_k_grid[ik][ib] = &wfc_k_grid2[ik*page+ib*gt.lgd];
-				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"wfc_k_grid address: "<<wfc_k_grid[ik][ib]<<" wfc_k_grid2 address: "<<&wfc_k_grid2[ik*page+ib*gt.lgd]<<std::endl;
+				this->wfc_k_grid[ik][ib] = &wfc_k_grid2[ik*page+ib*lgd];
+				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"wfc_k_grid address: "<<wfc_k_grid[ik][ib]<<" wfc_k_grid2 address: "<<&wfc_k_grid2[ik*page+ib*lgd]<<std::endl;
 			}
 			//std::cout<<"set wfc_k_grid pointer success, ik: "<<ik<<std::endl;
 			ModuleBase::Memory::record("LocalOrbital_Coef","wfc_k_grid",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
@@ -98,10 +98,19 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 	{
 		int error;
 		std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
+        if(psi == nullptr)
+        {
+            ModuleBase::WARNING_QUIT("allocate_k","psi should be allocated first!");
+        }
+        else
+        {
+            psi->resize(GlobalC::kv.nkstot, this->ParaV->ncol_bands, this->ParaV->nrow);
+        }
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
-			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-            error = WF_Local::read_lowf_complex(this->wfc_k_grid[ik], ik, lowf);
+            GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
+            std::complex<double>** ctot;
+            error = WF_Local::read_lowf_complex(ctot, ik, this->ParaV, psi);
 #ifdef __MPI
             Parallel_Common::bcast_int(error);
 #endif
@@ -147,7 +156,12 @@ int Local_Orbital_wfc::localIndex(int globalindex, int nblk, int nprocs, int& my
 }
 
 #ifdef __MPI
-void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, const double* wfc_2d, double** wfc_grid)
+void Local_Orbital_wfc::wfc_2d_to_grid(
+    int out_wfc_lcao, 
+    const double* wfc_2d, 
+    double** wfc_grid, 
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg)
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
     ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
@@ -208,7 +222,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(int out_wfc_lcao, const double* wfc_2d, d
     {
         std::stringstream ss;
         ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
-        WF_Local::write_lowf(ss.str(), ctot);
+        WF_Local::write_lowf(ss.str(), ctot, ekb, wg);
         for (int i = 0; i < GlobalV::NBANDS; i++)
         {
             delete[] ctot[i];
@@ -224,7 +238,9 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
     int out_wfc_lcao,
     const std::complex<double>* wfc_2d,
     std::complex<double>** wfc_grid,
-    int ik)
+    int ik, 
+    const ModuleBase::matrix& ekb, 
+    const ModuleBase::matrix& wg)
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
     ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
@@ -285,8 +301,8 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
     if (out_wfc_lcao && myid == 0)
     {
         std::stringstream ss;
-        ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";
-        WF_Local::write_lowf_complex(ss.str(), ctot, ik);
+        ss << GlobalV::global_readin_dir << "LOWF_K_" << ik + 1 << ".dat";
+        WF_Local::write_lowf_complex(ss.str(), ctot, ik, ekb, wg);
         for (int i = 0; i < GlobalV::NBANDS; i++)
         {
             delete[] ctot[i];

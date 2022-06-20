@@ -13,10 +13,22 @@
 
 ## Installation
 
+### Container Deployment
+
+We've built a ready-for-use version of ABACUS with docker [here](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus). For a quick start: pull the image, prepare the data, run container. Instructions on using the image can be accessed in [Dockerfile](../Dockerfile).
+
+We also offer a pre-built docker image containing all the requirements for development. Please refer to our [Package Page](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus-development-kit).
+
+The project is ready for VS Code development container. Please refer to [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers#_quick-start-try-a-development-container). Choose `Open a Remote Window -> Clone a Repository in Container Volume` in VS Code command palette, and put the [git address](https://github.com/deepmodeling/abacus-develop.git) of `ABACUS` when prompted.
+
+We also support [gitpod](https://www.gitpod.io/) to offer an ready-to-use online development environment.
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/deepmodeling/abacus-develop)
+
 ### Prerequisites
 
-ABACUS current supports Linux. To compile ABACUS, please make sure that the following prerequisites are
-present:
+ABACUS currently supports Linux. `Dockerfile`s under the root directory of our repo will come in handy.
+
+To compile ABACUS, please make sure that the following prerequisites are present:
 
 - C++ compiler, supporting C++11. You can use [Intel® C++ compiler](https://software.intel.com/enus/c-compilers) or [GCC](https://gcc.gnu.org/).
 - MPI compiler. The recommended version are [Intel MPI](https://software.intel.com/enus/mpi-library) or [MPICH](https://www.mpich.org/).
@@ -24,23 +36,32 @@ present:
 - [BLAS](http://www.netlib.org/blas/). You can use [OpenBLAS](https://www.openblas.net/).
 - [LAPACK](http://www.netlib.org/lapack/).
 - [ScaLAPACK](http://www.netlib.org/scalapack/).
-- [FFTW](http://www.fftw.org/).
-- [ELPA](https://elpa.mpcdf.mpg.de/).
+- [FFTW3](http://www.fftw.org/).
+- [ELPA](https://elpa.mpcdf.mpg.de/) >= 2017.
 - [CEREAL](https://uscilab.github.io/cereal/).
+
+These packages can be installed with popular package management system, such as `apt` and `yum`:
+
+```bash
+sudo apt update && sudo apt install -y libopenblas-dev liblapack-dev libscalapack-mpi-dev libelpa-dev libfftw3-dev libcereal-dev libxc-dev g++ make cmake bc git
+```
+
+> Please double-check the installed version of ELPA!
 
 Alternatively, you can choose [Intel® oneAPI toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/commercial-base-hpc.html) (former Parallel Studio) as toolchain. The [Intel® oneAPI Base Toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html#base-kit) contains Intel® oneAPI Math Kernel Library (aka `MKL`), including `BLAS`, `LAPACK`, `ScaLAPACK` and `FFTW3`,  - this means that no Fortran compiler required anymore. The [Intel® oneAPI HPC Toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html#hpc-kit) contains Intel® MPI Library, and C++ compiler(including MPI compiler). Please noted that building `elpa` with a different MPI library may cause conflict between MPI libraries. Don't forget to [set environment variables](https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-intel-oneapi-render-linux/top/configure-your-system.html) before you start! `cmake` will use Intel MKL if the environment variable `MKLROOT` is set.
 
 If you have trouble building requirements, our Dockerfiles in root path offer a reference, or read the section below to use a pre-built container.
+
+And of course, a copy of ABACUS source code is required:
+
+- Clone the whole repo with git: `git clone https://github.com/deepmodeling/abacus-develop.git`
+- Clone the minimum required part of repo: `git clone https://github.com/deepmodeling/abacus-develop.git --depth=1`
+- Download the latest source code without git: `wget https://github.com/deepmodeling/abacus-develop/archive/refs/heads/develop.zip`
+- Get the source code of a stable version [here](https://github.com/deepmodeling/abacus-develop/releases)
+- If you have connection issues accessing GitHub, please try out our official [Gitee repo](https://gitee.com/deepmodeling/abacus-develop/): replacing 'github.com' with 'gitee.com' works for all the links above. e.g. `git clone https://gitee.com/deepmodeling/abacus-develop.git`
+
+
 [back to top](#download-and-install)
-
-### Container Deployment
-
-We offer a pre-built docker image containing all the requirements - you only need to clone and compile `abacus` in the container. Please refer to our [Package Page](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus-development-kit).
-
-The project is ready for VS Code development container. Please refer to [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers#_quick-start-try-a-development-container). Choose `Open a Remote Window -> Clone a Repository in Container Volume` in VS Code command palette, and put the [git address](https://github.com/deepmodeling/abacus-develop.git) of `ABACUS` when prompted.
-
-We also support [gitpod](https://www.gitpod.io/) to offer an ready-to-use online development environment.
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/deepmodeling/abacus-develop)
 
 ### Build and install ABACUS with CMake
 
@@ -74,6 +95,9 @@ You can also choose to build with which components.
 
 ```bash
 cmake -B build -DUSE_LIBXC=1 -DUSE_CUDA=1
+```
+```bash
+cmake -B build -DUSE_CUSOLVER_LCAO=1
 ```
 
 If Libxc is not installed in standard path (i.e. installed with a custom prefix path), you may add the installation prefix of `FindLibxc.cmake` to `CMAKE_MODULE_PATH` environment variable, or set `Libxc_DIR` to the directory containing the file.

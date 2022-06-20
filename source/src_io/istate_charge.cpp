@@ -7,9 +7,9 @@
 #include "../module_base/blas_connector.h"
 
 IState_Charge::IState_Charge(
-    std::vector<ModuleBase::matrix>& wfc_gamma_in,
+    psi::Psi<double>* wfc_gamma_in,
     Local_Orbital_Charge& loc_in) :
-    wfc_gamma(&wfc_gamma_in),
+    wfc_gamma(wfc_gamma_in),
     loc(&loc_in)
 {}
 
@@ -131,12 +131,13 @@ void IState_Charge::begin(Gint_Gamma &gg)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 
 			// band.
-   			gg.cal_rho(this->loc->DM);
+			Gint_inout inout(this->loc->DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+   			gg.cal_gint(&inout);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			std::stringstream ss;
 			std::stringstream ss1;
@@ -213,25 +214,26 @@ void IState_Charge::idmatrix(const int &ib)
 			}
 		
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			ModuleBase::matrix wg_wfc(this->wfc_gamma->at(is));
+			this->wfc_gamma->fix_k(is);
+			psi::Psi<double> wg_wfc(this->wfc_gamma[0], 1);
 	
-			for(int ir=0; ir!=wg_wfc.nr; ++ir)
+			for(int ir=0; ir!=wg_wfc.get_nbands(); ++ir)
 			{
-				BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+				BlasConnector::scal( wg_wfc.get_nbasis(), wg_local[ir], wg_wfc.get_pointer()+ir*wg_wfc.get_nbasis(), 1 );
 			}
 
 			// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
 			const double one_float=1.0, zero_float=0.0;
 			const int one_int=1;
 			const char N_char='N', T_char='T';
-			this->loc->dm_gamma.at(is).create( wg_wfc.nr, wg_wfc.nc );
+			this->loc->dm_gamma.at(is).create( wg_wfc.get_nbands(), wg_wfc.get_nbasis() );
 
 			pdgemm_(
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalC::wf.wg.nc,
 				&one_float,
-				wg_wfc.c, &one_int, &one_int, this->loc->ParaV->desc,
-				this->wfc_gamma->at(is).c, &one_int, &one_int, this->loc->ParaV->desc,
+				wg_wfc.get_pointer(), &one_int, &one_int, this->loc->ParaV->desc,
+				this->wfc_gamma->get_pointer(), &one_int, &one_int, this->loc->ParaV->desc,
 				&zero_float,
 				this->loc->dm_gamma.at(is).c, &one_int, &one_int, this->loc->ParaV->desc);
 		}

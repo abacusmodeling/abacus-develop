@@ -27,10 +27,17 @@ public:
 
 	FFT();
 	~FFT();
+	void clear(); //reset fft
+	
+	// init parameters of fft
 	void initfft(int nx_in, int bigny_in, int nz_in, int liy_in, int riy_in, int ns_in, int nplane_in, 
 				 int nproc_in, bool gamma_only_in, bool mpifft_in = false);
-	void setupFFT();
-	void cleanFFT();
+
+	//init fftw_plans
+	void setupFFT(); 
+
+	//destroy fftw_plans
+	void cleanFFT(); 
 
 	void fftzfor(std::complex<double>* & in, std::complex<double>* & out);
 	void fftzbac(std::complex<double>* & in, std::complex<double>* & out);
@@ -50,35 +57,37 @@ public:
 #endif
 
 public:
-	void initplan();
+	//init fftw_plans
+	void initplan(); 
 	void initplan_mpi();
 #ifdef __MIX_PRECISION
-	void initplanf();
+	//init fftwf_plans
+	void initplanf(); 
 	void initplanf_mpi();
 #endif
 	
 public:
-	int nx,ny,nz;
-	int nxy;
-	int bigny;
-	int bignxy;
-	int liy,riy;// liy: the left edge of the pw ball in the y direction; riy: the right edge of the pw ball in the y direction
-	int ns; //number of sticks
-	int nplane; //number of x-y planes
-	int maxgrids; // max between nz * ns and bignxy * nplane
-	int nproc; // number of proc.
-	std::complex<double> *aux1, *aux2; //fft space, [maxgrids]
-	double *r_rspace; //real number space for r, [nplane * nx *ny]
+	int nx=0,ny=0,nz=0;
+	int nxy=0;
+	int bigny=0;
+	int bignxy=0;
+	int liy=0,riy=0;// liy: the left edge of the pw ball in the y direction; riy: the right edge of the pw ball in the y direction
+	int ns=0; //number of sticks
+	int nplane=0; //number of x-y planes
+	int maxgrids=0; // max between nz * ns and bignxy * nplane
+	int nproc=1; // number of proc.
+	std::complex<double> *aux1=nullptr, *aux2=nullptr; //fft space, [maxgrids]
+	double *r_rspace=nullptr; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
-	std::complex<float> *auxf1, *auxf2; //fft space, [maxgrids]
-	float *rf_rspace; //real number space for r, [nplane * nx *ny]
+	std::complex<float> *auxf1=nullptr, *auxf2=nullptr; //fft space, [maxgrids]
+	float *rf_rspace=nullptr; //real number space for r, [nplane * nx *ny]
 #endif
 
 
 private:
-	bool gamma_only;
-	bool destroyp;
-	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
+	bool gamma_only=false;
+	bool destroyp=true;
+	bool mpifft=false; // if use mpi fft, only used when define __FFTW3_MPI
 	// fftw_plan plan2r2c;
 	// fftw_plan plan2c2r;
 	// fftw_plan plan1for;
@@ -96,7 +105,7 @@ private:
 	fftw_plan planyr2c;
 	fftw_plan planyc2r;
 #ifdef __MIX_PRECISION
-	bool destroypf;
+	bool destroypf=true;
 	fftwf_plan planfzfor;
 	fftwf_plan planfzbac;
 	fftwf_plan planfxfor1;

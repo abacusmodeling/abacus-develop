@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
+#ifdef __MPI
 #include "mpi.h"
+#endif
 #include <iostream>
 #include <fstream>
 #include <complex>
@@ -7,12 +9,12 @@
 #include "gamma_rho_mock.h"
 
 /***************************************************************
-*  unit test of functions in src_lcao/gint_gamma_rho.cpp
+*  unit test of functions in module_gint/gint_gamma_rho.cpp
 ****************************************************************/
 
 /**
  * This unit test is designed to test the functions in src_lcao/
- * gint_gamma_rho.cpp: Gint_Gamma::cal_rho(), Gint_Gamma::gamma_charge()
+ * gint_gamma_rho.cpp: Gint_Gamma::cal_gint_gamma(), Gint_Gamma::gamma_charge()
  * and sum_up_rho. 
  * It can make two comparisons:
  * (1) compare density matrix calculated from wavefunction with that read
@@ -252,16 +254,15 @@ TEST_F(LCAOTest,GammaRho)
 	LOC.ParaV = &ParaV;
 	//
         GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
-        GlobalC::UFFT.allocate();
 	// Grid Technique
 	set_matrix_grid();
 
 	// read gamma wavefunction
 	LOWF.wfc_gamma.resize(GlobalV::NSPIN);
-	LOC.gamma_file(GlobalC::GridT,LOWF);
+	LOC.gamma_file(nullptr, LOWF);
 	// allocate space for DM
 	GlobalC::GridT.lgd = GlobalV::NLOCAL;
-	LOC.allocate_gamma(GlobalC::GridT);
+	LOC.allocate_gamma(GlobalC::GridT.lgd, nullptr);
 	// dm_gamma is another way to save density matrix
 	LOC.dm_gamma.resize(GlobalV::NSPIN); // originally inside allocate_gamma
 	// calculate density matrix from wavefunction
@@ -290,7 +291,7 @@ TEST_F(LCAOTest,GammaRho)
 	// read density matrix
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
 		std::stringstream ssd;
 		ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM_Gamma" ;
 		//std::cout<<"ssd "<<ssd.str()<<std::endl;
@@ -313,9 +314,8 @@ TEST_F(LCAOTest,GammaRho)
 	// calculate the charge density
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		double nelec;
-		nelec = GG.cal_rho(LOC.DM);
-		//std::cout<<"number of elec: "<<nelec<<std::endl;
+		Gint_inout inout(LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
+		GG.cal_gint(&inout);
 	}
 	//std::cout<<"rho in test "<<GlobalC::CHR.rho[0][0]<<std::endl;
 
@@ -326,11 +326,11 @@ TEST_F(LCAOTest,GammaRho)
 	double totale = 0.0;
 	for (int is = 0; is < GlobalV::NSPIN; is++)
 	{
-	    rho_for_compare[is] = new double[GlobalC::pw.nrxx];
+	    rho_for_compare[is] = new double[GlobalC::rhopw->nrxx];
 	    std::stringstream ssc;
 	    ssc << GlobalV::global_out_dir<< "SPIN" << is + 1 << "_CHG_Gamma";
 	    GlobalC::CHR.read_rho(is, ssc.str(), rho_for_compare[is]);
-	    for (int ix = 0; ix < GlobalC::pw.nrxx; ix++)
+	    for (int ix = 0; ix < GlobalC::rhopw->nrxx; ix++)
 	    //for (int ix = 0; ix < 5; ix++)
 	    {
 	        totale += rho_for_compare[is][ix];
@@ -340,7 +340,7 @@ TEST_F(LCAOTest,GammaRho)
 	    }
 	}
 	// check total number of electrons
-	totale = totale * GlobalC::ucell.omega / GlobalC::pw.nrxx;
+	totale = totale * GlobalC::ucell.omega / GlobalC::rhopw->nrxx;
 	EXPECT_NEAR(totale, GlobalC::CHR.nelec, 1e-8);
 }
 
@@ -364,16 +364,20 @@ int RunAllTests(ENVEnvironment* env, ENVPrepare* ENVP)
 
 int main(int argc, char **argv)
 {
-
+#ifdef __MPI
     MPI_Init(&argc, &argv);
+#endif
 
     testing::InitGoogleTest(&argc, argv);
 
     ENVEnvironment* const env = new ENVEnvironment;
     testing::AddGlobalTestEnvironment(env);
     Check (RunAllTests(env,&ENVP)==0,"");
-
+	delete GlobalC::rhopw;
+	delete GlobalC::wfcpw;
+#ifdef __MPI
     MPI_Finalize();
+#endif
 
     return 0;
 }

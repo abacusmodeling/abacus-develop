@@ -75,37 +75,39 @@ void MD_func::kinetic_stress(
 //   This function calculates the classical kinetic energy of atoms
 //   and its contribution to stress.
 //----------------------------------------------------------------------------
+    kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
 
-	kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
+    if(GlobalV::CAL_STRESS)
+    {
+        ModuleBase::matrix temp;
+        temp.create(3,3);    // initialize
 
-	ModuleBase::matrix temp;
-	temp.create(3,3);    // initialize
+        for(int ion=0; ion<unit_in.nat; ++ion)
+        {
+            for(int i=0; i<3; ++i)
+            {
+                for(int j=i; j<3; ++j)
+                {
+                    temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
+                }
+            }
+        }
 
-	for(int ion=0; ion<unit_in.nat; ++ion)
-	{
-		for(int i=0; i<3; ++i)
-		{
-			for(int j=i; j<3; ++j)
-			{
-				temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
-			}
-		}
-	}
-
-	for(int i=0; i<3; ++i)
-	{
-		for(int j=0; j<3; ++j)
-		{
-			if(j<i) 
-			{
-				stress(i, j) = stress(j, i);
-			}
-			else
-			{
-				stress(i, j) = temp(i, j)/unit_in.omega;
-			}
-		}
-	}
+        for(int i=0; i<3; ++i)
+        {
+            for(int j=0; j<3; ++j)
+            {
+                if(j<i) 
+                {
+                    stress(i, j) = stress(j, i);
+                }
+                else
+                {
+                    stress(i, j) = temp(i, j)/unit_in.omega;
+                }
+            }
+        }
+    }
 }
 
 // Read Velocity from STRU liuyu 2021-09-24
@@ -286,7 +288,7 @@ void MD_func::force_virial(
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao")
 		{
-			Run_MD_LCAO md_lcao(*ParaV);
+			Run_MD_LCAO md_lcao;
 			md_lcao.md_force_virial(p_esolver,istep, unit_in.nat, potential, force, stress);
 		}
 #endif
@@ -314,22 +316,23 @@ void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matr
     GlobalV::ofs_running<<"Virial Term is "<<virial_scalar*unit_transform<<" Kbar "<<std::endl;
     GlobalV::ofs_running<<"Kenetic Term is "<<(stress_scalar-virial_scalar)*unit_transform<<" Kbar "<<std::endl;
 
-	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-	ModuleBase::GlobalFunc::NEW_PART("MD STRESS (KBAR)");
-	for (int i=0; i<3; i++)
-	{
-		GlobalV::ofs_running << " " << std::setw(15) << stress(i,0)*unit_transform 
-			<< std::setw(15)<< stress(i,1)*unit_transform 
-			<< std::setw(15) << stress(i,2)*unit_transform << std::endl;
+    GlobalV::ofs_running.unsetf(ios::fixed);
+    GlobalV::ofs_running << std::setprecision(8) << std::endl;
+    ModuleBase::GlobalFunc::NEW_PART("MD STRESS (KBAR)");
+    for (int i=0; i<3; i++)
+    {
+        GlobalV::ofs_running << std::setw(15) << stress(i,0)*unit_transform 
+            << std::setw(15) << stress(i,1)*unit_transform 
+            << std::setw(15) << stress(i,2)*unit_transform << std::endl;
 
-	}
-	GlobalV::ofs_running << std::setiosflags(ios::left);
+    }
+    GlobalV::ofs_running << std::setiosflags(ios::left);
 }
 
 void MD_func::MDdump(const int &step, 
-		const UnitCell_pseudo &unit_in,
-		const ModuleBase::matrix &virial, 
-		const ModuleBase::Vector3<double> *force)
+        const UnitCell_pseudo &unit_in,
+        const ModuleBase::matrix &virial, 
+        const ModuleBase::Vector3<double> *force)
 {
     if(GlobalV::MY_RANK) return;
 
@@ -345,48 +348,51 @@ void MD_func::MDdump(const int &step,
         ofs.open(file.str(), ios::app);
     }
 
-	const double unit_virial = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
-	const double unit_force = ModuleBase::Hartree_to_eV * ModuleBase::ANGSTROM_AU;
+    const double unit_virial = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+    const double unit_force = ModuleBase::Hartree_to_eV * ModuleBase::ANGSTROM_AU;
 
-	ofs << "MDSTEP:  " << step << std::endl;
-	ofs << std::setprecision(12) << std::setiosflags(ios::fixed);
+    ofs << "MDSTEP:  " << step << std::endl;
+    ofs << std::setprecision(12) << std::setiosflags(ios::fixed);
 
-	ofs << "LATTICE_CONSTANT: " << unit_in.lat0 << std::endl;
+    ofs << "LATTICE_CONSTANT: " << unit_in.lat0 << std::endl;
 
-	ofs << "LATTICE_VECTORS" << std::endl;
-	ofs << std::setw(18) << unit_in.latvec.e11 << std::setw(18) << unit_in.latvec.e12 << std::setw(18) << unit_in.latvec.e13 << std::endl; 
-	ofs << std::setw(18) << unit_in.latvec.e21 << std::setw(18) << unit_in.latvec.e22 << std::setw(18) << unit_in.latvec.e23 << std::endl;
-	ofs << std::setw(18) << unit_in.latvec.e31 << std::setw(18) << unit_in.latvec.e32 << std::setw(18) << unit_in.latvec.e33 << std::endl;
+    ofs << "LATTICE_VECTORS" << std::endl;
+    ofs << "  " << unit_in.latvec.e11 << "  " << unit_in.latvec.e12 << "  " << unit_in.latvec.e13 << std::endl; 
+    ofs << "  " << unit_in.latvec.e21 << "  " << unit_in.latvec.e22 << "  " << unit_in.latvec.e23 << std::endl;
+    ofs << "  " << unit_in.latvec.e31 << "  " << unit_in.latvec.e32 << "  " << unit_in.latvec.e33 << std::endl;
 
-	ofs << "VIRIAL (KBAR)" << std::endl;
-	for(int i=0; i<3; ++i)
-	{
-		ofs << std::setw(18) << virial(i, 0) * unit_virial 
-			<< std::setw(18) << virial(i, 1) * unit_virial 
-			<< std::setw(18) << virial(i, 2) * unit_virial << std::endl;
-	}
-
-	ofs << "INDEX    LABEL    POSITIONS    FORCE (eV/Angstrom)" << std::endl;
-	int index = 0;
-	for(int it=0; it<unit_in.ntype; ++it)
+    if(GlobalV::CAL_STRESS)
     {
-        for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
-	    {	
-		    ofs << std::setw(4) << index
-			<< std::setw(4) << unit_in.atom_label[it]
-			<< std::setw(18) << unit_in.atoms[it].tau[ia].x
-			<< std::setw(18) << unit_in.atoms[it].tau[ia].y
-			<< std::setw(18) << unit_in.atoms[it].tau[ia].z
-			<< std::setw(18) << force[index].x * unit_force 
-			<< std::setw(18) << force[index].y * unit_force 
-			<< std::setw(18) << force[index].z * unit_force << std::endl;
-            index++;
-	    }
+        ofs << "VIRIAL (KBAR)" << std::endl;
+        for(int i=0; i<3; ++i)
+        {
+            ofs << "  " << virial(i, 0) * unit_virial 
+                << "  " << virial(i, 1) * unit_virial 
+                << "  " << virial(i, 2) * unit_virial << std::endl;
+        }
     }
 
-	ofs << std::endl;
-	ofs << std::endl;
-	ofs.close();
+    ofs << "INDEX    LABEL    POSITIONS    FORCE (eV/Angstrom)" << std::endl;
+    int index = 0;
+    for(int it=0; it<unit_in.ntype; ++it)
+    {
+        for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
+        {
+            ofs << "  " << index
+            << "  " << unit_in.atom_label[it]
+            << "  " << unit_in.atoms[it].tau[ia].x
+            << "  " << unit_in.atoms[it].tau[ia].y
+            << "  " << unit_in.atoms[it].tau[ia].z
+            << "  " << force[index].x * unit_force 
+            << "  " << force[index].y * unit_force 
+            << "  " << force[index].z * unit_force << std::endl;
+            index++;
+        }
+    }
+
+    ofs << std::endl;
+    ofs << std::endl;
+    ofs.close();
 }
 
 void MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 

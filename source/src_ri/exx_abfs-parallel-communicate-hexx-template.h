@@ -119,7 +119,7 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(const Parallel_Orbit
 						const int iwt2_m2D = pv.trace_loc_col[iwt2];
 						if(iwt2_m2D<0) continue;
 
-						if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+						if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
 							HK_m2D(iwt2_m2D,iwt1_m2D) = HK_a2D(iw1,iw2);
 						else
 							HK_m2D(iwt1_m2D,iwt2_m2D) = HK_a2D(iw1,iw2);

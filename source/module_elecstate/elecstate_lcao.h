@@ -13,16 +13,18 @@ class ElecStateLCAO : public ElecState
 {
   public:
     ElecStateLCAO(Charge* chg_in,
+                  const K_Vectors* klist_in, 
                   int nks_in,
                   int nbands_in,
                   Local_Orbital_Charge* loc_in,
                   LCAO_Hamilt* uhm_in,
                   Local_Orbital_wfc* lowf_in)
     {
-        init(chg_in, nks_in, nbands_in);
+        init(chg_in, klist_in, nks_in, nbands_in);
         this->loc = loc_in;
         this->uhm = uhm_in;
         this->lowf = lowf_in;
+        this->classname = "ElecStateLCAO";
     }
     // void init(Charge* chg_in):charge(chg_in){} override;
 
@@ -45,8 +47,6 @@ class ElecStateLCAO : public ElecState
     // void parallelK();
     // calcualte rho for each k
     // void rhoBandK(const psi::Psi<std::complex<double>>& psi);
-
-    template <typename T> void cal_dm(const ModuleBase::matrix& wg, const psi::Psi<T>& wfc, psi::Psi<T>& dm);
 
     Local_Orbital_Charge* loc = nullptr;
     LCAO_Hamilt* uhm = nullptr;

@@ -2,13 +2,15 @@
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
+#include "module_psi/psi.h"
+#include "module_elecstate/cal_dm.h"
 
 // force due to the overlap matrix.
 // need energy density matrix here.
 void Force_LCAO_gamma::cal_foverlap(
 	const bool isforce, 
     const bool isstress,
-    vector<ModuleBase::matrix>& wfc_gamma,
+    const psi::Psi<double>* psid,
     Local_Orbital_Charge &loc,
     ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& soverlap)
@@ -30,8 +32,8 @@ void Force_LCAO_gamma::cal_foverlap(
     }
 
     std::vector<ModuleBase::matrix> edm_gamma(GlobalV::NSPIN);
-    loc.cal_dm(wgEkb,
-        wfc_gamma,
+    elecstate::cal_dm(loc.ParaV, wgEkb,
+        psid[0],
         edm_gamma);
 
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");

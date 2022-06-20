@@ -22,10 +22,10 @@ using namespace Lattice_Change_Basic;
 
 Lattice_Change_CG::Lattice_Change_CG()
 {
-	this->lat0 = new double[1];
-	this->grad0 = new double[1];
-	this->cg_grad0 = new double[1];
- 	this->move0 = new double[1];
+	this->lat0 = nullptr;
+	this->grad0 = nullptr;
+	this->cg_grad0 = nullptr;
+ 	this->move0 = nullptr;
 }
 
 Lattice_Change_CG::~Lattice_Change_CG()

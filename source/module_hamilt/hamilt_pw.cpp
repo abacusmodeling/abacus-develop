@@ -8,8 +8,9 @@ void HamiltPW::ch_mock()
     return;
 }
 
-void HamiltPW::hk_mock()
+void HamiltPW::hk_mock(const int ik)
 {
+    this->hpw->init_k(ik);
     return;
 }
 

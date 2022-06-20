@@ -28,7 +28,7 @@ private:
 		const bool isforce,
         const bool isstress,
         Record_adj &ra, 
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        const psi::Psi<std::complex<double>>* psi,
         Local_Orbital_Charge &loc,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
@@ -55,11 +55,11 @@ private:
         ModuleBase::matrix& ftvnl_dphi, ModuleBase::matrix& stvnl_dphi);
 
 	// calculate the overlap force
-    void cal_foverlap_k(const bool isforce, const bool isstress, Record_adj &ra, std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    void cal_foverlap_k(const bool isforce, const bool isstress, Record_adj &ra, const psi::Psi<std::complex<double>>* psi,
         Local_Orbital_Charge& loc, ModuleBase::matrix& foverlap, ModuleBase::matrix& soverlap);
 
 	// calculate the force due to < phi | Vlocal | dphi >
-	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);
+	void cal_fvl_dphi_k(const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi, double **DM_R);
 
 	// old method to calculate the force due to < phi | dbeta > < beta | phi >
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvnl_dbeta, ModuleBase::matrix& svnl_dbeta);

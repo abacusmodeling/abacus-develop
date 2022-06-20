@@ -1,0 +1,79 @@
+//=========================================================
+//AUTHOR : mohan
+//DATE : 2009-09-16
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
+#ifndef GINT_GAMMA_H
+#define GINT_GAMMA_H
+#include "gint.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "grid_technique.h"
+#include "../src_lcao/LCAO_matrix.h"
+#include <omp.h>
+
+//=========================================================
+// ModuleBase::Integral On 3D Grids, different from Grid_Integral
+// Feature : Matrix Elements Of Local Potential For 
+// Numerical Orbitals
+//=========================================================
+
+class Gint_Gamma : public Gint
+{
+	public:
+
+	Gint_Gamma();
+	~Gint_Gamma();
+
+    //------------------------------------------------------
+    // in gint_gamma_vl.cpp 
+    //------------------------------------------------------
+    // there is an additional step in calculating vlocal for gamma point
+    // namely the redistribution of Hamiltonian from grid to 2D block format
+    // hence we have an additional layer outside the unified interface
+	void cal_vlocal(Gint_inout *inout);
+
+    //------------------------------------------------------
+    // in gint_gamma_env.cpp 
+    //------------------------------------------------------
+	// calcualte the envelope function
+	void cal_env(const double* wfc, double* rho);
+
+    //------------------------------------------------------
+    // in gint_gamma_mull.cpp 
+    //------------------------------------------------------
+	// calculate the Mulliken charge
+	void cal_mulliken(double** mulliken);
+
+private:
+
+    double***  DM;   //pointer to LOC.DM
+
+    //------------------------------------------------------
+    // in gint_gamma_vl.cpp 
+    //------------------------------------------------------
+    // method for redistributing the Hamiltonian
+    // from grid to 2D format
+    void vl_grid_to_2D(const int lgd, LCAO_Matrix& lm);
+
+    ///===============================
+    /// Use MPI_Alltoallv to convert a grid distributed matrix
+    /// to 2D - block cyclic distributed matrix.
+    ///===============================
+    int sender_index_size;
+    int *sender_local_index;
+    int sender_size;
+    int *sender_size_process;
+    int *sender_displacement_process;
+    double* sender_buffer;
+
+    int receiver_index_size;
+    int *receiver_global_index;
+    int receiver_size;
+    int *receiver_size_process;
+    int *receiver_displacement_process;
+    double* receiver_buffer;
+
+};
+
+#endif

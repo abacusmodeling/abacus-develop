@@ -14,6 +14,10 @@ namespace hsolver
 class HSolver
 {
   public:
+    HSolver(){};
+    virtual ~HSolver(){
+        delete pdiagh;
+    };
     /*//initialization, used in construct function or restruct a new HSolver
     virtual void init(
         const Basis* pbas //We need Basis class here, use global class for this initialization first
@@ -25,24 +29,38 @@ class HSolver
         Input &in )=0;*/
 
     // solve Hamiltonian to electronic density in ElecState
-    virtual void solve(hamilt::Hamilt* phm, psi::Psi<std::complex<double>>& ppsi, elecstate::ElecState* pes)
+    virtual void solve
+    (
+        hamilt::Hamilt* phm, 
+        psi::Psi<std::complex<double>>& ppsi, 
+        elecstate::ElecState* pes, 
+        const std::string method, 
+        const bool skip_charge=false
+    )
     {
         return;
     }
-    virtual void solve(hamilt::Hamilt* phm, psi::Psi<double>& ppsi, elecstate::ElecState* pes)
+    virtual void solve
+    (
+        hamilt::Hamilt* phm, 
+        psi::Psi<double>& ppsi, 
+        elecstate::ElecState* pes, 
+        const std::string method, 
+        const bool skip_charge=false
+    )
     {
         return;
     }
+
+    std::string classname = "none";
+    // choose method of DiagH for solve Hamiltonian matrix
+    // cg, dav, elpa, scalapack, hpseps, cusolver
+    std::string method = "none";
 
   protected:
     DiagH* pdiagh = nullptr; // for single Hamiltonian matrix diagonal solver
 
-    // choose method of DiagH for solve Hamiltonian matrix
-    // cg, dav, elpa, scalapack, hpseps, cusolver
-    static std::string method;
 };
-
-std::string HSolver::method = "none";
 
 } // namespace hsolver
 #endif

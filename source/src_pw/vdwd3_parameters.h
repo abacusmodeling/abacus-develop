@@ -24,7 +24,7 @@ public:
     void init_rcov();
     void init_r0ab();
 
-    bool flag_vdwd3;    
+    bool flag_vdwd3=false;    
     bool abc; //third-order term?
 	double rthr2; //R^2 distance neglect threshold (important for speed in case of large systems) (a.u.)
 	double cn_thr2; //R^2 distance to cutoff for CN_calculation (a.u.)

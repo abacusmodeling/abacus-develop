@@ -16,6 +16,7 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
+#include "../module_surchem/efield.h"    // liuyu add 2022-05-06
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif
@@ -41,8 +42,6 @@ energy::~energy()
 {
 }
 
-#include "efield.h"
-
 void energy::calculate_harris(const int &flag)
 {
 //	ModuleBase::TITLE("energy","calculate_harris");
@@ -60,7 +59,8 @@ void energy::calculate_harris(const int &flag)
 		+ demet
 		+ exx
 		+ Efield::etotefield
-		+ evdw;							// Peize Lin add evdw 2021.03.09
+		+ evdw;  						// Peize Lin add evdw 2021.03.09
+
 #ifdef __LCAO
         if(INPUT.dft_plus_u) 
 		{
@@ -93,20 +93,21 @@ void energy::calculate_etot(void)
 	+ evdw;							// Peize Lin add evdw 2021.03.09
 
     //Quxin adds for DFT+U energy correction on 20201029
-/*
-	std::cout << std::resetiosflags(ios::scientific) << std::endl;
-	std::cout << std::setprecision(16) << std::endl;
-	std::cout << " eband=" << eband << std::endl;
-	std::cout << " deband=" << deband << std::endl;
-	std::cout << " etxc-etxcc=" << H_XC_pw::etxc-etxcc << std::endl;
-	std::cout << " ewld=" << H_Ewald_pw::ewald_energy << std::endl;
-	std::cout << " ehart=" << H_Hartree_pw::hartree_energy << std::endl;
-	std::cout << " demet=" << demet << std::endl;
-	std::cout << " descf=" << descf << std::endl;
-	std::cout << " exx=" << exx << std::endl;
-	std::cout << " efiled=" << Efield::etotefield << std::endl;
-	std::cout << " total= "<<etot<<std::endl;
-	std::cout << " fermienergy= "<<ef<<std::endl;*/
+
+	// std::cout << std::resetiosflags(ios::scientific) << std::endl;
+	// std::cout << std::setprecision(16) << std::endl;
+	// std::cout << " eband=" << eband << std::endl;
+	// std::cout << " deband=" << deband << std::endl;
+	// std::cout << " etxc-etxcc=" <<etxc-etxcc << std::endl;
+	// std::cout << " ewld=" << H_Ewald_pw::ewald_energy << std::endl;
+	// std::cout << " ehart=" << H_Hartree_pw::hartree_energy << std::endl;
+	// std::cout << " demet=" << demet << std::endl;
+	// std::cout << " descf=" << descf << std::endl;
+	// std::cout << " exx=" << exx << std::endl;
+	// std::cout << " efiled=" << Efield::etotefield << std::endl;
+	// std::cout << " total= "<<etot<<std::endl;
+	// std::cout << " fermienergy= "<<ef<<std::endl;
+
 #ifdef __LCAO
     if(INPUT.dft_plus_u) 
 	{
@@ -223,6 +224,10 @@ void energy::print_etot(
     else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
         label = "GV";
+	}
+	else if(GlobalV::KS_SOLVER=="cusolver")
+	{
+        label = "CU";
 	}
 	else
 	{
@@ -366,7 +371,7 @@ double energy::delta_e(void)
 
     double deband_aux = 0.0;
 
-    for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     {
     	deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
 		if(XC_Functional::get_func_type() == 3)
@@ -377,7 +382,7 @@ double energy::delta_e(void)
 
     if (GlobalV::NSPIN == 2)
     {
-    	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     	{
     		deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
 			if(XC_Functional::get_func_type() == 3)
@@ -388,7 +393,7 @@ double energy::delta_e(void)
     }
     else if(GlobalV::NSPIN == 4)
     {
-        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
         {
             deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
             deband_aux -= GlobalC::CHR.rho[2][ir] * GlobalC::pot.vr(2, ir);
@@ -402,7 +407,7 @@ double energy::delta_e(void)
     deband0 = deband_aux;
 #endif
 
-    deband0 *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+    deband0 *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
 	
 	// \int rho(r) v_{exx}(r) dr = 2 E_{exx}[rho]
 	deband0 -= 2*exx;				// Peize Lin add 2017-10-16
@@ -422,7 +427,7 @@ void energy::delta_escf(void)
 	// because in "deband" the energy is calculated from "output" charge density,
 	// so here is the correction.
 
-    for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     {
 		this->descf -= ( GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho_save[0][ir] ) * GlobalC::pot.vr(0, ir);
 		if(XC_Functional::get_func_type() == 3)
@@ -433,7 +438,7 @@ void energy::delta_escf(void)
 
     if (GlobalV::NSPIN==2)
     {
-       	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+       	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
        	{
            	this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
 			if(XC_Functional::get_func_type() == 3)
@@ -444,7 +449,7 @@ void energy::delta_escf(void)
     }
     if (GlobalV::NSPIN==4)
     {
-        for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+        for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
         {
             this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
             this->descf -= ( GlobalC::CHR.rho[2][ir] - GlobalC::CHR.rho_save[2][ir] ) * GlobalC::pot.vr(2, ir);
@@ -454,7 +459,7 @@ void energy::delta_escf(void)
 
     Parallel_Reduce::reduce_double_pool( descf );
 
-    this->descf *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+    this->descf *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
     return;
 }
 

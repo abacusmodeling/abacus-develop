@@ -1,18 +1,13 @@
 list(APPEND objects
     DM_gamma.cpp
     DM_k.cpp
-    ELEC_cbands_gamma.cpp
-    ELEC_cbands_k.cpp
     ELEC_evolve.cpp
-    ELEC_nscf.cpp
-    ELEC_scf.cpp
     exx_lip.cpp
     FORCE_STRESS.cpp
     FORCE_gamma.cpp
     FORCE_gamma_edm.cpp
     FORCE_gamma_tvnl.cpp
     FORCE_gamma_vl.cpp
-    FORCE_gamma_vl_new.cpp
     FORCE_k.cpp
     LCAO_diago.cpp
     LCAO_evolve.cpp
@@ -21,7 +16,6 @@ list(APPEND objects
     LCAO_matrix.cpp
     LCAO_nnr.cpp
     LOOP_cell.cpp
-    LOOP_elec.cpp
     LOOP_ions.cpp
     build_st_pw.cpp
     center2_orb-orb11.cpp
@@ -30,27 +24,7 @@ list(APPEND objects
     dftu.cpp
     dftu_relax.cpp
     dftu_yukawa.cpp
-    gint_gamma.cpp
-    gint_gamma_common.cpp
-    gint_gamma_env.cpp
-    gint_gamma_fvl.cpp
-    gint_gamma_fvl_new.cpp
-    gint_gamma_mull.cpp
-    gint_gamma_rho.cpp
-    gint_gamma_vl.cpp
-    gint_k.cpp
-    gint_k_fvl.cpp
-    gint_k_init.cpp
-    gint_k_rho.cpp
-    gint_k_vl.cpp
-    gint_tools.cpp
     global_fp.cpp
-    grid_base_beta.cpp
-    grid_bigcell.cpp
-    grid_meshball.cpp
-    grid_meshcell.cpp
-    grid_meshk.cpp
-    grid_technique.cpp
     local_orbital_charge.cpp
     local_orbital_wfc.cpp
     record_adj.cpp
@@ -66,7 +40,3 @@ add_library(
     OBJECT
     ${objects}
 )
-
-IF (BUILD_TESTING)
-  add_subdirectory(test)
-endif()

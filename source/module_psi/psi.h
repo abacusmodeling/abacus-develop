@@ -8,7 +8,7 @@
 #include <cassert>
 #include "module_base/global_variable.h"
 
-#include "../src_pw/pw_basis.h"
+#include <complex>
 
 namespace psi
 {
@@ -19,11 +19,6 @@ class Psi
 {
  public:
     Psi(void){};
-    Psi(PW_Basis* pbasis_in)
-    {
-        this->ngk = pbasis_in->Klist->ngk.data();
-        this->resize(pbasis_in->Klist->nks, GlobalV::NBANDS, pbasis_in->ngmw);
-    }
     Psi(const int* ngk_in){this->ngk = ngk_in;}
     Psi(int nk_in, int nbd_in, int nbs_in, const int* ngk_in=nullptr)
     {
@@ -90,12 +85,20 @@ class Psi
     // choose k-point index , then Psi(iband, ibasis) can reach Psi(ik, iband, ibasis)
     void fix_k(const int ik) const
     {
-        assert(ik>=0 && ik<this->nk);
+        assert(ik>=0);
         this->current_k = ik;
         if(this->ngk!=nullptr&&GlobalV::NSPIN!=4) this->current_nbasis = this->ngk[ik];
         else this->current_nbasis = this->nbasis;
         this->current_b = 0;
-        this->psi_current = const_cast<T*>(&(this->psi[ik * this->nbands * this->nbasis]));
+        if( ik >= this->nk)
+        {
+            // mem_saver case
+            this->psi_current = const_cast<T*>(&(this->psi[0]));
+        }
+        else
+        {
+            this->psi_current = const_cast<T*>(&(this->psi[ik * this->nbands * this->nbasis]));
+        }
         return;
     }
 

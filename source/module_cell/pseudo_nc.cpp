@@ -4,25 +4,25 @@ pseudo_nc::pseudo_nc()
 {
 // pseudo_h
 	els = new std::string[1];
-	lchi = new int[1];
-	oc = new double[1];
-	jjj = new double[1];
-	jchi = new double[1];
-	nn = new int[1];
+	lchi = nullptr;
+	oc = nullptr;
+	jjj = nullptr;
+	jchi = nullptr;
+	nn = nullptr;
 	has_so = false;
 	zv = 0;
 
 // pseudo local parts
-	vloc_at =  new double[1];
+	vloc_at =  nullptr;
 
 // pseudo_atom
-	r = new double[1];
-	rab = new double[1];
-	rho_at = new double[1];
-	rho_atc = new double[1];
+	r = nullptr;
+	rab = nullptr;
+	rho_at = nullptr;
+	rho_atc = nullptr;
 
 // pseudo_nc
-	lll = new int[1];
+	lll = nullptr;
 }
 
 pseudo_nc::~pseudo_nc()

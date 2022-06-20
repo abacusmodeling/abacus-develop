@@ -14,6 +14,7 @@ using namespace std;
 extern MPI_Datatype mpicomplex;
 extern MPI_Op myOp;
 extern MPI_Comm POOL_WORLD;
+extern MPI_Comm STO_WORLD;
 extern MPI_Comm PARAPW_WORLD;
 extern MPI_Comm GRID_WORLD; //mohan add 2012-01-13
 extern MPI_Comm DIAG_WORLD; //mohan add 2012-01-13
@@ -45,6 +46,9 @@ namespace Parallel_Global
 	//-------------------------------------------
 	void split_diag_world(const int &diag_np);
 	void split_grid_world(const int &diag_np);
+#ifdef __MPI
+	void finalize_mpi();
+#endif
 }
 
 

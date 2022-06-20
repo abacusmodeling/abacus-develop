@@ -34,9 +34,9 @@ LCAO_Deepks::LCAO_Deepks()
 {
     alpha_index = new ModuleBase::IntArray[1];
     inl_index = new ModuleBase::IntArray[1];
-    inl_l = new int[1];
-    H_V_delta = new double[1];
-    H_V_deltaR = new double[1];
+    inl_l = nullptr;
+    H_V_delta = nullptr;
+    H_V_deltaR = nullptr;
 }
 
 //Desctructor of the class

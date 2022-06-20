@@ -8,38 +8,38 @@
 #include <cmath>
 
 ModuleBase::matrix surchem::v_correction(const UnitCell &cell,
-                                         PW_Basis &pwb,
+                                         ModulePW::PW_Basis* rho_basis,
                                          const int &nspin,
                                          const double *const *const rho)
 {
     ModuleBase::TITLE("surchem", "v_correction");
     ModuleBase::timer::tick("surchem", "v_correction");
 
-    double *Porter = new double[pwb.nrxx];
-    for (int i = 0; i < pwb.nrxx; i++)
+    double *Porter = new double[rho_basis->nrxx];
+    for (int i = 0; i < rho_basis->nrxx; i++)
         Porter[i] = 0.0;
     const int nspin0 = (nspin == 2) ? 2 : 1;
     for (int is = 0; is < nspin0; is++)
-        for (int ir = 0; ir < pwb.nrxx; ir++)
+        for (int ir = 0; ir < rho_basis->nrxx; ir++)
             Porter[ir] += rho[is][ir];
 
-    complex<double> *Porter_g = new complex<double>[pwb.ngmc];
-    ModuleBase::GlobalFunc::ZEROS(Porter_g, pwb.ngmc);
+    complex<double> *Porter_g = new complex<double>[rho_basis->npw];
+    ModuleBase::GlobalFunc::ZEROS(Porter_g, rho_basis->npw);
 
-    GlobalC::UFFT.ToReciSpace(Porter, Porter_g);
+    GlobalC::UFFT.ToReciSpace(Porter, Porter_g, rho_basis);
 
-    complex<double> *N = new complex<double>[pwb.ngmc];
-    complex<double> *TOTN = new complex<double>[pwb.ngmc];
-    complex<double> *PS_TOTN = new complex<double>[pwb.ngmc];
+    complex<double> *N = new complex<double>[rho_basis->npw];
+    complex<double> *TOTN = new complex<double>[rho_basis->npw];
+    complex<double> *PS_TOTN = new complex<double>[rho_basis->npw];
 
-    cal_totn(cell, pwb, Porter_g, N, TOTN);
+    cal_totn(cell, rho_basis, Porter_g, N, TOTN);
 
-    cal_pseudo(cell, pwb, Porter_g, PS_TOTN);
+    cal_pseudo(cell, rho_basis, Porter_g, PS_TOTN);
 
-    ModuleBase::matrix v(nspin, pwb.nrxx);
+    ModuleBase::matrix v(nspin, rho_basis->nrxx);
 
-    v += cal_vel(cell, pwb, TOTN, PS_TOTN, nspin);
-    v += cal_vcav(cell, pwb, PS_TOTN, nspin);
+    v += cal_vel(cell, rho_basis, TOTN, PS_TOTN, nspin);
+    v += cal_vcav(cell, rho_basis, PS_TOTN, nspin);
 
     delete[] Porter;
     delete[] Porter_g;
