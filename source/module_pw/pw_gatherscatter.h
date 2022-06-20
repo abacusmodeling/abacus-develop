@@ -2,10 +2,6 @@
 #include "../module_base/global_function.h"
 #include "../module_base/timer.h"
 #include "typeinfo"
-#ifdef __MPI
-#include "mpi.h"
-#include "../src_parallel/parallel_global.h"
-#endif
 namespace ModulePW
 {
 /// 
@@ -48,9 +44,9 @@ void PW_Basis:: gatherp_scatters(std::complex<T> *in, std::complex<T> *out)
     //exchange data
     //(nplane,nstot) to (numz[ip],ns, poolnproc)
     if(typeid(T) == typeid(double))
-	    MPI_Alltoallv(out, numr, startr, mpicomplex, in, numg, startg, mpicomplex, POOL_WORLD);
+	    MPI_Alltoallv(out, numr, startr, mpi_dcomplex, in, numg, startg, mpi_dcomplex, this->pool_world);
     else if(typeid(T) == typeid(float))
-        MPI_Alltoallv(out, numr, startr, MPI_COMPLEX, in, numg, startg, MPI_COMPLEX, POOL_WORLD);
+        MPI_Alltoallv(out, numr, startr, MPI_COMPLEX, in, numg, startg, MPI_COMPLEX, this->pool_world);
     // change (nz,ns) to (numz[ip],ns, poolnproc)
     for (int ip = 0; ip < this->poolnproc ;++ip)
 	{
@@ -112,9 +108,9 @@ void PW_Basis:: gathers_scatterp(std::complex<T> *in, std::complex<T> *out)
 	//exchange data
     //(numz[ip],ns, poolnproc) to (nplane,nstot)
     if(typeid(T) == typeid(double))
-	    MPI_Alltoallv(out, numg, startg, mpicomplex, in, numr, startr, mpicomplex, POOL_WORLD);
+	    MPI_Alltoallv(out, numg, startg, mpi_dcomplex, in, numr, startr, mpi_dcomplex, this->pool_world);
     else if(typeid(T) == typeid(float))
-        MPI_Alltoallv(out, numg, startg, MPI_COMPLEX, in, numr, startr, MPI_COMPLEX, POOL_WORLD);
+        MPI_Alltoallv(out, numg, startg, MPI_COMPLEX, in, numr, startr, MPI_COMPLEX, this->pool_world);
     ModuleBase::GlobalFunc::ZEROS(out, this->nrxx);
     //change (nplane,nstot) to (nplane fftnxy)
 	for (int istot = 0;istot < nstot; ++istot)

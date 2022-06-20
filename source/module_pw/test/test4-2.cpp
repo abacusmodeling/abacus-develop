@@ -31,7 +31,10 @@ TEST_F(PWTEST,test4_2)
     bool xprime = true;
     //--------------------------------------------------
     //init 
-    pwtest.initgrids(lat0,latvec,wfcecut, nproc_in_pool, rank_in_pool);
+#ifdef __MPI
+    pwtest.initmpi(nproc_in_pool, rank_in_pool, POOL_WORLD);
+#endif
+    pwtest.initgrids(lat0,latvec,wfcecut);
     pwtest.initparameters(gamma_only, 2 * wfcecut, distribution_type, xprime); // pwtest will reset 2*wfcecut to wfcecut
     pwtest.setuptransform();
     pwtest.collect_local_pw();

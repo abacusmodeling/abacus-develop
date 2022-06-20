@@ -7,6 +7,9 @@
 #include <complex>
 #include "fft.h"
 #include <cstring>
+#ifdef __MPI
+#include "mpi.h"
+#endif
 
 namespace ModulePW
 {
@@ -24,9 +27,11 @@ namespace ModulePW
  * c(g) = \int f(r)*exp(-igr) dr
  * USAGE：
  * ModulePW::PW_Basis pwtest;
+ * 0. init mpi for PW_Basis
+ * pwtest.inimpi(nproc_in_pool,rank_in_pool,POOL_WORLD);
  * 1. setup FFT grids for PW_Basis
- * pwtest.initgrids(lat0,latvec,gridecut,nproc_in_pool,rank_in_pool);
- * pwtest.initgrids(lat0,latvec,N1,N2,N3,nproc_in_pool,rank_in_pool); 
+ * pwtest.initgrids(lat0,latvec,gridecut);
+ * pwtest.initgrids(lat0,latvec,N1,N2,N3); 
  * //double lat0：unit length, (unit: bohr)
  * //ModuleBase::Matrix3 latvec：lattice vector, (unit: lat0), e.g. ModuleBase::Matrix3 latvec(1, 1, 0, 0, 2, 0, 0, 0, 2);
  * //double gridecut：cutoff energy to generate FFT grids, (unit: Ry)
@@ -52,22 +57,26 @@ public:
     std::string classname;
     PW_Basis();
     ~PW_Basis();
+    //Init mpi parameters
+#ifdef __MPI
+    void initmpi(
+        const int poolnproc_in, // Number of processors in this pool
+        const int poolrank_in, // Rank in this pool
+        MPI_Comm pool_world_in //Comm world for pw_basis
+    );
+#endif
 
     //Init the grids for FFT
     virtual void initgrids(
         const double lat0_in, //unit length (unit in bohr)
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
-        const double gridecut, //unit in Ry, ecut to set up grids
-        const int poolnproc_in, // Number of processors in this pool
-        const int poolrank_in // Rank in this pool
+        const double gridecut //unit in Ry, ecut to set up grids
     );
     //Init the grids for FFT
     virtual void initgrids(
         const double lat0_in,
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        const int nx_in, int ny_in, int nz_in,
-        const int poolnproc_in, // Number of processors in this pool
-        const int poolrank_in // Rank in this pool
+        const int nx_in, int ny_in, int nz_in
     );
 
     //Init some parameters
@@ -82,8 +91,11 @@ public:
 //                 distribution maps
 //===============================================
 public:
-    //reciprocal-space
-    // only on first proc.
+#ifdef __MPI
+    MPI_Comm pool_world;
+    static MPI_Datatype mpi_dcomplex;
+    static int member;
+#endif
     
     int *ig2isz=nullptr; // map ig to (is, iz).
     int *istot2ixy=nullptr; // istot2ixy[is]: iy + ix * ny of is^th stick among all sticks.

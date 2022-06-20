@@ -32,7 +32,10 @@ TEST_F(PWTEST,test4_3)
     //--------------------------------------------------
     
     //init
-    pwtest.initgrids(lat0,latvec, 10, 10, 10, nproc_in_pool, rank_in_pool);
+#ifdef __MPI
+    pwtest.initmpi(nproc_in_pool, rank_in_pool, POOL_WORLD);
+#endif
+    pwtest.initgrids(lat0,latvec, 5, 5, 60);
     pwtest.initparameters(gamma_only,wfcecut,distribution_type,xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();

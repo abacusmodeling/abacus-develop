@@ -4,7 +4,6 @@
 #include "../module_base/global_function.h"
 #ifdef __MPI
 #include "mpi.h"
-#include "../src_parallel/parallel_global.h"
 #endif
 
 // temporary class, because previous ABACUS consider big grid for fft grids 
@@ -41,16 +40,13 @@ public:
 
 
     virtual void initgrids(const double lat0_in,const ModuleBase::Matrix3 latvec_in,
-        const double gridecut, const int poolnproc_in, const int poolrank_in){
+        const double gridecut){
         //init lattice
     this->lat0 = lat0_in;
     this->latvec = latvec_in;
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
-    this->poolnproc = poolnproc_in;
-    this->poolrank = poolrank_in;
-    
 
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
@@ -155,9 +151,7 @@ public:
     virtual void initgrids(
     const double lat0_in,
     const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    const int nx_in, int ny_in, int nz_in,
-    const int poolnproc_in,
-    const int poolrank_in
+    const int nx_in, int ny_in, int nz_in
     )
     {
         this->lat0 = lat0_in;
@@ -178,13 +172,11 @@ public:
         this->nbz = this->nz / bz;
         this->nxy = this->nx * this->ny;
         this->nxyz = this->nxy * this->nz;
-        this->poolnproc = poolnproc_in;
-        this->poolrank = poolrank_in;
 
         int *ibox = new int[3];
         ibox[0] = int((this->nx-1)/2)+1;
-        ibox[1] = int((this->nx-1)/2)+1;
-        ibox[2] = int((this->nx-1)/2)+1;
+        ibox[1] = int((this->ny-1)/2)+1;
+        ibox[2] = int((this->nz-1)/2)+1;
         this->gridecut_lat = 1e20;
         int count = 0;
         for(int igz = -ibox[2]; igz <= ibox[2]; ++igz)
@@ -209,7 +201,7 @@ public:
             }
         }
 #ifdef __MPI
-        MPI_Allreduce(MPI_IN_PLACE, &this->gridecut_lat, 1, MPI_DOUBLE, MPI_MIN , POOL_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, &this->gridecut_lat, 1, MPI_DOUBLE, MPI_MIN , this->pool_world);
 #endif
         this->gridecut_lat -= 1e-6;
 

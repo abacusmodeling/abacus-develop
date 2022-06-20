@@ -30,16 +30,18 @@ TEST_F(PWTEST,test1_2)
     int distribution_type = 1;
     bool xprime = false;
     //--------------------------------------------------
-
+#ifdef __MPI
+    pwtest.initmpi(nproc_in_pool, rank_in_pool, POOL_WORLD);
+#endif
     //Useless, only to test reinit function.
-    pwtest.initgrids(2, latvec, 50 ,nproc_in_pool, rank_in_pool);
+    pwtest.initgrids(2, latvec, 50);
     pwtest.initparameters(true, 46, 2);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
     pwtest.collect_uniqgg();
     
     //init //Real parameters
-    pwtest.initgrids(lat0,latvec,wfcecut, nproc_in_pool, rank_in_pool);
+    pwtest.initgrids(lat0,latvec,wfcecut);
     pwtest.initparameters(gamma_only,wfcecut,distribution_type,xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();

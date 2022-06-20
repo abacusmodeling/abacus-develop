@@ -18,11 +18,14 @@ namespace ModuleESolver
     }
     void ESolver_FP::Init(Input& inp, UnitCell_pseudo& cell)
     {
+#ifdef __MPI
+            this->pw_rho->initmpi(GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL, POOL_WORLD);
+#endif
         // Initalize the plane wave basis set
         if (inp.nx * inp.ny * inp.nz == 0)
-            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.ecutrho, GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.ecutrho);
 	    else
-            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.nx, inp.ny, inp.nz, GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.nx, inp.ny, inp.nz);
         
         this->pw_rho->initparameters(false, inp.ecutrho);
         this->pw_rho->setuptransform();

@@ -1,16 +1,31 @@
 #include "pw_basis.h"
 #include "../module_base/mymath.h"
-#include <iostream>
 #include "../module_base/timer.h"
 #include "../module_base/global_function.h"
 
 
 namespace ModulePW
 {
-
+#ifdef __MPI
+MPI_Datatype PW_Basis::mpi_dcomplex;
+int PW_Basis::member = 0;
+#endif
 PW_Basis::PW_Basis()
 {
     classname="PW_Basis";
+#ifdef __MPI
+    if(member == 0)
+    {
+        MPI_Datatype block[2];
+	    block[0]=MPI_DOUBLE;
+	    block[1]=MPI_DOUBLE;
+	    int ac[2]={1,1};
+	    MPI_Aint dipc[2]={0,sizeof(double)};
+	    MPI_Type_create_struct(2,ac,dipc,block,&mpi_dcomplex);
+	    MPI_Type_commit(&mpi_dcomplex);
+        ++member;
+    }
+#endif
 }
 
 PW_Basis:: ~PW_Basis()
@@ -32,6 +47,13 @@ PW_Basis:: ~PW_Basis()
     delete[] startr;
     delete[] ig2igg;
     delete[] gg_uniq;
+#ifdef __MPI
+    --member;
+    if(member==0)
+    {
+        MPI_Type_free(&mpi_dcomplex);
+    }
+#endif
 }
 
 /// 

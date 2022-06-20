@@ -23,8 +23,10 @@ TEST_F(PWTEST,test1_1_1)
     //--------------------------------------------------
 
     ModulePW::PW_Basis pwtest;
-
-    pwtest.initgrids(lat0, latvec, wfcecut,nproc_in_pool, rank_in_pool);
+#ifdef __MPI
+    pwtest.initmpi(nproc_in_pool, rank_in_pool, POOL_WORLD);
+#endif
+    pwtest.initgrids(lat0, latvec, wfcecut);
     pwtest.initparameters(gamma_only, wfcecut, distribution_type,xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
@@ -209,8 +211,8 @@ TEST_F(PWTEST,test1_1_1)
     lat0 = 1.88972613;
     distribution_type = 1;
     //--------------------------------------------------
-    pwtest.initgrids(lat0, latvec2, wfcecut,nproc_in_pool, rank_in_pool);
-    pwtest.initparameters(gamma_only, wfcecut, distribution_type);
+    pwtest.initgrids(lat0, latvec2, wfcecut);
+    pwtest.initparameters(gamma_only, wfcecut, distribution_type, xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
     pwtest.collect_uniqgg();

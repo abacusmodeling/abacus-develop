@@ -44,7 +44,10 @@ int main(int argc, char **argv)
       if(myrank < nproc)  
       {
         ModulePW::PW_Basis pwtest;
-        pwtest.initgrids(lat0, latvec, wfcecut,nproc, myrank);
+#ifdef __MPI
+        pwtest.initmpi(nproc, myrank, POOL_WORLD);
+#endif
+        pwtest.initgrids(lat0, latvec, wfcecut);
         pwtest.initparameters(gamma_only, wfcecut, distribution_type,xprime);
         pwtest.setuptransform();
         pwtest.collect_local_pw();

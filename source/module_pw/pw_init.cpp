@@ -1,12 +1,21 @@
 #include "./pw_basis.h"
 #include "../module_base/constants.h"
-#ifdef __MPI
-#include "mpi.h"
-#include "../src_parallel/parallel_global.h"
-#endif
 
 namespace ModulePW
 {
+#ifdef __MPI
+void PW_Basis:: initmpi(
+    const int poolnproc_in,
+        const int poolrank_in,
+        MPI_Comm pool_world_in
+)
+{
+    this->poolnproc = poolnproc_in;
+    this->poolrank = poolrank_in;
+    this->pool_world = pool_world_in;
+}
+#endif
+
 /// 
 /// Init the grids for FFT
 /// Input: lattice vectors of the cell, Energy cut off for G^2/2
@@ -15,9 +24,7 @@ namespace ModulePW
 void PW_Basis:: initgrids(
         const double lat0_in, //unit length (unit in bohr)
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        const double gridecut,
-        const int poolnproc_in,
-        const int poolrank_in
+        const double gridecut
 )
 {
     //init lattice
@@ -28,9 +35,6 @@ void PW_Basis:: initgrids(
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
-    this->poolnproc = poolnproc_in;
-    this->poolrank = poolrank_in;
-    
 
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
@@ -80,7 +84,7 @@ void PW_Basis:: initgrids(
     ibox[1] = 2*n2+1;
     ibox[2] = 2*n3+1;
 #ifdef __MPI
-    MPI_Allreduce(MPI_IN_PLACE, ibox, 3, MPI_INT, MPI_MAX , POOL_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, ibox, 3, MPI_INT, MPI_MAX , this->pool_world);
 #endif
 
     // Find the minimal FFT box size the factors into the primes (2,3,5,7).
@@ -148,9 +152,7 @@ void PW_Basis:: initgrids(
 void PW_Basis:: initgrids(
     const double lat0_in,
     const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    const int nx_in, int ny_in, int nz_in,
-    const int poolnproc_in,
-    const int poolrank_in
+    const int nx_in, int ny_in, int nz_in
 )
 {
     this->lat0 = lat0_in;
@@ -165,13 +167,11 @@ void PW_Basis:: initgrids(
     this->nz = nz_in;
     this->nxy = this->nx * this->ny;
     this->nxyz = this->nxy * this->nz;
-    this->poolnproc = poolnproc_in;
-    this->poolrank = poolrank_in;
 
     int *ibox = new int[3];
     ibox[0] = int((this->nx-1)/2)+1;
-    ibox[1] = int((this->nx-1)/2)+1;
-    ibox[2] = int((this->nx-1)/2)+1;
+    ibox[1] = int((this->ny-1)/2)+1;
+    ibox[2] = int((this->nz-1)/2)+1;
     this->gridecut_lat = 1e20;
     int count = 0;
     for(int igz = -ibox[2]; igz <= ibox[2]; ++igz)
@@ -196,7 +196,7 @@ void PW_Basis:: initgrids(
         }
     }
 #ifdef __MPI
-    MPI_Allreduce(MPI_IN_PLACE, &this->gridecut_lat, 1, MPI_DOUBLE, MPI_MIN , POOL_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &this->gridecut_lat, 1, MPI_DOUBLE, MPI_MIN , this->pool_world);
 #endif
     this->gridecut_lat -= 1e-6;
 
