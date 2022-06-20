@@ -236,7 +236,6 @@ void LCAO_Deepks::init_gdmepsl()
         for (int inl = 0;inl < inlmax;inl++)
         {
             this->gdm_epsl[ipol][inl] = new double [(2 * lmaxd + 1) * (2 * lmaxd + 1)];
-            //std::cout << " Hello Qi4" << std::endl;
             ModuleBase::GlobalFunc::ZEROS(gdm_epsl[ipol][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
         }
     }

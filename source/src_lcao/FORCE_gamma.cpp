@@ -81,7 +81,7 @@ void Force_LCAO_gamma::ftable_gamma (
 #endif
         if(GlobalV::deepks_out_unittest)
         {
-            //GlobalC::ld.print_dm(loc.dm_gamma[0]);
+            GlobalC::ld.print_dm(loc.dm_gamma[0]);
             GlobalC::ld.check_projected_dm();
             GlobalC::ld.check_descriptor(GlobalC::ucell);
             GlobalC::ld.check_gedm();
