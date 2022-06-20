@@ -10,7 +10,10 @@
 //2. subroutines that are related to calculating force label:
 //  - init_gdmx : allocates gdmx; it is a private subroutine
 //  - del_gdmx : releases gdmx
-//3. subroutines that are related to V_delta:
+//3. subroutines that are related to calculating force label:
+//  - init_gdmepsl : allocates gdm_epsl; it is a private subroutine
+//  - del_gdmepsl : releases gdm_epsl
+//4. subroutines that are related to V_delta:
 //  - allocate_V_delta : allocates H_V_delta; if calculating force, it also calls
 //      init_gdmx, as well as allocating F_delta
 //  - allocate_V_deltaR : allcoates H_V_deltaR, for multi-k calculations
@@ -223,6 +226,38 @@ void LCAO_Deepks::del_gdmx(const int nat)
     return;
 }
 
+void LCAO_Deepks::init_gdmepsl()
+{
+    this->gdm_epsl = new double** [6];
+    
+    for (int ipol = 0;ipol < 6;ipol++)
+    {
+        this->gdm_epsl[ipol] = new double* [inlmax];
+        for (int inl = 0;inl < inlmax;inl++)
+        {
+            this->gdm_epsl[ipol][inl] = new double [(2 * lmaxd + 1) * (2 * lmaxd + 1)];
+            //std::cout << " Hello Qi4" << std::endl;
+            ModuleBase::GlobalFunc::ZEROS(gdm_epsl[ipol][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
+        }
+    }
+    return;
+}
+
+void LCAO_Deepks::del_gdmepsl()
+{
+    for (int ipol = 0;ipol < 6;ipol++)
+    {
+        for (int inl = 0;inl < inlmax;inl++)
+        {
+            delete[] this->gdm_epsl[ipol][inl];
+        }
+        delete[] this->gdm_epsl[ipol];
+    }
+    delete[] this->gdm_epsl;
+    return;
+}
+
+
 void LCAO_Deepks::allocate_V_delta(const int nat, const int nloc, const int nks)
 {
     ModuleBase::TITLE("LCAO_Deepks", "allocate_V_delta");
@@ -256,7 +291,11 @@ void LCAO_Deepks::allocate_V_delta(const int nat, const int nloc, const int nks)
     {
         //init F_delta
         F_delta.create(nat, 3);
-        if(GlobalV::deepks_out_labels) this->init_gdmx(nat);
+        if(GlobalV::deepks_out_labels) 
+        { 
+            this->init_gdmx(nat);
+            this->init_gdmepsl();
+        }
         //gdmx is used only in calculating gvx
     }
 

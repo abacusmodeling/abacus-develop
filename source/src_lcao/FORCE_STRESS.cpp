@@ -301,7 +301,8 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ORB,
 						GlobalC::GridD,
 						pv->trace_loc_row,
-    					pv->trace_loc_col);
+    					pv->trace_loc_col,
+						isstress);
 				}
 				else
 				{			
@@ -312,7 +313,8 @@ void Force_Stress_LCAO::getForceStress(
 						pv->trace_loc_row,
     					pv->trace_loc_col,
 						GlobalC::kv.nks,
-						GlobalC::kv.kvec_d);	
+						GlobalC::kv.kvec_d,
+						isstress);	
 				}
 				if(GlobalV::deepks_out_unittest) GlobalC::ld.check_gdmx(GlobalC::ucell.nat);
 				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);
@@ -435,13 +437,7 @@ void Force_Stress_LCAO::getForceStress(
 					+ sigmacc(i,j) //nonlinear core correction stress (pw)
 					+ sigmaxc(i,j)//exchange corretion stress
 					+ sigmahar(i,j);// hartree stress
-#ifdef __DEEPKS
-				// wenfei add 2021/11/2
-				if (GlobalV::deepks_scf)
-				{
-					scs(i,j) += svnl_dalpha(i,j);
-				}
-#endif
+
 					//VDW stress from linpz and jiyy
 				if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 				{
@@ -455,6 +451,30 @@ void Force_Stress_LCAO::getForceStress(
 			}
 		}
 
+#ifdef __DEEPKS
+		if (GlobalV::deepks_out_labels) //not parallelized yet
+        {
+			GlobalC::ld.save_npy_s(scs, "s_base.npy", GlobalC::ucell.omega); //Ry/Bohr^3, S_base; no scf case -- same as S_tot
+			// wenfei add 2021/11/2
+			if (GlobalV::deepks_scf)
+			{
+				for (int i=0; i<3; i++)
+				{
+					for (int j=0; j<3; j++)
+					{
+						scs(i,j) += svnl_dalpha(i,j);
+					}
+				}
+				GlobalC::ld.save_npy_s(scs, "s_tot.npy", GlobalC::ucell.omega); //Ry/Bohr^3, S_tot
+				GlobalC::ld.cal_gvepsl(GlobalC::ucell.nat);
+				GlobalC::ld.save_npy_gvepsl(GlobalC::ucell.nat);//  /Bohr^3, grad_vepsl
+			}
+			else
+			{
+				GlobalC::ld.save_npy_s(scs, "s_tot.npy", GlobalC::ucell.omega); //Ry/Bohr^3, S_tot; no scf case -- same as S_base
+			}
+		}	
+#endif
 
 
 		if(ModuleSymmetry::Symmetry::symm_flag)
