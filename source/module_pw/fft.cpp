@@ -193,23 +193,23 @@ void FFT :: initplanf()
 	if(this->xprime)
 	{
 		//It is better to use in-place for stride > 1
-		this->planfyfor  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)aux2, 		  embed, nplane,     1,
-				(fftwf_complex *)aux2, 	 embed, nplane,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planfybac  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)aux2, 		  embed, nplane,     1,
-				(fftwf_complex *)aux2, 	 embed, nplane,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+		this->planfyfor  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)auxf2, 		  embed, nplane,     1,
+				(fftwf_complex *)auxf2, 	 embed, nplane,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+		this->planfybac  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)auxf2, 		  embed, nplane,     1,
+				(fftwf_complex *)auxf2, 	 embed, nplane,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
 		if(this->gamma_only)
 		{
 			this->planfxr2c  = fftwf_plan_many_dft_r2c(  1, &this->nx, npy,	rf_rspace , embed, npy,      1,
-				(fftwf_complex*)aux1, embed, npy,		1,	FFTW_MEASURE   );
-			this->planfxc2r  = fftwf_plan_many_dft_c2r(  1, &this->nx, npy,	(fftwf_complex*)aux1 , embed, npy,      1,
+				(fftwf_complex*)auxf1, embed, npy,		1,	FFTW_MEASURE   );
+			this->planfxc2r  = fftwf_plan_many_dft_c2r(  1, &this->nx, npy,	(fftwf_complex*)auxf1 , embed, npy,      1,
 				rf_rspace, embed, npy,		1,			FFTW_MEASURE   );
 		}
 		else
 		{
-			this->planfxfor1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)aux2, 		  embed, npy,     1,
-				(fftwf_complex *)aux2, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-			this->planfxbac1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)aux2, 		  embed, npy,     1,
-				(fftwf_complex *)aux2, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+			this->planfxfor1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)auxf2, 		  embed, npy,     1,
+				(fftwf_complex *)auxf2, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+			this->planfxbac1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)auxf2, 		  embed, npy,     1,
+				(fftwf_complex *)auxf2, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
 		}
 		
 	}

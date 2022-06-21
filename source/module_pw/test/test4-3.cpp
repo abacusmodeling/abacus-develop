@@ -107,7 +107,6 @@ TEST_F(PWTEST,test4_3)
     {
         rhog[ig] = 1.0/(pwtest.gg[ig]+1);
         rhogr[ig] = 1.0/(pwtest.gg[ig]+1);
-        double a = rhog[ig].real();
         if(pwtest.gdirect[ig].x > 0) 
         {
             rhog[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].y+1) + 1);
@@ -124,10 +123,10 @@ TEST_F(PWTEST,test4_3)
     {
         rhofg[ig] = 1.0/(pwtest.gg[ig]+1);
         rhofgr[ig] = 1.0/(pwtest.gg[ig]+1);
-        if(pwtest.gdirect[ig].y > 0) 
+        if(pwtest.gdirect[ig].x > 0) 
         {
-            rhofg[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
-            rhofgr[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
+            rhofg[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].y+1) + 1);
+            rhofgr[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].y+1) + 1);
         }
     }    
     float * rhofr = new float [nrxx];
