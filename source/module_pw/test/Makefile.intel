@@ -123,6 +123,7 @@ pw :
 	@ make init
 	@ make -j $(NP) pw_test.exe
 	@ if [ $(GEN) == "ON" ]; then make gen.exe ; fi
+	@ if [ $(TIME) == "ON" ]; then make time.exe ; fi
 
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
@@ -131,6 +132,8 @@ pw_test.exe: ${PW_OBJS} ${TESTFILE} pw_test.cpp test_tool.cpp
 	${CPLUSPLUS} ${OPTS} ${TESTFILE} pw_test.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o pw_test.exe ${GTESTOPTS}
 gen.exe: ${PW_OBJS} generate.cpp test_tool.cpp
 	${CPLUSPLUS} ${OPTS} generate.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o gen.exe
+time.exe: ${PW_OBJS} time.cpp
+	${CPLUSPLUS} ${OPTS} time.cpp ${PW_OBJS}  ${LIBS} -o time.exe
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS} ${OPTS} -c ${HONG} $< -o $@ ${GTESTOPTS}
 
@@ -139,3 +142,4 @@ clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
 	@ if [ -e pw_test.exe ]; then rm -f pw_test.exe; fi
 	@ if [ -e gen.exe ]; then rm -f gen.exe; fi
+	@ if [ -e time.exe ]; then rm -f time.exe; fi
