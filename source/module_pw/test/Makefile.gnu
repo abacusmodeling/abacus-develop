@@ -41,7 +41,15 @@ test1-5.o\
 test2-1-1.o\
 test2-1-2.o\
 test2-2.o\
-test2-3.o
+test2-3.o\
+test3-1.o\
+test3-2.o\
+test3-3.o\
+test4-1.o\
+test4-2.o\
+test4-3.o\
+test4-4.o\
+test4-5.o
 
 
 TESTFILE0 = ${DOUBLEFILE} 

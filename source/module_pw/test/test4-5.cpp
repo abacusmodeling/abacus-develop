@@ -137,7 +137,7 @@ TEST_F(PWTEST,test4_5)
             rhofg[ig] = 1.0/(pwtest.getgk2(ik,ig)+1); 
             rhofgr[ig] = 1.0/(pwtest.getgk2(ik,ig)+1);
             ModuleBase::Vector3<double> f = pwtest.getgdirect(ik,ig);
-            if(f.y > 0) 
+            if(f.x > 0) 
             {
                 rhofg[ig]+=ModuleBase::IMAG_UNIT / (abs(f.x+1) + 1);
                 rhofgr[ig]+=ModuleBase::IMAG_UNIT / (abs(f.x+1) + 1);
@@ -153,7 +153,7 @@ TEST_F(PWTEST,test4_5)
         ModuleBase::GlobalFunc::ZEROS(rhofr, nrxx);
         pwtest.recip2real(rhofg,rhofr,ik); //check out-of-place transform
 
-        pwtest.recip2real(rhofgr,(double*)rhofgr,ik); //check in-place transform
+        pwtest.recip2real(rhofgr,(float*)rhofgr,ik); //check in-place transform
 #endif
 
         int startiz = pwtest.startz_current;

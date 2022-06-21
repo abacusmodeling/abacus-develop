@@ -47,15 +47,15 @@ void FFT:: initfft(int nx_in, int ny_in, int nz_in, int lixy_in, int rixy_in, in
 	// this->maxgrids = (this->nz * this->ns > this->nxy * nplane) ? this->nz * this->ns : this->nxy * nplane;
 	const int nrxx = this->nxy * this->nplane;
 	const int nsz = this->nz * this->ns;
-	int maxgrids = (nsz > (nrxx/2) + 1) ? nsz : (nrxx/2) + 1;
+	int maxgrids = (nsz > nrxx) ? nsz : nrxx;
 	if(!this->mpifft)
 	{
 		auxg  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
-		auxr  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * nrxx);
+		auxr  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
 		r_rspace = (double *) auxg;
 #ifdef __MIX_PRECISION
 		auxfg  = (std::complex<float> *) fftw_malloc(sizeof(fftwf_complex) * maxgrids);
-		auxfr  = (std::complex<float> *) fftw_malloc(sizeof(fftwf_complex) * nrxx);
+		auxfr  = (std::complex<float> *) fftw_malloc(sizeof(fftwf_complex) * maxgrids);
 		rf_rspace = (float *) auxfg;
 #endif
 	}
@@ -121,8 +121,8 @@ void FFT :: initplan()
 		if(this->gamma_only)
 		{
 			this->planxr2c  = fftw_plan_many_dft_r2c(  1, &this->nx, npy,	r_rspace , embed, npy,      1,
-				(fftw_complex*)auxg, embed, npy,		1,	FFTW_MEASURE   );
-			this->planxc2r  = fftw_plan_many_dft_c2r(  1, &this->nx, npy,	(fftw_complex*)auxg , embed, npy,      1,
+				(fftw_complex*)auxr, embed, npy,		1,	FFTW_MEASURE   );
+			this->planxc2r  = fftw_plan_many_dft_c2r(  1, &this->nx, npy,	(fftw_complex*)auxr , embed, npy,      1,
 				r_rspace, embed, npy,		1,			FFTW_MEASURE   );
 		}
 		else
@@ -143,8 +143,8 @@ void FFT :: initplan()
 		if(this->gamma_only)
 		{
 			this->planyr2c  = fftw_plan_many_dft_r2c(  1, &this->ny, this->nplane,	r_rspace , embed, this->nplane,      1,
-				(fftw_complex*)auxg, embed, this->nplane,		1,	FFTW_MEASURE   );
-			this->planyc2r  = fftw_plan_many_dft_c2r(  1, &this->ny, this->nplane,	(fftw_complex*)auxg , embed, this->nplane,      1,
+				(fftw_complex*)auxr, embed, this->nplane,		1,	FFTW_MEASURE   );
+			this->planyc2r  = fftw_plan_many_dft_c2r(  1, &this->ny, this->nplane,	(fftw_complex*)auxr , embed, this->nplane,      1,
 				r_rspace, embed, this->nplane,		1,			FFTW_MEASURE   );
 		}
 		else
@@ -179,11 +179,11 @@ void FFT :: initplanf()
 	
 	this->planfzfor = fftwf_plan_many_dft(     1,    &this->nz,  this->ns,  
 					    (fftwf_complex*) auxfg,  &this->nz,  1,  this->nz,
-					    (fftwf_complex*) auxfr,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
+					    (fftwf_complex*) auxfg,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
 	
 	this->planfzbac = fftwf_plan_many_dft(     1,    &this->nz,  this->ns,  
 						(fftwf_complex*) auxfg,  &this->nz,  1,  this->nz,
-						(fftwf_complex*) auxfr,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
+						(fftwf_complex*) auxfg,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 	//---------------------------------------------------------
 	//                              2 D
 	//---------------------------------------------------------
@@ -192,23 +192,23 @@ void FFT :: initplanf()
 	int npy = this->nplane * this->ny;
 	if(this->xprime)
 	{
-		this->planfyfor  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)auxr, 		  embed, nplane,     1,
-				(fftwf_complex *)auxr, 	 embed, nplane,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-		this->planfybac  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)auxr, 		  embed, nplane,     1,
-				(fftwf_complex *)auxr, 	 embed, nplane,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+		this->planfyfor  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)auxfr, 		  embed, nplane,     1,
+				(fftwf_complex *)auxfr, 	 embed, nplane,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+		this->planfybac  = fftwf_plan_many_dft(  1, &this->ny,	this->nplane,	 (fftwf_complex *)auxfr, 		  embed, nplane,     1,
+				(fftwf_complex *)auxfr, 	 embed, nplane,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
 		if(this->gamma_only)
 		{
 			this->planfxr2c  = fftwf_plan_many_dft_r2c(  1, &this->nx, npy,	rf_rspace , embed, npy,      1,
-				(fftwf_complex*)auxg, embed, npy,		1,	FFTW_MEASURE   );
-			this->planfxc2r  = fftwf_plan_many_dft_c2r(  1, &this->nx, npy,	(fftwf_complex*)auxg , embed, npy,      1,
+				(fftwf_complex*)auxfr, embed, npy,		1,	FFTW_MEASURE   );
+			this->planfxc2r  = fftwf_plan_many_dft_c2r(  1, &this->nx, npy,	(fftwf_complex*)auxfr , embed, npy,      1,
 				rf_rspace, embed, npy,		1,			FFTW_MEASURE   );
 		}
 		else
 		{
-			this->planfxfor1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)auxr, 		  embed, npy,     1,
-				(fftwf_complex *)auxr, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-			this->planfxbac1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)auxr, 		  embed, npy,     1,
-				(fftwf_complex *)auxr, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+			this->planfxfor1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)auxfr, 		  embed, npy,     1,
+				(fftwf_complex *)auxfr, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+			this->planfxbac1  = fftwf_plan_many_dft(  1, &this->nx,	npy,	 (fftwf_complex *)auxfr, 		  embed, npy,     1,
+				(fftwf_complex *)auxfr, 	 embed, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
 		}
 		
 	}
@@ -221,8 +221,8 @@ void FFT :: initplanf()
 		if(this->gamma_only)
 		{
 			this->planfyr2c  = fftwf_plan_many_dft_r2c(  1, &this->ny, this->nplane,	rf_rspace , embed, this->nplane,      1,
-				(fftwf_complex*)auxfg, embed, this->nplane,		1,	FFTW_MEASURE   );
-			this->planfyc2r  = fftwf_plan_many_dft_c2r(  1, &this->ny, this->nplane,	(fftwf_complex*)auxfg , embed, this->nplane,      1,
+				(fftwf_complex*)auxfr, embed, this->nplane,		1,	FFTW_MEASURE   );
+			this->planfyc2r  = fftwf_plan_many_dft_c2r(  1, &this->ny, this->nplane,	(fftwf_complex*)auxfr , embed, this->nplane,      1,
 				rf_rspace, embed, this->nplane,		1,			FFTW_MEASURE   );
 		}
 		else

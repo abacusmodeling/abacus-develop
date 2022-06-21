@@ -143,7 +143,7 @@ void Input::Default(void)
     seed_sto = 0;
     bndpar = 1;
     kpar = 1;
-    initsto_freq = 1000;
+    initsto_freq = 1;
     method_sto = 1;
     berry_phase = false;
     gdir = 3;
