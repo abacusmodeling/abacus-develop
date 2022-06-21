@@ -76,12 +76,11 @@ public:
 	int lixy=0,rixy=0;// lixy: the left edge of the pw ball in the y direction; rixy: the right edge of the pw ball in the x or y direction
 	int ns=0; //number of sticks
 	int nplane=0; //number of x-y planes
-	int maxgrids=0; // max between nz * ns and bignxy * nplane
 	int nproc=1; // number of proc.
-	std::complex<double> *aux1=nullptr, *aux2=nullptr; //fft space, [maxgrids]
+	std::complex<double> *auxg=nullptr, *auxr=nullptr; //fft space
 	double *r_rspace=nullptr; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
-	std::complex<float> *auxf1=nullptr, *auxf2=nullptr; //fft space, [maxgrids]
+	std::complex<float> *auxfg=nullptr, *auxfr=nullptr; //fft space,
 	float *rf_rspace=nullptr; //real number space for r, [nplane * nx *ny]
 #endif
 
