@@ -28,7 +28,7 @@
 
 - [Electronic structure (SDFT)](#electronic-structure-sdft)
 
-    [method_sto](#method_sto) | [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto)
+    [method_sto](#method_sto) | [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto) | [initsto_freq](#initsto_freq)
 
 - [Geometry relaxation](#geometry-relaxation)
 
@@ -571,7 +571,7 @@ calculations.
 
 ### Electronic structure (SDFT)
 
-This part of variables are used to control the parameters of stochastic DFT (SDFT),  mix stochastic-deterministic DFT (MDFT), or complete-basis Chebyshev method (CT).
+This part of variables are used to control the parameters of stochastic DFT (SDFT),  mix stochastic-deterministic DFT (MDFT), or complete-basis Chebyshev method (CT). We now support calculation of "sto-scf" and "sto-md".
 
 #### method_sto
 
@@ -614,8 +614,15 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 
 - **Type**: Integer
 - **Description**: The random seed to generate stochastic orbitals.
-  - seed_sto>=0: Stochastic orbitals have the form of $\exp(i2\pi\theta(G))$, where $\theta$ is a uniform distribution in $(0,1)$. If seed_sto=0, the seed is decided by time(NULL).
-  - seed_sto<=-1: Stochastic orbitals have the form of $\pm1$ with the equal probability. If seed_sto=-1, the seed is decided
+  - seed_sto>=0: Stochastic orbitals have the form of $\exp(i2\pi\theta(G))$, where $\theta$ is a uniform distribution in $(0,1)$. If seed_sto = 0, the seed is decided by time(NULL).
+  - seed_sto<=-1: Stochastic orbitals have the form of $\pm1$ with the equal probability. If seed_sto = -1, the seed is decided by time(NULL).
+- **Default**:0
+
+#### initsto_freq
+
+- **Type**: Integer
+- **Description**: Frequency (once each initsto_freq steps) to generate new stochastic orbitals when running md.
+- **Default**:1000
 
 ### Geometry relaxation
 
