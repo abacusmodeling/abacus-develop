@@ -41,8 +41,8 @@ void PW_Basis_K:: real2recip(const std::complex<double> * in, std::complex<doubl
     {
         out[igl] = this->ft.aux1[this->igl2isz_k[igl+startig]] / double(this->nxyz);
     }
-    return;
     ModuleBase::timer::tick("PW_Basis_K", "real2recip");
+    return;
 }
 
 ///
