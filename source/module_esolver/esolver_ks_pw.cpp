@@ -48,6 +48,23 @@ namespace ModuleESolver
     }
     ESolver_KS_PW::~ESolver_KS_PW()
     {
+        //delete HSolver and ElecState
+        if(this->phsol != nullptr)
+        {
+            delete (hsolver::HSolverPW*)this->phsol;
+            this->phsol = nullptr;
+        }
+        if(this->pelec != nullptr)
+        {
+            delete (elecstate::ElecStatePW*)this->pelec;
+            this->pelec = nullptr;
+        }
+        //delete Hamilt
+        if(this->phami != nullptr)
+        {
+            delete (hamilt::HamiltPW*)this->phami;
+            this->phami = nullptr;
+        }
     }
 
     void ESolver_KS_PW::Init(Input& inp, UnitCell_pseudo& ucell)
@@ -128,48 +145,34 @@ namespace ModuleESolver
 
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
 
-        //init Psi, HSolver, ElecState, Hamilt
-        if(this->phsol != nullptr)
-        {
-            if(this->phsol->classname != "HSolverPW")
-            {
-                delete this->phsol;
-                this->phsol = nullptr;
-            }
-        }
-        else
-        {
-            this->phsol = new hsolver::HSolverPW(GlobalC::wfcpw);
-        }
-        if(this->pelec != nullptr)
-        {
-            if(this->pelec->classname != "ElecStatePW")
-            {
-                delete this->pelec;
-                this->pelec = nullptr;
-            }
-        }
-        else
+        //init ElecState,
+        if(this->pelec == nullptr)
         {
             this->pelec = new elecstate::ElecStatePW( GlobalC::wfcpw, (Charge*)(&(GlobalC::CHR)), (K_Vectors*)(&(GlobalC::kv)), GlobalV::NBANDS);
         }
-        if(this->phami != nullptr)
+        //init HSolver
+        if(this->phsol == nullptr)
         {
-            if(this->phami->classname != "HamiltPW")
-            {
-                delete this->phami;
-                this->phami = nullptr;
-            }
+            this->phsol = new hsolver::HSolverPW(GlobalC::wfcpw);
         }
-        else
-        {
-            this->phami = new hamilt::HamiltPW();
-        }
-
     }
 
     void ESolver_KS_PW::beforescf(int istep)
     {
+        //init Hamilt, this should be allocated before each scf loop
+        //Operators in HamiltPW should be reallocated once cell changed
+        //delete Hamilt if not first scf
+        if(this->phami != nullptr)
+        {
+            delete (hamilt::HamiltPW*)this->phami;
+            this->phami = nullptr;
+        }
+        //allocate HamiltPW
+        if(this->phami == nullptr)
+        {
+            this->phami = new hamilt::HamiltPW();
+        }
+
         //calculate ewald energy
         H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
         //Symmetry_rho should be moved to Init()

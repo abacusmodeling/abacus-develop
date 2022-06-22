@@ -145,7 +145,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 // Calculates beta functions (Kleinman-Bylander projectors),
 // with structure factor, for all atoms, in reciprocal space
 //----------------------------------------------------------
-void pseudopot_cell_vnl::getvnl(const int &ik, ModuleBase::ComplexMatrix& vkb_in)
+void pseudopot_cell_vnl::getvnl(const int &ik, ModuleBase::ComplexMatrix& vkb_in)const
 {
 	if(GlobalV::test_pp) ModuleBase::TITLE("pseudopot_cell_vnl","getvnl");
 	ModuleBase::timer::tick("pp_cell_vnl","getvnl");

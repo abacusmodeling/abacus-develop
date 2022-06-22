@@ -3,8 +3,10 @@
 
 #include "matrixblock.h"
 #include "module_psi/psi.h"
+#include "operator.h"
 
 #include <complex>
+#include <vector>
 
 namespace hamilt
 {
@@ -32,8 +34,7 @@ class Hamilt
 
   protected:
     // array, save operations from each operators
-    // would be implemented later
-    // vector<Operator*> p_operators;
+    std::vector<Operator*> ops;
 };
 
 } // namespace hamilt
