@@ -53,7 +53,7 @@ void Gint_k::destroy_pvpR(void)
     
     if(!pvpR_alloc_flag)
     {
-        ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","<phi_0i | V | phi_Rj> matrix has not been allocated yet!");
+        return;
     }
     
     for(int is =0;is<GlobalV::NSPIN;is++) delete[] pvpR_reduced[is];
@@ -352,6 +352,7 @@ void Gint_k::folding_vl_k(const int &ik, LCAO_Matrix *LM)
             }
             delete[] pvp_nc[spin];
         }
+        delete[] pvp_nc;
     }
     ModuleBase::timer::tick("Gint_k","Distri");
 

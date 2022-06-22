@@ -10,7 +10,6 @@ MSST::MSST(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para
 {
     std::cout << "MSST" << std::endl;
 
-    GlobalV::CAL_STRESS = 1;
     mdp.msst_qmass = mdp.msst_qmass / pow(ModuleBase::ANGSTROM_AU, 4) / pow(ModuleBase::AU_to_MASS, 2);
     mdp.msst_vel = mdp.msst_vel * ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
     mdp.msst_vis = mdp.msst_vis / ModuleBase::AU_to_MASS / ModuleBase::ANGSTROM_AU * ModuleBase::AU_to_FS;
@@ -240,6 +239,9 @@ void MSST::rescale(double volume)
     ucell.latvec.e11 *= dilation[0];
     ucell.latvec.e22 *= dilation[1];
     ucell.latvec.e33 *= dilation[2];
+    ucell.a1 *= dilation[0];
+    ucell.a2 *= dilation[1];
+    ucell.a3 *= dilation[2];
 
     ucell.setup_cell_after_vc(GlobalV::ofs_running);
     MD_func::InitPos(ucell, pos);

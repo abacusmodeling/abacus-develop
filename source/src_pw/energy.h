@@ -4,6 +4,7 @@
 #include "../module_base/global_variable.h"
 #include "src_lcao/local_orbital_wfc.h"
 #include "src_lcao/LCAO_hamilt.h"
+#include "module_psi/psi.h"
 
 class energy
 {
@@ -28,7 +29,10 @@ class energy
     energy();
     ~energy();
 
-	void perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm);
+	void perform_dos(
+		const psi::Psi<double> *psid, 
+		const psi::Psi<std::complex<double>> *psi, 
+		LCAO_Hamilt &uhm);
     void perform_dos_pw(void);
 
     double etot;    	   // the total energy of the solid

@@ -55,6 +55,7 @@ inline int set_elpahandle(elpa_t &handle,
 
 void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, double *eigenvalue_in)
 {
+    ModuleBase::TITLE("DiagoElpa", "diag");
 #ifdef __MPI
     matcd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
@@ -95,6 +96,7 @@ void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi
 
 void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eigenvalue_in)
 {
+    ModuleBase::TITLE("DiagoElpa", "diag");
 #ifdef __MPI
     matd h_mat, s_mat;
     phm_in->matrix(h_mat, s_mat);
@@ -135,6 +137,9 @@ void DiagoElpa::diag(hamilt::Hamilt *phm_in, psi::Psi<double> &psi, double *eige
                                     DiagoElpa::is_already_decomposed,
                                     &elpa_error);
     ModuleBase::timer::tick("DiagoElpa", "elpa_solve");
+
+    //S matrix has been decomposed
+    DiagoElpa::is_already_decomposed = true;
 
     const int inc = 1;
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "K-S equation was solved by genelpa2");

@@ -980,7 +980,7 @@ void UnitCell::set_iat2itia(void)
  * because of lack of codes without mpi
  * in WF_Local::distri_lowf_new() called by WF_Local::read_lowf()
  ******************************/
-void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
+void Local_Orbital_Charge::gamma_file(psi::Psi<double>* psid, Local_Orbital_wfc &lowf)
 {
     for (int is = 0; is < GlobalV::NSPIN; ++is)
     {
@@ -1032,7 +1032,7 @@ void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
     }
 }
 
-void Local_Orbital_Charge::allocate_gamma(const int& lgd)
+void Local_Orbital_Charge::allocate_gamma(const int& lgd, psi::Psi<double>* psid)
 {
     this->DM = new double **[GlobalV::NSPIN];
     this->DM_pool = new double *[GlobalV::NSPIN];
@@ -1900,7 +1900,7 @@ void LCAO_Orbitals::read_orb_file(
 InfoNonlocal::InfoNonlocal()
 {
     this->Beta = new Numerical_Nonlocal[1];
-	this->nproj = new int[1];
+	this->nproj = nullptr;
     this->nprojmax = 0;
     this->rcutmax_Beta = 0.0;
 }
@@ -2200,22 +2200,22 @@ using namespace std;
 Pseudopot_upf::Pseudopot_upf()
 {
 	this->els = new std::string[1];
-	this->lchi = new int[1];
-	this->oc = new double[1];
+	this->lchi = nullptr;
+	this->oc = nullptr;
 
-	this->r = new double[1];
-	this->rab = new double[1];
-	this->vloc = new double[1];
+	this->r = nullptr;
+	this->rab = nullptr;
+	this->vloc = nullptr;
 
-	this->kkbeta = new int[1];
-	this->lll = new int[1];
+	this->kkbeta = nullptr;
+	this->lll = nullptr;
 
-	this->rho_at = new double[1];
-	this->rho_atc = new double[1];
+	this->rho_at = nullptr;
+	this->rho_atc = nullptr;
 
-	this->nn = new int[1];//zhengdy-soc
-	this->jchi = new double[1];
-	this->jjj = new double[1];
+	this->nn = nullptr;//zhengdy-soc
+	this->jchi = nullptr;
+	this->jjj = nullptr;
 
 	functional_error = 0;//xiaohui add 2015-03-24
 }

@@ -36,6 +36,14 @@ namespace ModuleESolver
         tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
     }
 
+    ESolver_KS::~ESolver_KS()
+    {
+        delete this->pw_wfc;
+        delete this->pelec;
+        delete this->phami;
+        delete this->phsol;
+    }
+
     void ESolver_KS::Init(Input& inp, UnitCell_pseudo& ucell)
     {
         ESolver_FP::Init(inp,ucell);
@@ -150,11 +158,7 @@ namespace ModuleESolver
     void ESolver_KS::Run(const int istep, UnitCell_pseudo& ucell)
     {
         if (!(GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md"
-            || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax" || GlobalV::CALCULATION.substr(0,3) == "sto")
-#ifdef __MPI
-            || Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type
-#endif
-            )
+            || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax" || GlobalV::CALCULATION.substr(0,3) == "sto"))
         {
             this->othercalculation(istep);
         }
@@ -171,8 +175,11 @@ namespace ModuleESolver
             for (int iter = 1; iter <= this->maxniter; ++iter)
             {
                 writehead(GlobalV::ofs_running, istep, iter);
-                clock_t iterstart, iterend;
-                iterstart = std::clock();
+#ifdef __MPI
+                auto iterstart = MPI_Wtime();
+#else
+                auto iterstart = std::chrono::system_clock::now();
+#endif
                 set_ethr(istep, iter);
                 eachiterinit(istep, iter);
                 this->hamilt2density(istep, iter, this->diag_ethr);
@@ -226,13 +233,17 @@ namespace ModuleESolver
                 // this->phamilt->update(conv_elec);
                 updatepot(istep, iter);
                 eachiterfinish(iter);
-                iterend = std::clock();
-                double duration = double(iterend - iterstart) / CLOCKS_PER_SEC;
+#ifdef __MPI
+                double duration = (double)(MPI_Wtime() - iterstart);
+#else
+                double duration = (std::chrono::system_clock::now() - iterstart).count() / CLOCKS_PER_SEC;
+#endif
                 printiter(iter, drho, duration, diag_ethr);
                 if (this->conv_elec)
                 {
+                    int stop = this->do_after_converge(iter);
                     this->niter = iter;
-                    break;
+                    if(stop) break;
                 }
             }
             afterscf();

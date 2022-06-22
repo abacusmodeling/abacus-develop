@@ -5,8 +5,8 @@ namespace Test_Deepks
 
     Parallel_Orbitals::Parallel_Orbitals()
     {
-        trace_loc_row = new int[1];
-        trace_loc_col = new int[1];
+        trace_loc_row = nullptr;
+        trace_loc_col = nullptr;
     }
 
     Parallel_Orbitals::~Parallel_Orbitals()

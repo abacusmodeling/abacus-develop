@@ -9,6 +9,7 @@
 #include "../src_pw/stress_func.h"
 #include "../input_conv.h"
 #include "../src_pw/forces.h"
+#include "module_psi/psi.h"
 
 class Force_Stress_LCAO  
 {
@@ -31,7 +32,8 @@ class Force_Stress_LCAO
 		const bool istestf, 
         const bool istests,
         Local_Orbital_Charge& loc,
-        Local_Orbital_wfc& lowf,
+        const psi::Psi<double>* psid,
+		const psi::Psi<std::complex<double>>* psi,
         LCAO_Hamilt &uhm,
         ModuleBase::matrix& fcs,
 		ModuleBase::matrix &scs);
@@ -61,7 +63,8 @@ private:
 		const bool isforce,
         const bool isstress,
         Local_Orbital_Charge& loc,
-        Local_Orbital_wfc& lowf,
+        const psi::Psi<double>* psid,
+		const psi::Psi<std::complex<double>>* psi,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix &ftvnl_dphi,
 		ModuleBase::matrix &fvnl_dbeta,	

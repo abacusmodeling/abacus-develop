@@ -1,4 +1,5 @@
 #include <memory>
+#include <array>
 #include "symmetry.h"
 //#include "../src_pw/global.h"
 //#include "symm_other.h"

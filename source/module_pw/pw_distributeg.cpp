@@ -132,10 +132,8 @@ void PW_Basis::get_ig2isz_is2fftixy(
 {
     if (this->npw == 0)
     {
-        delete[] this->ig2isz; this->ig2isz = new int[1]; // map ig to the z coordinate of this planewave.
-        this->ig2isz[0] = 0;
-        delete[] this->is2fftixy; this->is2fftixy = new int[1]; // map is (index of sticks) to ixy (iy + ix * fftny).
-        this->is2fftixy[0] = -1;
+        delete[] this->ig2isz; this->ig2isz = nullptr; // map ig to the z coordinate of this planewave.
+        delete[] this->is2fftixy; this->is2fftixy = nullptr; // map is (index of sticks) to ixy (iy + ix * fftny).
         return;
     }
 

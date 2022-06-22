@@ -40,7 +40,7 @@ namespace HS_Matrix
 // void save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_H, const int *rowind_H, 
 // const double *nzval_H, const double *nzval_S, bool bit);
 
-    void saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_hs, const std::string &file__name, const Parallel_Orbitals &pv); //LiuXh, 2017-03-21
+    void saving_HS(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_hs, const std::string &file__name, const Parallel_Orbitals &pv); //LiuXh, 2017-03-21
 
     void save_HS_complex(std::complex<double> *H, std::complex<double> *S, const bool bit, const std::string &file__name, const Parallel_Orbitals &pv); //LiuXh, 2017-03-21
 }

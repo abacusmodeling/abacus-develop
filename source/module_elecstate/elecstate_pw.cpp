@@ -3,12 +3,15 @@
 #include "module_base/constants.h"
 #include "src_parallel/parallel_reduce.h"
 #include "src_pw/global.h"
+#include "module_base/timer.h"
 
 namespace elecstate
 {
 
 void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 {
+    ModuleBase::TITLE("ElecStatePW", "psiToRho");
+    ModuleBase::timer::tick("ElecStatePW", "psiToRho");
     this->calculate_weights();
 
     this->calEBand();
@@ -28,6 +31,7 @@ void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
         this->updateRhoK(psi);
     }
     this->parallelK();
+    ModuleBase::timer::tick("ElecStatePW", "psiToRho");
 }
 
 void ElecStatePW::updateRhoK(const psi::Psi<std::complex<double>>& psi)

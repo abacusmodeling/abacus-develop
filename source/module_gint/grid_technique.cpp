@@ -13,17 +13,17 @@ Grid_Technique GridT;
 
 Grid_Technique::Grid_Technique()
 {
-    this->nlocdimg = new int[1];	
-	this->nlocstartg = new int[1];
-	this->nad = new int[1];
-    this->how_many_atoms = new int[1];
-	this->start_ind = new int[1];
-	this->which_atom = new int[1];
-	this->which_bigcell = new int[1];
-	this->which_unitcell = new int[1];
-	this->bcell_start = new int[1];
-	this->in_this_processor = new bool[1];
-	this->trace_lo = new int[1];
+    this->nlocdimg = nullptr;	
+	this->nlocstartg = nullptr;
+	this->nad = nullptr;
+    this->how_many_atoms = nullptr;
+	this->start_ind = nullptr;
+	this->which_atom = nullptr;
+	this->which_bigcell = nullptr;
+	this->which_unitcell = nullptr;
+	this->bcell_start = nullptr;
+	this->in_this_processor = nullptr;
+	this->trace_lo = nullptr;
 
 	this->total_atoms_on_grid = 0;
     allocate_find_R2 = false;
@@ -121,13 +121,13 @@ void Grid_Technique::get_startind(void)
 {
 	ModuleBase::TITLE("Grid_Technique","get_startind");
 
-	assert(nbxx>0);
-
+	assert(nbxx>=0);
 	// calculates start_ind, which stores the 
 	// starting index of each bigcell
 
 	delete[] this->start_ind;
-	this->start_ind = new int[nbxx];
+	if(nbxx > 0)	this->start_ind = new int[nbxx];
+	else			this->start_ind = nullptr;
 	ModuleBase::GlobalFunc::ZEROS(start_ind, nbxx);
 	ModuleBase::Memory::record("atoms_on_grid","start_ind",nbxx,"int");	
 
@@ -159,15 +159,15 @@ void Grid_Technique::init_atoms_on_grid(void)
 {
 	ModuleBase::TITLE("Grid_Technique","init_atoms_on_grid");
 
-	assert(nbxx>0);
-
+	assert(nbxx>=0);
 	this->get_startind();
 	
 	// (1) prepare data. 
 	// counting the number of atoms whose orbitals have
 	// values on the bigcell.
 	delete[] this->how_many_atoms;
-	this->how_many_atoms = new int[nbxx];
+	if(nbxx > 0)	this->how_many_atoms = new int[nbxx];
+	else			this->how_many_atoms = nullptr;
 	ModuleBase::GlobalFunc::ZEROS(how_many_atoms, nbxx);
 	ModuleBase::Memory::record("atoms_on_grid","how_many_atoms",nbxx,"int");
 	

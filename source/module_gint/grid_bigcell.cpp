@@ -8,7 +8,7 @@
 Grid_BigCell::Grid_BigCell()
 {
 	this->flag_tib = false;
-	this->index_atom = new int[1];
+	this->index_atom = nullptr;
 	this->orbital_rmax = 0.0;
 	this->nxe = this->nye = this->nze = 0;	
 	this->bigcell_dx = 0.0;
@@ -43,7 +43,7 @@ void Grid_BigCell::init_big_latvec(void)
 	// initialize the mesh cell vectors.
 	assert(nbx>0);
 	assert(nby>0);
-	assert(nbz>0);
+	assert(nbz>=0);
 
 	//size of each big room (same shape with unitcell)
 	this->bigcell_vec1[0]= GlobalC::ucell.a1.x / (double)nbx * GlobalC::ucell.lat0;
@@ -148,7 +148,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	// +1 in order to cover the spillage atom on the right side.
 	assert(nbx>0);
 	assert(nby>0);
-	assert(nbz>0);
+	assert(nbz>=0);
 
 	this->nxe = nbx + 2*dxe +1;
 	this->nye = nby + 2*dye +1;

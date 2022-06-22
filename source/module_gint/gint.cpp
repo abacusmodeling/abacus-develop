@@ -50,12 +50,6 @@ void Gint::cal_gint(Gint_inout *inout)
                 }
             }
 
-            if(inout->job==Gint_Tools::job_type::vlocal && GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
-            {
-                this->pvpR_grid = new double[lgd*lgd];
-                ModuleBase::GlobalFunc::ZEROS(pvpR_grid, lgd*lgd);
-            }
-
             //perpare auxiliary arrays to store thread-specific values
 #ifdef _OPENMP
 			double* pvpR_thread;
@@ -214,7 +208,7 @@ void Gint::prep_grid(
 	this->nbz_start = nbz_start_in;
 	assert(nbx>0);
 	assert(nby>0);
-	assert(nbz>0);
+	assert(nbz>=0);
 	assert(ncxyz>0);
 
 	assert( GlobalC::ucell.omega > 0.0);

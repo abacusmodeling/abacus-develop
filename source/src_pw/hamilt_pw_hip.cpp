@@ -113,9 +113,9 @@ int Hamilt_PW::moved = 0;
 
 Hamilt_PW::Hamilt_PW()
 {
-	// hpsi = new complex<double>[1];
-	// spsi = new complex<double>[1];
-	// GR_index = new int[1];
+	// hpsi = nullptr;
+	// spsi = nullptr;
+	// GR_index = nullptr;
 #ifdef __ROCM
 	hipMalloc((void **)&GR_index_d, sizeof(int));
 	CHECK_CUBLAS(hipblasCreate(&hpw_handle));
@@ -142,7 +142,6 @@ void Hamilt_PW::allocate(const int &npwx, const int &npol, const int &nkb, const
 	assert(npwx > 0);
 	assert(npol > 0);
 	assert(nkb >= 0);
-	assert(nrxx > 0);
 
 	// delete[] hpsi;
 	// delete[] spsi;

@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	DD.init();
 
 #ifdef __MPI
-    MPI_Finalize();
+	Parallel_Global::finalize_mpi();
 #endif
 
     return 0;

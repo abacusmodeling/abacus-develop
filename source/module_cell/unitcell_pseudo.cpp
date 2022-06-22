@@ -695,24 +695,11 @@ void UnitCell_pseudo::setup_cell_after_vc(std::ofstream &log)
         for(int ia =0;ia< atom->na;ia++)
         {
             atom->tau[ia] = atom->taud[ia] * latvec;
-/*
-#ifdef __MPI
-Parallel_Common::bcast_double( atom->tau[ia].x );
-Parallel_Common::bcast_double( atom->tau[ia].y );
-Parallel_Common::bcast_double( atom->tau[ia].z );
-Parallel_Common::bcast_double( atom->taud[ia].x );
-Parallel_Common::bcast_double( atom->taud[ia].y );
-Parallel_Common::bcast_double( atom->taud[ia].z );
-#endif
-*/
         }
     }
+    
 #ifdef __MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-    for (int i=0;i<ntype;i++)
-    {
-        atoms[i].bcast_atom(); // bcast tau array
-    }
+    this->bcast_unitcell();
 #endif
 
     log << std::endl;

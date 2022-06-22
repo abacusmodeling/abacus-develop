@@ -56,7 +56,7 @@ class PW_Basis
 public:
     std::string classname;
     PW_Basis();
-    ~PW_Basis();
+    virtual ~PW_Basis();
     //Init mpi parameters
 #ifdef __MPI
     void initmpi(

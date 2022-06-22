@@ -11,6 +11,11 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
     ucell(unit_in)
 {
+    if(mdp.md_seed >= 0)
+    {
+        srand(mdp.md_seed);
+    }
+
     stop = false;
 
     allmass = new double [ucell.nat];
@@ -25,15 +30,7 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp.md_dt /= ModuleBase::AU_to_FS;
     mdp.md_tfirst /= ModuleBase::Hartree_to_K;
     mdp.md_tlast /= ModuleBase::Hartree_to_K;
-
-    if(mdp.md_tfreq == 0)
-    {
-        mdp.md_tfreq = 1.0/40.0/mdp.md_dt;
-    }
-    else
-    {
-        mdp.md_tfreq *= ModuleBase::AU_to_FS;
-    }
+    mdp.md_tfreq *= ModuleBase::AU_to_FS;
 
     // LJ parameters
     mdp.lj_rcut *= ModuleBase::ANGSTROM_AU;
@@ -42,7 +39,6 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 
     step_ = 0;
     step_rst_ = 0;
-    if(mdp.md_restart) unit_in.init_vel = 1;
 
     MD_func::InitPos(ucell, pos);
     MD_func::InitVel(ucell, mdp.md_tfirst, allmass, frozen_freedom_, ionmbl, vel);

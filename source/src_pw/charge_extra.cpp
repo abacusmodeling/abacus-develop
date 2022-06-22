@@ -39,10 +39,10 @@ Charge_Extra::Charge_Extra()
 		ModuleBase::GlobalFunc::ZEROS(delta_rho3[is], GlobalC::rhopw->nrxx);
 	}
 
-	pos_old1 = new double[1];
-	pos_old2 = new double[1];
-	pos_now = new double[1];
-	pos_next = new double[1];
+	pos_old1 = nullptr;
+	pos_old2 = nullptr;
+	pos_now = nullptr;
+	pos_next = nullptr;
 	alpha = 0.0;
 	beta = 0.0;
 }

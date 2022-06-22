@@ -37,8 +37,8 @@ check_out() {
         cal=$(grep "$key" $outfile | awk '{printf "%.'$ca'f\n",$2}')
         ref=$(grep "$key" result.ref | awk '{printf "%.'$ca'f\n",$2}')
         deviation=$(awk 'BEGIN {x='$ref';y='$cal';if (x<y) {a=y-x} else {a=x-y};printf "%.'$ca'f\n",a}')
-        deviation1=$(awk 'BEGIN{print '$deviation'*(10**'$ca')}')
-
+        deviation1=$(awk 'BEGIN{print '$deviation'*(10^'$ca')}')
+        
         if [ $key == "totaltimeref" ]; then
             break
         fi
@@ -80,7 +80,7 @@ run_abacus() {
         lastword=$(tail -1 result.log | awk '{print $1}')
     fi
     if [[ $lastword != "SEE" ]]; then
-        /usr/bin/time -v mpirun -n $1 -env OMP_NUM_THREADS=$2 $abacus 2>time.log ｜ tee result.log
+        OMP_NUM_THREADS=$2 /usr/bin/time -v mpirun -n $1 $abacus 2>time.log | tee result.log
     else
         printf "**result.log is normal end, skip this job** "
     fi

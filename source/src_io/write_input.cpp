@@ -47,6 +47,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "calculation", calculation, "test; scf; relax; nscf; ienvelope; istate;");
     ModuleBase::GlobalFunc::OUTP(ofs, "ntype", ntype, "atom species number");
     ModuleBase::GlobalFunc::OUTP(ofs, "nspin", nspin, "1: single spin; 2: up and down spin; 4: noncollinear spin");
+    ModuleBase::GlobalFunc::OUTP(ofs, "kspacing", kspacing, "unit in 1/bohr, should be > 0, default is 0 which means read KPT file");
     ModuleBase::GlobalFunc::OUTP(ofs, "nbands", nbands, "number of bands");
     ModuleBase::GlobalFunc::OUTP(ofs, "nbands_sto", nbands_sto, "number of stochastic bands");
     ModuleBase::GlobalFunc::OUTP(ofs,
@@ -227,6 +228,7 @@ void Input::Print(const std::string &fn) const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tlast",mdp.md_tlast,"temperature last");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfreq",mdp.md_dumpfreq,"The period to dump MD information");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_restartfreq",mdp.md_restartfreq,"The period to output MD restart information");
+    ModuleBase::GlobalFunc::OUTP(ofs,"md_seed",mdp.md_seed,"random seed for MD");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_restart",mdp.md_restart,"whether restart");
 	ModuleBase::GlobalFunc::OUTP(ofs,"lj_rcut",mdp.lj_rcut,"cutoff radius of LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"lj_epsilon",mdp.lj_epsilon,"the value of epsilon for LJ potential");

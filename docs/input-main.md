@@ -8,7 +8,7 @@
 
 - [System variables](#system-variables)
 
-    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
+    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline) | [kspacing](#kspacing)
 
 - [Variables related to input files](#variables-related-to-input-files)
 
@@ -48,7 +48,7 @@
 
 - [Molecular dynamics](#molecular-dynamics)
 
-    [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
+    [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_seed](#md-seed) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
 
 - [vdW correction](#vdw-correction)
 
@@ -292,6 +292,12 @@ This part of variables are used to control general system parameters.
 - **Descrption**: If set to a natural number, a Cardinal B-spline interpolation will be used to calculate Structure Factor. `nbspline` represents the order of B-spline basis and larger one can get more accurate results but cost more.
     It is turned off by default.
 - **Default**: -1
+
+#### kspacing
+
+- **Type**: double
+- **Descrption**: Set the smallest allowed spacing between k points, unit in 1/bohr. It should be larger than 0.0, and suggest smaller than 0.25. When you have set this value > 0.0, then the KPT file is unneccessary, and the number of K points nk_i = max(1,int(|b_i|/KSPACING)+1), where b_i is the reciprocal lattice vector. The default value 0.0 means that ABACUS will read the applied KPT file. Notice: if gamma_only is set to be true, kspacing is invalid.
+- **Default**: 0.0
 
 ### Variables related to input files
 
@@ -1132,7 +1138,7 @@ This part of variables are used to control the molecular dynamics calculations.
 
 - **Type**: Double
 - **Description**: This is the time step(fs) used in md simulation .
-- **Default**: 1
+- **Default**: 1.0
 
 #### md_tfirst & md_tlast
 
@@ -1151,6 +1157,14 @@ This part of variables are used to control the molecular dynamics calculations.
 - **Type**: Integer
 - **Description**:This is the frequence to output restart information.
 - **Default**: 5
+
+#### md_seed
+
+- **Type**: Integer
+- **Description**: 
+  - md_seed < 0: No srand() in MD initialization.
+  - md_seed >= 0: srand(md_seed) in MD initialization.
+- **Default**: -1
 
 #### md_tfreq
 
@@ -1196,23 +1210,23 @@ temperature will fluctuate violently; if it is too small, the temperature will t
 
 - **Type**: Real
 - **Description**: the velocity of shock wave ($\AA$/fs) for MSST.
-- **Default**: 0
+- **Default**: 0.0
 
 #### msst_vis
 
 - **Type**: Real
 - **Description**: artificial viscosity (mass/length/time) for MSST.
-- **Default**: 0
+- **Default**: 0.0
 
 #### msst_tscale
 
 - **Type**: Real
 - **Description**: reduction in initial temperature (0~1) used to compress volume in MSST.
-- **Default**: 0
+- **Default**: 0.01
 
 #### msst_qmass
 
-- **Type**: Double
+- **Type**: Real
 - **Description**: Inertia of extended system variable. Used only when md_type is 4, you should set a number which is larger than 0. Note that Qmass of NHC is set by md_tfreq.
 - **Default**: No default
 
@@ -1220,7 +1234,7 @@ temperature will fluctuate violently; if it is too small, the temperature will t
 
 - **Type**: Real
 - **Description**: damping parameter (fs) used to add force in Langevin method.
-- **Default**: 1
+- **Default**: 1.0
 
 ### DFT+U correction
 
