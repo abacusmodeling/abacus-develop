@@ -277,5 +277,8 @@ void hamilt::HamiltPW::updateHk(const int ik)
 
 hamilt::HamiltPW::HamiltPW()
 {
-    return;
+}
+
+hamilt::HamiltPW::~HamiltPW()
+{
 }

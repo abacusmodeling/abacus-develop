@@ -48,7 +48,7 @@
 
 - [Molecular dynamics](#molecular-dynamics)
 
-    [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
+    [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_seed](#md-seed) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
 
 - [vdW correction](#vdw-correction)
 
@@ -1139,6 +1139,14 @@ This part of variables are used to control the molecular dynamics calculations.
 - **Type**: Integer
 - **Description**:This is the frequence to output restart information.
 - **Default**: 5
+
+#### md_seed
+
+- **Type**: Integer
+- **Description**: 
+  - md_seed < 0: No srand() in MD initialization.
+  - md_seed >= 0: srand(md_seed) in MD initialization.
+- **Default**: -1
 
 #### md_tfreq
 

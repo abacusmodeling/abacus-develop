@@ -25,6 +25,7 @@ mixing_beta     0.7
 
 md_tfreq        0.1
 md_tfirst       10
+init_vel        1
 
 chg_extrap  second-order
 

@@ -16,6 +16,7 @@ public:
 		md_tlast = -1.0;
 		md_dumpfreq = 1;
 		md_restartfreq = 5;
+        md_seed = -1;
 
 		// Classic MD 
 		md_ensolver = "FP";
@@ -47,6 +48,7 @@ public:
     double md_tlast;              // Target temperature
     int md_dumpfreq;              // The period to dump MD information
 	int md_restartfreq;           // The period to output MD restart information
+    int md_seed;                  // random seed for MD
 
 	// Classic MD               // liuyu 2021-07-30
 	std::string md_ensolver;    // choose potential: LJ, DP, FP
