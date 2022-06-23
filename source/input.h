@@ -400,7 +400,8 @@ class Input
     double tau;
     double sigma_k;
     double nc_k;
-    // gauss charge
+    // compensating charge
+    bool comp_chg;
     double comp_q;
     double comp_l;
     double comp_center;
