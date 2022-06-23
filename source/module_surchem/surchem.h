@@ -25,6 +25,9 @@ class surchem
     ModuleBase::matrix Vel;
     double qs;
 
+    // energy of compensating charge
+    double comp_chg_energy;
+
     // compensating charge params
     double comp_q;
     double comp_l;

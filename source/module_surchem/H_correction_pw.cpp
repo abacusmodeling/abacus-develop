@@ -134,14 +134,20 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell, ModulePW::PW_Ba
     ModuleBase::GlobalFunc::ZEROS(phi_comp_R, rho_basis->nrxx);
     // get comp chg in reci space
     add_comp_chg(cell, rho_basis, comp_q, comp_l, comp_center, comp_reci, comp_dim);
+    double ecomp = 0.0;
     for (int ig = 0; ig < rho_basis->npw; ig++)
     {
         if (rho_basis->gg[ig] >= 1.0e-12) // LiuXh 20180410
         {
             const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (cell.tpiba2 * rho_basis->gg[ig]);
+            ecomp += (conj(comp_reci[ig]) * comp_reci[ig]).real() * fac;
             phi_comp_G[ig] = fac * comp_reci[ig];
         }
     }
+    Parallel_Reduce::reduce_double_pool(ecomp);
+    ecomp *= 0.5 * cell.omega;
+    // std::cout << " ecomp=" << ecomp << std::endl;
+    comp_chg_energy = ecomp;
 
     GlobalC::UFFT.ToRealSpace(phi_comp_G, phi_comp_R, rho_basis);
 
