@@ -16,8 +16,8 @@ class Sto_Stress_PW:public Stress_Func
 	void cal_stress(ModuleBase::matrix& sigmatot,const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
 
 	private :
-	void sto_stress_kin(ModuleBase::matrix&, Stochastic_WF& stowf);
-	void sto_stress_nl(ModuleBase::matrix&, Stochastic_WF& stowf);
+	void sto_stress_kin(ModuleBase::matrix&, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
+	void sto_stress_nl(ModuleBase::matrix&, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
 	
 
 

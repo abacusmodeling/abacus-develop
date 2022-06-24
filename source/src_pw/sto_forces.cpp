@@ -25,13 +25,10 @@ void Sto_Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<dou
 	ModuleBase::matrix forceion(nat, 3);
 	ModuleBase::matrix forcecc(nat, 3);
 	ModuleBase::matrix forcenl(nat, 3);
-    ModuleBase::matrix sto_forcenl(nat,3);
 	ModuleBase::matrix forcescc(nat, 3);
     this->cal_force_loc(forcelc, GlobalC::rhopw);
     this->cal_force_ew(forceion, GlobalC::rhopw);
-    if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0)  this->cal_force_nl(forcenl,psi_in);
-    this->cal_sto_force_nl(sto_forcenl,stowf);
-    forcenl = forcenl + sto_forcenl;
+    this->cal_sto_force_nl(forcenl,psi_in,stowf);
 	this->cal_force_cc(forcecc, GlobalC::rhopw);
 	this->cal_force_scc(forcescc, GlobalC::rhopw);
 	
@@ -157,157 +154,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<dou
     return;
 }
 
-void Sto_Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<std::complex<double>>* psi_in)
-{
-	ModuleBase::TITLE("Sto_Forces","cal_force_nl");
-	ModuleBase::timer::tick("Sto_Forces","cal_force_nl");
-
-    const int nkb = GlobalC::ppcell.nkb;
-	if(nkb == 0) return; // mohan add 2010-07-25
-	
-	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ModuleBase::ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
-    ModuleBase::ComplexMatrix becp( nkb, GlobalV::NBANDS);
-    
-	
-	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
-
-    for (int ik = 0;ik < GlobalC::kv.nks;ik++)
-    {
-        if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
-        // generate vkb
-        if (GlobalC::ppcell.nkb > 0)
-        {
-            GlobalC::ppcell.getvnl(ik);
-        }
-
-        // get becp according to wave functions and vkb
-        // important here ! becp must set zero!!
-		// vkb: Beta(nkb,npw)
-		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
-        becp.zero_out();
-        for (int ib=0; ib<GlobalV::NBANDS; ib++)
-        {
-            for (int i=0;i<nkb;i++)
-            {
-                for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                {
-                    becp(i,ib) += psi_in->operator()(ik,ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
-                }
-            }
-        }
-        Parallel_Reduce::reduce_complex_double_pool( becp.c, becp.size);
-
-        //out.printcm_real("becp",becp,1.0e-4);
-        // Calculate the derivative of beta,
-        // |dbeta> =  -ig * |beta>
-        dbecp.zero_out();
-        for (int ipol = 0; ipol<3; ipol++)
-        {
-			for (int i = 0;i < nkb;i++)
-			{
-				if (ipol==0)
-				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).x;
-				}
-				if (ipol==1)
-				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).y;
-				}
-				if (ipol==2)
-				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).z;
-				}
-			}
-            for (int ib=0; ib<GlobalV::NBANDS; ib++)
-            {
-                for (int i=0; i<nkb; i++)
-                {
-                    for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                    {
-                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * psi_in->operator()(ik,ib,ig) ;
-                    }
-                }
-            }
-        }// end ipol
-
-//		don't need to reduce here, keep dbecp different in each processor,
-//		and at last sum up all the forces.
-//		Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
-
-//		double *cf = new double[ucell.nat*3];
-//		ZEROS(cf, ucell.nat);
-		for (int ib=0; ib<GlobalV::NBANDS; ib++)
-		{
-			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
-        	int iat = 0;
-        	int sum = 0;
-			for (int it=0; it<GlobalC::ucell.ntype; it++)
-			{
-				const int Nprojs = GlobalC::ucell.atoms[it].nh;
-				for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
-				{
-					for (int ip=0; ip<Nprojs; ip++)
-					{
-						double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
-						const int inkb = sum + ip; 
-						//out<<"\n ps = "<<ps;
-
-						for (int ipol=0; ipol<3; ipol++)
-						{
-							const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( inkb, ib) ).real();
-							forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
-							//cf[iat*3+ipol] += ps * fac * dbb;
-						}
-					}
-
-					//if ( ucell.atoms[it].nbeta > ucell.atoms[it].lmax+1 )    //{zws add 20160110
-					//{
-					//cout << " \n multi-projector force calculation ... " << endl;
-					for (int ip=0; ip<Nprojs; ip++)
-					{
-						const int inkb = sum + ip;
-						//for (int ip2=0; ip2<Nprojs; ip2++)
-						for (int ip2=ip+1; ip2<Nprojs; ip2++)
-						{
-						//if ( ip != ip2 )
-						//{
-							const int jnkb = sum + ip2;
-							double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip2, ip) ;
-
-							for (int ipol=0; ipol<3; ipol++)
-							{
-								const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib)
-										+ dbecp( jnkb, ib, ipol) * conj(becp( inkb, ib) ) ).real();
-								//const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib) ).real();
-								forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
-								//cf[iat*3+ipol] += ps * fac * dbb;
-							}
-						//}
-						}
-					}
-					//}    //}zws add 20160110
-
-					++iat;
-					sum+=Nprojs;
-				}
-			} //end it
-		} //end band
-    }// end ik
-
-    // sum up forcenl from all processors
-    Parallel_Reduce::reduce_double_pool(forcenl.c, forcenl.nr * forcenl.nc);
-//  this->print(ofs_running, "nonlocal forces", forcenl);
-	ModuleBase::timer::tick("Sto_Forces","cal_force_nl");
-    return;
-}
-
-void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& stowf)
+void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf)
 {
 	ModuleBase::TITLE("Sto_Forces","cal_force_nl");
 	ModuleBase::timer::tick("Sto_Forces","cal_force_nl");
@@ -316,18 +163,24 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
     int* nchip = stowf.nchip;
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
-	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-    
-	
+	const int npwx = GlobalC::wf.npwx;
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb1( nkb, npwx );
+	int nksbands = psi_in->get_nbands();
+	if(GlobalV::MY_STOGROUP != 0) nksbands = 0;
+    
 
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
-		ModuleBase::ComplexArray dbecp( nkb, nchip[ik], 3);
-    	ModuleBase::ComplexMatrix becp( nkb, nchip[ik]);
+		const int nstobands = nchip[ik];
+		const int nbandstot = nstobands + nksbands;
+		const int npw = GlobalC::kv.ngk[ik];
+
+		// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
+		ModuleBase::ComplexArray dbecp( 3, nbandstot, nkb);
+    	ModuleBase::ComplexMatrix becp( nbandstot, nkb);
         if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
+        
         // generate vkb
         if (GlobalC::ppcell.nkb > 0)
         {
@@ -339,16 +192,22 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
 		// vkb: Beta(nkb,npw)
 		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
         becp.zero_out();
-        for (int ib=0; ib<nchip[ik]; ib++)
-        {
-            for (int i=0;i<nkb;i++)
-            {
-                for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                {
-                    becp(i,ib) += stowf.shchi[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
-                }
-            }
-        }
+		char transa = 'C';
+        char transb = 'N';
+		psi_in[0].fix_k(ik);
+		//KS orbitals
+		int npmks = GlobalV::NPOL * nksbands;
+		zgemm_(&transa,&transb,&nkb,&npmks,&npw,&ModuleBase::ONE,
+				GlobalC::ppcell.vkb.c,&npwx,
+            	psi_in->get_pointer(),&npwx,
+            	&ModuleBase::ZERO,becp.c,&nkb);
+		//stochastic orbitals
+		int npmsto = GlobalV::NPOL * nstobands;
+		zgemm_(&transa,&transb,&nkb,&npmsto,&npw,&ModuleBase::ONE,
+				GlobalC::ppcell.vkb.c,&npwx,
+            	stowf.shchi[ik].c,&npwx,
+            	&ModuleBase::ZERO,&becp(nksbands,0),&nkb);
+        
         Parallel_Reduce::reduce_complex_double_pool( becp.c, becp.size);
 
         //out.printcm_real("becp",becp,1.0e-4);
@@ -359,32 +218,34 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
         {
 			for (int i = 0;i < nkb;i++)
 			{
+				std::complex<double>* pvkb1 = &vkb1(i,0);
+                std::complex<double>* pvkb = &GlobalC::ppcell.vkb(i,0);
 				if (ipol==0)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).x;
-				}
+					for (int ig=0; ig<npw; ig++)
+                        pvkb1[ig] = pvkb[ig] * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[0];
+                }
 				if (ipol==1)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).y;
-				}
+					for (int ig=0; ig<npw; ig++)
+                        pvkb1[ig] = pvkb[ig] * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[1];
+                }
 				if (ipol==2)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-						vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig).z;
-				}
-			}
-            for (int ib=0; ib<nchip[ik]; ib++)
-            {
-                for (int i=0; i<nkb; i++)
-                {
-                    for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                    {
-                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * stowf.shchi[ik](ib,ig) ;
-                    }
+					for (int ig=0; ig<npw; ig++)
+                        pvkb1[ig] = pvkb[ig] * ModuleBase::NEG_IMAG_UNIT * GlobalC::wfcpw->getgcar(ik,ig)[2];
                 }
-            }
+			}
+            //KS orbitals
+			zgemm_(&transa,&transb,&nkb,&npmks,&npw,&ModuleBase::ONE,
+					vkb1.c,&npwx,
+        	    	psi_in->get_pointer(),&npwx,
+        	    	&ModuleBase::ZERO,&dbecp(ipol, 0, 0),&nkb);
+			//stochastic orbitals
+			zgemm_(&transa,&transb,&nkb,&npmsto,&npw,&ModuleBase::ONE,
+					vkb1.c,&npwx,
+        	    	stowf.shchi[ik].c,&npwx,
+        	    	&ModuleBase::ZERO,&dbecp(ipol, nksbands, 0),&nkb);
         }// end ipol
 
 //		don't need to reduce here, keep dbecp different in each processor,
@@ -393,9 +254,13 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
 
 //		double *cf = new double[ucell.nat*3];
 //		ZEROS(cf, ucell.nat);
-		for (int ib=0; ib<nchip[ik]; ib++)
+		for (int ib=0; ib<nbandstot; ib++)
 		{
-			double fac = GlobalC::kv.wk[ik] * 2.0 * GlobalC::ucell.tpiba;
+			double fac;
+			if(ib < nksbands)
+				fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
+			else
+				fac = GlobalC::kv.wk[ik] * 2.0 * GlobalC::ucell.tpiba;
         	int iat = 0;
         	int sum = 0;
 			for (int it=0; it< GlobalC::ucell.ntype; it++)
@@ -411,7 +276,7 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
 
 						for (int ipol=0; ipol<3; ipol++)
 						{
-							const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( inkb, ib) ).real();
+							const double dbb = ( conj( dbecp( ipol, ib, inkb) ) * becp( ib, inkb) ).real();
 							forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
 							//cf[iat*3+ipol] += ps * fac * dbb;
 						}
@@ -430,11 +295,9 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
 						//{
 							const int jnkb = sum + ip2;
 							double ps =  GlobalC::ppcell.deeq( GlobalV::CURRENT_SPIN, iat, ip2, ip) ;
-
 							for (int ipol=0; ipol<3; ipol++)
 							{
-								const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib)
-										+ dbecp( jnkb, ib, ipol) * conj(becp( inkb, ib) ) ).real();
+								const double dbb = 2.0 * ( conj( dbecp( ipol, ib, inkb) ) * becp( ib, jnkb) ).real();
 								//const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib) ).real();
 								forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
 								//cf[iat*3+ipol] += ps * fac * dbb;
@@ -453,7 +316,7 @@ void Sto_Forces::cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& st
 
     // sum up forcenl from all processors
     Parallel_Reduce::reduce_double_all(forcenl.c, forcenl.nr * forcenl.nc);
-//  this->print(ofs_running, "nonlocal forces", forcenl);
+
 	ModuleBase::timer::tick("Sto_Forces","cal_force_nl");
     return;
 }

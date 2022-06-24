@@ -23,8 +23,7 @@ public:
     void init(ModuleBase::matrix& matrix,const psi::Psi<std::complex<double>>* psi_in,Stochastic_WF& stowf);
 
 private:
-    void cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<std::complex<double>>* psi_in);
-    void cal_sto_force_nl(ModuleBase::matrix& forcenl, Stochastic_WF& stowf);
+    void cal_sto_force_nl(ModuleBase::matrix& forcenl,const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
 
 };
 
