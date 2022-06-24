@@ -20,16 +20,8 @@ void HSolverPW::update()
 {
     return;
 }*/
-
-void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge)
+void HSolverPW::initpdiagh()
 {
-    ModuleBase::TITLE("HSolverPW", "solve");
-    ModuleBase::timer::tick("HSolverPW", "solve");
-    // prepare for the precondition of diagonalization
-    this->precondition.resize(psi.get_nbasis());
-
-    // select the method of diagonalization
-    this->method = method_in;
     if (this->method == "cg")
     {
         if(pdiagh!=nullptr)
@@ -69,6 +61,18 @@ void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& p
     {
         ModuleBase::WARNING_QUIT("HSolverPW::solve", "This method of DiagH is not supported!");
     }
+}
+
+void HSolverPW::solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge)
+{
+    ModuleBase::TITLE("HSolverPW", "solve");
+    ModuleBase::timer::tick("HSolverPW", "solve");
+    // prepare for the precondition of diagonalization
+    this->precondition.resize(psi.get_nbasis());
+
+    // select the method of diagonalization
+    this->method = method_in;
+    this->initpdiagh();
 
     /// Loop over k points for solve Hamiltonian to charge density
     for (int ik = 0; ik < this->wfc_basis->nks; ++ik)

@@ -4,6 +4,8 @@
 #include "../module_base/math_chebyshev.h"
 #include "sto_hchi.h"
 #include "sto_func.h"
+#include "module_psi/psi.h"
+#include "module_elecstate/elecstate.h"
 
 //----------------------------------------------
 // Solve for the new electron density and iterate 
@@ -24,15 +26,15 @@ class Stochastic_Iter
 
     void init(const int, int* nchip_in, const int method_in, Stochastic_WF& stowf);
     
-    void sum_stoband(Stochastic_WF& stowf);
+    void sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pes);
 
-    double calne(void);
+    double calne(elecstate::ElecState* pes);
 
-    void itermu(int & iter);
+    void itermu(const int iter, elecstate::ElecState* pes);
 
-    void orthog(const int &ik, Stochastic_WF& stowf);
+    void orthog(const int &ik, psi::Psi<std::complex<double>>& psi, Stochastic_WF& stowf);
 
-    void checkemm(const int &ik, int &iter, Stochastic_WF& stowf);
+    void checkemm(const int &ik, const int iter, Stochastic_WF& stowf);
 
     ModuleBase::Chebyshev<double>* p_che = nullptr;
 
@@ -47,6 +49,7 @@ class Stochastic_Iter
 	public:
     
     int * nchip = nullptr;
+    bool check = false;
     double th_ne;
     double KS_ne;
     public:

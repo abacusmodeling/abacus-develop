@@ -52,7 +52,7 @@ class Psi
         const int nbands_in,
         const int nbasis_in)
     {
-        assert(nks_in>0 && nbands_in>0 && nbasis_in>0);
+        assert(nks_in>0 && nbands_in>=0 && nbasis_in>0);
         this->psi.resize(nks_in * nbands_in * nbasis_in);
         this->nk = nks_in;
         this->nbands = nbands_in;

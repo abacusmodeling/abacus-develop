@@ -14,7 +14,7 @@
 
 
 
-void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
+void Sto_Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>>* psi_in, Stochastic_WF& stowf)
 {
 	ModuleBase::timer::tick("Sto_Force","cal_force");
 	ModuleBase::TITLE("Sto_Forces", "init");
@@ -29,7 +29,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
 	ModuleBase::matrix forcescc(nat, 3);
     this->cal_force_loc(forcelc, GlobalC::rhopw);
     this->cal_force_ew(forceion, GlobalC::rhopw);
-    if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0)  this->cal_force_nl(forcenl);
+    if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0)  this->cal_force_nl(forcenl,psi_in);
     this->cal_sto_force_nl(sto_forcenl,stowf);
     forcenl = forcenl + sto_forcenl;
 	this->cal_force_cc(forcecc, GlobalC::rhopw);
@@ -157,7 +157,7 @@ void Sto_Forces::init(ModuleBase::matrix& force, Stochastic_WF& stowf)
     return;
 }
 
-void Sto_Forces::cal_force_nl(ModuleBase::matrix& forcenl)
+void Sto_Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<std::complex<double>>* psi_in)
 {
 	ModuleBase::TITLE("Sto_Forces","cal_force_nl");
 	ModuleBase::timer::tick("Sto_Forces","cal_force_nl");
@@ -194,7 +194,7 @@ void Sto_Forces::cal_force_nl(ModuleBase::matrix& forcenl)
             {
                 for (int ig=0; ig<GlobalC::wf.npw; ig++)
                 {
-                    becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
+                    becp(i,ib) += psi_in->operator()(ik,ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
                 }
             }
         }
@@ -230,7 +230,7 @@ void Sto_Forces::cal_force_nl(ModuleBase::matrix& forcenl)
                 {
                     for (int ig=0; ig<GlobalC::wf.npw; ig++)
                     {
-                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * GlobalC::wf.evc[ik](ib,ig) ;
+                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * psi_in->operator()(ik,ib,ig) ;
                     }
                 }
             }

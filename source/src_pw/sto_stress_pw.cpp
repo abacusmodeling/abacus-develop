@@ -4,7 +4,7 @@
 #include "../module_base/timer.h"
 #include "global.h"
 
-void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stowf)
+void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf)
 {
 	ModuleBase::TITLE("Sto_Stress_PW","cal_stress");
 	ModuleBase::timer::tick("Sto_Stress_PW","cal_stress");    
@@ -21,7 +21,7 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
 	ModuleBase::matrix sigmaxcc(3,3);
 
 	//kinetic contribution
-	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_kin(sigmakin);
+	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_kin(sigmakin,psi_in);
 	sto_stress_kin(sto_sigmakin, stowf);
 	sigmakin = sigmakin + sto_sigmakin;
 	
@@ -45,7 +45,7 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
     stress_cc(sigmaxcc, GlobalC::rhopw, 1);
    
     //nonlocal
-	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_nl(sigmanl);
+	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_nl(sigmanl,psi_in);
 	sto_stress_nl(sto_sigmanl, stowf);
 	sigmanl = sigmanl + sto_sigmanl;
 

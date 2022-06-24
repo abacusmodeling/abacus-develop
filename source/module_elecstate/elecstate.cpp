@@ -213,7 +213,7 @@ void ElecState::calEBand()
             this->eband += this->ekb(ik, ibnd) * this->wg(ik, ibnd);
         }
     }
-    if(GlobalV::KPAR != 1)
+    if(GlobalV::KPAR != 1 && GlobalV::CALCULATION.substr(0,3) != "sto")
     {
         //==================================
         // Reduce all the Energy in each cpu

@@ -31,11 +31,11 @@ namespace ModuleESolver
         virtual void eachiterfinish(const int iter) override;
         virtual void afterscf() override;
 
-    private:
-        // <Temporary> Get wavefunctions and eigen energies. 
-        // It should be replaced by diag class in HSolver module in the future
-        void c_bands(const int istep, const int iter);
+        //temporary, this will be removed in the future;
+        //Init Global class
+        void Init_GlobalC(Input& inp, UnitCell_pseudo& cell);
 
+    private:
         // It copies the function in Threshold_Elec class.
         // After all ESolver, HSolver are constructed, Class Electrons and Threshold_Elec should be deleted.
         void print_eigenvalue(std::ofstream& ofs);

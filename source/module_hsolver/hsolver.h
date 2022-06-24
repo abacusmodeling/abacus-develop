@@ -5,6 +5,7 @@
 #include "module_elecstate/elecstate.h"
 #include "module_hamilt/hamilt.h"
 #include "module_psi/psi.h"
+#include "src_pw/sto_wf.h"
 
 #include <complex>
 
@@ -45,6 +46,20 @@ class HSolver
         hamilt::Hamilt* phm, 
         psi::Psi<double>& ppsi, 
         elecstate::ElecState* pes, 
+        const std::string method, 
+        const bool skip_charge=false
+    )
+    {
+        return;
+    }
+
+    virtual void solve
+    (
+        hamilt::Hamilt* phm, 
+        psi::Psi<std::complex<double>>& ppsi, 
+        elecstate::ElecState* pes, 
+        Stochastic_WF& stowf,
+        const int iter,
         const std::string method, 
         const bool skip_charge=false
     )

@@ -26,7 +26,8 @@ class HSolverPW : public HSolver
 
     void solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge) override;
 
-  private:
+  protected:
+    void initpdiagh();
     void hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double>>& psi, double* eigenvalue);
 
     void updatePsiK(psi::Psi<std::complex<double>>& psi, const int ik);

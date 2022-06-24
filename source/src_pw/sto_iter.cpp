@@ -56,7 +56,7 @@ void Stochastic_Iter::init(const int dim, int* nchip_in, const int method_in, St
     }
 }
 
-void Stochastic_Iter::orthog(const int& ik, Stochastic_WF& stowf)
+void Stochastic_Iter::orthog(const int& ik, psi::Psi<std::complex<double>>& psi, Stochastic_WF& stowf)
 {
     ModuleBase::TITLE("Stochastic_Iter","orthog");
     //orthogonal part
@@ -78,17 +78,17 @@ void Stochastic_Iter::orthog(const int& ik, Stochastic_WF& stowf)
     
 	    //sum(b<NBANDS, a<nchi) = < psi_b | chi_a >
 	    zgemm_(&transC, &transN, &GlobalV::NBANDS, &nchipk, &npw, &ModuleBase::ONE, 
-                GlobalC::wf.evc[ik].c, &npwx, wfgout, &npwx, &ModuleBase::ZERO, sum, &GlobalV::NBANDS);
+                psi.get_pointer(), &npwx, wfgout, &npwx, &ModuleBase::ZERO, sum, &GlobalV::NBANDS);
 	    Parallel_Reduce::reduce_complex_double_pool(sum, GlobalV::NBANDS * nchipk);
     
 	    //psi -= psi * sum
 	    zgemm_(&transN, &transN, &npw, &nchipk, &GlobalV::NBANDS, &ModuleBase::NEG_ONE, 
-                GlobalC::wf.evc[ik].c, &npwx, sum, &GlobalV::NBANDS, &ModuleBase::ONE, wfgout, &npwx);
+                psi.get_pointer(), &npwx, sum, &GlobalV::NBANDS, &ModuleBase::ONE, wfgout, &npwx);
 	    delete[] sum;
     }
 }
 
-void Stochastic_Iter::checkemm(const int& ik, int &iter, Stochastic_WF& stowf)
+void Stochastic_Iter::checkemm(const int& ik, const int iter, Stochastic_WF& stowf)
 {
     ModuleBase::TITLE("Stochastic_Iter","checkemm");
     if(iter > 5)
@@ -155,7 +155,7 @@ void Stochastic_Iter::checkemm(const int& ik, int &iter, Stochastic_WF& stowf)
     }
 }
 
-void Stochastic_Iter::itermu(int &iter) 
+void Stochastic_Iter::itermu(const int iter, elecstate::ElecState* pes) 
 {
     ModuleBase::TITLE("Stochastic_Iter","itermu");
     ModuleBase::timer::tick("Stochastic_Iter","itermu");
@@ -172,11 +172,11 @@ void Stochastic_Iter::itermu(int &iter)
         th_ne = GlobalV::SCF_THR * 1e-2 * GlobalC::CHR.nelec;
     }
     this->stofunc.mu = mu0 - dmu;
-    double ne1 = calne();
+    double ne1 = calne(pes);
     double mu1 = this->stofunc.mu;
 
     this->stofunc.mu = mu0 + dmu;
-    double ne2 = calne();
+    double ne2 = calne(pes);
     double mu2 = this->stofunc.mu;
     double Dne = th_ne + 1;
     double ne3;
@@ -188,7 +188,7 @@ void Stochastic_Iter::itermu(int &iter)
         mu2 = mu1;
         mu1 -= dmu;
         this->stofunc.mu = mu1;
-        ne1 = calne();
+        ne1 = calne(pes);
         std::cout<<"Reset mu1 from "<<mu1+dmu<<" to "<<mu1<<std::endl;
         dmu *= 2;
     }
@@ -198,7 +198,7 @@ void Stochastic_Iter::itermu(int &iter)
         mu1 = mu2;
         mu2 += dmu;
         this->stofunc.mu = mu2;
-        ne2 = calne();
+        ne2 = calne(pes);
         // cout<<"Reset mu2 from "<<mu2-dmu<<" to "<<mu2<<endl;
         dmu *= 2;
     }
@@ -207,7 +207,7 @@ void Stochastic_Iter::itermu(int &iter)
     {
         mu3 = (mu2 + mu1) / 2;
         this->stofunc.mu = mu3;
-        ne3 = calne();
+        ne3 = calne(pes);
         if(ne3 < targetne)
         {
             ne1 = ne3;
@@ -252,17 +252,17 @@ void Stochastic_Iter::itermu(int &iter)
     }
 
 
-    GlobalC::en.ef = this->stofunc.mu = mu0 = mu3;
+    pes->ef = this->stofunc.mu = mu0 = mu3;
     
     //Set wf.wg 
     if(GlobalV::NBANDS > 0)
     {
         for(int ikk = 0; ikk < GlobalC::kv.nks; ++ikk)
         {
-            double *en = GlobalC::wf.ekb[ikk];
+            double *en = &pes->ekb(ikk,0);
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
-                GlobalC::wf.wg(ikk,iksb) = stofunc.fd(en[iksb])*GlobalC::kv.wk[ikk];
+                pes->wg(ikk,iksb) = stofunc.fd(en[iksb])*GlobalC::kv.wk[ikk];
             }
         }
     }
@@ -312,7 +312,7 @@ void Stochastic_Iter::calPn(const int& ik, Stochastic_WF& stowf)
 }
 
 
-double Stochastic_Iter::calne()
+double Stochastic_Iter::calne(elecstate::ElecState* pes)
 {  
     ModuleBase::timer::tick("Stochastic_Iter","calne");
 
@@ -325,7 +325,7 @@ double Stochastic_Iter::calne()
     {
         for(int ikk = 0; ikk < GlobalC::kv.nks; ++ikk)
         {
-            double *en=GlobalC::wf.ekb[ikk];
+            double *en=&pes->ekb(ikk,0);
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
                 KS_ne += stofunc.fd(en[iksb]) * GlobalC::kv.wk[ikk];
@@ -344,7 +344,7 @@ double Stochastic_Iter::calne()
     return totne;
 }
 
-void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
+void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pes)
 {  
     ModuleBase::TITLE("Stochastic_Iter","sum_stoband");
     ModuleBase::timer::tick("Stochastic_Iter","sum_stoband");
@@ -360,16 +360,16 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     {
         for(int ikk = 0; ikk < GlobalC::kv.nks; ++ikk)
         {
-            double *enb=GlobalC::wf.ekb[ikk];
+            double *enb=&pes->ekb(ikk,0);
             //number of electrons in KS orbitals
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
-                GlobalC::en.demet += stofunc.fdlnfd(enb[iksb]) * GlobalC::kv.wk[ikk];
+                pes->demet += stofunc.fdlnfd(enb[iksb]) * GlobalC::kv.wk[ikk];
             }
         }
     }
-    GlobalC::en.demet /= GlobalV::NPROC_IN_POOL;
-	MPI_Allreduce(MPI_IN_PLACE, &GlobalC::en.demet, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+    pes->demet /= GlobalV::NPROC_IN_POOL;
+	MPI_Allreduce(MPI_IN_PLACE, &pes->demet, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
 
     //cal eband
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nxfd);
@@ -394,8 +394,8 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP==0 )
     {
         ksrho = new double [nrxx];
-        ModuleBase::GlobalFunc::DCOPY(GlobalC::CHR.rho[0],ksrho,nrxx);
-        ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[0],nrxx);
+        ModuleBase::GlobalFunc::DCOPY(pes->charge->rho[0],ksrho,nrxx);
+        ModuleBase::GlobalFunc::ZEROS(pes->charge->rho[0],nrxx);
     }
     
     for(int ik = 0; ik < GlobalC::kv.nks; ++ik)
@@ -412,17 +412,17 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
             GlobalC::wfcpw->recip2real(tmpout, porter, ik);
             for(int ir = 0 ; ir < nrxx ; ++ir)
             {
-                GlobalC::CHR.rho[0][ir] += norm(porter[ir]) * GlobalC::kv.wk[ik];
+                pes->charge->rho[0][ir] += norm(porter[ir]) * GlobalC::kv.wk[ik];
             }
             tmpout+=npwx;
         }
     }
     delete[] porter;
    
-    GlobalC::CHR.rho_mpi();
+    pes->charge->rho_mpi();
     for(int ir = 0; ir < nrxx ; ++ir)
     {
-        tmprho = GlobalC::CHR.rho[0][ir] / GlobalC::ucell.omega;
+        tmprho = pes->charge->rho[0][ir] / GlobalC::ucell.omega;
         sto_rho[ir] = tmprho;
         sto_ne += tmprho;
     }
@@ -437,9 +437,9 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     MPI_Allreduce(MPI_IN_PLACE,&sto_ne,1,MPI_DOUBLE,MPI_SUM,PARAPW_WORLD);
     MPI_Allreduce(MPI_IN_PLACE,sto_rho,nrxx,MPI_DOUBLE,MPI_SUM,PARAPW_WORLD);
 #endif
-    GlobalC::en.eband += sto_eband;
-    GlobalC::en.demet += stodemet;
-    GlobalC::en.demet *= Occupy::gaussian_parameter;
+    pes->eband += sto_eband;
+    pes->demet += stodemet;
+    pes->demet *= Occupy::gaussian_parameter;
 
     cout.precision(12);
     GlobalV::ofs_running<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
@@ -453,9 +453,9 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     if(GlobalV::MY_STOGROUP==0)
     {
         if(GlobalV::NBANDS > 0)
-            ModuleBase::GlobalFunc::DCOPY(ksrho,GlobalC::CHR.rho[0],nrxx);
+            ModuleBase::GlobalFunc::DCOPY(ksrho,pes->charge->rho[0],nrxx);
         else
-            ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[0],nrxx);
+            ModuleBase::GlobalFunc::ZEROS(pes->charge->rho[0],nrxx);
     }
     
     
@@ -464,7 +464,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf)
     {
         for(int ir = 0; ir < nrxx ; ++ir)
         {
-            GlobalC::CHR.rho[is][ir] += sto_rho[ir] * factor;
+            pes->charge->rho[is][ir] += sto_rho[ir] * factor;
         }
     }
 
