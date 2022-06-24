@@ -108,6 +108,15 @@ private:
 	double*** gdmy;
 	double*** gdmz;
 
+    //gdm_epsl: dD/d\epsilon_{\alpha\beta}
+    double*** gdm_epsl; //[6][tot_Inl][2l+1][2l+1] 
+
+    //dD/d\epsilon_{\alpha\beta}, tensor form of gdm_epsl
+    std::vector<torch::Tensor> gdmepsl_vector;
+
+    //gv_epsl:d(d)/d\epsilon_{\alpha\beta}, [natom][6][des_per_atom]
+    torch::Tensor gvepsl_tensor;
+
 	///dE/dD, autograd from loaded model(E: Ry)
 	double** gedm;	//[tot_Inl][2l+1][2l+1]
 
@@ -179,6 +188,10 @@ public:
 	void init_gdmx(const int nat);
 	void del_gdmx(const int nat);
 
+    // array for storing gdm_epsl, used for calculating gvx
+	void init_gdmepsl();
+	void del_gdmepsl();
+
 private:
 
     // arrange index of descriptor in all atoms
@@ -242,7 +255,7 @@ public:
 //2. cal_projected_DM_k, counterpart of 1, for multi-k
 //3. check_projected_dm, which prints pdm to descriptor.dat
 
-//4. cal_gdmx, calculating gdmx for gamma point
+//4. cal_gdmx, calculating gdmx (and optionally gdm_epsl for stress) for gamma point
 //5. cal_gdmx_k, counterpart of 3, for multi-k
 //6. check_gdmx, which prints gdmx to a series of .dat files
 
@@ -273,7 +286,8 @@ public:
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
         const int* trace_loc_row,
-        const int* trace_loc_col);
+        const int* trace_loc_col,
+        const bool isstress);
     void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
@@ -281,7 +295,8 @@ public:
         const int* trace_loc_row,
         const int* trace_loc_col,
         const int nks,
-        const std::vector<ModuleBase::Vector3<double>> &kvec_d);
+        const std::vector<ModuleBase::Vector3<double>> &kvec_d,
+        const bool isstress);
     void check_gdmx(const int nat);
 
 //-------------------
@@ -405,17 +420,21 @@ public:
 //      calculated by d(des)/dX = d(pdm)/dX * d(des)/d(pdm) = gdmx * gvdm
 //      using einsum
 //4. check_gvx : prints gvx into gvx.dat for checking
-//5. cal_gvdm : d(des)/d(pdm)
+//5. cal_gvepsl : gvepsl is used for training with stress label, which is derivative of 
+//      descriptors wrt strain tensor, calculated by 
+//      d(des)/d\epsilon_{ab} = d(pdm)/d\epsilon_{ab} * d(des)/d(pdm) = gdm_epsl * gvdm
+//      using einsum
+//6. cal_gvdm : d(des)/d(pdm)
 //      calculated using torch::autograd::grad
-//6. load_model : loads model for applying V_delta
-//7. cal_gedm : calculates d(E_delta)/d(pdm)
+//7. load_model : loads model for applying V_delta
+//8. cal_gedm : calculates d(E_delta)/d(pdm)
 //      this is the term V(D) that enters the expression H_V_delta = |alpha>V(D)<alpha|
 //      caculated using torch::autograd::grad
-//8. check_gedm : prints gedm for checking
-//9. cal_orbital_precalc : orbital_precalc is usted for training with orbital label, 
+//9. check_gedm : prints gedm for checking
+//10. cal_orbital_precalc : orbital_precalc is usted for training with orbital label, 
 //                         which equals gvdm * orbital_pdm_shell, 
 //                         orbital_pdm_shells[1,Inl,nm*nm] = dm_hl * overlap * overlap
-//10. cal_orbital_precalc_k : orbital_precalc is usted for training with orbital label, 
+//11. cal_orbital_precalc_k : orbital_precalc is usted for training with orbital label, 
 //                         for multi-k case, which equals gvdm * orbital_pdm_shell, 
 //                         orbital_pdm_shells[1,Inl,nm*nm] = dm_hl_k * overlap * overlap
 
@@ -438,6 +457,9 @@ public:
     ///----------------------------------------------------
     void cal_gvx(const int nat);
     void check_gvx(const int nat);
+
+    //for stress
+    void cal_gvepsl(const int nat);
 
     //load the trained neural network model
     void load_model(const std::string& model_file);
@@ -486,8 +508,9 @@ private:
 //4. save_npy_gvx : gvx ->grad_vx.npy
 //5. save_npy_e : energy
 //6. save_npy_f : force
-//7. save_npy_o: orbital
-//8. save_npy_orbital_precalc: orbital_precalc -> orbital_precalc.npy
+//7. save_npy_s : stress
+//8. save_npy_o: orbital
+//9. save_npy_orbital_precalc: orbital_precalc -> orbital_precalc.npy
 
 public:
   
@@ -510,7 +533,11 @@ public:
 	void save_npy_e(const double &e/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/,const std::string &e_file);
 	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/,
         const std::string &f_file, const int nat);
+
+    void save_npy_s(const ModuleBase::matrix &sbase/**<[in] \f$S_{base}\f$ or \f$S_{tot}\f$, in Ry/Bohr^3*/,
+        const std::string &s_file, const double omega);
     void save_npy_gvx(const int nat);
+    void save_npy_gvepsl(const int nat);
 
     //QO added on 2021-12-15
     void save_npy_o(const double &bandgap/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &o_file);
