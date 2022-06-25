@@ -13,6 +13,10 @@
 //2. save_npy_gvx : gvx ->grad_vx.npy
 //3. save_npy_e : energy
 //4. save_npy_f : force
+//5. save_npy_s : stress
+//6. save_npy_o : bandgap
+//7. save_npy_orbital_precalc : orbital_precalc
+
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
@@ -102,6 +106,31 @@ void LCAO_Deepks::save_npy_gvx(const int nat)
     return;
 }
 
+//saves gvx into grad_vepsl.npy
+void LCAO_Deepks::save_npy_gvepsl(const int nat)
+{
+    ModuleBase::TITLE("LCAO_Deepks", "save_npy_gvepsl");
+    if(GlobalV::MY_RANK!=0) return;
+    //save grad_vepsl.npy (when  stress label is in use)
+    //unit: /Bohr^3
+    const long unsigned gshape[] = {(long unsigned) 6, nat, this->des_per_atom};
+    vector<double> npy_gvepsl;
+    for (int i = 0;i < 6;i++)
+    {
+        for (int ibt = 0;ibt < nat;++ibt)
+        {
+
+            for(int p=0;p<this->des_per_atom;++p)
+            {
+                npy_gvepsl.push_back(this->gvepsl_tensor.index({ i, ibt, p }).item().toDouble());
+            }
+            
+        }
+    }
+    npy::SaveArrayAsNumpy("grad_vepsl.npy", false, 3, gshape, npy_gvepsl);
+    return;
+}
+
 //saves energy in numpy format
 void LCAO_Deepks::save_npy_e(const double &e, const std::string &e_file)
 {
@@ -132,6 +161,27 @@ void LCAO_Deepks::save_npy_f(const ModuleBase::matrix &f, const std::string &f_f
         }
     }
     npy::SaveArrayAsNumpy(f_file, false, 2, fshape, npy_f);
+    return;
+}
+
+//saves stress in numpy format
+void LCAO_Deepks::save_npy_s(const ModuleBase::matrix &s, const std::string &s_file, const double omega)
+{
+    ModuleBase::TITLE("LCAO_Deepks", "save_npy_s");
+    if(GlobalV::MY_RANK!=0) return;
+    //save f_base
+    //caution: unit: Rydberg/Bohr
+    const long unsigned sshape[] = { 6 };
+    vector<double> npy_s;
+    
+    for (int ipol = 0;ipol < 3;++ipol)
+    {
+        for (int jpol = ipol;jpol < 3;jpol++)
+        {
+            npy_s.push_back(s(ipol, jpol)*omega);
+        }
+    }
+    npy::SaveArrayAsNumpy(s_file, false, 1, sshape, npy_s);
     return;
 }
 
