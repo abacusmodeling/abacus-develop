@@ -19,6 +19,11 @@ namespace hsolver
                            const int iter,
                            const std::string method_in, 
                            const bool skip_charge) override;
+        virtual double set_diagethr(const int istep, const int iter, const double drho) override;                   
+        virtual double cal_hsolerror() override
+        {
+            return 0.0;
+        }
         Stochastic_Iter stoiter;
     };
 }

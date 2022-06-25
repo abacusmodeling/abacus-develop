@@ -619,9 +619,9 @@ namespace ModuleESolver
         //========================================
         // diagonalization of the KS hamiltonian
         // =======================================
-        set_ethr(1, 1);
+        double diag_ethr = this->phsol->set_diagethr(1, 1, drho);
 
-        this->hamilt2estates(this->diag_ethr);
+        this->hamilt2estates(diag_ethr);
 
         for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
         {

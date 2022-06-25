@@ -4,6 +4,7 @@
 #include "src_pw/symmetry_rho.h"
 #include "module_base/timer.h"
 #include "module_base/tool_title.h"
+#include <algorithm>
 
 //temporary
 #include "src_pw/global.h"
@@ -128,5 +129,26 @@ namespace hsolver
         ModuleBase::timer::tick(this->classname, "solve");
         return;
     }
-    
+    double HSolverPW_SDFT::set_diagethr(const int istep, const int iter, const double drho)
+	{
+		if (iter == 1)
+    	{
+    	    if (abs(this->diag_ethr - 1.0e-2) < 1.0e-10)
+    	    {
+    	        if (GlobalC::pot.init_chg == "file")
+    	        {
+    	            this->diag_ethr = 1.0e-5;
+    	        }
+    	        else
+    	        {
+    	            this->diag_ethr = 1.0e-2;
+    	        }
+    	    }
+    		this->diag_ethr = std::max(this->diag_ethr, GlobalV::PW_DIAG_THR);
+    	}
+    	else
+    	{
+    	    this->diag_ethr = std::min(this->diag_ethr, 0.1 * drho / std::max(1.0, GlobalC::CHR.nelec));
+    	}
+	}
 }

@@ -10,12 +10,7 @@ namespace hsolver
 class HSolverPW : public HSolver
 {
   public:
-    HSolverPW(ModulePW::PW_Basis_K* wfc_basis_in)
-    {
-        this->wfc_basis = wfc_basis_in;
-        this->classname = "HSolverPW";
-        /*this->init(pbas_in);*/
-    }
+    HSolverPW(ModulePW::PW_Basis_K* wfc_basis_in);
 
     /*void init(
         const Basis* pbas
@@ -26,6 +21,9 @@ class HSolverPW : public HSolver
 
     void solve(hamilt::Hamilt* pHamilt, psi::Psi<std::complex<double>>& psi, elecstate::ElecState* pes, const std::string method_in, const bool skip_charge) override;
 
+    virtual double cal_hsolerror() override;
+    virtual double set_diagethr(const int istep, const int iter, const double drho) override;
+    virtual double reset_diagethr(std::ofstream& ofs_running, const double hsover_error, const double drho) override;
   protected:
     void initpdiagh();
     void hamiltSolvePsiK(hamilt::Hamilt* hm, psi::Psi<std::complex<double>>& psi, double* eigenvalue);
