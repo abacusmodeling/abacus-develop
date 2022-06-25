@@ -114,8 +114,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
     {
         hsolver::DiagoIterAssist::need_subspace = true;
 	}
-    // hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
-    hsolver::DiagoIterAssist::PW_DIAG_THR = GlobalV::PW_DIAG_THR; 
+    hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
     hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
     this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, iter, GlobalV::KS_SOLVER);   
     // transform energy for print
