@@ -235,14 +235,14 @@ void Stochastic_Iter::itermu(const int iter, elecstate::ElecState* pes)
     tmpre = p_che->coef_real[p_che->norder-1] * spolyv[p_che->norder-1];
     MPI_Allreduce(MPI_IN_PLACE, &tmpre, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
     GlobalV::ofs_running<<"Chebyshev Precision: "<<abs(tmpre/targetne)*1e9<<"E-09"<<std::endl;
-    if(tmpre/targetne > GlobalV::SCF_THR )
+    if(tmpre/targetne > GlobalV::SCF_THR * 1e2 )
     {
         stringstream ss;
         ss<<tmpre/targetne;
         string fractxt,tartxt,itertxt;
         ss>>fractxt;
         ss.clear();
-        ss<<GlobalV::SCF_THR;
+        ss<<GlobalV::SCF_THR * 1e2;
         ss>>tartxt;
         ss.clear();
         ss<<iter+1;
