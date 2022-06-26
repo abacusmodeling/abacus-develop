@@ -143,6 +143,8 @@ void Input::Default(void)
     seed_sto = 0;
     bndpar = 1;
     kpar = 1;
+    initsto_freq = 1000;
+    method_sto = 1;
     berry_phase = false;
     gdir = 3;
     towannier90 = false;
@@ -568,6 +570,14 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("emin_sto", word) == 0)
         {
             read_value(ifs, emin_sto);
+        }
+        else if (strcmp("initsto_freq", word) == 0)
+        {
+            read_value(ifs, initsto_freq);
+        }
+        else if (strcmp("method_sto", word) == 0)
+        {
+            read_value(ifs, method_sto);
         }
         else if (strcmp("bndpar", word) == 0)
         {
@@ -1899,6 +1909,8 @@ void Input::Bcast()
     Parallel_Common::bcast_int(pw_seed);
     Parallel_Common::bcast_double(emax_sto);
     Parallel_Common::bcast_double(emin_sto);
+    Parallel_Common::bcast_int(initsto_freq);
+    Parallel_Common::bcast_int(method_sto);
     Parallel_Common::bcast_int(bndpar);
     Parallel_Common::bcast_int(kpar);
     Parallel_Common::bcast_bool(berry_phase);

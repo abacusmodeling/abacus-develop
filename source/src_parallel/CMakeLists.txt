@@ -1,5 +1,4 @@
 list(APPEND objects
-    ft.cpp
     parallel_common.cpp
     parallel_global.cpp
     parallel_grid.cpp

@@ -78,63 +78,46 @@ psi::Psi<std::complex<double>>* wavefunc::allocate(const int nks)
 
 	const int nks2 = nks;
 
-	if(GlobalV::CALCULATION.substr(0,3) == "sto")
+	psi::Psi<std::complex<double>>* psi_out = nullptr;
+	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
+	{
+		//initial psi rather than evc
+		psi_out = new psi::Psi<std::complex<double>>(1, GlobalV::NBANDS, npwx * GlobalV::NPOL, GlobalC::kv.ngk.data());
+		if(GlobalV::BASIS_TYPE=="lcao_in_pw")
+		{
+			wanf2[0].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);
+			std::cout << " Memory for wanf2 (MB): " << 
+				ModuleBase::Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
+		}
+		std::cout << " MEMORY FOR PSI (MB)  : " << 
+			ModuleBase::Memory::record("wavefunc","psi",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+	}
+	else if(GlobalV::BASIS_TYPE!="pw")
 	{
 		this->evc = new ModuleBase::ComplexMatrix [nks2];
+		this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
 		for (int ik = 0; ik < nks2; ik++)
 		{
 			this->evc[ik].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);//added by zhengdy-soc
-		}
+			//Mohan add 2010-1-10
+			if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
+			{
+				this->wanf2[ik].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);//added by zhengdy-soc
+			}
+		};
+		std::cout << " MEMORY FOR PSI (MB)  : " << 
+		ModuleBase::Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 	}
 	else
 	{
-		psi::Psi<std::complex<double>>* psi_out = nullptr;
-		if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
-		{
-			//initial psi rather than evc
-			psi_out = new psi::Psi<std::complex<double>>(1, GlobalV::NBANDS, npwx * GlobalV::NPOL, GlobalC::kv.ngk.data());
-
-			if(GlobalV::BASIS_TYPE=="lcao_in_pw")
-			{
-				wanf2[0].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);
-				std::cout << " Memory for wanf2 (MB): " << 
-					ModuleBase::Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
-			}
-			std::cout << " MEMORY FOR PSI (MB)  : " << 
-				ModuleBase::Memory::record("wavefunc","psi",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
-		}
-		else if(GlobalV::BASIS_TYPE!="pw")
-		{
-			this->evc = new ModuleBase::ComplexMatrix [nks2];
-			this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
-
-			for (int ik = 0; ik < nks2; ik++)
-			{
-				this->evc[ik].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);//added by zhengdy-soc
-
-				//Mohan add 2010-1-10
-				if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
-				{
-					this->wanf2[ik].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);//added by zhengdy-soc
-				}
-			};
-
-			std::cout << " MEMORY FOR PSI (MB)  : " << 
-			ModuleBase::Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
-		}
-		else
-		{
-			//initial psi rather than evc
-			psi_out = new psi::Psi<std::complex<double>>(nks2, GlobalV::NBANDS, npwx * GlobalV::NPOL, GlobalC::kv.ngk.data());
-
-			std::cout << " MEMORY FOR PSI (MB)  : " << 
-			ModuleBase::Memory::record("wavefunc","psi",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
-		}
-		return psi_out;
+		//initial psi rather than evc
+		psi_out = new psi::Psi<std::complex<double>>(nks2, GlobalV::NBANDS, npwx * GlobalV::NPOL, GlobalC::kv.ngk.data());
+		std::cout << " MEMORY FOR PSI (MB)  : " << 
+		ModuleBase::Memory::record("wavefunc","psi",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 	}
+	return psi_out;
 
 	//showMemStats();
-	return nullptr;
 }
 
 //===================================================================
@@ -360,14 +343,7 @@ void wavefunc::wfcinit_k(psi::Psi<std::complex<double>>* psi_in)
 			// get the wave functions
 			// by first diagolize PAO
 			// wave functions.
-			if(GlobalV::CALCULATION.substr(0,3) == "sto")
-			{
-				this->diago_PAO_in_pw_k(ik, this->evc[ik]);
-			}
-			else
-			{
-				this->diago_PAO_in_pw_k(ik, *psi_in);
-			}
+			this->diago_PAO_in_pw_k(ik, *psi_in);
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -885,7 +861,6 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 		GlobalV::ofs_running << " " << std::setw(15) << etatom[ib]*Ry_to_eV << std::endl;
 	}
 	*/
-
 	assert(wvf.nr <= wfcatom.nr);
 	for (int ib=0; ib<GlobalV::NBANDS; ib++)
 	{

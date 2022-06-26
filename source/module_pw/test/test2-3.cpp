@@ -14,10 +14,10 @@
 using namespace std;
 TEST_F(PWTEST,test2_3)
 {
-    cout<<"dividemthd 2, gamma_only: on, double precision, check fft"<<endl;
+    cout<<"dividemthd 2, gamma_only: on, xprime: false, check fft"<<endl;
     ModulePW::PW_Basis pwtest;
     ModuleBase::Matrix3 latvec;
-    int fftnx,fftny,fftnz;  //f*G
+    int nx,ny,nz;  //f*G
     double wfcecut;
     double lat0;
     bool gamma_only;
@@ -28,20 +28,23 @@ TEST_F(PWTEST,test2_3)
     wfcecut = 15;
     gamma_only = true;
     int distribution_type = 2;
+    bool xprime = false;
     //--------------------------------------------------
     
     //init
-    pwtest.initgrids(lat0,latvec,4*wfcecut, nproc_in_pool, rank_in_pool);
-    //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,distribution_type);
+#ifdef __MPI
+    pwtest.initmpi(nproc_in_pool, rank_in_pool, POOL_WORLD);
+#endif
+    pwtest.initgrids(lat0,latvec,4*wfcecut);
+    pwtest.initparameters(gamma_only,wfcecut,distribution_type, xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
     int npw = pwtest.npw;
     int nrxx = pwtest.nrxx;
-    fftnx = pwtest.fftnx;
-    fftny = pwtest.ny;
-    fftnz = pwtest.fftnz;
+    nx = pwtest.nx;
+    ny = pwtest.ny;
+    nz = pwtest.nz;
     int nplane = pwtest.nplane;
 
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / lat0 / lat0;
@@ -50,50 +53,50 @@ TEST_F(PWTEST,test2_3)
     GT = latvec.Inverse();
 	G  = GT.Transpose();
 	GGT = G * GT;
-    complex<double> *tmp = new complex<double> [fftnx*fftny*fftnz];
+    complex<double> *tmp = new complex<double> [nx*ny*nz];
     if(rank_in_pool == 0)
     {
-        for(int ix = 0 ; ix < fftnx ; ++ix)
+        for(int ix = 0 ; ix < nx ; ++ix)
         {
-            for(int iy = 0 ; iy < fftny ; ++iy)
+            for(int iy = 0 ; iy < ny ; ++iy)
             {
-                for(int iz = 0 ; iz < fftnz ; ++iz)
+                for(int iz = 0 ; iz < nz ; ++iz)
                 {
-                    tmp[ix*fftny*fftnz + iy*fftnz + iz]=0.0;
-                    double vx = ix -  int(fftnx/2);
-                    double vy = iy -  int(fftny/2);
-                    double vz = iz -  int(fftnz/2);
+                    tmp[ix*ny*nz + iy*nz + iz]=0.0;
+                    double vx = ix -  int(nx/2);
+                    double vy = iy -  int(ny/2);
+                    double vz = iz -  int(nz/2);
                     ModuleBase::Vector3<double> v(vx,vy,vz);
                     double modulus = v * (GGT * v);
                     if (modulus <= ggecut)
                     {
-                        tmp[ix*fftny*fftnz + iy*fftnz + iz] = 1.0/(modulus+1);
-                        if(vy > 0) tmp[ix*fftny*fftnz + iy*fftnz + iz]+=ModuleBase::IMAG_UNIT / (abs(v.x+1) + 1);
-                        else if(vy < 0) tmp[ix*fftny*fftnz + iy*fftnz + iz]-=ModuleBase::IMAG_UNIT / (abs(-v.x+1) + 1);
+                        tmp[ix*ny*nz + iy*nz + iz] = 1.0/(modulus+1);
+                        if(vy > 0) tmp[ix*ny*nz + iy*nz + iz]+=ModuleBase::IMAG_UNIT / (abs(v.x+1) + 1);
+                        else if(vy < 0) tmp[ix*ny*nz + iy*nz + iz]-=ModuleBase::IMAG_UNIT / (abs(-v.x+1) + 1);
                     }
                 }
             }   
         }
-        fftw_plan pp = fftw_plan_dft_3d(fftnx,fftny,fftnz,(fftw_complex *) tmp, (fftw_complex *) tmp, FFTW_BACKWARD, FFTW_ESTIMATE);
+        fftw_plan pp = fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *) tmp, (fftw_complex *) tmp, FFTW_BACKWARD, FFTW_ESTIMATE);
         fftw_execute(pp);  
         fftw_destroy_plan(pp);    
         
-        ModuleBase::Vector3<double> delta_g(double(int(fftnx/2))/fftnx, double(int(fftny/2))/fftny, double(int(fftny/2))/fftnz); 
-        for(int ixy = 0 ; ixy < fftnx * fftny ; ++ixy)
+        ModuleBase::Vector3<double> delta_g(double(int(nx/2))/nx, double(int(ny/2))/ny, double(int(nz/2))/nz); 
+        for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
         {
-            for(int iz = 0 ; iz < fftnz ; ++iz)
+            for(int iz = 0 ; iz < nz ; ++iz)
             {
-                int ix = ixy / fftny;
-                int iy = ixy % fftny;
+                int ix = ixy / ny;
+                int iy = ixy % ny;
                 ModuleBase::Vector3<double> real_r(ix, iy, iz);
                 double phase_im = -delta_g * real_r;
                 complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
-                tmp[ixy * fftnz + iz] *= exp(phase);
+                tmp[ixy * nz + iz] *= exp(phase);
             }
         }
     }
 #ifdef __MPI
-    MPI_Bcast(tmp,2*fftnx*fftny*fftnz,MPI_DOUBLE,0,POOL_WORLD);
+    MPI_Bcast(tmp,2*nx*ny*nz,MPI_DOUBLE,0,POOL_WORLD);
 #endif
     
     complex<double> * rhog = new complex<double> [npw];
@@ -106,11 +109,11 @@ TEST_F(PWTEST,test2_3)
     double * rhor = new double [nrxx];
     pwtest.recip2real(rhog,rhor);
     int startiz = pwtest.startz_current;
-    for(int ixy = 0 ; ixy < fftnx * fftny ; ++ixy)
+    for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
     {
         for(int iz = 0 ; iz < nplane ; ++iz)
         {
-            EXPECT_NEAR(tmp[ixy * fftnz + startiz + iz].real(),rhor[ixy*nplane+iz],1e-6);
+            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz],1e-6);
         }
     }
     
