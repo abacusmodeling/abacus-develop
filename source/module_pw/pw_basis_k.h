@@ -17,25 +17,27 @@ namespace ModulePW
  * 
  * USAGE：
  * ModulePW::PW_Basis_K pwtest;
- * //1. setup FFT grids for PW_Basis
- * pwtest.initgrids(lat0,latvec,gridecut,nproc_in_pool,rank_in_pool);
- * pwtest.initgrids(lat0,latvec,N1,N2,N3,nproc_in_pool,rank_in_pool); 
+ * 0. init mpi for PW_Basis
+ * pwtest.inimpi(nproc_in_pool,rank_in_pool,POOL_WORLD);
+ * 1. setup FFT grids for PW_Basis
+ * pwtest.initgrids(lat0,latvec,gridecut);
+ * pwtest.initgrids(lat0,latvec,N1,N2,N3); 
  * //double lat0：unit length, (unit: bohr)
  * //ModuleBase::Matrix3 latvec：lattice vector, (unit: lat0), e.g. ModuleBase::Matrix3 latvec(1, 1, 0, 0, 2, 0, 0, 0, 2);
  * //double gridecut：cutoff energy to generate FFT grids, (unit: Ry)
  * //int N1,N2,N3: FFT grids
- * //2. init parameters
+ * 2. init parameters
  * pwtest.initparameters(gamma_only, ggecut, nks, kvec_d, dividemthd);
  * //bool gamma_only: if use gamma_only
  * //double ggecut: cutoff kinetic energy for planewaves(unit in Ry) (G+K)^2 < ggecut
  * //int nks: number of k points in current cores
  * //ModuleBase::Vector<double>* kvec_d: different k points
  * //int dividemthd: method to divide planewaves to different cores
- * //3. Setup transforms from real space to reciprocal space or from reciprocal space to real space.
+ * 3. Setup transforms from real space to reciprocal space or from reciprocal space to real space.
  * pwtest.setuptransform(); 
  * pwtest.recip2real(wfg,wfr,ik); //wfg to wfr
  * pwtest.real2recip(wfr,wfg,ik); //wfr to wfg
- * //4. Generate the wave vector for planewaves
+ * 4. Generate the wave vector for planewaves
  * pwtest.collect_local_pw(); 
  * //then we can use pwtest.gk2, pwtest.gcar, (unit in lat0^-1 or lat0^-2)
  * //getgk2(ik,ig) : get pwtest.gk2: (G+K)^2
@@ -59,7 +61,8 @@ public:
         const double ecut_in,
         const int nk_in, //number of k points in this pool
         const ModuleBase::Vector3<double> *kvec_d, // Direct coordinates of k points
-        const int distribution_type_in = 1
+        const int distribution_type_in = 1,
+        const bool xprime_in = false
     );
 
 

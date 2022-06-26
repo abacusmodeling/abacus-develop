@@ -30,8 +30,8 @@ public:
 	void clear(); //reset fft
 	
 	// init parameters of fft
-	void initfft(int nx_in, int bigny_in, int nz_in, int liy_in, int riy_in, int ns_in, int nplane_in, 
-				 int nproc_in, bool gamma_only_in, bool mpifft_in = false);
+	void initfft(int nx_in, int ny_in, int nz_in, int lixy_in, int rixy_in, int ns_in, int nplane_in, 
+				 int nproc_in, bool gamma_only_in, bool xprime_in = false, bool mpifft_in = false);
 
 	//init fftw_plans
 	void setupFFT(); 
@@ -67,33 +67,29 @@ public:
 #endif
 	
 public:
-	int nx=0,ny=0,nz=0;
+	int fftnx=0, fftny=0;
+	int fftnxy=0;
+	int ny=0, nx=0, nz=0;
 	int nxy=0;
-	int bigny=0;
-	int bignxy=0;
-	int liy=0,riy=0;// liy: the left edge of the pw ball in the y direction; riy: the right edge of the pw ball in the y direction
+	bool xprime = false; // true: when do recip2real, x-fft will be done last and when doing real2recip, x-fft will be done first; false: y-fft
+                         // For gamma_only, true: we use half x; false: we use half y
+	int lixy=0,rixy=0;// lixy: the left edge of the pw ball in the y direction; rixy: the right edge of the pw ball in the x or y direction
 	int ns=0; //number of sticks
 	int nplane=0; //number of x-y planes
-	int maxgrids=0; // max between nz * ns and bignxy * nplane
 	int nproc=1; // number of proc.
-	std::complex<double> *aux1=nullptr, *aux2=nullptr; //fft space, [maxgrids]
+	std::complex<double> *auxg=nullptr, *auxr=nullptr; //fft space
 	double *r_rspace=nullptr; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
-	std::complex<float> *auxf1=nullptr, *auxf2=nullptr; //fft space, [maxgrids]
+	std::complex<float> *auxfg=nullptr, *auxfr=nullptr; //fft space,
 	float *rf_rspace=nullptr; //real number space for r, [nplane * nx *ny]
 #endif
 
 
 private:
 	bool gamma_only=false;
-	bool destroyp=true;
 	bool mpifft=false; // if use mpi fft, only used when define __FFTW3_MPI
-	// fftw_plan plan2r2c;
-	// fftw_plan plan2c2r;
-	// fftw_plan plan1for;
-	// fftw_plan plan1bac;
-	// fftw_plan plan2for;
-	// fftw_plan plan2bac;
+
+	bool destroyp=true;
 	fftw_plan planzfor;
 	fftw_plan planzbac;
 	fftw_plan planxfor1;
@@ -102,6 +98,8 @@ private:
 	fftw_plan planxbac2;
 	fftw_plan planyfor;
 	fftw_plan planybac;
+	fftw_plan planxr2c;
+	fftw_plan planxc2r;
 	fftw_plan planyr2c;
 	fftw_plan planyc2r;
 #ifdef __MIX_PRECISION
@@ -114,6 +112,8 @@ private:
 	fftwf_plan planfxbac2;
 	fftwf_plan planfyfor;
 	fftwf_plan planfybac;
+	fftwf_plan planfxr2c;
+	fftwf_plan planfxc2r;
 	fftwf_plan planfyr2c;
 	fftwf_plan planfyc2r;
 #endif

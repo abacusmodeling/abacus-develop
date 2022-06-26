@@ -25,7 +25,7 @@ class ElecStatePW : public ElecState
     // update charge density for next scf step
     // void getNewRho() override;
 
-  private:
+  protected:
     ModulePW::PW_Basis_K *basis;
 
     // calculate electronic charge density on grid points or density matrix in real space
