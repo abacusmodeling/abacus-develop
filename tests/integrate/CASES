@@ -53,6 +53,8 @@
 112_PW_dipole
 112_PW_efield
 114_PW_BD_15
+115_PW_sol_H2
+115_PW_sol_H2O
 120_PW_KP_MD_ADS
 120_PW_KP_MD_FIRE
 120_PW_KP_MD_LGV
@@ -116,6 +118,8 @@
 212_NO_wfc_out
 212_NO_wfc_ienvelope
 213_NO_mulliken
+215_NO_sol_H2
+215_NO_sol_H2O
 220_NO_KP_MD_ADS
 220_NO_KP_MD_FIRE
 220_NO_KP_MD_LGV
