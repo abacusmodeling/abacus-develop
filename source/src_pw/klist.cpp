@@ -618,14 +618,10 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm, bool use_symm)
 				// fix the bug like kvec_d * G; is wrong
 				//kvec_rot = kvec_d[i] * kgmatrix[j]; //wrong for total energy, but correct for nonlocal force.
 				kvec_rot = kgmatrix[j] * kvec_d[i]; //correct for total energy, but wrong for nonlocal force.
-				
-                GlobalV::ofs_running << "kvec_rot : " << i << " " << kvec_d[i] << " " << kvec_rot << std::endl;
 
                 kvec_rot.x = fmod(kvec_rot.x + 100, 1);
                 kvec_rot.y = fmod(kvec_rot.y + 100, 1);
                 kvec_rot.z = fmod(kvec_rot.z + 100, 1);
-
-                GlobalV::ofs_running << "kvec_rot : " << i << " " << kvec_d[i] << " " << kvec_rot << std::endl;
 
 
 //				std::cout << "\n kvec_rot = " << kvec_rot.x << " " << kvec_rot.y << " " << kvec_rot.z;
@@ -646,7 +642,6 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm, bool use_symm)
                         break;
                     }
                 }
-                GlobalV::ofs_running << "already_exist : " << already_exist << std::endl;
             }//end !already_exist
         }
 
