@@ -17,6 +17,7 @@
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
 #include "../module_surchem/efield.h"    // liuyu add 2022-05-06
+#include "../module_surchem/surchem.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif
@@ -36,6 +37,8 @@ energy::energy()
 
     this->demet  = 0;          // correction for metals
     this->ef     = 0;          // the fermi energy
+	this->esol_el = 0;		   // the implicit solvation energy Ael
+	this->esol_cav = 0;		   // the implicit solvation energy Acav
 }
 
 energy::~energy()
@@ -91,7 +94,11 @@ void energy::calculate_etot(void)
 	+ exx
 	+ Efield::etotefield
 	+ evdw;							// Peize Lin add evdw 2021.03.09
-
+	if (GlobalV::imp_sol)
+    {
+	this->etot += GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::rhopw)
+				 + GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::rhopw);
+	}
     //Quxin adds for DFT+U energy correction on 20201029
 
 	// std::cout << std::resetiosflags(ios::scientific) << std::endl;
@@ -165,7 +172,15 @@ void energy::print_etot(
 			{
 				this->print_format("E_vdwD3", evdw);
 			}
-			this->print_format("E_exx", exx);
+			this->print_format("E_exx", exx);	
+					
+			if (GlobalV::imp_sol)
+        	{
+				esol_el = GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::rhopw);
+            	esol_cav = GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::rhopw);
+				this->print_format("E_sol_el", esol_el);
+				this->print_format("E_sol_cav", esol_cav);
+			}
 #ifdef __DEEPKS
 			if (GlobalV::deepks_scf)	//caoyu add 2021-08-10
 			{

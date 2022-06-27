@@ -7,7 +7,6 @@
 #include "../src_io/restart.h"
 #include "../src_ions/ions.h"
 #include "../src_lcao/exx_lip.h"
-#include "../src_parallel/ft.h"
 #include "VNL_in_pw.h"
 #include "charge_broyden.h"
 #include "energy.h"

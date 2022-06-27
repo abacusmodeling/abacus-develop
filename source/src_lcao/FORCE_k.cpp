@@ -5,6 +5,7 @@
 #include <map>
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
+#include "module_elecstate/cal_dm.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -23,7 +24,7 @@ void Force_LCAO_k::ftable_k (
 		const bool isforce,
 		const bool isstress,
         Record_adj &ra, 
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        const psi::Psi<std::complex<double>>* psi,
         Local_Orbital_Charge &loc, 
 		ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
@@ -50,7 +51,7 @@ void Force_LCAO_k::ftable_k (
 
 	// calculate the energy density matrix
 	// and the force related to overlap matrix and energy density matrix.
-    this->cal_foverlap_k(isforce, isstress, ra, wfc_k, loc, foverlap, soverlap);
+    this->cal_foverlap_k(isforce, isstress, ra, psi, loc, foverlap, soverlap);
 
 	// calculate the density matrix
 	double** dm2d = new double*[GlobalV::NSPIN];
@@ -61,7 +62,7 @@ void Force_LCAO_k::ftable_k (
 	}
     ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*pv->nnr, "double");	
 
-    loc.cal_dm_R(loc.dm_k, ra, dm2d);
+	loc.cal_dm_R(loc.dm_k, ra, dm2d);
     
     this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ra, ftvnl_dphi, stvnl_dphi);
 
@@ -269,7 +270,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	const bool isforce, 
     const bool isstress,
     Record_adj &ra, 
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    const psi::Psi<std::complex<double>>* psi,
     Local_Orbital_Charge &loc,
     ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& soverlap)
@@ -304,8 +305,8 @@ void Force_LCAO_k::cal_foverlap_k(
         }
     }
     std::vector<ModuleBase::ComplexMatrix> edm_k(GlobalC::kv.nks);
-    loc.cal_dm(wgEkb,
-        wfc_k,
+    elecstate::cal_dm(loc.ParaV, wgEkb,
+        psi[0],
         edm_k);
     loc.cal_dm_R(edm_k,
         ra, edm2d);

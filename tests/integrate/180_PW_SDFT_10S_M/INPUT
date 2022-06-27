@@ -6,7 +6,6 @@ ntype			1
 symmetry		0
 pseudo_dir      ../tools/PP_ORB/
 
-nbands			0
 nbands_sto		10
 
 nche_sto		120

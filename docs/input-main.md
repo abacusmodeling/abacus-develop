@@ -8,7 +8,7 @@
 
 - [System variables](#system-variables)
 
-    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
+    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline) | [kspacing](#kspacing)
 
 - [Variables related to input files](#variables-related-to-input-files)
 
@@ -28,7 +28,7 @@
 
 - [Electronic structure (SDFT)](#electronic-structure-sdft)
 
-    [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto)
+    [method_sto](#method_sto) | [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto) | [initsto_freq](#initsto_freq)
 
 - [Geometry relaxation](#geometry-relaxation)
 
@@ -48,7 +48,7 @@
 
 - [Molecular dynamics](#molecular-dynamics)
 
-    [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
+    [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_seed](#md-seed) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
 
 - [vdW correction](#vdw-correction)
 
@@ -293,6 +293,12 @@ This part of variables are used to control general system parameters.
     It is turned off by default.
 - **Default**: -1
 
+#### kspacing
+
+- **Type**: double
+- **Descrption**: Set the smallest allowed spacing between k points, unit in 1/bohr. It should be larger than 0.0, and suggest smaller than 0.25. When you have set this value > 0.0, then the KPT file is unneccessary, and the number of K points nk_i = max(1,int(|b_i|/KSPACING)+1), where b_i is the reciprocal lattice vector. The default value 0.0 means that ABACUS will read the applied KPT file. Notice: if gamma_only is set to be true, kspacing is invalid.
+- **Default**: 0.0
+
 ### Variables related to input files
 
 This part of variables are used to control input files related parameters.
@@ -463,7 +469,7 @@ calculations.
 #### nbands
 
 - **Type**: Integer
-- **Description**: Number of bands to calculate. It is recommended you setup this value, especially when you use smearing techniques, more bands should be included.
+- **Description**: Number of Kohn-Sham orbitals to calculate. It is recommended you setup this value, especially when you use smearing techniques, more bands should be included.
 - **Default**:
   - nspin=1: 1.2\*occupied_bands, occupied_bands+10)
   - nspin=2: max(1.2\*nelec, nelec+20)
@@ -571,7 +577,17 @@ calculations.
 
 ### Electronic structure (SDFT)
 
-This part of variables are used to control the parameters of stochastic DFT (SDFT),  mix stochastic-deterministic DFT (MDFT), or complete-basis Chebyshev method (CT).
+This part of variables are used to control the parameters of stochastic DFT (SDFT),  mix stochastic-deterministic DFT (MDFT), or complete-basis Chebyshev method (CT). We now support calculation of "sto-scf" and "sto-md".
+
+#### method_sto
+
+- **Type**: Integer
+- **Description**: 
+  - Different method to do SDFT.
+  - 1: SDFT calculates $T_n(\hat{h})\ket{\chi}$ twice, where $T_n(x)$ is the n-th order Chebyshev polynomial and $\hat{h}=\frac{\hat{H}-\bar{E}}{\Delta E}$ owning eigen-value $\in(-1,1)$. This method cost less memory but slow.
+  - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is fast but when memory is not enough. Only method 1 can be used.
+  - other: use 1
+- **Default**: 1
 
 #### nbands_sto
 
@@ -579,6 +595,7 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 - **Description**: 
   - nbands_sto>0: Number of stochastic orbitals to calculate in SDFT and MDFT.  More bands obtain more precise results or smaller stochastic errors ($ \propto 1/\sqrt{N_{\chi}}$); 
   - nbands_sto=0: Complete basis will be used to replace stochastic orbitals with the Chebyshev method (CT) and it will get the results the same as KSDFT without stochastic errors.
+  - If you want to do MDFT. [nbands](#nbands) which represents the number of KS orbitals should be set.
 - **Default**: 0
 
 #### nche_sto
@@ -603,8 +620,15 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 
 - **Type**: Integer
 - **Description**: The random seed to generate stochastic orbitals.
-  - seed_sto>=0: Stochastic orbitals have the form of $\exp(i2\pi\theta(G))$, where $\theta$ is a uniform distribution in $(0,1)$. If seed_sto=0, the seed is decided by time(NULL).
-  - seed_sto<=-1: Stochastic orbitals have the form of $\pm1$ with the equal probability. If seed_sto=-1, the seed is decided
+  - seed_sto>=0: Stochastic orbitals have the form of $\exp(i2\pi\theta(G))$, where $\theta$ is a uniform distribution in $(0,1)$. If seed_sto = 0, the seed is decided by time(NULL).
+  - seed_sto<=-1: Stochastic orbitals have the form of $\pm1$ with the equal probability. If seed_sto = -1, the seed is decided by time(NULL).
+- **Default**:0
+
+#### initsto_freq
+
+- **Type**: Integer
+- **Description**: Frequency (once each initsto_freq steps) to generate new stochastic orbitals when running md.
+- **Default**:1000
 
 ### Geometry relaxation
 
@@ -1114,7 +1138,7 @@ This part of variables are used to control the molecular dynamics calculations.
 
 - **Type**: Double
 - **Description**: This is the time step(fs) used in md simulation .
-- **Default**: 1
+- **Default**: 1.0
 
 #### md_tfirst & md_tlast
 
@@ -1133,6 +1157,14 @@ This part of variables are used to control the molecular dynamics calculations.
 - **Type**: Integer
 - **Description**:This is the frequence to output restart information.
 - **Default**: 5
+
+#### md_seed
+
+- **Type**: Integer
+- **Description**: 
+  - md_seed < 0: No srand() in MD initialization.
+  - md_seed >= 0: srand(md_seed) in MD initialization.
+- **Default**: -1
 
 #### md_tfreq
 
@@ -1178,23 +1210,23 @@ temperature will fluctuate violently; if it is too small, the temperature will t
 
 - **Type**: Real
 - **Description**: the velocity of shock wave ($\AA$/fs) for MSST.
-- **Default**: 0
+- **Default**: 0.0
 
 #### msst_vis
 
 - **Type**: Real
 - **Description**: artificial viscosity (mass/length/time) for MSST.
-- **Default**: 0
+- **Default**: 0.0
 
 #### msst_tscale
 
 - **Type**: Real
 - **Description**: reduction in initial temperature (0~1) used to compress volume in MSST.
-- **Default**: 0
+- **Default**: 0.01
 
 #### msst_qmass
 
-- **Type**: Double
+- **Type**: Real
 - **Description**: Inertia of extended system variable. Used only when md_type is 4, you should set a number which is larger than 0. Note that Qmass of NHC is set by md_tfreq.
 - **Default**: No default
 
@@ -1202,7 +1234,7 @@ temperature will fluctuate violently; if it is too small, the temperature will t
 
 - **Type**: Real
 - **Description**: damping parameter (fs) used to add force in Langevin method.
-- **Default**: 1
+- **Default**: 1.0
 
 ### DFT+U correction
 

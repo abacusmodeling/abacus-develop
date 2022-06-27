@@ -58,7 +58,7 @@ public:
 
     void cal_nelec();  // calculate total number of electrons  Yu Liu add 2021-07-03
 
-    void sum_band(void);
+    void sum_band(void); // it is useless now and should be removed.
 
     void renormalize_rho(void);
 

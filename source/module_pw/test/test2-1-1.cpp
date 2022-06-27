@@ -19,12 +19,15 @@ TEST_F(PWTEST,test2_1_1)
     double wfcecut = 70;
     double lat0 = 1;
     int distribution_type = 2;
+    bool xprime = false;
     //--------------------------------------------------
 
     ModulePW::PW_Basis pwtest;
-
-    pwtest.initgrids(lat0, latvec, wfcecut,nproc_in_pool, rank_in_pool);
-    pwtest.initparameters(gamma_only, wfcecut, distribution_type);
+#ifdef __MPI
+    pwtest.initmpi(nproc_in_pool, rank_in_pool, POOL_WORLD);
+#endif
+    pwtest.initgrids(lat0, latvec, wfcecut);
+    pwtest.initparameters(gamma_only, wfcecut, distribution_type,xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
     pwtest.collect_uniqgg();
@@ -38,9 +41,9 @@ TEST_F(PWTEST,test2_1_1)
     //ref
     const int totnpw_ref = 911;
     const int totnst_ref = 95;
-    const int fftnx_ref = 54;
-    const int fftny_ref = 3;
-    const int fftnz_ref = 15;
+    const int nx_ref = 54;
+    const int ny_ref = 3;
+    const int nz_ref = 15;
     //some results for different number of processors
     int npw_per_ref[12][12]={
         {911},
@@ -70,7 +73,7 @@ TEST_F(PWTEST,test2_1_1)
         {9,9,9,9,9,9,9,8,8,8,8},
         {8,8,8,8,8,8,8,8,8,8,8,7}
     };
-    int *npw_per;
+    int *npw_per = nullptr;
     if(rank_in_pool == 0)
     {
         npw_per = new int [nproc_in_pool];
@@ -86,8 +89,8 @@ TEST_F(PWTEST,test2_1_1)
         {
             for(int ip = 0 ; ip < nproc_in_pool ; ++ip)
             {
-                ASSERT_EQ(npw_per_ref[nproc_in_pool-1][ip], npw_per[ip]);
-                ASSERT_EQ(nst_per_ref[nproc_in_pool-1][ip], pwtest.nst_per[ip]);
+                EXPECT_EQ(npw_per_ref[nproc_in_pool-1][ip], npw_per[ip]);
+                EXPECT_EQ(nst_per_ref[nproc_in_pool-1][ip], pwtest.nst_per[ip]);
             }
         }
         else
@@ -105,22 +108,23 @@ TEST_F(PWTEST,test2_1_1)
 #else
     tot_npw = pwtest.npw;
 #endif
-    ASSERT_EQ(pwtest.fftnx, fftnx_ref);
-    ASSERT_EQ(pwtest.fftny, fftny_ref);
-    ASSERT_EQ(pwtest.ny, fftny_ref);
-    ASSERT_EQ(pwtest.fftnz, fftnz_ref);
-    ASSERT_EQ(tot_npw, totnpw_ref);
-    ASSERT_EQ(pwtest.npwtot, totnpw_ref);
-    ASSERT_EQ(pwtest.nstot,totnst_ref);
-    ASSERT_EQ(pwtest.nxyz, fftnx_ref*fftny_ref*fftnz_ref);
+    EXPECT_EQ(pwtest.nx, nx_ref);
+    EXPECT_EQ(pwtest.ny, ny_ref);
+    EXPECT_EQ(pwtest.nz, nz_ref);
+    EXPECT_EQ(pwtest.fftnx, nx_ref);
+    EXPECT_EQ(pwtest.fftny, ny_ref);
+    EXPECT_EQ(tot_npw, totnpw_ref);
+    EXPECT_EQ(pwtest.npwtot, totnpw_ref);
+    EXPECT_EQ(pwtest.nstot,totnst_ref);
+    EXPECT_EQ(pwtest.nxyz, nx_ref*ny_ref*nz_ref);
 
 
-    int *tmpx = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
-    int *tmpy = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
-    int *tmpz = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
-    ModuleBase::GlobalFunc::ZEROS(tmpx,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
-    ModuleBase::GlobalFunc::ZEROS(tmpy,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
-    ModuleBase::GlobalFunc::ZEROS(tmpz,pwtest.fftnx*pwtest.fftny*pwtest.fftnz);
+    int *tmpx = new int[pwtest.nx*pwtest.ny*pwtest.nz];
+    int *tmpy = new int[pwtest.nx*pwtest.ny*pwtest.nz];
+    int *tmpz = new int[pwtest.nx*pwtest.ny*pwtest.nz];
+    ModuleBase::GlobalFunc::ZEROS(tmpx,pwtest.nx*pwtest.ny*pwtest.nz);
+    ModuleBase::GlobalFunc::ZEROS(tmpy,pwtest.nx*pwtest.ny*pwtest.nz);
+    ModuleBase::GlobalFunc::ZEROS(tmpz,pwtest.nx*pwtest.ny*pwtest.nz);
     
     int * startnst = new int [nproc_in_pool];
     startnst[0] = 0;
@@ -131,17 +135,17 @@ TEST_F(PWTEST,test2_1_1)
 
     for(int ig = 0 ; ig < pwtest.npw; ++ig)
     {
-        int istot = pwtest.ig2isz[ig] / pwtest.fftnz + startnst[rank_in_pool];
-        // int is = pwtest.ig2isz[ig] / pwtest.fftnz;
-        int iz = pwtest.ig2isz[ig] % pwtest.fftnz;
-        int iy = pwtest.istot2ixy[istot] % pwtest.fftny;
-        int ix = pwtest.istot2ixy[istot] / pwtest.fftny;
-        // int iy = pwtest.is2fftixy[is] % pwtest.fftny;
-        // int ix = pwtest.is2fftixy[is] / pwtest.fftny;
+        int istot = pwtest.ig2isz[ig] / pwtest.nz + startnst[rank_in_pool];
+        // int is = pwtest.ig2isz[ig] / pwtest.nz;
+        int iz = pwtest.ig2isz[ig] % pwtest.nz;
+        int iy = pwtest.istot2ixy[istot] % pwtest.ny;
+        int ix = pwtest.istot2ixy[istot] / pwtest.ny;
+        // int iy = pwtest.is2fftixy[is] % pwtest.ny;
+        // int ix = pwtest.is2fftixy[is] / pwtest.ny;
 
-        tmpx[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].x);
-        tmpy[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].y);
-        tmpz[iz+(iy+ix*pwtest.fftny)*pwtest.fftnz] = int(pwtest.gdirect[ig].z);
+        tmpx[iz+(iy+ix*pwtest.ny)*pwtest.nz] = int(pwtest.gdirect[ig].x);
+        tmpy[iz+(iy+ix*pwtest.ny)*pwtest.nz] = int(pwtest.gdirect[ig].y);
+        tmpz[iz+(iy+ix*pwtest.ny)*pwtest.nz] = int(pwtest.gdirect[ig].z);
     }
 #ifdef __MPI
     MPI_Allreduce(MPI_IN_PLACE,tmpx,pwtest.nxyz,MPI_INT,MPI_SUM,POOL_WORLD);
@@ -150,25 +154,25 @@ TEST_F(PWTEST,test2_1_1)
 #endif
     if(rank_in_pool==0)
     {
-        for(int iz = 0 ; iz < pwtest.fftnz; ++iz)
+        for(int iz = 0 ; iz < pwtest.nz; ++iz)
         {
-            for(int iy = 0 ; iy < pwtest.fftny ; ++iy)
+            for(int iy = 0 ; iy < pwtest.ny ; ++iy)
             {
-                for(int ix = 0 ; ix < pwtest.fftnx ; ++ix)
+                for(int ix = 0 ; ix < pwtest.nx ; ++ix)
                 {
                     ModuleBase::Vector3<double> f;
                     f.x = ix;
                     f.y = iy;
                     f.z = iz;
-                    if(iz >= int(pwtest.fftnz/2) +1) f.z -= pwtest.fftnz;
-                    if(iy >= int(pwtest.fftny/2) +1) f.y -= pwtest.fftny;
-                    if(ix >= int(pwtest.fftnx/2) +1) f.x -= pwtest.fftnx;
+                    if(iz >= int(pwtest.nz/2) +1) f.z -= pwtest.nz;
+                    if(iy >= int(pwtest.ny/2) +1) f.y -= pwtest.ny;
+                    if(ix >= int(pwtest.nx/2) +1) f.x -= pwtest.nx;
                     double modulus = f * (GGT * f);
                     if (modulus <= ggecut)
                     {
-                        EXPECT_EQ(tmpx[iz + iy*pwtest.fftnz + ix*pwtest.fftny*pwtest.fftnz], int(f.x));
-                        EXPECT_EQ(tmpy[iz + iy*pwtest.fftnz + ix*pwtest.fftny*pwtest.fftnz], int(f.y));
-                        EXPECT_EQ(tmpz[iz + iy*pwtest.fftnz + ix*pwtest.fftny*pwtest.fftnz], int(f.z));
+                        EXPECT_EQ(tmpx[iz + iy*pwtest.nz + ix*pwtest.ny*pwtest.nz], int(f.x));
+                        EXPECT_EQ(tmpy[iz + iy*pwtest.nz + ix*pwtest.ny*pwtest.nz], int(f.y));
+                        EXPECT_EQ(tmpz[iz + iy*pwtest.nz + ix*pwtest.ny*pwtest.nz], int(f.z));
                     }
                     
                 }
@@ -194,7 +198,7 @@ TEST_F(PWTEST,test2_1_1)
     {
         EXPECT_GT(pwtest.gg_uniq[igg], pwtest.gg_uniq[igg-1]);
     }
-    if(pwtest.ig_gge0 >= 0) EXPECT_NEAR(0.0, pwtest.gg[pwtest.ig_gge0], 1e-8);
+    if(pwtest.ig_gge0 >= 0) {EXPECT_NEAR(0.0, pwtest.gg[pwtest.ig_gge0], 1e-8);}
     delete [] startnst;
     delete [] tmpx;
     delete [] tmpy;

@@ -22,6 +22,8 @@ int NBANDS = 0;
 int NBANDS_ISTATE = 0; // default number.
 int NLOCAL = 0; // total number of local basis.
 
+double KSPACING = 0.0;
+
 double PSEUDORCUT;
 bool PSEUDO_MESH;
 
@@ -203,4 +205,6 @@ double eb_k = 80.0;
 double tau = 1.0798 * 1e-5;
 double sigma_k = 0.6;
 double nc_k = 0.00037;
+
+bool comp_chg = false; // compensating charge
 } // namespace GlobalV

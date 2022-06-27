@@ -34,10 +34,11 @@ Potential::~Potential()
 void Potential::allocate(const int nrxx)
 {
     ModuleBase::TITLE("Potential", "allocate");
-    assert(nrxx > 0);
+    assert(nrxx >= 0);
 
     delete[] this->vltot;
-    this->vltot = new double[nrxx];
+    if(nrxx > 0)    this->vltot = new double[nrxx];
+    else            this->vltot = nullptr;
     ModuleBase::Memory::record("Potential", "vltot", nrxx, "double");
 
     this->vr.create(GlobalV::NSPIN, nrxx);
@@ -52,7 +53,8 @@ void Potential::allocate(const int nrxx)
     }
 
     delete[] this->vr_eff1;
-    this->vr_eff1 = new double[nrxx];
+    if(nrxx > 0)    this->vr_eff1 = new double[nrxx];
+    else            this->vr_eff1 = nullptr;
 #ifdef __CUDA
     cudaMalloc((void **)&this->d_vr_eff1, nrxx * sizeof(double));
 #endif
@@ -353,14 +355,19 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
     if (GlobalV::VH_IN_H)
     {
         v += H_Hartree_pw::v_hartree(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, rho_in);
+        if(GlobalV::comp_chg)
+        {
+            v += GlobalC::solvent_model.v_compensating(GlobalC::ucell, GlobalC::rhopw);
+        }
         if (GlobalV::imp_sol)
         {
             v += GlobalC::solvent_model.v_correction(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, rho_in);
-
+            /*
             // test energy outside
             cout << "energy Outside: " << endl;
             GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::rhopw);
             GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::rhopw);
+            */
         }
     }
 

@@ -30,4 +30,5 @@ tddft			1
 
 md_type		    0
 md_dt			0.01
+md_tfirst       0
 init_vel                 1

@@ -143,11 +143,14 @@ void Input::Default(void)
     seed_sto = 0;
     bndpar = 1;
     kpar = 1;
+    initsto_freq = 1000;
+    method_sto = 1;
     berry_phase = false;
     gdir = 3;
     towannier90 = false;
     NNKP = "seedname.nnkp";
     wannier_spin = "up";
+    kspacing = 0.0;
     //----------------------------------------------------------
     // electrons / spin
     //----------------------------------------------------------
@@ -420,6 +423,10 @@ void Input::Default(void)
     sigma_k = 0.6;
     nc_k = 0.00037;
 
+    //==========================================================
+    //    compensating charge        donghs added on 2022-06-23
+    //==========================================================
+    comp_chg = 0;
     comp_q = 0.0;
     comp_l = 1.0;
     comp_center = 0.0;
@@ -528,18 +535,18 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("ntype", word) == 0) // number of atom types
         {
             read_value(ifs, ntype);
-            if (ntype <= 0)
-                ModuleBase::WARNING_QUIT("Input", "ntype must > 0");
         }
         else if (strcmp("nbands", word) == 0) // number of atom bands
         {
             read_value(ifs, nbands);
-            if (nbands < 0)
-                ModuleBase::WARNING_QUIT("Input", "NBANDS must >= 0");
         }
         else if (strcmp("nbands_sto", word) == 0) // number of stochastic bands
         {
             read_value(ifs, nbands_sto);
+        }
+        else if (strcmp("kspacing", word) == 0)
+        {
+            read_value(ifs, kspacing);
         }
         else if (strcmp("nbands_istate", word) == 0) // number of atom bands
         {
@@ -567,6 +574,14 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("emin_sto", word) == 0)
         {
             read_value(ifs, emin_sto);
+        }
+        else if (strcmp("initsto_freq", word) == 0)
+        {
+            read_value(ifs, initsto_freq);
+        }
+        else if (strcmp("method_sto", word) == 0)
+        {
+            read_value(ifs, method_sto);
         }
         else if (strcmp("bndpar", word) == 0)
         {
@@ -812,8 +827,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("nb2d", word) == 0)
         {
             read_value(ifs, nb2d);
-            if (nb2d < 0)
-                ModuleBase::WARNING_QUIT("Input", "nb2d must > 0");
         }
         else if (strcmp("nurse", word) == 0)
         {
@@ -1115,6 +1128,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("md_restartfreq", word) == 0)
         {
             read_value(ifs, mdp.md_restartfreq);
+        }
+        else if (strcmp("md_seed", word) == 0)
+        {
+            read_value(ifs, mdp.md_seed);
         }
         else if (strcmp("md_restart", word) == 0)
         {
@@ -1500,6 +1517,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, nc_k);
         }
+        else if (strcmp("comp_chg", word) == 0)
+        {
+            read_value(ifs, comp_chg);
+        }
         else if (strcmp("comp_q", word) == 0)
         {
             read_value(ifs, comp_q);
@@ -1591,6 +1612,7 @@ bool Input::Read(const std::string &fn)
         while (ifs.good())
         {
             ifs >> word1;
+            if(ifs.eof() != 0) break;
             strtolower(word1, word); // convert uppercase std::string to lower case; word1 --> word
 
             if (strcmp("dftu_type", word) == 0)
@@ -1889,11 +1911,14 @@ void Input::Bcast()
     Parallel_Common::bcast_int(nbands);
     Parallel_Common::bcast_int(nbands_sto);
     Parallel_Common::bcast_int(nbands_istate);
+    Parallel_Common::bcast_double(kspacing);
     Parallel_Common::bcast_int(nche_sto);
     Parallel_Common::bcast_int(seed_sto);
     Parallel_Common::bcast_int(pw_seed);
     Parallel_Common::bcast_double(emax_sto);
     Parallel_Common::bcast_double(emin_sto);
+    Parallel_Common::bcast_int(initsto_freq);
+    Parallel_Common::bcast_int(method_sto);
     Parallel_Common::bcast_int(bndpar);
     Parallel_Common::bcast_int(kpar);
     Parallel_Common::bcast_bool(berry_phase);
@@ -2046,6 +2071,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double(mdp.md_tlast);
     Parallel_Common::bcast_int(mdp.md_dumpfreq);
     Parallel_Common::bcast_int(mdp.md_restartfreq);
+    Parallel_Common::bcast_int(mdp.md_seed);
     Parallel_Common::bcast_bool(mdp.md_restart);
     Parallel_Common::bcast_double(mdp.lj_rcut);
     Parallel_Common::bcast_double(mdp.lj_epsilon);
@@ -2183,6 +2209,12 @@ void Input::Bcast()
     Parallel_Common::bcast_double(sigma_k);
     Parallel_Common::bcast_double(nc_k);
 
+    Parallel_Common::bcast_bool(comp_chg);
+    Parallel_Common::bcast_double(comp_q);
+    Parallel_Common::bcast_double(comp_l);
+    Parallel_Common::bcast_double(comp_center);
+    Parallel_Common::bcast_int(comp_dim);
+
     return;
 }
 #endif
@@ -2214,9 +2246,9 @@ void Input::Check(void)
         diago_proc = GlobalV::NPROC;
     }
 
-    if (nbands < 0)
+    if (kspacing < 0.0)
     {
-        ModuleBase::WARNING_QUIT("Input", "nbands < 0 is not allowed !");
+        ModuleBase::WARNING_QUIT("Input", "kspacing must > 0");
     }
 
     if (nelec < 0.0)
@@ -2358,6 +2390,26 @@ void Input::Check(void)
             ModuleBase::WARNING_QUIT("Input::Check", "temperature of MD calculation should be set!");
         if (mdp.md_tlast < 0.0)
             mdp.md_tlast = mdp.md_tfirst;
+
+        if(mdp.md_tfreq == 0)
+        {
+            mdp.md_tfreq = 1.0/40.0/mdp.md_dt;
+        }
+        if(mdp.md_restart) 
+        {
+            init_vel = 1;
+        }
+        if(mdp.md_ensolver == "LJ" || mdp.md_ensolver == "DP" || mdp.md_type == 4)
+        {
+            cal_stress = 1;
+        }
+        if(mdp.md_type == 4)
+        {
+            if(mdp.msst_qmass <= 0)
+            {
+                ModuleBase::WARNING_QUIT("Input::Check", "msst_qmass must be greater than 0!");
+            }
+        }
         // if(mdp.md_tfirst!=mdp.md_tlast)
         // {
         //     std::ifstream file1;

@@ -6,6 +6,10 @@
 #include "../module_base/vector3.h"
 #include <complex>
 #include "fft.h"
+#include <cstring>
+#ifdef __MPI
+#include "mpi.h"
+#endif
 
 namespace ModulePW
 {
@@ -23,9 +27,11 @@ namespace ModulePW
  * c(g) = \int f(r)*exp(-igr) dr
  * USAGE：
  * ModulePW::PW_Basis pwtest;
+ * 0. init mpi for PW_Basis
+ * pwtest.inimpi(nproc_in_pool,rank_in_pool,POOL_WORLD);
  * 1. setup FFT grids for PW_Basis
- * pwtest.initgrids(lat0,latvec,gridecut,nproc_in_pool,rank_in_pool);
- * pwtest.initgrids(lat0,latvec,N1,N2,N3,nproc_in_pool,rank_in_pool); 
+ * pwtest.initgrids(lat0,latvec,gridecut);
+ * pwtest.initgrids(lat0,latvec,N1,N2,N3); 
  * //double lat0：unit length, (unit: bohr)
  * //ModuleBase::Matrix3 latvec：lattice vector, (unit: lat0), e.g. ModuleBase::Matrix3 latvec(1, 1, 0, 0, 2, 0, 0, 0, 2);
  * //double gridecut：cutoff energy to generate FFT grids, (unit: Ry)
@@ -48,39 +54,48 @@ class PW_Basis
 {
 
 public:
+    std::string classname;
     PW_Basis();
-    ~PW_Basis();
+    virtual ~PW_Basis();
+    //Init mpi parameters
+#ifdef __MPI
+    void initmpi(
+        const int poolnproc_in, // Number of processors in this pool
+        const int poolrank_in, // Rank in this pool
+        MPI_Comm pool_world_in //Comm world for pw_basis
+    );
+#endif
 
     //Init the grids for FFT
     virtual void initgrids(
         const double lat0_in, //unit length (unit in bohr)
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
-        const double gridecut, //unit in Ry, ecut to set up grids
-        const int poolnproc_in, // Number of processors in this pool
-        const int poolrank_in // Rank in this pool
+        const double gridecut //unit in Ry, ecut to set up grids
     );
     //Init the grids for FFT
     virtual void initgrids(
         const double lat0_in,
         const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        const int nx_in, int ny_in, int nz_in,
-        const int poolnproc_in, // Number of processors in this pool
-        const int poolrank_in // Rank in this pool
+        const int nx_in, int ny_in, int nz_in
     );
 
     //Init some parameters
     void initparameters(
         const bool gamma_only_in,
         const double pwecut_in, //unit in Ry, ecut to decides plane waves
-        const int distribution_type_in = 1
+        const int distribution_type_in = 1,
+        const bool xprime_in = false
     );
 
 //===============================================
 //                 distribution maps
 //===============================================
 public:
-    //reciprocal-space
-    // only on first proc.
+#ifdef __MPI
+    MPI_Comm pool_world;
+    static MPI_Datatype mpi_dcomplex;
+    static int member;
+#endif
     
     int *ig2isz=nullptr; // map ig to (is, iz).
     int *istot2ixy=nullptr; // istot2ixy[is]: iy + ix * ny of is^th stick among all sticks.
@@ -147,6 +162,7 @@ public:
 public:
     bool gamma_only=false;	// only half g are used.
     double ggecut=0;    //Energy cut off for g^2/2, unit in 1/lat0^2, ggecut=ecutwfc(Ry)*lat0^2/4pi^2
+    double gridecut_lat=0; //Energy cut off for all fft grids, unit in 1/lat0^2, gridecut_lat=ecutrho(Ry)*lat0^2/4pi^2
     double lat0=1;     //unit length for lattice, unit in bohr
     double tpiba=1;    //  2pi/lat0
     double tpiba2=1;   //  4pi^2/lat0^2
@@ -213,7 +229,10 @@ public:
 	// FFT dimensions for wave functions.
 	int fftnx=0, fftny=0, fftnz=0, fftnxyz=0, fftnxy=0;
     int nx=0, ny=0, nz=0, nxyz=0, nxy=0; // Gamma_only: fftny = int(ny/2)-1 , others: fftny = ny
-    int liy=0,riy=0;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
+    int liy=0, riy=0;// liy: the left edge of the pw ball; riy: the right edge of the pw ball in the y direction
+    int lix=0, rix=0;// lix: the left edge of the pw ball; rix: the right edge of the pw ball in the x direction
+    bool xprime = false; // true: when do recip2real, x-fft will be done last and when doing real2recip, x-fft will be done first; false: y-fft
+                         // For gamma_only, true: we use half x; false: we use half y
     int nmaxgr=0; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
                 // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data
     FFT ft;

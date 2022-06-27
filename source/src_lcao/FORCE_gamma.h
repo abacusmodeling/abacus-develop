@@ -7,6 +7,7 @@
 #include "LCAO_matrix.h" 
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/LCAO_hamilt.h"
+#include "module_psi/psi.h"
 
 class Force_LCAO_gamma
 {
@@ -26,7 +27,7 @@ private:
 	void ftable_gamma (
 		const bool isforce,
         const bool isstress,
-        vector<ModuleBase::matrix>& wfc_gamma,
+        const psi::Psi<double>* psid,
         Local_Orbital_Charge &loc, 
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
@@ -61,7 +62,7 @@ private:
 	void cal_foverlap(
 		const bool isforce, 
         const bool isstress,
-        vector<ModuleBase::matrix>& wfc_gamma,
+        const psi::Psi<double>* psid,
         Local_Orbital_Charge &loc,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& soverlap);	

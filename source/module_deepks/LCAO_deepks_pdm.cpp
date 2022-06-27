@@ -12,7 +12,7 @@
 //2. cal_projected_DM_k, counterpart of 1, for multi-k
 //3. check_projected_dm, which prints pdm to descriptor.dat
 
-//4. cal_gdmx, calculating gdmx for gamma point
+//4. cal_gdmx, calculating gdmx (and optionally gdm_epsl for stress) for gamma point
 //5. cal_gdmx_k, counterpart of 3, for multi-k
 //6. check_gdmx, which prints gdmx to a series of .dat files
 
@@ -285,12 +285,17 @@ void LCAO_Deepks::check_projected_dm(void)
 
 //this subroutine calculates the gradient of projected density matrices
 //gdmx_m,m = d/dX sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
+//if stress label is enabled, the gradient of PDM wrt strain tensor will 
+//be calculated: 
+//gdm_epsl = d/d\epsilon_{ab} * 
+//           sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
 void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const int* trace_loc_row,
-    const int* trace_loc_col)
+    const int* trace_loc_col,
+    const bool isstress)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx");
     ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx");
@@ -304,6 +309,17 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
             ModuleBase::GlobalFunc::ZEROS(gdmx[iat][inl], size);
             ModuleBase::GlobalFunc::ZEROS(gdmy[iat][inl], size);
             ModuleBase::GlobalFunc::ZEROS(gdmz[iat][inl], size);
+        }
+    }
+
+    if (isstress)
+    {
+        for (int ipol = 0;ipol < 6;ipol++)
+        {
+            for (int inl = 0;inl < inlmax;inl++)
+            {
+                ModuleBase::GlobalFunc::ZEROS(gdm_epsl[ipol][inl], size);
+            }
         }
     }
 
@@ -349,6 +365,18 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
 					{
 						continue;
 					}
+
+                    double r0[3];
+                    double r1[3];
+                    if(isstress)
+                    {
+                        r1[0] = ( tau1.x - tau0.x) ;
+                        r1[1] = ( tau1.y - tau0.y) ;
+                        r1[2] = ( tau1.z - tau0.z) ;
+                        r0[0] = ( tau2.x - tau0.x) ;
+                        r0[1] = ( tau2.y - tau0.y) ;
+                        r0[2] = ( tau2.z - tau0.z) ;
+                    }
 
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
@@ -399,12 +427,56 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
                                             gdmy[ibt2][inl][m2*nm+m1] -= nlm2[2][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                               
                                             gdmz[ibt2][inl][m2*nm+m1] -= nlm2[3][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                            
 
+                                            if (isstress)
+                                            {
+                                                int mm = 0;
+                                                for(int ipol=0;ipol<3;ipol++)
+                                                {
+                                                    for(int jpol=ipol;jpol<3;jpol++)
+                                                    {
+                                                        gdm_epsl[mm][inl][m2*nm+m1] += ucell.lat0 * dm(iw1_local, iw2_local) * (nlm2[jpol+1][ib+m2] * nlm1[ib+m1] * r0[ipol]);
+                                                        mm++;
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                     ib+=nm;
                                 }
                             }
                             assert(ib==nlm1.size());
+                            if  (isstress)
+                            {
+                                nlm1 = this->nlm_save[iat][ad2][iw2_all][0];
+                                nlm2 = this->nlm_save[iat][ad1][iw1_all];
+
+                                assert(nlm1.size()==nlm2[0].size());  
+                                int ib=0;
+                                for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
+                                {
+                                    for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
+                                    {
+                                        const int inl = this->inl_index[T0](I0, L0, N0);
+                                        const int nm = 2*L0+1;
+                                        for (int m1 = 0;m1 < nm; ++m1)
+                                        {
+                                            for (int m2 = 0; m2 < nm; ++m2)
+                                            {
+                                                int mm = 0;
+                                                for(int ipol=0;ipol<3;ipol++)
+                                                {
+                                                    for(int jpol=ipol;jpol<3;jpol++)
+                                                    {
+                                                        gdm_epsl[mm][inl][m2*nm+m1]  += ucell.lat0 * dm(iw1_local, iw2_local) * (nlm1[ib+m1] * nlm2[jpol+1][ib+m2] * r1[ipol]);
+                                                        mm++;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        ib+=nm;
+                                    }
+                                }
+                            }
 						}//iw2
 					}//iw1
 				}//ad2
@@ -419,6 +491,13 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
         allsum_deepks(this->inlmax,size,this->gdmy[iat]);
         allsum_deepks(this->inlmax,size,this->gdmz[iat]);
     }
+    if (isstress)
+    {
+        for(int ipol=0;ipol<6;ipol++)
+        {
+            allsum_deepks(this->inlmax,size,this->gdm_epsl[ipol]);
+        }
+    }
 #endif
     ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx");
     return;
@@ -431,7 +510,8 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
     const int* trace_loc_row,
     const int* trace_loc_col,
     const int nks,
-    const std::vector<ModuleBase::Vector3<double>> &kvec_d)
+    const std::vector<ModuleBase::Vector3<double>> &kvec_d,
+    const bool isstress)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx_k");
     ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx_k");
@@ -445,6 +525,17 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
             ModuleBase::GlobalFunc::ZEROS(gdmx[iat][inl], size);
             ModuleBase::GlobalFunc::ZEROS(gdmy[iat][inl], size);
             ModuleBase::GlobalFunc::ZEROS(gdmz[iat][inl], size);
+        }
+    }
+
+    if (isstress)
+    {
+        for (int ipol = 0;ipol < 6;ipol++)
+        {
+            for (int inl = 0;inl < inlmax;inl++)
+            {
+                ModuleBase::GlobalFunc::ZEROS(gdm_epsl[ipol][inl], size);
+            }
         }
     }
 
@@ -494,6 +585,19 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
 						continue;
 					}
 
+                    double r0[3];
+                    double r1[3];
+                    if(isstress)
+                    {
+                        r1[0] = ( tau1.x - tau0.x) ;
+                        r1[1] = ( tau1.y - tau0.y) ;
+                        r1[2] = ( tau1.z - tau0.z) ;
+                        r0[0] = ( tau2.x - tau0.x) ;
+                        r0[1] = ( tau2.y - tau0.y) ;
+                        r0[2] = ( tau2.z - tau0.z) ;
+                    }
+
+
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
@@ -516,7 +620,7 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
                                 tmp += dm[ik](iw1_local,iw2_local)*kphase;
                             }
                             dm_current=tmp.real();
-                            
+
                             key_tuple key_1(ibt1,dR1.x,dR1.y,dR1.z);
                             key_tuple key_2(ibt2,dR2.x,dR2.y,dR2.z);
                             std::vector<double> nlm1 = this->nlm_save_k[iat][key_1][iw1_all][0];
@@ -555,12 +659,59 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
                                             gdmy[ibt2][inl][m2*nm+m1] -= nlm2[2][ib+m2] * nlm1[ib+m1] * dm_current;                                               
                                             gdmz[ibt2][inl][m2*nm+m1] -= nlm2[3][ib+m2] * nlm1[ib+m1] * dm_current;     
 
+
+                                            if (isstress)
+                                            {
+                                                int mm = 0;
+                                                for(int ipol=0;ipol<3;ipol++)
+                                                {
+                                                    for(int jpol=ipol;jpol<3;jpol++)
+                                                    {
+                                                        gdm_epsl[mm][inl][m2*nm+m1] += ucell.lat0 * dm_current * (nlm2[jpol+1][ib+m2] * nlm1[ib+m1] * r0[ipol]);
+                                                        mm++;
+                                                    }
+                                                }
+                                            }
+
                                         }
                                     }
                                     ib+=nm;
                                 }
                             }
                             assert(ib==nlm1.size());
+
+                            if  (isstress)
+                            {
+                                nlm1 = this->nlm_save_k[iat][key_2][iw2_all][0];
+                                nlm2 = this->nlm_save_k[iat][key_1][iw1_all];
+
+                                assert(nlm1.size()==nlm2[0].size());  
+                                int ib=0;
+                                for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
+                                {
+                                    for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
+                                    {
+                                        const int inl = this->inl_index[T0](I0, L0, N0);
+                                        const int nm = 2*L0+1;
+                                        for (int m1 = 0;m1 < nm; ++m1)
+                                        {
+                                            for (int m2 = 0; m2 < nm; ++m2)
+                                            {
+                                                int mm = 0;
+                                                for(int ipol=0;ipol<3;ipol++)
+                                                {
+                                                    for(int jpol=ipol;jpol<3;jpol++)
+                                                    {
+                                                        gdm_epsl[mm][inl][m2*nm+m1]  += ucell.lat0 * dm_current * (nlm1[ib+m1] * nlm2[jpol+1][ib+m2] * r1[ipol]);
+                                                        mm++;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        ib+=nm;
+                                    }
+                                }
+                            }
 						}//iw2
 					}//iw1
 				}//ad2
@@ -574,6 +725,13 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
         allsum_deepks(this->inlmax,size,this->gdmx[iat]);
         allsum_deepks(this->inlmax,size,this->gdmy[iat]);
         allsum_deepks(this->inlmax,size,this->gdmz[iat]);
+    }
+    if (isstress)
+    {
+        for(int ipol=0;ipol<6;ipol++)
+        {
+            allsum_deepks(this->inlmax,size,this->gdm_epsl[ipol]);
+        }
     }
 #endif
     ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx_k");

@@ -259,10 +259,10 @@ TEST_F(LCAOTest,GammaRho)
 
 	// read gamma wavefunction
 	LOWF.wfc_gamma.resize(GlobalV::NSPIN);
-	LOC.gamma_file(LOWF);
+	LOC.gamma_file(nullptr, LOWF);
 	// allocate space for DM
 	GlobalC::GridT.lgd = GlobalV::NLOCAL;
-	LOC.allocate_gamma(GlobalC::GridT.lgd);
+	LOC.allocate_gamma(GlobalC::GridT.lgd, nullptr);
 	// dm_gamma is another way to save density matrix
 	LOC.dm_gamma.resize(GlobalV::NSPIN); // originally inside allocate_gamma
 	// calculate density matrix from wavefunction

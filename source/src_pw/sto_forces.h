@@ -3,6 +3,7 @@
 
 #include "forces.h"
 #include "./sto_wf.h"
+#include "module_psi/psi.h"
 
 class Sto_Forces : public Forces
 {
@@ -19,11 +20,10 @@ public:
     Sto_Forces(){};
     ~Sto_Forces(){};
 
-    void init(ModuleBase::matrix& matrix,Stochastic_WF& stowf);
+    void init(ModuleBase::matrix& matrix,const psi::Psi<std::complex<double>>* psi_in,Stochastic_WF& stowf);
 
 private:
-    void cal_force_nl(ModuleBase::matrix& forcenl);
-    void cal_sto_force_nl(ModuleBase::matrix& forcenl,Stochastic_WF& stowf);
+    void cal_sto_force_nl(ModuleBase::matrix& forcenl,const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
 
 };
 

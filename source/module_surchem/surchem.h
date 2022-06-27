@@ -25,6 +25,9 @@ class surchem
     ModuleBase::matrix Vel;
     double qs;
 
+    // energy of compensating charge
+    double comp_chg_energy;
+
     // compensating charge params
     double comp_q;
     double comp_l;
@@ -41,6 +44,14 @@ class surchem
                            ModulePW::PW_Basis* rho_basis,
                            const complex<double> *Porter_g,
                            complex<double> *PS_TOTN);
+
+    void add_comp_chg(const UnitCell &cell,
+                      ModulePW::PW_Basis *rho_basis,
+                      double q,
+                      double l,
+                      double center,
+                      complex<double> *NG,
+                      int dim);
 
     void gauss_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, complex<double> *N);
 
@@ -85,6 +96,10 @@ class surchem
                                            ModulePW::PW_Basis* rho_basis,
                                            const int &nspin,
                                            const double *const *const rho);
+    
+    ModuleBase::matrix v_compensating(const UnitCell &cell, ModulePW::PW_Basis *pwb);
+
+    void test_V_to_N(ModuleBase::matrix &v, const UnitCell &cell, ModulePW::PW_Basis *rho_basis, const double *const *const rho);
 
   private:
 };
