@@ -81,8 +81,11 @@ void K_Vectors::set(
 
     // (2)
     this->ibz_kpoint(symm, ModuleSymmetry::Symmetry::symm_flag);
-    this->update_use_ibz();
-    this->nks = this->nkstot = this->nkstot_ibz;
+    if(ModuleSymmetry::Symmetry::symm_flag)
+    {
+        this->update_use_ibz();
+        this->nks = this->nkstot = this->nkstot_ibz;
+    }
 
     // (3)
     this->set_both_kvec(reciprocal_vec, latvec);
@@ -233,11 +236,13 @@ bool K_Vectors::read_kpoints(const std::string &fn)
     {
         if (kword == "Gamma")
         {
+            is_mp = true;
             k_type = 0;
 			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Input type of k points","Monkhorst-Pack(Gamma)");
         }
         else if (kword == "Monkhorst-Pack" || kword == "MP" || kword == "mp")
         {
+            is_mp = true;
             k_type = 1;
 			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Input type of k points","Monkhorst-Pack");
         }
@@ -246,6 +251,8 @@ bool K_Vectors::read_kpoints(const std::string &fn)
 			GlobalV::ofs_warning << " Error: neither Gamma nor Monkhorst-Pack." << std::endl;
 			return 0;
         }
+
+        GlobalV::ofs_running << "is_mp : " << is_mp << std::endl;
 
         ifk >> nmp[0] >> nmp[1] >> nmp[2];
 
@@ -535,6 +542,7 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm, bool use_symm)
     bool include_inv = false;
     std::vector<ModuleBase::Matrix3> kgmatrix(48 * 2);
     ModuleBase::Matrix3 inv(-1, 0, 0, 0, -1, 0, 0, 0, -1);
+    ModuleBase::Matrix3 ind(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
     int nrotkm;
     if(use_symm)
@@ -558,10 +566,15 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm, bool use_symm)
             nrotkm = 2 * symm.nrotk;
         }
     }
+    else if(is_mp) // only include for mp grid
+    {
+        nrotkm = 2;
+        kgmatrix[0] = ind;
+        kgmatrix[1] = inv;
+    }
     else
     {
-        nrotkm = 1;
-        kgmatrix[0] = inv;
+        return;
     }
 
     // use operation : kgmatrix to find
@@ -606,10 +619,14 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm, bool use_symm)
 				//kvec_rot = kvec_d[i] * kgmatrix[j]; //wrong for total energy, but correct for nonlocal force.
 				kvec_rot = kgmatrix[j] * kvec_d[i]; //correct for total energy, but wrong for nonlocal force.
 				
+                GlobalV::ofs_running << "kvec_rot : " << i << " " << kvec_d[i] << " " << kvec_rot << std::endl;
 
                 kvec_rot.x = fmod(kvec_rot.x + 100, 1);
                 kvec_rot.y = fmod(kvec_rot.y + 100, 1);
                 kvec_rot.z = fmod(kvec_rot.z + 100, 1);
+
+                GlobalV::ofs_running << "kvec_rot : " << i << " " << kvec_d[i] << " " << kvec_rot << std::endl;
+
 
 //				std::cout << "\n kvec_rot = " << kvec_rot.x << " " << kvec_rot.y << " " << kvec_rot.z;
 
@@ -629,6 +646,7 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm, bool use_symm)
                         break;
                     }
                 }
+                GlobalV::ofs_running << "already_exist : " << already_exist << std::endl;
             }//end !already_exist
         }
 
