@@ -38,7 +38,7 @@ public:
         const ModuleBase::Matrix3 &reciprocal_vec,
         const ModuleBase::Matrix3 &latvec);
 
-    void ibz_kpoint( const ModuleSymmetry::Symmetry &symm);
+    void ibz_kpoint( const ModuleSymmetry::Symmetry &symm, bool use_symm);
     //LiuXh add 20180515
     void set_after_vc(
             const ModuleSymmetry::Symmetry &symm,

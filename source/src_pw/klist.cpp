@@ -80,12 +80,9 @@ void K_Vectors::set(
 	}
 
     // (2)
-	if(ModuleSymmetry::Symmetry::symm_flag)
-    {
-        this->ibz_kpoint(symm);
-        this->update_use_ibz();
-        this->nks = this->nkstot = this->nkstot_ibz;
-    }
+    this->ibz_kpoint(symm, ModuleSymmetry::Symmetry::symm_flag);
+    this->update_use_ibz();
+    this->nks = this->nkstot = this->nkstot_ibz;
 
     // (3)
     this->set_both_kvec(reciprocal_vec, latvec);
@@ -526,7 +523,7 @@ void K_Vectors::update_use_ibz( void )
     return;
 }
 
-void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm)
+void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm, bool use_symm)
 {
     if (GlobalV::MY_RANK!=0) return;
     ModuleBase::TITLE("K_Vectors", "ibz_kpoint");
@@ -539,23 +536,32 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm)
     std::vector<ModuleBase::Matrix3> kgmatrix(48 * 2);
     ModuleBase::Matrix3 inv(-1, 0, 0, 0, -1, 0, 0, 0, -1);
 
-    int nrotkm = symm.nrotk;// change if inv not included
-    for (int i = 0; i < nrotkm; ++i)
+    int nrotkm;
+    if(use_symm)
     {
-        if (symm.gmatrix[i] == inv)
+        nrotkm = symm.nrotk;// change if inv not included
+        for (int i = 0; i < nrotkm; ++i)
         {
-            include_inv = true;
+            if (symm.gmatrix[i] == inv)
+            {
+                include_inv = true;
+            }
+            kgmatrix[i] = symm.gmatrix[i];
         }
-        kgmatrix[i] = symm.gmatrix[i];
-    }
 
-    if (!include_inv)
-    {
-        for (int i = 0; i<symm.nrotk; ++i)
+        if (!include_inv)
         {
-            kgmatrix[i + symm.nrotk] = inv * symm.gmatrix[i];
+            for (int i = 0; i<symm.nrotk; ++i)
+            {
+                kgmatrix[i + symm.nrotk] = inv * symm.gmatrix[i];
+            }
+            nrotkm = 2 * symm.nrotk;
         }
-        nrotkm = 2 * symm.nrotk;
+    }
+    else
+    {
+        nrotkm = 1;
+        kgmatrix[0] = inv;
     }
 
     // use operation : kgmatrix to find
