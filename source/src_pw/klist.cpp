@@ -81,7 +81,7 @@ void K_Vectors::set(
 
     // (2)
     this->ibz_kpoint(symm, ModuleSymmetry::Symmetry::symm_flag);
-    if(ModuleSymmetry::Symmetry::symm_flag)
+    if(ModuleSymmetry::Symmetry::symm_flag || is_mp)
     {
         this->update_use_ibz();
         this->nks = this->nkstot = this->nkstot_ibz;
@@ -251,8 +251,6 @@ bool K_Vectors::read_kpoints(const std::string &fn)
 			GlobalV::ofs_warning << " Error: neither Gamma nor Monkhorst-Pack." << std::endl;
 			return 0;
         }
-
-        GlobalV::ofs_running << "is_mp : " << is_mp << std::endl;
 
         ifk >> nmp[0] >> nmp[1] >> nmp[2];
 
