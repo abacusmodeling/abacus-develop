@@ -130,7 +130,8 @@ void test_deepks::check_gdmx(void)
 			ORB,
 			Test_Deepks::GridD,
 			ParaO.trace_loc_row,
-			ParaO.trace_loc_col);
+			ParaO.trace_loc_col,
+			0);
 	}
 	else
 	{
@@ -141,7 +142,8 @@ void test_deepks::check_gdmx(void)
 			ParaO.trace_loc_row,
 			ParaO.trace_loc_col,
 			kv.nkstot,
-			kv.kvec_d);			
+			kv.kvec_d,
+			0);			
 	}
 	this->ld.check_gdmx(ucell.nat);
 

@@ -12,19 +12,22 @@ using namespace std;
 
 TEST_F(PWTEST,test1_1_2)
 {
-    cout<<"dividemthd 1, gamma_only: on, check gcar,gdirect,gg,istot2ixy,ig2isz"<<endl;
+    cout<<"dividemthd 1, gamma_only: on, xprime: false, check gcar,gdirect,gg,istot2ixy,ig2isz"<<endl;
     //--------------------------------------------------
     ModuleBase::Matrix3 latvec(1,2,0,2,1,1,0,0,5);
     bool gamma_only = true;
     double wfcecut = 70;
     double lat0 = 4;
     int distribution_type = 1;
+    bool xprime = false;
     //--------------------------------------------------
 
     ModulePW::PW_Basis pwtest;
-
-    pwtest.initgrids(lat0, latvec, wfcecut,nproc_in_pool, rank_in_pool);
-    pwtest.initparameters(gamma_only, wfcecut, distribution_type);
+#ifdef __MPI
+    pwtest.initmpi(nproc_in_pool, rank_in_pool, POOL_WORLD);
+#endif
+    pwtest.initgrids(lat0, latvec, wfcecut);
+    pwtest.initparameters(gamma_only, wfcecut, distribution_type, xprime);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
     pwtest.collect_uniqgg();
@@ -71,7 +74,7 @@ TEST_F(PWTEST,test1_1_2)
         {16,16,16,16,16,16,16,16,16,16,16},
         {15,15,15,15,15,15,14,14,14,15,14,15}
     };
-    int *npw_per;
+    int *npw_per = nullptr;
     if(rank_in_pool == 0)
     {
         npw_per = new int [nproc_in_pool];
@@ -87,8 +90,8 @@ TEST_F(PWTEST,test1_1_2)
         {
             for(int ip = 0 ; ip < nproc_in_pool ; ++ip)
             {
-                ASSERT_EQ(npw_per_ref[nproc_in_pool-1][ip], npw_per[ip]);
-                ASSERT_EQ(nst_per_ref[nproc_in_pool-1][ip], pwtest.nst_per[ip]);
+                EXPECT_EQ(npw_per_ref[nproc_in_pool-1][ip], npw_per[ip]);
+                EXPECT_EQ(nst_per_ref[nproc_in_pool-1][ip], pwtest.nst_per[ip]);
             }
         }
         else
@@ -106,14 +109,14 @@ TEST_F(PWTEST,test1_1_2)
 #else
     tot_npw = pwtest.npw;
 #endif
-    ASSERT_EQ(pwtest.fftnx, fftnx_ref);
-    ASSERT_EQ(pwtest.fftny, fftny_ref);
-    ASSERT_EQ(pwtest.ny, ny_ref);
-    ASSERT_EQ(pwtest.fftnz, fftnz_ref);
-    ASSERT_EQ(tot_npw, totnpw_ref);
-    ASSERT_EQ(pwtest.npwtot, totnpw_ref);
-    ASSERT_EQ(pwtest.nstot,totnst_ref);
-    ASSERT_EQ(pwtest.nxyz, fftnx_ref*ny_ref*fftnz_ref);
+    EXPECT_EQ(pwtest.fftnx, fftnx_ref);
+    EXPECT_EQ(pwtest.fftny, fftny_ref);
+    EXPECT_EQ(pwtest.ny, ny_ref);
+    EXPECT_EQ(pwtest.fftnz, fftnz_ref);
+    EXPECT_EQ(tot_npw, totnpw_ref);
+    EXPECT_EQ(pwtest.npwtot, totnpw_ref);
+    EXPECT_EQ(pwtest.nstot,totnst_ref);
+    EXPECT_EQ(pwtest.nxyz, fftnx_ref*ny_ref*fftnz_ref);
 
 
     int *tmpx = new int[pwtest.fftnx*pwtest.fftny*pwtest.fftnz];
@@ -161,8 +164,8 @@ TEST_F(PWTEST,test1_1_2)
                     f.x = ix;
                     f.y = iy;
                     f.z = iz;
-                    if(iz >= int(pwtest.fftnz/2) +1) f.z -= pwtest.fftnz;
-                    if(ix >= int(pwtest.fftnx/2) +1) f.x -= pwtest.fftnx;
+                    if(iz >= int(pwtest.nz/2) +1) f.z -= pwtest.nz;
+                    if(ix >= int(pwtest.nx/2) +1) f.x -= pwtest.nx;
                     double modulus = f * (GGT * f);
                     if (modulus <= ggecut)
                     {
@@ -194,7 +197,7 @@ TEST_F(PWTEST,test1_1_2)
     {
         EXPECT_GT(pwtest.gg_uniq[igg], pwtest.gg_uniq[igg-1]);
     }
-    if(pwtest.ig_gge0 >= 0) EXPECT_NEAR(0.0, pwtest.gg[pwtest.ig_gge0], 1e-8);
+    if(pwtest.ig_gge0 >= 0) {EXPECT_NEAR(0.0, pwtest.gg[pwtest.ig_gge0], 1e-8);}
     delete [] startnst;
     delete [] tmpx;
     delete [] tmpy;

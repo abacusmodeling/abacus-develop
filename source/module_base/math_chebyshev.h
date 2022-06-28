@@ -104,7 +104,7 @@ public:
     void calfinalvec(T *ptr, 
 		void (T::*funA)(REAL *in, REAL *out, const int), 
 		REAL *wavein, REAL *waveout, 
-		const int N, const int LDA = 1,  const int m = 1);
+		const int N, const int LDA = 1,  const int m = 1); //do not define yet
 
 	// calfinalvec_real uses C_n[f], where f is a function of real number and A is a complex Operator.
 	template<class T>
@@ -129,8 +129,25 @@ public:
 		T *ptr, void (T::*funA)(std::complex<REAL> *in, std::complex<REAL> *out, const int), 
 		std::complex<REAL> *wavein, 
 		const int N, const int LDA = 1,  const int m = 1);
-	//get T_n(x)
+	
+	// get T_n(x)
 	void getpolyval(REAL x, REAL* polyval, const int N);
+
+	// get each order of vector: {T_0(A)v, T_1(A)v, ..., T_n(A)v}
+	// Note: use it carefully, it will cost a lot of memory!
+	// calpolyvec_real: f(x) = \sum_n C_n*T_n(x), f is a real function
+	template<class T>
+	void calpolyvec_real(T *ptr, 
+		void (T::*funA)(REAL *in, REAL *out, const int), 
+		REAL *wavein, REAL *waveout, 
+		const int N, const int LDA = 1,  const int m = 1);//do not define yet
+	// calpolyvec_complex: f(x) = \sum_n C_n*T_n(x), f is a complex function
+	template<class T>
+	void calpolyvec_complex(T *ptr, 
+		void (T::*funA)(std::complex<REAL> *in, std::complex<REAL> *out, const int), 
+		std::complex<REAL> *wavein, std::complex<REAL> *waveout, 
+		const int N, const int LDA = 1,  const int m = 1);
+
 	
 	// IV.
 	// recurs fomula: v_{n+1} = 2Av_n - v_{n-1}

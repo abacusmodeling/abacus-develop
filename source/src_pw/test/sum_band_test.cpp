@@ -252,8 +252,10 @@ TEST_F(CHGTest, SumBand)
     GlobalC::rhopw = new ModulePW::PW_Basis_Big(); 
     ModulePW::PW_Basis_Big* tmp = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
     tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
-    
-    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc, 1, 0);
+#ifdef __MPI
+    GlobalC::rhopw->initmpi(1, 0 ,POOL_WORLD);
+#endif
+    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc);
     GlobalC::rhopw->initparameters(false, INPUT.ecutrho);
     GlobalC::rhopw->setuptransform();
 

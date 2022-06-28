@@ -26,12 +26,10 @@ void Variable_Cell::init_after_vc(ModuleESolver::ESolver *p_esolver)
     
     //only G-vector and K-vector are changed due to the change of lattice vector
     //FFT grids do not change!!
-    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, 
-                                GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
     GlobalC::rhopw->collect_local_pw(); 
     GlobalC::rhopw->collect_uniqgg();
-    GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::wfcpw->nx, GlobalC::wfcpw->ny, GlobalC::wfcpw->nz,
-                                GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+    GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::wfcpw->nx, GlobalC::wfcpw->ny, GlobalC::wfcpw->nz);
     GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
     GlobalC::wfcpw->collect_local_pw(); 
 

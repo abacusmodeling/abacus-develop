@@ -28,7 +28,7 @@
 
 - [Electronic structure (SDFT)](#electronic-structure-sdft)
 
-    [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto)
+    [method_sto](#method_sto) | [nbands_sto](#nbands_sto) | [nche_sto](#nche_sto) | [emin_sto](#emin_sto) | [emax_sto](#emax_sto) | [seed_sto](#seed_sto) | [initsto_freq](#initsto_freq)
 
 - [Geometry relaxation](#geometry-relaxation)
 
@@ -469,7 +469,7 @@ calculations.
 #### nbands
 
 - **Type**: Integer
-- **Description**: Number of bands to calculate. It is recommended you setup this value, especially when you use smearing techniques, more bands should be included.
+- **Description**: Number of Kohn-Sham orbitals to calculate. It is recommended you setup this value, especially when you use smearing techniques, more bands should be included.
 - **Default**:
   - nspin=1: 1.2\*occupied_bands, occupied_bands+10)
   - nspin=2: max(1.2\*nelec, nelec+20)
@@ -577,7 +577,17 @@ calculations.
 
 ### Electronic structure (SDFT)
 
-This part of variables are used to control the parameters of stochastic DFT (SDFT),  mix stochastic-deterministic DFT (MDFT), or complete-basis Chebyshev method (CT).
+This part of variables are used to control the parameters of stochastic DFT (SDFT),  mix stochastic-deterministic DFT (MDFT), or complete-basis Chebyshev method (CT). We now support calculation of "sto-scf" and "sto-md".
+
+#### method_sto
+
+- **Type**: Integer
+- **Description**: 
+  - Different method to do SDFT.
+  - 1: SDFT calculates $T_n(\hat{h})\ket{\chi}$ twice, where $T_n(x)$ is the n-th order Chebyshev polynomial and $\hat{h}=\frac{\hat{H}-\bar{E}}{\Delta E}$ owning eigen-value $\in(-1,1)$. This method cost less memory but slow.
+  - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is fast but when memory is not enough. Only method 1 can be used.
+  - other: use 1
+- **Default**: 1
 
 #### nbands_sto
 
@@ -585,6 +595,7 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 - **Description**: 
   - nbands_sto>0: Number of stochastic orbitals to calculate in SDFT and MDFT.  More bands obtain more precise results or smaller stochastic errors ($ \propto 1/\sqrt{N_{\chi}}$); 
   - nbands_sto=0: Complete basis will be used to replace stochastic orbitals with the Chebyshev method (CT) and it will get the results the same as KSDFT without stochastic errors.
+  - If you want to do MDFT. [nbands](#nbands) which represents the number of KS orbitals should be set.
 - **Default**: 0
 
 #### nche_sto
@@ -609,8 +620,15 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 
 - **Type**: Integer
 - **Description**: The random seed to generate stochastic orbitals.
-  - seed_sto>=0: Stochastic orbitals have the form of $\exp(i2\pi\theta(G))$, where $\theta$ is a uniform distribution in $(0,1)$. If seed_sto=0, the seed is decided by time(NULL).
-  - seed_sto<=-1: Stochastic orbitals have the form of $\pm1$ with the equal probability. If seed_sto=-1, the seed is decided
+  - seed_sto>=0: Stochastic orbitals have the form of $\exp(i2\pi\theta(G))$, where $\theta$ is a uniform distribution in $(0,1)$. If seed_sto = 0, the seed is decided by time(NULL).
+  - seed_sto<=-1: Stochastic orbitals have the form of $\pm1$ with the equal probability. If seed_sto = -1, the seed is decided by time(NULL).
+- **Default**:0
+
+#### initsto_freq
+
+- **Type**: Integer
+- **Description**: Frequency (once each initsto_freq steps) to generate new stochastic orbitals when running md.
+- **Default**:1000
 
 ### Geometry relaxation
 

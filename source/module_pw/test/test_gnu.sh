@@ -17,13 +17,12 @@ head -n $headn Makefile.gnu > Makefile
 if ((i==0)) ;then
 cat >>Makefile<<EOF
 HONG = -D__NORMAL
-CPLUSPLUS = icpc
+CPLUSPLUS = g++
 EOF
 elif ((i==1)) ;then
 cat >>Makefile<<EOF
 HONG = -D__MIX_PRECISION -D__NORMAL
-TESTFILE0 = \${DOUBLEFILE} \${FLOATFILE}
-CPLUSPLUS = icpc
+CPLUSPLUS = g++
 EOF
 elif ((i==2)) ;then
 cat >>Makefile<<EOF
@@ -32,7 +31,6 @@ EOF
 elif ((i==3)) ;then
 cat >>Makefile<<EOF
 HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
-TESTFILE0 = \${DOUBLEFILE} \${FLOATFILE}
 EOF
 fi
 cat >>Makefile<<EOF
@@ -51,9 +49,9 @@ if ((i==0)) ;then
 elif ((i==1)) ;then
     echo "Test for Serial Version with single precision:"
     ./pw_test.exe
-    echo "valgrind test:(1 processors)"
-    valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
+    # echo "valgrind test:(1 processors)"
+    # valgrind ./pw_test.exe >_tmp.txt 2>&1
+    # cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
 else
     if((i==2)) ;then
         echo "Test for MPI Version:"
@@ -64,35 +62,35 @@ else
     ./pw_test.exe
     sleep 1
     echo "3 processors:"
-    mpirun -np 3 ./pw_test.exe >_tmp.txt 2>&1
+    mpirun -np 3 ./pw_test.exe >_tmp.txt
     cat _tmp.txt|grep PASSED
     cat _tmp.txt|grep FAILED
     sleep 1
     echo "5 processors:"
-    mpirun -np 5 ./pw_test.exe >_tmp.txt 2>&1
+    mpirun -np 5 ./pw_test.exe >_tmp.txt
     cat _tmp.txt|grep PASSED
     cat _tmp.txt|grep FAILED
     sleep 1
     echo "8 processors:"
-    mpirun -np 8 ./pw_test.exe >_tmp.txt 2>&1
+    mpirun -np 8 ./pw_test.exe >_tmp.txt
     cat _tmp.txt|grep PASSED
     cat _tmp.txt|grep FAILED
 fi
 #for mix compile
-if ((i==3)) ;then
-    echo "valgrind test:(1 processors)"
-    valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
-    echo "valgrind test:(3 processors)"
-    mpirun -np 3 valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
-    echo "valgrind test:(5 processors)"
-    mpirun -np 5 valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
-    echo "valgrind test:(8 processors)"
-    mpirun -np 8 valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
-fi
+# if ((i==3)) ;then
+#     echo "valgrind test:(1 processors)"
+#     valgrind ./pw_test.exe >_tmp.txt 2>&1
+#     cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
+#     echo "valgrind test:(3 processors)"
+#     mpirun -np 3 valgrind ./pw_test.exe >_tmp.txt 2>&1
+#     cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
+#     echo "valgrind test:(5 processors)"
+#     mpirun -np 5 valgrind ./pw_test.exe >_tmp.txt 2>&1
+#     cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
+#     echo "valgrind test:(8 processors)"
+#     mpirun -np 8 valgrind ./pw_test.exe >_tmp.txt 2>&1
+#     cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
+# fi
 make clean > /dev/null 2>&1
 done
 mv Makefile.bak Makefile
