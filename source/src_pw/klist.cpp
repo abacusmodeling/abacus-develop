@@ -81,7 +81,7 @@ void K_Vectors::set(
 
     // (2)
     this->ibz_kpoint(symm, ModuleSymmetry::Symmetry::symm_flag);
-    if(ModuleSymmetry::Symmetry::symm_flag)
+    if(ModuleSymmetry::Symmetry::symm_flag || is_mp)
     {
         this->update_use_ibz();
         this->nks = this->nkstot = this->nkstot_ibz;
