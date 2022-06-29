@@ -101,6 +101,12 @@ void Gint::cal_gint(Gint_inout *inout)
 					this->gint_kernel_rho(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
 					delete[] vindex;
 				}
+				else if(inout->job == Gint_Tools::job_type::tau)
+				{
+					int* vindex = Gint_Tools::get_vindex(GlobalC::GridT.start_ind[grid_index], ncyz);
+					this->gint_kernel_tau(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
+					delete[] vindex;					
+				}
 				else if(inout->job == Gint_Tools::job_type::force)
 				{
 					double* vldr3 = Gint_Tools::get_vldr3(inout->vl, GlobalC::GridT.start_ind[grid_index], ncyz, dv);

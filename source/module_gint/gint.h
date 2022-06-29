@@ -130,6 +130,30 @@ class Gint
         double** psir_DMR,
         double* rho);
 
+    //------------------------------------------------------
+    // in gint_k_rho.cpp 
+    //------------------------------------------------------
+    // calculate the charge density via grid integrals
+    void gint_kernel_tau(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        int* vindex,
+        const int LD_pool,
+        Gint_inout *inout);
+
+    void cal_meshball_tau(
+        const int na_grid,
+        int* block_index,
+        int* vindex,
+        double** dpsix,
+        double** dpsiy,
+        double** dpsiz,
+        double** dpsix_dm,
+        double** dpsiy_dm,
+        double** dpsiz_dm,
+        double* rho);
+
     // dimension: [GlobalC::LNNR.nnrg] 
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.
     bool pvpR_alloc_flag = false;

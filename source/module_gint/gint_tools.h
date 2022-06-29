@@ -10,7 +10,8 @@
 
 namespace Gint_Tools
 {
-    enum class job_type{vlocal, rho, force};
+    enum class job_type{vlocal, rho, force, tau};
+	//Hamiltonian, electron density, force, kinetic energy density
 }
 
 //the class used to pass input/output variables

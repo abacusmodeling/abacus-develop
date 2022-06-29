@@ -73,6 +73,13 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     Gint_inout inout(this->loc->DM_R, this->charge, Gint_Tools::job_type::rho);
     this->uhm->GK.cal_gint(&inout);
 
+    if (XC_Functional::get_func_type() == 3)
+    {
+        ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[0], this->charge->nrxx);
+        Gint_inout inout1(this->loc->DM_R, this->charge, Gint_Tools::job_type::tau);
+        this->uhm->GK.cal_gint(&inout1);
+    }
+
     this->charge->renormalize_rho();
 
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
