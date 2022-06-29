@@ -159,6 +159,7 @@ ABACUS provides a wide variety of functionalities, with explanation and examples
 - [Electrostatic potential](docs/examples/potential.md)
 - [Mulliken charge](docs/examples/mulliken.md)
 - [Hybrid functional](docs/examples/hybrid.md)
+- [Electric field and dipole correction](docs/examples/electric_dipole.md)
 
 [back to top](#readme-top)
 

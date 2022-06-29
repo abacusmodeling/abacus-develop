@@ -74,7 +74,7 @@
 
     [deepks_out_labels](#out-descriptor) | [deepks_descriptor_lmax](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [deepks_model](#model-file)
 
-- [Electric field and dipole correction](#Electric-field-and-dipole-correction)
+- [Electric field and dipole correction](#electric-field-and-dipole-correction)
 
     [efield_flag](#efield_flag) | [dip_cor_flag](#dip_cor_flag) | [efield_dir](#efield_dir) | [efield_pos_max](#efield_pos_max) | [efield_pos_dec](#efield_pos_dec) | [efield_amp ](#efield_amp )
 
