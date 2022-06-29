@@ -423,6 +423,10 @@ void Input::Default(void)
     sigma_k = 0.6;
     nc_k = 0.00037;
 
+    //==========================================================
+    //    compensating charge        donghs added on 2022-06-23
+    //==========================================================
+    comp_chg = 0;
     comp_q = 0.0;
     comp_l = 1.0;
     comp_center = 0.0;
@@ -1513,6 +1517,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, nc_k);
         }
+        else if (strcmp("comp_chg", word) == 0)
+        {
+            read_value(ifs, comp_chg);
+        }
         else if (strcmp("comp_q", word) == 0)
         {
             read_value(ifs, comp_q);
@@ -2200,6 +2208,12 @@ void Input::Bcast()
     Parallel_Common::bcast_double(tau);
     Parallel_Common::bcast_double(sigma_k);
     Parallel_Common::bcast_double(nc_k);
+
+    Parallel_Common::bcast_bool(comp_chg);
+    Parallel_Common::bcast_double(comp_q);
+    Parallel_Common::bcast_double(comp_l);
+    Parallel_Common::bcast_double(comp_center);
+    Parallel_Common::bcast_int(comp_dim);
 
     return;
 }

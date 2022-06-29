@@ -187,22 +187,34 @@ void MSST::write_restart()
 
 void MSST::restart()
 {
+    bool ok = true;
+
     if(!GlobalV::MY_RANK)
     {
-		std::stringstream ssc;
-		ssc << GlobalV::global_out_dir << "Restart_md.dat";
-		std::ifstream file(ssc.str().c_str());
+        std::stringstream ssc;
+        ssc << GlobalV::global_readin_dir << "Restart_md.dat";
+        std::ifstream file(ssc.str().c_str());
 
         if(!file)
-		{
-			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
-            ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
-		}
+        {
+            ok = false;
+        }
 
-		file >> step_rst_ >> omega[mdp.msst_direction] >> e0 >> v0 >> p0 >> lag_pos;
+        if(ok)
+        {
+            file >> step_rst_ >> omega[mdp.msst_direction] >> e0 >> v0 >> p0 >> lag_pos;
+            file.close();
+        }
+    }
 
-		file.close();
-	}
+#ifdef __MPI
+    MPI_Bcast(&ok, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
+
+    if(!ok)
+    {
+        ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat !");
+    }
 
 #ifdef __MPI
 	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);

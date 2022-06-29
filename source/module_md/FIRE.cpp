@@ -118,25 +118,37 @@ void FIRE::write_restart()
 
 void FIRE::restart()
 {
+    bool ok = true;
+
     if(!GlobalV::MY_RANK)
     {
-		std::stringstream ssc;
-		ssc << GlobalV::global_out_dir << "Restart_md.dat";
-		std::ifstream file(ssc.str().c_str());
+        std::stringstream ssc;
+        ssc << GlobalV::global_readin_dir << "Restart_md.dat";
+        std::ifstream file(ssc.str().c_str());
 
         if(!file)
-		{
-			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
-            ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat ！");
-		}
+        {
+            ok = false;
+        }
 
-		file >> step_rst_ >> alpha >> negative_count >> dt_max >> mdp.md_dt;
-
-		file.close();
-	}
+        if(ok)
+        {
+            file >> step_rst_ >> alpha >> negative_count >> dt_max >> mdp.md_dt;
+            file.close();
+        }
+    }
 
 #ifdef __MPI
-	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&ok, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
+
+    if(!ok)
+    {
+        ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat !");
+    }
+
+#ifdef __MPI
+    MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&alpha, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&negative_count, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&dt_max, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
