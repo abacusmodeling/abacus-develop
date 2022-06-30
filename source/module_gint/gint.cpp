@@ -159,11 +159,11 @@ void Gint::cal_gint(Gint_inout *inout)
 					#else
 						if(GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
 						{
-							this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, vkdr3, LD_pool, pvpR_grid);
+							this->gint_kernel_vlocal_meta(na_grid, grid_index, delta_r, vldr3, vkdr3, LD_pool, pvpR_grid);
 						}
 						if(!GlobalV::GAMMA_ONLY_LOCAL)
 						{
-							this->gint_kernel_vlocal(na_grid, grid_index, delta_r, vldr3, vkdr3, LD_pool,
+							this->gint_kernel_vlocal_meta(na_grid, grid_index, delta_r, vldr3, vkdr3, LD_pool,
 								this->pvpR_reduced[inout->ispin]);
 						}
 					#endif

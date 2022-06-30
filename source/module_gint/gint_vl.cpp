@@ -81,13 +81,13 @@ void Gint::gint_kernel_vlocal_meta(
 	int * block_iw, * block_index, * block_size;
 	bool** cal_flag;
 	Gint_Tools::get_block_info(na_grid, grid_index, block_iw, block_index, block_size, cal_flag);
-GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
+
     //evaluate psi and dpsi on grids
 	Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
 	Gint_Tools::Array_Pool<double> dpsir_ylm_x(GlobalC::bigpw->bxyz, LD_pool);
 	Gint_Tools::Array_Pool<double> dpsir_ylm_y(GlobalC::bigpw->bxyz, LD_pool);
 	Gint_Tools::Array_Pool<double> dpsir_ylm_z(GlobalC::bigpw->bxyz, LD_pool);
-GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
+
 	Gint_Tools::cal_dpsir_ylm(
 		na_grid, grid_index, delta_r,
 		block_index, block_size, 
@@ -101,20 +101,16 @@ GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
 	//calculating f_mu(r) = v(r)*psi_mu(r)*dv
 	const Gint_Tools::Array_Pool<double> psir_vlbr3 = Gint_Tools::get_psir_vlbr3(
 			na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
-GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
-	//calculating df_mu(r) = 1/2 vofk(r) * dpsi_mu(r) * dv
-	for(int ib=0;ib<GlobalC::bigpw->bxyz;ib++)
-	{
-		vkdr3[ib] = vkdr3[ib] / 2.0;
-	}
-GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
+
+	//calculating df_mu(r) = vofk(r) * dpsi_mu(r) * dv
+
 	const Gint_Tools::Array_Pool<double> dpsix_vlbr3 = Gint_Tools::get_psir_vlbr3(
 			na_grid, LD_pool, block_index, cal_flag, vkdr3, dpsir_ylm_x.ptr_2D);
 	const Gint_Tools::Array_Pool<double> dpsiy_vlbr3 = Gint_Tools::get_psir_vlbr3(
 			na_grid, LD_pool, block_index, cal_flag, vkdr3, dpsir_ylm_y.ptr_2D);	
 	const Gint_Tools::Array_Pool<double> dpsiz_vlbr3 = Gint_Tools::get_psir_vlbr3(
 			na_grid, LD_pool, block_index, cal_flag, vkdr3, dpsir_ylm_z.ptr_2D);
-GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
+
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
 		this->cal_meshball_vlocal_gamma(
@@ -135,7 +131,6 @@ GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
         this->cal_meshball_vlocal_k(
             na_grid, LD_pool, grid_index, block_size, block_index, block_iw, cal_flag,
             psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, pvpR_in);
-GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
 		this->cal_meshball_vlocal_k(
             na_grid, LD_pool, grid_index, block_size, block_index, block_iw, cal_flag,
 			dpsir_ylm_x.ptr_2D, dpsix_vlbr3.ptr_2D, pvpR_in);
@@ -146,7 +141,7 @@ GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
             na_grid, LD_pool, grid_index, block_size, block_index, block_iw, cal_flag,
 			dpsir_ylm_z.ptr_2D, dpsiz_vlbr3.ptr_2D, pvpR_in);
     }
-GlobalV::ofs_running << __FILE__ << " " << __LINE__ << std::endl;
+
     //release memories
 	delete[] block_iw;
 	delete[] block_index;
