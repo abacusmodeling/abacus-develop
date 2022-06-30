@@ -71,6 +71,15 @@ class Gint
         double** psir_vlbr3,
         double* pvpR);
 
+    void gint_kernel_vlocal_meta(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        double* vkdr3,
+        const int LD_pool,
+        double* pvpR_reduced);
+
     //------------------------------------------------------
     // in gint_fvl.cpp 
     //------------------------------------------------------
