@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git g++ gfortran libssl-dev make cmake vim wget bc unzip python3-numpy\
+RUN apt-get update && apt-get install -y --no-install-recommends libopenblas-dev liblapack-dev libscalapack-mpi-dev git g++ gfortran libssl-dev make cmake vim wget bc unzip python3-numpy\
     && apt-get install -y --no-install-recommends mpich libmpich-dev
 
 ENV GIT_SSL_NO_VERIFY=1 TERM=xterm-256color
@@ -9,16 +9,6 @@ RUN cd /tmp \
     && git clone https://github.com/USCiLab/cereal.git \
     && cp -r cereal/include /usr/local \
     && rm -rf cereal
-
-RUN cd /tmp \
-    && git clone https://github.com/xianyi/OpenBLAS.git --single-branch --depth=1 \
-    && cd OpenBLAS && make USE_OPENMP=1 NO_AVX512=1 FC=gfortran -j8 && make PREFIX=/usr/local install \
-    && cd /tmp && rm -rf OpenBLAS
-
-RUN cd /tmp \
-    && git clone https://github.com/darelbeida/scalapack.git -b v2.0.2-openblas --single-branch --depth=1 \
-    && cd scalapack && make lib && cp libscalapack.a /usr/local/lib/ \
-    && cd /tmp && rm -rf scalapack
 
 RUN cd /tmp \
     && wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2021.05.002/elpa-2021.05.002.tar.gz --no-check-certificate --quiet \
