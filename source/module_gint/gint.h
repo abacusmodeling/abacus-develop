@@ -48,6 +48,15 @@ class Gint
         const int LD_pool,
         double* pvpR_reduced);
 
+    void gint_kernel_vlocal_meta(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        double* vkdr3,
+        const int LD_pool,
+        double* pvpR_reduced);
+
 	void cal_meshball_vlocal_gamma(
 		const int na_grid,  						// how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -70,15 +79,6 @@ class Gint
         double** psir_ylm,
         double** psir_vlbr3,
         double* pvpR);
-
-    void gint_kernel_vlocal_meta(
-        const int na_grid,
-        const int grid_index,
-        const double delta_r,
-        double* vldr3,
-        double* vkdr3,
-        const int LD_pool,
-        double* pvpR_reduced);
 
     //------------------------------------------------------
     // in gint_fvl.cpp 

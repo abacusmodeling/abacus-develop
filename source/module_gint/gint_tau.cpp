@@ -135,7 +135,7 @@ void Gint::cal_meshball_tau(
 		double ry=ddot_(&block_index[na_grid], dpsiy[ib], &inc, dpsiy_dm[ib], &inc);
 		double rz=ddot_(&block_index[na_grid], dpsiz[ib], &inc, dpsiz_dm[ib], &inc);
 		const int grid = vindex[ib];
-		rho[ grid ] += (rx + ry + rz) / 2.0;
+		rho[ grid ] += rx + ry + rz;
 	}
 }
 

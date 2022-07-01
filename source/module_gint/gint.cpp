@@ -168,11 +168,12 @@ void Gint::cal_gint(Gint_inout *inout)
 						}
 					#endif
 					delete[] vldr3;
+					delete[] vkdr3;
 				}				
 			} // int grid_index
 
 #ifdef _OPENMP
-			if(inout->job==Gint_Tools::job_type::vlocal)
+			if(inout->job==Gint_Tools::job_type::vlocal || inout->job==Gint_Tools::job_type::vlocal_meta)
 			{
                 if(GlobalV::GAMMA_ONLY_LOCAL && lgd>0)
                 {
