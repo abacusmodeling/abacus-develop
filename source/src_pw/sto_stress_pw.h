@@ -13,11 +13,11 @@ class Sto_Stress_PW:public Stress_Func
 	~Sto_Stress_PW (){};
 
 	//calculate the stress in PW basis
-	void cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stowf);
+	void cal_stress(ModuleBase::matrix& sigmatot,const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
 
 	private :
-	void sto_stress_kin(ModuleBase::matrix&, Stochastic_WF& stowf);
-	void sto_stress_nl(ModuleBase::matrix&, Stochastic_WF& stowf);
+	void sto_stress_kin(ModuleBase::matrix&, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
+	void sto_stress_nl(ModuleBase::matrix&, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf);
 	
 
 

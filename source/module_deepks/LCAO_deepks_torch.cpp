@@ -228,6 +228,77 @@ void LCAO_Deepks::check_gvx(const int nat)
     }
 }
 
+//calculates stress of descriptors from gradient of projected density matrices
+void LCAO_Deepks::cal_gvepsl(const int nat)
+{
+    ModuleBase::TITLE("LCAO_Deepks","cal_gvepsl");
+    //preconditions
+    this->cal_gvdm(nat);
+    if(!gdmepsl_vector.empty())
+    {
+        gdmepsl_vector.erase(gdmepsl_vector.begin(),gdmepsl_vector.end());
+    }
+
+    //gdmr_vector : nat(derivative) * 3 * inl(projector) * nm * nm
+    if(GlobalV::MY_RANK==0)
+    {
+        //make gdmx as tensor
+        int nlmax = this->inlmax/nat;
+        for (int nl=0;nl<nlmax;++nl)
+        {
+            std::vector<torch::Tensor> bmmv;
+            //for (int ipol=0;ipol<6;++ipol)
+            //{
+            //    std::vector<torch::Tensor> xmmv;
+                for (int i=0;i<6;++i)
+                {
+                    std::vector<torch::Tensor> ammv;
+                    for (int iat=0; iat<nat; ++iat)
+                    {
+                        int inl = iat*nlmax + nl;
+                        int nm = 2*this->inl_l[inl]+1;
+                        std::vector<double> mmv;
+                        for (int m1=0;m1<nm;++m1)
+                        {
+                            for(int m2=0;m2<nm;++m2)
+                            {
+                                 mmv.push_back(this->gdm_epsl[i][inl][m1*nm+m2]);
+                            }
+                        }//nm^2
+                        torch::Tensor mm = torch::tensor(mmv, torch::TensorOptions().dtype(torch::kFloat64) ).reshape({nm, nm});    //nm*nm
+                        ammv.push_back(mm);
+                    }
+                    torch::Tensor bmm = torch::stack(ammv, 0);  //nat*nm*nm
+                    bmmv.push_back(bmm);
+                }
+                //torch::Tensor bmm = torch::stack(xmmv, 0);  //3*nat*nm*nm
+                //bmmv.push_back(bmm); 
+            //}
+            this->gdmepsl_vector.push_back(torch::stack(bmmv, 0)); //nbt*3*nat*nm*nm
+        }
+        assert(this->gdmepsl_vector.size()==nlmax);
+
+        //einsum for each inl: 
+        //gdmepsl_vector : b:npol * a:inl(projector) * m:nm * n:nm
+        //gevdm_vector : a:inl * v:nm (descriptor) * m:nm (pdm, dim1) * n:nm (pdm, dim2)
+        //gvepsl_vector : b:npol * a:inl(projector) * m:nm(descriptor)
+        std::vector<torch::Tensor> gvepsl_vector;
+        for (int nl = 0;nl<nlmax;++nl)
+        {
+            gvepsl_vector.push_back(at::einsum("bamn, avmn->bav", {this->gdmepsl_vector[nl], this->gevdm_vector[nl]}));
+        }
+        
+        // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
+        // concatenate index a(inl) and m(nm)
+        this->gvepsl_tensor = torch::cat(gvepsl_vector, -1);
+        assert(this->gvepsl_tensor.size(0) == 6);
+        assert(this->gvepsl_tensor.size(1) == nat);
+        assert(this->gvepsl_tensor.size(2) == this->des_per_atom);
+    }
+
+    return;
+}
+
 //dDescriptor / dprojected density matrix
 void LCAO_Deepks::cal_gvdm(const int nat)
 {

@@ -1,6 +1,5 @@
 #include "esolver_ks.h"
 #include <iostream>
-#include <algorithm>
 #include "time.h"
 #include "../src_io/print_info.h"
 #ifdef __MPI
@@ -21,7 +20,6 @@ namespace ModuleESolver
     {
         classname = "ESolver_KS";
         basisname = "PLEASE ADD BASISNAME FOR CURRENT ESOLVER.";
-        diag_ethr = GlobalV::PW_DIAG_THR;
         scf_thr = GlobalV::SCF_THR;
         drho = 0.0;
         maxniter = GlobalV::SCF_NMAX;
@@ -79,8 +77,8 @@ namespace ModuleESolver
         Print_Info::setup_parameters(ucell, GlobalC::kv);
 
         //new plane wave basis
-        this->pw_wfc->initgrids(ucell.lat0, ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
-                                GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL);
+        this->pw_wfc->initmpi(GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL, POOL_WORLD);
+        this->pw_wfc->initgrids(ucell.lat0, ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
         this->pw_wfc->initparameters(false, inp.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
 #ifdef __MPI
         if(INPUT.pw_seed > 0)    MPI_Allreduce(MPI_IN_PLACE, &this->pw_wfc->ggecut, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
@@ -131,8 +129,15 @@ namespace ModuleESolver
 	    ofs << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 	    ofs << "\n\n\n\n";
         ofs << "\n SETUP PLANE WAVES FOR WAVE FUNCTIONS" << std::endl;
-        ModuleBase::GlobalFunc::OUT(ofs,"energy cutoff for wavefunc (unit:Ry)",INPUT.ecutwfc);
-        ModuleBase::GlobalFunc::OUT(ofs,"fft grid for wave functions", this->pw_rho->nx,this->pw_rho->ny,this->pw_rho->nz);
+        double ecut = INPUT.ecutwfc;
+        if(abs(ecut-this->pw_wfc->gk_ecut * this->pw_wfc->tpiba2) > 1e-6)
+        {
+            ecut = this->pw_wfc->gk_ecut * this->pw_wfc->tpiba2;
+            ofs<<"Energy cutoff for wavefunc is incompatible with nx, ny, nz and it will be reduced!"<<std::endl;
+
+        }  
+        ModuleBase::GlobalFunc::OUT(ofs,"energy cutoff for wavefunc (unit:Ry)", ecut);
+        ModuleBase::GlobalFunc::OUT(ofs,"fft grid for wave functions", this->pw_wfc->nx,this->pw_wfc->ny,this->pw_wfc->nz);
         ModuleBase::GlobalFunc::OUT(ofs,"number of plane waves",this->pw_wfc->npwtot);
 	    ModuleBase::GlobalFunc::OUT(ofs,"number of sticks", this->pw_wfc->nstot);
 
@@ -173,9 +178,9 @@ namespace ModuleESolver
 #else
                 auto iterstart = std::chrono::system_clock::now();
 #endif
-                set_ethr(istep, iter);
+                double diag_ethr = this->phsol->set_diagethr(istep, iter, drho);
                 eachiterinit(istep, iter);
-                this->hamilt2density(istep, iter, this->diag_ethr);
+                this->hamilt2density(istep, iter, diag_ethr);
                 
                 //<Temporary> It may be changed when more clever parallel algorithm is put forward.
                 //When parallel algorithm for bands are adopted. Density will only be treated in the first group.
@@ -191,14 +196,14 @@ namespace ModuleESolver
                 if (firstscf)
                 {
                     firstscf = false;
-                    hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
+                    hsolver_error = this->phsol->cal_hsolerror();
                     // The error of HSolver is larger than drho, so a more precise HSolver should be excuconv_elected.
                     if (hsolver_error > drho)
                     {
-                        reset_diagethr(GlobalV::ofs_running, hsolver_error);
-                        this->hamilt2density(istep, iter, this->diag_ethr);
+                        diag_ethr = this->phsol->reset_diagethr(GlobalV::ofs_running, hsolver_error, drho);
+                        this->hamilt2density(istep, iter, diag_ethr);
                         drho = GlobalC::CHR.get_drho();
-                        hsolver_error = this->diag_ethr * std::max(1.0, GlobalC::CHR.nelec);
+                        hsolver_error = this->phsol->cal_hsolerror();
                     }
                 }
 
@@ -247,55 +252,6 @@ namespace ModuleESolver
         return;
     };
 
-    //<Temporary> It should be a function of Diag_H class in the future.
-    void ESolver_KS::set_ethr(const int istep, const int iter)
-    {
-        //It is too complex now and should be modified.
-        if (iter == 1)
-        {
-            if (abs(this->diag_ethr - 1.0e-2) < 1.0e-10)
-            {
-                if (GlobalC::pot.init_chg == "file")
-                {
-                    //======================================================
-                    // if you think that the starting potential is good
-                    // do not spoil it with a louly first diagonalization:
-                    // set a strict this->diag_ethr in the input file ()diago_the_init
-                    //======================================================
-                    this->diag_ethr = 1.0e-5;
-                }
-                else
-                {
-                    //=======================================================
-                    // starting atomic potential is probably far from scf
-                    // don't waste iterations in the first diagonalization
-                    //=======================================================
-                    this->diag_ethr = 1.0e-2;
-                }
-            }
-            if (GlobalV::FINAL_SCF) this->diag_ethr = 1.0e-2;
-
-            if (GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
-            {
-                this->diag_ethr = std::max(this->diag_ethr, INPUT.pw_diag_thr);
-            }
-
-        }
-        else
-        {
-            if (iter == 2)
-            {
-                this->diag_ethr = 1.e-2;
-            }
-            this->diag_ethr = std::min(this->diag_ethr, 0.1 * this->drho / std::max(1.0, GlobalC::CHR.nelec));
-
-        }
-        if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw"|| GlobalV::CALCULATION.substr(0,3)=="sto")
-        {
-            this->diag_ethr = 0.0;
-        }
-    }
-
     void ESolver_KS::printhead()
     {
         std::cout << " " << std::setw(7) << "ITER";
@@ -323,16 +279,6 @@ namespace ModuleESolver
             << " ALGORITHM --------------- ION=" << std::setw(4) << istep + 1
             << "  ELEC=" << std::setw(4) << iter
             << "--------------------------------\n";
-    }
-
-    void ESolver_KS::reset_diagethr(std::ofstream& ofs_running, const double hsover_error)
-    {
-        ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
-        ModuleBase::WARNING("scf", "Threshold on eigenvalues was too large.");
-        ofs_running << " hsover_error=" << hsover_error << " > DRHO=" << drho << std::endl;
-        ofs_running << " Origin diag_ethr = " << this->diag_ethr << std::endl;
-        this->diag_ethr = 0.1 * drho / GlobalC::CHR.nelec;
-        ofs_running << " New    diag_ethr = " << this->diag_ethr << std::endl;
     }
 
     int ESolver_KS::getniter()

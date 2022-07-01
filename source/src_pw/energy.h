@@ -51,6 +51,8 @@ class energy
     double deband;         // correction for variational energy
 	double deband_harris;
     double descf;
+	double esol_el;		   //correction for implicit solvation energy
+	double esol_cav;		   //correction for implicit solvation energy
 
     double etxcc;          // the nlcc exchange and correlation
 	double etxc;

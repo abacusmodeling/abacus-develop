@@ -24,7 +24,6 @@ EOF
 elif ((i==1)) ;then
 cat >>Makefile<<EOF
 HONG = -D__MIX_PRECISION -D__NORMAL
-TESTFILE0 = \${DOUBLEFILE} \${FLOATFILE}
 CPLUSPLUS = icpc
 GTESTOPTS = $GTESTOPTS
 EOF
@@ -36,7 +35,6 @@ EOF
 elif ((i==3)) ;then
 cat >>Makefile<<EOF
 HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
-TESTFILE0 = \${DOUBLEFILE} \${FLOATFILE}
 GTESTOPTS = $GTESTOPTS
 EOF
 fi

@@ -1,9 +1,6 @@
 #include "pw_basis.h"
 #include "../module_base/mymath.h"
-#include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
-// #include "iostream"
-#include "../module_base/timer.h"
 
 
 namespace ModulePW
@@ -24,14 +21,13 @@ namespace ModulePW
 ///
 void PW_Basis::distribution_method2()
 {
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method2");
 
     // initial the variables needed by all proc.
     int *st_bottom2D = new int[fftnxy];             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = new int[fftnxy];             // st_length2D[ixy], number of planewaves in stick on (x, y).
-    if(this->nst_per!=nullptr) delete[] this->nst_per; this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
-    if(this->npw_per != nullptr) delete[] this->npw_per;   this->npw_per = new int[this->poolnproc];  // number of planewaves on each core.
-    if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains the stick on (x, y).
+    delete[] this->nst_per; this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
+    delete[] this->npw_per;   this->npw_per = new int[this->poolnproc];  // number of planewaves on each core.
+    delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains the stick on (x, y).
     for (int ixy = 0; ixy < this->fftnxy; ++ixy)
         this->fftixy2ip[ixy] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
     if (poolrank == 0)
@@ -45,12 +41,14 @@ void PW_Basis::distribution_method2()
         this->count_pw_st(st_length2D, st_bottom2D);
     }
 #ifdef __MPI
-    MPI_Bcast(&this->npwtot, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&liy, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&riy, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&this->npwtot, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&this->nstot, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&liy, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&riy, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&lix, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&rix, 1, MPI_INT, 0, this->pool_world);
 #endif
-    if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
+    delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
 
     if(poolrank == 0)
     {
@@ -85,12 +83,12 @@ void PW_Basis::distribution_method2()
 #endif
     }
 #ifdef __MPI
-    MPI_Bcast(st_length2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(st_bottom2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->fftixy2ip, this->fftnxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
-    MPI_Bcast(this->npw_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
+    MPI_Bcast(st_length2D, this->fftnxy, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(st_bottom2D, this->fftnxy, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(this->fftixy2ip, this->fftnxy, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , this->pool_world);
+    MPI_Bcast(this->npw_per, this->poolnproc, MPI_INT, 0 , this->pool_world);
 #endif
     this->npw = this->npw_per[this->poolrank];
     this->nst = this->nst_per[this->poolrank];
@@ -99,9 +97,8 @@ void PW_Basis::distribution_method2()
     // (5) Construct ig2isz and is2fftixy. 
     this->get_ig2isz_is2fftixy(st_bottom2D, st_length2D);
 
-    if (st_bottom2D != nullptr) delete[] st_bottom2D;
-    if (st_length2D != nullptr) delete[] st_length2D;
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method2");
+    delete[] st_bottom2D;
+    delete[] st_length2D;
     return;
 }
 

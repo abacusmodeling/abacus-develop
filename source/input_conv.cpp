@@ -52,6 +52,7 @@ void Input_Conv::Convert(void)
     GlobalV::global_pseudo_type = INPUT.pseudo_type;
     GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
 
+    GlobalV::KSPACING = INPUT.kspacing;
     GlobalV::NBANDS = INPUT.nbands;
     GlobalC::wf.pw_seed = INPUT.pw_seed;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
@@ -493,6 +494,10 @@ void Input_Conv::Convert(void)
     GlobalV::sigma_k = INPUT.sigma_k;
     GlobalV::nc_k = INPUT.nc_k;
 
+    //-----------------------------------------------
+    // compensating charge
+    //-----------------------------------------------
+    GlobalV::comp_chg = INPUT.comp_chg;
     GlobalC::solvent_model.comp_q = INPUT.comp_q;
     GlobalC::solvent_model.comp_l = INPUT.comp_l;
     GlobalC::solvent_model.comp_center = INPUT.comp_center;

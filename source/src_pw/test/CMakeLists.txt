@@ -20,7 +20,7 @@ install(FILES data-H DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 #AddTest(
 #  TARGET hsolver_sum_band
 #  LIBS ${math_libs} base_serial planewave_serial  
-#  SOURCES sum_band_test.cpp ../charge.cpp ../../src_parallel/parallel_reduce.cpp ../../src_parallel/ft.cpp ../pw_basis_old.cpp ../pw_complement.cpp ../klist.cpp ../../src_parallel/parallel_kpoints.cpp 
+#  SOURCES sum_band_test.cpp ../charge.cpp ../../src_parallel/parallel_reduce.cpp ../pw_basis_old.cpp ../pw_complement.cpp ../klist.cpp ../../src_parallel/parallel_kpoints.cpp 
 #)
 
 #install(FILES STRU DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

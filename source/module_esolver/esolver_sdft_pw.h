@@ -25,8 +25,6 @@ protected:
     virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
     virtual void eachiterfinish(const int iter) override; 
     virtual void afterscf() override;
-private:
-    void c_bands_k(const int ik, double* h_diag, const int istep, const int iter);
 
 };
 

@@ -41,6 +41,7 @@ has_wfc_pw=`grep out_wfc_pw INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 out_dm=`grep out_dm INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 out_mul=`grep out_mul INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 gamma_only=`grep gamma_only INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+imp_sol=`grep imp_sol INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 if [ $base == "pw" ]; then word="plane_wave_line" 
@@ -277,6 +278,13 @@ if [ $calculation == "istate" ]; then
 			echo "$cube $total_chg" >>$1
 		done
 	fi
+fi
+
+if ! test -z "$imp_sol" && [ $imp_sol -eq 1 ]; then
+	esol_el=`grep E_sol_el $running_path | awk '{print $3}'`
+	esol_cav=`grep E_sol_cav $running_path | awk '{print $3}'`
+	echo "esolelref $esol_el" >>$1
+	echo "esolcavref $esol_cav" >>$1
 fi
 
 #echo $total_band
