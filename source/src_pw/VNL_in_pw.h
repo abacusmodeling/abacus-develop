@@ -80,6 +80,7 @@ public:
 	ModuleBase::realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
 
 	ModuleBase::realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
+	bool multi_proj = false;
 #ifdef __CUDA
 	double *d_deeq;
 #endif
