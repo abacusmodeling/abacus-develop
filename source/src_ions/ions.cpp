@@ -28,7 +28,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 	if(GlobalV::CAL_FORCE)
 	{
 		IMM.allocate();
-		CE.allocate_ions();
+		// CE.allocate_ions();
 	}
 
 	if(GlobalV::CAL_STRESS)                    // pengfei Li 2018-05-14
