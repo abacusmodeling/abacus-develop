@@ -31,7 +31,6 @@ class Band:
                 self.energy.append(e)
         else:
             self.k_index, self.energy = self.read(self.bandfile)
-        self.energy = np.asarray(self.energy)
         self.kptfile = kptfile
         self.kpt = None
         if self.kptfile:
@@ -210,9 +209,9 @@ class Band:
         """
 
         bandplot = BandPlot(fig, ax, **kwargs)
-        nums = len(self.bandfile)
 
         if isinstance(self.bandfile, list):
+            nums = len(self.bandfile)
             if not efermi:
                 efermi = [0.0 for i in range(nums)]
             if not kwargs.pop('label', None):
