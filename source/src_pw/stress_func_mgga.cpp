@@ -76,18 +76,6 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 		}//band loop
 		delete[] psi;
 	}//k loop
-#ifdef __MPI
-	for(int l = 0;l<GlobalC::wfcpw->nrxx;l++)
-	{
-		for(int m = 0;m<6;m++)
-		{
-			for(int k = 0; k < GlobalV::NSPIN; k++)
-			{
-				Parallel_Reduce::reduce_double_pool( crosstaus[l][m][k] );
-			}
-		}
-	}
-#endif
 
 	for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++)
 	{
