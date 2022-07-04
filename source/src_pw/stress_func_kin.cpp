@@ -4,7 +4,6 @@
 //calculate the kinetic stress in PW base
 void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in)
 {
-	double *kfac;
 	double **gk;
 	gk=new double* [3];
 	int npw;
@@ -23,14 +22,9 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<d
 		if(npwx<GlobalC::kv.ngk[ik])npwx=GlobalC::kv.ngk[ik];
 	}
 		
-	kfac=new double[npwx];
 	gk[0]= new double[npwx]; 
 	gk[1]= new double[npwx];
 	gk[2]= new double[npwx];
-	for(int i=0;i<npwx;i++)
-	{
-		kfac[i]=1;
-	}
 	double factor=ModuleBase::TWO_PI/GlobalC::ucell.lat0;
 
 	for(int ik=0;ik<GlobalC::kv.nks;ik++)
@@ -63,7 +57,7 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<d
 					for(int i=0;i<npw;i++)
 					{
 						s_kin[l][m] +=
-							GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+							GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]
 							*(double((conj(ppsi[i]) * ppsi[i]).real()));
 					}
 				}
@@ -114,10 +108,7 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<d
 	{
 		for(int m=0;m<3;m++)
 		{
-			if(GlobalV::CALCULATION.substr(0,3)=="sto")
-				MPI_Allreduce(MPI_IN_PLACE , &s_kin[l][m] , 1, MPI_DOUBLE , MPI_SUM , STO_WORLD);
-			else
-				Parallel_Reduce::reduce_double_all( s_kin[l][m] ); //qianrui fix a bug for kpar > 1
+			Parallel_Reduce::reduce_double_all( s_kin[l][m] ); //qianrui fix a bug for kpar > 1
 		}
 	}
 
@@ -135,7 +126,6 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<d
 		GlobalC::symm.stress_symmetry(sigma, GlobalC::ucell);
 	}//end symmetry
 	
-	delete[] kfac;
 	delete[] gk[0];
 	delete[] gk[1];
 	delete[] gk[2];

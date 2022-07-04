@@ -24,6 +24,7 @@ class Stochastic_WF
 	ModuleBase::ComplexMatrix* shchi;     // sqrt(f(H))|chi>
 	int nchi; 				// Total number of stochatic obitals
 	int *nchip; 				// The number of stochatic obitals in current process of each k point.
+	int nks;           //number of k-points
 
 	int nbands_diag; // number of bands obtained from diagonalization
 

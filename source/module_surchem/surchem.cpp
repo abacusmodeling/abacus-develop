@@ -13,6 +13,7 @@ surchem::surchem()
     Vcav = ModuleBase::matrix();
     Vel = ModuleBase::matrix();
     qs = 0;
+    comp_chg_energy = 0;
 }
 
 void surchem::allocate(const int &nrxx, const int &nspin)

@@ -69,6 +69,8 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "out_mul", GlobalV::out_mul, " mulliken  charge or not"); // qifeng add 2019/9/10
     ModuleBase::GlobalFunc::OUTP(ofs, "noncolin", noncolin, "using non-collinear-spin");
     ModuleBase::GlobalFunc::OUTP(ofs, "lspinorb", lspinorb, "consider the spin-orbit interaction");
+    ModuleBase::GlobalFunc::OUTP(ofs, "kpar", kpar, "devide all processors into kpar groups and k points will be distributed among each group");
+    ModuleBase::GlobalFunc::OUTP(ofs, "bndpar", bndpar, "devide all processors into bndpar groups and bands will be distributed among each group");
 
     ofs << "\n#Parameters (2.PW)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "ecutwfc", ecutwfc, "#energy cutoff for wave functions");
@@ -86,7 +88,7 @@ void Input::Print(const std::string &fn) const
                                  pw_diag_thr,
                                  "threshold for eigenvalues is cg electron iterations");
     ModuleBase::GlobalFunc::OUTP(ofs, "scf_thr", scf_thr, "charge density error");
-    ModuleBase::GlobalFunc::OUTP(ofs, "init_wfc", init_wfc, "start wave functions are from 'atomic' or 'file'");
+    ModuleBase::GlobalFunc::OUTP(ofs, "init_wfc", init_wfc, "start wave functions are from 'atomic', 'atomic+random', 'random' or 'file'");
     ModuleBase::GlobalFunc::OUTP(ofs, "init_chg", init_chg, "start charge is from 'atomic' or file");
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "chg_extrap",
@@ -109,8 +111,17 @@ void Input::Print(const std::string &fn) const
                                  "cell_factor",
                                  cell_factor,
                                  "used in the construction of the pseudopotential tables");
-
-    ofs << "\n#Parameters (3.Relaxation)" << std::endl;
+    
+    ofs << "\n#Parameters (3.Stochastic DFT)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs, "method_sto", method_sto, "1: slow and save memory, 2: fast and waste memory");
+    ModuleBase::GlobalFunc::OUTP(ofs, "nbands_sto", nbands_sto, "number of stochstic orbitals");
+    ModuleBase::GlobalFunc::OUTP(ofs, "nche_sto", nche_sto, "Chebyshev expansion orders");
+    ModuleBase::GlobalFunc::OUTP(ofs, "emin_sto", emin_sto, "trial energy to guess the lower bound of eigen energies of the Hamitonian operator");
+    ModuleBase::GlobalFunc::OUTP(ofs, "emax_sto", emax_sto, "trial energy to guess the upper bound of eigen energies of the Hamitonian operator");
+    ModuleBase::GlobalFunc::OUTP(ofs, "seed_sto", seed_sto, "the random seed to generate stochastic orbitals");
+    ModuleBase::GlobalFunc::OUTP(ofs, "initsto_freq", initsto_freq, "frequency to generate new stochastic orbitals when running md");
+    
+    ofs << "\n#Parameters (4.Relaxation)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "ks_solver",
                                  GlobalV::KS_SOLVER,
@@ -167,7 +178,7 @@ void Input::Print(const std::string &fn) const
                                  deepks_descriptor_ecut,
                                  "ecut used in generating descriptor");
 
-    ofs << "\n#Parameters (4.LCAO)" << std::endl;
+    ofs << "\n#Parameters (5.LCAO)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "basis_type", basis_type, "PW; LCAO in pw; LCAO");
     if (ks_solver == "HPSEPS" || ks_solver == "genelpa" || ks_solver == "scalapack_gvx" || ks_solver == "cusolver")
     {
@@ -187,20 +198,20 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "by", by, "division of an element grid in FFT grid along y");
     ModuleBase::GlobalFunc::OUTP(ofs, "bz", bz, "division of an element grid in FFT grid along z");
 
-    ofs << "\n#Parameters (5.Smearing)" << std::endl;
+    ofs << "\n#Parameters (6.Smearing)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "smearing_method",
                                  smearing_method,
                                  "type of smearing_method: gauss; fd; fixed; mp; mp2; mv");
     ModuleBase::GlobalFunc::OUTP(ofs, "smearing_sigma", smearing_sigma, "energy range for smearing");
 
-    ofs << "\n#Parameters (6.Charge Mixing)" << std::endl;
+    ofs << "\n#Parameters (7.Charge Mixing)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_type", mixing_mode, "plain; kerker; pulay; pulay-kerker; broyden");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_beta", mixing_beta, "mixing parameter: 0 means no new charge");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_ndim", mixing_ndim, "mixing dimension in pulay");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_gg0", mixing_gg0, "mixing parameter in kerker");
 
-    ofs << "\n#Parameters (7.DOS)" << std::endl;
+    ofs << "\n#Parameters (8.DOS)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_emin_ev", dos_emin_ev, "minimal range for dos");
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_emax_ev", dos_emax_ev, "maximal range for dos");
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_edelta_ev", dos_edelta_ev, "delta energy for dos");
@@ -333,6 +344,8 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "sigma_k", sigma_k, " the width of the diffuse cavity");
     ModuleBase::GlobalFunc::OUTP(ofs, "nc_k", nc_k, " the cut-off charge density");
 
+    ofs << "\n#Parameters (19.compensating_charge)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_chg", comp_chg, " add compensating charge");
     ModuleBase::GlobalFunc::OUTP(ofs, "comp_q", comp_q, " total charge of compensating charge");
     ModuleBase::GlobalFunc::OUTP(ofs, "comp_l", comp_l, " total length of compensating charge");
     ModuleBase::GlobalFunc::OUTP(ofs, "comp_center", comp_center, " center of compensating charge on dim");

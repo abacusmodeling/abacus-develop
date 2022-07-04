@@ -8,6 +8,7 @@ pseudo_dir      ../tools/PP_ORB/
 
 nbands			0
 nbands_sto		10
+initsto_freq    1
 
 nche_sto		120
 seed_sto        20000

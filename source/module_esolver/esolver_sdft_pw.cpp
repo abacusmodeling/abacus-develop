@@ -3,6 +3,10 @@
 #include <fstream>
 #include <algorithm>
 #include "../module_base/timer.h"
+#include "module_hsolver/hsolver_pw_sdft.h"
+#include "module_elecstate/elecstate_pw_sdft.h"
+#include "module_hsolver/diago_iter_assist.h"
+#include "module_hamilt/hamilt_pw.h"
 
 //-------------------Temporary------------------
 #include "../module_base/global_variable.h"
@@ -28,11 +32,13 @@ ESolver_SDFT_PW::~ESolver_SDFT_PW()
 {
 }
 
-void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
+void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 {
-    ESolver_KS_PW::Init(inp, cell);
+     ESolver_KS::Init(inp,ucell);
+    this->Init_GlobalC(inp,ucell);//temporary
+
 	stowf.init(GlobalC::kv.nks);
-	if(INPUT.nbands_sto != 0)	Init_Sto_Orbitals(this->stowf, INPUT.seed_sto);
+	if(INPUT.nbands_sto != 0)	Init_Sto_Orbitals(this->stowf, inp.seed_sto);
 	else						Init_Com_Orbitals(this->stowf, GlobalC::kv);
 	for (int ik =0 ; ik < GlobalC::kv.nks; ++ik)
     {
@@ -42,13 +48,14 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &cell)
             this->stowf.chiortho[ik].create(this->stowf.nchip[ik],GlobalC::wf.npwx,false);
         }
     }
-	stoiter.init(GlobalC::wf.npwx, this->stowf.nchip);
+    this->phsol = new hsolver::HSolverPW_SDFT(GlobalC::wfcpw, this->stowf, inp.method_sto);
+    this->pelec = new elecstate::ElecStatePW_SDFT( GlobalC::wfcpw, (Charge*)(&(GlobalC::CHR)), (K_Vectors*)(&(GlobalC::kv)), GlobalV::NBANDS);
 }
 
 void ESolver_SDFT_PW::beforescf(const int istep)
 {
     ESolver_KS_PW::beforescf(istep);
-	if(istep > 0 && INPUT.nbands_sto != 0) Update_Sto_Orbitals(this->stowf, INPUT.seed_sto);
+	if(istep > 0 && INPUT.nbands_sto != 0 && istep%INPUT.initsto_freq == 0) Update_Sto_Orbitals(this->stowf, INPUT.seed_sto);
 }
 
 void ESolver_SDFT_PW::eachiterfinish(int iter)
@@ -58,6 +65,14 @@ void ESolver_SDFT_PW::eachiterfinish(int iter)
 }
 void ESolver_SDFT_PW::afterscf()
 {
+    for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
+    {
+        for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
+        {
+            GlobalC::wf.ekb[ik][ib] = this->pelec->ekb(ik, ib);
+            GlobalC::wf.wg(ik, ib) = this->pelec->wg(ik, ib);
+        }
+    }
 	for(int is=0; is<GlobalV::NSPIN; is++)
     {
         std::stringstream ssc;
@@ -82,165 +97,30 @@ void ESolver_SDFT_PW::afterscf()
 
 void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 {
-    double *h_diag = new double[GlobalC::wf.npwx * GlobalV::NPOL];
-	GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< std::endl;
-	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
-	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
-	{
-		if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0)
-		{
-			this->c_bands_k(ik,h_diag,istep+1,iter);
-		}
-		else
-		{
-			GlobalC::hm.hpw.init_k(ik); 
-			//In fact, hm.hpw.init_k has been done in wf.wfcinit();
-		}
-		stoiter.stohchi.current_ik = ik;
-		
-#ifdef __MPI
-			if(GlobalV::NBANDS > 0)
-			{
-				MPI_Bcast(GlobalC::wf.evc[ik].c, GlobalC::wf.npwx*GlobalV::NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
-				MPI_Bcast(GlobalC::wf.ekb[ik], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
-			}
-#endif
-			stoiter.orthog(ik,this->stowf);
-			stoiter.checkemm(ik,iter,this->stowf);	//check and reset emax & emin
-		}
-
-		for (int ik = 0;ik < GlobalC::kv.nks;ik++)
-		{
-			//init k
-			if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
-			stoiter.stohchi.current_ik = ik;
-			stoiter.sumpolyval_k(ik, this->stowf);
-		}
-		delete [] h_diag;
-		GlobalC::en.eband  = 0.0;
-        GlobalC::en.demet  = 0.0;
-        GlobalC::en.ef     = 0.0;
-        GlobalC::en.ef_up  = 0.0;
-        GlobalC::en.ef_dw  = 0.0;
-		stoiter.itermu(iter);
-		//(5) calculate new charge density 
-		// calculate KS rho.
-		if(GlobalV::NBANDS > 0)
-		{
-			if(GlobalV::MY_STOGROUP == 0)
-			{
-				GlobalC::CHR.sum_band();
-			}
-			else
-			{
-				for(int is=0; is < GlobalV::NSPIN; is++)
-				{
-					ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
-				}
-			}
-			MPI_Bcast(&GlobalC::en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
-		}
-		else
-		{
-			for(int is=0; is < GlobalV::NSPIN; is++)
-			{
-				ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::rhopw->nrxx);
-			}
-		}
-	// calculate stochastic rho
-		stoiter.sum_stoband(this->stowf);
-		
-
-		//(6) calculate the delta_harris energy 
-		// according to new charge density.
-		// mohan add 2009-01-23
-		//en.calculate_harris(2);
-
-		if(GlobalV::MY_STOGROUP==0)
-		{
-			Symmetry_rho srho;
-			for(int is=0; is < GlobalV::NSPIN; is++)
-			{
-				srho.begin(is, GlobalC::CHR,GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
-			}
-		}
-		else
-		{
-			if(ModuleSymmetry::Symmetry::symm_flag)	MPI_Barrier(MPI_COMM_WORLD);
-		}
-
-		if(GlobalV::MY_STOGROUP == 0)
-		{
-        	GlobalC::en.deband = GlobalC::en.delta_e();
-		}
-
-}
-
-void ESolver_SDFT_PW:: c_bands_k(const int ik, double* h_diag, const int istep, const int iter)
-{
-	ModuleBase::timer::tick(this->classname,"c_bands_k");
-	int precondition_type = 2;
-	GlobalC::hm.hpw.init_k(ik);
-	
-    //===========================================
-    // Conjugate-Gradient diagonalization
-    // h_diag is the precondition matrix
-    // h_diag(1:npw) = MAX( 1.0, g2kin(1:npw) );
-    //===========================================
-    if (precondition_type==1)
+	// reset energy 
+    this->pelec->eband  = 0.0;
+    this->pelec->demet  = 0.0;
+    this->pelec->ef     = 0.0;
+    GlobalC::en.ef_up  = 0.0;
+    GlobalC::en.ef_dw  = 0.0;
+    // choose if psi should be diag in subspace
+    // be careful that istep start from 0 and iter start from 1
+    if(istep==0&&iter==1) 
     {
-        for (int ig = 0;ig < GlobalC::wf.npw; ++ig)
-		{
-			double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::wfcpw->tpiba2;
-			h_diag[ig] = std::max(1.0, g2kin);
-			if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
-		}
+        hsolver::DiagoIterAssist::need_subspace = false;
     }
-    else if (precondition_type==2)
+    else 
     {
-        for (int ig = 0;ig < GlobalC::wf.npw; ig++)
-		{
-			double g2kin = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::wfcpw->tpiba2;
-			h_diag[ig] = 1 + g2kin + sqrt( 1 + (g2kin - 1) * (g2kin - 1));
-			if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
-		}
-    }
-	//h_diag can't be zero!  //zhengdy-soc
-	if(GlobalV::NPOL==2)
-	{
-		for(int ig = GlobalC::wf.npw;ig < GlobalC::wf.npwx; ig++)
-		{
-			h_diag[ig] = 1.0;
-			h_diag[ig+ GlobalC::wf.npwx] = 1.0;
-		}
+        hsolver::DiagoIterAssist::need_subspace = true;
 	}
-	clock_t start=clock();
-
-	//============================================================
-	// diago the hamiltonian!!
-	// In plane wave method, firstly using cinitcgg to diagnolize,
-	// then using cg method.
-	//
-	// In localized orbital presented in plane wave case,
-	// only using cinitcgg.
-	//
-	// In linear scaling method, using sparse matrix and
-	// adjacent searching code and cg method to calculate the
-	// eigenstates.
-	//=============================================================
-	double avg_iter_k = 0.0;
-	GlobalC::hm.diagH_pw(istep, iter, ik, h_diag, avg_iter_k);
-
-	GlobalC::en.print_band(ik);
-	clock_t finish=clock();
-	const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
-	GlobalV::ofs_running << " " << setw(8) 
-		<< ik+1 << setw(15) 
-		<< avg_iter_k << setw(15) << duration << endl;
-
-	ModuleBase::timer::tick(this->classname,"c_bands_k");
+    hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
+    hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
+    this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, iter, GlobalV::KS_SOLVER);   
+    // transform energy for print
+    GlobalC::en.eband = this->pelec->eband;
+    GlobalC::en.demet = this->pelec->demet;
+    GlobalC::en.ef = this->pelec->ef; 
 }
-
 
 void ESolver_SDFT_PW::cal_Energy(energy &en)
 {
@@ -250,12 +130,12 @@ void ESolver_SDFT_PW::cal_Energy(energy &en)
 void ESolver_SDFT_PW::cal_Force(ModuleBase::matrix &force)
 {
 	Sto_Forces ff;
-    ff.init(force, this->stowf);
+    ff.init(force, this->psi, this->stowf);
 }
 void ESolver_SDFT_PW::cal_Stress(ModuleBase::matrix &stress)
 {
 	Sto_Stress_PW ss;
-    ss.cal_stress(stress, this->stowf);
+    ss.cal_stress(stress,this->psi, this->stowf);
 }
 
 

@@ -4,7 +4,7 @@
 #include "../module_base/timer.h"
 #include "global.h"
 
-void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stowf)
+void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf)
 {
 	ModuleBase::TITLE("Sto_Stress_PW","cal_stress");
 	ModuleBase::timer::tick("Sto_Stress_PW","cal_stress");    
@@ -13,17 +13,13 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
 	ModuleBase::matrix sigmaxc(3,3);
 	ModuleBase::matrix sigmahar(3,3);
 	ModuleBase::matrix sigmakin(3,3);
-	ModuleBase::matrix sto_sigmakin(3,3);
 	ModuleBase::matrix sigmaloc(3,3);
 	ModuleBase::matrix sigmanl(3,3);
-	ModuleBase::matrix sto_sigmanl(3,3);
 	ModuleBase::matrix sigmaewa(3,3);
 	ModuleBase::matrix sigmaxcc(3,3);
 
 	//kinetic contribution
-	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_kin(sigmakin);
-	sto_stress_kin(sto_sigmakin, stowf);
-	sigmakin = sigmakin + sto_sigmakin;
+	sto_stress_kin(sigmakin, psi_in, stowf);
 	
 	//hartree contribution
 	stress_har(sigmahar, GlobalC::rhopw, 1);
@@ -32,7 +28,7 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
     stress_ewa(sigmaewa, GlobalC::rhopw, 1);
 
     //xc contribution: add gradient corrections(non diagonal)
-    for(int i=0;i<3;i++)
+    for(int i=0;i<3;++i)
 	{
        sigmaxc(i,i) = - (GlobalC::en.etxc - GlobalC::en.vtxc) / GlobalC::ucell.omega;
     }
@@ -45,14 +41,12 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
     stress_cc(sigmaxcc, GlobalC::rhopw, 1);
    
     //nonlocal
-	if(GlobalV::NBANDS > 0 && GlobalV::MY_STOGROUP == 0) stress_nl(sigmanl);
-	sto_stress_nl(sto_sigmanl, stowf);
-	sigmanl = sigmanl + sto_sigmanl;
+	sto_stress_nl(sigmanl,psi_in, stowf);
 
 
-    for(int ipol=0;ipol<3;ipol++)
+    for(int ipol=0;ipol<3;++ipol)
 	{
-        for(int jpol=0;jpol<3;jpol++)
+        for(int jpol=0;jpol<3;++jpol)
 		{
 			sigmatot(ipol,jpol) = sigmakin(ipol,jpol) 
 								+ sigmahar(ipol,jpol) 
@@ -91,72 +85,61 @@ void Sto_Stress_PW::cal_stress(ModuleBase::matrix& sigmatot, Stochastic_WF& stow
     
 }
 
-void Sto_Stress_PW::sto_stress_kin(ModuleBase::matrix& sigma, Stochastic_WF& stowf)
+void Sto_Stress_PW::sto_stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf)
 {
 	ModuleBase::TITLE("Sto_Stress_PW","cal_stress");
 	ModuleBase::timer::tick("Sto_Stress_PW","cal_stress");
 	double **gk;
 	gk=new double* [3];
-	double tbsp,gk2,arg;
-	int ik,l,m,i,j,ibnd,is;
-	int npw;
-	double s_kin[3][3];
-	for(l=0;l<3;l++)
-	{
-		for(m=0;m<3;m++)
-		{
-			s_kin[l][m]=0.0;
-		}
-	}
+	ModuleBase::matrix s_kin(3,3,true);
+
 		
-	tbsp=2.0/sqrt(ModuleBase::PI);
-		
-	int npwx=0;
-	int qtot = 0;
-	for(int ik=0; ik<GlobalC::kv.nks; ik++)
-	{
-		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
-		{
-			qtot += GlobalC::kv.ngk[ik];
-		}
-		if(npwx<GlobalC::kv.ngk[ik]) npwx=GlobalC::kv.ngk[ik];
-	}	
+	int npwx = GlobalC::wf.npwx;
 	gk[0]= new double[npwx]; 
 	gk[1]= new double[npwx];
 	gk[2]= new double[npwx];
 	double factor=ModuleBase::TWO_PI/GlobalC::ucell.lat0;
-	//    if(nks>1){
-	//       iunigh.clear();
-	//       iunigh.seekg(0,ios::beg);
-	//    }//go back to the beginning of file
+	int nksbands = psi_in->get_nbands();
+	if(GlobalV::MY_STOGROUP != 0) nksbands = 0;
 
-	for(ik=0;ik<GlobalC::kv.nks;ik++)
+	for(int ik=0;ik<GlobalC::kv.nks;++ik)
 	{
-
-		npw = GlobalC::kv.ngk[ik];
-	//       if(GlobalC::kv.nks>1){
-	//          iunigk>>igk;
-	//          get_buffer(evc,nwordwfc,iunwfc,ik);
-	//       }
-		for(i=0;i<npw;i++)
+		const int nstobands = stowf.nchip[ik];
+		const int nbandstot = nstobands + nksbands;
+		const int npw = GlobalC::kv.ngk[ik];
+		for(int i=0;i<npw;++i)
 		{
-			gk[0][i]=(GlobalC::kv.kvec_c[ik].x+GlobalC::wfcpw->getgcar(ik,i).x)*factor;
-			gk[1][i]=(GlobalC::kv.kvec_c[ik].y+GlobalC::wfcpw->getgcar(ik,i).y)*factor;
-			gk[2][i]=(GlobalC::kv.kvec_c[ik].z+GlobalC::wfcpw->getgcar(ik,i).z)*factor;
+			gk[0][i]=GlobalC::wfcpw->getgpluskcar(ik,i)[0]*factor;
+			gk[1][i]=GlobalC::wfcpw->getgpluskcar(ik,i)[1]*factor;
+			gk[2][i]=GlobalC::wfcpw->getgpluskcar(ik,i)[2]*factor;
 		}
 
 		//kinetic contribution
 
-		for(l=0;l<3;l++)
+		for(int l=0;l<3;++l)
 		{
-			for(m=0;m<l+1;m++)
+			for(int m=0;m<l+1;++m)
 			{
-				for(ibnd=0;ibnd<stowf.nchip[ik];ibnd++)
+				for(int ibnd=0;ibnd<nbandstot;++ibnd)
 				{
-					for(i=0;i<npw;i++)
+					if(ibnd < nksbands)
 					{
-						s_kin[l][m] += GlobalC::kv.wk[ik]*gk[l][i]*gk[m][i]
-						*(conj(stowf.shchi[ik](ibnd, i))*stowf.shchi[ik](ibnd, i)).real();
+						for(int i=0;i<npw;++i)
+						{
+							std::complex<double> p = psi_in->operator()(ik, ibnd, i);
+							double np = p.real() * p.real() + p.imag() * p.imag();
+							s_kin(l,m) +=
+								GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i] * np;
+						}
+					}
+					else
+					{
+						for(int i=0;i<npw;++i)
+						{
+							std::complex<double> p = stowf.shchi[ik](ibnd-nksbands, i);
+							double np = p.real() * p.real() + p.imag() * p.imag();
+							s_kin(l,m) += GlobalC::kv.wk[ik]*gk[l][i]*gk[m][i] * np;
+						}
 					}
 				}
 			}
@@ -165,49 +148,31 @@ void Sto_Stress_PW::sto_stress_kin(ModuleBase::matrix& sigma, Stochastic_WF& sto
 	}
 		
 
-	for(l=0;l<3;l++)
+	for(int l=0;l<3;++l)
 	{
-		for(m=0;m<l;m++)
+		for(int m=0;m<l;++m)
 		{
-			s_kin[m][l]=s_kin[l][m];
-		}
-	}
-
-	if(INPUT.gamma_only)
-	{
-		for(l=0;l<3;l++)
-		{
-			for(m=0;m<3;m++)
-			{
-				s_kin[l][m] *= 2.0*ModuleBase::e2/GlobalC::ucell.omega;
-			}
-		}
-	}
-	else 
-	{
-		for(l=0;l<3;l++)
-		{
-			for(m=0;m<3;m++)
-			{
-				s_kin[l][m] *= ModuleBase::e2/GlobalC::ucell.omega;
-			}
-		}
-	}
-
-	for(l=0;l<3;l++)
-	{
-		for(m=0;m<3;m++)
-		{
-			Parallel_Reduce::reduce_double_all( s_kin[l][m] );
+			s_kin(m,l)=s_kin(l,m);
 		}
 	}
 
 
-	for(l=0;l<3;l++)
+	for(int l=0;l<3;++l)
 	{
-		for(m=0;m<3;m++)
+		for(int m=0;m<3;++m)
 		{
-			sigma(l,m) = s_kin[l][m];
+			s_kin(l,m) *= ModuleBase::e2/GlobalC::ucell.omega;
+		}
+	}
+	
+
+	Parallel_Reduce::reduce_double_all( s_kin.c, 9 );
+
+	for(int l=0;l<3;++l)
+	{
+		for(int m=0;m<3;++m)
+		{
+			sigma(l,m) = s_kin(l,m);
 		}
 	}
 	//do symmetry
@@ -224,43 +189,42 @@ void Sto_Stress_PW::sto_stress_kin(ModuleBase::matrix& sigma, Stochastic_WF& sto
 	return;
 }
 
-void Sto_Stress_PW::sto_stress_nl(ModuleBase::matrix& sigma, Stochastic_WF& stowf){
+void Sto_Stress_PW::sto_stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in, Stochastic_WF& stowf){
 	ModuleBase::TITLE("Sto_Stress_Func","stres_nl");
 	ModuleBase::timer::tick("Sto_Stress_Func","stres_nl");
 	
 	const int nkb = GlobalC::ppcell.nkb;
-	if(nkb == 0) return;
-
-	double sigmanlc[3][3];
-	for(int l=0;l<3;l++)
+	if(nkb == 0) 
 	{
-		for(int m=0;m<3;m++)
-		{
-			sigmanlc[l][m]=0.0;
-		}
+		ModuleBase::timer::tick("Stress_Func","stres_nl");
+		return;
 	}
+
+	ModuleBase::matrix sigmanlc(3,3,true);
 	int* nchip = stowf.nchip;
-	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
+	const int npwx = GlobalC::wf.npwx;
+	int nksbands = psi_in->get_nbands();
+	if(GlobalV::MY_STOGROUP != 0) nksbands = 0;
 	
 
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb1( nkb, npwx );
 	ModuleBase::ComplexMatrix vkb0[3];
-	for(int i=0;i<3;i++){
-		vkb0[i].create(nkb, GlobalC::wf.npwx);
+	for(int i=0;i<3;++i){
+		vkb0[i].create(nkb, npwx);
 	}
-	ModuleBase::ComplexMatrix vkb2( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb2( nkb, npwx );
+	
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
-		ModuleBase::ComplexMatrix dbecp( nkb, nchip[ik]);
-		ModuleBase::ComplexMatrix becp( nkb, nchip[ik]);
-		for(int i=0;i<3;i++){
-			vkb0[i].zero_out();
-		}
-		vkb2.zero_out();      
+		const int nstobands = stowf.nchip[ik];
+		const int nbandstot = nstobands + nksbands;
+		const int npw = GlobalC::kv.ngk[ik];
+		// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
+		ModuleBase::ComplexMatrix dbecp( nbandstot, nkb);
+		ModuleBase::ComplexMatrix becp( nbandstot, nkb);
 		  
 		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 		// generate vkb
 		if (GlobalC::ppcell.nkb > 0)
 		{
@@ -272,97 +236,123 @@ void Sto_Stress_PW::sto_stress_nl(ModuleBase::matrix& sigma, Stochastic_WF& stow
 		// vkb: Beta(nkb,npw)
 		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
 		becp.zero_out();
-		for (int ib=0; ib<nchip[ik]; ib++)
-		{
-			for (int i=0;i<nkb;i++)
-			{
-				for (int ig=0; ig<GlobalC::wf.npw; ig++)
-				{
-					becp(i,ib) += stowf.shchi[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
-				}
-			}
-		}
+		char transa = 'C';
+        char transb = 'N';
+		psi_in[0].fix_k(ik);
+		//KS orbitals
+		int npmks = GlobalV::NPOL * nksbands;
+		zgemm_(&transa,&transb,&nkb,&npmks,&npw,&ModuleBase::ONE,
+				GlobalC::ppcell.vkb.c,&npwx,
+            	psi_in->get_pointer(),&npwx,
+            	&ModuleBase::ZERO,becp.c,&nkb);
+		//stochastic orbitals
+		int npmsto = GlobalV::NPOL * nstobands;
+		zgemm_(&transa,&transb,&nkb,&npmsto,&npw,&ModuleBase::ONE,
+				GlobalC::ppcell.vkb.c,&npwx,
+            	stowf.shchi[ik].c,&npwx,
+            	&ModuleBase::ZERO,&becp(nksbands,0),&nkb);
+		
 		Parallel_Reduce::reduce_complex_double_pool( becp.c, becp.size);
 			
-		for(int i=0;i<3;i++) {
+		for(int i=0;i<3;++i) {
 			get_dvnl1(vkb0[i],ik,i);
 		}
 				
 		get_dvnl2(vkb2,ik);
 
 		ModuleBase::Vector3<double> qvec;
-		double qvec0[3];
+		double* qvec0[3];
+		qvec0[0] = &(qvec.x);
+		qvec0[1] = &(qvec.y);
+		qvec0[2] = &(qvec.z);
 				
-		for (int ipol = 0; ipol<3; ipol++)
+		for (int ipol = 0; ipol<3; ++ipol)
 		{
-			for(int jpol = 0; jpol < ipol+1; jpol++)
+			for(int jpol = 0; jpol < ipol+1; ++jpol)
 			{
 				dbecp.zero_out();    
 				vkb1.zero_out();
-				for (int i = 0;i < nkb;i++)
+				for (int i = 0;i < nkb;++i)
 				{
-					for (int ig=0; ig<GlobalC::wf.npw; ig++)  
+					std::complex<double>* pvkb0i = &vkb0[ipol](i, 0);
+					std::complex<double>* pvkb0j = &vkb0[jpol](i, 0);
+					std::complex<double>* pvkb1 = &vkb1(i, 0);
+					// third term of dbecp_noevc
+					for (int ig = 0; ig < npw; ++ig) 
 					{
-						qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig) ;
-						qvec0[0] = qvec.x;
-						qvec0[1] = qvec.y;
-						qvec0[2] = qvec.z;
-					  
-						vkb1(i, ig) += 0.5 * qvec0[ipol] * vkb0[jpol](i,ig)
-								   + 0.5 * qvec0[jpol] * vkb0[ipol](i,ig) ;
-					}//end i	  
+						qvec = GlobalC::wfcpw->getgpluskcar(ik, ig);
+						pvkb1[ig] += 0.5 * qvec0[ipol][0] * pvkb0j[ig] +
+									0.5 * qvec0[jpol][0] * pvkb0i[ig];
+					} // end ig	  
 				}//end nkb
  
 
-				for (int ib=0; ib<nchip[ik]; ib++)
+				ModuleBase::ComplexMatrix dbecp_noevc(nkb, GlobalC::wf.npwx, true);
+				for (int i = 0; i < nkb; ++i) 
 				{
-					for (int i=0; i<nkb; i++)
+					std::complex<double>* pdbecp_noevc = &dbecp_noevc(i, 0);
+					std::complex<double>* pvkb = &vkb1(i, 0);
+					// first term
+					for (int ig = 0; ig < npw;++ig) 
 					{
-						for (int ig=0; ig<GlobalC::wf.npw; ig++)
+						pdbecp_noevc[ig] -= 2.0 * pvkb[ig];
+					}
+					// second termi
+					if (ipol == jpol)
+					{
+						pvkb = &GlobalC::ppcell.vkb(i, 0);
+						for (int ig = 0; ig < npw;++ig) 
 						{
-							//first term
-							dbecp(i,ib) = dbecp(i,ib) - 2.0 * stowf.shchi[ik](ib,ig) * conj( vkb1(i,ig) ) ;
-							//second termi
-							if(ipol == jpol)
-								 dbecp(i,ib) += -1.0 * stowf.shchi[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
-							//third term
-							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
-							qvec0[0] = qvec.x;
-							qvec0[1] = qvec.y;
-							qvec0[2] = qvec.z;
-							double qm1; 
-							if(qvec.norm() > 1e-8) qm1 = 1.0 / qvec.norm();
-							else qm1 = 0;
-							dbecp(i,ib) +=  -2.0 * stowf.shchi[ik](ib,ig) * conj(vkb2(i,ig)) * qvec0[ipol] * qvec0[jpol] * qm1 * GlobalC::ucell.tpiba;
-						}//end ig
-					}//end i
-				}//end ib
+							pdbecp_noevc[ig] -= pvkb[ig];
+						}
+					}
+					// third term
+					pvkb = &vkb2(i,0);
+					for (int ig = 0; ig < npw;++ig) 
+					{
+						qvec =	GlobalC::wfcpw->getgpluskcar(ik, ig);
+						double qm1;
+						if(qvec.norm2() > 1e-16) qm1 = 1.0 / qvec.norm(); 
+						else qm1 = 0; 
+						pdbecp_noevc[ig] -= 2.0 * pvkb[ig] * qvec0[ipol][0] * 
+							qvec0[jpol][0] * qm1 *	GlobalC::ucell.tpiba;
+					} // end ig
+				}     // end i
 
-//              don't need to reduce here, keep dbecp different in each processor,
-//              and at last sum up all the forces.
-//              Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
-
-//              double *cf = new double[GlobalC::ucell.nat*3];
-//              ZEROS(cf, GlobalC::ucell.nat);
-				for (int ib=0; ib<nchip[ik]; ib++)
+//              //KS orbitals
+				zgemm_(&transa,&transb,&nkb,&npmks,&npw,&ModuleBase::ONE,
+						dbecp_noevc.c,&npwx,
+        		    	psi_in->get_pointer(),&npwx,
+        		    	&ModuleBase::ZERO,dbecp.c,&nkb);
+				//stochastic orbitals
+				zgemm_(&transa,&transb,&nkb,&npmsto,&npw,&ModuleBase::ONE,
+						dbecp_noevc.c,&npwx,
+        		    	stowf.shchi[ik].c,&npwx,
+        		    	&ModuleBase::ZERO,&dbecp(nksbands, 0),&nkb);
+				
+				for (int ib=0; ib<nbandstot; ++ib)
 				{
-					double fac = 1.0 * GlobalC::kv.wk[ik];
+					double fac;
+					if(ib < nksbands)
+						fac = GlobalC::wf.wg(ik, ib);
+					else
+						fac = GlobalC::kv.wk[ik];
 					int iat = 0;
 					int sum = 0;
-					for (int it=0; it<GlobalC::ucell.ntype; it++)
+					for (int it=0; it<GlobalC::ucell.ntype; ++it)
 					{
 						const int Nprojs = GlobalC::ucell.atoms[it].nh;
-						for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+						for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ++ia)
 						{
-							for (int ip=0; ip<Nprojs; ip++)
+							for (int ip=0; ip<Nprojs; ++ip)
 							{
 								double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
 								const int inkb = sum + ip;
 								//out<<"\n ps = "<<ps;
 
 							 
-								const double dbb = ( conj( dbecp( inkb, ib) ) * becp( inkb, ib) ).real();
-								sigmanlc[ipol][ jpol] -= ps * fac * dbb;
+								const double dbb = ( conj( dbecp( ib, inkb) ) * becp( ib, inkb) ).real();
+								sigmanlc(ipol, jpol) -= ps * fac * dbb;
 							 
 							}//end ip
 							++iat;        
@@ -374,29 +364,33 @@ void Sto_Stress_PW::sto_stress_nl(ModuleBase::matrix& sigma, Stochastic_WF& stow
 		}//end ipol
 	}// end ik
 
-	// sum up forcenl from all processors
-	for(int l=0;l<3;l++){
-		for(int m=0;m<3;m++){
-			if(m>l) sigmanlc[l][m] = sigmanlc[m][l];
-				Parallel_Reduce::reduce_double_all( sigmanlc[l][m] );
+	for(int l=0;l<3;++l)
+	{
+		for(int m=0;m<3;++m)
+		{
+			if(m>l) 
+			{
+				sigmanlc(l,m) = sigmanlc(m,l);
+			}
 		}
 	}
+	// sum up forcenl from all processors
+	Parallel_Reduce::reduce_double_all( sigmanlc.c, 9);
 
-//        Parallel_Reduce::reduce_double_all(sigmanl.c, sigmanl.nr * sigmanl.nc);
         
-	for (int ipol = 0; ipol<3; ipol++)
+	for (int ipol = 0; ipol<3; ++ipol)
 	{
-		for(int jpol = 0; jpol < 3; jpol++)
+		for(int jpol = 0; jpol < 3; ++jpol)
 		{
-			sigmanlc[ipol][jpol] *= 1.0 / GlobalC::ucell.omega;
+			sigmanlc(ipol, jpol) *= 1.0 / GlobalC::ucell.omega;
 		}
 	}
 	
-	for (int ipol = 0; ipol<3; ipol++)
+	for (int ipol = 0; ipol<3; ++ipol)
 	{
-		for(int jpol = 0; jpol < 3; jpol++)
+		for(int jpol = 0; jpol < 3; ++jpol)
 		{
-			sigma(ipol,jpol) = sigmanlc[ipol][jpol] ;
+			sigma(ipol,jpol) = sigmanlc(ipol,jpol);
 		}
 	}
 	//do symmetry

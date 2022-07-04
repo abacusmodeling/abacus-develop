@@ -67,11 +67,8 @@ namespace ModuleESolver
         }
     }
 
-    void ESolver_KS_PW::Init(Input& inp, UnitCell_pseudo& ucell)
+    void ESolver_KS_PW::Init_GlobalC(Input& inp, UnitCell_pseudo& cell)
     {
-        ESolver_KS::Init(inp,ucell);
-
-
         this->psi = GlobalC::wf.allocate(GlobalC::kv.nks);
 
         // cout<<GlobalC::rhopw->nrxx<<endl;
@@ -144,6 +141,14 @@ namespace ModuleESolver
 #endif
 
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
+    }
+
+    void ESolver_KS_PW::Init(Input& inp, UnitCell_pseudo& ucell)
+    {
+        ESolver_KS::Init(inp,ucell);
+
+        //temporary
+        this->Init_GlobalC(inp,ucell);
 
         //init ElecState,
         if(this->pelec == nullptr)
@@ -270,14 +275,6 @@ namespace ModuleESolver
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
     }
 
-    //Temporary:
-    void ESolver_KS_PW::c_bands(const int istep, const int iter)
-    {
-        Electrons elec;
-        elec.iter = iter;
-        elec.c_bands(istep);
-    }
-
     //Temporary, it should be rewritten with Hamilt class. 
     void ESolver_KS_PW::updatepot(const int istep, const int iter)
     {
@@ -345,7 +342,6 @@ namespace ModuleESolver
             {
                 std::stringstream ssw;
                 ssw << GlobalV::global_out_dir << "WAVEFUNC";
-                //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
                 // mohan update 2011-02-21
                 //qianrui update 2020-10-17
                 WF_io::write_wfc(ssw.str(), this->psi[0], &GlobalC::kv, GlobalC::wfcpw);
@@ -626,9 +622,9 @@ namespace ModuleESolver
         //========================================
         // diagonalization of the KS hamiltonian
         // =======================================
-        set_ethr(1, 1);
+        double diag_ethr = this->phsol->set_diagethr(1, 1, drho);
 
-        this->hamilt2estates(this->diag_ethr);
+        this->hamilt2estates(diag_ethr);
 
         for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
         {

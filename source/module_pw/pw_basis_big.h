@@ -2,6 +2,9 @@
 #define PW_BASIS_BIG_H
 #include "../module_base/constants.h"
 #include "../module_base/global_function.h"
+#ifdef __MPI
+#include "mpi.h"
+#endif
 
 // temporary class, because previous ABACUS consider big grid for fft grids 
 // which are used for grid integration in LCAO.
@@ -37,23 +40,20 @@ public:
 
 
     virtual void initgrids(const double lat0_in,const ModuleBase::Matrix3 latvec_in,
-        const double gridecut, const int poolnproc_in, const int poolrank_in){
+        const double gridecut){
         //init lattice
     this->lat0 = lat0_in;
     this->latvec = latvec_in;
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
-    this->poolnproc = poolnproc_in;
-    this->poolrank = poolrank_in;
-    
 
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
     //------------------------------------------------------------
     this->tpiba = ModuleBase::TWO_PI / this->lat0;
     this->tpiba2 = this->tpiba * this->tpiba;
-    const double gridecut_lat = gridecut / tpiba2;
+    this->gridecut_lat = gridecut / tpiba2;
     ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];
     
@@ -151,9 +151,7 @@ public:
     virtual void initgrids(
     const double lat0_in,
     const ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    const int nx_in, int ny_in, int nz_in,
-    const int poolnproc_in,
-    const int poolrank_in
+    const int nx_in, int ny_in, int nz_in
     )
     {
         this->lat0 = lat0_in;
@@ -174,16 +172,48 @@ public:
         this->nbz = this->nz / bz;
         this->nxy = this->nx * this->ny;
         this->nxyz = this->nxy * this->nz;
-        this->poolnproc = poolnproc_in;
-        this->poolrank = poolrank_in;
+
+        int *ibox = new int[3];
+        ibox[0] = int((this->nx-1)/2)+1;
+        ibox[1] = int((this->ny-1)/2)+1;
+        ibox[2] = int((this->nz-1)/2)+1;
+        this->gridecut_lat = 1e20;
+        int count = 0;
+        for(int igz = -ibox[2]; igz <= ibox[2]; ++igz)
+        {
+            for(int igy = -ibox[1]; igy <= ibox[1]; ++igy)
+            {
+                for(int igx = -ibox[0]; igx <= ibox[0]; ++igx)
+                {
+                    ++count;
+                    if(count%this->poolnproc != this->poolrank) continue;
+                    if(abs(igx)<=ibox[0]-1 && abs(igy)<=ibox[1]-1 && abs(igz)<=ibox[2]-1 ) continue;
+                    ModuleBase::Vector3<double> f;
+                    f.x = igx;
+                    f.y = igy;
+                    f.z = igz;
+                    double modulus = f * (this->GGT * f);
+                    if(modulus < this->gridecut_lat)
+                    {
+                        this->gridecut_lat = modulus;
+                    }
+                }
+            }
+        }
+#ifdef __MPI
+        MPI_Allreduce(MPI_IN_PLACE, &this->gridecut_lat, 1, MPI_DOUBLE, MPI_MIN , this->pool_world);
+#endif
+        this->gridecut_lat -= 1e-6;
+
+        delete[] ibox;
 
         return;
     }
 
     virtual void distribute_r()
     {   
-       if(this->numz!=nullptr) delete[] this->numz; this->numz = new int[this->poolnproc];
-       if(this->startz!=nullptr) delete[] this->startz; this->startz = new int[this->poolnproc];
+        delete[] this->numz; this->numz = new int[this->poolnproc];
+        delete[] this->startz; this->startz = new int[this->poolnproc];
         ModuleBase::GlobalFunc::ZEROS(this->numz, this->poolnproc);
         ModuleBase::GlobalFunc::ZEROS(this->startz, this->poolnproc);
 

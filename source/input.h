@@ -70,6 +70,8 @@ class Input
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
     int bndpar; //parallel for stochastic/deterministic bands
+    int initsto_freq; //frequency to init stochastic orbitals when running md
+    int method_sto; //different methods for sdft, 1: slow, less memory  2: fast, more memory
 
     //==========================================================
     // electrons / spin
@@ -400,7 +402,8 @@ class Input
     double tau;
     double sigma_k;
     double nc_k;
-    // gauss charge
+    // compensating charge
+    bool comp_chg;
     double comp_q;
     double comp_l;
     double comp_center;
