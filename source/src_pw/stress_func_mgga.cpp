@@ -77,6 +77,10 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 		delete[] psi;
 	}//k loop
 
+	//if we are using kpools, then there should be a 
+	//reduction of crosstaus w.r.t. kpools here.
+	//will check later
+
 	for(int ir = 0;ir<GlobalC::wfcpw->nrxx;ir++)
 	{
 		delete[] gradwfc[ir];
