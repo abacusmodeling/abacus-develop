@@ -240,6 +240,7 @@ void HamiltLCAO<std::complex<double>>::constructHamilt()
 
     int start_spin = -1;
     GK->reset_spin(start_spin);
+    GK->destroy_pvpR();
     GK->allocate_pvpR();
 
 #ifdef __DEEPKS
