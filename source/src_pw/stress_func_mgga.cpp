@@ -120,7 +120,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<
 	{
 		for(int m = 0;m<3;m++)
 		{
-			Parallel_Reduce::reduce_double_pool( sigma_mgga[l][m] );
+			Parallel_Reduce::reduce_double_all( sigma_mgga[l][m] );
 		}
 	}
 #endif	
