@@ -519,7 +519,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			{
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
-					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * tpiba2;
+					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * GlobalC::ucell.tpiba;
 					porter[ig] = tmpsi_in[ig] * complex<double>(0.0,fact);
 				}
 				
@@ -533,7 +533,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 
 				for (int ig = 0;ig < npw ; ig++)
 				{
-					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * tpiba2;
+					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * GlobalC::ucell.tpiba;
 					tmhpsi[ig] -= complex<double>(0.0,fact) * porter[ig];
 				}
 			}//x,y,z directions
