@@ -128,7 +128,7 @@ const std::vector<std::string> element_name = {
 "Mc"	,
 "Lv"	,
 "Ts"	,
-"Og'
+"Og"
 };
 
 }
