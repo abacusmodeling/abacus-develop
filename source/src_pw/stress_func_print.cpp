@@ -38,7 +38,6 @@ void Stress_Func::print_stress(const std::string &name, const ModuleBase::matrix
 
 		if(screen)
 		{
-			std::cout<<fixed;
 			if( abs(f(i,0)) >output_acc) std::cout << std::setw(15) << f(i,0)*fac;
 			else std::cout << std::setw(15) << "0";
 			if( abs(f(i,1)) >output_acc) std::cout << std::setw(15) << f(i,1)*fac;
@@ -66,7 +65,7 @@ void Stress_Func::printstress_total(const ModuleBase::matrix& scs, bool ry)
 		unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
 //	std::cout.setf(ios::fixed);
-
+	
 
 	//GlobalV::ofs_running << std::setiosflags(ios::right);
  	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
@@ -90,6 +89,9 @@ void Stress_Func::printstress_total(const ModuleBase::matrix& scs, bool ry)
 			<< scs(i,1)*unit_transform << std::setw(15) << scs(i,2)*unit_transform << std::endl;
 
 	}
+	double pressure = (scs(0,0)+scs(1,1)+scs(2,2))/3.0*unit_transform;
+    std::cout << " TOTAL-PRESSURE: " <<pressure<<" KBAR"<< std::endl;
+	GlobalV::ofs_running << " TOTAL-PRESSURE: " <<pressure<<" KBAR"<< std::endl;
 	GlobalV::ofs_running << std::setiosflags(ios::left);
 	std::cout << std::resetiosflags(ios::showpos);
 

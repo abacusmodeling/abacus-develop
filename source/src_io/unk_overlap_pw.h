@@ -10,6 +10,7 @@
 #include "../module_base/global_variable.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/vector3.h"
+#include "module_psi/psi.h"
 
 using namespace std;
 
@@ -19,10 +20,10 @@ public:
 
 	unkOverlap_pw();
 	~unkOverlap_pw();	
-	std::complex<double> unkdotp_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc);
-	std::complex<double> unkdotp_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc, const ModuleBase::Vector3<double> G);
-	std::complex<double> unkdotp_soc_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc);
-	std::complex<double> unkdotp_soc_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc, const ModuleBase::Vector3<double> G);
+	std::complex<double> unkdotp_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const psi::Psi<std::complex<double>> *evc);
+	std::complex<double> unkdotp_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const psi::Psi<std::complex<double>> *evc, const ModuleBase::Vector3<double> G);
+	std::complex<double> unkdotp_soc_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const psi::Psi<std::complex<double>> *evc);
+	std::complex<double> unkdotp_soc_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const psi::Psi<std::complex<double>> *evc, const ModuleBase::Vector3<double> G);
 	
 	// this function just for test the class unkOverlap_pw that is works successful.
 	void test_for_unkOverlap_pw();

@@ -44,9 +44,10 @@ void Input::Print(const std::string &fn) const
                                  "0: use our own mesh to do radial renormalization; 1: use mesh as in QE");
     ModuleBase::GlobalFunc::OUTP(ofs, "lmaxmax", lmaxmax, "maximum of l channels used");
     ModuleBase::GlobalFunc::OUTP(ofs, "dft_functional", dft_functional, "exchange correlation functional");
-    ModuleBase::GlobalFunc::OUTP(ofs, "calculation", calculation, "test; scf; relax; nscf; ienvelope; istate;");
+    ModuleBase::GlobalFunc::OUTP(ofs, "calculation", calculation, "test; scf; relax; nscf; ienvelope; istate; sto-scf; sto-md");
     ModuleBase::GlobalFunc::OUTP(ofs, "ntype", ntype, "atom species number");
     ModuleBase::GlobalFunc::OUTP(ofs, "nspin", nspin, "1: single spin; 2: up and down spin; 4: noncollinear spin");
+    ModuleBase::GlobalFunc::OUTP(ofs, "kspacing", kspacing, "unit in 1/bohr, should be > 0, default is 0 which means read KPT file");
     ModuleBase::GlobalFunc::OUTP(ofs, "nbands", nbands, "number of bands");
     ModuleBase::GlobalFunc::OUTP(ofs, "nbands_sto", nbands_sto, "number of stochastic bands");
     ModuleBase::GlobalFunc::OUTP(ofs,
@@ -68,6 +69,8 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "out_mul", GlobalV::out_mul, " mulliken  charge or not"); // qifeng add 2019/9/10
     ModuleBase::GlobalFunc::OUTP(ofs, "noncolin", noncolin, "using non-collinear-spin");
     ModuleBase::GlobalFunc::OUTP(ofs, "lspinorb", lspinorb, "consider the spin-orbit interaction");
+    ModuleBase::GlobalFunc::OUTP(ofs, "kpar", kpar, "devide all processors into kpar groups and k points will be distributed among each group");
+    ModuleBase::GlobalFunc::OUTP(ofs, "bndpar", bndpar, "devide all processors into bndpar groups and bands will be distributed among each group");
 
     ofs << "\n#Parameters (2.PW)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "ecutwfc", ecutwfc, "#energy cutoff for wave functions");
@@ -85,7 +88,7 @@ void Input::Print(const std::string &fn) const
                                  pw_diag_thr,
                                  "threshold for eigenvalues is cg electron iterations");
     ModuleBase::GlobalFunc::OUTP(ofs, "scf_thr", scf_thr, "charge density error");
-    ModuleBase::GlobalFunc::OUTP(ofs, "init_wfc", init_wfc, "start wave functions are from 'atomic' or 'file'");
+    ModuleBase::GlobalFunc::OUTP(ofs, "init_wfc", init_wfc, "start wave functions are from 'atomic', 'atomic+random', 'random' or 'file'");
     ModuleBase::GlobalFunc::OUTP(ofs, "init_chg", init_chg, "start charge is from 'atomic' or file");
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "chg_extrap",
@@ -108,12 +111,21 @@ void Input::Print(const std::string &fn) const
                                  "cell_factor",
                                  cell_factor,
                                  "used in the construction of the pseudopotential tables");
-
-    ofs << "\n#Parameters (3.Relaxation)" << std::endl;
+    
+    ofs << "\n#Parameters (3.Stochastic DFT)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs, "method_sto", method_sto, "1: slow and save memory, 2: fast and waste memory");
+    ModuleBase::GlobalFunc::OUTP(ofs, "nbands_sto", nbands_sto, "number of stochstic orbitals");
+    ModuleBase::GlobalFunc::OUTP(ofs, "nche_sto", nche_sto, "Chebyshev expansion orders");
+    ModuleBase::GlobalFunc::OUTP(ofs, "emin_sto", emin_sto, "trial energy to guess the lower bound of eigen energies of the Hamitonian operator");
+    ModuleBase::GlobalFunc::OUTP(ofs, "emax_sto", emax_sto, "trial energy to guess the upper bound of eigen energies of the Hamitonian operator");
+    ModuleBase::GlobalFunc::OUTP(ofs, "seed_sto", seed_sto, "the random seed to generate stochastic orbitals");
+    ModuleBase::GlobalFunc::OUTP(ofs, "initsto_freq", initsto_freq, "frequency to generate new stochastic orbitals when running md");
+    
+    ofs << "\n#Parameters (4.Relaxation)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "ks_solver",
                                  GlobalV::KS_SOLVER,
-                                 "cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
+                                 "cg; dav; lapack; genelpa; hpseps; scalapack_gvx; cusolver");
     ModuleBase::GlobalFunc::OUTP(ofs, "scf_nmax", scf_nmax, "#number of electron iterations");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_force", out_force, "output the out_force or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "relax_nmax", relax_nmax, "number of ion iteration steps");
@@ -166,9 +178,9 @@ void Input::Print(const std::string &fn) const
                                  deepks_descriptor_ecut,
                                  "ecut used in generating descriptor");
 
-    ofs << "\n#Parameters (4.LCAO)" << std::endl;
+    ofs << "\n#Parameters (5.LCAO)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "basis_type", basis_type, "PW; LCAO in pw; LCAO");
-    if (ks_solver == "HPSEPS" || ks_solver == "genelpa" || ks_solver == "scalapack_gvx")
+    if (ks_solver == "HPSEPS" || ks_solver == "genelpa" || ks_solver == "scalapack_gvx" || ks_solver == "cusolver")
     {
         ModuleBase::GlobalFunc::OUTP(ofs, "nb2d", nb2d, "2d distribution of atoms");
     }
@@ -186,20 +198,20 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "by", by, "division of an element grid in FFT grid along y");
     ModuleBase::GlobalFunc::OUTP(ofs, "bz", bz, "division of an element grid in FFT grid along z");
 
-    ofs << "\n#Parameters (5.Smearing)" << std::endl;
+    ofs << "\n#Parameters (6.Smearing)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "smearing_method",
                                  smearing_method,
                                  "type of smearing_method: gauss; fd; fixed; mp; mp2; mv");
     ModuleBase::GlobalFunc::OUTP(ofs, "smearing_sigma", smearing_sigma, "energy range for smearing");
 
-    ofs << "\n#Parameters (6.Charge Mixing)" << std::endl;
+    ofs << "\n#Parameters (7.Charge Mixing)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_type", mixing_mode, "plain; kerker; pulay; pulay-kerker; broyden");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_beta", mixing_beta, "mixing parameter: 0 means no new charge");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_ndim", mixing_ndim, "mixing dimension in pulay");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_gg0", mixing_gg0, "mixing parameter in kerker");
 
-    ofs << "\n#Parameters (7.DOS)" << std::endl;
+    ofs << "\n#Parameters (8.DOS)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_emin_ev", dos_emin_ev, "minimal range for dos");
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_emax_ev", dos_emax_ev, "maximal range for dos");
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_edelta_ev", dos_edelta_ev, "delta energy for dos");
@@ -216,6 +228,7 @@ void Input::Print(const std::string &fn) const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tlast",mdp.md_tlast,"temperature last");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfreq",mdp.md_dumpfreq,"The period to dump MD information");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_restartfreq",mdp.md_restartfreq,"The period to output MD restart information");
+    ModuleBase::GlobalFunc::OUTP(ofs,"md_seed",mdp.md_seed,"random seed for MD");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_restart",mdp.md_restart,"whether restart");
 	ModuleBase::GlobalFunc::OUTP(ofs,"lj_rcut",mdp.lj_rcut,"cutoff radius of LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"lj_epsilon",mdp.lj_epsilon,"the value of epsilon for LJ potential");
@@ -228,36 +241,13 @@ void Input::Print(const std::string &fn) const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.md_tfreq,"oscillation frequency, used to determine qmass of NHC");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.md_damp,"damping parameter (time units) used to add force in Langevin method");
 
-    ofs << "\n#Parameters (9.Molecular dynamics)" << std::endl;
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_type", mdp.md_type, "choose ensemble");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_nstep", mdp.md_nstep, "md steps");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_ensolver", mdp.md_ensolver, "choose potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_dt", mdp.md_dt, "time step");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_mnhc", mdp.md_mnhc, "number of Nose-Hoover chains");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_tfirst", mdp.md_tfirst, "temperature first");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_tlast", mdp.md_tlast, "temperature last");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_dumpfreq", mdp.md_dumpfreq, "The period to dump MD information");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "md_restartfreq",
-                                 mdp.md_restartfreq,
-                                 "The period to output MD restart information");
-    ModuleBase::GlobalFunc::OUTP(ofs, "md_restart", mdp.md_restart, "whether restart");
-    ModuleBase::GlobalFunc::OUTP(ofs, "lj_rcut", mdp.lj_rcut, "cutoff radius of LJ potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "lj_epsilon", mdp.lj_epsilon, "the value of epsilon for LJ potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "lj_sigma", mdp.lj_sigma, "the value of sigma for LJ potential");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_direction", mdp.msst_direction, "the direction of shock wave");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_vel", mdp.msst_vel, "the velocity of shock wave");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_vis", mdp.msst_vis, "artificial viscosity");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_tscale", mdp.msst_tscale, "reduction in initial temperature");
-    ModuleBase::GlobalFunc::OUTP(ofs, "msst_qmass", mdp.msst_qmass, "mass of thermostat");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "md_tfreq",
-                                 mdp.md_tfreq,
-                                 "oscillation frequency, used to determine msst_qmass of NHC");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "md_damp",
-                                 mdp.md_damp,
-                                 "damping parameter (time units) used to add force in Langevin method");
+    ofs << "\n#Parameters (10.Electric field and dipole correction)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_flag",efield_flag,"add electric field");
+    ModuleBase::GlobalFunc::OUTP(ofs,"dip_cor_flag",dip_cor_flag,"dipole correction");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_dir",efield_dir,"the direction of the electric field or dipole correction");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_pos_max",efield_pos_max,"position of the maximum of the saw-like potential along crystal axis efield_dir");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_pos_dec",efield_pos_dec,"zone in the unit cell where the saw-like potential decreases");
+    ModuleBase::GlobalFunc::OUTP(ofs,"efield_amp ",efield_amp ,"amplitude of the electric field");
 
     ofs << "\n#Parameters (11.Test)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "out_alllog", out_alllog, "output information for each processor, when parallel");
@@ -353,6 +343,13 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "tau", tau, "the effective surface tension parameter");
     ModuleBase::GlobalFunc::OUTP(ofs, "sigma_k", sigma_k, " the width of the diffuse cavity");
     ModuleBase::GlobalFunc::OUTP(ofs, "nc_k", nc_k, " the cut-off charge density");
+
+    ofs << "\n#Parameters (19.compensating_charge)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_chg", comp_chg, " add compensating charge");
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_q", comp_q, " total charge of compensating charge");
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_l", comp_l, " total length of compensating charge");
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_center", comp_center, " center of compensating charge on dim");
+    ModuleBase::GlobalFunc::OUTP(ofs, "comp_dim", comp_dim, " dimension of compensating charge(x, y or z)");
     ofs.close();
     return;
 }

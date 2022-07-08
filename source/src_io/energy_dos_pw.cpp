@@ -127,7 +127,7 @@ void energy::perform_dos_pw(void)
 //scale up a little bit so the end peaks are displaced better
 		const double scl=this->dos_scale;
 		double delta=(emax-emin)*scl;
-		std::cout << scl;
+		//std::cout << scl;
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
@@ -138,7 +138,7 @@ void energy::perform_dos_pw(void)
 		
 //determine #. energy points	
 		const double de_ev = this->dos_edelta_ev;
-		std::cout << de_ev;
+		//std::cout << de_ev;
 
 		const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
 		const int np=npoints;

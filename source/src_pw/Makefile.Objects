@@ -72,8 +72,8 @@ charge_broyden.o \
 charge_extra.o \
 diago_david.o\
 diago_cg.o\
+efield.o\
 electrons.o \
-efield.o \
 energy.o \
 energy_dos_pw.o\
 dos.o\
@@ -89,7 +89,6 @@ occupy.o\
 potential.o \
 potential_libxc.o \
 pw_basis.o\
-bspline_sf.o\
 pw_complement.o\
 soc.o\
 sto_elec.o\

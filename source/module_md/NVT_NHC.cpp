@@ -9,7 +9,6 @@ NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(M
 {
     if(mdp.md_tfirst == 0)
     {
-        std::cout << " md_tfirst must be larger than 0 in NHC !!! " << std::endl;
         ModuleBase::WARNING_QUIT("NVT_NHC", " md_tfirst must be larger than 0 in NHC !!! ");
     }
 
@@ -89,9 +88,9 @@ void NVT_NHC::second_half()
     ModuleBase::timer::tick("NVT_NHC", "second_half");
 }
 
-void NVT_NHC::outputMD(std::ofstream &ofs)
+void NVT_NHC::outputMD(std::ofstream &ofs, bool cal_stress)
 {
-    Verlet::outputMD(ofs);
+    Verlet::outputMD(ofs, cal_stress);
 }
 
 void NVT_NHC::write_restart()
@@ -122,35 +121,59 @@ void NVT_NHC::write_restart()
 
 void NVT_NHC::restart()
 {
+    bool ok = true;
+    bool ok2 = true;
+
     if(!GlobalV::MY_RANK)
     {
-		std::stringstream ssc;
-		ssc << GlobalV::global_out_dir << "Restart_md.dat";
-		std::ifstream file(ssc.str().c_str());
+        std::stringstream ssc;
+        ssc << GlobalV::global_readin_dir << "Restart_md.dat";
+        std::ifstream file(ssc.str().c_str());
 
         if(!file)
-		{
-			std::cout<< "Please ensure whether 'Restart_md.dat' exists !" << std::endl;
-            ModuleBase::WARNING_QUIT("NVT_NHC", "no Restart_md.dat ！");
-		}
-        double Mnum;
-		file >> step_rst_ >> Mnum;
-        if(Mnum != mdp.md_mnhc)
-		{
-			std::cout<< "Num of NHC is not the same !" << std::endl;
-            ModuleBase::WARNING_QUIT("NVT_NHC", "no Restart_md.dat ！");
-		}
-        for(int i=0; i<mdp.md_mnhc; ++i)
         {
-            file >> eta[i];
-        }
-        for(int i=0; i<mdp.md_mnhc; ++i)
-        {
-            file >> veta[i];
+            ok = false;
         }
 
-		file.close();
-	}
+        if(ok)
+        {
+            double Mnum;
+            file >> step_rst_ >> Mnum;
+
+            if( Mnum != mdp.md_mnhc )
+            {
+                ok2 = false;
+            }
+
+            if(ok2)
+            {
+                for(int i=0; i<mdp.md_mnhc; ++i)
+                {
+                    file >> eta[i];
+                }
+                for(int i=0; i<mdp.md_mnhc; ++i)
+                {
+                    file >> veta[i];
+                }
+            }
+
+            file.close();
+        }
+    }
+
+#ifdef __MPI
+    MPI_Bcast(&ok, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&ok2, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
+
+    if(!ok)
+    {
+        ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat !");
+    }
+    if(!ok2)
+    {
+        ModuleBase::WARNING_QUIT("verlet", "Num of NHC is not the same !");
+    }
 
 #ifdef __MPI
 	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -196,7 +219,6 @@ void NVT_NHC::integrate()
             scale *= exp(-veta[0]*delta/2.0);
             if(!isfinite(scale))
             {
-                std::cout << " Please set a proper md_tfreq !!! " << std::endl;
                 ModuleBase::WARNING_QUIT("NVT_NHC", " Please set a proper md_tfreq !!! ");
             }
             

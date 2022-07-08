@@ -7,6 +7,9 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
+//-----HSolver ElecState Hamilt--------
+#include "module_hsolver/hsolver_lcao.h"
+
 ELEC_evolve::ELEC_evolve() {};
 ELEC_evolve::~ELEC_evolve() {};
 
@@ -28,7 +31,8 @@ int ELEC_evolve::td_dipoleout;
 void ELEC_evolve::evolve_psi(
     const int& istep,
     LCAO_Hamilt& uhm,
-    Local_Orbital_wfc& lowf)
+    Local_Orbital_wfc& lowf,
+    psi::Psi<std::complex<double>>* psi)
 {
     ModuleBase::TITLE("ELEC_evolve", "eveolve_psi");
     ModuleBase::timer::tick("ELEC_evolve", "evolve_psi");
@@ -50,7 +54,7 @@ void ELEC_evolve::evolve_psi(
         }
         GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
-        for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+        for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
@@ -68,18 +72,20 @@ void ELEC_evolve::evolve_psi(
             uhm.GK.reset_spin(GlobalV::CURRENT_SPIN);
 
             // vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-            uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT);
+            Gint_inout inout(GlobalC::pot.vr_eff1, 0, Gint_Tools::job_type::vlocal);
+            uhm.GK.cal_gint(&inout);
             // added by zhengdy-soc, for non-collinear case
             // integral 4 times, is there any method to simplify?
             if (GlobalV::NSPIN == 4)
             {
                 for (int is = 1;is < 4;is++)
                 {
-                    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+                    for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                     {
                         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
                     }
-                    uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, is);
+                    Gint_inout inout(GlobalC::pot.vr_eff1, is, Gint_Tools::job_type::vlocal);
+                    uhm.GK.cal_gint(&inout);
                 }
             }
         }
@@ -120,12 +126,13 @@ void ELEC_evolve::evolve_psi(
         }
         ModuleBase::timer::tick("Efficience", "evolve_k");
         Evolve_LCAO_Matrix ELM(uhm.LM);
-        ELM.evolve_complex_matrix(ik, lowf);
+        psi->fix_k(ik);
+        ELM.evolve_complex_matrix(ik, psi);
         ModuleBase::timer::tick("Efficience", "evolve_k");
     } // end k
 
     // LiuXh modify 2019-07-15*/
-    if (!Pdiag_Double::out_mat_hsR)
+    if (!hsolver::HSolverLCAO::out_mat_hsR)
     {
         uhm.GK.destroy_pvpR();
     }

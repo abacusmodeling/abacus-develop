@@ -22,12 +22,14 @@ int NBANDS = 0;
 int NBANDS_ISTATE = 0; // default number.
 int NLOCAL = 0; // total number of local basis.
 
+double KSPACING = 0.0;
+
 double PSEUDORCUT;
 bool PSEUDO_MESH;
 
 std::string CALCULATION = "scf";
-int EFIELD = 0; // 5: add electric field
-int DIPOLE = 0; // 7: add dipole field
+int EFIELD_FLAG = 0; // 5: add electric field
+int DIP_COR_FLAG = 0; // 7: add dipole field
 
 std::string DFT_FUNCTIONAL = "default";
 int NSPIN = 1; // LDA
@@ -101,10 +103,14 @@ int out_mul = 0; // qifeng add 2019/9/10
 //----------------------------------------------------------
 int NPROC = 1;
 int KPAR = 1;
+int NSTOGROUP = 1;
 int MY_RANK = 0;
 int MY_POOL = 0;
+int MY_STOGROUP = 0;
 int NPROC_IN_POOL = 1;
+int NPROC_IN_STOGROUP = 1;
 int RANK_IN_POOL = 0;
+int RANK_IN_STOGROUP = 0;
 int DRANK = -1; // mohan add 2012-01-13, must be -1, so we can recognize who didn't in DIAG_WORLD
 int DSIZE = KPAR;
 int DCOLOR = -1;
@@ -126,6 +132,7 @@ std::string global_pseudo_type = "auto";
 std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified
+std::string global_stru_dir;
 
 std::ofstream ofs_running;
 std::ofstream ofs_warning;
@@ -198,4 +205,6 @@ double eb_k = 80.0;
 double tau = 1.0798 * 1e-5;
 double sigma_k = 0.6;
 double nc_k = 0.00037;
+
+bool comp_chg = false; // compensating charge
 } // namespace GlobalV

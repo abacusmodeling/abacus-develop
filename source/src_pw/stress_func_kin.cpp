@@ -2,9 +2,8 @@
 #include "global.h"
 
 //calculate the kinetic stress in PW base
-void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
+void Stress_Func::stress_kin(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in)
 {
-	double *kfac;
 	double **gk;
 	gk=new double* [3];
 	int npw;
@@ -23,14 +22,9 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 		if(npwx<GlobalC::kv.ngk[ik])npwx=GlobalC::kv.ngk[ik];
 	}
 		
-	kfac=new double[npwx];
 	gk[0]= new double[npwx]; 
 	gk[1]= new double[npwx];
 	gk[2]= new double[npwx];
-	for(int i=0;i<npwx;i++)
-	{
-		kfac[i]=1;
-	}
 	double factor=ModuleBase::TWO_PI/GlobalC::ucell.lat0;
 
 	for(int ik=0;ik<GlobalC::kv.nks;ik++)
@@ -38,9 +32,9 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 		npw = GlobalC::kv.ngk[ik];
 		for(int i=0;i<npw;i++)
 		{
-			gk[0][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 0) * factor;
-			gk[1][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 1) * factor;
-			gk[2][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 2) * factor;
+			gk[0][i] = GlobalC::wfcpw->getgpluskcar(ik,i)[0] * factor;
+			gk[1][i] = GlobalC::wfcpw->getgpluskcar(ik,i)[1] * factor;
+			gk[2][i] = GlobalC::wfcpw->getgpluskcar(ik,i)[2] * factor;
 		}
 
 		//kinetic contribution
@@ -51,22 +45,20 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 			{
 				for(int ibnd=0;ibnd<GlobalV::NBANDS;ibnd++)
 				{
+					const std::complex<double>* ppsi=nullptr;
+					if(psi_in!=nullptr)
+					{
+						ppsi = &(psi_in[0](ik, ibnd, 0));
+					}
+					else
+					{
+						ppsi = &(GlobalC::wf.evc[ik](ibnd, 0));
+					}
 					for(int i=0;i<npw;i++)
 					{
-						if(0)
-						{
-							s_kin[l][m] +=
-								GlobalC::wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]
-								*(double((conj(GlobalC::wf.evc[ik](ibnd, i))
-								*GlobalC::wf.evc[ik](ibnd, i)).real())+
-								double((conj(GlobalC::wf.evc[ik](ibnd, i))*GlobalC::wf.evc[ik](ibnd, i+npwx)).real()));
-						}
-						else
-						{
-							s_kin[l][m] +=
-								GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
-								*(double((conj(GlobalC::wf.evc[ik](ibnd, i))*GlobalC::wf.evc[ik](ibnd, i)).real()));
-						}
+						s_kin[l][m] +=
+							GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]
+							*(double((conj(ppsi[i]) * ppsi[i]).real()));
 					}
 				}
 			}
@@ -134,7 +126,6 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 		GlobalC::symm.stress_symmetry(sigma, GlobalC::ucell);
 	}//end symmetry
 	
-	delete[] kfac;
 	delete[] gk[0];
 	delete[] gk[1];
 	delete[] gk[2];

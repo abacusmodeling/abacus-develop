@@ -36,7 +36,8 @@ void LCAO_Hamilt::set_lcao_matrices(void)
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {   
         // calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
-        this->calculate_STNR_gamma();	
+        this->calculate_STNR_gamma();
+        this->GG.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);	
 
     }
     else // multiple k-points
@@ -45,7 +46,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
         this->calculate_STNR_k();
 
         // calculate the grid integration of 'Vl' matrix for l-points algorithms.
-        this->GK.init(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz, this->LM);
+        this->GK.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);
     }
 
     // initial the overlap matrix is done.	
@@ -82,7 +83,8 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
         // calculate the 'Vl' matrix using gamma-algorithms.
         if(GlobalV::VL_IN_H)
         {	
-            this->GG.cal_vlocal(GlobalC::pot.vr_eff1, *this->LM);
+            Gint_inout inout(GlobalC::pot.vr_eff1, this->LM, Gint_Tools::job_type::vlocal);
+            this->GG.cal_vlocal(&inout);
 
         #ifdef __MPI //liyuanbo 2022/2/23
             // Peize Lin add 2016-12-03
@@ -226,27 +228,12 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
     if(GlobalV::VL_IN_H)
     {
-        //-------------------------
-        // set the local potential
-        // in plane wave basis.
-        //-------------------------
-//		Build_ST_pw bsp;
-//		bsp.set_local(ik);	
-//		this->LM->print_HSk('H','C',1.0e-5);
-
         //--------------------------
         // set the local potential
         // in LCAO basis.
         //--------------------------
 
-        if(GlobalV::NSPIN!=4) 
-        {
-            this->GK.folding_vl_k(ik);
-        }
-        else 
-        {
-            this->GK.folding_vl_k_nc(ik);
-        }
+        this->GK.folding_vl_k(ik, this->LM);
 
     #ifdef __MPI //liyuanbo 2022/2/23
         // Peize Lin add 2016-12-03
@@ -268,7 +255,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     #endif
     }
 
-
     //-----------------------------------------
     // folding matrix here: S(k) (SlocR->Sloc2)
     // folding matrix here: T(k)+Vnl(k)
@@ -276,22 +262,13 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     //-----------------------------------------
     this->LM->zeros_HSk('S');
     this->LM->zeros_HSk('T');
-//	std::cout << " after folding Hfixed k." << std::endl;
     this->LM->folding_fixedH(ik);
 
     //------------------------------------------
     // Add T(k)+Vnl(k)+Vlocal(k)
     // (Hloc2 += Hloc_fixed2), (std::complex matrix)
     //------------------------------------------
-//	std::cout << " Folding matrix here." << std::endl;
 	this->LM->update_Hloc2(ik);
-/*
-    if(GlobalV::NURSE)
-    {
-        this->LM->print_HSk('H','R',1.0e-5);
-//		this->LM->print_HSk('S','R',1.0e-5);
-    }
-    */
     
     ModuleBase::timer::tick("LCAO_Hamilt","calculate_Hk");
     return;
@@ -497,7 +474,7 @@ void LCAO_Hamilt::calculate_STN_R(void)
                             if(nu<0)continue;
 
                             int iic;
-                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                            if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                             {
                                 iic=mu+nu*this->LM->ParaV->nrow;
                             }
@@ -791,7 +768,7 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
 
     calculate_STN_R_sparse(current_spin, sparse_threshold);
 
-    GK.cal_vlocal_R_sparseMatrix(current_spin, sparse_threshold);
+    GK.cal_vlocal_R_sparseMatrix(current_spin, sparse_threshold, this->LM);
 
     if (INPUT.dft_plus_u)
     {
@@ -874,7 +851,7 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
                     for (auto &col_loop : row_loop.second)
                     {
                         ic = this->LM->ParaV->trace_loc_col[col_loop.first];
-                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                         {
                             iic = ir + ic * this->LM->ParaV->nrow;
                         }
@@ -899,7 +876,7 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
                         ic = this->LM->ParaV->trace_loc_col[j];
                         if (ic >= 0)
                         {
-                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                            if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                             {
                                 iic = ir + ic * this->LM->ParaV->nrow;
                             }
@@ -986,7 +963,7 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
                     for (auto &col_loop : row_loop.second)
                     {
                         ic = this->LM->ParaV->trace_loc_col[col_loop.first];
-                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                         {
                             iic = ir + ic * this->LM->ParaV->nrow;
                         }
@@ -1011,7 +988,7 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
                         ic = this->LM->ParaV->trace_loc_col[j];
                         if (ic >= 0)
                         {
-                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                            if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                             {
                                 iic = ir + ic * this->LM->ParaV->nrow;
                             }
@@ -1088,12 +1065,12 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 
 		for(int iwt1_local=0; iwt1_local<HexxR.nr; ++iwt1_local)
 		{
-			const int iwt1_global = (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+			const int iwt1_global = ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER()
 				? this->LM->ParaV->MatrixInfo.col_set[iwt1_local]
 				: this->LM->ParaV->MatrixInfo.row_set[iwt1_local];
 			for(int iwt2_local=0; iwt2_local<HexxR.nc; ++iwt2_local)
 			{
-				const int iwt2_global = (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+			    const int iwt2_global = ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER()
 					? this->LM->ParaV->MatrixInfo.row_set[iwt2_local]
 					: this->LM->ParaV->MatrixInfo.col_set[iwt2_local];
 				if(std::abs(HexxR(iwt1_local,iwt2_local)) > sparse_threshold)

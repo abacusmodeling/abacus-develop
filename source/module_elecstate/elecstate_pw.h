@@ -2,7 +2,7 @@
 #define ELECSTATEPW_H
 
 #include "elecstate.h"
-#include "src_pw/pw_basis.h"
+#include "module_pw/pw_basis_k.h"
 
 namespace elecstate
 {
@@ -10,9 +10,10 @@ namespace elecstate
 class ElecStatePW : public ElecState
 {
   public:
-    ElecStatePW(const PW_Basis* basis_in, Charge* chg_in, int nbands_in) : basis(basis_in)
+    ElecStatePW(ModulePW::PW_Basis_K *wfc_basis_in, Charge* chg_in, K_Vectors *pkv_in, int nbands_in) : basis(wfc_basis_in)
     {
-        init(chg_in, basis_in->Klist->nks, nbands_in);
+        init(chg_in, pkv_in, pkv_in->nks, nbands_in);
+        this->classname = "ElecStatePW";
     }
     // void init(Charge* chg_in):charge(chg_in){} override;
 
@@ -24,8 +25,8 @@ class ElecStatePW : public ElecState
     // update charge density for next scf step
     // void getNewRho() override;
 
-  private:
-    const PW_Basis* basis;
+  protected:
+    ModulePW::PW_Basis_K *basis;
 
     // calculate electronic charge density on grid points or density matrix in real space
     // the consequence charge density rho saved into rho_out, preparing for charge mixing.

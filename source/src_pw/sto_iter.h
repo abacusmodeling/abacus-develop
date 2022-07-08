@@ -1,10 +1,11 @@
 #ifndef STO_ITER_H
 #define STO_ITER_H
-
-#include "../module_base/global_function.h"
-#include "../module_base/global_variable.h"
-#include "sto_che.h"
+#include "sto_wf.h"
+#include "../module_base/math_chebyshev.h"
 #include "sto_hchi.h"
+#include "sto_func.h"
+#include "module_psi/psi.h"
+#include "module_elecstate/elecstate.h"
 
 //----------------------------------------------
 // Solve for the new electron density and iterate 
@@ -23,51 +24,41 @@ class Stochastic_Iter
     Stochastic_Iter();
     ~Stochastic_Iter();
 
-    void init(int &, int &);
+    void init(const int, int* nchip_in, const int method_in, Stochastic_WF& stowf);
     
-    void sum_stoband(void);
+    void sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pes);
 
-    double calne(void);
+    double calne(elecstate::ElecState* pes);
 
-    void itermu(int & iter);
+    void itermu(const int iter, elecstate::ElecState* pes);
 
-    void sumpolyval(void);
+    void orthog(const int &ik, psi::Psi<std::complex<double>>& psi, Stochastic_WF& stowf);
 
-    void orthog(void);
+    void checkemm(const int &ik, const int iter, Stochastic_WF& stowf);
 
-    void checkemm(int &iter);
-
-    void test(void); //only for test
-
-    Stochastic_Chebychev stoche;
+    ModuleBase::Chebyshev<double>* p_che = nullptr;
 
     Stochastic_hchi stohchi;
+    Sto_Func<double> stofunc;
 
-
-	static double mu;
-	static double mu0; // chemical potential; unit in Ry
-
-    static double Emin;
-	static double Emax; // unit in Ry
-
+	double mu0; // chemical potential; unit in Ry
+    bool change;
     double targetne;
+    double *spolyv = nullptr;
 
-    double *spolyv;
-
-    std::string stotype;
-
-	private:
+	public:
     
-    double nchip;
+    int * nchip = nullptr;
+    bool check = false;
     double th_ne;
     double KS_ne;
-
-    static double root_fd(double e);
-    static double fd(double e);
-    static double nroot_fd(double e);
-    static double nfd(double e);
-    static double fdlnfd(double e);
-    static double nfdlnfd(double e);
+    public:
+    int method; //different methods 1: slow, less memory  2: fast, more memory
+    ModuleBase::ComplexMatrix* chiallorder = nullptr;
+    //cal Pn = \sum_\chi <\chi|Tn(\hat{h})|\chi>
+    void calPn(const int& ik, Stochastic_WF& stowf);
+    //cal Tnchi = \sum_n C_n*T_n(\hat{h})|\chi>
+    void calTnchi(const int& ik, Stochastic_WF& stowf);
 
 };
 

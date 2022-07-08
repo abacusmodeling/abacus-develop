@@ -116,10 +116,10 @@ int Hamilt_PW::moved = 0;
 
 Hamilt_PW::Hamilt_PW()
 {
-    // hpsi = new complex<double>[1];
-    // spsi = new complex<double>[1];
-    // GR_index = new int[1];
-    // Bec = new complex<double>[1];
+    // hpsi = nullptr;
+    // spsi = nullptr;
+    // GR_index = nullptr;
+    // Bec = nullptr;
 #ifdef __CUDA
 	CHECK_CUBLAS(cublasCreate(&hpw_handle));
 #endif
@@ -152,7 +152,6 @@ void Hamilt_PW::allocate(
 	assert(npwx > 0);
 	assert(npol > 0);
 	assert(nkb >=0);
-	assert(nrxx > 0);
 
     // delete[] hpsi;
     // delete[] spsi;
@@ -190,18 +189,16 @@ void Hamilt_PW::init_k(const int ik)
 		GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 	}
 
-	// (2) Kinetic energy.
-	GlobalC::wf.ekin(ik);
 
 	// (3) Take the local potential.
-	// cout<<"nrxx="<<GlobalC::pw.nrxx<<endl;
+	// cout<<"nrxx="<<GlobalC::rhopw->nrxx<<endl;
 
-	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
 	{
 		GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
 #ifdef __CUDA
-	cudaMemcpy(GlobalC::pot.d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMemcpy(GlobalC::pot.d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::rhopw->nrxx*sizeof(double), cudaMemcpyHostToDevice);
 #endif
 
 	// (4) Calculate nonlocal pseudopotential vkb
@@ -215,16 +212,16 @@ void Hamilt_PW::init_k(const int ik)
 	GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
 	// (6) The index of plane waves.
-    // int *GR_index_tmp = new int[GlobalC::pw.nrxx];
-    for (int ig = 0;ig < GlobalC::wf.npw;ig++)
-    {
-        GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
-    }
-    // cout<<"init_K"<<endl;
-#ifdef __CUDA
-    CHECK_CUDA(cudaMemcpy(this->GR_index_d, GR_index, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyHostToDevice));
-    // delete [] GR_index_tmp;
-#endif
+    // int *GR_index_tmp = new int[GlobalC::rhopw->nrxx];
+//     for (int ig = 0;ig < GlobalC::wf.npw;ig++)
+//     {
+//         GR_index[ig] = GlobalC::sf.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
+//     }
+//     // cout<<"init_K"<<endl;
+// #ifdef __CUDA
+//     CHECK_CUDA(cudaMemcpy(this->GR_index_d, GR_index, GlobalC::rhopw->nrxx*sizeof(int), cudaMemcpyHostToDevice));
+//     // delete [] GR_index_tmp;
+// #endif
 
     // (7) ik
 	GlobalV::CURRENT_K = ik;
@@ -744,7 +741,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
 		
         CHECK_CUDA(cudaMalloc((void**)&d_g2kin, GlobalC::wf.npwx*sizeof(double)));
 		CHECK_CUDA(cudaMalloc((void**)&f_g2kin, GlobalC::wf.npwx*sizeof(float)));
-        CHECK_CUDA(cudaMemcpy(d_g2kin, GlobalC::wf.g2kin, GlobalC::wf.npw*sizeof(double), cudaMemcpyHostToDevice));
+        // CHECK_CUDA(cudaMemcpy(d_g2kin, GlobalC::wf.g2kin, GlobalC::wf.npw*sizeof(double), cudaMemcpyHostToDevice));
 		
 		int thread = 512;
         int block = (GlobalC::wf.npw + thread - 1) / thread;
@@ -802,15 +799,15 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
         float2 *f_porter;
 
         // CHECK_CUDA(cudaMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int)));
-        CHECK_CUDA(cudaMalloc((void**)&d_vr_eff1, GlobalC::pw.nrxx * sizeof(double)));
-		CHECK_CUDA(cudaMalloc((void**)&f_vr_eff1, GlobalC::pw.nrxx * sizeof(float)));
-        CHECK_CUDA(cudaMalloc((void**)&f_porter, GlobalC::pw.nrxx * sizeof(float2)));
+        CHECK_CUDA(cudaMalloc((void**)&d_vr_eff1, GlobalC::rhopw->nrxx * sizeof(double)));
+		CHECK_CUDA(cudaMalloc((void**)&f_vr_eff1, GlobalC::rhopw->nrxx * sizeof(float)));
+        CHECK_CUDA(cudaMalloc((void**)&f_porter, GlobalC::rhopw->nrxx * sizeof(float2)));
 
-        CHECK_CUDA(cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice));
+        CHECK_CUDA(cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::rhopw->nrxx*sizeof(double), cudaMemcpyHostToDevice));
         
 		int thread2 = 512;
-		int block2 = (GlobalC::pw.nrxx + thread2 - 1) / thread2;
-		cast_d2f<<<block2, thread2>>>(f_vr_eff1, d_vr_eff1, GlobalC::pw.nrxx);
+		int block2 = (GlobalC::rhopw->nrxx + thread2 - 1) / thread2;
+		cast_d2f<<<block2, thread2>>>(f_vr_eff1, d_vr_eff1, GlobalC::rhopw->nrxx);
 
 		// cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
         for(int ib = 0 ; ib < m; ++ib)
@@ -818,10 +815,17 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
             // cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
             // if(NSPIN!=4){
             // ZEROS( UFFT.porter, pw.nrxx);
-            CHECK_CUDA(cudaMemset(f_porter, 0, GlobalC::pw.nrxx * sizeof(float2)));
+            CHECK_CUDA(cudaMemset(f_porter, 0, GlobalC::rhopw->nrxx * sizeof(float2)));
 
 			//todo
-            GlobalC::UFFT.RoundTrip( tmpsi_in, f_vr_eff1, GR_index_d, f_porter );
+            // GlobalC::UFFT.RoundTrip( tmpsi_in, f_vr_eff1, GR_index_d, f_porter );
+			
+			// GlobalC::wfcpw->recip2real(tmpsi_in, f_porter, ik);
+			// for (int ir=0; ir< nrxx; ir++)
+			// {
+			// 	f_porter[ir] *=  GlobalC::pot.vr_eff1[ir];
+			// }
+			// GlobalC::wfcpw->real2recip(f_porter, tmhpsi, ik, true);
 
             // for (j = 0;j < wf.npw;j++)
             // {
@@ -1004,8 +1008,14 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
         tmpsi_in = psi_in;
         for(int ib = 0 ; ib < m; ++ib)
         {
-            CHECK_CUDA(cudaMemset(GlobalC::UFFT.d_porter, 0, GlobalC::pw.nrxx * sizeof(double2)));
-            GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.d_vr_eff1, GR_index_d, GlobalC::UFFT.d_porter );
+            CHECK_CUDA(cudaMemset(GlobalC::UFFT.d_porter, 0, GlobalC::rhopw->nrxx * sizeof(double2)));
+            // GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.d_vr_eff1, GR_index_d, GlobalC::UFFT.d_porter );
+			// GlobalC::wfcpw->recip2real(tmpsi_in, f_porter, ik);
+			// for (int ir=0; ir< nrxx; ir++)
+			// {
+			// 	f_porter[ir] *=  GlobalC::pot.vr_eff1[ir];
+			// }
+			// GlobalC::wfcpw->real2recip(f_porter, tmhpsi, ik, true);
 
             int thread = 512;
             int block = (GlobalC::wf.npw + thread - 1) / thread;
@@ -1117,6 +1127,11 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 
 	//if(GlobalV::NSPIN!=4) ZEROS(hpsi, GlobalC::wf.npw);
 	//else ZEROS(hpsi, GlobalC::wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
+	const int ik = GlobalV::CURRENT_K;
+	const double tpiba2 = GlobalC::ucell.tpiba2;
+	const int npwx = GlobalC::wf.npwx;
+	const int npw = npw;
+	const int nrxx = GlobalC::rhopw->nrxx;
 	int dmax = GlobalC::wf.npwx * GlobalV::NPOL;
 
 	//------------------------------------
@@ -1132,7 +1147,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		{
 			for(ig = 0;ig < GlobalC::wf.npw; ++ig)
 			{
-				tmhpsi[ig] = GlobalC::wf.g2kin[ig] * tmpsi_in[ig];
+				tmhpsi[ig] = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2 * tmpsi_in[ig];
 			}
 			if(GlobalV::NSPIN==4){
 				for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
@@ -1143,7 +1158,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 				tmpsi_in += GlobalC::wf.npwx;
 				for (ig = 0;ig < GlobalC::wf.npw ;++ig)
 				{
-					tmhpsi[ig] = GlobalC::wf.g2kin[ig] * tmpsi_in[ig];
+					tmhpsi[ig] = GlobalC::wfcpw->getgk2(ik,ig) * GlobalC::ucell.tpiba2 * tmpsi_in[ig];
 				}
 				for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
 				{
@@ -1159,6 +1174,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 	//(2) the local potential.
 	//-----------------------------------
     ModuleBase::timer::tick("Hamilt_PW","vloc");
+	std::complex<double>* porter = new std::complex<double>[GlobalC::wfcpw->nmaxgr];
 	if(GlobalV::VL_IN_H)
 	{
 		tmhpsi = hpsi;
@@ -1166,54 +1182,40 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		for(int ib = 0 ; ib < m; ++ib)
 		{
 			if(GlobalV::NSPIN!=4){
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-				GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
-				for (j = 0;j < GlobalC::wf.npw;j++)
+				GlobalC::wfcpw->recip2real(tmpsi_in, porter, ik);
+				for (int ir=0; ir< nrxx; ir++)
 				{
-					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
+					porter[ir] *=  GlobalC::pot.vr_eff1[ir];
 				}
+				GlobalC::wfcpw->real2recip(porter, tmhpsi, ik, true);
 			}
 			else
 			{
-				std::complex<double>* porter1 = new std::complex<double>[GlobalC::pw.nrxx];
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-				ModuleBase::GlobalFunc::ZEROS( porter1, GlobalC::pw.nrxx);
-				for (int ig=0; ig< GlobalC::wf.npw; ig++)
-				{
-					GlobalC::UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
-					porter1[ GR_index[ig]  ] = tmpsi_in[ig + GlobalC::wf.npwx];
-				}
-				// (2) fft to real space and doing things.
-				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, 1);
-				GlobalC::pw.FFT_wfc.FFT3D( porter1, 1);
+				std::complex<double>* porter1 = new std::complex<double>[nrxx];
+				// fft to real space and doing things.
+				GlobalC::wfcpw->recip2real(tmpsi_in, porter, ik);
+				GlobalC::wfcpw->recip2real(tmpsi_in+npwx, porter1, ik);
 				std::complex<double> sup,sdown;
-				for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
+				for (int ir=0; ir< nrxx; ir++)
 				{
-					sup = GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(0,ir) + GlobalC::pot.vr_eff(3,ir)) +
+					sup = porter[ir] * (GlobalC::pot.vr_eff(0,ir) + GlobalC::pot.vr_eff(3,ir)) +
 						porter1[ir] * (GlobalC::pot.vr_eff(1,ir) - std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
 					sdown = porter1[ir] * (GlobalC::pot.vr_eff(0,ir) - GlobalC::pot.vr_eff(3,ir)) +
-					GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(1,ir) + std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
-					GlobalC::UFFT.porter[ir] = sup;
+					porter[ir] * (GlobalC::pot.vr_eff(1,ir) + std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
+					porter[ir] = sup;
 					porter1[ir] = sdown;
 				}
 				// (3) fft back to G space.
-				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, -1);
-				GlobalC::pw.FFT_wfc.FFT3D( porter1, -1);
+				GlobalC::wfcpw->real2recip(porter, tmhpsi, ik, true);
+				GlobalC::wfcpw->real2recip(porter1, tmhpsi+npwx, ik, true);
 
-				for (j = 0;j < GlobalC::wf.npw;j++)
-				{
-					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
-				}
-				for (j = 0;j < GlobalC::wf.npw;j++ )
-				{
-					tmhpsi[j+GlobalC::wf.npwx] += porter1[ GR_index[j] ];
-				}
 				delete[] porter1;
 			}
 			tmhpsi += dmax;
 			tmpsi_in += dmax;
 		}
 	}
+	
     ModuleBase::timer::tick("Hamilt_PW","vloc");
 
 	//------------------------------------
@@ -1296,30 +1298,30 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		{
 			for(int j=0; j<3; j++)
 			{
-				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
-					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
-					GlobalC::UFFT.porter[ GR_index[ig] ] = tmpsi_in[ig] * complex<double>(0.0,fact);
+					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * tpiba2;
+					porter[ig] = tmpsi_in[ig] * complex<double>(0.0,fact);
 				}
+				
+				GlobalC::wfcpw->recip2real(porter,porter,ik);
 
-				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
-
-				for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+				for (int ir = 0; ir < nrxx; ir++)
 				{
-					GlobalC::UFFT.porter[ir] = GlobalC::UFFT.porter[ir] * GlobalC::pot.vofk(GlobalV::CURRENT_SPIN,ir);
+					porter[ir] *= GlobalC::pot.vofk(GlobalV::CURRENT_SPIN,ir);
 				}
-				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, -1);
+				GlobalC::wfcpw->real2recip(porter,porter,ik);
 
-				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
+				for (int ig = 0;ig < npw ; ig++)
 				{
-					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
-					tmhpsi[ig] = tmhpsi[ig] - complex<double>(0.0,fact) * GlobalC::UFFT.porter[ GR_index[ig] ];
+					double fact = GlobalC::wfcpw->getgpluskcar(ik,ig)[j] * tpiba2;
+					tmhpsi[ig] -= complex<double>(0.0,fact) * porter[ig];
 				}
 			}//x,y,z directions
 		}
 	}
 	// timer::tick("Hamilt_PW","meta");
+	delete[] porter;
     ModuleBase::timer::tick("Hamilt_PW","h_psi_cpu");
     return;
 }

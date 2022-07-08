@@ -38,17 +38,11 @@ void MSST::setup(ModuleESolver::ESolver *p_esolver)
     ModuleBase::TITLE("MSST", "setup");
     ModuleBase::timer::tick("MSST", "setup");
 
+    Verlet::setup(p_esolver);
+
     int sd = mdp.msst_direction;
 
-    MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
-    MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
-    stress += virial;
-
-    if(mdp.md_restart)
-    {
-        restart();
-    }
-    else
+    if(!mdp.md_restart)
     {
         lag_pos = 0;
         v0 = ucell.omega;
@@ -83,7 +77,7 @@ void MSST::first_half()
 
     const int sd = mdp.msst_direction;
     const double dthalf = 0.5 * mdp.md_dt;
-
+    double vol;
     energy_ = potential + kinetic;
 
     // propagate the time derivative of volume 1/2 step
@@ -112,7 +106,7 @@ void MSST::first_half()
     propagate_vel();
 
     // propagate volume 1/2 step
-    double vol = ucell.omega + omega[sd] * dthalf;
+    vol = ucell.omega + omega[sd] * dthalf;
 
     // rescale positions and change box size
     rescale(vol);
@@ -122,6 +116,11 @@ void MSST::first_half()
     {
         pos[i] += vel[i] * mdp.md_dt;
     }
+#ifdef __MPI
+    MPI_Bcast(pos , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(vel , ucell.nat*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+#endif
+
     ucell.update_pos_tau(pos);
     ucell.periodic_boundary_adjustment();
 
@@ -141,7 +140,6 @@ void MSST::second_half()
 
     const int sd = mdp.msst_direction;
     const double dthalf = 0.5 * mdp.md_dt;
-
     energy_ = potential + kinetic;
 
     // propagate velocities 1/2 step
@@ -160,9 +158,9 @@ void MSST::second_half()
     ModuleBase::timer::tick("MSST", "second_half");
 }
 
-void MSST::outputMD(std::ofstream &ofs)
+void MSST::outputMD(std::ofstream &ofs, bool cal_stress)
 {
-    Verlet::outputMD(ofs);
+    Verlet::outputMD(ofs, cal_stress);
 }
 
 void MSST::write_restart()
@@ -189,22 +187,34 @@ void MSST::write_restart()
 
 void MSST::restart()
 {
+    bool ok = true;
+
     if(!GlobalV::MY_RANK)
     {
-		std::stringstream ssc;
-		ssc << GlobalV::global_out_dir << "Restart_md.dat";
-		std::ifstream file(ssc.str().c_str());
+        std::stringstream ssc;
+        ssc << GlobalV::global_readin_dir << "Restart_md.dat";
+        std::ifstream file(ssc.str().c_str());
 
         if(!file)
-		{
-			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
-            ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
-		}
+        {
+            ok = false;
+        }
 
-		file >> step_rst_ >> omega[mdp.msst_direction] >> e0 >> v0 >> p0 >> lag_pos;
+        if(ok)
+        {
+            file >> step_rst_ >> omega[mdp.msst_direction] >> e0 >> v0 >> p0 >> lag_pos;
+            file.close();
+        }
+    }
 
-		file.close();
-	}
+#ifdef __MPI
+    MPI_Bcast(&ok, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
+
+    if(!ok)
+    {
+        ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat !");
+    }
 
 #ifdef __MPI
 	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -241,6 +251,9 @@ void MSST::rescale(double volume)
     ucell.latvec.e11 *= dilation[0];
     ucell.latvec.e22 *= dilation[1];
     ucell.latvec.e33 *= dilation[2];
+    ucell.a1 *= dilation[0];
+    ucell.a2 *= dilation[1];
+    ucell.a3 *= dilation[2];
 
     ucell.setup_cell_after_vc(GlobalV::ofs_running);
     MD_func::InitPos(ucell, pos);

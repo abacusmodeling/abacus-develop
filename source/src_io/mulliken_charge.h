@@ -17,21 +17,22 @@
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
 #include <vector>
+#include "module_psi/psi.h"
 
 // by qifeng
 class Mulliken_Charge
 {
 	public:
 
-	Mulliken_Charge(std::vector<ModuleBase::matrix> *wfc_gamma_in, 
-        std::vector<ModuleBase::ComplexMatrix> *wfc_k_in);
+	Mulliken_Charge(const psi::Psi<double> *wfc_gamma_in, 
+        const psi::Psi<std::complex<double>> *wfc_k_in);
 	~Mulliken_Charge();
 
 	double**  DecMulP ;
 	double**  MecMulP ;
 	double***  ADecMulP ;
-    std::vector<ModuleBase::matrix> *wfc_gamma;
-    std::vector<ModuleBase::ComplexMatrix> *wfc_k;
+    const psi::Psi<double> *wfc_gamma;
+    const psi::Psi<std::complex<double>> *wfc_k;
 
 	std::complex<double> *mug;
 

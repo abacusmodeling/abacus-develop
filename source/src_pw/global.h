@@ -7,7 +7,6 @@
 #include "../src_io/restart.h"
 #include "../src_ions/ions.h"
 #include "../src_lcao/exx_lip.h"
-#include "../src_parallel/ft.h"
 #include "VNL_in_pw.h"
 #include "charge_broyden.h"
 #include "energy.h"
@@ -16,7 +15,8 @@
 #include "klist.h"
 #include "magnetism.h"
 #include "potential.h"
-#include "pw_basis.h"
+#include "structure_factor.h"
+#include "../module_pw/pw_basis_k.h"
 #include "use_fft.h"
 #include "vdwd2.h"
 #include "vdwd2_parameters.h"
@@ -311,8 +311,10 @@ namespace GlobalC
 {
 extern K_Vectors kv;
 extern Use_FFT UFFT;
-extern PW_Basis pw;
-extern Stochastic_WF sto_wf; // qianrui add 2021-2-5
+extern Structure_Factor sf;
+extern ModulePW::PW_Basis* rhopw;
+extern ModulePW::PW_Basis_Big* bigpw;
+extern ModulePW::PW_Basis_K* wfcpw;
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;

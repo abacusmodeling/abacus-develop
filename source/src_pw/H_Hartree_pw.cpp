@@ -10,7 +10,7 @@ double H_Hartree_pw::hartree_energy = 0.0;
 // Transform charge density to hartree potential.
 //--------------------------------------------------------------------
 ModuleBase::matrix H_Hartree_pw::v_hartree(const UnitCell &cell,
-                                           PW_Basis &pwb,
+                                           ModulePW::PW_Basis* rho_basis,
                                            const int &nspin,
                                            const double *const *const rho)
 {
@@ -18,19 +18,19 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(const UnitCell &cell,
     ModuleBase::timer::tick("H_Hartree_pw", "v_hartree");
 
     //  Hartree potential VH(r) from n(r)
-    std::vector<std::complex<double>> Porter(pwb.nrxx);
+    std::vector<std::complex<double>> Porter(rho_basis->nmaxgr);
     const int nspin0 = (nspin == 2) ? 2 : 1;
     for (int is = 0; is < nspin0; is++)
-        for (int ir = 0; ir < pwb.nrxx; ir++)
+        for (int ir = 0; ir < rho_basis->nrxx; ir++)
             Porter[ir] += std::complex<double>(rho[is][ir], 0.0);
     //=============================
     //  bring rho (aux) to G space
     //=============================
-    pwb.FFT_chg.FFT3D(Porter.data(), -1);
+    rho_basis->real2recip(Porter.data(), Porter.data());
 
     // double charge;
-    // if (pwb.gstart == 1)
-    //     charge = cell.omega * Porter[pwb.ig2fftc[0]].real();
+    // if (rho_basis->gstart == 1)
+    //     charge = cell.omega * Porter[rho_basis->ig2fftc[0]].real();
     // OUT(GlobalV::ofs_running, "v_h charge", charge);
 
     //=======================================================
@@ -39,16 +39,15 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(const UnitCell &cell,
 
     double ehart = 0.0;
 
-    std::vector<std::complex<double>> vh_g(pwb.ngmc);
-    for (int ig = pwb.gstart; ig < pwb.ngmc; ig++)
+    std::vector<std::complex<double>> vh_g(rho_basis->npw);
+    for (int ig = 0; ig < rho_basis->npw; ig++)
     {
-        const int j = pwb.ig2fftc[ig];
-        if (pwb.gg[ig] >= 1.0e-12) // LiuXh 20180410
+        if (rho_basis->gg[ig] >= 1.0e-8) // LiuXh 20180410
         {
-            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (cell.tpiba2 * pwb.gg[ig]);
+            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (cell.tpiba2 * rho_basis->gg[ig]);
 
-            ehart += (conj(Porter[j]) * Porter[j]).real() * fac;
-            vh_g[ig] = fac * Porter[j];
+            ehart += (conj(Porter[ig]) * Porter[ig]).real() * fac;
+            vh_g[ig] = fac * Porter[ig];
         }
     }
 
@@ -57,27 +56,24 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(const UnitCell &cell,
     // std::cout << " ehart=" << ehart << std::endl;
     H_Hartree_pw::hartree_energy = ehart;
 
-    std::fill(Porter.begin(), Porter.end(), std::complex<double>(0.0, 0.0));
-    for (int ig = 0; ig < pwb.ngmc; ig++)
-        Porter[pwb.ig2fftc[ig]] = vh_g[ig];
     //==========================================
     // transform hartree potential to real space
     //==========================================
-    pwb.FFT_chg.FFT3D(Porter.data(), 1);
+    rho_basis->recip2real(vh_g.data(), Porter.data());
 
     //==========================================
     // Add hartree potential to the xc potential
     //==========================================
-    ModuleBase::matrix v(nspin, pwb.nrxx);
+    ModuleBase::matrix v(nspin, rho_basis->nrxx);
     if (nspin == 4)
     {
-        for (int ir = 0; ir < pwb.nrxx; ir++)
+        for (int ir = 0; ir < rho_basis->nrxx; ir++)
             v(0, ir) = Porter[ir].real();
     }
     else
     {
         for (int is = 0; is < nspin; is++)
-            for (int ir = 0; ir < pwb.nrxx; ir++)
+            for (int ir = 0; ir < rho_basis->nrxx; ir++)
                 v(is, ir) = Porter[ir].real();
     }
 

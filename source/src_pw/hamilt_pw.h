@@ -61,7 +61,7 @@ public:
         const std::complex < double> *psi,
         std::complex < double> *spsi);
 
-    int *GR_index;
+    int current_ik=0;
 
     std::complex<double> *psi_one;
 

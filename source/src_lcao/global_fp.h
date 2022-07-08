@@ -2,7 +2,7 @@
 #define GLOBAL_FP_H
 
 #include "../module_neighbor/sltk_grid_driver.h"
-#include "grid_technique.h"
+#include "../module_gint/grid_technique.h"
 #include "src_pdiag/pdiag_double.h"
 #include "local_orbital_wfc.h"
 #include "local_orbital_charge.h"

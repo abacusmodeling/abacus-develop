@@ -8,7 +8,7 @@
 #include "sltk_atom_input.h"
 
 #include "../module_cell/unitcell.h"
-//extern PW_Basis pw;
+//extern Structure_Factor sf;
 
 //==========================================================
 // STRUCT :

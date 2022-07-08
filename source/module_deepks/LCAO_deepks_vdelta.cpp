@@ -113,7 +113,7 @@ void LCAO_Deepks::add_v_delta(const UnitCell_pseudo &ucell,
                             
                             int iic;
 
-                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                            if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                             {
                                 iic=iw1_local+iw2_local*nrow;
                             }
@@ -142,7 +142,7 @@ void LCAO_Deepks::check_v_delta(const int nrow, const int ncol)
 		for (int icol=0;icol<ncol;icol++)
 		{
 			int iic;
-			if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+            if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
 			{
 				iic=irow+icol*nrow;
 			}
@@ -429,7 +429,7 @@ void LCAO_Deepks::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix
             if (mu >= 0 && nu >= 0)
             {                
                 int iic;
-                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                if (ModuleBase::GlobalFunc::IS_COLUMN_MAJOR_KS_SOLVER())
                 {
                     iic=mu+nu*nrow;
                 }

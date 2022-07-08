@@ -1,4 +1,6 @@
+#ifdef __MPI
 #include "mpi.h"
+#endif
 #include "gtest/gtest.h"
 #include <complex>
 #include <fstream>
@@ -20,7 +22,7 @@
  * abacus-develop/tests/integrate/801_PW_LT_sc.
  * Note: the output files WAVEFUNC1.txt and SPIN1_CHG were obtained by
  * using ABACUS without MPI (ABACUC.fp.x). This is because the 
- * GlobalC::pw.gdirect_global indexes are different with and without MPI.
+ * GlobalC::sf.gdirect_global indexes are different with and without MPI.
  * The mpi env. is currently invalid in this UT.
  */
 
@@ -239,44 +241,42 @@ TEST_F(CHGTest, SumBand)
                     GlobalV::NSPIN,
                     GlobalC::ucell.G,
                     GlobalC::ucell.latvec);
-    // here we use GlobalC::pw directly
-    GlobalC::pw.set(INPUT.gamma_only,
-                    INPUT.ecutwfc,
-                    INPUT.ecutrho,
-                    INPUT.nx,
-                    INPUT.ny,
-                    INPUT.nz,
-                    INPUT.ncx,
-                    INPUT.ncy,
-                    INPUT.ncz,
-                    INPUT.bx,
-                    INPUT.by,
-                    INPUT.bz,
-                    INPUT.pw_seed,
-                    INPUT.nbspline);
+    // here we use GlobalC::sf directly
+    GlobalC::sf.set(INPUT.nbspline);
     // ecut is needed here in setup_gg()
     // the first parameter GlobalV::ofs_running is not necessarily needed
     // because GlobalV::ofs_running is used inside the function anyway.
-    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
+
+    // pw_rho = new ModuleBase::PW_Basis();
+    //temporary, it will be removed
+    GlobalC::rhopw = new ModulePW::PW_Basis_Big(); 
+    ModulePW::PW_Basis_Big* tmp = static_cast<ModulePW::PW_Basis_Big*>(GlobalC::rhopw);
+    tmp->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
+#ifdef __MPI
+    GlobalC::rhopw->initmpi(1, 0 ,POOL_WORLD);
+#endif
+    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc);
+    GlobalC::rhopw->initparameters(false, INPUT.ecutrho);
+    GlobalC::rhopw->setuptransform();
+
     // test the generated fft grid (nx,ny,nz)
-    EXPECT_TRUE((GlobalC::pw.nx + 1) % 2 == 0 || (GlobalC::pw.nx + 1) % 3 == 0 || (GlobalC::pw.nx + 1) % 5 == 0);
-    EXPECT_TRUE((GlobalC::pw.ny + 1) % 2 == 0 || (GlobalC::pw.ny + 1) % 3 == 0 || (GlobalC::pw.ny + 1) % 5 == 0);
-    EXPECT_TRUE((GlobalC::pw.nz + 1) % 2 == 0 || (GlobalC::pw.nz + 1) % 3 == 0 || (GlobalC::pw.nz + 1) % 5 == 0);
+    EXPECT_TRUE((GlobalC::rhopw->nx + 1) % 2 == 0 || (GlobalC::rhopw->nx + 1) % 3 == 0 || (GlobalC::rhopw->nx + 1) % 5 == 0);
+    EXPECT_TRUE((GlobalC::rhopw->ny + 1) % 2 == 0 || (GlobalC::rhopw->ny + 1) % 3 == 0 || (GlobalC::rhopw->ny + 1) % 5 == 0);
+    EXPECT_TRUE((GlobalC::rhopw->nz + 1) % 2 == 0 || (GlobalC::rhopw->nz + 1) % 3 == 0 || (GlobalC::rhopw->nz + 1) % 5 == 0);
 
     // Calculate Structure factor
-    //GlobalC::pw.setup_structure_factor();
+    //GlobalC::sf.setup_structure_factor();
     // init charge/potential/wave functions
-    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
-    //GlobalC::pot.allocate(GlobalC::pw.nrxx);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
+    //GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
     // we need to supply NBANDS here
     GlobalC::wf.allocate(GlobalC::kv.nks);
-    GlobalC::UFFT.allocate();
 
     //====== read wavefunction ==========================================
     std::stringstream ssw;
     ssw << "WAVEFUNC";
     // we need to supply out_wfc_pw here
-    read_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
+    read_wfc2(ssw.str(), GlobalC::wf.evc, GlobalC::rhopw->gcar);
 
     //===== calculate occupation before sum_band ========================
     Occupy::calculate_weights();
@@ -290,11 +290,11 @@ TEST_F(CHGTest, SumBand)
     double totale = 0.0;
     for (int is = 0; is < GlobalV::NSPIN; is++)
     {
-        rho_for_compare[is] = new double[GlobalC::pw.nrxx];
+        rho_for_compare[is] = new double[GlobalC::rhopw->nrxx];
         std::stringstream ssc;
         ssc << "SPIN" << is + 1 << "_CHG";
         GlobalC::CHR.read_rho(is, ssc.str(), rho_for_compare[is]);
-        for (int ix = 0; ix < GlobalC::pw.nrxx; ix++)
+        for (int ix = 0; ix < GlobalC::rhopw->nrxx; ix++)
         //for (int ix = 0; ix < 5; ix++)
         {
             totale += rho_for_compare[is][ix];
@@ -304,7 +304,7 @@ TEST_F(CHGTest, SumBand)
         }
     }
     // check total number of electrons
-    totale = totale * GlobalC::ucell.omega / GlobalC::pw.nrxx;
+    totale = totale * GlobalC::ucell.omega / GlobalC::rhopw->nrxx;
     EXPECT_NEAR(totale, GlobalC::CHR.nelec, 1e-8);
 }
 
@@ -325,16 +325,18 @@ int RunAllTests(ENVEnvironment* env, ENVPrepare* ENVP)
 
 int main(int argc, char** argv)
 {
-
+#ifdef __MPI
     MPI_Init(&argc, &argv);
+#endif
 
     testing::InitGoogleTest(&argc, argv);
 
     ENVEnvironment* const env = new ENVEnvironment;
     testing::AddGlobalTestEnvironment(env);
     Check(RunAllTests(env, &ENVP) == 0, "");
-
+#ifdef __MPI
     MPI_Finalize();
+#endif
 
     return 0;
 }

@@ -12,7 +12,7 @@ scf_nmax			20
 
 scf_thr         1E-7
 basis_type		lcao
-md_nstep           1
+md_nstep           3
 
 cal_stress          1
 stress_thr      1e-6
@@ -25,6 +25,8 @@ mixing_beta     0.7
 
 md_type          0
 md_restart         0
+md_tfirst        10
+init_vel         1
 
 read_file_dir   ./
 

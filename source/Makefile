@@ -14,10 +14,16 @@ VPATH=./src_global\
 :./module_cell\
 :./module_base\
 :./module_md\
+:./module_pw\
 :./module_surchem\
 :./module_deepks\
 :./module_xc\
 :./module_esolver\
+:./module_hsolver\
+:./module_elecstate\
+:./module_psi\
+:./module_hamilt\
+:./module_gint\
 :./src_pw\
 :./src_lcao\
 :./src_ions\
