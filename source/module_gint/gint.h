@@ -163,6 +163,18 @@ class Gint
         double** dpsiz_dm,
         double* rho);
 
+    void cal_meshball_crosstaus(
+        const int na_grid,
+        int* block_index,
+        int* vindex,
+        double** dpsix,
+        double** dpsiy,
+        double** dpsiz,
+        double** dpsix_dm,
+        double** dpsiy_dm,
+        double** dpsiz_dm,
+        double** crosstaus);
+
     // dimension: [GlobalC::LNNR.nnrg] 
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.
     bool pvpR_alloc_flag = false;
