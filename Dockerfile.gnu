@@ -11,7 +11,8 @@ RUN git clone https://github.com/llohse/libnpy.git && \
     cp libnpy/include/npy.hpp /usr/local/include && \
     rm -r libnpy
 
-RUN wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.1%2Bcpu.zip --no-check-certificate --quiet && \
-    unzip -q libtorch-cxx11-abi-shared-with-deps-1.9.1+cpu.zip && \
+RUN wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.1%2Bcpu.zip \
+        --no-check-certificate --quiet -O libtorch.zip && \
+    unzip -q libtorch.zip && rm libtorch.zip && \
     cd libtorch && cp -r . /usr/local && \
     cd .. && rm -r libtorch
