@@ -26,6 +26,10 @@ namespace ModuleESolver
             {
                 delete psi;
             }
+            if(this->psid != nullptr)
+            {
+                delete psid;
+            }
         }
 
         //virtual void Init(Input_EnSolver &inp, matrix &lattice_v)=0
@@ -60,7 +64,8 @@ namespace ModuleESolver
         virtual void nscf() {};
         
         //wavefunction coefficients
-        psi::Psi<std::complex<double>>* psi=nullptr;
+        psi::Psi<std::complex<double>>* psi = nullptr;
+        psi::Psi<double>* psid = nullptr;
     };
 
     void init_esolver(ESolver*& p_esolver, const string use_esol);

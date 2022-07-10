@@ -22,6 +22,8 @@ extern int NBANDS;
 extern int NBANDS_ISTATE; // 1.05 // mohan add 2011-03-22
 extern int NLOCAL; // 1.1 // mohan add 2009-05-29
 
+extern double KSPACING;
+
 extern double PSEUDORCUT;
 extern bool PSEUDO_MESH;
 
@@ -230,5 +232,8 @@ extern double eb_k;
 extern double tau;
 extern double sigma_k;
 extern double nc_k;
+
+// compensating charge
+extern bool comp_chg;
 } // namespace GlobalV
 #endif

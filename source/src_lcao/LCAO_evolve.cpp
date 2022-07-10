@@ -24,7 +24,7 @@ inline int globalIndex(int localindex, int nblk, int nprocs, int myproc)
     return gIndex;
 }
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int& ik, Local_Orbital_wfc& lowf, double* ekb) const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int& ik, Local_Orbital_wfc &lowf, psi::Psi<std::complex<double>>* psi, double* ekb) const
 {
     ModuleBase::TITLE("Evolve_LCAO_Matrix", "evolve_complex_matrix");
     time_t time_start = time(NULL);
@@ -32,14 +32,11 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int& ik, Local_Orbital_wfc&
 
     if (INPUT.tddft == 1)
     {
-///*
 #ifdef __MPI
         this->using_ScaLAPACK_complex(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik], lowf.wfc_k_laststep[ik], lowf, ekb);
 #else
         this->using_LAPACK_complex(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik], lowf.wfc_k_laststep[ik], ekb);
 #endif
-        //*/
-        // this->using_ScaLAPACK_complex(ik, lowf.wfc_k_grid, lowf.wfc_k[ik]);
     }
     else
     {
@@ -1033,5 +1030,5 @@ void Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int& ik,
     // Z is delete in gath_eig
     // ModuleBase::timer::tick("Evolve_LCAO_Matrix","gath_eig_complex",'G');
     return;
-}
+        }
 #endif

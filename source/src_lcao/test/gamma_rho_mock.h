@@ -9,7 +9,6 @@
 #include "module_symmetry/symmetry.h"
 #include "module_symmetry/symmetry_basic.h"
 #include "module_xc/xc_functional.h"
-#include "src_parallel/ft.h"
 #include "src_parallel/parallel_grid.h"
 #include "src_parallel/parallel_kpoints.h"
 #include "src_parallel/parallel_pw.h"
@@ -803,11 +802,14 @@ void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
     GlobalC::wfcpw = new ModulePW::PW_Basis_K_Big(); 
     ModulePW::PW_Basis_K_Big* tmp2 = static_cast<ModulePW::PW_Basis_K_Big*>(GlobalC::wfcpw);
     tmp2->setbxyz(INPUT.bx,INPUT.by,INPUT.bz);
-    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc, 1, 0);
+#ifdef __MPI
+    GlobalC::rhopw->initmpi(1, 0 ,POOL_WORLD);
+    GlobalC::wfcpw->initmpi(1, 0 ,POOL_WORLD);
+#endif
+    GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, 4 * INPUT.ecutwfc);
     GlobalC::rhopw->initparameters(false, 4 * INPUT.ecutwfc);
 	GlobalC::rhopw->setuptransform();
-	GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz,
-                                1, 0);
+	GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
     GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
 	
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
@@ -978,7 +980,7 @@ void UnitCell::set_iat2itia(void)
  * because of lack of codes without mpi
  * in WF_Local::distri_lowf_new() called by WF_Local::read_lowf()
  ******************************/
-void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
+void Local_Orbital_Charge::gamma_file(psi::Psi<double>* psid, Local_Orbital_wfc &lowf)
 {
     for (int is = 0; is < GlobalV::NSPIN; ++is)
     {
@@ -1030,7 +1032,7 @@ void Local_Orbital_Charge::gamma_file(Local_Orbital_wfc &lowf)
     }
 }
 
-void Local_Orbital_Charge::allocate_gamma(const int& lgd)
+void Local_Orbital_Charge::allocate_gamma(const int& lgd, psi::Psi<double>* psid)
 {
     this->DM = new double **[GlobalV::NSPIN];
     this->DM_pool = new double *[GlobalV::NSPIN];

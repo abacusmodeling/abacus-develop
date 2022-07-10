@@ -1656,7 +1656,10 @@ void toWannier90::getUnkFromLcao()
 	}
 	
 	
-	
+	if(this->unk_inLcao != nullptr)
+	{
+		delete this->unk_inLcao;
+	}
 	this->unk_inLcao = new psi::Psi<std::complex<double>>(num_kpts, GlobalV::NBANDS, GlobalC::wf.npwx, nullptr);
 	ModuleBase::ComplexMatrix *orbital_in_G = new ModuleBase::ComplexMatrix[num_kpts];
 
@@ -1664,13 +1667,13 @@ void toWannier90::getUnkFromLcao()
 	{
 		// ��ȡȫ�ֵ�lcao�Ĳ�����ϵ��
 		get_lcao_wfc_global_ik(lcao_wfc_global[ik], this->wfc_k_grid[ik]);
-	
+
 		int npw = GlobalC::kv.ngk[ik];
 		orbital_in_G[ik].create(GlobalV::NLOCAL,npw);
 		this->lcao2pw_basis(ik,orbital_in_G[ik]);
 	
 	}
-	
+
 	// ��lcao�����unkת��pw�����µ�unk
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
@@ -1685,7 +1688,7 @@ void toWannier90::getUnkFromLcao()
 			}
 		}
 	}
-	
+
 	// ��һ��
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
@@ -1710,7 +1713,7 @@ void toWannier90::getUnkFromLcao()
 		}
 	}
 	
-	
+
 	for(int ik = 0; ik < GlobalC::kv.nkstot; ik++)
 	{
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++)
@@ -1801,7 +1804,7 @@ void toWannier90::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::compl
 							}
 						}
 					}
-				
+
 					delete[] crecv;
 					delete[] trace_lo2;
 				}
@@ -1836,7 +1839,7 @@ void toWannier90::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::compl
 						csend[mu*GlobalV::NBANDS+ib] = cc[ib][mu];
 					}
 				}
-			
+	
 				tag = GlobalV::DRANK * 3 + 2;
 				#ifdef __MPI
 				MPI_Send(csend, GlobalV::NBANDS*GlobalC::GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD);

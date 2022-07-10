@@ -341,6 +341,40 @@ void Chebyshev<REAL>::calfinalvec_complex(T *ptr,
 
 template<typename REAL>
 template<class T>
+void Chebyshev<REAL>::calpolyvec_complex(T *ptr, 
+	void (T::*funA)(std::complex<REAL> *in, std::complex<REAL> *out, const int), 
+	std::complex<REAL> *wavein, 
+	std::complex<REAL> *polywaveout, 
+	const int N, const int LDA, const int m)
+{
+
+    assert(N>=0 && LDA >= N);
+    int ndmxt;
+    if(m == 1) ndmxt = N * m;
+    else       ndmxt = LDA * m; 
+
+    std::complex<REAL> *arraynp1 = polywaveout + 2 * ndmxt;
+	std::complex<REAL> *arrayn = polywaveout + ndmxt;
+	std::complex<REAL> *arrayn_1 = polywaveout;
+  
+    ModuleBase::GlobalFunc::DCOPY(wavein, arrayn_1, ndmxt);
+    
+    //1-st order
+    (ptr->*funA)(arrayn_1, arrayn, m);
+
+    //more than 1-st orders
+    for(int ior = 2; ior < norder; ++ior)
+    {
+        recurs_complex(ptr, funA, arraynp1, arrayn, arrayn_1, N, LDA, m);
+        arrayn_1 += ndmxt;
+        arrayn += ndmxt;
+        arraynp1 += ndmxt; 
+    }
+    return;
+}
+
+template<typename REAL>
+template<class T>
 void Chebyshev<REAL>::tracepolyA(
 	T *ptr, void (T::*funA)(std::complex<REAL> *in, std::complex<REAL> *out, const int), 
 	std::complex<REAL> *wavein, 

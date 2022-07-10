@@ -43,46 +43,36 @@ void Diago_LCAO_Matrix::solve_complex_matrix(const int &ik, Local_Orbital_wfc &l
 #ifdef __MPI
 void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, Local_Orbital_wfc &lowf)
 {
-    ModuleBase::TITLE("Diago_LCAO_Matrix", "using_HPSEPS_complex");
+	ModuleBase::TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
-    // lowf.ParaV->out_mat_hs=1;//zhengdy-soc-test
-    bool bit = false; // LiuXh, 2017-03-21
-    // if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
-    HS_Matrix::saving_HS_complex(this->LM->Hloc2.data(),
-                                 this->LM->Sloc2.data(),
-                                 bit,
-                                 this->out_mat_hs,
-                                 "data-" + std::to_string(ik),
-                                 *lowf.ParaV); // LiuXh, 2017-03-21
-    GlobalV::ofs_running << std::setprecision(6); // LiuXh, 2017-03-21
+	//lowf.ParaV->out_mat_hs=1;//zhengdy-soc-test
+	bool bit = false; //LiuXh, 2017-03-21
+	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
+	HS_Matrix::saving_HS(this->LM->Hloc2.data(), this->LM->Sloc2.data(), bit, this->out_mat_hs, "data-"+std::to_string(ik), *lowf.ParaV); //LiuXh, 2017-03-21
+	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 
-    this->diago_complex_begin(ik,
-                              lowf,
-                              this->LM->Hloc2.data(),
-                              this->LM->Sloc2.data(),
-                              this->LM->Sdiag2.data(),
-                              GlobalC::wf.ekb[ik]);
+	this->diago_complex_begin(ik, lowf, this->LM->Hloc2.data(), this->LM->Sloc2.data(), this->LM->Sdiag2.data(), GlobalC::wf.ekb[ik]);
 
-    // added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
-    if (GlobalV::NSPIN == 4)
-    {
-        int row = GlobalC::GridT.lgd;
-        std::vector<std::complex<double>> tmp(row);
-        for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-        {
-            for (int iw = 0; iw < row / GlobalV::NPOL; iw++)
-            {
-                tmp[iw] = lowf.wfc_k_grid[ik][ib][iw * GlobalV::NPOL];
-                tmp[iw + row / GlobalV::NPOL] = lowf.wfc_k_grid[ik][ib][iw * GlobalV::NPOL + 1];
-            }
-            for (int iw = 0; iw < row; iw++)
-            {
-                lowf.wfc_k_grid[ik][ib][iw] = tmp[iw];
-            }
-        }
-    }
+	//added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
+	if(GlobalV::NSPIN==4)
+	{
+		int row = GlobalC::GridT.lgd;
+		std::vector<std::complex<double>> tmp(row);
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
+		{
+			for(int iw=0; iw<row / GlobalV::NPOL; iw++)
+			{
+				tmp[iw] = lowf.wfc_k_grid[ik][ib][iw * GlobalV::NPOL];
+				tmp[iw + row / GlobalV::NPOL] = lowf.wfc_k_grid[ik][ib][iw * GlobalV::NPOL + 1];
+			}
+			for(int iw=0; iw<row; iw++)
+			{
+				lowf.wfc_k_grid[ik][ib][iw] = tmp[iw];
+			}
+		}
+	}
 
-    return;
+	return;
 }
 #endif
 

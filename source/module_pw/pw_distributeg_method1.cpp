@@ -1,9 +1,6 @@
 #include "pw_basis.h"
 #include "../module_base/mymath.h"
-#include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
-// #include "iostream"
-#include "../module_base/timer.h"
 
 
 namespace ModulePW
@@ -25,14 +22,12 @@ namespace ModulePW
 ///
 void PW_Basis::distribution_method1()
 {
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
-
     // initial the variables needed by all process
     int *st_bottom2D = new int[fftnxy];             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = new int[fftnxy];             // st_length2D[ixy], number of planewaves in stick on (x, y).
-    if(this->nst_per!=nullptr) delete[] this->nst_per; this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
-    if(this->npw_per != nullptr) delete[] this->npw_per;   this->npw_per = new int[this->poolnproc];  // number of planewaves on each core.
-    if(this->fftixy2ip!=nullptr) delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains the stick on (x, y).
+    delete[] this->nst_per; this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
+    delete[] this->npw_per;   this->npw_per = new int[this->poolnproc];  // number of planewaves on each core.
+    delete[] this->fftixy2ip; this->fftixy2ip = new int[this->fftnxy];              // ip of core which contains the stick on (x, y).
     for (int ixy = 0; ixy < this->fftnxy; ++ixy)
         this->fftixy2ip[ixy] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
     if (poolrank == 0)
@@ -46,12 +41,14 @@ void PW_Basis::distribution_method1()
         this->count_pw_st(st_length2D, st_bottom2D); 
     }
 #ifdef __MPI
-    MPI_Bcast(&this->npwtot, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&liy, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&riy, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&this->npwtot, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&this->nstot, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&liy, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&riy, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&lix, 1, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(&rix, 1, MPI_INT, 0, this->pool_world);
 #endif
-    if(this->istot2ixy!=nullptr) delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
+    delete[] this->istot2ixy; this->istot2ixy = new int[this->nstot];
 
     if(poolrank == 0)
     {
@@ -95,12 +92,12 @@ void PW_Basis::distribution_method1()
     }
 
 #ifdef __MPI
-    MPI_Bcast(st_length2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(st_bottom2D, this->fftnxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->fftixy2ip, this->fftnxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
-    MPI_Bcast(this->npw_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
+    MPI_Bcast(st_length2D, this->fftnxy, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(st_bottom2D, this->fftnxy, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(this->fftixy2ip, this->fftnxy, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, this->pool_world);
+    MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , this->pool_world);
+    MPI_Bcast(this->npw_per, this->poolnproc, MPI_INT, 0 , this->pool_world);
 #endif
     this->npw = this->npw_per[this->poolrank];
     this->nst = this->nst_per[this->poolrank];
@@ -109,9 +106,8 @@ void PW_Basis::distribution_method1()
     // (5) Construct ig2isz and is2fftixy. 
     this->get_ig2isz_is2fftixy(st_bottom2D, st_length2D);
 
-    if (st_bottom2D != nullptr) delete[] st_bottom2D;
-    if (st_length2D != nullptr) delete[] st_length2D;
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
+    delete[] st_bottom2D;
+    delete[] st_length2D;
     return;
 }
 
@@ -136,22 +132,28 @@ void PW_Basis::collect_st(
     double *temp_st_length = new double[this->nstot];           // length of sticks.
     ModuleBase::GlobalFunc::ZEROS(temp_st_length, this->nstot);
 
-    int ibox[3] = {0, 0, 0};                            // an auxiliary vector, determine the boundary of the scanning area.
-    ibox[0] = int(this->fftnx / 2) + 1;                    // scan x from -ibox[0] to ibox[0].
-    ibox[1] = int(this->fftny / 2) + 1;                    // scan y from -ibox[1] to ibox[1], if not gamma-only.
-    ibox[2] = int(this->nz / 2) + 1;                    // scan z from -ibox[2] to ibox[2].
-
     ModuleBase::Vector3<double> f;
     int is = 0; // index of stick.
 
-    int iy_start = -ibox[1]; // determine the scaning area along x-direct, if gamma-only, only positive axis is used.
-    int iy_end = ibox[1];
+    int ix_end = int(this->nx / 2) + 1;
+    int ix_start = -ix_end; 
+    int iy_end = int(this->ny / 2) + 1;
+    int iy_start = -iy_end; 
     if (this->gamma_only)
     {
-        iy_start = 0;
-        iy_end = this->fftny - 1;
+        if(this->xprime)
+        {
+            ix_start = 0;
+            ix_end = this->fftnx - 1;
+        }
+        else
+        {
+            iy_start = 0;
+            iy_end = this->fftny - 1;
+        }
     }
-    for (int ix = -ibox[0]; ix <= ibox[0]; ++ix)
+
+    for (int ix = ix_start; ix <= ix_end; ++ix)
     {
         for (int iy = iy_start; iy <= iy_end; ++iy)
         {
@@ -162,8 +164,8 @@ void PW_Basis::collect_st(
             // so that its index in st_length and st_bottom is 9 * 10 + 2 = 92.
             int x = ix;
             int y = iy;
-            if (x < 0) x += fftnx;
-            if (y < 0) y += fftny;
+            if (x < 0) x += nx;
+            if (y < 0) y += ny;
             int index = x * this->fftny + y;
             if (st_length2D[index] > 0) // meaning there is a stick on (x, y) point.
             {
@@ -178,7 +180,7 @@ void PW_Basis::collect_st(
                     {
                         find_stick = true;
                         break;
-                    }                  
+                    }
                 }
                 if (find_stick)
                 {
@@ -240,7 +242,6 @@ void PW_Basis::divide_sticks_1(
         // find the ip of core containing the least planewaves.
         for (int ip = 0; ip < this->poolnproc; ++ip)
         {
-            //const int non_zero_grid = nst_per[ip] * this->nz;       // number of reciprocal planewaves on this core.
             const int npwmin = this->npw_per[ipmin];
             const int npw_ip = this->npw_per[ip];
             const int nstmin = nst_per[ipmin];
@@ -248,25 +249,16 @@ void PW_Basis::divide_sticks_1(
 
             if (npw_ip == 0)
             {
-                // if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
-                // {
-                    ipmin = ip;
-                    break;
-                // }
+                ipmin = ip;
+                break;
             }
             else if (npw_ip < npwmin)
             {
-                // if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
-                // {
-                    ipmin = ip;
-                // }
+                ipmin = ip;
             }
             else if (npw_ip == npwmin && nst_ip < nstmin)
             {
-                // if (non_zero_grid + nz < this->nrxx)
-                // {
-                    ipmin = ip;
-                // }
+                ipmin = ip;
             }
         }
         this->nst_per[ipmin]++;

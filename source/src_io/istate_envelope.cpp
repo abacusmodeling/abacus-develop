@@ -5,14 +5,14 @@
 #include "src_io/wf_io.h"
 #include "src_io/write_wfc_realspace.h"
 
-IState_Envelope::IState_Envelope()
-{}
+IState_Envelope::IState_Envelope(const elecstate::ElecState* pes_in)
+{pes = pes_in;}
 
 IState_Envelope::~IState_Envelope()
 {}
 
 
-void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wfc_pw, int& out_wfc_r)
+void IState_Envelope::begin(const psi::Psi<double>* psid, Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wfc_pw, int& out_wfc_r)
 {
     ModuleBase::TITLE("IState_Envelope", "begin");
 
@@ -93,13 +93,14 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf
                 // GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
                 // and 2d-to-grid conversion is unified into `wfc_2d_to_grid`.
                 //---------------------------------------------------------
+                psid->fix_k(is);
 #ifdef __MPI
-                lowf.wfc_2d_to_grid(0, lowf.wfc_gamma[is].c, wfc_gamma_grid[is]);
+                lowf.wfc_2d_to_grid(0, psid->get_pointer(), wfc_gamma_grid[is], this->pes->ekb, this->pes->wg);
 #else
                 for (int i = 0;i < GlobalV::NBANDS;++i)
                 {
                     for (int j = 0;j < GlobalV::NLOCAL;++j)
-                        wfc_gamma_grid[is][i][j] = lowf.wfc_gamma[is](i, j);
+                        wfc_gamma_grid[is][i][j] = psid[0](i, j);
                 }
 #endif
                 gg.cal_env(wfc_gamma_grid[is][ib], GlobalC::CHR.rho[is]);
@@ -145,7 +146,7 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_Gamma& gg, int& out_wf
     return;
 }
 
-void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, int& out_wf_r)
+void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi, Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, int& out_wf_r)
 {
     ModuleBase::TITLE("IState_Envelope", "begin");
 
@@ -210,14 +211,15 @@ void IState_Envelope::begin(Local_Orbital_wfc& lowf, Gint_k& gk, int& out_wf, in
                 ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[ispin], GlobalC::wfcpw->nrxx);
                 std::cout << " Perform envelope function for kpoint " << ik << ",  band" << ib + 1 << std::endl;
                 //  2d-to-grid conversion is unified into `wfc_2d_to_grid`.
+                psi->fix_k(ik);
 #ifdef __MPI
                 // need to deal with NSPIN=4 !!!!
-                lowf.wfc_2d_to_grid(0, lowf.wfc_k[ik].c, lowf.wfc_k_grid[ik], ik);
+                lowf.wfc_2d_to_grid(0, psi->get_pointer(), lowf.wfc_k_grid[ik], ik, this->pes->ekb, this->pes->wg);
 #else
                 for (int i = 0;i < GlobalV::NBANDS;++i)
                 {
                     for (int j = 0;j < GlobalV::NLOCAL;++j)
-                        lowf.wfc_k_grid[ik][i][j] = lowf.wfc_k[ik](i, j);
+                        lowf.wfc_k_grid[ik][i][j] = psi[0](i, j);
                 }
 #endif
                 //deal with NSPIN=4

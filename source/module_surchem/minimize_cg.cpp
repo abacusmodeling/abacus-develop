@@ -187,6 +187,8 @@ void surchem::Leps2(const UnitCell &ucell,
     }
 
     double *lp_real = new double[rho_basis->nrxx];
+    ModuleBase::GlobalFunc::ZEROS(lp_real, rho_basis->nrxx);
+    ModuleBase::GlobalFunc::ZEROS(lp, rho_basis->npw);
 
     double *grad_grad_phi = new double[rho_basis->nrxx];
     complex<double> *grad_grad_phi_G = new complex<double>[rho_basis->npw];

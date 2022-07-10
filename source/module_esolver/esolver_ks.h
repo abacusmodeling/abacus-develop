@@ -18,7 +18,6 @@ namespace ModuleESolver
         ESolver_KS();
         virtual ~ESolver_KS();
         // HSolver* phsol;
-        double diag_ethr; // diag threshold
         double scf_thr;   // scf threshold
         double drho;      // the difference between rho_in (before HSolver) and rho_out (After HSolver)
         int maxniter;     // maximum iter steps for scf
@@ -49,12 +48,12 @@ namespace ModuleESolver
         virtual void afterscf() {};
         // <Temporary> It should be replaced by a function in Hamilt Class
         virtual void updatepot(const int istep, const int iter) {};
+        // choose strategy when charge density convergence achieved
+        virtual bool do_after_converge(int& iter){this->niter = iter; return true;}
 
 
         //TOOLS:
     protected:
-        // Set ethr for hsolver
-        void set_ethr(const int istep, const int iter);
         // Print the headline on the screen:
         // ITER   ETOT(eV)       EDIFF(eV)      DRHO    TIME(s) 
         void printhead();
@@ -64,7 +63,6 @@ namespace ModuleESolver
         // Write the headline in the running_log file
         // "PW/LCAO" ALGORITHM --------------- ION=   1  ELEC=   1--------------------------------
         void writehead(std::ofstream& ofs_running, const int istep, const int iter);
-        void reset_diagethr(std::ofstream& ofs_running, const double hsover_error);
 
 
     hsolver::HSolver* phsol = nullptr;

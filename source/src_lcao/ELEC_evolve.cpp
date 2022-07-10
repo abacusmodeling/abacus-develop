@@ -26,7 +26,10 @@ int ELEC_evolve::td_vextout;
 int ELEC_evolve::td_dipoleout;
 
 // this routine only serves for TDDFT using LCAO basis set
-void ELEC_evolve::evolve_psi(const int& istep, LCAO_Hamilt& uhm, Local_Orbital_wfc& lowf)
+void ELEC_evolve::evolve_psi(const int& istep,
+                             LCAO_Hamilt& uhm,
+                             Local_Orbital_wfc& lowf,
+                             psi::Psi<std::complex<double>>* psi)
 {
     ModuleBase::TITLE("ELEC_evolve", "eveolve_psi");
     ModuleBase::timer::tick("ELEC_evolve", "evolve_psi");
@@ -119,7 +122,8 @@ void ELEC_evolve::evolve_psi(const int& istep, LCAO_Hamilt& uhm, Local_Orbital_w
         }
         ModuleBase::timer::tick("Efficience", "evolve_k");
         Evolve_LCAO_Matrix ELM(uhm.LM);
-        ELM.evolve_complex_matrix(ik, lowf, GlobalC::wf.ekb[ik]);
+        psi->fix_k(ik);
+        ELM.evolve_complex_matrix(ik, lowf, psi, GlobalC::wf.ekb[ik]);
         ModuleBase::timer::tick("Efficience", "evolve_k");
     } // end k
 

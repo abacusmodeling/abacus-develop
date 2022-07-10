@@ -78,12 +78,12 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
     this->Sloc.resize(nloc);
     this->Hloc_fixed.resize(nloc);
     this->Hloc.resize(nloc);
-    this->Sdiag.resize(nloc);
+    //this->Sdiag.resize(nloc);
 
     ModuleBase::GlobalFunc::ZEROS(Sloc.data(),nloc);
     ModuleBase::GlobalFunc::ZEROS(Hloc_fixed.data(),nloc);
     ModuleBase::GlobalFunc::ZEROS(Hloc.data(),nloc);
-    ModuleBase::GlobalFunc::ZEROS(Sdiag.data(),nloc); // mohan add 2021-01-30
+    //ModuleBase::GlobalFunc::ZEROS(Sdiag.data(),nloc); // mohan add 2021-01-30
 
     return;
 }
@@ -102,7 +102,7 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
     this->Sloc2.resize(nloc);
     this->Hloc_fixed2.resize(nloc);
     this->Hloc2.resize(nloc);
-    this->Sdiag2.resize(nloc);
+    //this->Sdiag2.resize(nloc);
 
     ModuleBase::GlobalFunc::ZEROS(Sloc2.data(),nloc);
     ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2.data(),nloc);
@@ -455,7 +455,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 
 void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 {
-    ModuleBase::TITLE("Parallel_Orbitals","print_HSgamma");
+    ModuleBase::TITLE("LCAO_Matrix","print_HSgamma");
 
     GlobalV::ofs_running << " " << mtype << " matrix" << std::endl;
     GlobalV::ofs_running << " nrow=" << this->ParaV->nrow << std::endl;
@@ -530,6 +530,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 // becareful! Update Hloc, we add new members to it.
 void LCAO_Matrix::update_Hloc(void)
 {
+    ModuleBase::TITLE("LCAO_Matrix","update_Hloc");
     for (long i=0; i<this->ParaV->nloc; i++)
     {
         Hloc[i] += Hloc_fixed[i];
@@ -539,6 +540,7 @@ void LCAO_Matrix::update_Hloc(void)
 
 void LCAO_Matrix::update_Hloc2(const int &ik)
 {
+    ModuleBase::TITLE("LCAO_Matrix","update_Hloc2");
 	for (long i = 0; i < this->ParaV->nloc; i++)
 	{
 		Hloc2[i] += Hloc_fixed2[i];

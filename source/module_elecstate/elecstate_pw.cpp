@@ -3,12 +3,15 @@
 #include "module_base/constants.h"
 #include "src_parallel/parallel_reduce.h"
 #include "src_pw/global.h"
+#include "module_base/timer.h"
 
 namespace elecstate
 {
 
 void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
 {
+    ModuleBase::TITLE("ElecStatePW", "psiToRho");
+    ModuleBase::timer::tick("ElecStatePW", "psiToRho");
     this->calculate_weights();
 
     this->calEBand();
@@ -28,6 +31,7 @@ void ElecStatePW::psiToRho(const psi::Psi<std::complex<double>>& psi)
         this->updateRhoK(psi);
     }
     this->parallelK();
+    ModuleBase::timer::tick("ElecStatePW", "psiToRho");
 }
 
 void ElecStatePW::updateRhoK(const psi::Psi<std::complex<double>>& psi)
@@ -48,16 +52,8 @@ void ElecStatePW::parallelK()
     charge->rho_mpi();
     if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it 2021-7-21
 	{
-		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
-		MPI_Allreduce(MPI_IN_PLACE, &GlobalC::en.eband, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
-	}
-	else
-	{
-    	//==================================
-    	// Reduce all the Energy in each cpu
-    	//==================================
-		GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
-		Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
+		this->eband /= GlobalV::NPROC_IN_POOL;
+		MPI_Allreduce(MPI_IN_PLACE, &this->eband, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
 	}
 #endif
     return;

@@ -38,7 +38,7 @@ public:
         const ModuleBase::Matrix3 &reciprocal_vec,
         const ModuleBase::Matrix3 &latvec);
 
-    void ibz_kpoint( const ModuleSymmetry::Symmetry &symm);
+    void ibz_kpoint( const ModuleSymmetry::Symmetry &symm, bool use_symm);
     //LiuXh add 20180515
     void set_after_vc(
             const ModuleSymmetry::Symmetry &symm,
@@ -54,7 +54,8 @@ private:
     double koffset[3];     			// used only in automatic k-points.
     std::string k_kword; //LiuXh add 20180619
     int k_nkstot; //LiuXh add 20180619
-
+    bool is_mp = false; //Monkhorst-Pack
+    
     void renew( const int &kpoint_number );
 
     // step 1 : generate kpoints

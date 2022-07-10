@@ -65,7 +65,8 @@ inline void cal_DM_ATOM(const Grid_Technique &gt,
                         const int gstart,
                         std::complex<double> ***wfc_k_grid,
                         std::complex<double> *WFC_PHASE,
-                        std::complex<double> **DM_ATOM)
+                        std::complex<double> **DM_ATOM,
+                        const ModuleBase::matrix &wg_in)
 {
 
     const char transa = 'N';
@@ -98,7 +99,7 @@ inline void cal_DM_ATOM(const Grid_Technique &gt,
             int nRow = 0;
             for (int ib = 0; ib < GlobalV::NBANDS; ++ib)
             {
-                const double wg_local = GlobalC::wf.wg(ik, ib);
+                const double wg_local = wg_in(ik, ib);
                 if (wg_local > 0 || GlobalV::ocp == 1)
                 {
                     if (nRow == 0)
@@ -146,7 +147,8 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt,
                            const int gstart,
                            std::complex<double> ***wfc_k_grid,
                            std::complex<double> *WFC_PHASE,
-                           std::complex<double> **DM_ATOM)
+                           std::complex<double> **DM_ATOM,
+                           const ModuleBase::matrix &wg_in)
 {
 
     if (GlobalV::NSPIN != 4)
@@ -188,7 +190,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt,
                     int nRow = 0;
                     for (int ib = 0; ib < GlobalV::NBANDS; ++ib)
                     {
-                        const double w1 = GlobalC::wf.wg(ik, ib);
+                        const double w1 = wg_in(ik, ib);
                         if (w1 > 0)
                         {
                             if (nRow == 0)
@@ -230,7 +232,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt,
     return;
 }
 
-void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
+void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt, const ModuleBase::matrix &wg_in)
 {
     ModuleBase::TITLE("Local_Orbital_Charge", "cal_dk_k");
     ModuleBase::timer::tick("LCAO_Charge", "cal_dk_k");
@@ -287,11 +289,31 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS * nw1);
                 if (GlobalV::NSPIN != 4)
                 {
-                    cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, this->LOWF->wfc_k_grid, WFC_PHASE, DM_ATOM);
+                    cal_DM_ATOM(gt,
+                                fac,
+                                RA,
+                                ca,
+                                iw1_lo,
+                                nw1,
+                                gstart,
+                                this->LOWF->wfc_k_grid,
+                                WFC_PHASE,
+                                DM_ATOM,
+                                wg_in);
                 }
                 else
                 {
-                    cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, this->LOWF->wfc_k_grid, WFC_PHASE, DM_ATOM);
+                    cal_DM_ATOM_nc(gt,
+                                   fac,
+                                   RA,
+                                   ca,
+                                   iw1_lo,
+                                   nw1,
+                                   gstart,
+                                   this->LOWF->wfc_k_grid,
+                                   WFC_PHASE,
+                                   DM_ATOM,
+                                   wg_in);
                 }
                 ++ca;
 

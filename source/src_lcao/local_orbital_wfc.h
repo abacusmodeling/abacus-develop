@@ -5,6 +5,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_orbital/ORB_control.h" // mohan add 2021-05-24
+#include "module_psi/psi.h"
 
 class Local_Orbital_wfc
 {
@@ -38,7 +39,7 @@ public:
 
 
     void allocate_k(const int& lgd,
-        Local_Orbital_wfc &lowf);
+        psi::Psi<std::complex<double>>* psi);
 
     //=========================================
     // Init Cij, make it satisfy 2 conditions:
@@ -67,8 +68,19 @@ public:
     // (in which the implementation should be put in header file )
     // because sub-function `write_lowf_complex`contains GlobalC declared in `global.h`
     // which will cause lots of "not defined" if included in a header file.
-    void wfc_2d_to_grid(int out_wfc_lcao, const double* wfc_2d, double** wfc_grid);
-    void wfc_2d_to_grid(int out_wfc_lcao, const std::complex<double>* wfc_2d, std::complex<double>** wfc_grid, int ik);
+    void wfc_2d_to_grid(
+        int out_wfc_lcao, 
+        const double* wfc_2d, 
+        double** wfc_grid, 
+        const ModuleBase::matrix& ekb, 
+        const ModuleBase::matrix& wg);
+    void wfc_2d_to_grid(
+        int out_wfc_lcao, 
+        const std::complex<double>* wfc_2d, 
+        std::complex<double>** wfc_grid, 
+        int ik, 
+        const ModuleBase::matrix& ekb, 
+        const ModuleBase::matrix& wg);
 #endif
 
 private:

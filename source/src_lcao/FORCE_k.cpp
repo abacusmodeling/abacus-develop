@@ -2,11 +2,7 @@
 
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
-#include "../src_parallel/parallel_reduce.h"
-#include "../src_pw/global.h"
-
-#include <map>
-#include <unordered_map>
+#include "module_elecstate/cal_dm.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -21,18 +17,19 @@ Force_LCAO_k::~Force_LCAO_k()
 }
 
 // be called in Force_LCAO::start_force_calculation
-void Force_LCAO_k::ftable_k(const bool isforce,
-                            const bool isstress,
-                            Record_adj& ra,
-                            std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-                            Local_Orbital_Charge& loc,
-                            ModuleBase::matrix& foverlap,
-                            ModuleBase::matrix& ftvnl_dphi,
-                            ModuleBase::matrix& fvnl_dbeta,
-                            ModuleBase::matrix& fvl_dphi,
-                            ModuleBase::matrix& soverlap,
-                            ModuleBase::matrix& stvnl_dphi,
-                            ModuleBase::matrix& svnl_dbeta,
+void Force_LCAO_k::ftable_k (
+		const bool isforce,
+		const bool isstress,
+        Record_adj &ra, 
+        const psi::Psi<std::complex<double>>* psi,
+        Local_Orbital_Charge &loc, 
+		ModuleBase::matrix& foverlap,
+		ModuleBase::matrix& ftvnl_dphi,
+		ModuleBase::matrix& fvnl_dbeta,	
+		ModuleBase::matrix& fvl_dphi,
+		ModuleBase::matrix& soverlap,
+		ModuleBase::matrix& stvnl_dphi,
+		ModuleBase::matrix& svnl_dbeta,
 #ifdef __DEEPKS
                             ModuleBase::matrix& svl_dphi,
                             ModuleBase::matrix& svnl_dalpha,
@@ -49,9 +46,9 @@ void Force_LCAO_k::ftable_k(const bool isforce,
     const Parallel_Orbitals* pv = loc.ParaV;
     this->allocate_k(*pv);
 
-    // calculate the energy density matrix
-    // and the force related to overlap matrix and energy density matrix.
-    this->cal_foverlap_k(isforce, isstress, ra, wfc_k, loc, foverlap, soverlap);
+	// calculate the energy density matrix
+	// and the force related to overlap matrix and energy density matrix.
+    this->cal_foverlap_k(isforce, isstress, ra, psi, loc, foverlap, soverlap);
 
     // calculate the density matrix
     double** dm2d = new double*[GlobalV::NSPIN];
@@ -266,13 +263,14 @@ void Force_LCAO_k::finish_k(void)
 }
 
 #include "record_adj.h"
-void Force_LCAO_k::cal_foverlap_k(const bool isforce,
-                                  const bool isstress,
-                                  Record_adj& ra,
-                                  std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-                                  Local_Orbital_Charge& loc,
-                                  ModuleBase::matrix& foverlap,
-                                  ModuleBase::matrix& soverlap)
+void Force_LCAO_k::cal_foverlap_k(
+	const bool isforce, 
+    const bool isstress,
+    Record_adj &ra, 
+    const psi::Psi<std::complex<double>>* psi,
+    Local_Orbital_Charge &loc,
+    ModuleBase::matrix& foverlap,
+	ModuleBase::matrix& soverlap)
 {
     ModuleBase::TITLE("Force_LCAO_k", "cal_foverlap_k");
     ModuleBase::timer::tick("Force_LCAO_k", "cal_foverlap_k");
@@ -315,7 +313,9 @@ void Force_LCAO_k::cal_foverlap_k(const bool isforce,
     }
     else
     {
-        loc.cal_dm(wgEkb, wfc_k, edm_k);
+        elecstate::cal_dm(loc.ParaV, wgEkb,
+        psi[0],
+        edm_k);
     }
 
     loc.cal_dm_R(edm_k, ra, edm2d);
