@@ -68,7 +68,6 @@ template <> void HamiltLCAO<double>::updateHk(const int ik)
     {
         GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
     }
-    GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
     {
@@ -152,7 +151,6 @@ template <> void HamiltLCAO<std::complex<double>>::updateHk(const int ik)
     {
         GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
     }
-    GlobalC::wf.npw = GlobalC::kv.ngk[ik];
     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
     {
         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
@@ -273,6 +271,7 @@ void HamiltLCAO<std::complex<double>>::constructHamilt()
 
     int start_spin = -1;
     GK->reset_spin(start_spin);
+    GK->destroy_pvpR();
     GK->allocate_pvpR();
 
 #ifdef __DEEPKS

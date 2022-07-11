@@ -7,6 +7,9 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
+//-----HSolver ElecState Hamilt--------
+#include "module_hsolver/hsolver_lcao.h"
+
 ELEC_evolve::ELEC_evolve() {};
 ELEC_evolve::~ELEC_evolve() {};
 
@@ -49,7 +52,6 @@ void ELEC_evolve::evolve_psi(
         {
             GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
         }
-        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
         for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
         {
@@ -154,7 +156,7 @@ void ELEC_evolve::evolve_psi(
     } // end k
 
     // LiuXh modify 2019-07-15*/
-    if (!Pdiag_Double::out_mat_hsR)
+    if (!hsolver::HSolverLCAO::out_mat_hsR)
     {
         uhm.GK.destroy_pvpR();
     }

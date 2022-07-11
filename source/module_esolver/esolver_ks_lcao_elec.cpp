@@ -230,16 +230,19 @@ namespace ModuleESolver
             {
                 GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
             }
+
             if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
             {
+                //program should be stopped after this judgement
                 Exx_Opt_Orb exx_opt_orb;
                 exx_opt_orb.generate_matrix();
-                ModuleBase::timer::tick("LOOP_ions", "opt_ions");
+                ModuleBase::timer::tick("ESolver_KS_LCAO", "beforesolver");
                 return;
             }
         }
-    }
 #endif
+        ModuleBase::timer::tick("ESolver_KS_LCAO", "beforesolver");
+    }
 
     void ESolver_KS_LCAO::beforescf(int istep)
     {
