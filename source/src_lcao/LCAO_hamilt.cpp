@@ -82,9 +82,17 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
     
         // calculate the 'Vl' matrix using gamma-algorithms.
         if(GlobalV::VL_IN_H)
-        {	
-            Gint_inout inout(GlobalC::pot.vr_eff1, this->LM, Gint_Tools::job_type::vlocal);
-            this->GG.cal_vlocal(&inout);
+        {
+            if(XC_Functional::get_func_type()==3)
+            {
+                Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, this->LM, Gint_Tools::job_type::vlocal_meta);
+                this->GG.cal_vlocal(&inout);
+            }
+            else
+            {
+                Gint_inout inout(GlobalC::pot.vr_eff1, this->LM, Gint_Tools::job_type::vlocal);
+                this->GG.cal_vlocal(&inout);
+            }
 
         #ifdef __MPI //liyuanbo 2022/2/23
             // Peize Lin add 2016-12-03

@@ -156,11 +156,29 @@ namespace ModuleESolver
             {
                 Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GG.cal_gint(&inout);
+                if (XC_Functional::get_func_type() == 3)
+                {
+                    for(int is=0; is<GlobalV::NSPIN; is++)
+                    {
+                        ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.kin_r[0], GlobalC::rhopw->nrxx);
+                    }
+                    Gint_inout inout1(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::tau);
+                    this->UHM.GG.cal_gint(&inout1);
+                }
             }
             else
             {
                 Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GK.cal_gint(&inout);
+                if (XC_Functional::get_func_type() == 3)
+                {
+                    for(int is=0; is<GlobalV::NSPIN; is++)
+                    {
+                        ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.kin_r[0], GlobalC::rhopw->nrxx);
+                    }
+                    Gint_inout inout1(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::tau);
+                    this->UHM.GK.cal_gint(&inout1);
+                }
             }
 
             // renormalize the charge density
