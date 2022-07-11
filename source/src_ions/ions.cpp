@@ -346,8 +346,8 @@ void Ions::reset_after_cellrelax(int& f_step, int& s_step, ModuleESolver::ESolve
 	Variable_Cell::init_after_vc(p_esolver);
 	GlobalC::pot.init_pot(s_step, GlobalC::sf.strucFac); //LiuXh add 20180619
 
-	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
-	GlobalC::wf.wfcinit(p_esolver->psi); //LiuXh add 20180619
+	//GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
+	//GlobalC::wf.wfcinit(p_esolver->psi); //LiuXh add 20180619
 	f_step = 1;
 	++s_step;
 }

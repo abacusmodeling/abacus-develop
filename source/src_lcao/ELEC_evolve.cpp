@@ -49,7 +49,6 @@ void ELEC_evolve::evolve_psi(
         {
             GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
         }
-        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
         for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
         {
