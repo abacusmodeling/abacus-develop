@@ -2,6 +2,7 @@
 101_PW_15_pseudopots
 101_PW_blps_pseudopots
 101_PW_OU_pseudopots
+101_PW_upf100_Al_pseudopots
 101_PW_upf201_Al_pseudopots
 101_PW_upf201_pseudopots
 101_PW_VW_pseudopots
@@ -45,6 +46,7 @@
 109_PW_CR_fix_c
 109_PW_CR_fix_volume
 109_PW_CR_moveatoms
+110_PW_SY
 110_PW_SY_symmetry
 111_PW_elec_add
 111_PW_elec_minus
