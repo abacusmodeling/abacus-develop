@@ -34,7 +34,7 @@ add_compile_options(-O2 -g)
 add_compile_options(-Wno-write-strings)
 
 find_package(Cereal REQUIRED)
-include_directories(${Cereal_INCLUDE_DIR})
+include_directories(${CEREAL_INCLUDE_DIR})
 add_compile_definitions(USE_CEREAL_SERIALIZATION)
 
 find_package(ELPA REQUIRED)
