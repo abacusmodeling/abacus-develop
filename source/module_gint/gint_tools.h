@@ -236,6 +236,15 @@ namespace Gint_Tools
 		double*const*const dpsir_ylm_yz,
 		double*const*const dpsir_ylm_zz);
 
+	void cal_ddpsir_ylm(
+		const int na_grid, 					// number of atoms on this grid 
+		const int grid_index, 				// 1d index of FFT index (i,j,k) 
+		const double delta_r, 				// delta_r of the uniform FFT grid
+		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
+		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
+		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		double*const*const ddpsir_ylm);
+
 	// psir_ylm * vldr3
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
 		const int na_grid,  					    // how many atoms on this (i,j,k) grid
