@@ -96,6 +96,19 @@ class Gint
         ModuleBase::matrix* fvl_dphi,
         ModuleBase::matrix* svl_dphi);
 
+    void gint_kernel_force_meta(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        double* vkdr3,
+        const int LD_pool,
+        double** DM_in,
+        const bool isforce,
+        const bool isstress,
+        ModuleBase::matrix* fvl_dphi,
+        ModuleBase::matrix* svl_dphi);
+
     void cal_meshball_force(
         const int grid_index,
         const int na_grid,  					    // how many atoms on this (i,j,k) grid

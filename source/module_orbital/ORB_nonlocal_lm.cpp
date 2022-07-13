@@ -223,6 +223,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	delete [] y2;
 	delete [] rad;	
 	delete [] tmp;
+	delete [] tmp1;
 	return;
 }
 

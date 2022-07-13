@@ -464,7 +464,7 @@ namespace Gint_Tools
 						const int idx_lm = atom->iw2_ylm[iw];
 
 						const double rl = pow(distance, ll);
-						const double r_lp2 = pow(distance, ll);
+						const double r_lp2 = pow(distance, ll+2);
 
 						// 2nd derivative of wave functions with respect to atom positions.
 						const double tmpdphi = (dtmp  - tmp * ll / distance) / rl / distance;
