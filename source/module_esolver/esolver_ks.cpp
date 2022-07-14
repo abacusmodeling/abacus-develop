@@ -77,7 +77,9 @@ namespace ModuleESolver
         Print_Info::setup_parameters(ucell, GlobalC::kv);
 
         //new plane wave basis
+#ifdef __MPI
         this->pw_wfc->initmpi(GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL, POOL_WORLD);
+#endif
         this->pw_wfc->initgrids(ucell.lat0, ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
         this->pw_wfc->initparameters(false, inp.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
 #ifdef __MPI

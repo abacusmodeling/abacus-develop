@@ -84,7 +84,7 @@ public:
         const bool gamma_only_in,
         const double pwecut_in, //unit in Ry, ecut to decides plane waves
         const int distribution_type_in = 1,
-        const bool xprime_in = false
+        const bool xprime_in = true
     );
 
 //===============================================
@@ -227,7 +227,7 @@ public:
     int nx=0, ny=0, nz=0, nxyz=0, nxy=0; // Gamma_only: fftny = int(ny/2)-1 , others: fftny = ny
     int liy=0, riy=0;// liy: the left edge of the pw ball; riy: the right edge of the pw ball in the y direction
     int lix=0, rix=0;// lix: the left edge of the pw ball; rix: the right edge of the pw ball in the x direction
-    bool xprime = false; // true: when do recip2real, x-fft will be done last and when doing real2recip, x-fft will be done first; false: y-fft
+    bool xprime = true; // true: when do recip2real, x-fft will be done last and when doing real2recip, x-fft will be done first; false: y-fft
                          // For gamma_only, true: we use half x; false: we use half y
     int nmaxgr=0; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
                 // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data
