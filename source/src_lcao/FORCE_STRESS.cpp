@@ -862,8 +862,16 @@ void Force_Stress_LCAO::stress_mgga(ModuleBase::matrix &sigmaxc,
 				crosstaus[is][ir] = new double [6];
 				ModuleBase::GlobalFunc::ZEROS(crosstaus[is][ir],6);
 			}
-			Gint_inout inout(loc.DM_R, crosstaus[is], Gint_Tools::job_type::crosstaus);
-			uhm.GK.cal_gint(&inout);
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				Gint_inout inout(loc.DM, crosstaus[is], Gint_Tools::job_type::crosstaus);
+				uhm.GG.cal_gint(&inout);
+			}
+			else
+			{
+				Gint_inout inout(loc.DM_R, crosstaus[is], Gint_Tools::job_type::crosstaus);
+				uhm.GK.cal_gint(&inout);
+			}
 		}
 
 		for(int is = 0; is < GlobalV::NSPIN; is++)

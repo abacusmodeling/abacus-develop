@@ -47,6 +47,7 @@ void Gint::gint_kernel_tau(
 		ModuleBase::GlobalFunc::ZEROS(dpsix_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
 		ModuleBase::GlobalFunc::ZEROS(dpsiy_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
 		ModuleBase::GlobalFunc::ZEROS(dpsiz_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
+
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			Gint_Tools::mult_psi_DM(
@@ -69,7 +70,7 @@ void Gint::gint_kernel_tau(
 				block_index, cal_flag,
 				dpsir_ylm_z.ptr_2D,
 				dpsiz_DM.ptr_2D,
-				inout->DM[is], 1);		
+				inout->DM[is], 1);
 		}
 		else
 		{
@@ -117,6 +118,7 @@ void Gint::gint_kernel_tau(
 				inout->crosstaus);			
 		}
 	}
+
 	delete[] block_iw;
 	delete[] block_index;
 	delete[] block_size;

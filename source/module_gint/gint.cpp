@@ -88,7 +88,6 @@ void Gint::cal_gint(Gint_inout *inout)
             // entering the main loop of grid points
 			for(int grid_index = 0; grid_index < GlobalC::bigpw->nbxx; grid_index++)
 			{
-
 				// get the value: how many atoms has orbital value on this grid.
 				const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
 
