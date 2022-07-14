@@ -76,6 +76,12 @@ namespace hsolver
 		}
 
 		stoiter.itermu(iter,pes);
+		stoiter.calHsqrtchi(stowf);
+		if(skip_charge)
+    	{
+    	    ModuleBase::timer::tick(this->classname, "solve");
+    	    return;
+    	}
 		//(5) calculate new charge density 
 		// calculate KS rho.
 		if(nbands > 0)

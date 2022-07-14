@@ -344,6 +344,19 @@ double Stochastic_Iter::calne(elecstate::ElecState* pes)
     return totne;
 }
 
+void Stochastic_Iter::calHsqrtchi(Stochastic_WF& stowf)
+{
+    p_che->calcoef_real(&stofunc,&Sto_Func<double>::nroot_fd);
+    for(int ik = 0; ik < GlobalC::kv.nks; ++ik)
+    {
+        //init k
+        if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
+        stohchi.current_ik = ik;
+
+        this->calTnchi_ik(ik, stowf);
+    }
+}
+
 void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pes)
 {  
     ModuleBase::TITLE("Stochastic_Iter","sum_stoband");
@@ -352,7 +365,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     int npwx = GlobalC::wf.npwx;
     const int norder = p_che->norder;
 
-    //cal demet
+    //---------------cal demet-----------------------
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nfdlnfd);
     double stodemet = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
 
@@ -369,15 +382,14 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
         }
     }
     pes->demet /= GlobalV::NPROC_IN_POOL;
+#ifdef __MPI
 	MPI_Allreduce(MPI_IN_PLACE, &pes->demet, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
-
-    //cal eband
+#endif
+    //--------------------cal eband------------------------
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nxfd);
     double sto_eband = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
 
-    //cal rho
-    p_che->calcoef_real(&stofunc,&Sto_Func<double>::nroot_fd);
-    
+    //---------------------cal rho-------------------------
     double *sto_rho = new double [nrxx];
     //int npwall = npwx * nchip;
 
@@ -400,12 +412,6 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     
     for(int ik = 0; ik < GlobalC::kv.nks; ++ik)
     {
-        //init k
-        if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
-        stohchi.current_ik = ik;
-
-        this->calTnchi(ik, stowf);
-
         std::complex<double> *tmpout = stowf.shchi[ik].c;
         for(int ichi = 0; ichi < nchip[ik] ; ++ichi)
         {
@@ -474,7 +480,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     return;
 }
 
-void Stochastic_Iter::calTnchi(const int& ik, Stochastic_WF& stowf)
+void Stochastic_Iter::calTnchi_ik(const int& ik, Stochastic_WF& stowf)
 {
     const int npw = GlobalC::kv.ngk[ik];
     std::complex<double> * out = stowf.shchi[ik].c;

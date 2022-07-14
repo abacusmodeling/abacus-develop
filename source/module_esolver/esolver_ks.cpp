@@ -166,7 +166,7 @@ namespace ModuleESolver
         {
             ModuleBase::timer::tick(this->classname, "Run");
 
-            this->printhead(); //print the headline on the screen.
+            if(this->maxniter > 0)  this->printhead(); //print the headline on the screen.
             this->beforescf(istep); //Something else to do before the iter loop
 
             bool firstscf = true;
@@ -241,8 +241,8 @@ namespace ModuleESolver
                 printiter(iter, drho, duration, diag_ethr);
                 if (this->conv_elec)
                 {
-                    int stop = this->do_after_converge(iter);
                     this->niter = iter;
+                    bool stop = this->do_after_converge(iter);
                     if(stop) break;
                 }
             }
