@@ -30,9 +30,21 @@ include_directories(${ABACUS_SOURCE_DIR})
 add_executable(${ABACUS_BIN_NAME} source/main.cpp)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_compile_options(-O2 -g)
 add_compile_options(-Wno-write-strings)
 set(FETCHCONTENT_QUIET FALSE) # Notify user when cloning git repo
+
+# Select 'Release' configuration for best performance;
+#   this will disable all assertions.
+# Other default configurations are also available, see:
+# https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#default-and-custom-configurations
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  add_compile_options(-O2 -g) # default flag
+endif()
+include(CheckIPOSupported)
+check_ipo_supported(RESULT IPOSupported)
+if(IPOSupported)
+  set_target_properties(${ABACUS_BIN_NAME} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
 
 find_package(Cereal REQUIRED)
 include_directories(${CEREAL_INCLUDE_DIR})
