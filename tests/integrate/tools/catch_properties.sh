@@ -201,7 +201,7 @@ if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 		wfc_ref=LOWF_K_2_mod.dat.ref
 	fi
 
-	python3 ../tools/CompareFile.py $wfc_cal $wfc_ref 8
+	python3 ../tools/CompareFile.py $wfc_cal $wfc_ref 8 -abs 1
 	echo "Compare_wfc_lcao_pass $?" >>$1
 fi
 
