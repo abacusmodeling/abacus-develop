@@ -3107,3 +3107,6 @@ void Pseudopot_upf::read_pseudo_upf201_rhoatom(std::ifstream &ifs)
 		ifs >> this->rho_at[ir];
 	}
 }
+
+#include "src_io/berryphase.h"
+bool berryphase::berry_phase_flag;
