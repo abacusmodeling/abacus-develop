@@ -231,29 +231,8 @@ if ! test -z "$out_dm"  && [ $out_dm -eq 1 ]; then
 fi
 
 if ! test -z "$out_mul"  && [ $out_mul -eq 1 ]; then
-      mulfile=`ls OUT.autotest/ | grep mulliken`
-      if test -z "$mulfile"; then
-              echo "Can't find Mulliken files"
-              exit 1
-      else
-              for mul in $mulfile;
-              do
-                      if ! test -f OUT.autotest/$mul; then
-                              echo "Irregular Mulliken file found"
-                              exit 1
-                      else
-                              sed -i "1,$ s/[a-d]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/[f-z]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/[A-D]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/[F-Z]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/+//g" OUT.autotest/$mul
-                              sed -i "1,$ s/)//g" OUT.autotest/$mul
-                              sed -i "1,$ s/(//g" OUT.autotest/$mul
-                              total_mul=`sum_file OUT.autotest/$mul`
-                              echo "$mul $total_mul" >>$1
-			fi
-		done
-	fi
+    python3 ../tools/CompareFile.py mulliken.txt.ref OUT.autotest/mulliken.txt 8
+	echo "Compare_mulliken_pass $?" >>$1
 fi
 
 if [ $calculation == "ienvelope" ]; then
