@@ -2,7 +2,7 @@
 
 # ABACUS executable path
 abacus=abacus
-# number of mpi processes
+# number of MPI processes
 np=4
 # threshold with unit: eV
 threshold=0.0000001
@@ -26,9 +26,17 @@ do
     esac
 done
 
+# number of OpenMP threads
+nt=$OMP_NUM_THREADS
+if [[ -z "$nt" ]]; then
+    nt=$(expr `nproc` / ${np})
+    export OMP_NUM_THREADS=${nt}
+fi
+
 echo "-----AUTO TESTS OF ABACUS ------"
-echo "ABACUS path: $abacus";
-echo "Number of cores: $np";
+echo "ABACUS path: $abacus"
+echo "Number of processes: $np"
+echo "Number of threads: $nt"
 echo "Test accuracy: $threshold eV"
 echo "Check accuaracy: $ca"
 echo "Test cases: $case"
