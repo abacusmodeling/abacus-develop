@@ -217,14 +217,16 @@ if ! test -z "$out_dm"  && [ $out_dm -eq 1 ]; then
                               echo "Irregular DM file found"
                               exit 1
                       else
-                              sed -i "1,$ s/[a-d]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/[f-z]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/[A-D]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/[F-Z]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/)//g" OUT.autotest/$dm
-                              sed -i "1,$ s/(//g" OUT.autotest/$dm
-                              total_dm=`sum_file OUT.autotest/$dm`
-                              echo "$dm $total_dm" >>$1
+                            total_dm=$(awk 'BEGIN {sum=0.0;startline=999}
+							{
+								if(NR==7){startline=$1+14;}
+								else if(NR>=startline) 
+								{
+									for(i=1;i<=NF;i++){sum+=sqrt($i*$i)}
+								}
+							}
+							END {printf"%.6f",sum}' OUT.autotest/$dm)
+                            echo "$dm $total_dm" >>$1
                       fi
               done
       fi
