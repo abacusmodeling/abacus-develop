@@ -25,6 +25,18 @@ protected:
     virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
     virtual void eachiterfinish(const int iter) override; 
     virtual void afterscf() override;
+    virtual void postprocess() override;
+
+public:
+    //Stochastic Kubo-Greenwood
+    void sKG(const int nche_KG, const double fwhmin, const double wcut, 
+             const double dw_in, const int times);
+private:
+    void calcondw(const int nt,const double dt,const double fwhmin,const double wcut,const double dw_in,double*ct11,double*ct12,double *ct22);
+
+private:
+    int nche_sto; //norder of Chebyshev
+
 
 };
 

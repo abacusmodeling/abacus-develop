@@ -78,6 +78,10 @@
 
     [efield_flag](#efield_flag) | [dip_cor_flag](#dip_cor_flag) | [efield_dir](#efield_dir) | [efield_pos_max](#efield_pos_max) | [efield_pos_dec](#efield_pos_dec) | [efield_amp ](#efield_amp )
 
+- [Electronic conductivities](#electronic-conductivities)
+
+    [cal_cond](#cal_cond) | [cond_nche](#cond_nche) | [cond_dw](#cond_dw) | [cond_wcut](#cond_wcut) | [cond_wenlarge](#cond_wenlarge) | [cond_fwhm ](#cond_fwhm )
+
 [back to main page](../README.md)
 
 ## Structure of the file
@@ -1561,3 +1565,52 @@ This part of variables are used to control berry phase and wannier90 interfacae 
 - **Type**: Boolean
 - **Description**: If set to 1, then only perform the neighboring atoms search.
 - **Default**: 0
+
+### Electronic conductivities
+
+Frequency-dependent electronic conductivities can be calculated with Kubo-Greenwood formula[Phys. Rev. B 83, 235120 (2011)].
+Onsager coefficiencies:
+$$L_{mn}(\omega)=(-1)^{m+n}\frac{2\pi e^2\hbar^2}{3m_e^2\omega\Omega}\\
+\times\sum_{ij\alpha\mathbf{k}}W(\mathbf{k})\left(\frac{\epsilon_{i\mathbf{k}}+\epsilon_{j\mathbf{k}}}{2}-\mu\right)^{m+n-2}|
+\langle\Psi_{i\mathbf{k}}|\nabla_\alpha|\Psi_{j\mathbf{k}}\rangle|^2\\
+\times[f(\epsilon_{i\mathbf{k}})-f(\epsilon_{j\mathbf{k}})]\delta(\epsilon_{j\mathbf{k}}-\epsilon_{i\mathbf{k}}-\hbar\omega).$$
+Frequency-dependent electric conductivities:    $\sigma(\omega)=L_{11}(\omega).$
+Frequency-dependent thermal conductivities: $\kappa(\omega)=\frac{1}{e^2T}\left(L_{22}-\frac{L_{12}^2}{L_{11}}\right).$
+DC electric conductivities: $\sigma = \lim_{\omega\to 0}\sigma(\omega)$
+Thermal conductivities: $\kappa = \lim_{\omega\to 0}\kappa(\omega)$
+
+#### cal_cond
+
+- **Type**: Boolean
+- **Description**: If set to 1, electronic conductivities will be calculated. Only supported in calculations of SDFT and KSDFT_PW. 
+- **Default**: 0
+
+#### cond_nche
+
+- **Type**: Integer
+- **Description**: Chebyshev expansion orders for stochastic Kubo Greenwood. Only used when the calculation is SDFT.
+- **Default**: 100
+
+#### cond_dw
+
+- **Type**: Real
+- **Description**: Frequency interval ($d\omega$) for frequency-dependent conductivities. The unit is eV.
+- **Default**: 0.1
+
+#### cond_wcut
+
+- **Type**: Real
+- **Description**: Cutoff frequency for frequency-dependent conductivities. The unit is eV.
+- **Default**: 10.0
+
+#### cond_wenlarge
+
+- **Type**: Integer
+- **Description**: Control the t interval: dt = PI/wcut/cond_wenlarge
+- **Default**: 10
+
+#### cond_fwhm
+
+- **Type**: Integer
+- **Description**: FWHM for conductivities. The unit is eV.
+- **Default**: 0.3

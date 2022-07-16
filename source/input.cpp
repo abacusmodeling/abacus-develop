@@ -145,6 +145,12 @@ void Input::Default(void)
     kpar = 1;
     initsto_freq = 1000;
     method_sto = 1;
+    cal_cond = false;
+    cond_nche = 100;
+    cond_dw = 0.1;
+    cond_wcut = 10;
+    cond_wenlarge = 10;
+    cond_fwhm = 0.3;
     berry_phase = false;
     gdir = 3;
     towannier90 = false;
@@ -582,6 +588,30 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("method_sto", word) == 0)
         {
             read_value(ifs, method_sto);
+        }
+        else if (strcmp("cal_cond", word) == 0)
+        {
+            read_value(ifs, cal_cond);
+        }
+        else if (strcmp("cond_nche", word) == 0)
+        {
+            read_value(ifs, cond_nche);
+        }
+        else if (strcmp("cond_dw", word) == 0)
+        {
+            read_value(ifs, cond_dw);
+        }
+        else if (strcmp("cond_wcut", word) == 0)
+        {
+            read_value(ifs, cond_wcut);
+        }
+        else if (strcmp("cond_wenlarge", word) == 0)
+        {
+            read_value(ifs, cond_wenlarge);
+        }
+        else if (strcmp("cond_fwhm", word) == 0)
+        {
+            read_value(ifs, cond_fwhm);
         }
         else if (strcmp("bndpar", word) == 0)
         {
@@ -1919,6 +1949,12 @@ void Input::Bcast()
     Parallel_Common::bcast_double(emin_sto);
     Parallel_Common::bcast_int(initsto_freq);
     Parallel_Common::bcast_int(method_sto);
+    Parallel_Common::bcast_bool(cal_cond);
+    Parallel_Common::bcast_int(cond_nche);
+    Parallel_Common::bcast_double(cond_dw);
+    Parallel_Common::bcast_double(cond_wcut);
+    Parallel_Common::bcast_int(cond_wenlarge);
+    Parallel_Common::bcast_double(cond_fwhm);
     Parallel_Common::bcast_int(bndpar);
     Parallel_Common::bcast_int(kpar);
     Parallel_Common::bcast_bool(berry_phase);

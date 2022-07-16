@@ -19,6 +19,13 @@ public:
     REAL nxfd(REAL e);
     REAL fdlnfd(REAL e);
     REAL nfdlnfd(REAL e);
+    REAL n_fd(REAL e);
+
+public:
+    REAL t;
+    REAL ncos(REAL e);
+    REAL n_sin(REAL e);
+
 };
 
 #endif

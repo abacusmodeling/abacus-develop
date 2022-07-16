@@ -17,9 +17,9 @@ Stochastic_Iter::Stochastic_Iter()
 
 Stochastic_Iter::~Stochastic_Iter()
 {
-    if(p_che != nullptr)        delete p_che;
-    if(spolyv != nullptr)       delete[] spolyv;
-    if(chiallorder != nullptr)  delete[] chiallorder;
+    delete p_che;
+    delete[] spolyv;
+    delete[] chiallorder;
 }
 
 void Stochastic_Iter::init(const int dim, int* nchip_in, const int method_in, Stochastic_WF& stowf)
@@ -333,10 +333,9 @@ double Stochastic_Iter::calne(elecstate::ElecState* pes)
         }
     }
     KS_ne /= GlobalV::NPROC_IN_POOL;
-	MPI_Allreduce(MPI_IN_PLACE, &KS_ne, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
-
 #ifdef __MPI
-        MPI_Allreduce(MPI_IN_PLACE, &sto_ne, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
+	MPI_Allreduce(MPI_IN_PLACE, &KS_ne, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &sto_ne, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
 #endif
 
     totne = KS_ne + sto_ne;
@@ -513,4 +512,12 @@ void Stochastic_Iter::calTnchi_ik(const int& ik, Stochastic_WF& stowf)
     
 }
 
+void Stochastic_Iter::cleanchiallorder()
+{
+    if(this->method==2) 
+    {
+        delete[] chiallorder;
+        chiallorder = nullptr;
+    }
+}
 
