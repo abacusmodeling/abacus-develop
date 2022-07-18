@@ -82,7 +82,7 @@ cmake -B build -DCMAKE_INSTALL_PREFIX=${ABACUS_BIN_PATH}
 ```
 
 You can provide path of each dependent package if the package cannot be automatically found by cmake.
-Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDEDIR`, `MPI_CXX_COMPILER` and `MKLROOT` are currently available to specify.
+Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDE_DIR`, `MPI_CXX_COMPILER` and `MKLROOT` are currently available to specify.
 For example:
 
 ```bash

@@ -39,11 +39,11 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {   	  
 		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
+		const int npw = GlobalC::kv.ngk[ik];
 		// generate vkb
 		if (GlobalC::ppcell.nkb > 0)
 		{
-			GlobalC::ppcell.getvnl(ik);
+			GlobalC::ppcell.getvnl(ik, GlobalC::ppcell.vkb);
 		}
 
 		// get becp according to wave functions and vkb
@@ -75,7 +75,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
             &transb,
             &nkb,
             &npm,
-            &GlobalC::wf.npw,
+            &npw,
             &ModuleBase::ONE,
             GlobalC::ppcell.vkb.c,
             &GlobalC::wf.npwx,
@@ -113,7 +113,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 					// third term of dbecp_noevc
 					//std::complex<double>* pvkb = &vkb2(i,0);
 					//std::complex<double>* pdbecp_noevc = &dbecp_noevc(i, 0);
-					for (int ig = 0; ig < GlobalC::wf.npw; ig++) 
+					for (int ig = 0; ig < npw; ig++) 
 					{
 						qvec = GlobalC::wfcpw->getgpluskcar(ik, ig);
 
@@ -129,7 +129,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 					std::complex<double>* pdbecp_noevc = &dbecp_noevc(i, 0);
 					std::complex<double>* pvkb = &vkb1(i, 0);
 					// first term
-					for (int ig = 0; ig < GlobalC::wf.npw;ig++) 
+					for (int ig = 0; ig < npw;ig++) 
 					{
 						pdbecp_noevc[ig] -= 2.0 * pvkb[ig];
 					}
@@ -137,14 +137,14 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 					if (ipol == jpol)
 					{
 						pvkb = &GlobalC::ppcell.vkb(i, 0);
-						for (int ig = 0; ig < GlobalC::wf.npw;ig++) 
+						for (int ig = 0; ig < npw;ig++) 
 						{
 							pdbecp_noevc[ig] -= pvkb[ig];
 						}
 					}
 					// third term
 					pvkb = &vkb2(i,0);
-					for (int ig = 0; ig < GlobalC::wf.npw;ig++) 
+					for (int ig = 0; ig < npw;ig++) 
 					{
 						qvec =	GlobalC::wfcpw->getgpluskcar(ik, ig);
 						double qm1;
@@ -158,7 +158,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 					&transb,
 					&nkb,
 					&npm,
-					&GlobalC::wf.npw,
+					&npw,
 					&ModuleBase::ONE,
 					dbecp_noevc.c,
 					&GlobalC::wf.npwx,
@@ -189,15 +189,23 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma, const psi::Psi<complex<do
 						const int Nprojs = GlobalC::ucell.atoms[it].nh;
 						for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 						{
-							for (int ip=0; ip<Nprojs; ip++)
+							for (int ip1=0; ip1<Nprojs; ip1++)
 							{
-								double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
-								const int inkb = sum + ip;
-								//out<<"\n ps = "<<ps;
+								for(int ip2=0; ip2<Nprojs; ip2++)
+								{
+									if(!GlobalC::ppcell.multi_proj && ip1 != ip2) 
+									{
+										continue;
+									}
+									double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip1, ip2) ;
+									const int inkb1 = sum + ip1;
+									const int inkb2 = sum + ip2;
+									//out<<"\n ps = "<<ps;
 
-							 
-								const double dbb = ( conj( dbecp( ib, inkb) ) * becp( ib, inkb) ).real();
-								sigmanlc[ipol][ jpol] -= ps * fac * dbb;
+								
+									const double dbb = ( conj( dbecp( ib, inkb1) ) * becp( ib, inkb2) ).real();
+									sigmanlc[ipol][ jpol] -= ps * fac * dbb;
+								}
 							 
 							}//end ip
 							++iat;        

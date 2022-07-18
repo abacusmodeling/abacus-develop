@@ -52,11 +52,14 @@ void ELEC_evolve::evolve_psi(
         {
             GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
         }
-        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
         for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
+            if(XC_Functional::get_func_type()==3)
+            {
+                GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(GlobalV::CURRENT_SPIN, ir);
+            }
         }
 
         //--------------------------------------------
@@ -72,8 +75,16 @@ void ELEC_evolve::evolve_psi(
             uhm.GK.reset_spin(GlobalV::CURRENT_SPIN);
 
             // vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-            Gint_inout inout(GlobalC::pot.vr_eff1, 0, Gint_Tools::job_type::vlocal);
-            uhm.GK.cal_gint(&inout);
+            if(XC_Functional::get_func_type()==3)
+            {
+                Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, 0, Gint_Tools::job_type::vlocal_meta);
+                uhm.GK.cal_gint(&inout);
+            }
+            else
+            {
+                Gint_inout inout(GlobalC::pot.vr_eff1, 0, Gint_Tools::job_type::vlocal);
+                uhm.GK.cal_gint(&inout);
+            }
             // added by zhengdy-soc, for non-collinear case
             // integral 4 times, is there any method to simplify?
             if (GlobalV::NSPIN == 4)
@@ -83,9 +94,22 @@ void ELEC_evolve::evolve_psi(
                     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                     {
                         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
+                        if(XC_Functional::get_func_type()==3)
+                        {
+                            GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(is, ir);
+                        }
                     }
-                    Gint_inout inout(GlobalC::pot.vr_eff1, is, Gint_Tools::job_type::vlocal);
-                    uhm.GK.cal_gint(&inout);
+
+                    if(XC_Functional::get_func_type()==3)
+                    {
+                        Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, is, Gint_Tools::job_type::vlocal_meta);
+                        uhm.GK.cal_gint(&inout);
+                    }
+                    else
+                    {
+                        Gint_inout inout(GlobalC::pot.vr_eff1, is, Gint_Tools::job_type::vlocal);
+                        uhm.GK.cal_gint(&inout);
+                    }
                 }
             }
         }
