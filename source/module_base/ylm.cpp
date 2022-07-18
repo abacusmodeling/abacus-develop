@@ -1110,21 +1110,21 @@ void Ylm::hes_rl_sph_harm
 	hrly[5][3] = hrly[5][4] = hrly[5][5] = 0.0;
 	
 	//m=-1 : yz
-	hrly[6][5] = coeff;
+	hrly[6][4] = coeff;
 	hrly[6][0] = hrly[6][1] = 0.0;
-	hrly[6][2] = hrly[6][3] = hrly[6][4] = 0.0;
+	hrly[6][2] = hrly[6][3] = hrly[6][5] = 0.0;
 
 	//m=-2 : xy
-	hrly[7][1] = coeff;
-	hrly[7][0] = hrly[7][2] = 0.0;
-	hrly[7][3] = hrly[7][4] = hrly[7][5] = 0.0;
+	hrly[8][1] = coeff;
+	hrly[8][0] = hrly[8][2] = 0.0;
+	hrly[8][3] = hrly[8][4] = hrly[8][5] = 0.0;
 
 	//m=2 : (x^2-y^2)
 	coeff = sqrt(15.0 / ModuleBase::PI) / 4.0;
-	hrly[8][0] =  2.0 * coeff;
-	hrly[8][1] = -2.0 * coeff;
-	hrly[8][2] = hrly[8][3] = 0.0;
-	hrly[8][4] = hrly[8][5] = 0.0;
+	hrly[7][0] =  2.0 * coeff;
+	hrly[7][3] = -2.0 * coeff;
+	hrly[7][1] = hrly[7][2] = 0.0;
+	hrly[7][4] = hrly[7][5] = 0.0;
 
 	if (Lmax == 2) return;
 	
@@ -1136,8 +1136,8 @@ void Ylm::hes_rl_sph_harm
 	hrly[9][0] = hrly[9][3] = -6.0 * z * coeff;
 	hrly[9][1] =  0.0;
 	hrly[9][2] = -6.0 * x * coeff;
-	hrly[9][3] = -6.0 * y * coeff;
-	hrly[9][4] = 12.0 * z * coeff;
+	hrly[9][4] = -6.0 * y * coeff;
+	hrly[9][5] = 12.0 * z * coeff;
 	
 	//m=1 : x(5z^2-r^2)
 	coeff = sqrt(21.0 / 2.0 / ModuleBase::PI) / 4.0;
