@@ -373,7 +373,12 @@ namespace Gint_Tools
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
 		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		double*const*const ddpsir_ylm)
+		double*const*const ddpsir_ylm_xx,
+		double*const*const ddpsir_ylm_xy,
+		double*const*const ddpsir_ylm_xz,
+		double*const*const ddpsir_ylm_yy,
+		double*const*const ddpsir_ylm_yz,
+		double*const*const ddpsir_ylm_zz)
 	{
 		for (int id=0; id<na_grid; id++)
 		{
@@ -391,10 +396,20 @@ namespace Gint_Tools
 
 			for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 			{
-				double*const p_ddpsi=&ddpsir_ylm[ib][block_index[id]];
+				double*const p_ddpsi_xx=&ddpsir_ylm_xx[ib][block_index[id]];
+				double*const p_ddpsi_xy=&ddpsir_ylm_xy[ib][block_index[id]];
+				double*const p_ddpsi_xz=&ddpsir_ylm_xz[ib][block_index[id]];
+				double*const p_ddpsi_yy=&ddpsir_ylm_yy[ib][block_index[id]];
+				double*const p_ddpsi_yz=&ddpsir_ylm_yz[ib][block_index[id]];
+				double*const p_ddpsi_zz=&ddpsir_ylm_zz[ib][block_index[id]];
 				if(!cal_flag[ib][id]) 
 				{
-					ModuleBase::GlobalFunc::ZEROS(p_ddpsi, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_xx, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_xy, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_xz, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_yy, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_yz, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_zz, block_size[id]);
 				}
 				else
 				{
@@ -407,7 +422,9 @@ namespace Gint_Tools
 					//array to store spherical harmonics and its derivatives
 					std::vector<double> rly;
 					std::vector<std::vector<double>> grly;
+					std::vector<std::vector<double>> hrly;
 					ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
+					ModuleBase::Ylm::hes_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], hrly);
 					if(distance < 1e-9)  distance = 1e-9;
 
 					const double position = distance / delta_r;
@@ -466,14 +483,34 @@ namespace Gint_Tools
 						const double rl = pow(distance, ll);
 						const double r_lp2 = pow(distance, ll+2);
 
-						// 2nd derivative of wave functions with respect to atom positions.
-						const double tmpdphi = (dtmp  - tmp * ll / distance) / rl / distance;
-						const double tmpddphi = (distance * distance * ddtmp + 2.0 * distance * (1-ll) * dtmp
-							+ (ll - 1) * ll * tmp) / r_lp2;
+						// d/dr (R_l / r^l)
+						const double tmpdphi = (dtmp - tmp * ll / distance) / rl;
+						const double term1 = ddtmp / r_lp2;
+						const double term2 = (2 * ll + 1) * dtmp / r_lp2 / distance;
+						const double term3 = ll * (ll + 2) * tmp / r_lp2 / distance / distance;
+						const double term4 = tmpdphi / distance;
+						const double term5 = term1 - term2 + term3;
 
-						// 2 (\nabla phi/r^l) (\nabla r^l Ylm) + (lapl phi/r^l) * (r^l Ylm)
-						p_ddpsi[iw] = 2.0 * tmpdphi * (dr[0] * grly[idx_lm][0] + 
-							dr[1] * grly[idx_lm][1] + dr[2] * grly[idx_lm][2]) + tmpddphi * rly[idx_lm];
+						// hessian of (R_l / r^l)
+						const double term_xx = term4 + dr[0]*dr[0]*term5;
+						const double term_xy = dr[0]*dr[1]*term5;
+						const double term_xz = dr[0]*dr[2]*term5;
+						const double term_yy = term4 + dr[1]*dr[1]*term5;
+						const double term_yz = dr[1]*dr[2]*term5;
+						const double term_zz = term4 + dr[2]*dr[2]*term5;
+
+						// d/dr (R_l / r^l) * alpha / r
+						const double term_1x = dr[0] * term4;
+						const double term_1y = dr[1] * term4;
+						const double term_1z = dr[2] * term4;
+
+						p_ddpsi_xx[iw] = term_xx * rly[idx_lm] + 2.0*term_1x*grly[idx_lm][0] + tmp/rl*hrly[idx_lm][0];
+						p_ddpsi_xy[iw] = term_xy * rly[idx_lm] + term_1x*grly[idx_lm][1] + term_1y*grly[idx_lm][0] + tmp/rl*hrly[idx_lm][1];
+						p_ddpsi_xz[iw] = term_xz * rly[idx_lm] + term_1x*grly[idx_lm][2] + term_1z*grly[idx_lm][0] + tmp/rl*hrly[idx_lm][2];
+						p_ddpsi_yy[iw] = term_yy * rly[idx_lm] + 2.0*term_1y*grly[idx_lm][1] + tmp/rl*hrly[idx_lm][3];
+						p_ddpsi_yz[iw] = term_yz * rly[idx_lm] + term_1y*grly[idx_lm][2] + term_1z*grly[idx_lm][1] + tmp/rl*hrly[idx_lm][4];
+						p_ddpsi_zz[iw] = term_zz * rly[idx_lm] + 2.0*term_1z*grly[idx_lm][2] + tmp/rl*hrly[idx_lm][5];
+						
 					}//iw
 				}//else
 			}	

@@ -28,15 +28,8 @@ void Gint::gint_kernel_force(
 	Gint_Tools::Array_Pool<double> dpsir_ylm_y(GlobalC::bigpw->bxyz, LD_pool);
 	Gint_Tools::Array_Pool<double> dpsir_ylm_z(GlobalC::bigpw->bxyz, LD_pool);
 
-	Gint_Tools::cal_dpsir_ylm(
-		na_grid, grid_index, delta_r,
-		block_index, block_size, 
-		cal_flag,
-		psir_ylm.ptr_2D,
-		dpsir_ylm_x.ptr_2D,
-		dpsir_ylm_y.ptr_2D,
-		dpsir_ylm_z.ptr_2D
-	);
+	Gint_Tools::cal_dpsir_ylm(na_grid, grid_index, delta_r,	block_index, block_size, cal_flag,
+		psir_ylm.ptr_2D, dpsir_ylm_x.ptr_2D, dpsir_ylm_y.ptr_2D, dpsir_ylm_z.ptr_2D);
 
     //calculating f_mu(r) = v(r)*psi_mu(r)*dv
 	const Gint_Tools::Array_Pool<double> psir_vlbr3 
@@ -48,35 +41,20 @@ void Gint::gint_kernel_force(
 	//calculating g_mu(r) = sum_nu rho_mu,nu f_nu(r)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		Gint_Tools::mult_psi_DM(
-			na_grid, LD_pool,
-			block_iw, block_size,
-			block_index, cal_flag,
-			psir_vlbr3.ptr_2D,
-			psir_vlbr3_DM.ptr_2D,
-			DM_in, 2);
+		Gint_Tools::mult_psi_DM(na_grid, LD_pool, block_iw, block_size, block_index, cal_flag,
+			psir_vlbr3.ptr_2D, psir_vlbr3_DM.ptr_2D, DM_in, 2);
 	}
 	else
 	{
-		Gint_Tools::mult_psi_DMR(
-			grid_index, na_grid,
-			block_index, block_size,
-			cal_flag, GlobalC::GridT,
-			psir_vlbr3.ptr_2D,
-			psir_vlbr3_DM.ptr_2D,
-			DM_in[GlobalV::CURRENT_SPIN], 2);
+		Gint_Tools::mult_psi_DMR(grid_index, na_grid, block_index, block_size, cal_flag, GlobalC::GridT,
+			psir_vlbr3.ptr_2D, psir_vlbr3_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
 	}
 
 	if(isforce)
 	{
         //do integration to get force
-		this-> cal_meshball_force(
-			grid_index, na_grid, 
-			block_size, block_index,
-			psir_vlbr3_DM.ptr_2D, 
-			dpsir_ylm_x.ptr_2D, 
-			dpsir_ylm_y.ptr_2D, 
-			dpsir_ylm_z.ptr_2D, 
+		this-> cal_meshball_force(grid_index, na_grid, block_size, block_index,
+			psir_vlbr3_DM.ptr_2D, dpsir_ylm_x.ptr_2D, dpsir_ylm_y.ptr_2D, dpsir_ylm_z.ptr_2D, 
 			fvl_dphi);
 	}
 	if(isstress)
@@ -88,30 +66,15 @@ void Gint::gint_kernel_force(
 		Gint_Tools::Array_Pool<double> dpsir_ylm_yy(GlobalC::bigpw->bxyz, LD_pool);
 		Gint_Tools::Array_Pool<double> dpsir_ylm_yz(GlobalC::bigpw->bxyz, LD_pool);
 		Gint_Tools::Array_Pool<double> dpsir_ylm_zz(GlobalC::bigpw->bxyz, LD_pool);
-		Gint_Tools::cal_dpsirr_ylm(
-			na_grid, grid_index,
-			block_index, block_size, 
-			cal_flag,
-			dpsir_ylm_x.ptr_2D,
-			dpsir_ylm_y.ptr_2D,
-			dpsir_ylm_z.ptr_2D,
-			dpsir_ylm_xx.ptr_2D,
-			dpsir_ylm_xy.ptr_2D,
-			dpsir_ylm_xz.ptr_2D,
-			dpsir_ylm_yy.ptr_2D,
-			dpsir_ylm_yz.ptr_2D,
-			dpsir_ylm_zz.ptr_2D
-		);
+		Gint_Tools::cal_dpsirr_ylm(na_grid, grid_index,	block_index, block_size, cal_flag,
+			dpsir_ylm_x.ptr_2D, dpsir_ylm_y.ptr_2D, dpsir_ylm_z.ptr_2D,
+			dpsir_ylm_xx.ptr_2D, dpsir_ylm_xy.ptr_2D, dpsir_ylm_xz.ptr_2D,
+			dpsir_ylm_yy.ptr_2D, dpsir_ylm_yz.ptr_2D, dpsir_ylm_zz.ptr_2D);
+
         //do integration to get stress
-		this-> cal_meshball_stress(na_grid, block_index,
-			psir_vlbr3_DM.ptr_2D, 
-			dpsir_ylm_xx.ptr_2D, 
-			dpsir_ylm_xy.ptr_2D, 
-			dpsir_ylm_xz.ptr_2D,
-			dpsir_ylm_yy.ptr_2D, 
-			dpsir_ylm_yz.ptr_2D, 
-			dpsir_ylm_zz.ptr_2D,
-			svl_dphi);
+		this-> cal_meshball_stress(na_grid, block_index, psir_vlbr3_DM.ptr_2D, 
+			dpsir_ylm_xx.ptr_2D, dpsir_ylm_xy.ptr_2D, dpsir_ylm_xz.ptr_2D,
+			dpsir_ylm_yy.ptr_2D, dpsir_ylm_yz.ptr_2D, dpsir_ylm_zz.ptr_2D, svl_dphi);
 	}
 
     //release memories
@@ -148,38 +111,39 @@ void Gint::gint_kernel_force_meta(
 	Gint_Tools::Array_Pool<double> dpsir_ylm_x(GlobalC::bigpw->bxyz, LD_pool);
 	Gint_Tools::Array_Pool<double> dpsir_ylm_y(GlobalC::bigpw->bxyz, LD_pool);
 	Gint_Tools::Array_Pool<double> dpsir_ylm_z(GlobalC::bigpw->bxyz, LD_pool);
-	Gint_Tools::Array_Pool<double> ddpsir_ylm(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> ddpsir_ylm_xx(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> ddpsir_ylm_xy(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> ddpsir_ylm_xz(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> ddpsir_ylm_yy(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> ddpsir_ylm_yz(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> ddpsir_ylm_zz(GlobalC::bigpw->bxyz, LD_pool);
 
-	Gint_Tools::cal_dpsir_ylm(
-		na_grid, grid_index, delta_r,
-		block_index, block_size, 
-		cal_flag,
-		psir_ylm.ptr_2D,
-		dpsir_ylm_x.ptr_2D,
-		dpsir_ylm_y.ptr_2D,
-		dpsir_ylm_z.ptr_2D
-	);
-	Gint_Tools::cal_ddpsir_ylm(
-		na_grid, grid_index, delta_r,
-		block_index, block_size, 
-		cal_flag,
-		ddpsir_ylm.ptr_2D);
+	Gint_Tools::cal_dpsir_ylm(na_grid, grid_index, delta_r,	block_index, block_size, cal_flag,
+		psir_ylm.ptr_2D, dpsir_ylm_x.ptr_2D, dpsir_ylm_y.ptr_2D, dpsir_ylm_z.ptr_2D);
+	//hessian of psi
+	Gint_Tools::cal_ddpsir_ylm(na_grid, grid_index, delta_r, block_index, block_size, cal_flag,
+		ddpsir_ylm_xx.ptr_2D, ddpsir_ylm_xy.ptr_2D, ddpsir_ylm_xz.ptr_2D,
+		ddpsir_ylm_yy.ptr_2D, ddpsir_ylm_yz.ptr_2D, ddpsir_ylm_zz.ptr_2D);
 
     //calculating f_mu(r) = v(r)*psi_mu(r)*dv 
 	const Gint_Tools::Array_Pool<double> psir_vlbr3 
 		= Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
-	const Gint_Tools::Array_Pool<double> ddpsir_vlbr3 
-		= Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vkdr3, ddpsir_ylm.ptr_2D);
+	const Gint_Tools::Array_Pool<double> dpsir_x_vlbr3 
+		= Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vkdr3, dpsir_ylm_x.ptr_2D);
+	const Gint_Tools::Array_Pool<double> dpsir_y_vlbr3 
+		= Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vkdr3, dpsir_ylm_y.ptr_2D);
+	const Gint_Tools::Array_Pool<double> dpsir_z_vlbr3 
+		= Gint_Tools::get_psir_vlbr3(na_grid, LD_pool, block_index, cal_flag, vkdr3, dpsir_ylm_z.ptr_2D);
 
 	Gint_Tools::Array_Pool<double> psir_vlbr3_DM(GlobalC::bigpw->bxyz, LD_pool);
-	Gint_Tools::Array_Pool<double> dpsirx_DM(GlobalC::bigpw->bxyz, LD_pool);
-	Gint_Tools::Array_Pool<double> dpsiry_DM(GlobalC::bigpw->bxyz, LD_pool);
-	Gint_Tools::Array_Pool<double> dpsirz_DM(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> dpsirx_v_DM(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> dpsiry_v_DM(GlobalC::bigpw->bxyz, LD_pool);
+	Gint_Tools::Array_Pool<double> dpsirz_v_DM(GlobalC::bigpw->bxyz, LD_pool);
 
 	ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
-	ModuleBase::GlobalFunc::ZEROS(dpsirx_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
-	ModuleBase::GlobalFunc::ZEROS(dpsiry_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
-	ModuleBase::GlobalFunc::ZEROS(dpsirz_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
+	ModuleBase::GlobalFunc::ZEROS(dpsirx_v_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
+	ModuleBase::GlobalFunc::ZEROS(dpsiry_v_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
+	ModuleBase::GlobalFunc::ZEROS(dpsirz_v_DM.ptr_1D, GlobalC::bigpw->bxyz*LD_pool);
 
 	//calculating g_mu(r) = sum_nu rho_mu,nu f_nu(r)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -187,22 +151,22 @@ void Gint::gint_kernel_force_meta(
 		Gint_Tools::mult_psi_DM(na_grid, LD_pool, block_iw, block_size,	block_index, cal_flag,
 			psir_vlbr3.ptr_2D, psir_vlbr3_DM.ptr_2D, DM_in, 2);
 		Gint_Tools::mult_psi_DM(na_grid, LD_pool, block_iw, block_size,	block_index, cal_flag,
-			dpsir_ylm_x.ptr_2D,	dpsirx_DM.ptr_2D, DM_in, 2);
+			dpsir_x_vlbr3.ptr_2D, dpsirx_v_DM.ptr_2D, DM_in, 2);
 		Gint_Tools::mult_psi_DM(na_grid, LD_pool, block_iw, block_size, block_index, cal_flag,
-			dpsir_ylm_y.ptr_2D,	dpsiry_DM.ptr_2D, DM_in, 2);
+			dpsir_y_vlbr3.ptr_2D, dpsiry_v_DM.ptr_2D, DM_in, 2);
 		Gint_Tools::mult_psi_DM(na_grid, LD_pool, block_iw, block_size,	block_index, cal_flag,
-			dpsir_ylm_z.ptr_2D,	dpsirz_DM.ptr_2D, DM_in, 2);
+			dpsir_z_vlbr3.ptr_2D, dpsirz_v_DM.ptr_2D, DM_in, 2);
 	}
 	else
 	{
 		Gint_Tools::mult_psi_DMR(grid_index, na_grid, block_index, block_size, cal_flag, GlobalC::GridT,
 			psir_vlbr3.ptr_2D, psir_vlbr3_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
 		Gint_Tools::mult_psi_DMR(grid_index, na_grid, block_index, block_size, cal_flag, GlobalC::GridT,
-			dpsir_ylm_x.ptr_2D, dpsirx_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
+			dpsir_x_vlbr3.ptr_2D, dpsirx_v_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
 		Gint_Tools::mult_psi_DMR(grid_index, na_grid, block_index, block_size, cal_flag, GlobalC::GridT,
-			dpsir_ylm_y.ptr_2D,	dpsiry_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
+			dpsir_y_vlbr3.ptr_2D, dpsiry_v_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
 		Gint_Tools::mult_psi_DMR(grid_index, na_grid, block_index, block_size, cal_flag, GlobalC::GridT,
-			dpsir_ylm_z.ptr_2D, dpsirz_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
+			dpsir_z_vlbr3.ptr_2D, dpsirz_v_DM.ptr_2D, DM_in[GlobalV::CURRENT_SPIN], 2);
 	}
 
 	if(isforce)
@@ -211,12 +175,15 @@ void Gint::gint_kernel_force_meta(
 		this-> cal_meshball_force(grid_index, na_grid, block_size, block_index,
 			psir_vlbr3_DM.ptr_2D, dpsir_ylm_x.ptr_2D, dpsir_ylm_y.ptr_2D, dpsir_ylm_z.ptr_2D, 
 			fvl_dphi);
-		this-> cal_meshball_force(grid_index, na_grid, block_size, block_index,
-			ddpsir_vlbr3.ptr_2D, dpsirx_DM.ptr_2D, dpsiry_DM.ptr_2D, dpsirz_DM.ptr_2D, 
+		this-> cal_meshball_force_meta(grid_index, na_grid, block_size, block_index,
+			dpsirx_v_DM.ptr_2D, dpsiry_v_DM.ptr_2D, dpsirz_v_DM.ptr_2D,
+			ddpsir_ylm_xx.ptr_2D, ddpsir_ylm_xy.ptr_2D, ddpsir_ylm_xz.ptr_2D,
+			ddpsir_ylm_yy.ptr_2D, ddpsir_ylm_yz.ptr_2D, ddpsir_ylm_zz.ptr_2D,
 			fvl_dphi);
 	}
 	if(isstress)
 	{
+		/*
         //calculating g_mu(r)*(r-R) where R is the location of atom
 		Gint_Tools::Array_Pool<double> dpsir_ylm_xx(GlobalC::bigpw->bxyz, LD_pool);
 		Gint_Tools::Array_Pool<double> dpsir_ylm_xy(GlobalC::bigpw->bxyz, LD_pool);
@@ -243,7 +210,8 @@ void Gint::gint_kernel_force_meta(
 		this-> cal_meshball_stress_meta(na_grid, block_index,
 			ddpsir_ylm_x.ptr_2D, ddpsir_ylm_y.ptr_2D, ddpsir_ylm_z.ptr_2D,
 			dpsirx_DM.ptr_2D, dpsiry_DM.ptr_2D, dpsirz_DM.ptr_2D,
-			svl_dphi);		
+			svl_dphi);
+		*/		
 	}
 
     //release memories
@@ -284,6 +252,58 @@ void Gint::cal_meshball_force(
             const double rz = ddot_(&block_size[ia1], &psir_vlbr3_DMR[ib][block_index[ia1]], &inc, &dpsir_z[ib][block_index[ia1]], &inc);
             force[0](iat,2)+=rz*2.0;
           
+        }
+    }
+	
+	return;
+}
+
+void Gint::cal_meshball_force_meta(
+	const int grid_index,
+	const int na_grid,  					    // how many atoms on this (i,j,k) grid
+	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
+	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+	const double*const*const dpsirx_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+	const double*const*const dpsiry_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+	const double*const*const dpsirz_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
+	const double*const*const ddpsir_xx,
+	const double*const*const ddpsir_xy,
+	const double*const*const ddpsir_xz,
+	const double*const*const ddpsir_yy,
+	const double*const*const ddpsir_yz,
+	const double*const*const ddpsir_zz,
+	ModuleBase::matrix *force)
+{
+
+	const int inc=1;
+	double r;
+    for(int ia1=0;ia1<na_grid;ia1++)
+    {
+        const int mcell_index=GlobalC::GridT.bcell_start[grid_index] + ia1;
+        const int iat=GlobalC::GridT.which_atom[mcell_index]; // index of atom
+
+        for(int ib=0;ib<GlobalC::bigpw->bxyz;ib++)
+        {
+            r = ddot_(&block_size[ia1], &dpsirx_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xx[ib][block_index[ia1]], &inc);
+            force[0](iat,0)+=r*2.0;
+            r = ddot_(&block_size[ia1], &dpsiry_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xy[ib][block_index[ia1]], &inc);
+            force[0](iat,0)+=r*2.0;
+            r = ddot_(&block_size[ia1], &dpsirz_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xz[ib][block_index[ia1]], &inc);
+            force[0](iat,0)+=r*2.0;
+
+            r = ddot_(&block_size[ia1], &dpsirx_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xy[ib][block_index[ia1]], &inc);
+            force[0](iat,1)+=r*2.0;
+            r = ddot_(&block_size[ia1], &dpsiry_v_dm[ib][block_index[ia1]], &inc, &ddpsir_yy[ib][block_index[ia1]], &inc);
+            force[0](iat,1)+=r*2.0;
+            r = ddot_(&block_size[ia1], &dpsirz_v_dm[ib][block_index[ia1]], &inc, &ddpsir_yz[ib][block_index[ia1]], &inc);
+            force[0](iat,1)+=r*2.0;
+
+            r = ddot_(&block_size[ia1], &dpsirx_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xz[ib][block_index[ia1]], &inc);
+            force[0](iat,2)+=r*2.0;
+            r = ddot_(&block_size[ia1], &dpsiry_v_dm[ib][block_index[ia1]], &inc, &ddpsir_yz[ib][block_index[ia1]], &inc);
+            force[0](iat,2)+=r*2.0;
+            r = ddot_(&block_size[ia1], &dpsirz_v_dm[ib][block_index[ia1]], &inc, &ddpsir_zz[ib][block_index[ia1]], &inc);
+            force[0](iat,2)+=r*2.0;         
         }
     }
 	

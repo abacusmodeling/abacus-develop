@@ -239,7 +239,12 @@ namespace Gint_Tools
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
 		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		double*const*const ddpsir_ylm);
+		double*const*const ddpsir_ylm_xx,
+		double*const*const ddpsir_ylm_xy,
+		double*const*const ddpsir_ylm_xz,
+		double*const*const ddpsir_ylm_yy,
+		double*const*const ddpsir_ylm_yz,
+		double*const*const ddpsir_ylm_zz);
 
 	// psir_ylm * vldr3
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
