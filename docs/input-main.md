@@ -1612,5 +1612,5 @@ Thermal conductivities: $\kappa = \lim_{\omega\to 0}\kappa(\omega)$
 #### cond_fwhm
 
 - **Type**: Integer
-- **Description**: FWHM for conductivities. The unit is eV.
+- **Description**: We use gaussian functions to approxiamte $\delta(E)\approx \frac{1}{\sqrt{2\pi}\Delta E}e^{-\frac{E^2}{2{\Delta E}^2}}$. FWHM for conductivities, $FWHM=2*\sqrt{2\ln2}\cdot \Delta E$. The unit is eV.
 - **Default**: 0.3
