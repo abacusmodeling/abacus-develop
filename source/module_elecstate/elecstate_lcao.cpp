@@ -3,6 +3,7 @@
 #include "cal_dm.h"
 #include "module_base/timer.h"
 #include "module_gint/grid_technique.h"
+#include "module_xc/xc_functional.h"
 
 namespace elecstate
 {
@@ -73,6 +74,13 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     Gint_inout inout(this->loc->DM_R, this->charge, Gint_Tools::job_type::rho);
     this->uhm->GK.cal_gint(&inout);
 
+    if (XC_Functional::get_func_type() == 3)
+    {
+        ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[0], this->charge->nrxx);
+        Gint_inout inout1(this->loc->DM_R, this->charge, Gint_Tools::job_type::tau);
+        this->uhm->GK.cal_gint(&inout1);
+    }
+
     this->charge->renormalize_rho();
 
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
@@ -123,10 +131,38 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
     Gint_inout inout(this->loc->DM, this->charge,Gint_Tools::job_type::rho);
     this->uhm->GG.cal_gint(&inout);
+    if (XC_Functional::get_func_type() == 3)
+    {
+        for (int is = 0; is < GlobalV::NSPIN; is++)
+        {
+            ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[0], this->charge->nrxx);
+        }
+        Gint_inout inout1(this->loc->DM, this->charge, Gint_Tools::job_type::tau);
+        this->uhm->GG.cal_gint(&inout1);
+    }
 
     this->charge->renormalize_rho();
 
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
+    return;
+}
+
+void ElecStateLCAO::print_psi(const psi::Psi<double>& psi_in)
+{
+    if(!ElecStateLCAO::out_wfc_lcao) return;
+
+    // output but not do "2d-to-grid" conversion
+    double** wfc_grid = nullptr; 
+    this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi_in.get_pointer(), wfc_grid, this->ekb, this->wg);
+    return;
+}
+void ElecStateLCAO::print_psi(const psi::Psi<std::complex<double>>& psi_in)
+{
+    if(!ElecStateLCAO::out_wfc_lcao) return;
+
+    // output but not do "2d-to-grid" conversion
+    std::complex<double>** wfc_grid = nullptr; 
+    this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi_in.get_pointer(), wfc_grid, psi_in.get_current_k(), this->ekb, this->wg);
     return;
 }
 
