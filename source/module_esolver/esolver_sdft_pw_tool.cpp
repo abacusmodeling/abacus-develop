@@ -205,7 +205,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
         //               sto conductivity
         //-----------------------------------------------------------
         //j|left> = [(Hp+pH)/2 - mu*p]|left>
-        this->phami->hPsi(this->stowf.shchi[ik].c, hleftv, nchip); //hleftv is a transitional array to get jleftv3
+        this->phami->hPsi(this->stowf.shchi[ik].c, hleftv, nchip*npwx); //hleftv is a transitional array to get jleftv3
         for(int a = 0 ; a < 3 ; ++a)
         {
             for(int ib = 0; ib < nchip ; ++ib) // sto orbitals
@@ -223,7 +223,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
 		    	}
             }
         }
-        this->phami->hPsi(leftv3, jleftv3, totbands*3); //leftv3 is a transitional array to get jleftv3
+        this->phami->hPsi(leftv3, jleftv3, totbands*3*npwx); //leftv3 is a transitional array to get jleftv3
         for(int a = 0 ; a < 3 ; ++a)
         {
             for (int ib = 0; ib < nchip ; ++ib) // sto orbitals
@@ -299,7 +299,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
             }
 
             //-i[(Hp+pH)/2 - mu*p]|right>
-            this->phami->hPsi(rightv, hleftv, nchip); //hleftv is a transitional array to get jleftv3
+            this->phami->hPsi(rightv, hleftv, nchip*npwx); //hleftv is a transitional array to get jleftv3
             for(int a = 0 ; a < 3 ; ++a)
             {
                 for (int ib = 0; ib < totbands ; ++ib) //KS + sto
@@ -310,7 +310,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
 		        	}
 		        }
             }
-            this->phami->hPsi(prightv3, jrightv3, totbands*3); //prightv3 is a transitional array to get jleftv3
+            this->phami->hPsi(prightv3, jrightv3, totbands*3*npwx); //prightv3 is a transitional array to get jleftv3
             for(int a = 0 ; a < 3 ; ++a)
             {
                 for (int ib = 0; ib < nchip ; ++ib) //sto orbitals
