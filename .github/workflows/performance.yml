@@ -4,14 +4,38 @@ on:
   workflow_dispatch:
 
 jobs:
+  start-runner:
+    name: Start self-hosted EC2 runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.PAT }}
+          ec2-image-id: ami-04cd9fec4a7a39019
+          ec2-instance-type: c5.9xlarge
+          subnet-id: subnet-72d3e53e
+          security-group-id: sg-06b0c93122c08aeab
+
   test:
     name: Performance test
-    runs-on: self-hosted
+    needs: start-runner
+    runs-on: ${{ needs.start-runner.outputs.label }}
     strategy:
       matrix:
         tag: ["gnu", "intel"]
-    if: github.repository_owner == 'deepmodeling'
-    container: ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{ matrix.tag }}
+    container: ghcr.io/deepmodeling/abacus-development-kit:${{ matrix.tag }}
     timeout-minutes: 2880
     steps:
       - name: Checkout
@@ -22,7 +46,7 @@ jobs:
       - name: Build
         run: |
           cmake -B build -DENABLE_LIBXC=ON
-          cmake --build build -j16
+          cmake --build build -j`nproc`
           cmake --install build
       - name: Test
         run: |
@@ -32,3 +56,25 @@ jobs:
       - name: Show Result
         run: |
           cat examples/performance/sumall.dat
+
+  stop-runner:
+    name: Stop self-hosted EC2 runner
+    needs:
+      - start-runner # required to get output from the start-runner job
+      - test # required to wait when the main job is done
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Stop EC2 runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.PAT }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
