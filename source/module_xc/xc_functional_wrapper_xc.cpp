@@ -97,7 +97,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
                 ex *= (1.0 - GlobalC::exx_global.info.hybrid_alpha); 
                 vupx *= (1.0 - GlobalC::exx_global.info.hybrid_alpha); 
                 vdwx *= (1.0 - GlobalC::exx_global.info.hybrid_alpha);
-                XC_Functional::pz_spin(rs, zeta, ec, vupc, vdwc);
+                XC_Functional::pw_spin(rs, zeta, ec, vupc, vdwc);
                 e = ex + ec;
                 vup = vupx + vupc;
                 vdw = vdwx + vdwc;
