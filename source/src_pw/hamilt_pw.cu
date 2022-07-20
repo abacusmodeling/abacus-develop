@@ -307,7 +307,7 @@ void Hamilt_PW::diagH_subspace(
 				add_Hexx(1);
 			}
 			else if (Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
-					(Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type ||
+					Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type ||
 					Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type) // PBE0 or HSE
 			{
 				add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
