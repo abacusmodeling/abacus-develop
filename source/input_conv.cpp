@@ -362,6 +362,7 @@ void Input_Conv::Convert(void)
     if (GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
     {
         GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
+        XC_Functional::get_hybrid_alpha(INPUT.exx_hybrid_alpha);
         GlobalC::exx_global.info.hse_omega = INPUT.exx_hse_omega;
         GlobalC::exx_global.info.separate_loop = INPUT.exx_separate_loop;
         GlobalC::exx_global.info.hybrid_step = INPUT.exx_hybrid_step;

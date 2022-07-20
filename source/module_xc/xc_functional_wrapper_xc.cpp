@@ -6,8 +6,6 @@
 // 3. xc_spin_libxc, which is the wrapper for LDA functional, spin polarized
 
 #include "xc_functional.h"
-#include "../src_pw/global.h"
-#include "../module_base/global_function.h"
 #include <stdexcept>
 
 void XC_Functional::xc(const double &rho, double &exc, double &vxc)
@@ -37,8 +35,8 @@ void XC_Functional::xc(const double &rho, double &exc, double &vxc)
             //  PBE0
                 double ex, vx, ec, vc;
                 XC_Functional::slater(rs, ex, vx);
-                ex *= (1 - GlobalC::exx_global.info.hybrid_alpha); 
-                vx *= (1 - GlobalC::exx_global.info.hybrid_alpha);
+                ex *= (1 - XC_Functional::hybrid_alpha); 
+                vx *= (1 - XC_Functional::hybrid_alpha);
                 XC_Functional::pw(rs, 0, ec, vc);
                 e = ex + ec;
                 v = vx + vc;
@@ -94,9 +92,9 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
             //  PBE0
                 double ex, vupx, vdwx, ec, vupc, vdwc;
                 XC_Functional::slater_spin(rho, zeta, ex, vupx, vdwx);
-                ex *= (1.0 - GlobalC::exx_global.info.hybrid_alpha); 
-                vupx *= (1.0 - GlobalC::exx_global.info.hybrid_alpha); 
-                vdwx *= (1.0 - GlobalC::exx_global.info.hybrid_alpha);
+                ex *= (1.0 - XC_Functional::hybrid_alpha); 
+                vupx *= (1.0 - XC_Functional::hybrid_alpha); 
+                vdwx *= (1.0 - XC_Functional::hybrid_alpha);
                 XC_Functional::pw_spin(rs, zeta, ec, vupc, vdwc);
                 e = ex + ec;
                 vup = vupx + vupc;

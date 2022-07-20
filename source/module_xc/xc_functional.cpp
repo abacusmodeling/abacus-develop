@@ -9,6 +9,12 @@ XC_Functional::~XC_Functional(){}
 std::vector<int> XC_Functional::func_id(1);
 int XC_Functional::func_type = 0;
 bool XC_Functional::use_libxc = true;
+double XC_Functional::hybrid_alpha = 0.25;
+
+void XC_Functional::get_hybrid_alpha(const double alpha_in)
+{
+    hybrid_alpha = alpha_in;
+}
 
 int XC_Functional::get_func_type()
 {
