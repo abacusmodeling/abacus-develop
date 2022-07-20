@@ -56,7 +56,7 @@ void ELEC_evolve::evolve_psi(
         for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
-            if(XC_Functional::get_func_type()==3)
+            if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
             {
                 GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(GlobalV::CURRENT_SPIN, ir);
             }
@@ -75,7 +75,7 @@ void ELEC_evolve::evolve_psi(
             uhm.GK.reset_spin(GlobalV::CURRENT_SPIN);
 
             // vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-            if(XC_Functional::get_func_type()==3)
+            if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
             {
                 Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, 0, Gint_Tools::job_type::vlocal_meta);
                 uhm.GK.cal_gint(&inout);
@@ -94,13 +94,13 @@ void ELEC_evolve::evolve_psi(
                     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                     {
                         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
-                        if(XC_Functional::get_func_type()==3)
+                        if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
                         {
                             GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(is, ir);
                         }
                     }
 
-                    if(XC_Functional::get_func_type()==3)
+                    if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
                     {
                         Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, is, Gint_Tools::job_type::vlocal_meta);
                         uhm.GK.cal_gint(&inout);

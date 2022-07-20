@@ -307,7 +307,7 @@ void Input_Conv::Convert(void)
         if (GlobalV::MY_RANK == 0)
             system(command0.c_str());
         if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse"
-            || INPUT.dft_functional == "opt_orb")
+            || INPUT.dft_functional == "opt_orb" || INPUT.dft_functional == "scan0" )
         {
             GlobalC::restart.info_save.save_charge = true;
             GlobalC::restart.info_save.save_H = true;
@@ -321,7 +321,7 @@ void Input_Conv::Convert(void)
     {
         GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
         if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse"
-            || INPUT.dft_functional == "opt_orb")
+            || INPUT.dft_functional == "opt_orb" || INPUT.dft_functional == "scan0")
         {
             GlobalC::restart.info_load.load_charge = true;
         }
@@ -345,6 +345,10 @@ void Input_Conv::Convert(void)
     else if (INPUT.dft_functional == "pbe0")
     {
         GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+    }
+    else if (INPUT.dft_functional == "scan0")
+    {
+        GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::SCAN0;
     }
     else if (INPUT.dft_functional == "hse")
     {

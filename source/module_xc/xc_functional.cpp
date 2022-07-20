@@ -107,6 +107,13 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         func_type = 3;
         use_libxc = true;
 	}
+    else if ( xc_func == "SCAN0")
+	{
+        func_id.push_back(XC_MGGA_X_SCAN);
+        func_id.push_back(XC_MGGA_C_SCAN);
+        func_type = 5;
+        use_libxc = true;
+	}
 #endif
    	else if( xc_func == "PBE0")
 	{
@@ -143,11 +150,11 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
 		std::cerr << "\n OPTX untested please test,";
 	}
 
-    if(func_type == 3 && GlobalV::BASIS_TYPE != "pw" && (GlobalV::CAL_STRESS || GlobalV::CAL_FORCE))
+    if((func_type == 3 || func_type == 5) && GlobalV::BASIS_TYPE != "pw" && (GlobalV::CAL_STRESS || GlobalV::CAL_FORCE))
     {
         ModuleBase::WARNING_QUIT("set_xc_type","mGGA stress & force not finished for LCAO yet");
     }
-    if(func_type == 4 && GlobalV::BASIS_TYPE == "pw")
+    if((func_type == 4 || func_type == 5) && GlobalV::BASIS_TYPE == "pw")
     {
         ModuleBase::WARNING_QUIT("set_xc_type","hybrid functional not realized for planewave yet");
     }
@@ -157,9 +164,9 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
     }
 
 #ifndef USE_LIBXC
-    if(xc_func == "SCAN" || xc_func == "HSE")
+    if(xc_func == "SCAN" || xc_func == "HSE" || xc_func == "SCAN0")
     {
-        ModuleBase::WARNING_QUIT("set_xc_type","to use SCAN or HSE, LIBXC is required");
+        ModuleBase::WARNING_QUIT("set_xc_type","to use SCAN, SCAN0, or HSE, LIBXC is required");
     }
     use_libxc = false;
 #endif
@@ -175,6 +182,7 @@ void XC_Functional::set_xc_type_libxc(std::string xc_func_in)
     if(xc_func_in.find("GGA") != std::string::npos) func_type = 2;
     if(xc_func_in.find("MGGA") != std::string::npos) func_type = 3;
     if(xc_func_in.find("HYB") != std::string::npos) func_type =4;
+    if(xc_func_in.find("HYB") != std::string::npos && xc_func_in.find("MGGA") != std::string::npos) func_type =5;
 
     // determine the id
     int pos = 0;
