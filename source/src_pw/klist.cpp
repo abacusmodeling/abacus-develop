@@ -5,6 +5,7 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../src_parallel/parallel_common.h"
 #include "../module_base/memory.h"
+#include "src_io/berryphase.h"
 
 K_Vectors::K_Vectors()
 {	
@@ -80,11 +81,16 @@ void K_Vectors::set(
 	}
 
     // (2)
-    this->ibz_kpoint(symm, ModuleSymmetry::Symmetry::symm_flag);
-    if(ModuleSymmetry::Symmetry::symm_flag || is_mp)
+    //only berry phase need all kpoints including time-reversal symmetry!
+    //if symm_flag is not set, only time-reversal symmetry would be considered.
+    if(!berryphase::berry_phase_flag)
     {
-        this->update_use_ibz();
-        this->nks = this->nkstot = this->nkstot_ibz;
+        this->ibz_kpoint(symm, ModuleSymmetry::Symmetry::symm_flag);
+        if(ModuleSymmetry::Symmetry::symm_flag || is_mp)
+        {
+            this->update_use_ibz();
+            this->nks = this->nkstot = this->nkstot_ibz;
+        }
     }
 
     // (3)

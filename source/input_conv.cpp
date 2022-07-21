@@ -444,6 +444,10 @@ void Input_Conv::Convert(void)
     hsolver::HSolverLCAO::out_mat_hs = INPUT.out_mat_hs;
     hsolver::HSolverLCAO::out_mat_hsR = INPUT.out_mat_hs2; // LiuXh add 2019-07-16
     elecstate::ElecStateLCAO::out_wfc_lcao = INPUT.out_wfc_lcao;
+    if(INPUT.calculation == "nscf" && !INPUT.towannier90 && !INPUT.berry_phase)
+    {
+        elecstate::ElecStateLCAO::need_psi_grid = false;
+    }
 #endif
 
     GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;
