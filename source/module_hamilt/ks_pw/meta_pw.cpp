@@ -10,32 +10,35 @@
 namespace hamilt
 {
 
-MetaPW::MetaPW(
-    int max_npw_in,
-    int npol_in,
-    double tpiba2_in,
-    const int* ngk_in, 
+template class Meta<OperatorPW>;
+
+template<>
+Meta<OperatorPW>::Meta(
+    double tpiba2_in, 
     const int* isk_in,
     const ModuleBase::matrix* vk_in,
     ModulePW::PW_Basis_K* wfcpw_in
 )
 {
-    this->ngk = ngk_in;
+    this->cal_type = 13;
     this->isk = isk_in;
-    this->max_npw = max_npw_in;
     this->tpiba2 = tpiba2_in;
     this->vk = vk_in;
     this->wfcpw = wfcpw_in;
-    this->npol = npol_in;
-    if(this->ngk == nullptr || this->isk == nullptr || this->max_npw == 0 
-    || this->tpiba2 < 1e-10 || this->vk == nullptr || this->wfcpw == nullptr
-    || this->npol == 0)
+    if(this->isk == nullptr || this->tpiba2 < 1e-10 || this->vk == nullptr || this->wfcpw == nullptr)
     {
         ModuleBase::WARNING_QUIT("MetaPW", "Constuctor of Operator::MetaPW is failed, please check your code!");
     }
 }
 
-void MetaPW::act(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const
+template<>
+void Meta<OperatorPW>::act
+(
+    const psi::Psi<std::complex<double>> *psi_in, 
+    const int n_npwx, 
+    const std::complex<double>* tmpsi_in, 
+    std::complex<double>* tmhpsi
+)const
 {
     if (XC_Functional::get_func_type() != 3)
     {
@@ -43,21 +46,15 @@ void MetaPW::act(const std::complex<double> *psi_in, std::complex<double> *hpsi,
     }
 
     ModuleBase::timer::tick("Operator", "MetaPW");
-    int m = int(size / this->max_npw / this->npol);
-    if (int(size - m * this->max_npw * this->npol) != 0)
-    {
-        m++;
-    }
-    const int npw = this->ngk[this->ik];
+
+    const int npw = psi_in->get_ngk(this->ik);
     const int current_spin = this->isk[this->ik];
+    this->max_npw = psi_in->get_nbasis();
+    //npol == 2 case has not been considered
+    this->npol = psi_in->npol;
 
-    std::complex<double> *tmhpsi;
-    const std::complex<double> *tmpsi_in;
-
-    tmhpsi = hpsi;
-    tmpsi_in = psi_in;
     std::complex<double> *porter = new std::complex<double>[wfcpw->nmaxgr];
-    for (int ib = 0; ib < m; ++ib)
+    for (int ib = 0; ib < n_npwx; ++ib)
     {
         for (int j = 0; j < 3; j++)
         {
@@ -82,6 +79,8 @@ void MetaPW::act(const std::complex<double> *psi_in, std::complex<double> *hpsi,
                 tmhpsi[ig] -= complex<double>(0.0, fact) * porter[ig];
             }
         } // x,y,z directions
+        tmhpsi += this->max_npw;
+        tmpsi_in += this->max_npw;
     }
     delete[] porter;
     ModuleBase::timer::tick("Operator", "MetaPW");

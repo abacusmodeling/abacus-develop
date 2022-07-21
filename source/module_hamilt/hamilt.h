@@ -33,9 +33,8 @@ class Hamilt
 
     int non_first_scf=0;
 
-  protected:
-    // array, save operations from each operators
-    std::vector<Operator*> ops;
+    // first node operator, add operations from each operators
+    Operator* ops = nullptr;
 };
 
 } // namespace hamilt

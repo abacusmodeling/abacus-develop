@@ -8,6 +8,7 @@
 
 namespace hsolver
 {
+typedef hamilt::Operator::hpsi_info hp_info;
 
 int DiagoDavid::PW_DIAG_NDIM = 4;
 
@@ -39,7 +40,7 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
 
     int nbase_x = DiagoDavid::PW_DIAG_NDIM * nband; // maximum dimension of the reduced basis set
 
-    ModuleBase::ComplexMatrix basis(nbase_x, dim); // the reduced basis set
+    psi::Psi<std::complex<double>> basis(1, nbase_x, dim, &(psi.get_ngk(0))); // the reduced basis set
     ModuleBase::ComplexMatrix hp(nbase_x, dim); // the product of H and psi in the reduced basis set
     ModuleBase::ComplexMatrix sp(nbase_x, dim); // the Product of S and psi in the reduced basis set
 
@@ -72,19 +73,23 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
             psi_m[ig] = psi(m, ig);
         }
 
-        this->SchmitOrth(phm_in, dim, nband, m, basis, psi_m.data(), spsi.data());
-
-        phm_in->hPsi(psi_m.data(), hpsi.data(),  (size_t)dim);
+        phm_in->sPsi(psi_m.data(), spsi.data(),  (size_t)dim);
+        this->SchmitOrth(dim, nband, m, basis, psi_m.data(), spsi.data());
         phm_in->sPsi(psi_m.data(), spsi.data(),  (size_t)dim);
 
         // basis(m) = psi_m, hp(m) = H |psi_m>, sp(m) = S |psi_m>
+        std::complex<double>* sp_p = &sp(m, 0);
+        std::complex<double>* basis_p = &basis(m, 0);
         for (int ig = 0; ig < dim; ig++)
         {
-            basis(m, ig) = psi_m[ig];
-            hp(m, ig) = hpsi[ig];
-            sp(m, ig) = spsi[ig];
+            basis_p[ig] = psi_m[ig];
+            //hp(m, ig) = hpsi[ig];
+            sp_p[ig] = spsi[ig];
         }
     }
+    hp_info dav_hpsi_in(&basis, psi::Range(1, 0, 0, nband-1));
+    auto hp_psi = std::get<0>(phm_in->ops->hPsi(dav_hpsi_in));
+    ModuleBase::GlobalFunc::COPYARRAY(hp_psi->get_pointer(), &hp(0, 0), hp_psi->get_nbasis() * nband);
 
     hc.zero_out();
     sc.zero_out();
@@ -115,9 +120,6 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
                        vc,
                        unconv.data(),
                        eigenvalue.data(),
-                       hpsi.data(),
-                       spsi.data(),
-                       ppsi.data(),
                        respsi.data());
 
         this->cal_elem(dim, nbase, this->notconv, basis, hp, sp, hc, sc);
@@ -190,20 +192,23 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
                           const int &npw,
                           const int &nbase, // current dimension of the reduced basis
                           const int &notconv,
-                          ModuleBase::ComplexMatrix &basis,
+                          psi::Psi<std::complex<double>> &basis,
                           ModuleBase::ComplexMatrix &hp,
                           ModuleBase::ComplexMatrix &sp,
                           const ModuleBase::ComplexMatrix &vc,
                           const int *unconv,
                           const double *eigenvalue,
-                          std::complex<double> *hpsi,
-                          std::complex<double> *spsi,
-                          std::complex<double> *ppsi,
                           std::complex<double> *respsi)
 {
     if (test_david == 1)
         ModuleBase::TITLE("DiagoDavid", "cal_grad");
+    if(notconv == 0) return;
     ModuleBase::timer::tick("DiagoDavid", "cal_grad");
+
+    //use template pointer for accelerate
+    std::complex<double> *hpsi;
+    std::complex<double> *spsi;
+    std::complex<double> *ppsi;
 
     // expand the reduced basis set with the new basis vectors P|R(psi)>...
     // in which psi are the last eigenvectors
@@ -213,29 +218,38 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
         ModuleBase::GlobalFunc::ZEROS(respsi, npw);
         for (int i = 0; i < nbase; i++)
         {
+            hpsi = &(hp(i, 0));
+            spsi = &(sp(i, 0));
+            auto vc_value = vc(i, unconv[m]);
+            auto ev_value = eigenvalue[unconv[m]];
             for (int ig = 0; ig < npw; ig++)
             {
-                respsi[ig] += vc(i, unconv[m]) * (hp(i, ig) - eigenvalue[unconv[m]] * sp(i, ig));
+                respsi[ig] += vc_value * (hpsi[ig] - ev_value * spsi[ig]);
             }
         }
 
+        ppsi = &basis(m, 0);
+        spsi = &sp(nbase + m, 0);
         for (int ig = 0; ig < npw; ig++)
         {
             ppsi[ig] = respsi[ig] / this->precondition[ig];
         }
 
-        this->SchmitOrth(phm_in, npw, nbase + notconv, nbase + m, basis, ppsi, spsi);
-
-        phm_in->hPsi(ppsi, hpsi, (size_t)npw);
+        phm_in->sPsi(ppsi, spsi, (size_t)npw);
+        this->SchmitOrth(npw, nbase + notconv, nbase + m, basis, ppsi, spsi);
         phm_in->sPsi(ppsi, spsi, (size_t)npw);
 
-        for (int ig = 0; ig < npw; ig++)
-        {
-            basis(nbase + m, ig) = ppsi[ig];
-            hp(nbase + m, ig) = hpsi[ig];
-            sp(nbase + m, ig) = spsi[ig];
-        }
+        
+        //for (int ig = 0; ig < npw; ig++)
+        //{
+            //basis(nbase + m, ig) = ppsi[ig];
+            //hp(nbase + m, ig) = hpsi[ig];
+            //sp(nbase + m, ig) = spsi[ig];
+        //}
     }
+    hp_info dav_hpsi_in(&basis, psi::Range(1, 0, nbase, nbase + notconv-1));
+    auto hp_psi = std::get<0>(phm_in->ops->hPsi(dav_hpsi_in));
+    ModuleBase::GlobalFunc::COPYARRAY(hp_psi->get_pointer(), &hp(nbase, 0), hp_psi->get_nbasis()*notconv);
 
     ModuleBase::timer::tick("DiagoDavid", "cal_grad");
     return;
@@ -244,7 +258,7 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
 void DiagoDavid::cal_elem(const int &npw,
                           int &nbase, // current dimension of the reduced basis
                           const int &notconv, // number of newly added basis vectors
-                          const ModuleBase::ComplexMatrix &basis,
+                          const psi::Psi<std::complex<double>> &basis,
                           const ModuleBase::ComplexMatrix &hp,
                           const ModuleBase::ComplexMatrix &sp,
                           ModuleBase::ComplexMatrix &hc,
@@ -387,7 +401,7 @@ void DiagoDavid::refresh(const int &npw,
                          int &nbase,
                          const double *eigenvalue_in,
                          const psi::Psi<std::complex<double>> &psi,
-                         ModuleBase::ComplexMatrix &basis,
+                         psi::Psi<std::complex<double>> &basis,
                          ModuleBase::ComplexMatrix &hp,
                          ModuleBase::ComplexMatrix &sp,
                          ModuleBase::ComplexMatrix &hc,
@@ -449,7 +463,7 @@ void DiagoDavid::cal_err(const int &npw,
                          const int &nbase,
                          const ModuleBase::ComplexMatrix &vc,
                          const ModuleBase::ComplexMatrix &hp,
-                         const ModuleBase::ComplexMatrix &basis,
+                         const psi::Psi<std::complex<double>> &basis,
                          const double *eigenvalue_in,
                          std::complex<double> *respsi)
 {
@@ -484,11 +498,10 @@ void DiagoDavid::cal_err(const int &npw,
     return;
 }
 
-void DiagoDavid::SchmitOrth(hamilt::Hamilt* phm_in,
-                            const int &npw,
+void DiagoDavid::SchmitOrth(const int &npw,
                             const int n_band,
                             const int m,
-                            const ModuleBase::ComplexMatrix &psi,
+                            const psi::Psi<std::complex<double>> &psi,
                             std::complex<double> *psi_m,
                             std::complex<double> *spsi)
 {
@@ -501,11 +514,9 @@ void DiagoDavid::SchmitOrth(hamilt::Hamilt* phm_in,
     // psi(m) -> psi(m) - \sum_{i < m} \langle psi(i)|S|psi(m) \rangle psi(i)
     // so the orthogonalize is performed about S.
 
-    assert(psi.nr >= n_band);
+    assert(psi.get_nbands() >= n_band);
     assert(m >= 0);
     assert(m < n_band);
-
-    phm_in->sPsi(psi_m, spsi, (size_t)npw);
 
     std::complex<double> *lagrange = new std::complex<double>[m + 1];
     ModuleBase::GlobalFunc::ZEROS(lagrange, m + 1);
@@ -559,8 +570,6 @@ void DiagoDavid::SchmitOrth(hamilt::Hamilt* phm_in,
             psi_m[i] /= psi_norm;
         }
     }
-
-    phm_in->sPsi(psi_m, spsi, (size_t)npw);
 
     delete[] lagrange;
     ModuleBase::timer::tick("DiagoDavid", "SchmitOrth");
