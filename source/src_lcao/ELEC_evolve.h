@@ -7,6 +7,7 @@
 #include "module_esolver/esolver_ks_lcao.h"
 #include "module_esolver/esolver_ks_lcao_tddft.h"
 #include "module_psi/psi.h"
+#include "module_hamilt/hamilt_lcao.h"
 
 //-----------------------------------------------------------
 // mohan add 2021-02-09
@@ -42,12 +43,12 @@ class ELEC_evolve
     static int td_vextout;
     static int td_dipoleout;
 
-
-private:
-
-    static void evolve_psi(const int& istep, LCAO_Hamilt& uhm,
-        Local_Orbital_wfc& lowf, psi::Psi<std::complex<double>>* psi);
-
+  private:
+    static void evolve_psi(const int& istep,
+                           hamilt::Hamilt* phm,
+                           Local_Orbital_wfc& lowf,
+                           psi::Psi<std::complex<double>>* psi,
+                           psi::Psi<std::complex<double>>* psi_laststep);
 };
 
 #endif

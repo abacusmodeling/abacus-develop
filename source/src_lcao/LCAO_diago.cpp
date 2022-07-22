@@ -141,7 +141,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik,
     {
         std::stringstream ss;
         ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";
-        WF_Local::write_lowf_complex(ss.str(), wfc_k_grid, ik);
+        //WF_Local::write_lowf_complex(ss.str(), wfc_k_grid, ik, GlobalC::wf.ekb, GlobalC::wf.wg);
     }
 
     delete[] en;
