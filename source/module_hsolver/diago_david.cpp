@@ -266,6 +266,8 @@ void DiagoDavid::cal_elem(const int &npw,
 {
     if (test_david == 1)
         ModuleBase::TITLE("DiagoDavid", "cal_elem");
+
+    if(notconv == 0) return;
     ModuleBase::timer::tick("DiagoDavid", "cal_elem");
 
     // updat the reduced Hamiltonian
@@ -274,8 +276,43 @@ void DiagoDavid::cal_elem(const int &npw,
     //	ModuleBase::GlobalFunc::ZEROS( hc.c+offset_h, notconv*hc.nr );
     //	ModuleBase::GlobalFunc::ZEROS( sc.c+offset_s, notconv*sc.nr );
 
-    for (int i = nbase; i < nbase + notconv; i++)
+    /*for (int i = nbase; i < nbase + notconv; i++)
     {
+        char trans1 = 'C';
+        char trans2 = 'N';
+        const int nb_notc = i+1;
+        const int one = 1;
+        hc = transpose(hc, false);
+        zgemm_(&trans1,
+            &trans2,
+            &one,
+            &nb_notc,
+            &npw,
+            &ModuleBase::ONE,
+            &basis(i , 0),
+            &basis.get_nbasis(),
+            hp.c,
+            &hp.nc,
+            &ModuleBase::ONE,
+            &hc(0, i),
+            &hc.nr);
+        hc = transpose(hc, false);
+
+        sc = transpose(sc, false);
+        zgemm_(&trans1,
+            &trans2,
+            &one,
+            &nb_notc,
+            &npw,
+            &ModuleBase::ONE,
+            &basis(i, 0),
+            &basis.get_nbasis(),
+            sp.c,
+            &sp.nc,
+            &ModuleBase::ONE,
+            &sc(0, i),
+            &sc.nr);
+        sc = transpose(sc, false);
         for (int j = 0; j <= i; j++)
         {
             for (int ig = 0; ig < npw; ig++)
@@ -286,7 +323,43 @@ void DiagoDavid::cal_elem(const int &npw,
             //	hc(j,i) = Diago_CG::ddot( npw, basis, j, hp, i );
             //	sc(j,i) = Diago_CG::ddot( npw, basis, j, sp, i );
         }
-    }
+        std::cout<<__FILE__<<__LINE__<<" "<<i<<" "<<hc(i,0)<<" "<<hc(i,1)<<std::endl;
+    }*/
+
+    char trans1 = 'C';
+    char trans2 = 'N';
+    const int nb_notc = (nbase + notconv);
+    hc = transpose(hc, false);
+    zgemm_(&trans1,
+           &trans2,
+           &notconv,
+           &nb_notc,
+           &npw,
+           &ModuleBase::ONE,
+           &basis(nbase, 0),
+           &basis.get_nbasis(),
+           hp.c,
+           &hp.nc,
+           &ModuleBase::ONE,
+           hc.c + nbase,
+           &hc.nr);
+    hc = transpose(hc, false);
+
+    sc = transpose(sc, false);
+    zgemm_(&trans1,
+           &trans2,
+           &notconv,
+           &nb_notc,
+           &npw,
+           &ModuleBase::ONE,
+           &basis(nbase, 0),
+           &basis.get_nbasis(),
+           sp.c,
+           &sp.nc,
+           &ModuleBase::ONE,
+           sc.c + nbase,
+           &sc.nr);
+    sc = transpose(sc, false);
 
     Parallel_Reduce::reduce_complex_double_pool(hc.c + offset_h, notconv * hc.nr);
     Parallel_Reduce::reduce_complex_double_pool(sc.c + offset_s, notconv * sc.nr);
@@ -521,18 +594,22 @@ void DiagoDavid::SchmitOrth(const int &npw,
     std::complex<double> *lagrange = new std::complex<double>[m + 1];
     ModuleBase::GlobalFunc::ZEROS(lagrange, m + 1);
 
+    const int one = 1;
     for (int j = 0; j < m; j++)
     {
-        for (int ig = 0; ig < npw; ig++)
+        const std::complex<double>* psi_p = &(psi(j, 0));
+        zdotc_(&lagrange[j], &npw, psi_p, &one, spsi, &one);
+        /*for (int ig = 0; ig < npw; ig++)
         {
             lagrange[j] += conj(psi(j, ig)) * spsi[ig];
-        }
+        }*/
         //	lagrange[j] = Diago_CG::ddot( npw, psi, j, spsi );
     }
-    for (int ig = 0; ig < npw; ig++)
+    zdotc_(&lagrange[m], &npw, psi_m, &one, spsi, &one);
+    /*for (int ig = 0; ig < npw; ig++)
     {
         lagrange[m] += conj(psi_m[ig]) * spsi[ig];
-    }
+    }*/
     //	lagrange[m] = Diago_CG::ddot( npw, psi_m, spsi );
 
     Parallel_Reduce::reduce_complex_double_pool(lagrange, m + 1);
@@ -545,10 +622,12 @@ void DiagoDavid::SchmitOrth(const int &npw,
 
     for (int j = 0; j < m; j++)
     {
-        for (int ig = 0; ig < npw; ig++)
+        const std::complex<double> alpha = -1 * lagrange[j];
+        zaxpy_(&npw, &alpha, &psi(j,0), &one, psi_m, &one);
+        /*for (int ig = 0; ig < npw; ig++)
         {
             psi_m[ig] -= lagrange[j] * psi(j, ig);
-        }
+        }*/
         psi_norm -= (conj(lagrange[j]) * lagrange[j]).real();
     }
 
