@@ -12,7 +12,8 @@
 #include "module_elecstate/elecstate.h"
 
 #include "updaterhok_pw_test.h"
-
+#include "src_io/berryphase.h"
+bool berryphase::berry_phase_flag;
 using::testing::AtLeast;
 using::testing::Assign;
 

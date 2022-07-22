@@ -389,7 +389,7 @@ double energy::delta_e(void)
     for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     {
     	deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
-		if(XC_Functional::get_func_type() == 3)
+		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 		{
 			deband_aux -= GlobalC::CHR.kin_r[0][ir] * GlobalC::pot.vofk(0,ir);
 		}
@@ -400,7 +400,7 @@ double energy::delta_e(void)
     	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
     	{
     		deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
-			if(XC_Functional::get_func_type() == 3)
+			if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 			{
 				deband_aux -= GlobalC::CHR.kin_r[1][ir] * GlobalC::pot.vofk(1,ir);
 			}
@@ -554,7 +554,8 @@ void energy::set_exx()
 	{
 		this->exx = exx_energy();
 	}
-	else if( Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+	else if( Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type ||
+			Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type || 
 			 Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// PBE0 or HSE
 	{
 		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();

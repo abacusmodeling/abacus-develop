@@ -2742,7 +2742,7 @@ void Input::Check(void)
         }
     }
 
-    if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "hse")
+    if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "hse" || dft_functional == "scan0")
     {
         if (exx_hybrid_alpha < 0 || exx_hybrid_alpha > 1)
         {

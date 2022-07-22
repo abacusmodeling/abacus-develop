@@ -52,6 +52,7 @@ namespace ModuleESolver
             {
             case Exx_Global::Hybrid_Type::HF:
             case Exx_Global::Hybrid_Type::PBE0:
+            case Exx_Global::Hybrid_Type::SCAN0:
             case Exx_Global::Hybrid_Type::HSE:
                 XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
                 break;
@@ -113,6 +114,7 @@ namespace ModuleESolver
             {
             case Exx_Global::Hybrid_Type::HF:
             case Exx_Global::Hybrid_Type::PBE0:
+            case Exx_Global::Hybrid_Type::SCAN0:
             case Exx_Global::Hybrid_Type::HSE:
                 GlobalC::exx_lcao.init();
                 break;
@@ -413,7 +415,7 @@ namespace ModuleESolver
 
 #ifdef __MPI
         // calculate exact-exchange
-        if (XC_Functional::get_func_type() == 4)
+        if (XC_Functional::get_func_type() == 4 || XC_Functional::get_func_type() == 5)
         {
             if (!GlobalC::exx_global.info.separate_loop)
             {
@@ -478,7 +480,7 @@ namespace ModuleESolver
         GlobalC::en.set_exx();
 
         // Peize Lin add 2020.04.04
-        if (XC_Functional::get_func_type() == 4)
+        if (XC_Functional::get_func_type() == 4 || XC_Functional::get_func_type() == 5)
         {
             if (GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
             {
@@ -906,7 +908,7 @@ namespace ModuleESolver
             GlobalC::dmft.out_to_dmft(this->LOWF, *this->UHM.LM);
         }
 
-        if (Pdiag_Double::out_mat_hsR)
+        if (hsolver::HSolverLCAO::out_mat_hsR)
         {
             this->output_HS_R(); //LiuXh add 2019-07-15
         }

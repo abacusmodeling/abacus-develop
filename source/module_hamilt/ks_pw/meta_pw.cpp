@@ -14,7 +14,7 @@ template class Meta<OperatorPW>;
 
 template<>
 Meta<OperatorPW>::Meta(
-    double tpiba2_in, 
+    double tpiba_in, 
     const int* isk_in,
     const ModuleBase::matrix* vk_in,
     ModulePW::PW_Basis_K* wfcpw_in
@@ -22,10 +22,10 @@ Meta<OperatorPW>::Meta(
 {
     this->cal_type = 13;
     this->isk = isk_in;
-    this->tpiba2 = tpiba2_in;
+    this->tpiba = tpiba_in;
     this->vk = vk_in;
     this->wfcpw = wfcpw_in;
-    if(this->isk == nullptr || this->tpiba2 < 1e-10 || this->vk == nullptr || this->wfcpw == nullptr)
+    if(this->isk == nullptr || this->tpiba < 1e-10 || this->vk == nullptr || this->wfcpw == nullptr)
     {
         ModuleBase::WARNING_QUIT("MetaPW", "Constuctor of Operator::MetaPW is failed, please check your code!");
     }
@@ -60,7 +60,7 @@ void Meta<OperatorPW>::act
         {
             for (int ig = 0; ig < npw; ig++)
             {
-                double fact = wfcpw->getgpluskcar(ik, ig)[j] * this->tpiba2;
+                double fact = wfcpw->getgpluskcar(ik, ig)[j] * this->tpiba;
                 porter[ig] = tmpsi_in[ig] * complex<double>(0.0, fact);
             }
 
@@ -75,7 +75,7 @@ void Meta<OperatorPW>::act
 
             for (int ig = 0; ig < npw; ig++)
             {
-                double fact = wfcpw->getgpluskcar(ik, ig)[j] * this->tpiba2;
+                double fact = wfcpw->getgpluskcar(ik, ig)[j] * this->tpiba;
                 tmhpsi[ig] -= complex<double>(0.0, fact) * porter[ig];
             }
         } // x,y,z directions

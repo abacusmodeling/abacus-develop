@@ -325,7 +325,7 @@ double berryphase::stringPhase(int index_str, int nbands, const psi::Psi<std::co
 			if(GlobalV::NSPIN!=4)
 			{
 				//std::complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
-				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands, *this->lowf);
+				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands, *this->lowf, psi_in);
 				// test by jingan
 				//GlobalV::ofs_running << "methon 1: det = " << my_det << std::endl;
 				// test by jingan
@@ -456,7 +456,7 @@ void berryphase::Macroscopic_polarization(const psi::Psi<std::complex<double>>* 
 	GlobalV::ofs_running << "\n\n\n\n";
 	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 	GlobalV::ofs_running << " |                                                                    |" << std::endl;
-	GlobalV::ofs_running << " | POLARIZATION GlobalV::CALCULATION:                                          |" << std::endl;
+	GlobalV::ofs_running << " | POLARIZATION CALCULATION:                                          |" << std::endl;
 	GlobalV::ofs_running << " |                  Modern Theory of Polarization                     |" << std::endl;
 	GlobalV::ofs_running << " | calculate the Macroscopic polarization of a crystalline insulator  |" << std::endl;
 	GlobalV::ofs_running << " | by using Berry Phase method.                                       |" << std::endl;

@@ -32,6 +32,7 @@ has_dftu=`grep -En '(^|[[:space:]])dft_plus_u($|[[:space:]])' INPUT | awk '{prin
 has_band=`grep -En '(^|[[:space:]])out_band($|[[:space:]])' INPUT | awk '{print $2}'`
 has_dos=`grep -En '(^|[[:space:]])out_dos($|[[:space:]])' INPUT | awk '{print $2}'`
 has_hs=`grep -En '(^|[[:space:]])out_mat_hs($|[[:space:]])' INPUT | awk '{print $2}'`
+has_hs2=`grep -En '(^|[[:space:]])out_mat_hs2($|[[:space:]])' INPUT | awk '{print $2}'`
 has_r=`grep -En '(^|[[:space:]])out_mat_r($|[[:space:]])' INPUT | awk '{print $2}'`
 deepks_out_labels=`grep deepks_out_labels INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 deepks_bandgap=`grep deepks_bandgap INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
@@ -110,10 +111,30 @@ if ! test -z "$has_band"  && [  $has_band -eq 1 ]; then
 fi
 #echo $has_hs
 if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
-        total_h=`sum_file OUT.autotest/data-0-H`
-        echo "totalHmatrix $total_h" >>$1
-	total_s=`sum_file OUT.autotest/data-0-S`
-	echo "totalSmatrix $total_s" >>$1
+	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
+		href=data-0-H.ref
+		hcal=OUT.autotest/data-0-H
+		sref=data-0-H.ref
+		scal=OUT.autotest/data-0-H
+	else
+		href=data-1-H.ref
+		hcal=OUT.autotest/data-1-H
+		sref=data-1-H.ref
+		scal=OUT.autotest/data-1-H
+	fi
+
+	python3 ../tools/CompareFile.py $href $hcal 8
+    echo "CompareH_pass $?" >>$1
+    python3 ../tools/CompareFile.py $sref $scal 8
+    echo "CompareS_pass $?" >>$1
+fi
+
+#echo $has_hs2
+if ! test -z "$has_hs2"  && [  $has_hs2 -eq 1 ]; then
+    python3 ../tools/CompareFile.py data-HR-sparse_SPIN0.csr.ref OUT.autotest/data-HR-sparse_SPIN0.csr 8
+    echo "CompareHR_pass $?" >>$1
+    python3 ../tools/CompareFile.py data-SR-sparse_SPIN0.csr.ref OUT.autotest/data-SR-sparse_SPIN0.csr 8
+    echo "CompareSR_pass $?" >>$1
 fi
 
 # echo "$has_wfc_r" ## test out_wfc_r > 0
@@ -161,31 +182,27 @@ fi
 # echo "$has_lowf" ## test out_wfc_lcao > 0
 if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
-		lowfiles=`ls OUT.autotest/ | grep LOWF_GAMMA`
+		wfc_cal=OUT.autotest/LOWF_GAMMA_S1.dat
+		wfc_ref=LOWF_GAMMA_S1.dat.ref	
 	else
-		lowfiles=`ls OUT.autotest/ | grep LOWF_K`
+		awk 'BEGIN {flag=999}
+    	{
+        	if($2 == "(band)") {flag=2;print $0}
+        	else if(flag>0) {flag-=1;print $0}
+        	else if(flag==0) 
+        	{
+            	for(i=1;i<=NF/2;i++)
+            	{printf "%.10e ",sqrt( $(2*i)*$(2*i)+$(2*i-1)*$(2*i-1) )};
+            	printf "\n"
+        	}	
+        	else {print $0}
+    	}' OUT.autotest/LOWF_K_2.dat > OUT.autotest/LOWF_K_2_mod.dat
+		wfc_cal=OUT.autotest/LOWF_K_2_mod.dat
+		wfc_ref=LOWF_K_2_mod.dat.ref
 	fi
-	if test -z "$lowfiles"; then
-		echo "Can't find LOWF files"
-		exit 1
-	else
-		for lowf in $lowfiles;
-		do
-			if ! test -f OUT.autotest/$lowf; then
-				echo "Irregular LOWF file found"
-				exit 1
-			else
-				sed -i "1,$ s/[a-d]//g" OUT.autotest/$lowf
-				sed -i "1,$ s/[f-z]//g" OUT.autotest/$lowf
-				sed -i "1,$ s/[A-D]//g" OUT.autotest/$lowf
-				sed -i "1,$ s/[F-Z]//g" OUT.autotest/$lowf
-				sed -i "1,$ s/)//g" OUT.autotest/$lowf
-				sed -i "1,$ s/(//g" OUT.autotest/$lowf
-				total_lowf=`sum_file OUT.autotest/$lowf`
-				echo "$lowf $total_lowf" >>$1
-			fi
-		done
-	fi
+
+	python3 ../tools/CompareFile.py $wfc_cal $wfc_ref 8 -abs 1
+	echo "Compare_wfc_lcao_pass $?" >>$1
 fi
 
 if ! test -z "$out_dm"  && [ $out_dm -eq 1 ]; then
@@ -200,43 +217,24 @@ if ! test -z "$out_dm"  && [ $out_dm -eq 1 ]; then
                               echo "Irregular DM file found"
                               exit 1
                       else
-                              sed -i "1,$ s/[a-d]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/[f-z]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/[A-D]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/[F-Z]//g" OUT.autotest/$dm
-                              sed -i "1,$ s/)//g" OUT.autotest/$dm
-                              sed -i "1,$ s/(//g" OUT.autotest/$dm
-                              total_dm=`sum_file OUT.autotest/$dm`
-                              echo "$dm $total_dm" >>$1
+                            total_dm=$(awk 'BEGIN {sum=0.0;startline=999}
+							{
+								if(NR==7){startline=$1+14;}
+								else if(NR>=startline) 
+								{
+									for(i=1;i<=NF;i++){sum+=sqrt($i*$i)}
+								}
+							}
+							END {printf"%.6f",sum}' OUT.autotest/$dm)
+                            echo "$dm $total_dm" >>$1
                       fi
               done
       fi
 fi
 
 if ! test -z "$out_mul"  && [ $out_mul -eq 1 ]; then
-      mulfile=`ls OUT.autotest/ | grep mulliken`
-      if test -z "$mulfile"; then
-              echo "Can't find Mulliken files"
-              exit 1
-      else
-              for mul in $mulfile;
-              do
-                      if ! test -f OUT.autotest/$mul; then
-                              echo "Irregular Mulliken file found"
-                              exit 1
-                      else
-                              sed -i "1,$ s/[a-d]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/[f-z]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/[A-D]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/[F-Z]//g" OUT.autotest/$mul
-                              sed -i "1,$ s/+//g" OUT.autotest/$mul
-                              sed -i "1,$ s/)//g" OUT.autotest/$mul
-                              sed -i "1,$ s/(//g" OUT.autotest/$mul
-                              total_mul=`sum_file OUT.autotest/$mul`
-                              echo "$mul $total_mul" >>$1
-			fi
-		done
-	fi
+    python3 ../tools/CompareFile.py mulliken.txt.ref OUT.autotest/mulliken.txt 8
+	echo "Compare_mulliken_pass $?" >>$1
 fi
 
 if [ $calculation == "ienvelope" ]; then

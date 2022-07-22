@@ -156,11 +156,29 @@ namespace ModuleESolver
             {
                 Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GG.cal_gint(&inout);
+                if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
+                {
+                    for(int is=0; is<GlobalV::NSPIN; is++)
+                    {
+                        ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.kin_r[0], GlobalC::rhopw->nrxx);
+                    }
+                    Gint_inout inout1(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::tau);
+                    this->UHM.GG.cal_gint(&inout1);
+                }
             }
             else
             {
                 Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GK.cal_gint(&inout);
+                if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
+                {
+                    for(int is=0; is<GlobalV::NSPIN; is++)
+                    {
+                        ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.kin_r[0], GlobalC::rhopw->nrxx);
+                    }
+                    Gint_inout inout1(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::tau);
+                    this->UHM.GK.cal_gint(&inout1);
+                }
             }
 
             // renormalize the charge density
@@ -201,14 +219,23 @@ namespace ModuleESolver
             }
         }
 #endif
+        ModuleBase::timer::tick("ESolver_KS_LCAO", "beforesolver");
 
+    }
+
+    void ESolver_KS_LCAO::beforescf(int istep)
+    {
+        ModuleBase::TITLE("ESolver_KS_LCAO", "beforescf");
+        ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");
+        this->beforesolver(istep);
 //Peize Lin add 2016-12-03
 #ifdef __MPI
         if(Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type)
         {
             if (Exx_Global::Hybrid_Type::HF == GlobalC::exx_lcao.info.hybrid_type
                 || Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type
-                || Exx_Global::Hybrid_Type::HSE == GlobalC::exx_lcao.info.hybrid_type)
+                || Exx_Global::Hybrid_Type::HSE == GlobalC::exx_lcao.info.hybrid_type
+                || Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type)
             {
                 GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
             }
@@ -218,19 +245,11 @@ namespace ModuleESolver
                 //program should be stopped after this judgement
                 Exx_Opt_Orb exx_opt_orb;
                 exx_opt_orb.generate_matrix();
-                ModuleBase::timer::tick("ESolver_KS_LCAO", "beforesolver");
+                ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");
                 return;
             }
         }
 #endif
-        ModuleBase::timer::tick("ESolver_KS_LCAO", "beforesolver");
-    }
-
-    void ESolver_KS_LCAO::beforescf(int istep)
-    {
-        ModuleBase::TITLE("ESolver_KS_LCAO", "beforescf");
-        ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");
-        this->beforesolver(istep);
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
         H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
@@ -298,6 +317,7 @@ namespace ModuleESolver
         {
         case Exx_Global::Hybrid_Type::HF:
         case Exx_Global::Hybrid_Type::PBE0:
+        case Exx_Global::Hybrid_Type::SCAN0:
         case Exx_Global::Hybrid_Type::HSE:
             GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
             break;
@@ -377,7 +397,7 @@ namespace ModuleESolver
         if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
         {
             berryphase bp(this->LOWF);
-            bp.Macroscopic_polarization(nullptr);
+            bp.Macroscopic_polarization(this->psi);
         }
 
         return;

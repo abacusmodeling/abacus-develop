@@ -33,7 +33,7 @@ class Meta : public T
 
     mutable int npol = 0;
 
-    double tpiba2 = 0.0;
+    double tpiba = 0.0;
 
     const int* isk = nullptr;
 
