@@ -49,7 +49,7 @@ void Meta<OperatorPW>::act
 
     const int npw = psi_in->get_ngk(this->ik);
     const int current_spin = this->isk[this->ik];
-    this->max_npw = psi_in->get_nbasis();
+    this->max_npw = psi_in->get_nbasis() / psi_in->npol;
     //npol == 2 case has not been considered
     this->npol = psi_in->npol;
 

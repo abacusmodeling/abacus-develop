@@ -75,7 +75,7 @@ void Nonlocal<OperatorPW>::act
                    &nkb,
                    &ModuleBase::ONE,
                    this->ppcell->vkb.c,
-                   &this->max_npw,
+                   &this->ppcell->vkb.nc,
                    tmpsi_in,
                    &inc,
                    &ModuleBase::ZERO,
@@ -92,7 +92,7 @@ void Nonlocal<OperatorPW>::act
                    &this->npw,
                    &ModuleBase::ONE,
                    this->ppcell->vkb.c,
-                   &this->max_npw,
+                   &this->ppcell->vkb.nc,
                    tmpsi_in,
                    &this->max_npw,
                    &ModuleBase::ZERO,
@@ -171,7 +171,7 @@ void Nonlocal<OperatorPW>::add_nonlocal_pp(std::complex<double> *hpsi_in, const 
                     {
                         for (int ib = 0; ib < m; ib+=2)
                         {
-                            psind = (sum + ip2) * 2 * m + ib;
+                            psind = (sum + ip2) * m + ib;
                             becpind = ib * nkb + sum + ip;
                             becp1 = becp[becpind];
                             becp2 = becp[becpind + nkb];
@@ -201,7 +201,7 @@ void Nonlocal<OperatorPW>::add_nonlocal_pp(std::complex<double> *hpsi_in, const 
                &(this->ppcell->nkb),
                &ModuleBase::ONE,
                this->ppcell->vkb.c,
-               &this->max_npw,
+               &this->ppcell->vkb.nc,
                ps,
                &inc,
                &ModuleBase::ONE,
@@ -218,7 +218,7 @@ void Nonlocal<OperatorPW>::add_nonlocal_pp(std::complex<double> *hpsi_in, const 
                &(this->ppcell->nkb),
                &ModuleBase::ONE,
                this->ppcell->vkb.c,
-               &this->max_npw,
+               &this->ppcell->vkb.nc,
                ps,
                &npm,
                &ModuleBase::ONE,

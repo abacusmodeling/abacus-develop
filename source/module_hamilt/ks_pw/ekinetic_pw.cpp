@@ -11,12 +11,14 @@ template class Ekinetic<OperatorPW>;
 template<>
 Ekinetic<OperatorPW>::Ekinetic(
     double tpiba2_in,
-    const double* gk2_in
+    const double* gk2_in,
+    const int gk2_dim_in
 )
 {
     this->cal_type = 10;
     this->tpiba2 = tpiba2_in;
     this->gk2 = gk2_in;
+    this->gk2_dim = gk2_dim_in;
     if( this->tpiba2 < 1e-10 || this->gk2 == nullptr
     )
     {
@@ -38,7 +40,7 @@ void Ekinetic<OperatorPW>::act
     this->max_npw = psi_in->get_nbasis() / psi_in->npol;
 
 
-    const double *gk2_ik = &(this->gk2[this->ik * this->max_npw]);
+    const double *gk2_ik = &(this->gk2[this->ik * this->gk2_dim]);
 
     for (int ib = 0; ib < n_npwx; ++ib)
     {

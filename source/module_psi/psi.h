@@ -53,9 +53,15 @@ class Psi
 {
 public:
     //Constructor 1: basic
-    Psi(void){};
+    Psi(void){
+        this->npol = GlobalV::NPOL;
+    };
     //Constructor 2: specify ngk only, should call resize() later
-    Psi(const int* ngk_in){this->ngk = ngk_in;}
+    Psi(const int* ngk_in)
+    {
+        this->ngk = ngk_in;
+        this->npol = GlobalV::NPOL;
+    }
     //Constructor 3: specify nk, nbands, nbasis, ngk, and do not need to call resize() later
     Psi(int nk_in, int nbd_in, int nbs_in, const int* ngk_in=nullptr)
     {
@@ -76,16 +82,20 @@ public:
         this->resize(nk_in, nband_in, psi_in.get_nbasis());
         this->ngk = psi_in.ngk;
         this->npol = psi_in.npol;
-        // copy from Psi from psi_in(current_k, 0, 0), 
-        // if size of k is 1, current_k in new Psi is psi_in.current_k 
-        const T* tmp = psi_in.get_pointer();
-        if(nk_in==1) for(size_t index=0; index<this->size();++index)
+
+        if(nband_in <= psi_in.get_nbands())
         {
-            psi[index] = tmp[index];
-            //current_k for this Psi only keep the spin index same as the copied Psi
-            this->current_k = psi_in.get_current_k();
-        } 
-        else for(size_t index=0; index<this->size();++index) psi[index] = tmp[index];
+            // copy from Psi from psi_in(current_k, 0, 0), 
+            // if size of k is 1, current_k in new Psi is psi_in.current_k 
+            const T* tmp = psi_in.get_pointer();
+            if(nk_in==1) for(size_t index=0; index<this->size();++index)
+            {
+                psi[index] = tmp[index];
+                //current_k for this Psi only keep the spin index same as the copied Psi
+                this->current_k = psi_in.get_current_k();
+            } 
+            else for(size_t index=0; index<this->size();++index) psi[index] = tmp[index];
+        }
     }
     // initialize the wavefunction coefficient
     // only resize and construct function now is used
@@ -235,12 +245,12 @@ public:
         else
         {
             const T* p = &this->psi[(range.index_1 * this->nbands + range.range_1) * this->nbasis];
-            int m = range.range_2 - range.range_1 + 1;
+            int m = (range.range_2 - range.range_1 + 1)* this->npol;
             return std::tuple<const T*, int>(p, m);
         }
     }
 
-    bool npol = 1;
+    int npol = 1;
  
  private:   
     std::vector<T> psi;

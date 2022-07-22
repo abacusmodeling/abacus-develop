@@ -228,7 +228,7 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
             }
         }
 
-        ppsi = &basis(m, 0);
+        ppsi = &basis(nbase + m, 0);
         spsi = &sp(nbase + m, 0);
         for (int ig = 0; ig < npw; ig++)
         {

@@ -26,7 +26,8 @@ HamiltPW::HamiltPW()
     {
         Operator* ekinetic = new Ekinetic<OperatorPW>( 
             tpiba2, 
-            gk2
+            gk2,
+            GlobalC::wfcpw->npwk_max
         );
         if(this->ops == nullptr)
         {

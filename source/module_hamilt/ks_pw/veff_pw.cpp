@@ -42,7 +42,7 @@ void Veff<OperatorPW>::act
     this->npol = psi_in->npol;
     
     std::complex<double> *porter = new std::complex<double>[wfcpw->nmaxgr];
-    for (int ib = 0; ib < n_npwx; ++ib)
+    for (int ib = 0; ib < n_npwx; ib += this->npol)
     {
         if (this->npol == 1)
         {

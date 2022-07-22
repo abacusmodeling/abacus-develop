@@ -12,7 +12,8 @@ class Ekinetic : public T
     public:
     Ekinetic(
         double tpiba2_in, 
-        const double* gk2_in
+        const double* gk2_in,
+        const int gk2_dim_in
     );
 
     virtual void act
@@ -32,6 +33,8 @@ class Ekinetic : public T
     double tpiba2 = 0.0;
 
     const double* gk2 = nullptr;
+
+    int gk2_dim = 0;
 
 };
 
