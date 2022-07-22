@@ -52,7 +52,7 @@ class ElecState
     }
 
     // calculate wg from ekb
-    virtual void calculate_weights(void);
+    virtual void calculate_weights();
 
     // pointer to charge density
     Charge *charge = nullptr;

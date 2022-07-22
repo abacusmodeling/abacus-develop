@@ -278,6 +278,7 @@ hsolver_pw_sdft.o
 OBJ_ELECSTATES=elecstate.o\
 dm2d_to_grid.o\
 elecstate_lcao.o\
+elecstate_lcao_tddft.o\
 elecstate_pw.o\
 elecstate_pw_sdft.o
 

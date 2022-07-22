@@ -1,20 +1,20 @@
-#include "elecstate_lcao.h"
+#include "elecstate_lcao_tddft.h"
 
 #include "cal_dm.h"
 #include "module_base/timer.h"
 #include "module_gint/grid_technique.h"
+#include "src_pw/global.h"
 
 namespace elecstate
 {
-int ElecStateLCAO::out_wfc_lcao = 0;
 
 // multi-k case
-void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
+void ElecStateLCAO_TDDFT::psiToRho_td(const psi::Psi<std::complex<double>>& psi)
 {
     ModuleBase::TITLE("ElecStateLCAO", "psiToRho");
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
 
-    this->calculate_weights();
+    this->calculate_weights_td();
     this->calEBand();
 
     ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
@@ -43,6 +43,9 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
                                        ik,
                                        this->ekb,
                                        this->wg);
+
+            GlobalV::ofs_running << endl;
+
             // added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
             if (GlobalV::NSPIN == 4)
             {
@@ -84,59 +87,20 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     return;
 }
 
-// Gamma_only case
-void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
+void ElecStateLCAO_TDDFT::calculate_weights_td()
 {
-    ModuleBase::TITLE("ElecStateLCAO", "psiToRho");
-    ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
+    ModuleBase::TITLE("ElecState", "calculate_weights");
 
-    this->calculate_weights();
-    this->calEBand();
-
-    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack")
+    if (GlobalV::ocp == 1)
     {
-        ModuleBase::timer::tick("ElecStateLCAO", "cal_dm_2d");
-
-        // psi::Psi<double> dm_gamma_2d;
-        //  caution:wfc and dm
-        cal_dm(this->loc->ParaV, this->wg, psi, this->loc->dm_gamma);
-
-        ModuleBase::timer::tick("ElecStateLCAO", "cal_dm_2d");
-
-        for (int ik = 0; ik < psi.get_nk(); ++ik)
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
         {
-            // for gamma_only case, no convertion occured, just for print.
-            if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
             {
-                psi.fix_k(ik);
-                double** wfc_grid = nullptr; // output but not do "2d-to-grid" conversion
-                this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao,
-                                           psi.get_pointer(),
-                                           wfc_grid,
-                                           this->ekb,
-                                           this->wg);
+                this->wg(ik, ib) = GlobalV::ocp_kb[ik * GlobalV::NBANDS + ib];
             }
-            // this->loc->dm2dToGrid(this->loc->dm_gamma[ik], this->loc->DM[ik]); // transform dm_gamma[is].c to
-            // this->loc->DM[is]
-            this->loc->cal_dk_gamma_from_2D_pub();
         }
     }
-
-    for (int is = 0; is < GlobalV::NSPIN; is++)
-    {
-        ModuleBase::GlobalFunc::ZEROS(this->charge->rho[is], this->charge->nrxx); // mohan 2009-11-10
-    }
-
-    //------------------------------------------------------------
-    // calculate the charge density on real space grid.
-    //------------------------------------------------------------
-    ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    Gint_inout inout(this->loc->DM, this->charge, Gint_Tools::job_type::rho);
-    this->uhm->GG.cal_gint(&inout);
-
-    this->charge->renormalize_rho();
-
-    ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
     return;
 }
 
