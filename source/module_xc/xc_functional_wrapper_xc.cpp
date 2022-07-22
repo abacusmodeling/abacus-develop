@@ -33,8 +33,13 @@ void XC_Functional::xc(const double &rho, double &exc, double &vxc)
             // Exchange functionals containing attenuated slater exchange
             case XC_HYB_GGA_XC_PBEH:
             //  PBE0
-                XC_Functional::slater(rs, e, v);
-                e *= 0.75; v*= 0.75;
+                double ex, vx, ec, vc;
+                XC_Functional::slater(rs, ex, vx);
+                ex *= (1 - XC_Functional::hybrid_alpha); 
+                vx *= (1 - XC_Functional::hybrid_alpha);
+                XC_Functional::pw(rs, 0, ec, vc);
+                e = ex + ec;
+                v = vx + vc;
                 break;
 
             // Correlation functionals containing PW correlation
@@ -85,8 +90,15 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
             // Exchange functionals containing attenuated slater exchange
             case XC_HYB_GGA_XC_PBEH:
             //  PBE0
-                XC_Functional::slater_spin(rho, zeta, e, vup, vdw);
-                e *= 0.75; vup *= 0.75; vdw *=0.75;
+                double ex, vupx, vdwx, ec, vupc, vdwc;
+                XC_Functional::slater_spin(rho, zeta, ex, vupx, vdwx);
+                ex *= (1.0 - XC_Functional::hybrid_alpha); 
+                vupx *= (1.0 - XC_Functional::hybrid_alpha); 
+                vdwx *= (1.0 - XC_Functional::hybrid_alpha);
+                XC_Functional::pw_spin(rs, zeta, ec, vupc, vdwc);
+                e = ex + ec;
+                vup = vupx + vupc;
+                vdw = vdwx + vdwc;
                 break;
 
             // Correlation functionals containing PZ correlation

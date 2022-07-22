@@ -156,7 +156,7 @@ namespace ModuleESolver
             {
                 Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GG.cal_gint(&inout);
-                if (XC_Functional::get_func_type() == 3)
+                if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
                 {
                     for(int is=0; is<GlobalV::NSPIN; is++)
                     {
@@ -170,7 +170,7 @@ namespace ModuleESolver
             {
                 Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GK.cal_gint(&inout);
-                if (XC_Functional::get_func_type() == 3)
+                if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
                 {
                     for(int is=0; is<GlobalV::NSPIN; is++)
                     {
@@ -234,7 +234,8 @@ namespace ModuleESolver
         {
             if (Exx_Global::Hybrid_Type::HF == GlobalC::exx_lcao.info.hybrid_type
                 || Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type
-                || Exx_Global::Hybrid_Type::HSE == GlobalC::exx_lcao.info.hybrid_type)
+                || Exx_Global::Hybrid_Type::HSE == GlobalC::exx_lcao.info.hybrid_type
+                || Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type)
             {
                 GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
             }
@@ -316,6 +317,7 @@ namespace ModuleESolver
         {
         case Exx_Global::Hybrid_Type::HF:
         case Exx_Global::Hybrid_Type::PBE0:
+        case Exx_Global::Hybrid_Type::SCAN0:
         case Exx_Global::Hybrid_Type::HSE:
             GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
             break;
@@ -395,7 +397,7 @@ namespace ModuleESolver
         if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
         {
             berryphase bp(this->LOWF);
-            bp.Macroscopic_polarization(nullptr);
+            bp.Macroscopic_polarization(this->psi);
         }
 
         return;
