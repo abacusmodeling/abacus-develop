@@ -332,58 +332,6 @@ void Gint::cal_meshball_force(
 	return;
 }
 
-void Gint::cal_meshball_force_meta(
-	const int grid_index,
-	const int na_grid,  					    // how many atoms on this (i,j,k) grid
-	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
-	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-	const double*const*const dpsirx_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
-	const double*const*const dpsiry_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
-	const double*const*const dpsirz_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
-	const double*const*const ddpsir_xx,
-	const double*const*const ddpsir_xy,
-	const double*const*const ddpsir_xz,
-	const double*const*const ddpsir_yy,
-	const double*const*const ddpsir_yz,
-	const double*const*const ddpsir_zz,
-	ModuleBase::matrix *force)
-{
-
-	const int inc=1;
-	double r;
-    for(int ia1=0;ia1<na_grid;ia1++)
-    {
-        const int mcell_index=GlobalC::GridT.bcell_start[grid_index] + ia1;
-        const int iat=GlobalC::GridT.which_atom[mcell_index]; // index of atom
-
-        for(int ib=0;ib<GlobalC::bigpw->bxyz;ib++)
-        {
-            r = ddot_(&block_size[ia1], &dpsirx_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xx[ib][block_index[ia1]], &inc);
-            force[0](iat,0)+=r*2.0;
-            r = ddot_(&block_size[ia1], &dpsiry_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xy[ib][block_index[ia1]], &inc);
-            force[0](iat,0)+=r*2.0;
-            r = ddot_(&block_size[ia1], &dpsirz_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xz[ib][block_index[ia1]], &inc);
-            force[0](iat,0)+=r*2.0;
-
-            r = ddot_(&block_size[ia1], &dpsirx_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xy[ib][block_index[ia1]], &inc);
-            force[0](iat,1)+=r*2.0;
-            r = ddot_(&block_size[ia1], &dpsiry_v_dm[ib][block_index[ia1]], &inc, &ddpsir_yy[ib][block_index[ia1]], &inc);
-            force[0](iat,1)+=r*2.0;
-            r = ddot_(&block_size[ia1], &dpsirz_v_dm[ib][block_index[ia1]], &inc, &ddpsir_yz[ib][block_index[ia1]], &inc);
-            force[0](iat,1)+=r*2.0;
-
-            r = ddot_(&block_size[ia1], &dpsirx_v_dm[ib][block_index[ia1]], &inc, &ddpsir_xz[ib][block_index[ia1]], &inc);
-            force[0](iat,2)+=r*2.0;
-            r = ddot_(&block_size[ia1], &dpsiry_v_dm[ib][block_index[ia1]], &inc, &ddpsir_yz[ib][block_index[ia1]], &inc);
-            force[0](iat,2)+=r*2.0;
-            r = ddot_(&block_size[ia1], &dpsirz_v_dm[ib][block_index[ia1]], &inc, &ddpsir_zz[ib][block_index[ia1]], &inc);
-            force[0](iat,2)+=r*2.0;         
-        }
-    }
-	
-	return;
-}
-
 void Gint::cal_meshball_stress(
     const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals

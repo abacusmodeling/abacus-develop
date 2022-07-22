@@ -120,22 +120,6 @@ class Gint
         const double*const*const dpsir_z,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
         ModuleBase::matrix *force);
 
-    void cal_meshball_force_meta(
-        const int grid_index,
-        const int na_grid,  					    // how many atoms on this (i,j,k) grid
-        const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
-        const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
-        const double*const*const dpsirx_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
-        const double*const*const dpsiry_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
-        const double*const*const dpsirz_v_dm,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
-        const double*const*const ddpsir_xx,
-        const double*const*const ddpsir_xy,
-        const double*const*const ddpsir_xz,
-        const double*const*const ddpsir_yy,
-        const double*const*const ddpsir_yz,
-        const double*const*const ddpsir_zz,
-        ModuleBase::matrix *force);
-
     void cal_meshball_stress(
         const int na_grid,  					    // how many atoms on this (i,j,k) grid
         const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals

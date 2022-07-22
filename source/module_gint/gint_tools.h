@@ -67,6 +67,21 @@ class Gint_inout
             job = job_in;
         }
 
+	// force (mGGA), multi-k
+        Gint_inout(double** DM_R_in, double* vl_in, double* vofk_in, const bool isforce_in, const bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in, ModuleBase::matrix* svl_dphi_in,
+            Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            vl = vl_in;
+			vofk = vofk_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
 	// vlocal, multi-k
         Gint_inout(double* vl_in, int ispin_in, Gint_Tools::job_type job_in)
         {
@@ -220,17 +235,6 @@ namespace Gint_Tools
 		double*const*const dpsir_ylm_x, double*const*const dpsir_ylm_y, double*const*const dpsir_ylm_z,
 		double*const*const dpsir_ylm_xx, double*const*const dpsir_ylm_xy, double*const*const dpsir_ylm_xz,
 		double*const*const dpsir_ylm_yy, double*const*const dpsir_ylm_yz, double*const*const dpsir_ylm_zz);
-
-	void cal_ddpsir_ylm_r(
-		const int na_grid, 					// number of atoms on this grid 
-		const int grid_index, 				// 1d index of FFT index (i,j,k) 
-		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
-		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
-		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		double*const*const ddpsir,
-		double*const*const ddpsir_ylm_x,
-		double*const*const ddpsir_ylm_y,
-		double*const*const ddpsir_ylm_z);
 
 	void cal_ddpsir_ylm(
 		const int na_grid, 					// number of atoms on this grid 
