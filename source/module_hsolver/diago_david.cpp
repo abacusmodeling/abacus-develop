@@ -231,9 +231,44 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
     // expand the reduced basis set with the new basis vectors P|R(psi)>...
     // in which psi are the last eigenvectors
     // we define |R(psi)> as (H-ES)*|Psi>, E = <psi|H|psi>/<psi|S|psi>
+    std::vector<std::complex<double>> vc_ev_vector(nbase);
     for (int m = 0; m < notconv; m++)
     {
-        ModuleBase::GlobalFunc::ZEROS(respsi, npw);
+        for(int i = 0; i < nbase; i++)
+        {
+            vc_ev_vector[i] = vc(i, unconv[m]);
+        }
+        int inc = 1;
+        char trans = 'N';
+        zgemv_(&trans,
+            &npw,
+            &nbase,
+            &ModuleBase::ONE,
+            hp.c,
+            &hp.nc,
+            vc_ev_vector.data(),
+            &inc,
+            &ModuleBase::ZERO,
+            respsi,
+            &inc);
+
+        for(int i = 0; i < nbase; i++)
+        {
+            vc_ev_vector[i] *= -1 * eigenvalue[unconv[m]];
+        }
+        zgemv_(&trans,
+            &npw,
+            &nbase,
+            &ModuleBase::ONE,
+            sp.c,
+            &sp.nc,
+            vc_ev_vector.data(),
+            &inc,
+            &ModuleBase::ONE,
+            respsi,
+            &inc);
+
+        /*ModuleBase::GlobalFunc::ZEROS(respsi, npw);
         for (int i = 0; i < nbase; i++)
         {
             hpsi = &(hp(i, 0));
@@ -244,7 +279,8 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
             {
                 respsi[ig] += vc_value * (hpsi[ig] - ev_value * spsi[ig]);
             }
-        }
+        }*/
+
 
         ppsi = &basis(nbase + m, 0);
         spsi = &sp(nbase + m, 0);
@@ -505,7 +541,37 @@ void DiagoDavid::refresh(const int &npw,
 
     // update hp,sp
     basis.zero_out();
-    for (int m = 0; m < nband; m++)
+    char transa = 'N';
+    char transb = 'T';
+    zgemm_(&transa,
+            &transb,
+            &npw, // m: row of A,C
+            &nband, // n: col of B,C
+            &nbase, // k: col of A, row of B
+            &ModuleBase::ONE, // alpha
+            hp.c, // A
+            &hp.nc, // LDA: if(N) max(1,m) if(T) max(1,k)
+            vc.c, // B
+            &vc.nc, // LDB: if(N) max(1,k) if(T) max(1,n)
+            &ModuleBase::ZERO, // belta
+            basis.get_pointer(), // C
+            &basis.get_nbasis()); // LDC: if(N) max(1, m)
+
+    zgemm_(&transa,
+            &transb,
+            &npw, // m: row of A,C
+            &nband, // n: col of B,C
+            &nbase, // k: col of A, row of B
+            &ModuleBase::ONE, // alpha
+            sp.c, // A
+            &sp.nc, // LDA: if(N) max(1,m) if(T) max(1,k)
+            vc.c, // B
+            &vc.nc, // LDB: if(N) max(1,k) if(T) max(1,n)
+            &ModuleBase::ZERO, // belta
+            &basis(nband, 0), // C
+            &basis.get_nbasis()); // LDC: if(N) max(1, m)
+    
+    /*for (int m = 0; m < nband; m++)
     {
         for (int j = 0; j < nbase; j++)
         {
@@ -515,23 +581,26 @@ void DiagoDavid::refresh(const int &npw,
                 basis(m + nband, ig) += vc(j, m) * sp(j, ig);
             }
         }
-    }
+    }*/
 
-    for (int m = 0; m < nband; m++)
+    ModuleBase::GlobalFunc::COPYARRAY(&basis(0, 0), &hp(0, 0), npw * nband);
+    ModuleBase::GlobalFunc::COPYARRAY(&basis(nband, 0), &sp(0, 0), npw * nband);
+    /*for (int m = 0; m < nband; m++)
     {
         for (int ig = 0; ig < npw; ig++)
         {
             hp(m, ig) = basis(m, ig);
             sp(m, ig) = basis(m + nband, ig);
         }
-    }
+    }*/
 
     // update basis
     basis.zero_out();
     for (int m = 0; m < nband; m++)
     {
-        for (int ig = 0; ig < npw; ig++)
-            basis(m, ig) = psi(m, ig);
+        ModuleBase::GlobalFunc::COPYARRAY(&psi(m, 0), &basis(m, 0), npw);
+        /*for (int ig = 0; ig < npw; ig++)
+            basis(m, ig) = psi(m, ig);*/
     }
 
     // updata the reduced Hamiltonian
