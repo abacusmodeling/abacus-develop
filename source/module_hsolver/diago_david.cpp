@@ -68,24 +68,27 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
     for (int m = 0; m < nband; m++)
     {
         // psi_m = psi(m)
-        for (int ig = 0; ig < dim; ig++)
+        ModuleBase::GlobalFunc::COPYARRAY(&psi(m, 0), psi_m.data(), dim);
+        /*for (int ig = 0; ig < dim; ig++)
         {
             psi_m[ig] = psi(m, ig);
-        }
+        }*/
 
         phm_in->sPsi(psi_m.data(), spsi.data(),  (size_t)dim);
         this->SchmitOrth(dim, nband, m, basis, psi_m.data(), spsi.data());
         phm_in->sPsi(psi_m.data(), spsi.data(),  (size_t)dim);
 
         // basis(m) = psi_m, hp(m) = H |psi_m>, sp(m) = S |psi_m>
-        std::complex<double>* sp_p = &sp(m, 0);
+        ModuleBase::GlobalFunc::COPYARRAY(psi_m.data(), &basis(m, 0), dim);
+        ModuleBase::GlobalFunc::COPYARRAY(spsi.data(), &sp(m, 0), dim);
+        /*std::complex<double>* sp_p = &sp(m, 0);
         std::complex<double>* basis_p = &basis(m, 0);
         for (int ig = 0; ig < dim; ig++)
         {
             basis_p[ig] = psi_m[ig];
             //hp(m, ig) = hpsi[ig];
             sp_p[ig] = spsi[ig];
-        }
+        }*/
     }
     hp_info dav_hpsi_in(&basis, psi::Range(1, 0, 0, nband-1));
     auto hp_psi = std::get<0>(phm_in->ops->hPsi(dav_hpsi_in));
@@ -150,7 +153,22 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
 
             // updata eigenvectors of Hamiltonian
             ModuleBase::GlobalFunc::ZEROS(psi.get_pointer(), psi.get_nbands() * psi.get_nbasis());
-            for (int m = 0; m < nband; m++)
+            char transa = 'N';
+            char transb = 'T';
+            zgemm_(&transa,
+                    &transb,
+                    &dim, // m: row of A,C
+                    &nband, // n: col of B,C
+                    &nbase, // k: col of A, row of B
+                    &ModuleBase::ONE, // alpha
+                    basis.get_pointer(), // A
+                    &basis.get_nbasis(), // LDA: if(N) max(1,m) if(T) max(1,k)
+                    vc.c, // B
+                    &nbase_x, // LDB: if(N) max(1,k) if(T) max(1,n)
+                    &ModuleBase::ZERO, // belta
+                    psi.get_pointer(), // C
+                    &psi.get_nbasis()); // LDC: if(N) max(1, m)
+            /*for (int m = 0; m < nband; m++)
             {
                 for (int j = 0; j < nbase; j++)
                 {
@@ -159,7 +177,7 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
                         psi(m, ig) += vc(j, m) * basis(j, ig);
                     }
                 }
-            }
+            }*/
 
             if (!this->notconv || (dav_iter == DiagoIterAssist::PW_DIAG_NMAX))
             {
@@ -594,18 +612,31 @@ void DiagoDavid::SchmitOrth(const int &npw,
     std::complex<double> *lagrange = new std::complex<double>[m + 1];
     ModuleBase::GlobalFunc::ZEROS(lagrange, m + 1);
 
-    const int one = 1;
-    for (int j = 0; j < m; j++)
+    int inc = 1;
+    int mp = m;
+    char trans = 'C';
+    zgemv_(&trans,
+           &npw,
+           &mp,
+           &ModuleBase::ONE,
+           psi.get_pointer(),
+           &psi.get_nbasis(),
+           spsi,
+           &inc,
+           &ModuleBase::ZERO,
+           lagrange,
+           &inc);
+    /*for (int j = 0; j < m; j++)
     {
         const std::complex<double>* psi_p = &(psi(j, 0));
         zdotc_(&lagrange[j], &npw, psi_p, &one, spsi, &one);
-        /*for (int ig = 0; ig < npw; ig++)
+        for (int ig = 0; ig < npw; ig++)
         {
             lagrange[j] += conj(psi(j, ig)) * spsi[ig];
-        }*/
+        }
         //	lagrange[j] = Diago_CG::ddot( npw, psi, j, spsi );
-    }
-    zdotc_(&lagrange[m], &npw, psi_m, &one, spsi, &one);
+    }*/
+    zdotc_(&lagrange[m], &npw, psi_m, &inc, spsi, &inc);
     /*for (int ig = 0; ig < npw; ig++)
     {
         lagrange[m] += conj(psi_m[ig]) * spsi[ig];
@@ -623,7 +654,7 @@ void DiagoDavid::SchmitOrth(const int &npw,
     for (int j = 0; j < m; j++)
     {
         const std::complex<double> alpha = -1 * lagrange[j];
-        zaxpy_(&npw, &alpha, &psi(j,0), &one, psi_m, &one);
+        zaxpy_(&npw, &alpha, &psi(j,0), &inc, psi_m, &inc);
         /*for (int ig = 0; ig < npw; ig++)
         {
             psi_m[ig] -= lagrange[j] * psi(j, ig);
