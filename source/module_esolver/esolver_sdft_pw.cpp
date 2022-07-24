@@ -1,12 +1,11 @@
-#include "./esolver_sdft_pw.h"
-#include "time.h"
 #include <fstream>
 #include <algorithm>
+
+#include "./esolver_sdft_pw.h"
 #include "../module_base/timer.h"
 #include "module_hsolver/hsolver_pw_sdft.h"
 #include "module_elecstate/elecstate_pw_sdft.h"
 #include "module_hsolver/diago_iter_assist.h"
-#include "module_hamilt/hamilt_pw.h"
 
 //-------------------Temporary------------------
 #include "../module_base/global_variable.h"
@@ -34,7 +33,8 @@ ESolver_SDFT_PW::~ESolver_SDFT_PW()
 
 void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 {
-     ESolver_KS::Init(inp,ucell);
+    this->nche_sto = inp.nche_sto;
+    ESolver_KS::Init(inp,ucell);
     this->Init_GlobalC(inp,ucell);//temporary
 
 	stowf.init(GlobalC::kv.nks);
@@ -137,6 +137,22 @@ void ESolver_SDFT_PW::cal_Stress(ModuleBase::matrix &stress)
 	Sto_Stress_PW ss;
     ss.cal_stress(stress,this->psi, this->stowf);
 }
-
+void ESolver_SDFT_PW::postprocess()
+{
+    ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
+    if(this->maxniter == 0)
+    {
+        int iter = 1;
+        int istep = 0;
+        hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
+        hsolver::DiagoIterAssist::PW_DIAG_THR = this->phsol->set_diagethr(istep, iter, drho);
+        hsolver::DiagoIterAssist::need_subspace = false;
+        this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, iter, GlobalV::KS_SOLVER, true);
+    }
+    if(INPUT.cal_cond)
+	{
+        this->sKG(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
+    }
+}
 
 }

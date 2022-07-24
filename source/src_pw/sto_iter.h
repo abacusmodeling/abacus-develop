@@ -55,10 +55,14 @@ class Stochastic_Iter
     public:
     int method; //different methods 1: slow, less memory  2: fast, more memory
     ModuleBase::ComplexMatrix* chiallorder = nullptr;
+    //chiallorder cost too much memories and should be cleaned after scf.
+    void cleanchiallorder();
+    //cal shchi = \sqrt{f(\hat{H})}|\chi>
+    void calHsqrtchi(Stochastic_WF& stowf);
     //cal Pn = \sum_\chi <\chi|Tn(\hat{h})|\chi>
     void calPn(const int& ik, Stochastic_WF& stowf);
     //cal Tnchi = \sum_n C_n*T_n(\hat{h})|\chi>
-    void calTnchi(const int& ik, Stochastic_WF& stowf);
+    void calTnchi_ik(const int& ik, Stochastic_WF& stowf);
 
 };
 
