@@ -73,7 +73,7 @@ class Operator
     std::complex<double>* get_hpsi(const hpsi_info& info)const
     {
         const int nbands_range = (std::get<1>(info).range_2 - std::get<1>(info).range_1 + 1);
-        if(this->hpsi == nullptr)
+        if(this->hpsi != nullptr)
         {
             delete this->hpsi;
         }
