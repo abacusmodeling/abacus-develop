@@ -722,7 +722,7 @@ void DiagoDavid::SchmitOrth(const int &npw,
 
     for (int j = 0; j < m; j++)
     {
-        const std::complex<double> alpha = -1 * lagrange[j];
+        const std::complex<double> alpha = std::complex<double>(-1, 0) * lagrange[j];
         zaxpy_(&npw, &alpha, &psi(j,0), &inc, psi_m, &inc);
         /*for (int ig = 0; ig < npw; ig++)
         {
