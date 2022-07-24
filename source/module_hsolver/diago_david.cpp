@@ -65,22 +65,41 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
 
     ModuleBase::timer::tick("DiagoDavid", "first");
     // orthogonalise the initial trial psi(0~nband-1)
+    //plan for SchmitOrth
+    ModuleBase::ComplexMatrix lagrange_matrix(nband, nband);
+    std::vector<int> pre_matrix_mm_m(nband, 0);
+    std::vector<int> pre_matrix_mv_m(nband, 1);
+    this->planSchmitOrth(nband, pre_matrix_mm_m.data(), pre_matrix_mv_m.data());
+    for( int m = 0; m < nband; m++)
+    {
+        phm_in->sPsi(&psi(m, 0), &sp(m, 0),  (size_t)dim);
+    }
+    //begin SchmitOrth
     for (int m = 0; m < nband; m++)
     {
         // psi_m = psi(m)
-        ModuleBase::GlobalFunc::COPYARRAY(&psi(m, 0), psi_m.data(), dim);
+        ModuleBase::GlobalFunc::COPYARRAY(&psi(m, 0), &basis(m, 0), dim);
         /*for (int ig = 0; ig < dim; ig++)
         {
             psi_m[ig] = psi(m, ig);
         }*/
 
-        phm_in->sPsi(psi_m.data(), spsi.data(),  (size_t)dim);
-        this->SchmitOrth(dim, nband, m, basis, psi_m.data(), spsi.data());
-        phm_in->sPsi(psi_m.data(), spsi.data(),  (size_t)dim);
+        //phm_in->sPsi(psi_m.data(), spsi.data(),  (size_t)dim);
+        this->SchmitOrth(
+            dim, 
+            nband, 
+            m, 
+            basis, 
+            sp,
+            &lagrange_matrix(m, 0), 
+            pre_matrix_mm_m[m], 
+            pre_matrix_mv_m[m]
+        );
+        phm_in->sPsi(&basis(m, 0), &sp(m, 0),  (size_t)dim);
 
         // basis(m) = psi_m, hp(m) = H |psi_m>, sp(m) = S |psi_m>
-        ModuleBase::GlobalFunc::COPYARRAY(psi_m.data(), &basis(m, 0), dim);
-        ModuleBase::GlobalFunc::COPYARRAY(spsi.data(), &sp(m, 0), dim);
+        //ModuleBase::GlobalFunc::COPYARRAY(psi_m.data(), &basis(m, 0), dim);
+        //ModuleBase::GlobalFunc::COPYARRAY(spsi.data(), &sp(m, 0), dim);
         /*std::complex<double>* sp_p = &sp(m, 0);
         std::complex<double>* basis_p = &basis(m, 0);
         for (int ig = 0; ig < dim; ig++)
@@ -90,6 +109,7 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
             sp_p[ig] = spsi[ig];
         }*/
     }
+    //end of SchmitOrth and calculate H|psi>
     hp_info dav_hpsi_in(&basis, psi::Range(1, 0, 0, nband-1));
     auto hp_psi = std::get<0>(phm_in->ops->hPsi(dav_hpsi_in));
     ModuleBase::GlobalFunc::COPYARRAY(hp_psi->get_pointer(), &hp(0, 0), hp_psi->get_nbasis() * nband);
@@ -283,23 +303,57 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
 
 
         ppsi = &basis(nbase + m, 0);
-        spsi = &sp(nbase + m, 0);
         for (int ig = 0; ig < npw; ig++)
         {
             ppsi[ig] = respsi[ig] / this->precondition[ig];
         }
+    }
 
-        phm_in->sPsi(ppsi, spsi, (size_t)npw);
-        this->SchmitOrth(npw, nbase + notconv, nbase + m, basis, ppsi, spsi);
+    //there is a nbase to nbase + notconv band orthogonalise
+    //plan for SchmitOrth
+    ModuleBase::ComplexMatrix lagrange_matrix(notconv, nbase + notconv);
+    std::vector<int> pre_matrix_mm_m(notconv, 0);
+    std::vector<int> pre_matrix_mv_m(notconv, 1);
+    this->planSchmitOrth(notconv, pre_matrix_mm_m.data(), pre_matrix_mv_m.data());
+    for( int m = 0; m < notconv; m++)
+    {
+        phm_in->sPsi(&basis(nbase + m, 0), &sp(nbase + m, 0),  (size_t)npw);
+    }
+    //first nbase bands psi* dot notconv bands spsi to prepare lagrange_matrix 
+    char trans = 'C';
+    char transb = 'N';
+    //calculate the square matrix for future lagranges
+    zgemm_(&trans,
+            &transb,
+            &nbase, // m: row of A,C
+            &notconv, // n: col of B,C
+            &npw, // k: col of A, row of B
+            &ModuleBase::ONE, // alpha
+            &basis(0, 0), // A
+            &basis.get_nbasis(), // LDA: if(N) max(1,m) if(T) max(1,k)
+            &sp(nbase, 0), // B
+            &sp.nc, // LDB: if(N) max(1,k) if(T) max(1,n)
+            &ModuleBase::ZERO, // belta
+            &lagrange_matrix(0, 0), // C
+            &lagrange_matrix.nc); // LDC: if(N) max(1, m)
+
+    for (int m = 0; m < notconv; m++)
+    {
+        ppsi = &basis(nbase + m, 0);
+        spsi = &sp(nbase + m, 0);
+
+        this->SchmitOrth(
+            npw, 
+            nbase + notconv, 
+            nbase + m, 
+            basis, 
+            sp, 
+            &lagrange_matrix(m, 0),
+            pre_matrix_mm_m[m], 
+            pre_matrix_mv_m[m]
+        );
         phm_in->sPsi(ppsi, spsi, (size_t)npw);
 
-        
-        //for (int ig = 0; ig < npw; ig++)
-        //{
-            //basis(nbase + m, ig) = ppsi[ig];
-            //hp(nbase + m, ig) = hpsi[ig];
-            //sp(nbase + m, ig) = spsi[ig];
-        //}
     }
     hp_info dav_hpsi_in(&basis, psi::Range(1, 0, nbase, nbase + notconv-1));
     auto hp_psi = std::get<0>(phm_in->ops->hPsi(dav_hpsi_in));
@@ -329,56 +383,6 @@ void DiagoDavid::cal_elem(const int &npw,
     int offset_s = nbase * sc.nr;
     //	ModuleBase::GlobalFunc::ZEROS( hc.c+offset_h, notconv*hc.nr );
     //	ModuleBase::GlobalFunc::ZEROS( sc.c+offset_s, notconv*sc.nr );
-
-    /*for (int i = nbase; i < nbase + notconv; i++)
-    {
-        char trans1 = 'C';
-        char trans2 = 'N';
-        const int nb_notc = i+1;
-        const int one = 1;
-        hc = transpose(hc, false);
-        zgemm_(&trans1,
-            &trans2,
-            &one,
-            &nb_notc,
-            &npw,
-            &ModuleBase::ONE,
-            &basis(i , 0),
-            &basis.get_nbasis(),
-            hp.c,
-            &hp.nc,
-            &ModuleBase::ONE,
-            &hc(0, i),
-            &hc.nr);
-        hc = transpose(hc, false);
-
-        sc = transpose(sc, false);
-        zgemm_(&trans1,
-            &trans2,
-            &one,
-            &nb_notc,
-            &npw,
-            &ModuleBase::ONE,
-            &basis(i, 0),
-            &basis.get_nbasis(),
-            sp.c,
-            &sp.nc,
-            &ModuleBase::ONE,
-            &sc(0, i),
-            &sc.nr);
-        sc = transpose(sc, false);
-        for (int j = 0; j <= i; j++)
-        {
-            for (int ig = 0; ig < npw; ig++)
-            {
-                hc(i, j) += conj(basis(i, ig)) * hp(j, ig);
-                sc(i, j) += conj(basis(i, ig)) * sp(j, ig);
-            }
-            //	hc(j,i) = Diago_CG::ddot( npw, basis, j, hp, i );
-            //	sc(j,i) = Diago_CG::ddot( npw, basis, j, sp, i );
-        }
-        std::cout<<__FILE__<<__LINE__<<" "<<i<<" "<<hc(i,0)<<" "<<hc(i,1)<<std::endl;
-    }*/
 
     char trans1 = 'C';
     char trans2 = 'N';
@@ -661,9 +665,11 @@ void DiagoDavid::cal_err(const int &npw,
 void DiagoDavid::SchmitOrth(const int &npw,
                             const int n_band,
                             const int m,
-                            const psi::Psi<std::complex<double>> &psi,
-                            std::complex<double> *psi_m,
-                            std::complex<double> *spsi)
+                            psi::Psi<std::complex<double>>& psi,
+                            const ModuleBase::ComplexMatrix& spsi,
+                            std::complex<double>* lagrange_m,
+                            const int mm_size,
+                            const int mv_size)
 {
     //	if(test_david == 1) ModuleBase::TITLE("DiagoDavid","SchmitOrth");
     ModuleBase::timer::tick("DiagoDavid", "SchmitOrth");
@@ -678,22 +684,42 @@ void DiagoDavid::SchmitOrth(const int &npw,
     assert(m >= 0);
     assert(m < n_band);
 
-    std::complex<double> *lagrange = new std::complex<double>[m + 1];
-    ModuleBase::GlobalFunc::ZEROS(lagrange, m + 1);
+    std::complex<double>* psi_m = &psi(m, 0);
+
+    //std::complex<double> *lagrange = new std::complex<double>[m + 1];
+    //ModuleBase::GlobalFunc::ZEROS(lagrange, m + 1);
 
     int inc = 1;
-    int mp = m;
     char trans = 'C';
+    char transb = 'N';
+    //calculate the square matrix for future lagranges
+    if(mm_size != 0)
+    {
+        zgemm_(&trans,
+            &transb,
+            &mm_size, // m: row of A,C
+            &mm_size, // n: col of B,C
+            &npw, // k: col of A, row of B
+            &ModuleBase::ONE, // alpha
+            &psi(m-mv_size+1-mm_size, 0), // A
+            &psi.get_nbasis(), // LDA: if(N) max(1,m) if(T) max(1,k)
+            &spsi(m, 0), // B
+            &spsi.nc, // LDB: if(N) max(1,k) if(T) max(1,n)
+            &ModuleBase::ZERO, // belta
+            &lagrange_m[m-mv_size+1-mm_size], // C
+            &n_band); // LDC: if(N) max(1, m)
+    }
+    //calculate other lagranges for this band
     zgemv_(&trans,
            &npw,
-           &mp,
+           &mv_size,
            &ModuleBase::ONE,
-           psi.get_pointer(),
+           &psi(m-mv_size+1, 0),
            &psi.get_nbasis(),
-           spsi,
+           &spsi(m, 0),
            &inc,
            &ModuleBase::ZERO,
-           lagrange,
+           &lagrange_m[m-mv_size+1],
            &inc);
     /*for (int j = 0; j < m; j++)
     {
@@ -705,30 +731,30 @@ void DiagoDavid::SchmitOrth(const int &npw,
         }
         //	lagrange[j] = Diago_CG::ddot( npw, psi, j, spsi );
     }*/
-    zdotc_(&lagrange[m], &npw, psi_m, &inc, spsi, &inc);
+    //zdotc_(&lagrange[m], &npw, psi_m, &inc, spsi, &inc);
     /*for (int ig = 0; ig < npw; ig++)
     {
         lagrange[m] += conj(psi_m[ig]) * spsi[ig];
     }*/
     //	lagrange[m] = Diago_CG::ddot( npw, psi_m, spsi );
 
-    Parallel_Reduce::reduce_complex_double_pool(lagrange, m + 1);
+    Parallel_Reduce::reduce_complex_double_pool(lagrange_m, m + 1);
 
     //	out.printr1_d("lagrange", lagrange, m+1 );
 
-    double psi_norm = lagrange[m].real();
+    double psi_norm = lagrange_m[m].real();
     assert(psi_norm > 0.0);
     //	std::cout << "m = " << m << std::endl;
 
     for (int j = 0; j < m; j++)
     {
-        const std::complex<double> alpha = std::complex<double>(-1, 0) * lagrange[j];
+        const std::complex<double> alpha = std::complex<double>(-1, 0) * lagrange_m[j];
         zaxpy_(&npw, &alpha, &psi(j,0), &inc, psi_m, &inc);
         /*for (int ig = 0; ig < npw; ig++)
         {
             psi_m[ig] -= lagrange[j] * psi(j, ig);
         }*/
-        psi_norm -= (conj(lagrange[j]) * lagrange[j]).real();
+        psi_norm -= (conj(lagrange_m[j]) * lagrange_m[j]).real();
     }
 
     assert(psi_norm > 0.0);
@@ -750,9 +776,70 @@ void DiagoDavid::SchmitOrth(const int &npw,
         }
     }
 
-    delete[] lagrange;
+    //delete[] lagrange;
     ModuleBase::timer::tick("DiagoDavid", "SchmitOrth");
     return;
+}
+
+void DiagoDavid::planSchmitOrth(
+    const int nband,
+    int* pre_matrix_mm_m,
+    int* pre_matrix_mv_m
+)
+{
+    if(nband<=0)return;
+    ModuleBase::GlobalFunc::ZEROS(pre_matrix_mm_m, nband);
+    ModuleBase::GlobalFunc::ZEROS(pre_matrix_mv_m, nband);
+    int last_matrix_size = nband;
+    int matrix_size = int(nband / 2);
+    int divide_times = 0;
+    std::vector<int> divide_points(nband);
+    int res_nband = nband - matrix_size;
+    while(matrix_size>1)
+    {
+        int index = nband - matrix_size;
+        if(divide_times == 0)
+        {
+            divide_points[0] = index;
+            pre_matrix_mm_m[index] = matrix_size;
+            if(res_nband == matrix_size) pre_matrix_mv_m[index] = 1;
+            else pre_matrix_mv_m[index] = 2;
+            divide_times = 1;
+        }
+        else
+        {
+        for(int i=divide_times-1; i>=0; i--)
+        {
+            divide_points[i*2] = divide_points[i] - matrix_size;
+            divide_points[i*2+1] = divide_points[i*2] + last_matrix_size; 
+            pre_matrix_mm_m[ divide_points[i*2] ] = matrix_size;
+            pre_matrix_mm_m[ divide_points[i*2+1]] = matrix_size;
+            if(res_nband == matrix_size) 
+            {
+                pre_matrix_mv_m[divide_points[i*2]] = 1;
+                pre_matrix_mv_m[divide_points[i*2+1]] = 1;
+            }
+            else
+            {
+                pre_matrix_mv_m[divide_points[i*2]] = 2;
+                pre_matrix_mv_m[divide_points[i*2+1]] = 2;
+            } 
+        }
+            divide_times *= 2;
+        }
+        last_matrix_size = matrix_size;
+        matrix_size = int(res_nband / 2);
+        res_nband -= matrix_size;
+    }
+    //fill the pre_matrix_mv_m array
+    pre_matrix_mv_m[0] = 1;
+    for(int m = 1; m < nband; m++)
+    {
+        if(pre_matrix_mv_m[m] == 0)
+        {
+            pre_matrix_mv_m[m] = pre_matrix_mv_m[m-1]+1;
+        }
+    }
 }
 
 void DiagoDavid::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, double *eigenvalue_in)

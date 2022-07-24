@@ -78,9 +78,15 @@ class DiagoDavid : public DiagH
     void SchmitOrth(const int& npw,
                     const int n_band,
                     const int m,
-                    const psi::Psi<std::complex<double>>& psi,
-                    std::complex<double>* psi_m,
-                    std::complex<double>* spsi);
+                    psi::Psi<std::complex<double>>& psi,
+                    const ModuleBase::ComplexMatrix& spsi,
+                    std::complex<double>* lagrange_m,
+                    const int mm_size,
+                    const int mv_size);
+    void planSchmitOrth(
+                    const int nband,
+                    int* pre_matrix_mm_m,
+                    int* pre_matrix_mv_m);
 
     void diag_zhegvx(const int& n,
                      const int& m,
