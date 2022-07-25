@@ -55,6 +55,7 @@ ABACUS provides the following features and functionalities:
 19. (subsidiary tool)Plot_tools for plot PDOS and PBANDS.
 20. (subsidiary tool)Generator for second generation numerical orbital basis.
 21. Interface with DPGEN
+22. Interface with phonopy
 
 [back to top](#readme-top)
 
@@ -159,6 +160,7 @@ The following provides basic sample jobs in ABACUS. More can be found in the dir
 - [Wave functions](docs/examples/wavefunction.md)
 - [BSSE for molecular formation energy](docs/examples/BSSE.md)
 - [ABACUS-DPGEN interface](docs/examples/dpgen.md)
+- [ABACUS-phonopy interface](docs/examples/phonopy.md)
 
 [back to top](#readme-top)
 
