@@ -19,6 +19,7 @@ HamiltPW::HamiltPW()
 {
     this->classname = "HamiltPW";
     const double tpiba2 = GlobalC::ucell.tpiba2;
+    const double tpiba = GlobalC::ucell.tpiba;
     const int* isk = GlobalC::kv.isk.data();
     const double* gk2 = GlobalC::wfcpw->gk2;
 
@@ -71,7 +72,7 @@ HamiltPW::HamiltPW()
         }
     }
     Operator* meta = new Meta<OperatorPW>(
-        tpiba2,
+        tpiba,
         isk,
         &GlobalC::pot.vofk,
         GlobalC::wfcpw
