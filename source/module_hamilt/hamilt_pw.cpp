@@ -102,13 +102,6 @@ void HamiltPW::updateHk(const int ik)
     return;
 }
 
-void HamiltPW::hPsi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const
-{
-    ModuleBase::timer::tick("HamiltPW", "h_psi");
-    ModuleBase::timer::tick("HamiltPW", "h_psi");
-    return;
-}
-
 void HamiltPW::sPsi
 (
     const std::complex<double> *psi,
