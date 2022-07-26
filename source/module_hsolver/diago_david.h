@@ -37,21 +37,18 @@ class DiagoDavid : public DiagH
                   const int& npw,
                   const int& nbase,
                   const int& notconv,
-                  ModuleBase::ComplexMatrix& basis,
+                  psi::Psi<std::complex<double>>& basis,
                   ModuleBase::ComplexMatrix& hp,
                   ModuleBase::ComplexMatrix& sp,
                   const ModuleBase::ComplexMatrix& vc,
                   const int* unconv,
                   const double* en,
-                  std::complex<double>* hpsi,
-                  std::complex<double>* spsi,
-                  std::complex<double>* ppsi,
                   std::complex<double>* respsi);
 
     void cal_elem(const int& npw,
                   int& nbase,
                   const int& notconv,
-                  const ModuleBase::ComplexMatrix& basis,
+                  const psi::Psi<std::complex<double>>& basis,
                   const ModuleBase::ComplexMatrix& hp,
                   const ModuleBase::ComplexMatrix& sp,
                   ModuleBase::ComplexMatrix& hc,
@@ -62,7 +59,7 @@ class DiagoDavid : public DiagH
                  int& nbase,
                  const double* en,
                  const psi::Psi<std::complex<double>>& psi,
-                 ModuleBase::ComplexMatrix& basis,
+                 psi::Psi<std::complex<double>>& basis,
                  ModuleBase::ComplexMatrix& hp,
                  ModuleBase::ComplexMatrix& sp,
                  ModuleBase::ComplexMatrix& hc,
@@ -74,17 +71,22 @@ class DiagoDavid : public DiagH
                  const int& nbase,
                  const ModuleBase::ComplexMatrix& vc,
                  const ModuleBase::ComplexMatrix& hp,
-                 const ModuleBase::ComplexMatrix& basis,
+                 const psi::Psi<std::complex<double>>& basis,
                  const double* en,
                  std::complex<double>* respsi);
 
-    void SchmitOrth(hamilt::Hamilt* phm_in,
-                    const int& npw,
+    void SchmitOrth(const int& npw,
                     const int n_band,
                     const int m,
-                    const ModuleBase::ComplexMatrix& psi,
-                    std::complex<double>* psi_m,
-                    std::complex<double>* spsi);
+                    psi::Psi<std::complex<double>>& psi,
+                    const ModuleBase::ComplexMatrix& spsi,
+                    std::complex<double>* lagrange_m,
+                    const int mm_size,
+                    const int mv_size);
+    void planSchmitOrth(
+                    const int nband,
+                    int* pre_matrix_mm_m,
+                    int* pre_matrix_mv_m);
 
     void diag_zhegvx(const int& n,
                      const int& m,

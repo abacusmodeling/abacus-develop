@@ -1,37 +1,39 @@
 #ifndef __METAPW
 #define __METAPW
 
-#include "operator.h"
+#include "operator_pw.h"
 #include "module_base/matrix.h"
 #include "module_pw/pw_basis_k.h"
 
 namespace hamilt
 {
 
-class MetaPW : public Operator
+template<class T>
+class Meta : public T
 {
     public:
-    MetaPW(
-        int max_npw_in,
-        int npol_in,
-        double tpiba_in,
-        const int* ngk_in, 
+    Meta(
+        double tpiba2_in,
         const int* isk_in,
         const ModuleBase::matrix* vk,
         ModulePW::PW_Basis_K* wfcpw
     );
 
-    void act(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const override;
+    virtual void act
+    (
+        const psi::Psi<std::complex<double>> *psi_in, 
+        const int n_npwx, 
+        const std::complex<double>* tmpsi_in, 
+        std::complex<double>* tmhpsi
+    )const override;
 
     private:
 
-    int max_npw = 0;
+    mutable int max_npw = 0;
 
-    int npol = 0;
+    mutable int npol = 0;
 
     double tpiba = 0.0;
-
-    const int* ngk = nullptr;
 
     const int* isk = nullptr;
 
