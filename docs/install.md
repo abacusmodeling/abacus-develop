@@ -15,7 +15,7 @@
 
 ### Container Deployment
 
-We've built a ready-for-use version of ABACUS with docker [here](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus). For a quick start: pull the image, prepare the data, run container. Instructions on using the image can be accessed in [Dockerfile](../Dockerfile).
+We've built a ready-for-use version of ABACUS with docker [here](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus). For a quick start: pull the image, prepare the data, run container. Instructions on using the image can be accessed in [Dockerfile](../Dockerfile). A mirror is available by `docker pull registry.dp.tech/deepmodeling/abacus`.
 
 We also offer a pre-built docker image containing all the requirements for development. Please refer to our [Package Page](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus-development-kit).
 
