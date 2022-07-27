@@ -9,6 +9,7 @@ namespace hamilt
 class OperatorPW : public Operator
 {
     public:
+    virtual ~OperatorPW(){};
     
     //in PW code, different operators donate hPsi independently
     //run this->act function for the first operator and run all act() for other nodes in chain table  
@@ -29,11 +30,17 @@ class OperatorPW : public Operator
             node = (OperatorPW*)(node->next_op);
         }
 
+        //during recursive call of hPsi, delete the input psi
+        if(this->recursive) delete std::get<0>(input);
+
         ModuleBase::timer::tick("OperatorPW", "hPsi");
         
         return hpsi_info(this->hpsi, psi::Range(1, 0, 0, n_npwx/std::get<0>(input)->npol));
     }
     
+    //main function which should be modified in Operator for PW base
+    //do operation : |hpsi_choosed> = V|psi_choosed>
+    //V is the target operator act on choosed psi, the consequence should be added to choosed hpsi
     virtual void act
     (
         const psi::Psi<std::complex<double>> *psi_in, 
