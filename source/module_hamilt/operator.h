@@ -16,7 +16,7 @@ class Operator
     { 
         if(this->hpsi != nullptr) delete this->hpsi;
         Operator* last = this->next_op;
-        if(last != nullptr) 
+        while(last != nullptr) 
         {
             Operator* node_delete = last;
             last = last->next_op;
