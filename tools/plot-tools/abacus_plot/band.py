@@ -43,7 +43,7 @@ class Band:
             self._kzip = self.k_index
 
     @classmethod
-    def read(cls, filename: PathLike, old_ver=True):
+    def read(cls, filename: PathLike, old_ver=False):
         """Read band data file and return k-points and energy
 
         :params filename: string of band data file
@@ -367,6 +367,8 @@ class PBand(Band):
         else:
             self._kzip = self.k_index
 
+        self._check_weights(self.weights)
+
     def _check_energy(self, energy):
         assert energy.shape[0] == self.nkpoints, "The dimension of band structure dismatches with the number of k-points."
         assert energy.shape[1] == self.nbands, "The dimension of band structure dismatches with the number of bands."
@@ -384,7 +386,6 @@ class PBand(Band):
         data = np.empty((self.norbitals, self.nkpoints, self.nbands))
         for i, orb in enumerate(self.orbitals):
             data[i] = orb['data']
-        self._check_weights(data)
         return data
 
     @classmethod
