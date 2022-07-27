@@ -24,8 +24,7 @@ body:
     label: Expected behavior
     description: >
       A clear and concise description of what you expected to happen.
-  validations:
-    required: true
+
 - type: textarea
   attributes:
     label: To Reproduce
@@ -42,8 +41,7 @@ body:
       
       
       It is recommended to attach your calculation case here for the developers to reproduce the bug.
-  validations:
-    required: true
+
 - type: textarea
   attributes:
     label: Environment
@@ -53,8 +51,7 @@ body:
       - Compiler: [e.g. gcc 5.1.0]
       
       - Dependencies: [e.g. Intel MKL, OpenBLAS]
-  validations:
-    required: true
+
 - type: textarea
   attributes:
     label: Additional Context
