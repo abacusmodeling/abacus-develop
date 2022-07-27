@@ -916,13 +916,14 @@ if __name__ == "__main__":
     parent = Path(r"../examples/Si")
     name = "PBANDS_1"
     path = parent/name
+    kptfile = parent/'KLINES'
     fig, ax = plt.subplots(figsize=(12, 6))
     energy_range = [-5, 7]
     efermi = 6.585653952007503
     shift = False
     #species = {"Ag": [2], "Cl": [1], "In": [0]}
     atom_index = {1: {1: [0, 1]}}
-    pband = PBand(str(path))
+    pband = PBand(str(path), kptfile)
 
     # if you want to specify `species` or `index`, you need to
     # set `species=species` or `index=index` in the following two functions
