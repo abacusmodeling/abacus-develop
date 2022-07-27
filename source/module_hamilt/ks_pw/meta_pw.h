@@ -19,6 +19,8 @@ class Meta : public T
         ModulePW::PW_Basis_K* wfcpw
     );
 
+    virtual ~Meta(){};
+
     virtual void act
     (
         const psi::Psi<std::complex<double>> *psi_in, 

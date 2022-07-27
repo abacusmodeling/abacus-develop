@@ -20,6 +20,8 @@ class Nonlocal : public T
         const UnitCell_pseudo* ucell_in
     );
 
+    virtual ~Nonlocal(){};
+
     virtual void init(const int ik_in)override;
 
     virtual void act

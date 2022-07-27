@@ -12,21 +12,18 @@ class Operator
 {
     public:
     Operator(){};
-    ~Operator()
+    virtual ~Operator()
     { 
         if(this->hpsi != nullptr) delete this->hpsi;
-        this->release();
         Operator* last = this->next_op;
-        if(last != nullptr) 
+        while(last != nullptr) 
         {
-            last->release();
             Operator* node_delete = last;
             last = last->next_op;
             node_delete->next_op = nullptr;
             delete node_delete;
         } 
     }
-    virtual void release(){return;}
 
     typedef std::tuple<const psi::Psi<std::complex<double>>*, const psi::Range> hpsi_info;
     virtual hpsi_info hPsi(const hpsi_info& input)const {return hpsi_info(nullptr, 0);}
@@ -63,6 +60,8 @@ class Operator
     protected:
     int ik = 0;
 
+    mutable bool recursive = false;
+
     //calculation type, only different type can be in main chain table 
     int cal_type = 0;
     Operator* next_op = nullptr;
@@ -73,10 +72,21 @@ class Operator
     std::complex<double>* get_hpsi(const hpsi_info& info)const
     {
         const int nbands_range = (std::get<1>(info).range_2 - std::get<1>(info).range_1 + 1);
-        if(this->hpsi != nullptr)
+        //recursive call of hPsi, hpsi inputs as new psi, 
+        //create a new hpsi and delete old hpsi later
+        if(this->hpsi != std::get<0>(info) )
         {
-            delete this->hpsi;
+            this->recursive = false;
+            if(this->hpsi != nullptr)
+            {
+                delete this->hpsi;
+            }
         }
+        else
+        {
+            this->recursive = true;
+        }
+        //create a new hpsi
         this->hpsi = new psi::Psi<std::complex<double>>(std::get<0>(info)[0], 1, nbands_range);
         
         std::complex<double>* pointer_hpsi = this->hpsi->get_pointer();

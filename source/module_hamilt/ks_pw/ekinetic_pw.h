@@ -16,6 +16,8 @@ class Ekinetic : public T
         const int gk2_dim_in
     );
 
+    virtual ~Ekinetic(){};
+
     virtual void act
     (
         const psi::Psi<std::complex<double>> *psi_in, 

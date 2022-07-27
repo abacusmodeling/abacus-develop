@@ -18,6 +18,8 @@ class Veff : public T
         ModulePW::PW_Basis_K* wfcpw_in
     );
 
+    virtual ~Veff(){};
+
     virtual void act
     (
         const psi::Psi<std::complex<double>> *psi_in, 
