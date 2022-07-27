@@ -49,12 +49,6 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
     ModuleBase::ComplexMatrix vc(nbase_x, nbase_x); // Eigenvectors of hc
     std::vector<double> eigenvalue(nbase_x); // the lowest N eigenvalues of hc
 
-    std::vector<std::complex<double>> psi_m(dim);
-    std::vector<std::complex<double>> hpsi(dim);
-    std::vector<std::complex<double>> spsi(dim);
-    std::vector<std::complex<double>> ppsi(dim);
-    std::vector<std::complex<double>> respsi(dim);
-
     std::vector<bool> convflag(nband, false); // convflag[m] = true if the m th band is convergent
     std::vector<int> unconv(nband); // unconv[m] store the number of the m th unconvergent band
 
@@ -142,8 +136,7 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
                        sp,
                        vc,
                        unconv.data(),
-                       eigenvalue.data(),
-                       respsi.data());
+                       eigenvalue.data());
 
         this->cal_elem(dim, nbase, this->notconv, basis, hp, sp, hc, sc);
 
@@ -235,8 +228,7 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
                           ModuleBase::ComplexMatrix &sp,
                           const ModuleBase::ComplexMatrix &vc,
                           const int *unconv,
-                          const double *eigenvalue,
-                          std::complex<double> *respsi)
+                          const double *eigenvalue)
 {
     if (test_david == 1)
         ModuleBase::TITLE("DiagoDavid", "cal_grad");
@@ -251,32 +243,63 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
     // expand the reduced basis set with the new basis vectors P|R(psi)>...
     // in which psi are the last eigenvectors
     // we define |R(psi)> as (H-ES)*|Psi>, E = <psi|H|psi>/<psi|S|psi>
-    std::vector<std::complex<double>> vc_ev_vector(nbase);
+    ModuleBase::ComplexMatrix vc_ev_vector(notconv, nbase);
     for (int m = 0; m < notconv; m++)
     {
         for(int i = 0; i < nbase; i++)
         {
-            vc_ev_vector[i] = vc(i, unconv[m]);
+            vc_ev_vector(m, i) = vc(i, unconv[m]);
         }
-        int inc = 1;
-        char trans = 'N';
-        zgemv_(&trans,
-            &npw,
-            &nbase,
-            &ModuleBase::ONE,
-            hp.c,
-            &hp.nc,
-            vc_ev_vector.data(),
-            &inc,
-            &ModuleBase::ZERO,
-            respsi,
-            &inc);
-
+    }
+    ppsi = &basis(nbase, 0);
+    int inc = 1;
+    char trans = 'N';
+    char transb = 'N';
+    zgemm_(&trans,
+            &transb,
+            &npw, // m: row of A,C
+            &notconv, // n: col of B,C
+            &nbase, // k: col of A, row of B
+            &ModuleBase::ONE, // alpha
+            hp.c, // A
+            &hp.nc, // LDA: if(N) max(1,m) if(T) max(1,k)
+            vc_ev_vector.c, // B
+            &vc_ev_vector.nc, // LDB: if(N) max(1,k) if(T) max(1,n)
+            &ModuleBase::ZERO, // belta
+            ppsi, // C
+            &basis.get_nbasis()); // LDC: if(N) max(1, m)
+    /*zgemv_(&trans,
+        &npw,
+        &nbase,
+        &ModuleBase::ONE,
+        hp.c,
+        &hp.nc,
+        vc_ev_vector.data(),
+        &inc,
+        &ModuleBase::ZERO,
+        respsi,
+        &inc);*/
+    for (int m = 0; m < notconv; m++)
+    {
         for(int i = 0; i < nbase; i++)
         {
-            vc_ev_vector[i] *= -1 * eigenvalue[unconv[m]];
+            vc_ev_vector(m, i) *= -1 * eigenvalue[unconv[m]];
         }
-        zgemv_(&trans,
+    }
+    zgemm_(&trans,
+            &transb,
+            &npw, // m: row of A,C
+            &notconv, // n: col of B,C
+            &nbase, // k: col of A, row of B
+            &ModuleBase::ONE, // alpha
+            sp.c, // A
+            &sp.nc, // LDA: if(N) max(1,m) if(T) max(1,k)
+            vc_ev_vector.c, // B
+            &vc_ev_vector.nc, // LDB: if(N) max(1,k) if(T) max(1,n)
+            &ModuleBase::ONE, // belta
+            ppsi, // C
+            &basis.get_nbasis()); // LDC: if(N) max(1, m)
+        /*zgemv_(&trans,
             &npw,
             &nbase,
             &ModuleBase::ONE,
@@ -286,7 +309,7 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
             &inc,
             &ModuleBase::ONE,
             respsi,
-            &inc);
+            &inc);*/
 
         /*ModuleBase::GlobalFunc::ZEROS(respsi, npw);
         for (int i = 0; i < nbase; i++)
@@ -301,11 +324,12 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
             }
         }*/
 
-
+    for (int m = 0; m < notconv; m++)
+    {
         ppsi = &basis(nbase + m, 0);
         for (int ig = 0; ig < npw; ig++)
         {
-            ppsi[ig] = respsi[ig] / this->precondition[ig];
+            ppsi[ig] /= this->precondition[ig];
         }
     }
 
@@ -320,8 +344,8 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
         phm_in->sPsi(&basis(nbase + m, 0), &sp(nbase + m, 0),  (size_t)npw);
     }
     //first nbase bands psi* dot notconv bands spsi to prepare lagrange_matrix 
-    char trans = 'C';
-    char transb = 'N';
+    trans = 'C';
+    transb = 'N';
     //calculate the square matrix for future lagranges
     zgemm_(&trans,
             &transb,
