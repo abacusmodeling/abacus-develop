@@ -42,8 +42,7 @@ class DiagoDavid : public DiagH
                   ModuleBase::ComplexMatrix& sp,
                   const ModuleBase::ComplexMatrix& vc,
                   const int* unconv,
-                  const double* en,
-                  std::complex<double>* respsi);
+                  const double* en);
 
     void cal_elem(const int& npw,
                   int& nbase,
