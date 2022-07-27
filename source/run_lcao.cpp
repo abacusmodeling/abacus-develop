@@ -60,6 +60,12 @@ void Run_lcao::lcao_line(ModuleESolver::ESolver* p_esolver)
     //------------------------------------------------------------
     //---------------------Init ESolver-------------------------
     p_esolver->Init(INPUT, GlobalC::ucell);
+    if(GlobalV::CALCULATION=="get_S")
+    {
+        p_esolver->Run(0, GlobalC::ucell);
+        ModuleBase::timer::tick("Run_lcao", "lcao_line");
+        return;
+    }
     //------------------------------------------------------------
 
 
