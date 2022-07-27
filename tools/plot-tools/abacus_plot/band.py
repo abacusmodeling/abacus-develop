@@ -10,7 +10,7 @@ import numpy as np
 from os import PathLike
 from typing import Sequence, Tuple, Union, Any, List, Dict
 from matplotlib.figure import Figure
-from matplotlib.colors import Normalize
+from matplotlib.colors import Normalize, ListedColormap
 from matplotlib.collections import LineCollection
 from matplotlib import axes
 import matplotlib.pyplot as plt
@@ -22,15 +22,16 @@ from abacus_plot.utils import energy_minus_efermi, list_elem2str, read_kpt, remo
 class Band:
     """Parse Bands data"""
 
-    def __init__(self, bandfile: Union[PathLike, Sequence[PathLike]] = None, kptfile: PathLike = '') -> None:
+    def __init__(self, bandfile: Union[PathLike, Sequence[PathLike]] = None, kptfile: PathLike = '', old_ver=False) -> None:
         self.bandfile = bandfile
+        self.old_ver = old_ver
         if isinstance(bandfile, list) or isinstance(bandfile, tuple):
             self.energy = []
             for file in self.bandfile:
-                self.k_index, e = self.read(file)
+                self.k_index, e, self.k_lines = self.read(file, self.old_ver)
                 self.energy.append(e)
         else:
-            self.k_index, self.energy = self.read(self.bandfile)
+            self.k_index, self.energy, self.k_lines = self.read(self.bandfile, self.old_ver)
         self.kptfile = kptfile
         self.kpt = None
         if self.kptfile:
@@ -42,17 +43,24 @@ class Band:
             self._kzip = self.k_index
 
     @classmethod
-    def read(cls, filename: PathLike):
+    def read(cls, filename: PathLike, old_ver=True):
         """Read band data file and return k-points and energy
 
         :params filename: string of band data file
         """
 
-        data = np.loadtxt(filename, dtype=float)
-        X, y = np.split(data, (1, ), axis=1)
-        x = X.flatten()
+        z = None
+        if old_ver:
+            data = np.loadtxt(filename, dtype=float)
+            X, y = np.split(data, (1, ), axis=1)
+            x = X.flatten()
+        else:
+            data = np.loadtxt(filename, dtype=float)
+            X, Z, y = np.split(data, [1, 2, data.shape[-1]], axis=1)
+            x = X.flatten()
+            z = Z.flatten()
 
-        return x, y
+        return x, y, z
 
     @classmethod
     def direct_bandgap(cls, vb: namedtuple, cb: namedtuple, klength: int):
@@ -713,9 +721,9 @@ class PBand(Band):
         Returns:
             BandPlot object: for manually plotting picture with bandplot.ax 
         """
-        nums = len(self.bandfile)
 
         if isinstance(self.bandfile, list):
+            nums = len(self.bandfile)
             if not efermi:
                 efermi = [0.0 for i in range(nums)]
             _linestyle = kwargs.pop(
@@ -751,6 +759,155 @@ class PBand(Band):
 
         return bandplot
 
+    def _plot_contributions(self,
+              fig: Figure,
+              ax: axes.Axes,
+              energy: np.ndarray,
+              species: Union[Sequence[Any], Dict[Any, List[int]],
+                             Dict[Any, Dict[int, List[int]]]] = [],
+              efermi: float = 0,
+              energy_range: Sequence[float] = [],
+              shift: bool = False,
+              keyname: str = '',
+              colors: list = [],
+              scale_width_factor: int = 10,
+              **kwargs):
+        """Plot parsed projected bands data of different contributions
+
+        Args:
+            fig (Figure): object of matplotlib.figure.Figure
+            ax (Union[axes.Axes, Sequence[axes.Axes]]): object of matplotlib.axes.Axes or a list of this objects
+            species (Union[Sequence[Any], Dict[Any, List[int]], Dict[Any, Dict[int, List[int]]]], optional): list of atomic species(index or atom index) or dict of atomic species(index or atom index) and its angular momentum list. Defaults to [].
+            efermi (float, optional): fermi level in unit eV. Defaults to 0.
+            energy_range (Sequence[float], optional): energy range in unit eV for plotting. Defaults to [].
+            shift (bool, optional): if shift energy by fermi level and set the VBM to zero, or not. Defaults to False.
+            keyname (str, optional): the keyword that extracts the PBANDS. Defaults to ''.
+
+        Returns:
+            BandPlot object: for manually plotting picture with bandplot.ax 
+        """
+
+        wei, totnum = parse_projected_data(self.orbitals, species, keyname)
+        energy = self._shift_energy(energy, efermi, shift)
+
+        if not species:
+            bandplot = BandPlot(fig, ax, **kwargs)
+            bandplot = super().plot(fig, ax, efermi, energy_range, shift, **kwargs)
+            bandplot._set_figure(self._kzip, energy_range)
+
+            return bandplot
+
+        whole_data_parsed = []
+        whole_label_parsed = []
+        bandplot = BandPlot(fig, ax, **kwargs)
+        if isinstance(species, (list, tuple)):
+            for i, elem in enumerate(wei.keys()):
+                whole_label_parsed.append(elem)
+                whole_data_parsed.append(wei[elem])
+
+        elif isinstance(species, dict):
+            for i, elem in enumerate(wei.keys()):
+                for ang in wei[elem].keys():
+                    l_index = int(ang)
+                    if isinstance(wei[elem][ang], dict):
+                        for mag in wei[elem][ang].keys():
+                            m_index = int(mag)
+                            whole_label_parsed.append(f"{elem}-{get_angular_momentum_name(l_index, m_index)}")
+                            whole_data_parsed.append(wei[elem][ang][mag])
+
+                    else:
+                        whole_label_parsed.append(f"{elem}-{get_angular_momentum_label(l_index)}")
+                        whole_data_parsed.append(wei[elem][ang])
+
+        argmax_index = np.argmax(whole_data_parsed, axis=0)
+        max_array = np.max(whole_data_parsed, axis=0)
+
+        if len(colors) == 0:
+            cmap = plt.cm.get_cmap("tab10")
+            colors = [cmap(c) for c in np.linspace(0, 1, len(whole_label_parsed))]
+
+        norm =  Normalize(vmin=0, vmax=1)
+        cmaps = ListedColormap(colors)
+        for ib in range(self.nbands):
+            bandplot.ax.scatter(self.k_index, energy[:, ib], c=argmax_index[:,ib], s=max_array[:, ib]*scale_width_factor, norm=norm, cmap=cmaps)
+
+        clb = plt.colorbar(
+            plt.cm.ScalarMappable(norm=norm, cmap=cmaps), ax=bandplot.ax
+        )
+        clb.set_ticks(np.linspace(0, 1, len(whole_label_parsed)))
+        clb.set_ticklabels(whole_label_parsed)
+        bandplot._set_figure(self._kzip, energy_range)
+
+        return bandplot
+
+    def plot_contributions(self,
+             fig: Figure,
+             ax: Union[axes.Axes, Sequence[axes.Axes]],
+             index: Union[Sequence[int], Dict[int, List[int]],
+                          Dict[int, Dict[int, List[int]]]] = [],
+             atom_index: Union[Sequence[int], Dict[int, List[int]],
+                               Dict[int, Dict[int, List[int]]]] = [],
+             species: Union[Sequence[str], Dict[str, List[int]],
+                            Dict[str, Dict[int, List[int]]]] = [],
+             efermi: Union[float, Sequence[float]] = [],
+             energy_range: Sequence[float] = [],
+             shift: bool = False,
+             colors: list = [],
+             **kwargs):
+        """Plot parsed projected band data of different contributions
+
+        Args:
+            fig (Figure): object of matplotlib.figure.Figure
+            ax (Union[axes.Axes, Sequence[axes.Axes]]): object of matplotlib.axes.Axes or a list of this objects
+            index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PBAND of each atom. Defaults to [].
+            atom_index (Union[Sequence[int], Dict[int, List[int]], Dict[int, Dict[int, List[int]]]], optional): extract PBAND of each atom with same atom_index. Defaults to [].
+            species (Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[int, List[int]]]], optional): extract PBAND of each atom with same species. Defaults to [].
+            efermi (float, optional): fermi level in unit eV. Defaults to 0.
+            energy_range (Sequence[float], optional): energy range in unit eV for plotting. Defaults to [].
+            shift (bool, optional): if shift energy by fermi level and set the VBM to zero, or not. Defaults to False.
+            colors (list, optional): Default:[]
+
+        Returns:
+            BandPlot object: for manually plotting picture with bandplot.ax 
+        """
+
+        if isinstance(self.bandfile, list):
+            nums = len(self.bandfile)
+            if not efermi:
+                efermi = [0.0 for i in range(nums)]
+            _linestyle = kwargs.pop(
+                'linestyle', ['solid' for i in range(nums)])
+
+            for i, band in enumerate(self.energy):
+                if not index and not atom_index and not species:
+                    bandplot = self._plot_contributions(fig=fig, ax=ax, energy=band, species=[
+                    ], efermi=efermi[i], energy_range=energy_range, shift=shift, keyname='', linestyle=_linestyle[i], **kwargs)
+                if index:
+                    bandplot = self._plot_contributions(fig=fig, ax=ax, energy=band, species=index, efermi=efermi[i],
+                                          energy_range=energy_range, shift=shift, keyname='index', linestyle=_linestyle[i], colors=colors, **kwargs)
+                if atom_index:
+                    bandplot = self._plot_contributions(fig=fig, ax=ax, energy=band, species=atom_index, efermi=efermi[i],
+                                          energy_range=energy_range, shift=shift, keyname='atom_index', linestyle=_linestyle[i], colors=colors, **kwargs)
+                if species:
+                    bandplot = self._plot_contributions(fig=fig, ax=ax, energy=band, species=species, efermi=efermi[i],
+                                          energy_range=energy_range, shift=shift, keyname='species', linestyle=_linestyle[i], colors=colors, **kwargs)
+
+        else:
+            if not index and not atom_index and not species:
+                bandplot = self._plot_contributions(fig=fig, ax=ax, energy=self.energy, species=[
+                ], efermi=efermi, energy_range=energy_range, shift=shift, keyname='', colors=colors, **kwargs)
+            if index:
+                bandplot = self._plot_contributions(fig=fig, ax=ax, energy=self.energy, species=index, efermi=efermi,
+                                      energy_range=energy_range, shift=shift, keyname='index', colors=colors, **kwargs)
+            if atom_index:
+                bandplot = self._plot_contributions(fig=fig, ax=ax, energy=self.energy, species=atom_index, efermi=efermi,
+                                      energy_range=energy_range, shift=shift, keyname='atom_index', colors=colors, **kwargs)
+            if species:
+                bandplot = self._plot_contributions(fig=fig, ax=ax, energy=self.energy, species=species, efermi=efermi,
+                                      energy_range=energy_range, shift=shift, keyname='species', colors=colors, **kwargs)
+
+        return bandplot
+
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
@@ -768,6 +925,8 @@ if __name__ == "__main__":
 
     # if you want to specify `species` or `index`, you need to
     # set `species=species` or `index=index` in the following two functions
-    pband.plot(fig, ax, atom_index=atom_index, efermi=efermi,
+    pband.plot_contributions(fig, ax, atom_index=atom_index, efermi=efermi,
                energy_range=energy_range, shift=shift)
-    pband.write(atom_index=atom_index)
+    #pband.write(atom_index=atom_index)
+    #pband.plot(fig, ax, atom_index=atom_index, efermi=efermi,
+    #           energy_range=energy_range, shift=shift)
