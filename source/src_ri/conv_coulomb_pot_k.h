@@ -10,7 +10,8 @@ class Conv_Coulomb_Pot_K
 public:
 
 	enum class Ccp_Type{		//  parameter:
-		Ccp,					//
+		Ccp,                 // 
+		Hf,					//
 		Hse};					//  	"hse_omega"
 
 	template<typename T> static T cal_orbs_ccp(
@@ -35,6 +36,10 @@ private:
 private:
 
 	static std::vector<double> cal_psi_ccp( const std::vector<double> & psif );
+	
+	static std::vector<double> cal_psi_hf(const std::vector<double> &psif,
+                                          const std::vector<double> &k_radial,
+                                          const double omega);
 
 	static std::vector<double> cal_psi_hse( 
 		const std::vector<double> & psif,
