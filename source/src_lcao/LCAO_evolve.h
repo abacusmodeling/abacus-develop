@@ -26,13 +26,15 @@ class Evolve_LCAO_Matrix
                                double* ekb) const;
 
   private:
-    //LCAO_Matrix* LM;
+    // LCAO_Matrix* LM;
     const Parallel_Orbitals* ParaV;
 
     void using_LAPACK_complex(const int& ik,
+                              hamilt::Hamilt* phami,
                               std::complex<double>** wfc_k_grid,
-                              ModuleBase::ComplexMatrix& wfc_k,
-                              ModuleBase::ComplexMatrix& wfc_k_laststep,
+                              std::complex<double>* wfc_k,
+                              std::complex<double>* wfc_k_laststep,
+                              Local_Orbital_wfc& lowf,
                               double* ekb) const;
 #ifdef __MPI
     void using_ScaLAPACK_complex(const int& ik,

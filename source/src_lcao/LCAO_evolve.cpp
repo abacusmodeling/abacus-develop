@@ -45,7 +45,13 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int& ik,
                                       ekb);
         // this->using_ScaLAPACK_complex(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik], lowf.wfc_k_laststep[ik], lowf, ekb);
 #else
-        // this->using_LAPACK_complex(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik], lowf.wfc_k_laststep[ik], ekb);
+        this->using_LAPACK_complex(ik,
+                                   phami,
+                                   lowf.wfc_k_grid[ik],
+                                   psi[0].get_pointer(),
+                                   psi_laststep[0].get_pointer(),
+                                   lowf,
+                                   ekb);
 #endif
     }
     else
@@ -60,9 +66,11 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int& ik,
 }
 
 void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
+                                              hamilt::Hamilt* phami,
                                               std::complex<double>** wfc_k_grid,
-                                              ModuleBase::ComplexMatrix& wfc_k,
-                                              ModuleBase::ComplexMatrix& wfc_k_laststep,
+                                              std::complex<double>* wfc_k,
+                                              std::complex<double>* wfc_k_laststep,
+                                              Local_Orbital_wfc& lowf,
                                               double* ekb) const
 {
     ModuleBase::TITLE("Evolve_LCAO_Matrix", "using_LAPACK_complex");
@@ -71,15 +79,22 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
 
     ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL, GlobalV::NLOCAL);
     ModuleBase::ComplexMatrix Stmp(GlobalV::NLOCAL, GlobalV::NLOCAL);
+    hamilt::MatrixBlock<complex<double>> h_mat, s_mat;
+        phami->matrix(h_mat, s_mat);
     for (int i = 0; i < GlobalV::NLOCAL; i++)
     {
         for (int j = 0; j < GlobalV::NLOCAL; j++)
         {
-            // Htmp(i, j) = this->LM->Hloc2[i * GlobalV::NLOCAL + j];
+            Htmp(i, j) = h_mat.p[i * GlobalV::NLOCAL + j];
             //  Htmp(i,j) = (this->LM->Hloc2[i*GlobalV::NLOCAL+j] +this->LM->Hloc2_laststep[i*GlobalV::NLOCAL+j])/2.0;
-            // Stmp(i, j) = this->LM->Sloc2[i * GlobalV::NLOCAL + j];
+            Stmp(i, j) = s_mat.p[i * GlobalV::NLOCAL + j];
         }
     }
+
+    ModuleBase::ComplexMatrix wfc_tmp(GlobalV::NBANDS, GlobalV::NLOCAL, true);
+    ModuleBase::ComplexMatrix wfc_laststep_tmp(GlobalV::NBANDS, GlobalV::NLOCAL, true);
+    wfc_tmp.c=wfc_k;
+    wfc_laststep_tmp.c=wfc_k_laststep;
 
     /*
         GlobalV::ofs_running << " Htmp: " <<std::endl;
@@ -251,10 +266,10 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
     */
 
     const bool conjugate = false;
-    wfc_k = wfc_k_laststep * transpose(U_operator, conjugate);
+    wfc_tmp = wfc_laststep_tmp * transpose(U_operator, conjugate);
 
     ModuleBase::ComplexMatrix cmatrix(GlobalV::NBANDS, GlobalV::NBANDS);
-    cmatrix = conj(wfc_k) * Stmp * transpose(wfc_k, conjugate);
+    cmatrix = conj(wfc_tmp) * Stmp * transpose(wfc_tmp, conjugate);
 
     /*
            GlobalV::ofs_running<<"wfc_k before renomalization "<<endl;
@@ -276,7 +291,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
         factor = 1.0 / sqrt(cmatrix.c[i * GlobalV::NBANDS + i].real());
         for (int j = 0; j < GlobalV::NLOCAL; j++)
         {
-            wfc_k.c[i * GlobalV::NLOCAL + j] *= factor;
+            wfc_tmp.c[i * GlobalV::NLOCAL + j] *= factor;
         }
     }
 
@@ -284,7 +299,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
     {
         for (int j = 0; j < GlobalV::NLOCAL; j++)
         {
-            wfc_k_grid[i][j] = wfc_k.c[i * GlobalV::NLOCAL + j];
+            wfc_k_grid[i][j] = wfc_tmp.c[i * GlobalV::NLOCAL + j];
         }
     }
 
@@ -318,7 +333,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
     ///*
     // calculate energy level
     ModuleBase::ComplexMatrix Ematrix(GlobalV::NLOCAL, GlobalV::NLOCAL);
-    Ematrix = conj(wfc_k) * Htmp * transpose(wfc_k, conjugate);
+    Ematrix = conj(wfc_tmp) * Htmp * transpose(wfc_tmp, conjugate);
     for (int i = 0; i < GlobalV::NBANDS; i++)
     {
         ekb[i] = Ematrix.c[i * GlobalV::NBANDS + i].real();

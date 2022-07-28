@@ -37,12 +37,14 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
         for (int ik = 0; ik < psi.get_nk(); ik++)
         {
             psi.fix_k(ik);
+#ifdef __MPI
             this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao,
                                        psi.get_pointer(),
                                        this->lowf->wfc_k_grid[ik],
                                        ik,
                                        this->ekb,
                                        this->wg);
+#endif
             // added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
             if (GlobalV::NSPIN == 4)
             {
@@ -110,11 +112,13 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
             {
                 psi.fix_k(ik);
                 double** wfc_grid = nullptr; // output but not do "2d-to-grid" conversion
+#ifdef __MPI
                 this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao,
                                            psi.get_pointer(),
                                            wfc_grid,
                                            this->ekb,
                                            this->wg);
+#endif
             }
             // this->loc->dm2dToGrid(this->loc->dm_gamma[ik], this->loc->DM[ik]); // transform dm_gamma[is].c to
             // this->loc->DM[is]

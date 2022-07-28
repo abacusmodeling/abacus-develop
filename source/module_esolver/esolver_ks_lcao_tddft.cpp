@@ -519,8 +519,10 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
         const int inc = 1;
         int nrow = this->LOC.ParaV->nrow;
         int ncol = this->LOC.ParaV->ncol;
-        zcopy_(&this->LOC.ParaV->nloc, this->UHM.LM->Hloc2.data(), &inc, Htmp, &inc);
-        zcopy_(&this->LOC.ParaV->nloc, this->UHM.LM->Sloc2.data(), &inc, Sinv, &inc);
+        hamilt::MatrixBlock<complex<double>> h_mat, s_mat;
+        phami->matrix(h_mat, s_mat);
+        zcopy_(&this->LOC.ParaV->nloc, h_mat.p, &inc, Htmp, &inc);
+        zcopy_(&this->LOC.ParaV->nloc, s_mat.p, &inc, Sinv, &inc);
 
         int* ipiv = new int[this->LOC.ParaV->nloc];
         int info;
@@ -683,12 +685,14 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
         this->LOC.edm_k_tddft[ik].create(this->LOC.ParaV->ncol, this->LOC.ParaV->nrow);
         ModuleBase::ComplexMatrix Sinv(GlobalV::NLOCAL, GlobalV::NLOCAL);
         ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL, GlobalV::NLOCAL);
+        hamilt::MatrixBlock<complex<double>> h_mat, s_mat;
+        phami->matrix(h_mat, s_mat);
         for (int i = 0; i < GlobalV::NLOCAL; i++)
         {
             for (int j = 0; j < GlobalV::NLOCAL; j++)
             {
-                Htmp(i, j) = this->LM->Hloc2[i * GlobalV::NLOCAL + j];
-                Sinv(i, j) = this->LM->Sloc2[i * GlobalV::NLOCAL + j];
+                Htmp(i, j) = h_mat.p[i * GlobalV::NLOCAL + j];
+                Sinv(i, j) = s_mat.p[i * GlobalV::NLOCAL + j];
             }
         }
         int INFO;
@@ -702,7 +706,7 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
         LapackConnector::zgetri(GlobalV::NLOCAL, Sinv, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
 
         this->LOC.edm_k_tddft[ik] = 0.5 * (Sinv * Htmp * this->LOC.dm_k[ik] + this->LOC.dm_k[ik] * Htmp * Sinv);
-        delete[] WORK; 
+        delete[] WORK;
 #endif
     }
     return;

@@ -37,12 +37,14 @@ void ElecStateLCAO_TDDFT::psiToRho_td(const psi::Psi<std::complex<double>>& psi)
         for (int ik = 0; ik < psi.get_nk(); ik++)
         {
             psi.fix_k(ik);
+#ifdef __MPI
             this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao,
                                        psi.get_pointer(),
                                        this->lowf->wfc_k_grid[ik],
                                        ik,
                                        this->ekb,
                                        this->wg);
+#endif
 
             GlobalV::ofs_running << endl;
 
