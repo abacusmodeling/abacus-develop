@@ -118,6 +118,15 @@ REAL Sto_Func<REAL>:: ncos(REAL rawe)
 }
 
 template<typename REAL>
+REAL Sto_Func<REAL>:: nsin(REAL rawe)
+{
+    REAL Ebar = (Emin + Emax)/2;
+	REAL DeltaE = (Emax - Emin)/2;
+    REAL e = rawe * DeltaE + Ebar;
+    return sin(e * t);
+}
+
+template<typename REAL>
 REAL Sto_Func<REAL>:: n_sin(REAL rawe)
 {
     REAL Ebar = (Emin + Emax)/2;

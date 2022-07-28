@@ -139,6 +139,8 @@ void ESolver_SDFT_PW::cal_Stress(ModuleBase::matrix &stress)
 }
 void ESolver_SDFT_PW::postprocess()
 {
+    GlobalC::en.print_occ();
+
     ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
     if(this->maxniter == 0)
     {
@@ -151,7 +153,7 @@ void ESolver_SDFT_PW::postprocess()
     }
     if(INPUT.cal_cond)
 	{
-        this->sKG(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
+        this->sKG_new(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
     }
 }
 

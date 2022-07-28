@@ -24,6 +24,7 @@ public:
 public:
     REAL t;
     REAL ncos(REAL e);
+    REAL nsin(REAL e);
     REAL n_sin(REAL e);
 
 };

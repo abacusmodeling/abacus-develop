@@ -31,6 +31,8 @@ public:
     //Stochastic Kubo-Greenwood
     void sKG(const int nche_KG, const double fwhmin, const double wcut, 
              const double dw_in, const int times);
+    void sKG_new(const int nche_KG, const double fwhmin, const double wcut, 
+             const double dw_in, const int times);
 private:
     void calcondw(const int nt,const double dt,const double fwhmin,const double wcut,const double dw_in,double*ct11,double*ct12,double *ct22);
 

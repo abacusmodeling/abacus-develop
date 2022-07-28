@@ -545,6 +545,10 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::postprocess()
     {
+        if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
+	    {
+	    	GlobalC::en.print_occ();
+	    }
         // compute density of states
         GlobalC::en.perform_dos_pw();
 
