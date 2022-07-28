@@ -18,7 +18,7 @@ void energy::print_occ()
 			MPI_Barrier(MPI_COMM_WORLD);
 			if( GlobalV::MY_POOL == ip )
 			{
-				if( GlobalV::RANK_IN_POOL != 0 ) continue;
+				if( GlobalV::RANK_IN_POOL != 0 || GlobalV::MY_STOGROUP != 0 ) continue;
 #endif
 				std::ofstream ofsi2( ss.str().c_str(), ios::app );
 				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)

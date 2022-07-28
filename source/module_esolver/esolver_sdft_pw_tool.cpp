@@ -8,19 +8,7 @@
 #include "module_base/global_variable.h"
 #include "module_base/global_function.h"
 #include "src_pw/global.h"
-//------------------------------------------------------------------
-// hbar = 6.62607015e-34/2pi
-// e    = 1.6021766208e-19
-// a    = 5.2917721067e-11
-// m    = 9.1093897e-31
-// 1 ha   = hbar^2/m/a^2/e  = 27.21136857564 eV
-// 1 ry   = hbar^2/2m/a^2/e = 13.60568428782 eV = 2.17987092759e-18 J
-// 1 t(ry^-1) = hbar/ry/e    = 4.837771834548454e-17 s
-// factor = hbar*e^2/a^5/m^2*t^2  = 1.839939223835727e+07  (1 a.u. = 1.84e7 Sm^-1)
-// 1 a.u. = factor*(2.17987092759e-18)^2/e^2 = 3.40599696130e+09 Wm^-1
-// k = 1.380649e-23
-// e/k = 11604.518026 , 1 eV = 11604.5 K
-//------------------------------------------------------------------
+
 #define TWOSQRT2LN2 2.354820045030949 //FWHM = 2sqrt(2ln2) * \sigma
 #define FACTOR 1.839939223835727e7
 namespace ModuleESolver
@@ -46,7 +34,6 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
     ModuleBase::timer::tick(this->classname,"sKG");
     cout<<"Calculating conductivity...."<<endl;
     
-    double factor = FACTOR;
     int nw = ceil(wcut/dw_in);
     double dw =  dw_in / ModuleBase::Ry_to_eV; //converge unit in eV to Ry 
     double sigma = fwhmin / TWOSQRT2LN2 / ModuleBase::Ry_to_eV;
@@ -79,6 +66,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
 	    }
 
         this->phami->updateHk(ik);
+        stoiter.stohchi.current_ik = ik;
         const int npw = GlobalC::kv.ngk[ik];
 
         complex<double> *pchi = new complex<double> [npw*4*ntest];
@@ -180,6 +168,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
         {
             this->phami->updateHk(ik);
         }
+        stoiter.stohchi.current_ik = ik;
         const int npw = GlobalC::kv.ngk[ik];
 
         int nchip = this->stowf.nchip[ik];
@@ -409,7 +398,6 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
     ModuleBase::timer::tick(this->classname,"sKG");
     cout<<"Calculating conductivity...."<<endl;
     
-    double factor = FACTOR;
     int nw = ceil(wcut/dw_in);
     double dw =  dw_in / ModuleBase::Ry_to_eV; //converge unit in eV to Ry 
     double sigma = fwhmin / TWOSQRT2LN2 / ModuleBase::Ry_to_eV;
@@ -443,6 +431,7 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
 	    }
 
         this->phami->updateHk(ik);
+        stoiter.stohchi.current_ik = ik;
         const int npw = GlobalC::kv.ngk[ik];
 
         for(int j = 0 ; j < 2 ; ++j)
@@ -534,6 +523,7 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
         {
             this->phami->updateHk(ik);
         }
+        stoiter.stohchi.current_ik = ik;
         const int npw = GlobalC::kv.ngk[ik];
 
         int nchip = this->stowf.nchip[ik];
@@ -583,13 +573,13 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
         for(int ib = 0 ; ib < totbands_per ; ++ib )
         {
             std::complex<double> *tmp, *tmp2;
-            double factor = 1;
+            double fac = 1;
             
             if(ib < ksbandper)
             {
                 tmp = &(this->psi[0](ik,ib+startband,0));
                 tmp2 = &(this->psi[0](ik,ib+startband,0));
-                factor = sqrt(stoiter.stofunc.fd(en[ib]));
+                fac = sqrt(stoiter.stofunc.fd(en[ib]));
             }
             else
             {
@@ -603,7 +593,7 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
             for(int ig = 0; ig < npw ; ++ig)
             {
                 psi0(ib,ig) = tmp[ig];
-                sfpsi0(ib,ig) = factor * tmp2[ig];
+                sfpsi0(ib,ig) = fac * tmp2[ig];
             }
         }
         
@@ -774,58 +764,6 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
     delete[] ct22;
     // delete[] cterror;
     ModuleBase::timer::tick(this->classname,"sKG");
-}
-
-void ESolver_SDFT_PW::calcondw(const int nt,const double dt,const double fwhmin,const double wcut,const double dw_in,double*ct11,double*ct12,double *ct22)
-{
-    double factor = FACTOR;
-    const int ndim = 3;
-    int nw = ceil(wcut/dw_in);
-    double dw =  dw_in / ModuleBase::Ry_to_eV; //converge unit in eV to Ry 
-    double sigma = fwhmin / TWOSQRT2LN2 / ModuleBase::Ry_to_eV;
-    ofstream ofscond("je-je.txt");
-    ofscond<<setw(8)<<"#t(a.u.)"<<setw(15)<<"c11(t)"<<setw(15)<<"c12(t)"<<setw(15)<<"c22(t)"<<setw(15)<<"decay"<<endl;
-	for(int it = 0; it < nt; ++it)
-	{
-		ofscond <<setw(8)<<(it)*dt<<setw(15)<<-2*ct11[it]<<setw(15)<<-2*ct12[it]<<setw(15)<<-2*ct22[it]<<setw(15)<<exp(-double(1)/2*sigma*sigma*pow((it)*dt,2))<<endl;
-	}
-    ofscond.close();
-    double * cw11 = new double [nw];
-    double * cw12 = new double [nw];
-    double * cw22 = new double [nw];
-    double * kappa = new double [(int)ceil(wcut/dw_in)];
-    ModuleBase::GlobalFunc::ZEROS(cw11,nw);
-    ModuleBase::GlobalFunc::ZEROS(cw12,nw);
-    ModuleBase::GlobalFunc::ZEROS(cw22,nw);
-    for(int iw = 0 ; iw < nw ; ++iw )
-    {
-        for(int it = 0 ; it < nt ; ++it)
-        {
-            cw11[iw] += -2 * ct11[it] * sin( -(iw+0.5) * dw * it *dt) * exp(-double(1)/2*sigma*sigma*pow((it)*dt,2) ) / (iw+0.5) /dw * dt ;
-            cw12[iw] += -2 * ct12[it] * sin( -(iw+0.5) * dw * it *dt) * exp(-double(1)/2*sigma*sigma*pow((it)*dt,2) ) / (iw+0.5) /dw * dt ;
-            cw22[iw] += -2 * ct22[it] * sin( -(iw+0.5) * dw * it *dt) * exp(-double(1)/2*sigma*sigma*pow((it)*dt,2) ) / (iw+0.5) /dw * dt ;
-        }
-    }
-    ofscond.open("Onsager.txt");
-    ofscond<<setw(8)<<"## w(eV) "<<setw(20)<<"sigma (Sm^-1)"<<setw(20)<<"kappa (W(mK)^-1)"<<setw(20)<<"L12/e (Am^-1)"<<setw(20)<<"L22/e^2 (Wm^-1)"<<endl;
-    for(int iw = 0; iw < nw; ++iw)
-	{
-        cw11[iw] *= double(2)/ndim/GlobalC::ucell.omega* factor; //unit in Sm^-1
-        cw12[iw] *= double(2)/ndim/GlobalC::ucell.omega* factor * 2.17987092759e-18/1.6021766208e-19; //unit in Am^-1
-        cw22[iw] *= double(2)/ndim/GlobalC::ucell.omega* factor * pow(2.17987092759e-18/1.6021766208e-19,2); //unit in Wm^-1
-        kappa[iw] = (cw22[iw]-pow(cw12[iw],2)/cw11[iw])/stoiter.stofunc.tem/ModuleBase::Ry_to_eV/11604.518026;
-	    ofscond <<setw(8)<<(iw+0.5)*dw * ModuleBase::Ry_to_eV <<setw(20)<<cw11[iw] <<setw(20)<<kappa[iw]<<setw(20)<<cw12[iw] <<setw(20)<<cw22[iw]<<endl;
-	}
-    cout<<setprecision(6)<<"DC electrical conductivity: "<<cw11[0] - (cw11[1] - cw11[0]) * 0.5<<" Sm^-1"<<endl;
-    cout<<setprecision(6)<<"Thermal conductivity: "<<kappa[0] - (kappa[1] - kappa[0]) * 0.5<<" Wm^-1"<<endl;;
-    ofscond.close();
-    
-    
-    delete[] cw11;
-    delete[] cw12;
-    delete[] cw22;
-    delete[] kappa;
-
 }
 
 }
