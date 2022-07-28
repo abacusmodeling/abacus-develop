@@ -80,7 +80,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
     ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL, GlobalV::NLOCAL);
     ModuleBase::ComplexMatrix Stmp(GlobalV::NLOCAL, GlobalV::NLOCAL);
     hamilt::MatrixBlock<complex<double>> h_mat, s_mat;
-        phami->matrix(h_mat, s_mat);
+    phami->matrix(h_mat, s_mat);
     for (int i = 0; i < GlobalV::NLOCAL; i++)
     {
         for (int j = 0; j < GlobalV::NLOCAL; j++)
@@ -93,8 +93,15 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
 
     ModuleBase::ComplexMatrix wfc_tmp(GlobalV::NBANDS, GlobalV::NLOCAL, true);
     ModuleBase::ComplexMatrix wfc_laststep_tmp(GlobalV::NBANDS, GlobalV::NLOCAL, true);
-    wfc_tmp.c=wfc_k;
-    wfc_laststep_tmp.c=wfc_k_laststep;
+    //wfc_laststep_tmp.c = wfc_k_laststep;
+
+    for (int i = 0; i < GlobalV::NBANDS; i++)
+    {
+        for (int j = 0; j < GlobalV::NLOCAL; j++)
+        {
+            wfc_laststep_tmp.c[i * GlobalV::NLOCAL + j]=wfc_k_laststep[i * GlobalV::NLOCAL + j];
+        }
+    }
 
     /*
         GlobalV::ofs_running << " Htmp: " <<std::endl;
@@ -299,10 +306,10 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik,
     {
         for (int j = 0; j < GlobalV::NLOCAL; j++)
         {
+            wfc_k[i * GlobalV::NLOCAL + j]=wfc_tmp.c[i * GlobalV::NLOCAL + j];
             wfc_k_grid[i][j] = wfc_tmp.c[i * GlobalV::NLOCAL + j];
         }
     }
-
     /*
             GlobalV::ofs_running<<"wfc_k "<<endl;
             for(int i=0; i<GlobalV::NBANDS; i++)

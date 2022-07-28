@@ -32,7 +32,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     // 1. psi_k transform from 2d-block to grid format
     // 2. psi_k_grid -> DM_R
     // 3. DM_R -> rho(r)
-    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
+    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack")
     {
         for (int ik = 0; ik < psi.get_nk(); ik++)
         {
@@ -44,6 +44,14 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
                                        ik,
                                        this->ekb,
                                        this->wg);
+#else
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+            {
+                for (int iw = 0; iw < GlobalV::NLOCAL; iw++)
+                {
+                    this->lowf->wfc_k_grid[ik][ib][iw] = psi.get_pointer()[ib * GlobalV::NLOCAL + iw];
+                }
+            }
 #endif
             // added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
             if (GlobalV::NSPIN == 4)

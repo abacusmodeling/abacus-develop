@@ -30,6 +30,15 @@ template <typename T> void HamiltLCAO<T>::getMatrix(MatrixBlock<T> &hk_in, Matri
                            (size_t)this->LM->ParaV->nrow,
                            (size_t)this->LM->ParaV->ncol,
                            this->LM->ParaV->desc};
+#else
+    hk_in = MatrixBlock<T>{hmatrix_k,
+                           (size_t)this->LM->ParaV->nrow,
+                           (size_t)this->LM->ParaV->ncol,
+                           nullptr};
+    sk_in = MatrixBlock<T>{smatrix_k,
+                           (size_t)this->LM->ParaV->nrow,
+                           (size_t)this->LM->ParaV->ncol,
+                           nullptr};
 #endif
 }
 

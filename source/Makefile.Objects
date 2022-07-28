@@ -267,6 +267,7 @@ pw_transform.o\
 pw_transform_k.o
 
 OBJ_HSOLVER=diago_blas.o\
+diago_lapack.o\
 diago_cg.o\
 diago_david.o\
 diago_elpa.o\

@@ -378,21 +378,26 @@ void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
         GlobalC::pot.set_vrs_tddft(istep);
     }
 
+    ///*
     // store wfc
     if (this->conv_elec & istep >= 1)
     {
         if (this->psi_laststep == nullptr)
+#ifdef __MPI
             this->psi_laststep = new psi::Psi<std::complex<double>>(GlobalC::kv.nks,
                                                                     this->LOWF.ParaV->ncol_bands,
                                                                     this->LOWF.ParaV->nrow,
                                                                     nullptr);
-
+#else
+            this->psi_laststep
+                = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, GlobalV::NBANDS, GlobalV::NLOCAL, nullptr);
+#endif
         std::complex<double>* tmp = psi[0].get_pointer();
         for (int index = 0; index < psi[0].size(); ++index)
             psi_laststep[0].get_pointer()[index] = tmp[index];
         if (istep > 1)
             this->cal_edm_tddft();
-    }
+    } //*/
 }
 
 void ESolver_KS_LCAO_TDDFT::afterscf()
@@ -687,6 +692,7 @@ void ESolver_KS_LCAO_TDDFT::cal_edm_tddft()
         ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL, GlobalV::NLOCAL);
         hamilt::MatrixBlock<complex<double>> h_mat, s_mat;
         phami->matrix(h_mat, s_mat);
+        // cout<<"hmat "<<h_mat.p[0]<<endl;
         for (int i = 0; i < GlobalV::NLOCAL; i++)
         {
             for (int j = 0; j < GlobalV::NLOCAL; j++)
