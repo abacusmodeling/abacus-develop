@@ -1,7 +1,7 @@
 #include "conv_coulomb_pot_k.h"
 #include "../module_base/constants.h"
 #include "../module_orbital/ORB_atomic_lm.h"
-
+#include "../src_pw/global.h"
 std::vector<double> Conv_Coulomb_Pot_K::cal_psi_ccp( const std::vector<double> & psif )
 {
 	std::vector<double> psik2_ccp(psif.size());
@@ -9,6 +9,21 @@ std::vector<double> Conv_Coulomb_Pot_K::cal_psi_ccp( const std::vector<double> &
 		psik2_ccp[ik] = ModuleBase::FOUR_PI * psif[ik];
 	return psik2_ccp;
 }
+
+// rongshi add 2022-07-27
+// Sphere truction -- Spencer
+std::vector<double> Conv_Coulomb_Pot_K::cal_psi_hf(const std::vector<double> &psif,
+                                                   const std::vector<double> &k_radial,
+                                                   const double omega = 0)
+{	
+    double Rc = pow(0.75 * GlobalC::kv.nks * GlobalC::ucell.omega / (ModuleBase::PI), 0.3333334);
+   // cout << "hf_Rc:  " << Rc << endl;
+    std::vector<double> psik2_ccp(psif.size());
+    for (size_t ik = 0; ik < psif.size(); ++ik)
+        psik2_ccp[ik] = ModuleBase::FOUR_PI * psif[ik] * (1 - std::cos(k_radial[ik] * Rc));
+    return psik2_ccp;
+}
+
 
 std::vector<double> Conv_Coulomb_Pot_K::cal_psi_hse( 
 	const std::vector<double> & psif,
@@ -35,6 +50,8 @@ Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
 	{
 		case Ccp_Type::Ccp:
 			psik2_ccp = cal_psi_ccp( orbs.get_psif() );		break;
+		case Ccp_Type::Hf:
+        	psik2_ccp = cal_psi_hf(orbs.get_psif(), orbs.get_k_radial());      break;
 		case Ccp_Type::Hse:
 			psik2_ccp = cal_psi_hse( orbs.get_psif(), orbs.get_k_radial(), parameter.at("hse_omega") );		break;
 		default:
