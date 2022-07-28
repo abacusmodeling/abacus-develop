@@ -23,6 +23,7 @@ VPATH=./src_global\
 :./module_elecstate\
 :./module_psi\
 :./module_hamilt\
+:./module_hamilt/ks_pw\
 :./module_gint\
 :./src_pw\
 :./src_lcao\
