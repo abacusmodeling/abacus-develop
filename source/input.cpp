@@ -2300,8 +2300,7 @@ void Input::Check(void)
         if (!this->relax_nmax)
             this->relax_nmax = 50;
     }
-
-    else if (calculation == "nscf")
+    else if (calculation == "nscf" || calculation == "get_S")
     {
         GlobalV::CALCULATION = "nscf";
         this->relax_nmax = 1;

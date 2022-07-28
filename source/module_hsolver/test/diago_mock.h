@@ -247,28 +247,42 @@ void hamilt::HamiltPW::sPsi
 }
 
 //Mock function h_psi
-void hamilt::HamiltPW::hPsi(const std::complex<double> *psi_in, std::complex<double> *hpsi_local, const size_t size)const
+#include "module_hamilt/ks_pw/operator_pw.h"
+class OperatorMock : public hamilt::OperatorPW
 {
-    int m = size / DIAGOTEST::npw;
-    int nprocs=1, mypnum=0;
-#ifdef __MPI    
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-    MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
-#endif        
-
-    std::complex<double> *hpsi = new std::complex<double>[DIAGOTEST::npw];
-    for(int i=0;i<DIAGOTEST::npw;i++)
+    virtual void act
+    (
+        const psi::Psi<std::complex<double>> *psi_in, 
+        const int n_npwx, 
+        const std::complex<double>* tmpsi_in, 
+        std::complex<double>* tmhpsi
+    )const 
     {
-        hpsi[i] = 0.0;
-        for(int j=0;j<(DIAGOTEST::npw_local[mypnum]);j++)
+        int nprocs=1, mypnum=0;
+    #ifdef __MPI    
+        MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+        MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
+    #endif        
+
+        std::complex<double> *hpsi = new std::complex<double>[DIAGOTEST::npw];
+        for(int m = 0; m< n_npwx; m++)
         {
-            hpsi[i] += DIAGOTEST::hmatrix_local(i,j) * psi_in[j];
+            for(int i=0;i<DIAGOTEST::npw;i++)
+            {
+                hpsi[i] = 0.0;
+                for(int j=0;j<(DIAGOTEST::npw_local[mypnum]);j++)
+                {
+                    hpsi[i] += DIAGOTEST::hmatrix_local(i,j) * tmpsi_in[j];
+                }
+            }
+            Parallel_Reduce::reduce_complex_double_pool(hpsi, DIAGOTEST::npw);
+            DIAGOTEST::divide_psi<std::complex<double>>(hpsi, tmhpsi);
+            tmhpsi += DIAGOTEST::npw;
+            tmpsi_in += DIAGOTEST::npw;
         }
+        delete [] hpsi;
     }
-    Parallel_Reduce::reduce_complex_double_pool(hpsi, DIAGOTEST::npw);
-    DIAGOTEST::divide_psi<std::complex<double>>(hpsi,hpsi_local);
-    delete [] hpsi;
-}
+};
 
 void hamilt::HamiltPW::updateHk(const int ik)
 {
@@ -277,8 +291,10 @@ void hamilt::HamiltPW::updateHk(const int ik)
 
 hamilt::HamiltPW::HamiltPW()
 {
+    this->ops = new OperatorMock;
 }
 
 hamilt::HamiltPW::~HamiltPW()
 {
+    delete this->ops;
 }

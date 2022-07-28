@@ -7,47 +7,42 @@
 namespace hamilt
 {
 
-VeffPW::VeffPW(
-    int max_npw_in,
-    int npol_in,
-    const int* ngk_in,
+template class Veff<OperatorPW>;
+
+template<>
+Veff<OperatorPW>::Veff(
     const int* isk_in,
     const ModuleBase::matrix* veff_in,
     ModulePW::PW_Basis_K* wfcpw_in
 )
 {
-    this->max_npw = max_npw_in;
-    this->npol = npol_in;
-    this->ngk = ngk_in;
+    this->cal_type = 11;
     this->isk = isk_in;
     this->veff = veff_in;
     this->wfcpw = wfcpw_in;
-    if(this->max_npw == 0 || this->npol == 0 || this->ngk == nullptr
-    || this->isk == nullptr || this->veff == nullptr || this->wfcpw == nullptr)
+    if( this->isk == nullptr || this->veff == nullptr || this->wfcpw == nullptr)
     {
         ModuleBase::WARNING_QUIT("VeffPW", "Constuctor of Operator::VeffPW is failed, please check your code!");
     }
 }
 
-void VeffPW::act(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const
+template<>
+void Veff<OperatorPW>::act
+(
+    const psi::Psi<std::complex<double>> *psi_in, 
+    const int n_npwx, 
+    const std::complex<double>* tmpsi_in, 
+    std::complex<double>* tmhpsi
+)const  
 {
     ModuleBase::timer::tick("Operator", "VeffPW");
-    int m = int(size / this->max_npw / this->npol);
-    if (int(size - m * this->max_npw * this->npol) != 0)
-    {
-        m++;
-    }
-    const int npw = this->ngk[this->ik];
 
+    this->max_npw = psi_in->get_nbasis() / psi_in->npol;
     const int current_spin = this->isk[this->ik];
-
-    std::complex<double> *tmhpsi;
-    const std::complex<double> *tmpsi_in;
-
+    this->npol = psi_in->npol;
+    
     std::complex<double> *porter = new std::complex<double>[wfcpw->nmaxgr];
-    tmhpsi = hpsi;
-    tmpsi_in = psi_in;
-    for (int ib = 0; ib < m; ++ib)
+    for (int ib = 0; ib < n_npwx; ib += this->npol)
     {
         if (this->npol == 1)
         {

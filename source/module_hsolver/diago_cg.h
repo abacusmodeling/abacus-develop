@@ -43,24 +43,27 @@ class DiagoCG : public DiagH
     /// eigenvalue results
     double *eigenvalue = nullptr;
 
+    /// temp vector for new psi for one band, size dim
+    psi::Psi<std::complex<double>>* phi_m = nullptr;
     /// temp vector for S|psi> for one band, size dim
     std::vector<std::complex<double>> sphi;
-    /// temp vector for , size dim
-    std::vector<std::complex<double>> scg;
     /// temp vector for H|psi> for one band, size dim
     std::vector<std::complex<double>> hphi;
+
+    /// temp vector for , size dim
+    psi::Psi<std::complex<double>>* cg = nullptr;
+    /// temp vector for , size dim
+    std::vector<std::complex<double>> scg;
+    /// temp vector for store psi in sorting with eigenvalues, size dim
+    std::vector<std::complex<double>> pphi;
+
     /// temp vector for , size dim
     std::vector<std::complex<double>> gradient;
     /// temp vector for , size dim
-    std::vector<std::complex<double>> cg;
-    /// temp vector for , size dim
     std::vector<std::complex<double>> g0;
-    /// temp vector for store psi in sorting with eigenvalues, size dim
-    std::vector<std::complex<double>> pphi;
     /// temp vector for matrix eigenvector * vector S|psi> , size m_band
     std::vector<std::complex<double>> lagrange;
-    /// temp vector for new psi for one band, size dim
-    std::vector<std::complex<double>> phi_m;
+
 
     void calculate_gradient();
 
@@ -68,9 +71,9 @@ class DiagoCG : public DiagH
 
     void calculate_gamma_cg(const int iter, double &gg_last, const double &cg0, const double &theta);
 
-    bool update_psi(hamilt::Hamilt *phm_in, double &cg_norm, double &theta, double &eigenvalue);
+    bool update_psi(double &cg_norm, double &theta, double &eigenvalue);
 
-    void schmit_orth(hamilt::Hamilt *phm_in, const int &m, const psi::Psi<std::complex<double>> &psi);
+    void schmit_orth(const int &m, const psi::Psi<std::complex<double>> &psi);
 
     // used in diag() for template replace Hamilt with Hamilt_PW
     void diag_mock(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &phi, double *eigenvalue_in);

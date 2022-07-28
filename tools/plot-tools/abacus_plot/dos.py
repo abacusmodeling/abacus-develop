@@ -391,7 +391,7 @@ class PDOS(DOS):
         Returns:
             DOSPlot object: for manually plotting picture with dosplot.ax 
         """
-        if not isinstance(ax, list):
+        if isinstance(ax, axes.Axes):
             ax = [ax]
 
         dos, totnum = parse_projected_data(self.orbitals, species, keyname)

@@ -178,7 +178,7 @@ void Numerical_Orbital_Lm::copy_parameter(
     // assert(r_radial_in[nr-1]<50);						// Peize Lin delete 2017-08-18
     this->rcut = r_radial_in[nr-1];
     assert(nk_in>1);
-    assert(nk_in<10000);
+    //assert(nk_in<10000);				// Jiyy delete 2022-07-18
     this->nk = nk_in;
     assert(nk%2!=0);
     assert(dk_in>0);
