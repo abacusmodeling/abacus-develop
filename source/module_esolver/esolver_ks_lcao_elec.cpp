@@ -275,6 +275,11 @@ namespace ModuleESolver
     {
         ModuleBase::TITLE("ESolver_KS_LCAO", "othercalculation");
         ModuleBase::timer::tick("ESolver_KS_LCAO", "othercalculation");
+        if(GlobalV::CALCULATION == "get_S")
+        {
+            this->get_S();
+            return;
+        }
         this->beforesolver(istep);
         // self consistent calculations for electronic ground state
         if (GlobalV::CALCULATION == "nscf")
@@ -301,6 +306,41 @@ namespace ModuleESolver
 
         ModuleBase::timer::tick("ESolver_KS_LCAO", "othercalculation");
         return;
+    }
+
+    void ESolver_KS_LCAO::get_S()
+    {
+        ModuleBase::TITLE("ESolver_KS_LCAO", "get_S");
+        if(GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            ModuleBase::WARNING_QUIT("ESolver_KS_LCAO::get_S", "not implemented for");
+        }
+        else
+        {
+            // (1) Find adjacent atoms for each atom.
+            GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+                GlobalV::ofs_running,
+                GlobalV::OUT_LEVEL,
+                GlobalC::ORB.get_rcutmax_Phi(),
+                GlobalC::ucell.infoNL.get_rcutmax_Beta(),
+                GlobalV::GAMMA_ONLY_LOCAL);
+
+            atom_arrange::search(
+                GlobalV::SEARCH_PBC,
+                GlobalV::ofs_running,
+                GlobalC::GridD,
+                GlobalC::ucell,
+                GlobalV::SEARCH_RADIUS,
+                GlobalV::test_atom_input);
+
+            this->RA.for_2d(this->orb_con.ParaV, GlobalV::GAMMA_ONLY_LOCAL);
+            this->UHM.genH.LM->ParaV = &this->orb_con.ParaV;
+            this->LM.allocate_HS_R(this->orb_con.ParaV.nnr);
+            this->LM.zeros_HSR('S');
+            this->UHM.genH.calculate_S_no(this->LM.SlocR.data());
+            this->output_SR("SR.csr");
+
+        }
     }
 
     void ESolver_KS_LCAO::nscf()
