@@ -11,6 +11,8 @@ add_library(
     diago_elpa.cpp
 )
 
+add_subdirectory(genelpa)
+
 IF (BUILD_TESTING)
   add_subdirectory(test)
 endif()
