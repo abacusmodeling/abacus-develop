@@ -564,8 +564,8 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
         //(1-f)*j*sqrt(f)|psi>
         psi::Psi<std::complex<double>> j1sfpsi(ndim,totbands_per,npwx);
         psi::Psi<std::complex<double>> j2sfpsi(ndim,totbands_per,npwx);
-        double* en = new double [ksbandper];
-        if(ksbandper == 0) en = nullptr;
+        double* en;
+        if(ksbandper > 0)   en = new double [ksbandper];
         for(int ib = 0 ; ib < ksbandper ; ++ib)
         {
             en[ib] = this->pelec->ekb(ik, ib+startband);
@@ -742,7 +742,7 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
             }
         }
         cout<<endl;
-        delete[] en;
+        if(ksbandper > 0)   delete[] en;
 
     }
     ModuleBase::timer::tick(this->classname,"kloop");
