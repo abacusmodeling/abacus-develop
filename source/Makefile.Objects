@@ -283,7 +283,7 @@ elecstate_pw_sdft.o
 
 OBJ_PSI=psi.o
 
-OBJ_HAMILT=hamilt_lcao.o\
+OBJ_OPERATOR=hamilt_lcao.o\
 hamilt_pw.o\
 ekinetic_pw.o\
 meta_pw.o\
@@ -300,7 +300,7 @@ $(OBJ_PLANEWAVE)\
 $(OBJ_HSOLVER)\
 $(OBJ_ELECSTATES)\
 $(OBJ_PSI)\
-${OBJ_HAMILT}\
+${OBJ_OPERATOR}\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
