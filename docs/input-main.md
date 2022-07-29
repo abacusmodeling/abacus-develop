@@ -912,8 +912,26 @@ This part of variables are used to control the calculation of DOS.
 #### dos_scale
 
 - **Type**: Real
-- **Description**: the energy range of dos output is given by (emax-emin)*(1+dos_scale), centered at (emax+emin)/2.
+- **Description**: the energy range of dos output is given by (emax-emin)*(1+dos_scale), centered at (emax+emin)/2. This parameter will be used when dos_emin and dos_emax are not set.
 - **Default**: 0.01
+
+#### dos_emin_ev
+
+- **Type**: Real
+- **Description**: minimal range for dos (in eV). If we set it, "dos_scale" will be ignored.
+- **Default**: minimal eigenenergy of $\hat{H}$
+
+#### dos_emax_ev
+
+- **Type**: Real
+- **Description**: maximal range for dos (in eV). If we set it, "dos_scale" will be ignored.
+- **Default**: maximal eigenenergy of $\hat{H}$
+
+#### dos_nche
+
+- **Type**: Integer
+- **Description**: orders of Chebyshev expansions when using SDFT to calculate DOS
+- **Default**: 100
 
 ### DeePKS
 
@@ -1574,6 +1592,11 @@ $$L_{mn}(\omega)=(-1)^{m+n}\frac{2\pi e^2\hbar^2}{3m_e^2\omega\Omega}\\
 \times\sum_{ij\alpha\mathbf{k}}W(\mathbf{k})\left(\frac{\epsilon_{i\mathbf{k}}+\epsilon_{j\mathbf{k}}}{2}-\mu\right)^{m+n-2}|
 \langle\Psi_{i\mathbf{k}}|\nabla_\alpha|\Psi_{j\mathbf{k}}\rangle|^2\\
 \times[f(\epsilon_{i\mathbf{k}})-f(\epsilon_{j\mathbf{k}})]\delta(\epsilon_{j\mathbf{k}}-\epsilon_{i\mathbf{k}}-\hbar\omega).$$
+They can also computed by $j$-$j$ correlation function.
+$$L_{mn}=\frac{2e^{m+n-2}}{3\Omega\hbar\omega}\Im[\tilde{C}_{mn}(\omega)]\\
+\tilde{C}_{mn}=\int_0^\infty C_{mn}(t)e^{-i\omega t}e^{-\frac{1}{2}(\Delta E)^2t^2}dt\\
+C_{mn}(t)=-2\theta(t)\Im\left\{Tr\left[\sqrt{\hat f}\hat{j}_m(1-\hat{f})e^{i\frac{\hat{H}}{\hbar}t}\hat{j}_ne^{-i\frac{\hat{H}}{\hbar}t}\sqrt{\hat f}\right]\right\},$$
+where $j_1$ is electric flux and $j_2$ is thermal flux.
 Frequency-dependent electric conductivities:    $\sigma(\omega)=L_{11}(\omega).$
 Frequency-dependent thermal conductivities: $\kappa(\omega)=\frac{1}{e^2T}\left(L_{22}-\frac{L_{12}^2}{L_{11}}\right).$
 DC electric conductivities: $\sigma = \lim_{\omega\to 0}\sigma(\omega)$
@@ -1589,7 +1612,7 @@ Thermal conductivities: $\kappa = \lim_{\omega\to 0}\kappa(\omega)$
 
 - **Type**: Integer
 - **Description**: Chebyshev expansion orders for stochastic Kubo Greenwood. Only used when the calculation is SDFT.
-- **Default**: 100
+- **Default**: 20
 
 #### cond_dw
 
@@ -1606,7 +1629,7 @@ Thermal conductivities: $\kappa = \lim_{\omega\to 0}\kappa(\omega)$
 #### cond_wenlarge
 
 - **Type**: Integer
-- **Description**: Control the t interval: dt = PI/wcut/cond_wenlarge
+- **Description**: Control the t interval: dt = $\frac{\pi}{\omega_{cut}\times\omega enlarge}$
 - **Default**: 10
 
 #### cond_fwhm

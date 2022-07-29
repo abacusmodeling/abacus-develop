@@ -227,6 +227,9 @@ class Input
     double dos_emax_ev;
     double dos_edelta_ev;
     double dos_scale;
+    int dos_nche; //orders of Chebyshev expansions for dos
+    bool dos_setemin = false; //true: emin is set
+    bool dos_setemax = false; //true: emax is set
 
     double b_coef; //  pengfei 2014-10-13
 

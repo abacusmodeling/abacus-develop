@@ -146,7 +146,8 @@ void Input::Default(void)
     initsto_freq = 1000;
     method_sto = 1;
     cal_cond = false;
-    cond_nche = 100;
+    dos_nche = 100;
+    cond_nche = 20;
     cond_dw = 0.1;
     cond_wcut = 10;
     cond_wenlarge = 10;
@@ -1087,10 +1088,12 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("dos_emin_ev", word) == 0)
         {
             read_value(ifs, dos_emin_ev);
+            dos_setemin = true;
         }
         else if (strcmp("dos_emax_ev", word) == 0)
         {
             read_value(ifs, dos_emax_ev);
+            dos_setemax = true;
         }
         else if (strcmp("dos_edelta_ev", word) == 0)
         {
@@ -1103,6 +1106,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("dos_sigma", word) == 0)
         {
             read_value(ifs, b_coef);
+        }
+        else if (strcmp("dos_nche", word) == 0)
+        {
+            read_value(ifs, dos_nche);
         }
 
         //----------------------------------------------------------
@@ -2080,6 +2087,9 @@ void Input::Bcast()
     Parallel_Common::bcast_double(dos_emax_ev);
     Parallel_Common::bcast_double(dos_edelta_ev);
     Parallel_Common::bcast_double(dos_scale);
+    Parallel_Common::bcast_bool(dos_setemin);
+    Parallel_Common::bcast_bool(dos_setemax);
+    Parallel_Common::bcast_int(dos_nche);
     Parallel_Common::bcast_double(b_coef);
 
     // mohan add 2009-11-11

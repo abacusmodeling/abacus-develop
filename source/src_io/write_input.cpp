@@ -54,10 +54,6 @@ void Input::Print(const std::string &fn) const
                                  "nbands_istate",
                                  nbands_istate,
                                  "number of bands around Fermi level for istate calulation");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "nche_sto",
-                                 nche_sto,
-                                 "number of orders for Chebyshev expansion in stochastic DFT");
     ModuleBase::GlobalFunc::OUTP(ofs, "symmetry", symmetry, "turn symmetry on or off");
     ModuleBase::GlobalFunc::OUTP(ofs, "init_vel", init_vel, "read velocity from STRU or not");
     ModuleBase::GlobalFunc::OUTP(ofs,
@@ -223,6 +219,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_edelta_ev", dos_edelta_ev, "delta energy for dos");
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_scale", dos_scale, "scale dos range by");
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_sigma", b_coef, "gauss b coefficeinet(default=0.07)");
+    ModuleBase::GlobalFunc::OUTP(ofs, "dos_nche", dos_nche, "orders of Chebyshev expansions for dos");
 
 	ofs << "\n#Parameters (9.Molecular dynamics)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_type",mdp.md_type,"choose ensemble");

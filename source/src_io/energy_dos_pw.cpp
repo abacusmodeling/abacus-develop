@@ -124,15 +124,18 @@ void energy::perform_dos_pw(void)
 		emax *= ModuleBase::Ry_to_eV;
 		emin *= ModuleBase::Ry_to_eV;
 
-//scale up a little bit so the end peaks are displaced better
-		const double scl=this->dos_scale;
-		double delta=(emax-emin)*scl;
-		//std::cout << scl;
-		emax=emax+delta/2.0;
-		emin=emin-delta/2.0;
+		if(INPUT.dos_setemax)	emax = INPUT.dos_emax_ev;
+		if(INPUT.dos_setemin)	emin = INPUT.dos_emin_ev;
+		if(!INPUT.dos_setemax && !INPUT.dos_setemin)
+		{
+			//scale up a little bit so the end peaks are displaced better
+			double delta=(emax-emin)*dos_scale;
+			emax=emax+delta/2.0;
+			emin=emin-delta/2.0;
+		}
 
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
 		// 		atom_arrange::set_sr_NL();
 		//		atom_arrange::search( GlobalV::SEARCH_RADIUS );//qifeng-2019-01-21
 		
