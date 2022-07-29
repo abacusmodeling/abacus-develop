@@ -305,8 +305,8 @@ void UnitCell_pseudo::setup_cell(
 					abtype += 1;
 					if(abtype == 1)
 					{
-						std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
-						log << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+						std::cout << "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<std::endl;
+						log << "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<std::endl;
 					}
 					std::cout<<" Warning: number valence electrons > " << ModuleBase::MinZval.at(atoms[it].psd);
 					std::cout<<" for " << atoms[it].psd << ": " << ModuleBase::EleConfig.at(atoms[it].psd) << std::endl;
@@ -318,9 +318,9 @@ void UnitCell_pseudo::setup_cell(
 		if(abtype>0)
 		{
 			std::cout<< " Please make sure the pseudopotential file is what you need"<<std::endl;
-			std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"<<std::endl;
+			std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"<<std::endl;
 			log << " Please make sure the pseudopential file is what you need"<<std::endl;
-			log << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+			log << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%";
 			ModuleBase::GlobalFunc::OUT(log,"");
 		}
 	}
