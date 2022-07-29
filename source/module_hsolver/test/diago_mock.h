@@ -264,23 +264,23 @@ class OperatorMock : public hamilt::OperatorPW
         MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
     #endif        
 
-        std::complex<double> *hpsi = new std::complex<double>[DIAGOTEST::npw];
+        std::complex<double> *hpsi0 = new std::complex<double>[DIAGOTEST::npw];
         for(int m = 0; m< n_npwx; m++)
         {
             for(int i=0;i<DIAGOTEST::npw;i++)
             {
-                hpsi[i] = 0.0;
+                hpsi0[i] = 0.0;
                 for(int j=0;j<(DIAGOTEST::npw_local[mypnum]);j++)
                 {
-                    hpsi[i] += DIAGOTEST::hmatrix_local(i,j) * tmpsi_in[j];
+                    hpsi0[i] += DIAGOTEST::hmatrix_local(i,j) * tmpsi_in[j];
                 }
             }
-            Parallel_Reduce::reduce_complex_double_pool(hpsi, DIAGOTEST::npw);
-            DIAGOTEST::divide_psi<std::complex<double>>(hpsi, tmhpsi);
-            tmhpsi += DIAGOTEST::npw;
-            tmpsi_in += DIAGOTEST::npw;
+            Parallel_Reduce::reduce_complex_double_pool(hpsi0, DIAGOTEST::npw);
+            DIAGOTEST::divide_psi<std::complex<double>>(hpsi0, tmhpsi);
+            tmhpsi += psi_in->get_nbasis();
+            tmpsi_in += psi_in->get_nbasis();
         }
-        delete [] hpsi;
+        delete [] hpsi0;
     }
 };
 
