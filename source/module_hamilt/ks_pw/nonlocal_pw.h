@@ -1,7 +1,7 @@
 #ifndef __NONLOCALPW
 #define __NONLOCALPW
 
-#include "operator.h"
+#include "operator_pw.h"
 
 #include "module_cell/unitcell_pseudo.h"
 
@@ -10,30 +10,36 @@
 namespace hamilt
 {
 
-class NonlocalPW : public Operator
+template<class T>
+class Nonlocal : public T
 {
     public:
-    NonlocalPW(
-        int max_npw_in,
-        int npol_in,
-        const int* ngk_in,
+    Nonlocal(
         const int* isk_in,
         const pseudopot_cell_vnl* ppcell_in,
         const UnitCell_pseudo* ucell_in
     );
 
-    void init(const int ik)override;
+    virtual ~Nonlocal(){};
 
-    void act(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const override;
+    virtual void init(const int ik_in)override;
+
+    virtual void act
+    (
+        const psi::Psi<std::complex<double>> *psi_in, 
+        const int n_npwx, 
+        const std::complex<double>* tmpsi_in, 
+        std::complex<double>* tmhpsi
+    )const override;
 
     private:
     void add_nonlocal_pp(std::complex<double> *hpsi_in, const std::complex<double> *becp, const int m) const;
 
-    int max_npw = 0;
+    mutable int max_npw = 0;
 
-    int npol = 0;
-    
-    const int* ngk = nullptr;
+    mutable int npw = 0;
+
+    mutable int npol = 0;
 
     const int* isk = nullptr;
 

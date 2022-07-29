@@ -160,7 +160,8 @@ void Electrons::self_consistent(const int &istep)
 #ifdef __LCAO
 		if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
 			Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
-			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
+			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type ||
+            Exx_Global::Hybrid_Type::SCAN0  == GlobalC::exx_lcao.info.hybrid_type)
         {
             if( !GlobalC::exx_global.info.separate_loop )
             {
