@@ -54,6 +54,7 @@ jobs:
           cd examples/performance/
           bash run.sh
       - name: Show Result
+        if: always()
         run: |
           cat examples/performance/sumall.dat
 
