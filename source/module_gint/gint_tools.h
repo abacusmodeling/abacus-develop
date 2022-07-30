@@ -10,7 +10,7 @@
 
 namespace Gint_Tools
 {
-    enum class job_type{vlocal, rho, force, tau, vlocal_meta, crosstaus, force_meta};
+    enum class job_type{vlocal, rho, force, tau, vlocal_meta, force_meta};
 	//Hamiltonian, electron density, force, kinetic energy density, Hamiltonian for mGGA
 }
 
@@ -24,7 +24,6 @@ class Gint_inout
         double*** DM;
         double* vl;
 		double* vofk;
-		double** crosstaus;
         bool isforce;
         bool isstress;
         int ispin;
@@ -42,14 +41,6 @@ class Gint_inout
         {
             DM_R = DM_R_in;
             chr = chr_in;
-            job = job_in;
-        }
-
-	// crosstaus, multi-k
-        Gint_inout(double **DM_R_in, double** crosstaus_in, Gint_Tools::job_type job_in)
-        {
-            DM_R = DM_R_in;
-            crosstaus = crosstaus_in;
             job = job_in;
         }
 
@@ -104,14 +95,6 @@ class Gint_inout
         {
             DM = DM_in;
             chr = chr_in;
-            job = job_in;
-        }
-
-	// crosstaus, gamma point
-        Gint_inout(double ***DM_in, double** crosstaus_in, Gint_Tools::job_type job_in)
-        {
-            DM = DM_in;
-            crosstaus = crosstaus_in;
             job = job_in;
         }
 

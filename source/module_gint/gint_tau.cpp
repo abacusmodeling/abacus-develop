@@ -108,15 +108,6 @@ void Gint::gint_kernel_tau(
 				dpsix_DM.ptr_2D, dpsiy_DM.ptr_2D, dpsiz_DM.ptr_2D,
 				inout->chr->kin_r[is]);
 		}
-		else if(inout->job==Gint_Tools::job_type::crosstaus)
-		{
-			this->cal_meshball_crosstaus(
-				na_grid, block_index,
-				vindex,
-				dpsir_ylm_x.ptr_2D, dpsir_ylm_y.ptr_2D, dpsir_ylm_z.ptr_2D,
-				dpsix_DM.ptr_2D, dpsiy_DM.ptr_2D, dpsiz_DM.ptr_2D,
-				inout->crosstaus);			
-		}
 	}
 
 	delete[] block_iw;
@@ -150,37 +141,5 @@ void Gint::cal_meshball_tau(
 		double rz=ddot_(&block_index[na_grid], dpsiz[ib], &inc, dpsiz_dm[ib], &inc);
 		const int grid = vindex[ib];
 		rho[ grid ] += rx + ry + rz;
-	}
-}
-
-void Gint::cal_meshball_crosstaus(
-	const int na_grid,
-	int* block_index,
-	int* vindex,
-	double** dpsix,
-	double** dpsiy,
-	double** dpsiz,
-	double** dpsix_dm,
-	double** dpsiy_dm,
-	double** dpsiz_dm,
-	double** crosstaus)
-{		
-	const int inc = 1;
-	// sum over mu to get density on grid
-	for(int ib=0; ib<GlobalC::bigpw->bxyz; ++ib)
-	{
-		double rxx=ddot_(&block_index[na_grid], dpsix[ib], &inc, dpsix_dm[ib], &inc);
-		double rxy=ddot_(&block_index[na_grid], dpsix[ib], &inc, dpsiy_dm[ib], &inc);
-		double rxz=ddot_(&block_index[na_grid], dpsix[ib], &inc, dpsiz_dm[ib], &inc);
-		double ryy=ddot_(&block_index[na_grid], dpsiy[ib], &inc, dpsiy_dm[ib], &inc);
-		double ryz=ddot_(&block_index[na_grid], dpsiy[ib], &inc, dpsiz_dm[ib], &inc);
-		double rzz=ddot_(&block_index[na_grid], dpsiz[ib], &inc, dpsiz_dm[ib], &inc);
-		const int grid = vindex[ib];
-		crosstaus[ grid ][0] += rxx;
-		crosstaus[ grid ][1] += rxy;
-		crosstaus[ grid ][2] += rxz;
-		crosstaus[ grid ][3] += ryy;
-		crosstaus[ grid ][4] += ryz;
-		crosstaus[ grid ][5] += rzz;
 	}
 }
