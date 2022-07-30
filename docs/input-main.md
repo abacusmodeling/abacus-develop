@@ -40,7 +40,7 @@
 
 - [Density of states](#density-of-states)
 
-    [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale)
+    [dos_edelta_ev](#dos_edelta_ev) | [dos_sigma](#dos_sigma) | [dos_scale](#dos_scale) | [dos_nche](#dos_nche)
 
 - [Exact exchange](#exact-exchange) (Under tests)
 
