@@ -227,7 +227,7 @@ public:
     int lix=0, rix=0;// lix: the left edge of the pw ball; rix: the right edge of the pw ball in the x direction
     bool xprime = true; // true: when do recip2real, x-fft will be done last and when doing real2recip, x-fft will be done first; false: y-fft
                          // For gamma_only, true: we use half x; false: we use half y
-    int ng_xeq0 = -1; //only used when xprime = true, start ig when gx \ne 0
+    int ng_xeq0 = 0; //only used when xprime = true, number of g whose gx = 0
     int nmaxgr=0; // Gamma_only: max between npw and (nrxx+1)/2, others: max between npw and nrxx
                 // Thus complex<double>[nmaxgr] is able to contain either reciprocal or real data
     FFT ft;
