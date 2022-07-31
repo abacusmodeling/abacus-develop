@@ -2,29 +2,9 @@
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
 #include "../src_parallel/parallel_reduce.h"
-
-void energy::perform_dos_pw(void)
+void energy::print_occ()
 {
-	ModuleBase::TITLE("energy","perform_dos_pw");
-
-	if(out_dos !=0 || out_band !=0)
-    {
-        GlobalV::ofs_running << "\n\n\n\n";
-        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-        GlobalV::ofs_running << " |                                                                    |" << std::endl;
-        GlobalV::ofs_running << " | Post-processing of data:                                           |" << std::endl;
-        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << std::endl;
-        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << std::endl;
-        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << std::endl;
-        GlobalV::ofs_running << " | done here.                                                         |" << std::endl;
-        GlobalV::ofs_running << " |                                                                    |" << std::endl;
-        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
-        GlobalV::ofs_running << "\n\n\n\n";
-    }
-
-	//qianrui modify 2020-10-18
-	if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
-	{
+	
 		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "istate.info" ;
 		if(GlobalV::MY_RANK==0)
@@ -38,7 +18,7 @@ void energy::perform_dos_pw(void)
 			MPI_Barrier(MPI_COMM_WORLD);
 			if( GlobalV::MY_POOL == ip )
 			{
-				if( GlobalV::RANK_IN_POOL != 0 ) continue;
+				if( GlobalV::RANK_IN_POOL != 0 || GlobalV::MY_STOGROUP != 0 ) continue;
 #endif
 				std::ofstream ofsi2( ss.str().c_str(), ios::app );
 				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
@@ -97,7 +77,26 @@ void energy::perform_dos_pw(void)
 			}
 		}
 #endif
-	}
+}
+
+void energy::perform_dos_pw(void)
+{
+	ModuleBase::TITLE("energy","perform_dos_pw");
+
+	if(out_dos !=0 || out_band !=0)
+    {
+        GlobalV::ofs_running << "\n\n\n\n";
+        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+        GlobalV::ofs_running << " |                                                                    |" << std::endl;
+        GlobalV::ofs_running << " | Post-processing of data:                                           |" << std::endl;
+        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << std::endl;
+        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << std::endl;
+        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << std::endl;
+        GlobalV::ofs_running << " | done here.                                                         |" << std::endl;
+        GlobalV::ofs_running << " |                                                                    |" << std::endl;
+        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+        GlobalV::ofs_running << "\n\n\n\n";
+    }	
 	
 	int nspin0=1;
 	if(GlobalV::NSPIN==2) nspin0=2;
