@@ -291,17 +291,24 @@ void ESolver_KS_LCAO_TDDFT::hamilt2density(int istep, int iter, double ethr)
         ModuleBase::WARNING_QUIT("ESolver_KS_LCAO", "HSolver has not been initialed!");
     }
 
-    /*
-    GlobalV::ofs_running << " print psi:" << endl;
-        for (int i = 0; i < this->LOWF.ParaV->ncol_bands; i++)
+    if (iter == 1)
+    {
+        GlobalV::ofs_running
+            << "------------------------------------------------------------------------------------------------"
+            << endl;
+        GlobalV::ofs_running << "occupation : ";
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
         {
-            for (int j = 0; j < this->LOWF.ParaV->nrow; j++)
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
             {
-                GlobalV::ofs_running << this->psi[0].get_pointer()[i * this->LOWF.ParaV->ncol + j].real() << "+"
-                                     << this->psi[0].get_pointer()[i * this->LOWF.ParaV->ncol + j].imag() << "i ";
+                GlobalV::ofs_running << this->pelec_td->wg(ik, ib) << " ";
             }
-            GlobalV::ofs_running << endl;
-        }*/
+        }
+        GlobalV::ofs_running << endl;
+        GlobalV::ofs_running
+            << "------------------------------------------------------------------------------------------------"
+            << endl;
+    }
 
     // transform energy for print
     GlobalC::en.eband = this->pelec_td->eband;

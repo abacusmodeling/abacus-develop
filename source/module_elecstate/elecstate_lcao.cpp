@@ -3,10 +3,12 @@
 #include "cal_dm.h"
 #include "module_base/timer.h"
 #include "module_gint/grid_technique.h"
+#include "module_xc/xc_functional.h"
 
 namespace elecstate
 {
 int ElecStateLCAO::out_wfc_lcao = 0;
+bool ElecStateLCAO::need_psi_grid = 1;
 
 // multi-k case
 void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
@@ -37,40 +39,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
         for (int ik = 0; ik < psi.get_nk(); ik++)
         {
             psi.fix_k(ik);
-#ifdef __MPI
-            this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao,
-                                       psi.get_pointer(),
-                                       this->lowf->wfc_k_grid[ik],
-                                       ik,
-                                       this->ekb,
-                                       this->wg);
-#else
-            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-            {
-                for (int iw = 0; iw < GlobalV::NLOCAL; iw++)
-                {
-                    this->lowf->wfc_k_grid[ik][ib][iw] = psi.get_pointer()[ib * GlobalV::NLOCAL + iw];
-                }
-            }
-#endif
-            // added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
-            if (GlobalV::NSPIN == 4)
-            {
-                int row = GlobalC::GridT.lgd;
-                std::vector<std::complex<double>> tmp(row);
-                for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-                {
-                    for (int iw = 0; iw < row / GlobalV::NPOL; iw++)
-                    {
-                        tmp[iw] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL];
-                        tmp[iw + row / GlobalV::NPOL] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL + 1];
-                    }
-                    for (int iw = 0; iw < row; iw++)
-                    {
-                        this->lowf->wfc_k_grid[ik][ib][iw] = tmp[iw];
-                    }
-                }
-            }
+            this->print_psi(psi);
         }
     }
 
@@ -87,6 +56,13 @@ void ElecStateLCAO::psiToRho(const psi::Psi<std::complex<double>>& psi)
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
     Gint_inout inout(this->loc->DM_R, this->charge, Gint_Tools::job_type::rho);
     this->uhm->GK.cal_gint(&inout);
+
+    if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
+    {
+        ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[0], this->charge->nrxx);
+        Gint_inout inout1(this->loc->DM_R, this->charge, Gint_Tools::job_type::tau);
+        this->uhm->GK.cal_gint(&inout1);
+    }
 
     this->charge->renormalize_rho();
 
@@ -119,14 +95,7 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
             if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
             {
                 psi.fix_k(ik);
-                double** wfc_grid = nullptr; // output but not do "2d-to-grid" conversion
-#ifdef __MPI
-                this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao,
-                                           psi.get_pointer(),
-                                           wfc_grid,
-                                           this->ekb,
-                                           this->wg);
-#endif
+                this->print_psi(psi);
             }
             // this->loc->dm2dToGrid(this->loc->dm_gamma[ik], this->loc->DM[ik]); // transform dm_gamma[is].c to
             // this->loc->DM[is]
@@ -145,10 +114,75 @@ void ElecStateLCAO::psiToRho(const psi::Psi<double>& psi)
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
     Gint_inout inout(this->loc->DM, this->charge, Gint_Tools::job_type::rho);
     this->uhm->GG.cal_gint(&inout);
+    if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
+    {
+        for (int is = 0; is < GlobalV::NSPIN; is++)
+        {
+            ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[0], this->charge->nrxx);
+        }
+        Gint_inout inout1(this->loc->DM, this->charge, Gint_Tools::job_type::tau);
+        this->uhm->GG.cal_gint(&inout1);
+    }
 
     this->charge->renormalize_rho();
 
     ModuleBase::timer::tick("ElecStateLCAO", "psiToRho");
+    return;
+}
+
+void ElecStateLCAO::print_psi(const psi::Psi<double>& psi_in)
+{
+    if (!ElecStateLCAO::out_wfc_lcao)
+        return;
+
+    // output but not do "2d-to-grid" conversion
+    double** wfc_grid = nullptr;
+    this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi_in.get_pointer(), wfc_grid, this->ekb, this->wg);
+    return;
+}
+void ElecStateLCAO::print_psi(const psi::Psi<std::complex<double>>& psi_in)
+{
+    if (!ElecStateLCAO::out_wfc_lcao && !ElecStateLCAO::need_psi_grid)
+        return;
+
+    // output but not do "2d-to-grid" conversion
+    std::complex<double>** wfc_grid = nullptr;
+    int ik = psi_in.get_current_k();
+    if (ElecStateLCAO::need_psi_grid)
+    {
+        wfc_grid = this->lowf->wfc_k_grid[ik];
+    }
+#ifdef __MPI
+    this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao, psi.get_pointer(), wfc_grid, ik, this->ekb, this->wg);
+#else
+    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+    {
+        for (int iw = 0; iw < GlobalV::NLOCAL; iw++)
+        {
+            this->lowf->wfc_k_grid[ik][ib][iw] = psi.get_pointer()[ib * GlobalV::NLOCAL + iw];
+        }
+    }
+#endif
+
+    // added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
+    if (ElecStateLCAO::need_psi_grid && GlobalV::NSPIN == 4)
+    {
+        int row = GlobalC::GridT.lgd;
+        std::vector<std::complex<double>> tmp(row);
+        for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+        {
+            for (int iw = 0; iw < row / GlobalV::NPOL; iw++)
+            {
+                tmp[iw] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL];
+                tmp[iw + row / GlobalV::NPOL] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL + 1];
+            }
+            for (int iw = 0; iw < row; iw++)
+            {
+                this->lowf->wfc_k_grid[ik][ib][iw] = tmp[iw];
+            }
+        }
+    }
+
     return;
 }
 

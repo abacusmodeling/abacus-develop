@@ -122,6 +122,7 @@ gint_k_pvpr.o\
 gint_k_sparse.o\
 gint_rho.o\
 gint_vl.o\
+gint_tau.o\
 gint.o\
 ORB_control.o\
 ORB_read.o\
@@ -285,8 +286,12 @@ elecstate_pw_sdft.o
 
 OBJ_PSI=psi.o
 
-OBJ_HAMILT=hamilt_lcao.o\
-hamilt_pw.o
+OBJ_OPERATOR=hamilt_lcao.o\
+hamilt_pw.o\
+ekinetic_pw.o\
+meta_pw.o\
+veff_pw.o\
+nonlocal_pw.o
 
 OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\
@@ -298,7 +303,7 @@ $(OBJ_PLANEWAVE)\
 $(OBJ_HSOLVER)\
 $(OBJ_ELECSTATES)\
 $(OBJ_PSI)\
-${OBJ_HAMILT}\
+${OBJ_OPERATOR}\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
@@ -453,4 +458,3 @@ psort_w.o\
 s_cmp.o\
 s_copy.o\
 xerbla.o\
-

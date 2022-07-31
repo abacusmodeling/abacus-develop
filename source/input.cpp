@@ -2300,8 +2300,7 @@ void Input::Check(void)
         if (!this->relax_nmax)
             this->relax_nmax = 50;
     }
-
-    else if (calculation == "nscf")
+    else if (calculation == "nscf" || calculation == "get_S")
     {
         GlobalV::CALCULATION = "nscf";
         this->relax_nmax = 1;
@@ -2742,7 +2741,7 @@ void Input::Check(void)
         }
     }
 
-    if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "hse")
+    if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "hse" || dft_functional == "scan0")
     {
         if (exx_hybrid_alpha < 0 || exx_hybrid_alpha > 1)
         {

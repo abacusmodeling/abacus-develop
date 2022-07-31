@@ -1,16 +1,9 @@
-#include "../../src_pw/hamilt_pw.h"
-#include "../../src_pw/hamilt.h"
 #include<random>
 #include "../../module_base/lapack_connector.h"
 #include "../../module_base/blas_connector.h"
 #include "mpi.h"
 #include "src_parallel/parallel_reduce.h"
-
-
-Hamilt_PW::Hamilt_PW() {};
-Hamilt_PW::~Hamilt_PW() {};
-Hamilt::Hamilt() {};
-Hamilt::~Hamilt() {};
+#include "module_hamilt/hamilt_pw.h"
 
 namespace DIAGOTEST
 {
@@ -239,27 +232,14 @@ class HPsi
 };
 
 //totally same as the original function
-void Hamilt_PW::h_1psi( const int npw_in, const std::complex < double> *psi, 
-		       std::complex<double> *hpsi, std::complex < double> *spsi)
-{
-    this->h_psi(psi, hpsi);
-
-    for (int i=0;i<npw_in;i++)
-    {
-        spsi[i] = psi[i];
-    }
-    return;
-}
-
-//totally same as the original function
-void Hamilt_PW::s_1psi
+void hamilt::HamiltPW::sPsi
 (
-    const int dim,
-    const std::complex<double> *psi,
-    std::complex<double> *spsi
-)
+    const std::complex<double> *psi, 
+    std::complex<double> *spsi, 
+    const size_t size
+)const
 {
-    for (int i=0; i<dim; i++)
+    for (size_t i=0; i<size; i++)
     {
         spsi[i] = psi[i];
     }
@@ -267,29 +247,54 @@ void Hamilt_PW::s_1psi
 }
 
 //Mock function h_psi
-void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *hpsi_local, const int m)
+#include "module_hamilt/ks_pw/operator_pw.h"
+class OperatorMock : public hamilt::OperatorPW
 {
-    int nprocs=1, mypnum=0;
-#ifdef __MPI    
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-    MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
-#endif        
-
-    std::complex<double> *hpsi = new std::complex<double>[DIAGOTEST::npw];
-    for(int i=0;i<DIAGOTEST::npw;i++)
+    virtual void act
+    (
+        const psi::Psi<std::complex<double>> *psi_in, 
+        const int n_npwx, 
+        const std::complex<double>* tmpsi_in, 
+        std::complex<double>* tmhpsi
+    )const 
     {
-        hpsi[i] = 0.0;
-        for(int j=0;j<(DIAGOTEST::npw_local[mypnum]);j++)
-        {
-            hpsi[i] += DIAGOTEST::hmatrix_local(i,j) * psi_in[j];
-        }
-    }
-    Parallel_Reduce::reduce_complex_double_pool(hpsi, DIAGOTEST::npw);
-    DIAGOTEST::divide_psi<std::complex<double>>(hpsi,hpsi_local);
-    delete [] hpsi;
-}
+        int nprocs=1, mypnum=0;
+    #ifdef __MPI    
+        MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+        MPI_Comm_rank(MPI_COMM_WORLD, &mypnum);
+    #endif        
 
-void Hamilt_PW::init_k(const int ik)
+        std::complex<double> *hpsi0 = new std::complex<double>[DIAGOTEST::npw];
+        for(int m = 0; m< n_npwx; m++)
+        {
+            for(int i=0;i<DIAGOTEST::npw;i++)
+            {
+                hpsi0[i] = 0.0;
+                for(int j=0;j<(DIAGOTEST::npw_local[mypnum]);j++)
+                {
+                    hpsi0[i] += DIAGOTEST::hmatrix_local(i,j) * tmpsi_in[j];
+                }
+            }
+            Parallel_Reduce::reduce_complex_double_pool(hpsi0, DIAGOTEST::npw);
+            DIAGOTEST::divide_psi<std::complex<double>>(hpsi0, tmhpsi);
+            tmhpsi += psi_in->get_nbasis();
+            tmpsi_in += psi_in->get_nbasis();
+        }
+        delete [] hpsi0;
+    }
+};
+
+void hamilt::HamiltPW::updateHk(const int ik)
 {
     return;
+}
+
+hamilt::HamiltPW::HamiltPW()
+{
+    this->ops = new OperatorMock;
+}
+
+hamilt::HamiltPW::~HamiltPW()
+{
+    delete this->ops;
 }

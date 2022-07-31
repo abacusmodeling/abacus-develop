@@ -24,6 +24,7 @@ namespace ModuleESolver
         void cal_Stress(ModuleBase::matrix& stress) override;
         void postprocess() override;
         void nscf() override;
+        void get_S();
 
     protected:
         virtual void beforescf(const int istep) override;

@@ -97,6 +97,11 @@ void HSolverLCAO::solveTemplate(hamilt::Hamilt* pHamilt,
         /// solve eigenvector and eigenvalue for H(k)
         double* p_eigenvalues = &(pes->ekb(ik, 0));
         this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
+
+        if(skip_charge) 
+        {
+            pes->print_psi(psi);
+        }
     }
 
     if (this->method != "genelpa" && this->method != "scalapack_gvx" && this->method != "lapack")

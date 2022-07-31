@@ -19,6 +19,7 @@ Potential::Potential()
 {
     vltot = nullptr;
     vr_eff1 = nullptr;
+    vofk_eff1 = nullptr;
     this->out_pot = 0;
 }
 
@@ -26,6 +27,7 @@ Potential::~Potential()
 {
     delete[] vltot;
     delete[] vr_eff1;
+    delete[] vofk_eff1;
 #ifdef __CUDA
     cudaFree(d_vr_eff1);
 #endif
@@ -46,10 +48,14 @@ void Potential::allocate(const int nrxx)
     ModuleBase::Memory::record("Potential", "vr", GlobalV::NSPIN * nrxx, "double");
     ModuleBase::Memory::record("Potential", "vr_eff", GlobalV::NSPIN * nrxx, "double");
 
-    if (XC_Functional::get_func_type() == 3)
+    if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
     {
         this->vofk.create(GlobalV::NSPIN, nrxx);
         ModuleBase::Memory::record("Potential", "vofk", GlobalV::NSPIN * nrxx, "double");
+        delete[] this->vofk_eff1;
+        if(nrxx > 0)    this->vofk_eff1 = new double[nrxx];
+        else            this->vofk_eff1 = nullptr;
+        ModuleBase::Memory::record("Potential", "vofk_eff1", nrxx, "double");   
     }
 
     delete[] this->vr_eff1;
@@ -89,7 +95,7 @@ void Potential::init_pot(const int &istep, // number of ionic steps
     // the vltot should and must be zero here.
     ModuleBase::GlobalFunc::ZEROS(this->vltot, GlobalC::rhopw->nrxx);
 
-    if (XC_Functional::get_func_type() == 3)
+    if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
     {
         this->vofk.zero_out();
     }
@@ -319,7 +325,7 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
     //  calculate the exchange-correlation potential
     //----------------------------------------------------------
 
-    if (XC_Functional::get_func_type() == 3)
+    if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
     {
 #ifdef USE_LIBXC
         const std::tuple<double, double, ModuleBase::matrix, ModuleBase::matrix> etxc_vtxc_v
@@ -481,6 +487,13 @@ void Potential::newd(void)
                     {
                         GlobalC::ppcell.deeq(is, iat, ih, jh) = GlobalC::ppcell.dvan(it, ih, jh);
                         GlobalC::ppcell.deeq(is, iat, jh, ih) = GlobalC::ppcell.dvan(it, ih, jh);
+                        // in most of pseudopotential files, number of projections of one orbital is only one, 
+                        // which lead to diagonal matrix of dion
+                        // when number larger than 1, non-diagonal dion should be calculated.
+                        if(ih != jh && std::fabs(GlobalC::ppcell.deeq(is, iat, ih, jh))>0.0)
+                        {
+                            GlobalC::ppcell.multi_proj = true;
+                        }
                     }
                 }
             }

@@ -12,18 +12,6 @@
 
 #include "diagh.h"
 #include "module_base/complexmatrix.h"
-
-#if ((defined __CUDA) || (defined __ROCM))
-
-#ifdef __CUDA
-#include "src_pw/hamilt_pw.cuh"
-#else
-#include "src_pw/hamilt_pw_hip.h"
-#endif
-
-#else
-#include "src_pw/hamilt_pw.h"
-#endif
 #include "src_pw/structure_factor.h"
 
 namespace hsolver
@@ -32,7 +20,7 @@ namespace hsolver
 class DiagoDavid : public DiagH
 {
   public:
-    DiagoDavid(Hamilt_PW* hpw_in, const double* precondition_in);
+    DiagoDavid(const double* precondition_in);
 
     // this is the override function diag() for CG method
     void diag(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>>& phi, double* eigenvalue_in) override;
@@ -45,24 +33,21 @@ class DiagoDavid : public DiagH
     /// record for how many bands not have convergence eigenvalues
     int notconv = 0;
 
-    void cal_grad(const int& npw,
+    void cal_grad(hamilt::Hamilt* phm_in,
+                  const int& npw,
                   const int& nbase,
                   const int& notconv,
-                  ModuleBase::ComplexMatrix& basis,
+                  psi::Psi<std::complex<double>>& basis,
                   ModuleBase::ComplexMatrix& hp,
                   ModuleBase::ComplexMatrix& sp,
                   const ModuleBase::ComplexMatrix& vc,
                   const int* unconv,
-                  const double* en,
-                  std::complex<double>* hpsi,
-                  std::complex<double>* spsi,
-                  std::complex<double>* ppsi,
-                  std::complex<double>* respsi);
+                  const double* en);
 
     void cal_elem(const int& npw,
                   int& nbase,
                   const int& notconv,
-                  const ModuleBase::ComplexMatrix& basis,
+                  const psi::Psi<std::complex<double>>& basis,
                   const ModuleBase::ComplexMatrix& hp,
                   const ModuleBase::ComplexMatrix& sp,
                   ModuleBase::ComplexMatrix& hc,
@@ -73,7 +58,7 @@ class DiagoDavid : public DiagH
                  int& nbase,
                  const double* en,
                  const psi::Psi<std::complex<double>>& psi,
-                 ModuleBase::ComplexMatrix& basis,
+                 psi::Psi<std::complex<double>>& basis,
                  ModuleBase::ComplexMatrix& hp,
                  ModuleBase::ComplexMatrix& sp,
                  ModuleBase::ComplexMatrix& hc,
@@ -85,16 +70,22 @@ class DiagoDavid : public DiagH
                  const int& nbase,
                  const ModuleBase::ComplexMatrix& vc,
                  const ModuleBase::ComplexMatrix& hp,
-                 const ModuleBase::ComplexMatrix& basis,
+                 const psi::Psi<std::complex<double>>& basis,
                  const double* en,
                  std::complex<double>* respsi);
 
     void SchmitOrth(const int& npw,
                     const int n_band,
                     const int m,
-                    const ModuleBase::ComplexMatrix& psi,
-                    std::complex<double>* psi_m,
-                    std::complex<double>* spsi);
+                    psi::Psi<std::complex<double>>& psi,
+                    const ModuleBase::ComplexMatrix& spsi,
+                    std::complex<double>* lagrange_m,
+                    const int mm_size,
+                    const int mv_size);
+    void planSchmitOrth(
+                    const int nband,
+                    int* pre_matrix_mm_m,
+                    int* pre_matrix_mv_m);
 
     void diag_zhegvx(const int& n,
                      const int& m,
@@ -104,9 +95,8 @@ class DiagoDavid : public DiagH
                      double* e,
                      ModuleBase::ComplexMatrix& vc);
 
-    void diag_mock(psi::Psi<std::complex<double>>& psi, double* eigenvalue_in);
+    void diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>>& psi, double* eigenvalue_in);
 
-    Hamilt_PW* hpw = nullptr;
     const double* precondition = nullptr;
 };
 

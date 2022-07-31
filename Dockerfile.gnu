@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 RUN apt update && apt install -y --no-install-recommends \
     libopenblas-dev liblapack-dev libscalapack-mpi-dev libelpa-dev libfftw3-dev libcereal-dev \
-    libxc-dev libgtest-dev libgmock-dev \
+    libxc-dev libgtest-dev libgmock-dev python3-numpy \
     bc cmake git g++ make bc time sudo unzip vim wget
 
 ENV GIT_SSL_NO_VERIFY=true TERM=xterm-256color \

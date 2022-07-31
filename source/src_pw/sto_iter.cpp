@@ -66,51 +66,29 @@ void Stochastic_Iter::orthog(const int& ik, psi::Psi<std::complex<double>>& psi,
     // orthogonal part
     if (GlobalV::NBANDS > 0)
     {
-        const int nchipk = stowf.nchip[ik];
-        const int npw = GlobalC::wf.npw;
-        const int npwx = GlobalC::wf.npwx;
-        std::complex<double>*wfgin = stowf.chi0[ik].c, *wfgout = stowf.chiortho[ik].c;
-        for (int ig = 0; ig < npwx * nchipk; ++ig)
-        {
-            wfgout[ig] = wfgin[ig];
-        }
+	    const int nchipk=stowf.nchip[ik];
+	    const int npw = psi.get_current_nbas();
+	    const int npwx = psi.get_nbasis();
+        std::complex<double> *wfgin = stowf.chi0[ik].c, *wfgout = stowf.chiortho[ik].c;
+	    for(int ig = 0 ; ig < npwx * nchipk; ++ig)
+	    {
+		    wfgout[ig] = wfgin[ig];
+	    }
 
-        // orthogonal part
-        std::complex<double>* sum = new std::complex<double>[GlobalV::NBANDS * nchipk];
-        char transC = 'C';
-        char transN = 'N';
-
-        // sum(b<NBANDS, a<nchi) = < psi_b | chi_a >
-        zgemm_(&transC,
-               &transN,
-               &GlobalV::NBANDS,
-               &nchipk,
-               &npw,
-               &ModuleBase::ONE,
-               psi.get_pointer(),
-               &npwx,
-               wfgout,
-               &npwx,
-               &ModuleBase::ZERO,
-               sum,
-               &GlobalV::NBANDS);
-        Parallel_Reduce::reduce_complex_double_pool(sum, GlobalV::NBANDS * nchipk);
-
-        // psi -= psi * sum
-        zgemm_(&transN,
-               &transN,
-               &npw,
-               &nchipk,
-               &GlobalV::NBANDS,
-               &ModuleBase::NEG_ONE,
-               psi.get_pointer(),
-               &npwx,
-               sum,
-               &GlobalV::NBANDS,
-               &ModuleBase::ONE,
-               wfgout,
-               &npwx);
-        delete[] sum;
+	    //orthogonal part
+	    std::complex<double> *sum = new std::complex<double> [GlobalV::NBANDS * nchipk];
+	    char transC='C';
+	    char transN='N';
+    
+	    //sum(b<NBANDS, a<nchi) = < psi_b | chi_a >
+	    zgemm_(&transC, &transN, &GlobalV::NBANDS, &nchipk, &npw, &ModuleBase::ONE, 
+                psi.get_pointer(), &npwx, wfgout, &npwx, &ModuleBase::ZERO, sum, &GlobalV::NBANDS);
+	    Parallel_Reduce::reduce_complex_double_pool(sum, GlobalV::NBANDS * nchipk);
+    
+	    //psi -= psi * sum
+	    zgemm_(&transN, &transN, &npw, &nchipk, &GlobalV::NBANDS, &ModuleBase::NEG_ONE, 
+                psi.get_pointer(), &npwx, sum, &GlobalV::NBANDS, &ModuleBase::ONE, wfgout, &npwx);
+	    delete[] sum;
     }
 }
 
@@ -144,16 +122,15 @@ void Stochastic_Iter::checkemm(const int& ik, const int iter, Stochastic_WF& sto
         while (1)
         {
             bool converge;
-            converge = p_che->checkconverge(&stohchi,
-                                            &Stochastic_hchi::hchi_reciprocal,
-                                            pchi,
-                                            GlobalC::wf.npw,
-                                            stohchi.Emax,
-                                            stohchi.Emin,
-                                            5.0);
+            converge = p_che->checkconverge(
+				&stohchi, &Stochastic_hchi::hchi_reciprocal, 
+				pchi, GlobalC::kv.ngk[ik],
+				stohchi.Emax, 
+				stohchi.Emin, 
+				5.0);
 
-            if (!converge)
-            {
+            if(!converge)
+			{
                 change = true;
             }
             else
@@ -317,21 +294,15 @@ void Stochastic_Iter::calPn(const int& ik, Stochastic_WF& stowf)
 
     if (this->method == 2)
     {
-        p_che->calpolyvec_complex(&stohchi,
-                                  &Stochastic_hchi::hchi_reciprocal,
-                                  pchi,
-                                  this->chiallorder[ik].c,
-                                  GlobalC::wf.npw,
-                                  GlobalC::wf.npwx,
-                                  nchip[ik]);
-        double* vec_all = (double*)this->chiallorder[ik].c;
-        double* vec = (double*)pchi;
+        p_che->calpolyvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, this->chiallorder[ik].c, GlobalC::kv.ngk[ik], GlobalC::wf.npwx, nchip[ik]);
+        double* vec_all= (double *) this->chiallorder[ik].c;
+        double* vec= (double *) pchi;
         char transa = 'T';
         double one = 1;
         int inc = 1;
         // double zero = 0;
         int LDA = GlobalC::wf.npwx * nchip[ik] * 2;
-        int M = GlobalC::wf.npw * nchip[ik] * 2;
+        int M = GlobalC::kv.ngk[ik] * nchip[ik] * 2;
         int N = norder;
         dgemv_(&transa, &M, &N, &one, vec_all, &LDA, vec, &inc, &one, spolyv, &inc);
         for (int i = 0; i < norder; ++i)
@@ -341,13 +312,8 @@ void Stochastic_Iter::calPn(const int& ik, Stochastic_WF& stowf)
     }
     else
     {
-        p_che->tracepolyA(&stohchi,
-                          &Stochastic_hchi::hchi_reciprocal,
-                          pchi,
-                          GlobalC::wf.npw,
-                          GlobalC::wf.npwx,
-                          nchip[ik]);
-        for (int i = 0; i < norder; ++i)
+        p_che->tracepolyA(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, GlobalC::kv.ngk[ik], GlobalC::wf.npwx, nchip[ik]);
+        for(int i = 0 ; i < norder ; ++i)
         {
             spolyv[i] += p_che->polytrace[i] * GlobalC::kv.wk[ik];
         }
@@ -532,7 +498,7 @@ void Stochastic_Iter::calTnchi(const int& ik, Stochastic_WF& stowf)
         int inc = 1;
         std::complex<double> zero = 0;
         int LDA = GlobalC::wf.npwx * nchip[ik];
-        int M = GlobalC::wf.npw * nchip[ik];
+        int M = GlobalC::kv.ngk[ik] * nchip[ik];
         int N = p_che->norder;
         std::complex<double>* coef_real = new std::complex<double>[p_che->norder];
         for (int i = 0; i < p_che->norder; ++i)

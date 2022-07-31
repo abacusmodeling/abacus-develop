@@ -61,9 +61,26 @@ void ESolver_KS::Init(Input& inp, UnitCell_pseudo& ucell)
     }
     else
     {
-        XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
-    }
-    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+        ESolver_FP::Init(inp,ucell);
+        // Yu Liu add 2021-07-03
+        GlobalC::CHR.cal_nelec();
+
+        // it has been established that that
+        // xc_func is same for all elements, therefore
+        // only the first one if used
+        if (ucell.atoms[0].xc_func == "HSE" || ucell.atoms[0].xc_func == "PBE0")
+        {
+            XC_Functional::set_xc_type("pbe");
+        }
+        else if (ucell.atoms[0].xc_func == "SCAN0")
+        {
+            XC_Functional::set_xc_type("scan");
+        }
+        else
+        {
+            XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
+        }
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (ModuleSymmetry::Symmetry::symm_flag)

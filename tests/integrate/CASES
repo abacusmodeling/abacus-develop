@@ -2,6 +2,7 @@
 101_PW_15_pseudopots
 101_PW_blps_pseudopots
 101_PW_OU_pseudopots
+101_PW_upf100_Al_pseudopots
 101_PW_upf201_Al_pseudopots
 101_PW_upf201_pseudopots
 101_PW_VW_pseudopots
@@ -45,6 +46,7 @@
 109_PW_CR_fix_c
 109_PW_CR_fix_volume
 109_PW_CR_moveatoms
+110_PW_SY
 110_PW_SY_symmetry
 111_PW_elec_add
 111_PW_elec_minus
@@ -55,6 +57,7 @@
 114_PW_BD_15
 115_PW_sol_H2
 115_PW_sol_H2O
+116_PW_scan_Si2
 120_PW_KP_MD_ADS
 120_PW_KP_MD_FIRE
 120_PW_KP_MD_LGV
@@ -111,6 +114,8 @@
 206_NO_PU_chargemixing
 207_NO_KP_OB
 207_NO_KP_OD
+207_NO_KP_OH
+207_NO_KP_OH2
 208_NO_KP_CF_RE
 208_NO_KP_RE_MB
 208_NO_KP_CS_CR
