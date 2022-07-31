@@ -172,7 +172,7 @@ void ESolver_KS_PW::calcondw(const int nt,const double dt,const double fwhmin,co
         }
     }
     ofscond.open("Onsager.txt");
-    ofscond<<setw(8)<<"## w(eV) "<<setw(20)<<"sigma (Sm^-1)"<<setw(20)<<"kappa (W(mK)^-1)"<<setw(20)<<"L12/e (Am^-1)"<<setw(20)<<"L22/e^2 (Wm^-1)"<<endl;
+    ofscond<<setw(8)<<"## w(eV) "<<setw(20)<<"sigma(Sm^-1)"<<setw(20)<<"kappa(W(mK)^-1)"<<setw(20)<<"L12/e(Am^-1)"<<setw(20)<<"L22/e^2(Wm^-1)"<<endl;
     for(int iw = 0; iw < nw; ++iw)
 	{
         cw11[iw] *= double(2)/ndim/GlobalC::ucell.omega* factor; //unit in Sm^-1

@@ -554,16 +554,16 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
         //before loop
 
         //|psi>
-        psi::Psi<std::complex<double>> psi0(1,totbands_per,npwx); //|psi>
-        psi::Psi<std::complex<double>> sfpsi0(1,totbands_per,npwx); //sqrt(f)|psi>
-        psi::Psi<std::complex<double>> hpsi0(1,totbands_per,npwx); //h|psi>
-        psi::Psi<std::complex<double>> hsfpsi0(1,totbands_per,npwx); //h*sqrt(f)|psi>
+        psi::Psi<std::complex<double>> psi0(1,totbands_per,npwx,GlobalC::kv.ngk.data()); //|psi>
+        psi::Psi<std::complex<double>> sfpsi0(1,totbands_per,npwx,GlobalC::kv.ngk.data()); //sqrt(f)|psi>
+        psi::Psi<std::complex<double>> hpsi0(1,totbands_per,npwx,GlobalC::kv.ngk.data()); //h|psi>
+        psi::Psi<std::complex<double>> hsfpsi0(1,totbands_per,npwx,GlobalC::kv.ngk.data()); //h*sqrt(f)|psi>
         //j|psi> j1=p  j2=(Hp+pH)/2 - mu*p
-        psi::Psi<std::complex<double>> j1psi(ndim,totbands_per,npwx);
-        psi::Psi<std::complex<double>> j2psi(ndim,totbands_per,npwx);
+        psi::Psi<std::complex<double>> j1psi(1,ndim*totbands_per,npwx,GlobalC::kv.ngk.data());
+        psi::Psi<std::complex<double>> j2psi(1,ndim*totbands_per,npwx,GlobalC::kv.ngk.data());
         //(1-f)*j*sqrt(f)|psi>
-        psi::Psi<std::complex<double>> j1sfpsi(ndim,totbands_per,npwx);
-        psi::Psi<std::complex<double>> j2sfpsi(ndim,totbands_per,npwx);
+        psi::Psi<std::complex<double>> j1sfpsi(1,ndim*totbands_per,npwx,GlobalC::kv.ngk.data());
+        psi::Psi<std::complex<double>> j2sfpsi(1,ndim*totbands_per,npwx,GlobalC::kv.ngk.data());
         double* en;
         if(ksbandper > 0)   en = new double [ksbandper];
         for(int ib = 0 ; ib < ksbandper ; ++ib)
@@ -608,15 +608,63 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
                     std::complex<double> psiig = psi0(ib,ig);
                     std::complex<double> sfpsiig = sfpsi0(ib,ig);
                     double gplusk_a = GlobalC::wfcpw->getgpluskcar(ik,ig)[id];
-                    j1psi(id,ib,ig) = tpiba * gplusk_a * psiig;
-                    j1sfpsi(id,ib,ig) = tpiba * gplusk_a * sfpsiig;
+                    const int idib = id * totbands_per + ib;
+                    j1psi(idib,ig) = tpiba * gplusk_a * psiig;
+                    j1sfpsi(idib,ig) = tpiba * gplusk_a * sfpsiig;
                 }
             }
         }
-        this->phami->hPsi(psi0.get_pointer(), hpsi0.get_pointer(), totbands_per*npwx);
-        this->phami->hPsi(sfpsi0.get_pointer(), hsfpsi0.get_pointer(), totbands_per*npwx);
-        this->phami->hPsi(j1psi.get_pointer(), j2psi.get_pointer(), ndim*totbands_per*npwx);
-        this->phami->hPsi(j1sfpsi.get_pointer(), j2sfpsi.get_pointer(), ndim*totbands_per*npwx);
+        // this->phami->hPsi(psi0.get_pointer(), hpsi0.get_pointer(), totbands_per*npwx);
+        // this->phami->hPsi(sfpsi0.get_pointer(), hsfpsi0.get_pointer(), totbands_per*npwx);
+        // this->phami->hPsi(j1psi.get_pointer(), j2psi.get_pointer(), ndim*totbands_per*npwx);
+        // this->phami->hPsi(j1sfpsi.get_pointer(), j2sfpsi.get_pointer(), ndim*totbands_per*npwx);
+        psi::Range allbands(1,0,0,totbands_per-1);
+        hamilt::Operator::hpsi_info info_psi0(&psi0, allbands);
+        const std::complex<double>* hpsi_out = std::get<0>(this->phami->ops->hPsi(info_psi0))->get_pointer();
+        ModuleBase::GlobalFunc::COPYARRAY(hpsi_out, hpsi0.get_pointer(), totbands_per*npwx);
+
+        hamilt::Operator::hpsi_info info_sfpsi0(&sfpsi0, allbands);
+        const std::complex<double>* hsfpsi_out = std::get<0>(this->phami->ops->hPsi(info_sfpsi0))->get_pointer();
+        ModuleBase::GlobalFunc::COPYARRAY(hsfpsi_out, hsfpsi0.get_pointer(), totbands_per*npwx);
+
+        psi::Range allndimbands(1,0,0,ndim*totbands_per-1);
+        hamilt::Operator::hpsi_info info_j1psi(&j1psi, allndimbands);
+        const std::complex<double>* hj1psi_out = std::get<0>(this->phami->ops->hPsi(info_j1psi))->get_pointer();
+        ModuleBase::GlobalFunc::COPYARRAY(hj1psi_out, j2psi.get_pointer(), ndim*totbands_per*npwx);
+
+        hamilt::Operator::hpsi_info info_j1sfpsi(&j1sfpsi, allndimbands);
+        const std::complex<double>* hj1sfpsi_out = std::get<0>(this->phami->ops->hPsi(info_j1sfpsi))->get_pointer();
+        ModuleBase::GlobalFunc::COPYARRAY(hj1sfpsi_out, j2sfpsi.get_pointer(), ndim*totbands_per*npwx);
+
+        /*
+        // stohchi.hchi_reciprocal(psi0.get_pointer(), hpsi0.get_pointer(), totbands_per);
+        // stohchi.hchi_reciprocal(sfpsi0.get_pointer(), hsfpsi0.get_pointer(), totbands_per);
+        // stohchi.hchi_reciprocal(j1psi.get_pointer(), j2psi.get_pointer(), ndim*totbands_per);
+        // stohchi.hchi_reciprocal(j1sfpsi.get_pointer(), j2sfpsi.get_pointer(), ndim*totbands_per);
+        // double Ebar = (stohchi.Emin + stohchi.Emax)/2;
+	    // double DeltaE = (stohchi.Emax - stohchi.Emin)/2;
+	    // for(int ib = 0 ; ib < totbands_per ; ++ib)
+	    // {
+	    // 	for(int ig = 0; ig < npw; ++ig)
+	    // 	{
+        //         hpsi0(ib,ig) = hpsi0(ib,ig) * DeltaE + Ebar * psi0(ib,ig);
+	    // 		hsfpsi0(ib,ig) = hsfpsi0(ib,ig) * DeltaE + Ebar * sfpsi0(ib,ig);
+	    // 	}
+	    // }
+        // for(int id = 0 ; id < ndim ; ++id)
+        // {
+        //     for(int ib = 0 ; ib < totbands_per ; ++ib)
+	    //     {
+	    //     	for(int ig = 0; ig < npw; ++ig)
+	    //     	{
+        //             const int idib = id * totbands_per + ib;
+        //             j2psi(0,idib,ig) = j2psi(0,idib,ig) * DeltaE + Ebar * j1psi(0,idib,ig);
+	    //     		j2sfpsi(0,idib,ig) = j2sfpsi(0,idib,ig) * DeltaE + Ebar * j1sfpsi(0,idib,ig);
+	    //     	}
+	    //     }
+        // }*/
+
+        
         for(int id = 0 ; id < ndim ; ++id)
         {
             for(int ib = 0 ; ib < totbands_per ; ++ib )
@@ -626,8 +674,9 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
                     std::complex<double> hpsiig = hpsi0(ib,ig);
                     std::complex<double> hsfpsiig = hsfpsi0(ib,ig);
                     double gplusk_a = GlobalC::wfcpw->getgpluskcar(ik,ig)[id];
-                    j2psi(id,ib,ig) = (j2psi(id,ib,ig) + tpiba * gplusk_a * hpsiig)/2.0 - mu * j1psi(id,ib,ig);
-                    j2sfpsi(id,ib,ig) = (j2sfpsi(id,ib,ig) + tpiba * gplusk_a * hsfpsiig)/2.0 - mu * j1sfpsi(id,ib,ig);
+                    const int idib = id * totbands_per + ib;
+                    j2psi(0,idib,ig) = (j2psi(0,idib,ig) + tpiba * gplusk_a * hpsiig)/2.0 - mu * j1psi(0,idib,ig);
+                    j2sfpsi(0,idib,ig) = (j2sfpsi(0,idib,ig) + tpiba * gplusk_a * hsfpsiig)/2.0 - mu * j1sfpsi(0,idib,ig);
                 }
             }
         }
@@ -643,14 +692,16 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
         psi::Psi<std::complex<double>> j1psi_tot,j2psi_tot;
         if (GlobalV::NSTOGROUP > 1)
         {
-            j1psi_tot.resize(ndim,totbands,npwx);
-            j2psi_tot.resize(ndim,totbands,npwx);
+            j1psi_tot.resize(1,ndim*totbands,npwx);
+            j2psi_tot.resize(1,ndim*totbands,npwx);
             for(int id = 0 ; id < ndim ; ++id)
             {
-                MPI_Allgatherv(&j1psi(id,0,0), totbands_per * npwx, mpicomplex, 
-                            &j1psi_tot(id,0,0), nrecv, displs, mpicomplex, PARAPW_WORLD);
-                MPI_Allgatherv(&j2psi(id,0,0), totbands_per * npwx, mpicomplex, 
-                            &j2psi_tot(id,0,0), nrecv, displs, mpicomplex, PARAPW_WORLD);
+                const int idnb_per = id * totbands_per;
+                const int idnb = id * totbands;
+                MPI_Allgatherv(&j1psi(idnb_per,0), totbands_per * npwx, mpicomplex, 
+                            &j1psi_tot(idnb,0), nrecv, displs, mpicomplex, PARAPW_WORLD);
+                MPI_Allgatherv(&j2psi(idnb_per,0), totbands_per * npwx, mpicomplex, 
+                            &j2psi_tot(idnb,0), nrecv, displs, mpicomplex, PARAPW_WORLD);
             }
             p_j1psi = &j1psi_tot;
             p_j2psi = &j2psi_tot;
@@ -708,21 +759,23 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
             int totbands3 = ndim*totbands;
             for(int id = 0 ; id < ndim ; ++id)
             {
+                const int idnb = id * totbands_per;
                 //<psi|sqrt(f)j_1(1-f) exp(iHt)|psi>
-                zgemm_(&transa, &transb,&totbands_per, &totbands, &npw, &ModuleBase::ONE, &j1sfpsi(id,0,0), &npwx, 
+                zgemm_(&transa, &transb,&totbands_per, &totbands, &npw, &ModuleBase::ONE, &j1sfpsi(idnb,0), &npwx, 
                         p_exppsi->get_pointer(), &npwx, &ModuleBase::ZERO, &j1l(id,0), &totbands_per);
                 //<psi|sqrt(f)j_2(1-f) exp(iHt)|psi>
-                zgemm_(&transa, &transb,&totbands_per, &totbands, &npw, &ModuleBase::ONE, &j2sfpsi(id,0,0), &npwx, 
+                zgemm_(&transa, &transb,&totbands_per, &totbands, &npw, &ModuleBase::ONE, &j2sfpsi(idnb,0), &npwx, 
                         p_exppsi->get_pointer(), &npwx, &ModuleBase::ZERO, &j2l(id,0), &totbands_per);
             }
             for(int id = 0; id < ndim ; ++id) // it can also use zgemm once
             {
+                const int idnb = id * totbands;
                 //i<exp(-iHt)sqrt(f)psi| j_1|psi> = i<psi|sqrt(f)exp(iHt) j_1|psi> = i(<psi|j_1 exp(-iHt)sqrt(f)|psi>)^+
                 zgemm_(&transa, &transb,&totbands_per, &totbands, &npw, &ModuleBase::IMAG_UNIT, expsfpsi.get_pointer(), &npwx,
-                        &(p_j1psi->operator()(id,0,0)), &npwx, &ModuleBase::ZERO, &j1r(id,0), &totbands_per);
+                        &(p_j1psi->operator()(idnb,0)), &npwx, &ModuleBase::ZERO, &j1r(id,0), &totbands_per);
                 //i<psi|sqrt(f)exp(iHt) j_2|psi> 
                 zgemm_(&transa, &transb,&totbands_per, &totbands, &npw, &ModuleBase::IMAG_UNIT, expsfpsi.get_pointer(), &npwx,
-                        &(p_j2psi->operator()(id,0,0)), &npwx, &ModuleBase::ZERO, &j2r(id,0), &totbands_per);
+                        &(p_j2psi->operator()(idnb,0)), &npwx, &ModuleBase::ZERO, &j2r(id,0), &totbands_per);
             }
 
 #ifdef __MPI
