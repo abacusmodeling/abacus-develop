@@ -779,20 +779,31 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
             }
 
 #ifdef __MPI
-            MPI_Allreduce(MPI_IN_PLACE,j1l.c,ndim*totbands_per*totbands*2,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE,j2l.c,ndim*totbands_per*totbands*2,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE,j1r.c,ndim*totbands_per*totbands*2,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE,j2r.c,ndim*totbands_per*totbands*2,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE,j1l.c,ndim*totbands_per*totbands,MPI_DOUBLE_COMPLEX,MPI_SUM,POOL_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE,j2l.c,ndim*totbands_per*totbands,MPI_DOUBLE_COMPLEX,MPI_SUM,POOL_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE,j1r.c,ndim*totbands_per*totbands,MPI_DOUBLE_COMPLEX,MPI_SUM,POOL_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE,j2r.c,ndim*totbands_per*totbands,MPI_DOUBLE_COMPLEX,MPI_SUM,POOL_WORLD);
 #endif
-            //Re(i<psi|sqrt(f)j(1-f) exp(iHt)|psi><psi|j exp(-iHt)\sqrt(f)|psi>)
-            if(GlobalV::RANK_IN_POOL==0)
+            int totnum = ndim*totbands_per*totbands;
+            int num_per = totnum / GlobalV::NPROC_IN_POOL;
+            int st_per = num_per * GlobalV::RANK_IN_POOL;
+            int re = totnum % GlobalV::NPROC_IN_POOL;
+            if(GlobalV::RANK_IN_POOL < re)  
             {
-                //Im(l_ij*r_ji)=Re(i l^*_ij*r^+_ij)=Re(i l^*_i*r^+_i)
-                //ddot_real = real(A^*_i * B_i)
-                ct11[it] += ModuleBase::GlobalFunc::ddot_real(totbands*totbands_per*ndim,j1l.c,j1r.c,false) * GlobalC::kv.wk[ik] / 2,0;
-                ct12[it] -= ModuleBase::GlobalFunc::ddot_real(totbands*totbands_per*ndim,j1l.c,j2r.c,false) * GlobalC::kv.wk[ik] / 2,0;
-                ct22[it] += ModuleBase::GlobalFunc::ddot_real(totbands*totbands_per*ndim,j2l.c,j2r.c,false) * GlobalC::kv.wk[ik] / 2,0;
+                ++num_per;
+                st_per += GlobalV::RANK_IN_POOL;
             }
+            else
+            {
+                st_per += re;
+            }
+            //Re(i<psi|sqrt(f)j(1-f) exp(iHt)|psi><psi|j exp(-iHt)\sqrt(f)|psi>)
+            //Im(l_ij*r_ji)=Re(i l^*_ij*r^+_ij)=Re(i l^*_i*r^+_i)
+            //ddot_real = real(A^*_i * B_i)
+            ct11[it] += ModuleBase::GlobalFunc::ddot_real(num_per,j1l.c+st_per,j1r.c+st_per,false) * GlobalC::kv.wk[ik] / 2,0;
+            ct12[it] -= ModuleBase::GlobalFunc::ddot_real(num_per,j1l.c+st_per,j2r.c+st_per,false) * GlobalC::kv.wk[ik] / 2,0;
+            ct22[it] += ModuleBase::GlobalFunc::ddot_real(num_per,j2l.c+st_per,j2r.c+st_per,false) * GlobalC::kv.wk[ik] / 2,0;
+            
         }
         cout<<endl;
         if(ksbandper > 0)   delete[] en;
