@@ -22,7 +22,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
 		const int nbz_start = GlobalC::GridT.nbzp_start;
 		const int nbz = GlobalC::GridT.nbzp;
 		const int ncyz = GlobalC::rhopw->ny*GlobalC::rhopw->nplane; // mohan add 2012-03-25
-			
+
         for(int grid_index = 0; grid_index < GlobalC::bigpw->nbxx; grid_index++)
         {
 
@@ -38,7 +38,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
             Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::bigpw->bxyz, LD_pool);
             Gint_Tools::cal_psir_ylm(
                 size, grid_index, delta_r,
-                block_index, block_size, 
+                block_index, block_size,
                 cal_flag,
                 psir_ylm.ptr_2D);
 
@@ -74,7 +74,7 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
                     {
                         int iw1_lo;
                         double* psi1 = &psir_ylm.ptr_2D[ib][block_index[ia1]];
-                        std::complex<double> tmp = (0.0, 0.0);
+                        std::complex<double> tmp {0.0, 0.0};
                         if (GlobalV::NSPIN == 4) // is it a simple add of 2 spins?
                         {
                             for (int is = 0;is < 2;++is)
@@ -109,6 +109,3 @@ void Gint_k::cal_env_k(int ik, const std::complex<double>* wfc_k, double* rho)
     ModuleBase::timer::tick("Gint_k", "cal_env_k");
     return;
 }
-
-
-
