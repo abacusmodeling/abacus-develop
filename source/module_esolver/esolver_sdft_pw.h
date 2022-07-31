@@ -31,8 +31,9 @@ public:
     //Stochastic Kubo-Greenwood
     void sKG(const int nche_KG, const double fwhmin, const double wcut, 
              const double dw_in, const int times);
-    void sKG_new(const int nche_KG, const double fwhmin, const double wcut, 
-             const double dw_in, const int times);
+    //calculate DOS
+    void caldos(const int nche_dos, const double sigmain, 
+            const double emin, const double emax, const double de);
 
 private:
     int nche_sto; //norder of Chebyshev

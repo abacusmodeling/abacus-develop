@@ -118,7 +118,7 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
 	}
     hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
     hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
-    this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, iter, GlobalV::KS_SOLVER);   
+    this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, istep, iter, GlobalV::KS_SOLVER);   
     // transform energy for print
     GlobalC::en.eband = this->pelec->eband;
     GlobalC::en.demet = this->pelec->demet;
@@ -150,17 +150,33 @@ void ESolver_SDFT_PW::postprocess()
         int iter = 1;
         int istep = 0;
         hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
-        hsolver::DiagoIterAssist::PW_DIAG_THR = this->phsol->set_diagethr(istep, iter, drho);
+        hsolver::DiagoIterAssist::PW_DIAG_THR = std::max(std::min(1e-5, 0.1 * GlobalV::SCF_THR / std::max(1.0, GlobalC::CHR.nelec)),1e-12);
         hsolver::DiagoIterAssist::need_subspace = false;
-        this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, iter, GlobalV::KS_SOLVER, true);
+        this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf,istep, iter, GlobalV::KS_SOLVER, true);
     }
     int nche_test = 0;
     if(INPUT.cal_cond)  nche_test = std::max(nche_test, INPUT.cond_nche);
+    if(INPUT.out_dos)  nche_test = std::max(nche_test, INPUT.dos_nche);
     check_che(nche_test);
     
     if(INPUT.cal_cond)
 	{
-        this->sKG_new(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
+        this->sKG(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
+    }
+    if(INPUT.out_dos)
+	{
+        double emax, emin;
+        if(INPUT.dos_setemax)	emax = INPUT.dos_emax_ev;
+		if(INPUT.dos_setemin)	emin = INPUT.dos_emin_ev;
+		if(!INPUT.dos_setemax && !INPUT.dos_setemin)
+		{
+            emax =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emax;
+            emin =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emin;
+			double delta=(emax-emin)*INPUT.dos_scale;
+			emax=emax+delta/2.0;
+			emin=emin-delta/2.0;
+		}
+        this->caldos(INPUT.dos_nche, INPUT.b_coef, emin, emax, INPUT.dos_edelta_ev );
     }
 }
 

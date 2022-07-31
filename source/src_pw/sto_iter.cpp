@@ -88,17 +88,24 @@ void Stochastic_Iter::orthog(const int& ik, psi::Psi<std::complex<double>>& psi,
     }
 }
 
-void Stochastic_Iter::checkemm(const int& ik, const int iter, Stochastic_WF& stowf)
+void Stochastic_Iter::checkemm(const int& ik, const int istep, const int iter, Stochastic_WF& stowf)
 {
     ModuleBase::TITLE("Stochastic_Iter","checkemm");
-    if(iter > 5)
-	{
-        return;
-	}
+    //iter = 1,2,...   istep = 0,1,2,...
+    if( istep%INPUT.initsto_freq != 0 )    return;
+    if(istep == 0)
+    {
+        if( (GlobalV::NBANDS > 0 && iter > 3) || (GlobalV::NBANDS == 0 && iter > 1)) 
+            return;
+    }
+    else
+    {
+        if(iter > 1) return;
+    }
         
     const int norder = p_che->norder;
     std::complex<double> * pchi;
-    int ntest = 1;
+    int ntest = 2;
 
     if (nchip[ik] < ntest) 
 	{

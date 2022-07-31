@@ -34,7 +34,7 @@ class Stochastic_Iter
 
     void orthog(const int &ik, psi::Psi<std::complex<double>>& psi, Stochastic_WF& stowf);
 
-    void checkemm(const int &ik, const int iter, Stochastic_WF& stowf);
+    void checkemm(const int &ik, const int istep, const int iter, Stochastic_WF& stowf);
 
     ModuleBase::Chebyshev<double>* p_che = nullptr;
 

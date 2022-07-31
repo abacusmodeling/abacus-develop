@@ -27,6 +27,12 @@ public:
     REAL nsin(REAL e);
     REAL n_sin(REAL e);
 
+public:
+    REAL sigma;
+    REAL targ_e;
+    REAL gauss(REAL e);
+    REAL ngauss(REAL e);
+
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "sto_func.h"
 #include "occupy.h"
+#define TWOPI 6.283185307179586
 
 template<typename REAL>
 Sto_Func<REAL>::Sto_Func()
@@ -133,6 +134,29 @@ REAL Sto_Func<REAL>:: n_sin(REAL rawe)
 	REAL DeltaE = (Emax - Emin)/2;
     REAL e = rawe * DeltaE + Ebar;
     return -sin(e * t);
+}
+
+template<typename REAL>
+REAL Sto_Func<REAL>::gauss(REAL e)
+{
+    REAL a = pow((targ_e-e),2)/2.0/pow(sigma,2);
+    if(a > 72)
+        return 0;
+    else
+        return  exp(-a) /sqrt(TWOPI) / sigma ;
+}
+
+template<typename REAL>
+REAL Sto_Func<REAL>::ngauss(REAL rawe)
+{
+    REAL Ebar = (Emin + Emax)/2;
+	REAL DeltaE = (Emax - Emin)/2;
+    REAL e = rawe * DeltaE + Ebar;
+    REAL a = pow((targ_e-e),2)/2.0/pow(sigma,2);
+    if(a > 72)
+        return 0;
+    else
+        return  exp(-a) /sqrt(TWOPI) / sigma ;
 }
 
 //we only have two examples: double and float.

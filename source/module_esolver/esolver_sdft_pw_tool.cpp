@@ -106,291 +106,6 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
     cout<<"nt: "<<nt<<" ; dt: "<<dt<<" a.u.(ry^-1)"<<endl;
     assert(nw >= 1);
     assert(nt >= 1);
-
-    ModuleBase::Chebyshev<double> che(this->nche_sto);
-    ModuleBase::Chebyshev<double> chet(nche_KG);
-    const int npwx = GlobalC::wf.npwx;
-    const double tpiba = GlobalC::ucell.tpiba;
-    Stochastic_Iter& stoiter = ((hsolver::HSolverPW_SDFT*)phsol)->stoiter;
-    Stochastic_hchi& stohchi = stoiter.stohchi;
-    const int nk = GlobalC::kv.nks;
-    const int ndim = 3;
-
-    //------------------------------------------------------------------
-    //                    Calculate
-    //------------------------------------------------------------------
-    const double mu = GlobalC::en.ef;
-    stoiter.stofunc.mu = mu;
-    double * ct11 = new double[nt];
-    double * ct12 = new double[nt];
-    double * ct22 = new double[nt];
-    ModuleBase::GlobalFunc::ZEROS(ct11,nt);
-    ModuleBase::GlobalFunc::ZEROS(ct12,nt);
-    ModuleBase::GlobalFunc::ZEROS(ct22,nt);
-    double *gxyz = new double[npwx*ndim];
-
-    stoiter.stofunc.t = dt;
-    chet.calcoef_pair(&stoiter.stofunc, &Sto_Func<double>::ncos, &Sto_Func<double>::n_sin);
-    cout<<"Chebyshev precision: "<<abs(chet.coef_complex[nche_KG-1]/chet.coef_complex[0])<<endl;
-    ofstream cheofs("Chebycoef");
-    for(int i  = 0 ; i < nche_KG ; ++i)
-    {
-        cheofs<<setw(5)<<i<<setw(20)<<abs(chet.coef_complex[i]/chet.coef_complex[0])<<endl;
-    }
-    cheofs.close();
-    
-    //parallel KS orbitals
-    int ksbandper,startband;
-    parallelks(ksbandper,startband);
-    ModuleBase::ComplexMatrix kswf(ksbandper,npwx,false);
-    double *ksen = new double[ksbandper];   
-
-    ModuleBase::timer::tick(this->classname,"kloop");
-    for (int ik = 0;ik < nk;++ik)
-	{
-        if(nk > 1) 
-        {
-            this->phami->updateHk(ik);
-        }
-        stoiter.stohchi.current_ik = ik;
-        const int npw = GlobalC::kv.ngk[ik];
-
-        int nchip = this->stowf.nchip[ik];
-        int totbands = nchip + ksbandper;
-        complex<double> *leftv3 = new complex<double>[npwx*totbands*ndim];
-        complex<double> *jleftv3 = new complex<double>[npwx*totbands*ndim];
-        complex<double> *hleftv = new complex<double>[npwx*nchip];
-        complex<double> *prightv3 = new complex<double>[npwx*totbands*ndim];
-        complex<double> *jrightv3 = new complex<double>[npwx*totbands*ndim];
-        complex<double> *rightv = new complex<double>[npwx*totbands];
-        
-
-        for(int ib = 0; ib < ksbandper ; ++ib)
-        {
-            for(int ig = 0 ; ig < npw ; ++ig)
-            {
-                kswf(ib,ig) = this->psi[0](ik,ib+startband,ig);
-            }
-            ksen[ib] = this->pelec->ekb(ik, ib+startband);
-        }
-        for (int ig = 0;ig < npw;ig++)
-        {
-            ModuleBase::Vector3<double> v3 = GlobalC::wfcpw->getgpluskcar(ik,ig);
-            gxyz[ig] = v3.x * tpiba;
-            gxyz[ig+npwx] = v3.y * tpiba;
-            gxyz[ig+2*npwx] = v3.z * tpiba;
-        }
-        //-----------------------------------------------------------
-        //               sto conductivity
-        //-----------------------------------------------------------
-        //j|left> = [(Hp+pH)/2 - mu*p]|left>
-        this->phami->hPsi(this->stowf.shchi[ik].c, hleftv, nchip*npwx); //hleftv is id transitional array to get jleftv3
-        for(int id = 0 ; id < ndim ; ++id)
-        {
-            for(int ib = 0; ib < nchip ; ++ib) // sto orbitals
-		    {
-		    	for (int ig = 0; ig < npw; ++ig)
-		    	{
-		    		leftv3[id*totbands*npwx + ib*npwx + ig] = gxyz[id*npwx + ig] * this->stowf.shchi[ik](ib,ig);
-		    	}
-		    }
-            for(int ib = nchip ; ib < totbands ; ++ib) // KS orbital
-            {
-                for (int ig = 0; ig < npw; ++ig)
-		    	{
-		    		leftv3[id*totbands*npwx + ib*npwx + ig] = gxyz[id*npwx + ig] * kswf(ib-nchip,ig);
-		    	}
-            }
-        }
-        this->phami->hPsi(leftv3, jleftv3, totbands*ndim*npwx); //leftv3 is a transitional array to get jleftv3
-        for(int id = 0 ; id < ndim ; ++id)
-        {
-            for (int ib = 0; ib < nchip ; ++ib) // sto orbitals
-		    {
-		    	for (int ig = 0; ig < npw; ++ig)
-		    	{
-                    int iaibig = id*totbands*npwx + ib*npwx + ig;
-                    int ibig = ib *npwx + ig;
-                    double ga = gxyz[id*npwx + ig];
-                    jleftv3[iaibig] = (jleftv3[iaibig] + hleftv[ibig] * ga ) / 2.0 - mu * this->stowf.shchi[ik](ib,ig) * ga;
-                }
-            }
-            for (int ib = nchip; ib < totbands ; ++ib) //KS orbitals
-		    {
-		    	for (int ig = 0; ig < npw; ++ig)
-		    	{
-                    int iaibig = id*totbands*npwx + ib*npwx + ig; 
-                    double ga = gxyz[id*npwx + ig];
-                    complex<double> wfikib = kswf(ib-nchip,ig);
-                    jleftv3[iaibig] = (jleftv3[iaibig] + ga * ksen[ib-nchip] * wfikib ) / 2.0 - mu * wfikib * ga;
-                }
-            }
-        }
-
-        //p|left> Note: p^+=p, px=-id/dx  p|k>=k|k>
-        for(int id = 0 ; id < ndim ; ++id)
-        {
-            for (int ib = 0; ib < nchip ; ++ib) // sto orbitals
-		    {
-		    	for (int ig = 0; ig < npw; ++ig)
-		    	{
-		    		leftv3[id*totbands*npwx + ib*npwx + ig] = gxyz[id*npwx + ig] * this->stowf.shchi[ik](ib,ig);
-		    	}
-		    }
-            for(int ib = nchip; ib < totbands; ++ib) // KS orbitals
-            {
-                for (int ig = 0; ig < npw; ++ig)
-		    	{
-		    		leftv3[id*totbands*npwx + ib*npwx + ig] = gxyz[id*npwx + ig] * kswf(ib-nchip,ig);
-		    	}
-            }
-        }
-
-        ModuleBase::timer::tick(this->classname,"chebyshev");
-        //(1-f)|left>
-        che.calcoef_real(&stoiter.stofunc,&Sto_Func<double>::n_fd);
-        che.calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_reciprocal, leftv3, leftv3, npw, npwx, totbands*ndim);
-        che.calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_reciprocal, jleftv3, jleftv3, npw, npwx, totbands*ndim);
-        ModuleBase::timer::tick(this->classname,"chebyshev");
-
-                
-        cout<<"ik="<<ik<<": ";
-        for (int it = 1 ;it < nt ; ++it)
-        {
-            if(it%20==0) cout<<it<<" ";
-            ModuleBase::timer::tick(this->classname,"chebyshev");
-            //exp(-iH*dt/h)|left> Note: exp(iH*dt/h)^+=exp(-iHt/h)   
-            chet.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, leftv3, leftv3, npw, npwx, totbands*ndim);
-            chet.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, jleftv3, jleftv3, npw, npwx, totbands*ndim);
-
-
-            //exp(-iH*dt/h)|right>
-            if(it == 1) chet.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, this->stowf.shchi[ik].c, rightv, npw, npwx, nchip);
-            else        chet.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, rightv, rightv, npw, npwx, nchip);
-            ModuleBase::timer::tick(this->classname,"chebyshev");
-            for(int ib = nchip ; ib < totbands ; ++ib)
-            {
-                for (int ig = 0; ig < npw; ++ig)
-		    	{
-		    		rightv[ib*npwx + ig] = exp(-ModuleBase::IMAG_UNIT * ksen[ib-nchip] * double(it) * dt) * kswf(ib-nchip,ig);
-		    	}
-            }
-
-            //-i[(Hp+pH)/2 - mu*p]|right>
-            this->phami->hPsi(rightv, hleftv, nchip*npwx); //hleftv is a transitional array to get jleftv3
-            for(int id = 0 ; id < ndim ; ++id)
-            {
-                for (int ib = 0; ib < totbands ; ++ib) //KS + sto
-		        {
-		        	for (int ig = 0; ig < npw; ++ig)
-		        	{
-		        		prightv3[id*totbands*npwx + ib*npwx + ig] = gxyz[id*npwx + ig] * rightv[ib*npwx + ig];
-		        	}
-		        }
-            }
-            this->phami->hPsi(prightv3, jrightv3, totbands*ndim*npwx); //prightv3 is a transitional array to get jleftv3
-            for(int id = 0 ; id < ndim ; ++id)
-            {
-                for (int ib = 0; ib < nchip ; ++ib) //sto orbitals
-		        {
-		        	for (int ig = 0; ig < npw; ++ig)
-		        	{
-                        int iaibig = id*totbands*npwx + ib*npwx + ig;
-                        int ibig = ib *npwx + ig;
-                        double ga = gxyz[id*npwx + ig];
-                        jrightv3[iaibig] = -ModuleBase::IMAG_UNIT * ((jrightv3[iaibig] + hleftv[ibig] * ga ) / double(2) - mu * rightv[ib*npwx + ig] * ga);
-                    }
-                }
-                for (int ib = nchip; ib < totbands ; ++ib) //KS orbitals
-		        {
-		        	for (int ig = 0; ig < npw; ++ig)
-		        	{
-                        int iaibig = id*totbands*npwx + ib*npwx + ig; 
-                        double ga = gxyz[id*npwx + ig];
-                        complex<double> wfikib = rightv[ib*npwx + ig];
-                        jrightv3[iaibig] = -ModuleBase::IMAG_UNIT * ((jrightv3[iaibig] + ga * ksen[ib-nchip] * wfikib ) / double(2) - mu * wfikib * ga);
-                    }
-                }
-            }
-
-            //-ip|right>
-            for(int id = 0 ; id < ndim ; ++id)
-            {      
-                for (int ib = 0; ib < totbands ; ++ib) //sto + KS
-		        {
-		    	    for (int ig = 0; ig < npw; ++ig)
-		    	    {
-		    		    prightv3[id*totbands*npwx + ib*npwx + ig] = -ModuleBase::IMAG_UNIT * gxyz[id*npwx + ig] * rightv[ib*npwx + ig];
-		    	    }
-		        }
-            }
-
-            //Im<left|p|right>=Re<left|-ip|right>
-            for(int id = 0 ; id < ndim ; ++id)
-            {
-                for(int ib = 0 ; ib < nchip ; ++ib)
-                {
-                    ct11[it] += ModuleBase::GlobalFunc::ddot_real(npw,&leftv3[id*totbands*npwx + ib*npwx],&prightv3[id*totbands*npwx + ib*npwx],false) * GlobalC::kv.wk[ik] / 2,0;
-                    ct12[it] -= ModuleBase::GlobalFunc::ddot_real(npw,&jleftv3[id*totbands*npwx + ib*npwx],&prightv3[id*totbands*npwx + ib*npwx],false) * GlobalC::kv.wk[ik] / 2.0;
-                    ct22[it] += ModuleBase::GlobalFunc::ddot_real(npw,&jleftv3[id*totbands*npwx + ib*npwx],&jrightv3[id*totbands*npwx + ib*npwx],false) * GlobalC::kv.wk[ik] / 2.0;
-                }
-                for(int ib = nchip ; ib < totbands ; ++ib)
-                {
-                    double ei = ksen[ib-nchip];
-                    double fi = stoiter.stofunc.fd(ei);
-                    ct11[it] += ModuleBase::GlobalFunc::ddot_real(npw,&leftv3[id*totbands*npwx + ib*npwx],&prightv3[id*totbands*npwx + ib*npwx],false) * GlobalC::kv.wk[ik] / 2.0 * fi;
-                    ct12[it] -= ModuleBase::GlobalFunc::ddot_real(npw,&jleftv3[id*totbands*npwx + ib*npwx],&prightv3[id*totbands*npwx + ib*npwx],false) * GlobalC::kv.wk[ik] / 2.0 * fi;
-                    ct22[it] += ModuleBase::GlobalFunc::ddot_real(npw,&jleftv3[id*totbands*npwx + ib*npwx],&jrightv3[id*totbands*npwx + ib*npwx],false) * GlobalC::kv.wk[ik] / 2.0 * fi;
-                }
-            }
-        }
-        cout<<endl;
-
-        delete [] leftv3;
-        delete [] jleftv3;
-        delete [] hleftv;
-        delete [] prightv3;
-        delete [] jrightv3;
-        delete [] rightv;
-    }
-    ModuleBase::timer::tick(this->classname,"kloop");
-    delete[] gxyz;
-    delete[] ksen;
-#ifdef __MPI
-    MPI_Allreduce(MPI_IN_PLACE,ct11,nt,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-    MPI_Allreduce(MPI_IN_PLACE,ct12,nt,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-    MPI_Allreduce(MPI_IN_PLACE,ct22,nt,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-#endif
-   
-    //------------------------------------------------------------------
-    //                    Output
-    //------------------------------------------------------------------
-    if(GlobalV::MY_RANK==0)
-    {
-        calcondw(nt,dt,fwhmin,wcut,dw_in,ct11,ct12,ct22);
-    }
-    delete[] ct11;
-    delete[] ct12;
-    delete[] ct22;
-    // delete[] cterror;
-    ModuleBase::timer::tick(this->classname,"sKG");
-}
-
-void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const double wcut, 
-                          const double dw_in, const int times)
-{
-    ModuleBase::timer::tick(this->classname,"sKG");
-    cout<<"Calculating conductivity...."<<endl;
-    
-    int nw = ceil(wcut/dw_in);
-    double dw =  dw_in / ModuleBase::Ry_to_eV; //converge unit in eV to Ry 
-    double sigma = fwhmin / TWOSQRT2LN2 / ModuleBase::Ry_to_eV;
-    double dt = ModuleBase::PI/(dw*nw)/times ; //unit in a.u., 1 a.u. = 4.837771834548454e-17 s
-    int nt = ceil(sqrt(20)/sigma/dt);
-    cout<<"nw: "<<nw<<" ; dw: "<<dw*ModuleBase::Ry_to_eV<<" eV"<<endl;
-    cout<<"nt: "<<nt<<" ; dt: "<<dt<<" a.u.(ry^-1)"<<endl;
-    assert(nw >= 1);
-    assert(nt >= 1);
     const int ndim = 3;
 
     ModuleBase::Chebyshev<double> che(this->nche_sto);
@@ -741,6 +456,140 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
     delete[] ct22;
     // delete[] cterror;
     ModuleBase::timer::tick(this->classname,"sKG");
+}
+
+void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const double emin, const double emax, const double de)
+{
+    cout<<"Calculating Dos...."<<endl;
+    ModuleBase::Chebyshev<double> che(nche_dos);
+    const int nk = GlobalC::kv.nks;
+    Stochastic_Iter& stoiter = ((hsolver::HSolverPW_SDFT*)phsol)->stoiter;
+    Stochastic_hchi& stohchi = stoiter.stohchi;
+    const int npwx = GlobalC::wf.npwx;
+    //------------------------------
+    //      Convergence test
+    //------------------------------
+    bool change = false;
+    for (int ik = 0;ik < nk;ik++)
+	{
+        int ntest = 2;
+        if (this->stowf.nchip[ik] < ntest) 
+	    {
+	    	ntest = this->stowf.nchip[ik];
+	    }
+
+        this->phami->updateHk(ik);
+        stohchi.current_ik = ik;
+        const int npw = GlobalC::kv.ngk[ik];
+
+        for(int i = 0 ; i < ntest ; ++i)
+        {
+            while(1)
+            {
+                complex<double> *pchi;
+                if(GlobalV::NBANDS > 0)
+                    pchi = &stowf.chiortho[ik](i,0);
+                else
+                    pchi = &stowf.chi0[ik](i,0);
+                bool converge;
+                converge =  che.checkconverge(&stohchi, &Stochastic_hchi::hchi_reciprocal, 
+	        	    	pchi, npw, stohchi.Emax, stohchi.Emin, 5.0);
+                if(!converge)
+	        	{
+                    change = true;
+	        	}
+                else
+	        	{
+                    break;
+	        	}
+            }
+        }
+        if(ik == nk-1)
+        {
+            stoiter.stofunc.Emax = stohchi.Emax;
+            stoiter.stofunc.Emin = stohchi.Emin;
+#ifdef __MPI
+            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
+#endif
+            stohchi.Emin = stoiter.stofunc.Emin;
+            stohchi.Emax = stoiter.stofunc.Emax;
+            if(change)
+	        {
+	        	GlobalV::ofs_running<<"New Emax "<<stohchi.Emax<<" ; new Emin "<<stohchi.Emin<<std::endl;
+	        }
+            change = false;
+        }
+    }
+
+    double * spolyv = new double [nche_dos];
+    ModuleBase::GlobalFunc::ZEROS(spolyv, nche_dos);
+    for (int ik = 0;ik < nk;ik++)
+	{
+		if(nk > 1) 
+        {
+            this->phami->updateHk(ik);
+        }
+        stohchi.current_ik = ik;
+        const int npw = GlobalC::kv.ngk[ik];
+        const int nchip = this->stowf.nchip[ik];
+        
+        complex<double> * pchi;
+        if(GlobalV::NBANDS > 0)
+            pchi = stowf.chiortho[ik].c;
+        else
+            pchi = stowf.chi0[ik].c;
+        che.tracepolyA(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, npw, npwx, nchip);
+        for(int i = 0 ; i < nche_dos ; ++i)
+        {
+            spolyv[i] += che.polytrace[i] * GlobalC::kv.wk[ik] / 2 ;
+        }
+    }
+    string dosfile = GlobalV::global_out_dir+"DOS1_smearing.dat";
+    ofstream ofsdos(dosfile.c_str());
+    int ndos = int((emax-emin) / de)+1;
+    double *dos = new double [ndos];
+    ModuleBase::GlobalFunc::ZEROS(dos,ndos);
+    stoiter.stofunc.sigma = sigmain / ModuleBase::Ry_to_eV;
+    double sum = 0; 
+    double error = 0;
+    ofsdos<<setw(8)<<"## E(eV) "<<setw(20)<<"dos(eV^-1)"<<setw(20)<<"sum"<<setw(20)<<"Error(eV^-1)"<<endl;
+	for(int ie = 0; ie < ndos; ++ie)
+	{
+		stoiter.stofunc.targ_e = (emin + ie * de) / ModuleBase::Ry_to_eV;
+        che.calcoef_real(&stoiter.stofunc, &Sto_Func<double>::ngauss);
+        double KS_dos = 0;
+		double sto_dos = BlasConnector::dot(nche_dos,che.coef_real,1,spolyv,1);
+        if(GlobalV::NBANDS > 0)
+        {
+            for(int ik = 0; ik < nk; ++ik)
+            {
+                double *en=&(this->pelec->ekb(ik, 0));
+                for(int ib = 0; ib < GlobalV::NBANDS; ++ib)
+                {
+                    KS_dos += stoiter.stofunc.gauss(en[ib]) * GlobalC::kv.wk[ik] / 2 ;
+                }
+            }
+        }
+        KS_dos /= GlobalV::NPROC_IN_POOL;
+#ifdef __MPI
+	    MPI_Allreduce(MPI_IN_PLACE, &KS_dos, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, &sto_dos, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
+#endif
+        double tmpre = che.coef_real[nche_dos-1] * spolyv[nche_dos-1];
+#ifdef __MPI
+        MPI_Allreduce(MPI_IN_PLACE, &tmpre, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
+#endif
+        if(error < tmpre) error = tmpre;
+        dos[ie] = (KS_dos + sto_dos) / ModuleBase::Ry_to_eV;
+        sum += dos[ie];
+		ofsdos <<setw(8)<< emin + ie * de <<setw(20)<<dos[ie]<<setw(20)<<sum * de <<setw(20) <<error <<endl;
+	}
+    cout<<scientific<<"DOS max Chebyshev Error: "<<error<<endl;
+    delete[] dos;
+    delete[] spolyv;
+    return;
 }
 
 }
