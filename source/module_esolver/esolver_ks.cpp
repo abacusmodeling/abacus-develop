@@ -55,6 +55,10 @@ namespace ModuleESolver
         {
             XC_Functional::set_xc_type("pbe");
         }
+        else if (ucell.atoms[0].xc_func == "SCAN0")
+        {
+            XC_Functional::set_xc_type("scan");
+        }
         else
         {
             XC_Functional::set_xc_type(ucell.atoms[0].xc_func);

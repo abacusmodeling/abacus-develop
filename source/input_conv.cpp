@@ -307,7 +307,7 @@ void Input_Conv::Convert(void)
         if (GlobalV::MY_RANK == 0)
             system(command0.c_str());
         if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse"
-            || INPUT.dft_functional == "opt_orb")
+            || INPUT.dft_functional == "opt_orb" || INPUT.dft_functional == "scan0" )
         {
             GlobalC::restart.info_save.save_charge = true;
             GlobalC::restart.info_save.save_H = true;
@@ -321,7 +321,7 @@ void Input_Conv::Convert(void)
     {
         GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
         if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse"
-            || INPUT.dft_functional == "opt_orb")
+            || INPUT.dft_functional == "opt_orb" || INPUT.dft_functional == "scan0")
         {
             GlobalC::restart.info_load.load_charge = true;
         }
@@ -346,6 +346,10 @@ void Input_Conv::Convert(void)
     {
         GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
     }
+    else if (INPUT.dft_functional == "scan0")
+    {
+        GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::SCAN0;
+    }
     else if (INPUT.dft_functional == "hse")
     {
         GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
@@ -362,6 +366,7 @@ void Input_Conv::Convert(void)
     if (GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
     {
         GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
+        XC_Functional::get_hybrid_alpha(INPUT.exx_hybrid_alpha);
         GlobalC::exx_global.info.hse_omega = INPUT.exx_hse_omega;
         GlobalC::exx_global.info.separate_loop = INPUT.exx_separate_loop;
         GlobalC::exx_global.info.hybrid_step = INPUT.exx_hybrid_step;
@@ -443,6 +448,10 @@ void Input_Conv::Convert(void)
     hsolver::HSolverLCAO::out_mat_hs = INPUT.out_mat_hs;
     hsolver::HSolverLCAO::out_mat_hsR = INPUT.out_mat_hs2; // LiuXh add 2019-07-16
     elecstate::ElecStateLCAO::out_wfc_lcao = INPUT.out_wfc_lcao;
+    if(INPUT.calculation == "nscf" && !INPUT.towannier90 && !INPUT.berry_phase)
+    {
+        elecstate::ElecStateLCAO::need_psi_grid = false;
+    }
 #endif
 
     GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;

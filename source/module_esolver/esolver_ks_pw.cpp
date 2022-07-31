@@ -128,6 +128,7 @@ namespace ModuleESolver
         {
         case Exx_Global::Hybrid_Type::HF:
         case Exx_Global::Hybrid_Type::PBE0:
+        case Exx_Global::Hybrid_Type::SCAN0:
         case Exx_Global::Hybrid_Type::HSE:
             GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, GlobalC::wfcpw, GlobalC::rhopw, &GlobalC::ucell);
             break;

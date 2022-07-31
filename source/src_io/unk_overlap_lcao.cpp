@@ -723,7 +723,8 @@ void unkOverlap_lcao::prepare_midmatrix_pblas(const int ik_L, const int ik_R, co
 
 std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int ik_R,
     const ModuleBase::Vector3<double> dk, const int occ_bands,
-    Local_Orbital_wfc &lowf)
+    Local_Orbital_wfc &lowf,
+	const psi::Psi<std::complex<double>>* psi_in)
 {
 	const std::complex<double> minus = std::complex<double>(-1.0,0.0);
 	std::complex<double> det = std::complex<double>(1.0,0.0);
@@ -743,14 +744,14 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	int one = 1;
 #ifdef __MPI
 	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha[0],
-			lowf.wfc_k.at(ik_L).c,&one,&one,lowf.ParaV->desc,
+			&psi_in[0](ik_L, 0, 0), &one, &one, lowf.ParaV->desc,
 							  midmatrix,&one,&one,lowf.ParaV->desc,
 													   &beta[0],
 							   C_matrix,&one,&one,lowf.ParaV->desc);
 							   
 	pzgemm_(&transb,&transb,&occBands,&occBands,&nlocal,&alpha[0],
 								 C_matrix,&one,&one,lowf.ParaV->desc,
-			lowf.wfc_k.at(ik_R).c,&one,&one,lowf.ParaV->desc,
+			&psi_in[0](ik_R, 0, 0), &one, &one, lowf.ParaV->desc,
 														 &beta[0],
 							   out_matrix,&one,&one,lowf.ParaV->desc);	
 
