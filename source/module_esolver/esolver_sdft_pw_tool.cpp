@@ -28,6 +28,69 @@ void parallelks(int &ksbandper, int &startband)
     }
 }
 
+void ESolver_SDFT_PW::check_che(const int nche_in)
+{
+    //------------------------------
+    //      Convergence test
+    //------------------------------
+    bool change = false;
+    const int nk = GlobalC::kv.nks;
+    ModuleBase::Chebyshev<double> chetest(nche_in);
+    Stochastic_Iter& stoiter = ((hsolver::HSolverPW_SDFT*)phsol)->stoiter;
+    Stochastic_hchi& stohchi = stoiter.stohchi;
+    int ntest = 2;
+    for (int ik = 0;ik < nk; ++ik)
+	{
+        this->phami->updateHk(ik);
+        stoiter.stohchi.current_ik = ik;
+        const int npw = GlobalC::kv.ngk[ik];
+        std::complex<double> *pchi = new std::complex<double> [npw];
+        for(int i = 0; i < ntest ; ++i)
+        {
+            for(int ig = 0; ig < npw; ++ig)
+            {
+                double rr = std::rand()/double(RAND_MAX);
+                double arg = std::rand()/double(RAND_MAX);
+                pchi[ig] = std::complex<double>(rr * cos(arg), rr * sin(arg));
+            }
+            while(1)
+            {
+                bool converge;
+                converge= chetest.checkconverge(&stohchi, &Stochastic_hchi::hchi_reciprocal, 
+	        	    	pchi, npw, stohchi.Emax, stohchi.Emin, 5.0);
+                
+                if(!converge)
+	        	{
+                    change = true;
+	        	}
+                else
+	        	{
+                    break;
+	        	}
+            }
+        }
+        delete[] pchi;
+
+        if(ik == nk-1)
+        {
+            stoiter.stofunc.Emax = stohchi.Emax;
+            stoiter.stofunc.Emin = stohchi.Emin;
+#ifdef __MPI
+            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
+#endif
+            stohchi.Emin = stoiter.stofunc.Emin;
+            stohchi.Emax = stoiter.stofunc.Emax;
+            if(change)
+	        {
+	        	GlobalV::ofs_running<<"New Emax "<<stohchi.Emax<<" ; new Emin "<<stohchi.Emin<<std::endl;
+	        }
+            change = false;
+        }
+    }
+}
+
 void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double wcut, 
                           const double dw_in, const int times)
 {
@@ -52,85 +115,6 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
     Stochastic_hchi& stohchi = stoiter.stohchi;
     const int nk = GlobalC::kv.nks;
     const int ndim = 3;
-
-    //------------------------------
-    //      Convergence test
-    //------------------------------
-    bool change = false;
-    for (int ik = 0;ik < nk; ++ik)
-	{
-        int ntest = 2;
-        if (this->stowf.nchip[ik] < ntest) 
-	    {
-	    	ntest = this->stowf.nchip[ik];
-	    }
-
-        this->phami->updateHk(ik);
-        stoiter.stohchi.current_ik = ik;
-        const int npw = GlobalC::kv.ngk[ik];
-
-        complex<double> *pchi = new complex<double> [npw*4*ntest];
-        //\sqrt{f}|\chi>
-        for(int i = 0 ; i < ntest ; ++i)
-            for(int ig = 0 ; ig < npw ; ++ig)
-                pchi[i*npw+ig] = this->stowf.shchi[ik](i,ig);
-        //(G+k)\sqrt{f}|\chi>
-        for(int id = 0 ; id < ndim ; ++id)
-        {
-            for(int i = 0 ; i < ntest ; ++i)
-            {
-                for(int ig = 0 ; ig < npw ; ++ig)
-                {
-                    ModuleBase::Vector3<double> v3 = GlobalC::wfcpw->getgpluskcar(ik,i);
-                    pchi[((id+1)*ntest + i)*npw + ig] = this->stowf.shchi[ik](i,ig)*v3[id] * tpiba;
-                }
-            }
-        }
-        for(int i = 0; i < ntest * 4 ; ++i)
-        {
-            while(1)
-            {
-                bool converge;
-                if(this->nche_sto > nche_KG)
-                {
-                    converge= che.checkconverge(&stohchi, &Stochastic_hchi::hchi_reciprocal, 
-	        	    	&pchi[i*npw], npw, stohchi.Emax, stohchi.Emin, 5.0);
-                }
-                else
-                {
-                    converge= chet.checkconverge(&stohchi, &Stochastic_hchi::hchi_reciprocal, 
-	        	    	&pchi[i*npw], npw, stohchi.Emax, stohchi.Emin, 5.0);
-                }
-                if(!converge)
-	        	{
-                    change = true;
-	        	}
-                else
-	        	{
-                    break;
-	        	}
-            }
-        }
-
-        if(ik == nk-1)
-        {
-            stoiter.stofunc.Emax = stohchi.Emax;
-            stoiter.stofunc.Emin = stohchi.Emin;
-#ifdef __MPI
-            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
-#endif
-            stohchi.Emin = stoiter.stofunc.Emin;
-            stohchi.Emax = stoiter.stofunc.Emax;
-            if(change)
-	        {
-	        	GlobalV::ofs_running<<"New Emax "<<stohchi.Emax<<" ; new Emin "<<stohchi.Emin<<std::endl;
-	        }
-            change = false;
-        }
-        delete[] pchi;
-    }
 
     //------------------------------------------------------------------
     //                    Calculate
@@ -417,77 +401,6 @@ void ESolver_SDFT_PW::sKG_new(const int nche_KG, const double fwhmin, const doub
     Stochastic_Iter& stoiter = ((hsolver::HSolverPW_SDFT*)phsol)->stoiter;
     Stochastic_hchi& stohchi = stoiter.stohchi;
     const int nk = GlobalC::kv.nks;
-
-    //------------------------------
-    //      Convergence test
-    //------------------------------
-    bool change = false;
-    for (int ik = 0;ik < nk; ++ik)
-	{
-        int ntest = 2;
-        if (this->stowf.nchip[ik] < ntest) 
-	    {
-	    	ntest = this->stowf.nchip[ik];
-	    }
-
-        this->phami->updateHk(ik);
-        stoiter.stohchi.current_ik = ik;
-        const int npw = GlobalC::kv.ngk[ik];
-
-        for(int j = 0 ; j < 2 ; ++j)
-        {
-        for(int i = 0; i < ntest ; ++i)
-        {
-            std::complex<double> *pchi;
-            if(j==0)
-            {
-                if(GlobalV::NBANDS > 0)
-                    pchi = &stowf.chiortho[ik](i,0);
-                else
-                    pchi = &stowf.chi0[ik](i,0);
-            }
-            else
-            {
-                if(this->nche_sto > nche_KG) break;
-                pchi = &stowf.shchi[ik](i,0);
-            }
-            
-            while(1)
-            {
-                bool converge;
-                converge= chet.checkconverge(&stohchi, &Stochastic_hchi::hchi_reciprocal, 
-	        	    	pchi, npw, stohchi.Emax, stohchi.Emin, 5.0);
-                
-                if(!converge)
-	        	{
-                    change = true;
-	        	}
-                else
-	        	{
-                    break;
-	        	}
-            }
-        }
-        }
-
-        if(ik == nk-1)
-        {
-            stoiter.stofunc.Emax = stohchi.Emax;
-            stoiter.stofunc.Emin = stohchi.Emin;
-#ifdef __MPI
-            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
-#endif
-            stohchi.Emin = stoiter.stofunc.Emin;
-            stohchi.Emax = stoiter.stofunc.Emax;
-            if(change)
-	        {
-	        	GlobalV::ofs_running<<"New Emax "<<stohchi.Emax<<" ; new Emin "<<stohchi.Emin<<std::endl;
-	        }
-            change = false;
-        }
-    }
 
     //------------------------------------------------------------------
     //                    Calculate

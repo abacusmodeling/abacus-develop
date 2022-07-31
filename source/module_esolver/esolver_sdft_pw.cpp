@@ -154,6 +154,10 @@ void ESolver_SDFT_PW::postprocess()
         hsolver::DiagoIterAssist::need_subspace = false;
         this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, iter, GlobalV::KS_SOLVER, true);
     }
+    int nche_test = 0;
+    if(INPUT.cal_cond)  nche_test = std::max(nche_test, INPUT.cond_nche);
+    check_che(nche_test);
+    
     if(INPUT.cal_cond)
 	{
         this->sKG_new(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);

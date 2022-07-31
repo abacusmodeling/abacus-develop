@@ -36,6 +36,7 @@ public:
 
 private:
     int nche_sto; //norder of Chebyshev
+    void check_che(const int nche_in);
 
 
 };
