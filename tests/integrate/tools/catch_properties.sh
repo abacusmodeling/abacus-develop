@@ -31,6 +31,7 @@ has_stress=`grep -En '(^|[[:space:]])cal_stress($|[[:space:]])' INPUT | awk '{pr
 has_dftu=`grep -En '(^|[[:space:]])dft_plus_u($|[[:space:]])' INPUT | awk '{print $2}'`
 has_band=`grep -En '(^|[[:space:]])out_band($|[[:space:]])' INPUT | awk '{print $2}'`
 has_dos=`grep -En '(^|[[:space:]])out_dos($|[[:space:]])' INPUT | awk '{print $2}'`
+has_cond=`grep -En '(^|[[:space:]])cal_cond($|[[:space:]])' INPUT | awk '{print $2}'`
 has_hs=`grep -En '(^|[[:space:]])out_mat_hs($|[[:space:]])' INPUT | awk '{print $2}'`
 has_hs2=`grep -En '(^|[[:space:]])out_mat_hs2($|[[:space:]])' INPUT | awk '{print $2}'`
 has_r=`grep -En '(^|[[:space:]])out_mat_r($|[[:space:]])' INPUT | awk '{print $2}'`
@@ -102,6 +103,14 @@ fi
 #	smearing_dos=`sum_file OUT.autotest/DOS1_smearing.dat`
 #	echo "totaldossmearing $smearing_dos" >> $1
 
+#echo Onsager coefficiency
+if ! test -z "$has_cond"  && [  $has_cond -eq 1 ]; then
+	onref=refOnsager.txt
+	oncal=Onsager.txt
+	python3 ../tools/CompareFile.py $onref $oncal 2
+    echo "CompareH_Failed $?" >>$1
+	rm -f je-je.txt Chebycoef
+fi
 
 #echo total_dos
 #echo $has_band

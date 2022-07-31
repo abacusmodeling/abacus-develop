@@ -545,6 +545,10 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::postprocess()
     {
+        if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
+	    {
+	    	GlobalC::en.print_occ();
+	    }
         // compute density of states
         GlobalC::en.perform_dos_pw();
 
@@ -597,6 +601,11 @@ namespace ModuleESolver
         {
             Write_Wfc_Realspace::write_wfc_realspace_1(this->psi[0], "wfc_realspace", true);
         }	
+
+        if(INPUT.cal_cond)
+	    {
+            this->KG(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
+        }
     }
 
     void ESolver_KS_PW::hamilt2estates(const double ethr)

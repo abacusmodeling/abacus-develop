@@ -73,14 +73,17 @@ void ESolver_SDFT_PW::afterscf()
             GlobalC::wf.wg(ik, ib) = this->pelec->wg(ik, ib);
         }
     }
-	for(int is=0; is<GlobalV::NSPIN; is++)
+    if(GlobalC::CHR.out_chg > 0)
     {
-        std::stringstream ssc;
-        std::stringstream ss1;
-        ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
-		ss1 << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG.cube";
-        GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
-	    GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
+	    for(int is=0; is<GlobalV::NSPIN; is++)
+        {
+            std::stringstream ssc;
+            std::stringstream ss1;
+            ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
+	    	ss1 << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG.cube";
+            GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
+	        GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
+        }
     }
     if(this->conv_elec)
     {
@@ -139,6 +142,8 @@ void ESolver_SDFT_PW::cal_Stress(ModuleBase::matrix &stress)
 }
 void ESolver_SDFT_PW::postprocess()
 {
+    GlobalC::en.print_occ();
+
     ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
     if(this->maxniter == 0)
     {
@@ -151,7 +156,7 @@ void ESolver_SDFT_PW::postprocess()
     }
     if(INPUT.cal_cond)
 	{
-        this->sKG(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
+        this->sKG_new(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
     }
 }
 
