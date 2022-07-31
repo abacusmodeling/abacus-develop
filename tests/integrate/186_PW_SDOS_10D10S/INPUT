@@ -3,8 +3,8 @@ INPUT_PARAMETERS
 suffix			autotest
 calculation     sto-scf
 ntype			1
-nbands			0
-nbands_sto		0
+nbands			10
+nbands_sto		10
 nche_sto		120
 emax_sto		0
 emin_sto		0
@@ -20,6 +20,7 @@ scf_thr			1e-6
 scf_nmax	    20
 
 
+
 #Parameters (3.Basis)
 basis_type		pw
 gamma_only		1
@@ -32,9 +33,10 @@ smearing_sigma			0.6
 mixing_type		broyden
 mixing_beta		0.4
 
-cal_cond      1
-cond_nche  18
-cond_fwhm   8
-cond_wcut        20
-cond_dw          0.02
-cond_wenlarge    9
+out_dos          1
+dos_emin_ev      -20
+dos_emax_ev		 100
+dos_edelta_ev    0.1
+dos_sigma        4
+dos_nche         240
+

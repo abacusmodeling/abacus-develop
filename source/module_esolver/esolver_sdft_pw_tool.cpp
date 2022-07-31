@@ -466,62 +466,6 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
     Stochastic_Iter& stoiter = ((hsolver::HSolverPW_SDFT*)phsol)->stoiter;
     Stochastic_hchi& stohchi = stoiter.stohchi;
     const int npwx = GlobalC::wf.npwx;
-    //------------------------------
-    //      Convergence test
-    //------------------------------
-    bool change = false;
-    for (int ik = 0;ik < nk;ik++)
-	{
-        int ntest = 2;
-        if (this->stowf.nchip[ik] < ntest) 
-	    {
-	    	ntest = this->stowf.nchip[ik];
-	    }
-
-        this->phami->updateHk(ik);
-        stohchi.current_ik = ik;
-        const int npw = GlobalC::kv.ngk[ik];
-
-        for(int i = 0 ; i < ntest ; ++i)
-        {
-            while(1)
-            {
-                complex<double> *pchi;
-                if(GlobalV::NBANDS > 0)
-                    pchi = &stowf.chiortho[ik](i,0);
-                else
-                    pchi = &stowf.chi0[ik](i,0);
-                bool converge;
-                converge =  che.checkconverge(&stohchi, &Stochastic_hchi::hchi_reciprocal, 
-	        	    	pchi, npw, stohchi.Emax, stohchi.Emin, 5.0);
-                if(!converge)
-	        	{
-                    change = true;
-	        	}
-                else
-	        	{
-                    break;
-	        	}
-            }
-        }
-        if(ik == nk-1)
-        {
-            stoiter.stofunc.Emax = stohchi.Emax;
-            stoiter.stofunc.Emin = stohchi.Emin;
-#ifdef __MPI
-            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &stoiter.stofunc.Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
-#endif
-            stohchi.Emin = stoiter.stofunc.Emin;
-            stohchi.Emax = stoiter.stofunc.Emax;
-            if(change)
-	        {
-	        	GlobalV::ofs_running<<"New Emax "<<stohchi.Emax<<" ; new Emin "<<stohchi.Emin<<std::endl;
-	        }
-            change = false;
-        }
-    }
 
     double * spolyv = new double [nche_dos];
     ModuleBase::GlobalFunc::ZEROS(spolyv, nche_dos);
