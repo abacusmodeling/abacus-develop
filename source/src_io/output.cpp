@@ -14,12 +14,12 @@ void output::printrm(std::ofstream &ofs,const std::string &s, const ModuleBase::
         for (int j = 0;j < b2;j++)
         {
             if (j % 8 == 0) ofs << "\n ";
-			
-			if ( abs(m(i,j)) > limit) 
+
+			if (std::abs(m(i,j)) > limit)
 			{
 				ofs << std::setprecision(6) << std::setw(12) << m(i,j);
             }
-			else 
+			else
 			{
 				ofs << std::setw(12) << "0";
 			}
@@ -43,8 +43,8 @@ void output::printrm(const std::string &s, const ModuleBase::matrix &m, const do
         {
 //            if (j % 4 == 0) std::cout << "\n ";
 			if (j % 8 == 0) std::cout << "\n ";
-//            if ( abs(m(i,j)) > limit) std::cout << std::setprecision(15) << std::setw(20) << m(i,j);
-            if ( abs(m(i,j)) > limit) std::cout << std::setprecision(6) << std::setw(12) << m(i,j);
+//            if (std::abs(m(i,j)) > limit) std::cout << std::setprecision(15) << std::setw(20) << m(i,j);
+            if (std::abs(m(i,j)) > limit) std::cout << std::setprecision(6) << std::setw(12) << m(i,j);
 //            else std::cout<<std::setw(20)<<"0";
             else std::cout<<std::setw(12)<<"0";
         }
@@ -68,7 +68,7 @@ void output::printcm_norm(std::ofstream &ofs, const std::string &s, const Module
         {
             if (j % 8 == 0) ofs << "\n ";
             double norm = ( conj( m(i, j) ) * m(i, j) ).real();
-            if ( abs(norm) > limit) ofs<< std::setw(12) << sqrt(norm);
+            if (std::abs(norm) > limit) ofs<< std::setw(12) << sqrt(norm);
             else ofs<<std::setw(12)<<"0";
         }
     }
@@ -88,7 +88,7 @@ void output::printcm_norm(const std::string &s, const ModuleBase::ComplexMatrix 
         {
             if (j % 8 == 0) std::cout << "\n ";
             double norm = ( conj( m(i, j) ) * m(i, j) ).real();
-            if ( abs(norm) > limit) std::cout<< std::setw(12) << sqrt(norm);
+            if (std::abs(norm) > limit) std::cout<< std::setw(12) << sqrt(norm);
             else std::cout<<std::setw(12)<<"0";
         }
     }
@@ -150,7 +150,7 @@ void output::printcm_real_limit_hermit(const std::string &s, const ModuleBase::C
         {
             if (j % 8 == 0) std::cout << "\n ";
             const double x = m(i,j).real();
-            if ( abs(x) < limit || i < j) std::cout<<std::setw(12)<<"0";
+            if (std::abs(x) < limit || i < j) std::cout<<std::setw(12)<<"0";
             else std::cout << std::setw(12) << x;
         }
     }
@@ -171,7 +171,7 @@ void output::printcm_real(const std::string &s, const ModuleBase::ComplexMatrix 
         {
             if (j % 8 == 0) std::cout << "\n ";
             const double x = m(i,j).real();
-            if ( abs(x) < limit ) std::cout<<std::setw(12)<<"0";
+            if (std::abs(x) < limit ) std::cout<<std::setw(12)<<"0";
             else std::cout << std::setw(12) << x;
         }
     }
@@ -194,7 +194,7 @@ void output::printcm_imag(const std::string &s, const ModuleBase::ComplexMatrix 
         {
             if (j % 8 == 0) std::cout << "\n ";
             const double x = m(i,j).imag();
-            if ( abs(x) < limit ) std::cout<<std::setw(12)<<"0";
+            if (std::abs(x) < limit ) std::cout<<std::setw(12)<<"0";
             else std::cout << std::setw(12) << x;
         }
     }
@@ -256,8 +256,8 @@ void output::printM3(std::ofstream &ofs,const std::string &description, const Mo
 {
     ofs << " " << description << std::endl;
 	ofs << std::setiosflags(std::ios::showpos);
-    ofs << " " << std::setw(20) << m.e11 << std::setw(20) << m.e12 << std::setw(20) << m.e13 
-	<< "\n " << std::setw(20) << m.e21 << std::setw(20) << m.e22 << std::setw(20) << m.e23 
+    ofs << " " << std::setw(20) << m.e11 << std::setw(20) << m.e12 << std::setw(20) << m.e13
+	<< "\n " << std::setw(20) << m.e21 << std::setw(20) << m.e22 << std::setw(20) << m.e23
 	<< "\n " << std::setw(20) << m.e31 << std::setw(20) << m.e32 << std::setw(20) << m.e33 << std::endl;
 	ofs << std::resetiosflags(std::ios::showpos);
     return;
