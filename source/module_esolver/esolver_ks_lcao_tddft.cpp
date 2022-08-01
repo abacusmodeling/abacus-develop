@@ -405,6 +405,23 @@ void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
         if (istep > 1)
             this->cal_edm_tddft();
     } //*/
+
+    if (this->conv_elec){
+    GlobalV::ofs_running
+            << "------------------------------------------------------------------------------------------------"
+            << endl;
+        GlobalV::ofs_running << "Eii : ";
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        {
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+            {
+                GlobalV::ofs_running << this->pelec_td->ekb(ik, ib) << " ";
+            }
+        }
+        GlobalV::ofs_running << endl;
+        GlobalV::ofs_running
+            << "------------------------------------------------------------------------------------------------"
+            << endl;}
 }
 
 void ESolver_KS_LCAO_TDDFT::afterscf()
