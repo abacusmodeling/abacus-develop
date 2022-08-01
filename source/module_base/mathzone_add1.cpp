@@ -135,8 +135,7 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 	const double * const r,
 	const int& rsize,
 	double * const y,
-	double * const dy,
-	double * const ddy
+	double * const dy
 )
 {	
 	ModuleBase::timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");
@@ -172,8 +171,8 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 		dy[m] = dy_tmp;
 		const double y_tmp = a * rad_f[klo] + b * rad_f[khi] + ((a*a*a - a) * y2[klo] + (b*b*b - b) * y2[khi]) * (h*h) / 6.0;
 		y[m] = y_tmp;
-		const double ddy_tmp = a * y2[klo] + b * y2 [khi];
-		ddy[m] = ddy_tmp;
+		//const double ddy_tmp = a * y2[klo] + b * y2 [khi];
+		//ddy[m] = ddy_tmp;
 	}
 
 	ModuleBase::timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");

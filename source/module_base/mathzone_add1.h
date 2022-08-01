@@ -57,8 +57,7 @@ class Mathzone_Add1
                                            const double* const r,
                                            const int& rsize,
                                            double* const y,
-                                           double* const dy,
-                                           double* const ddy);
+                                           double* const dy);
 
     /**
      * @brief "spline like interpolation" of a uniform
