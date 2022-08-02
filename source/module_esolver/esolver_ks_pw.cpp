@@ -546,10 +546,8 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::postprocess()
     {
-        if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
-	    {
-	    	GlobalC::en.print_occ();
-	    }
+        //print occupation in istate.info
+	    GlobalC::en.print_occ();
         // compute density of states
         GlobalC::en.perform_dos_pw();
 
@@ -638,12 +636,14 @@ namespace ModuleESolver
         GlobalV::ofs_running << " PW_DIAG_THR  = "<< diag_ethr << std::endl;
 
         this->hamilt2estates(diag_ethr);
+        this->pelec->calculate_weights();
 
         for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
         {
             for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
             {
                 GlobalC::wf.ekb[ik][ib] = this->pelec->ekb(ik, ib);
+                GlobalC::wf.wg(ik, ib) = this->pelec->wg(ik, ib);
             }
         }
 
