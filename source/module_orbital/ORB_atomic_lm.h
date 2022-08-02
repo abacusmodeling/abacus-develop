@@ -28,6 +28,7 @@ class Numerical_Orbital_Lm
 
 	std::vector<double> psi_uniform;// mohan add 2009-5-10
 	std::vector<double> dpsi_uniform; //liaochen add 2010/5/11
+	std::vector<double> ddpsi_uniform; //wenfei add 2022/7/13
 	
 	int nr_uniform;// mohan add 2009-5-10
 	double dr_uniform;// mohan add 2009-5-10
