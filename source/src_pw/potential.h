@@ -13,8 +13,8 @@ class Potential
     friend class Hamilt_PW;
     friend class Electrons;
     friend class ELEC_scf;
-    friend class ModuleESolver::ESolver_KS_LCAO;
-	friend class ModuleESolver::ESolver_KS_LCAO_TDDFT;
+    //friend class ModuleESolver::ESolver_KS_LCAO;
+    //friend class ModuleESolver::ESolver_KS_LCAO_TDDFT;
 
     // constructor and deconstructor
     Potential();
@@ -36,10 +36,10 @@ class Potential
     ModuleBase::matrix vr_eff;
     ModuleBase::matrix vnew;
 
-    ModuleBase::matrix vofk; //kinetic energy density, for meta-GGA; wenfei 2021-07-28
+    ModuleBase::matrix vofk; // kinetic energy density, for meta-GGA; wenfei 2021-07-28
 
     double *vr_eff1;
-	double *vofk_eff1;
+    double *vofk_eff1;
 #ifdef __CUDA
     double *d_vr_eff1;
 #endif
