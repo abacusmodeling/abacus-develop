@@ -623,7 +623,8 @@ namespace ModuleESolver
         //========================================
         // diagonalization of the KS hamiltonian
         // =======================================
-        double diag_ethr = this->phsol->set_diagethr(1, 1, drho);
+        double diag_ethr = std::max(1e-13, 0.1*std::min(1e-2,GlobalV::SCF_THR / this->pelec->charge->nelec));
+        GlobalV::ofs_running << " DIAG_ETHR  = "<< diag_ethr << std::endl;
 
         this->hamilt2estates(diag_ethr);
 
