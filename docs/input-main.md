@@ -8,7 +8,7 @@
 
 - [System variables](#system-variables)
 
-    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline) | [kspacing](#kspacing)
+    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline) | [kspacing](#kspacing) | [min_dist_fact](#min_dist_fact)
 
 - [Variables related to input files](#variables-related-to-input-files)
 
@@ -300,6 +300,12 @@ This part of variables are used to control general system parameters.
 - **Type**: double
 - **Descrption**: Set the smallest allowed spacing between k points, unit in 1/bohr. It should be larger than 0.0, and suggest smaller than 0.25. When you have set this value > 0.0, then the KPT file is unneccessary, and the number of K points nk_i = max(1,int(|b_i|/KSPACING)+1), where b_i is the reciprocal lattice vector. The default value 0.0 means that ABACUS will read the applied KPT file. Notice: if gamma_only is set to be true, kspacing is invalid.
 - **Default**: 0.0
+
+#### min_dist_fact
+
+- **Type**: double
+- **Descrption**: a factor related to the allowed minimum distance between two atoms. At the begining, ABACUS will check the structure, and if there has the distance of two atoms is shorter than min_dist_fact*(standard covalent bond length), we think this structure is unreasonable. If you want to calculate some structures in extreme condition like high pressure, you should set this parameter as a smaller value.
+- **Default**: 0.8
 
 ### Variables related to input files
 

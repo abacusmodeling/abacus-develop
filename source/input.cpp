@@ -151,6 +151,7 @@ void Input::Default(void)
     NNKP = "seedname.nnkp";
     wannier_spin = "up";
     kspacing = 0.0;
+    min_dist_fact = 0.8;
     //----------------------------------------------------------
     // electrons / spin
     //----------------------------------------------------------
@@ -547,6 +548,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("kspacing", word) == 0)
         {
             read_value(ifs, kspacing);
+        }
+        else if (strcmp("min_dist_fact", word) == 0)
+        {
+            read_value(ifs, min_dist_fact);
         }
         else if (strcmp("nbands_istate", word) == 0) // number of atom bands
         {
@@ -1912,6 +1917,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(nbands_sto);
     Parallel_Common::bcast_int(nbands_istate);
     Parallel_Common::bcast_double(kspacing);
+    Parallel_Common::bcast_double(min_dist_fact);
     Parallel_Common::bcast_int(nche_sto);
     Parallel_Common::bcast_int(seed_sto);
     Parallel_Common::bcast_int(pw_seed);

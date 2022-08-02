@@ -53,6 +53,7 @@ void Input_Conv::Convert(void)
     GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
 
     GlobalV::KSPACING = INPUT.kspacing;
+    GlobalV::MIN_DIST_FACT = INPUT.kspacing;
     GlobalV::NBANDS = INPUT.nbands;
     GlobalC::wf.pw_seed = INPUT.pw_seed;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
