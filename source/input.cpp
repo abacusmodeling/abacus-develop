@@ -2353,7 +2353,7 @@ void Input::Check(void)
         out_stru = 0;
 
         // if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
-        if (basis_type == "pw") // xiaohui add 2013-09-01. Attention! maybe there is some problem
+        if (basis_type == "pw" && calculation == "get_S") // xiaohui add 2013-09-01. Attention! maybe there is some problem
         {
             if (pw_diag_thr > 1.0e-3)
             {

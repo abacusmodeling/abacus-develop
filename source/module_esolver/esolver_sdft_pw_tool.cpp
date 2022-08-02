@@ -233,12 +233,10 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
             {
                 for(int ig = 0; ig < npw ; ++ig)
                 {
-                    std::complex<double> psiig = psi0(ib,ig);
-                    std::complex<double> sfpsiig = sfpsi0(ib,ig);
                     double gplusk_a = GlobalC::wfcpw->getgpluskcar(ik,ig)[id];
                     const int idib = id * totbands_per + ib;
-                    j1psi(idib,ig) = tpiba * gplusk_a * psiig;
-                    j1sfpsi(idib,ig) = tpiba * gplusk_a * sfpsiig;
+                    j1psi(idib,ig) = tpiba * gplusk_a * psi0(ib,ig);
+                    j1sfpsi(idib,ig) = tpiba * gplusk_a * sfpsi0(ib,ig);
                 }
             }
         }
@@ -299,12 +297,10 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
             {
                 for(int ig = 0; ig < npw ; ++ig)
                 {
-                    std::complex<double> hpsiig = hpsi0(ib,ig);
-                    std::complex<double> hsfpsiig = hsfpsi0(ib,ig);
                     double gplusk_a = GlobalC::wfcpw->getgpluskcar(ik,ig)[id];
                     const int idib = id * totbands_per + ib;
-                    j2psi(0,idib,ig) = (j2psi(0,idib,ig) + tpiba * gplusk_a * hpsiig)/2.0 - mu * j1psi(0,idib,ig);
-                    j2sfpsi(0,idib,ig) = (j2sfpsi(0,idib,ig) + tpiba * gplusk_a * hsfpsiig)/2.0 - mu * j1sfpsi(0,idib,ig);
+                    j2psi(0,idib,ig) = (j2psi(0,idib,ig) + tpiba * gplusk_a * hpsi0(ib,ig))/2.0 - mu * j1psi(0,idib,ig);
+                    j2sfpsi(0,idib,ig) = (j2sfpsi(0,idib,ig) + tpiba * gplusk_a * hsfpsi0(ib,ig))/2.0 - mu * j1sfpsi(0,idib,ig);
                 }
             }
         }
