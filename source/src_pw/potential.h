@@ -6,8 +6,6 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "../module_pw/pw_basis.h"
-#include "module_esolver/esolver_ks_lcao.h"
-#include "module_esolver/esolver_ks_lcao_tddft.h"
 
 class Potential
 {

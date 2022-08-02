@@ -49,7 +49,7 @@ void ElecStateLCAO_TDDFT::psiToRho_td(const psi::Psi<std::complex<double>>& psi)
             {
                 for (int iw = 0; iw < GlobalV::NLOCAL; iw++)
                 {
-                    this->lowf->wfc_k_grid[ik][ib][iw] = psi.get_pointer()[ib * GlobalV::NLOCAL + iw];
+                    this->lowf->wfc_k_grid[ik][ib][iw] = psi(ib,iw);
                 }
             }
 #endif
