@@ -37,43 +37,7 @@ void ElecStateLCAO_TDDFT::psiToRho_td(const psi::Psi<std::complex<double>>& psi)
         for (int ik = 0; ik < psi.get_nk(); ik++)
         {
             psi.fix_k(ik);
-#ifdef __MPI
-            this->lowf->wfc_2d_to_grid(ElecStateLCAO::out_wfc_lcao,
-                                       psi.get_pointer(),
-                                       this->lowf->wfc_k_grid[ik],
-                                       ik,
-                                       this->ekb,
-                                       this->wg);
-#else
-            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-            {
-                for (int iw = 0; iw < GlobalV::NLOCAL; iw++)
-                {
-                    this->lowf->wfc_k_grid[ik][ib][iw] = psi(ib,iw);
-                }
-            }
-#endif
-
-            GlobalV::ofs_running << endl;
-
-            // added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...],
-            if (GlobalV::NSPIN == 4)
-            {
-                int row = GlobalC::GridT.lgd;
-                std::vector<std::complex<double>> tmp(row);
-                for (int ib = 0; ib < GlobalV::NBANDS; ib++)
-                {
-                    for (int iw = 0; iw < row / GlobalV::NPOL; iw++)
-                    {
-                        tmp[iw] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL];
-                        tmp[iw + row / GlobalV::NPOL] = this->lowf->wfc_k_grid[ik][ib][iw * GlobalV::NPOL + 1];
-                    }
-                    for (int iw = 0; iw < row; iw++)
-                    {
-                        this->lowf->wfc_k_grid[ik][ib][iw] = tmp[iw];
-                    }
-                }
-            }
+            this->print_psi(psi);
         }
     }
 
