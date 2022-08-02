@@ -18,6 +18,8 @@
 #include "global_variable.h"
 #include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
+#include "blas_connector.h"
+
 namespace ModuleBase
 {
 namespace GlobalFunc
@@ -165,6 +167,23 @@ template<class T>
 static inline void DCOPY( const T &a, T &b, const int &dim)
 {
     for (int i=0; i<dim; ++i) b[i] = a[i];
+}
+
+template<typename T>
+inline void COPYARRAY(const T* a, T* b, const long dim);
+
+template<>
+inline void COPYARRAY(const std::complex<double>* a, std::complex<double>* b, const long dim)
+{
+    const int one = 1;
+    zcopy_(&dim, a, &one, b, &one);
+}
+
+template<>
+inline void COPYARRAY(const double* a, double* b, const long dim)
+{
+    const int one = 1;
+    dcopy_(&dim, a, &one, b, &one);
 }
 
 void BLOCK_HERE( const std::string &description );

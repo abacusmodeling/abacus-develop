@@ -40,41 +40,47 @@ void ORB_gen_tables::gen_tables(
 		orb.get_dR(),	 
 		orb.get_dk());	 
 
-	tbeta.allocate(
-		orb.get_ntype(),
-		orb.get_lmax(),	
-		orb.get_kmesh(), 
-		orb.get_Rmax(),	
-		orb.get_dR(),
-		orb.get_dk());
-
-	//caoyu add 2021-03-18
-	//mohan update 2021-04-22
-	if (deepks_setorb)
+	if(GlobalV::CALCULATION!="get_S")
 	{
-		talpha.allocate(
-			orb.get_ntype(), 
+		tbeta.allocate(
+			orb.get_ntype(),
 			orb.get_lmax(),	
-			orb.get_kmesh(),
-			orb.get_Rmax(),
+			orb.get_kmesh(), 
+			orb.get_Rmax(),	
 			orb.get_dR(),
 			orb.get_dk());
+
+		//caoyu add 2021-03-18
+		//mohan update 2021-04-22
+		if (deepks_setorb)
+		{
+			talpha.allocate(
+				orb.get_ntype(), 
+				orb.get_lmax(),	
+				orb.get_kmesh(),
+				orb.get_Rmax(),
+				orb.get_dR(),
+				orb.get_dk());
+		}
 	}
 
 	// OV: overlap
 	MOT.init_OV_Tpair(orb);
 	MOT.init_OV_Opair(orb);
 
-	// NL: nonlocal
-	tbeta.init_NL_Tpair(orb.Phi, beta_);
-	tbeta.init_NL_Opair(orb, nprojmax, nproj); // add 2009-5-8
-
-	//caoyu add 2021-03-18
-	// DS: Descriptor
-	if (deepks_setorb)
+	if(GlobalV::CALCULATION!="get_S")
 	{
-		talpha.init_DS_Opair(orb);
-		talpha.init_DS_2Lplus1(orb);
+		// NL: nonlocal
+		tbeta.init_NL_Tpair(orb.Phi, beta_);
+		tbeta.init_NL_Opair(orb, nprojmax, nproj); // add 2009-5-8
+
+		//caoyu add 2021-03-18
+		// DS: Descriptor
+		if (deepks_setorb)
+		{
+			talpha.init_DS_Opair(orb);
+			talpha.init_DS_2Lplus1(orb);
+		}
 	}
 
 	//////////////////////////////
@@ -100,15 +106,18 @@ void ORB_gen_tables::gen_tables(
 
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0, orb);
-	tbeta.init_Table_Beta(MOT.pSB, orb.Phi, beta_, nproj); // add 2009-5-8
 
-	//caoyu add 2021-03-18
-	if (deepks_setorb)
-	{
-		talpha.init_Table_Alpha(MOT.pSB, orb);
-		if(GlobalV::deepks_out_unittest) talpha.print_Table_DSR(orb);
+	if(GlobalV::CALCULATION!="get_S")
+	{	
+		tbeta.init_Table_Beta(MOT.pSB, orb.Phi, beta_, nproj); // add 2009-5-8
+
+		//caoyu add 2021-03-18
+		if (deepks_setorb)
+		{
+			talpha.init_Table_Alpha(MOT.pSB, orb);
+			if(GlobalV::deepks_out_unittest) talpha.print_Table_DSR(orb);
+		}
 	}
-
 	/////////////////////////////
 	/// (3) make Gaunt coefficients table
 	/////////////////////////////

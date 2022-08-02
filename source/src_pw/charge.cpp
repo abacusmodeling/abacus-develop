@@ -47,7 +47,7 @@ Charge::~Charge()
 			delete[] rhog[i];
 			delete[] rho_save[i];
 			delete[] rhog_save[i];
-			if(XC_Functional::get_func_type() == 3)
+			if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 			{
 				delete[] kin_r[i];
 				delete[] kin_r_save[i];
@@ -59,7 +59,7 @@ Charge::~Charge()
 		delete[] rhog_save;
     	delete[] rho_core;
 		delete[] rhog_core;
-		if(XC_Functional::get_func_type() == 3)
+		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 		{
 			delete[] kin_r;
 			delete[] kin_r_save;
@@ -90,7 +90,7 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 	rhog = new std::complex<double>*[nspin];
 	rho_save = new double*[nspin];
 	rhog_save = new std::complex<double>*[nspin];
-	if(XC_Functional::get_func_type() == 3)
+	if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 	{
 		kin_r = new double*[nspin];
 		kin_r_save = new double*[nspin];
@@ -106,7 +106,7 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		ModuleBase::GlobalFunc::ZEROS(rhog[is], ngmc);
 		ModuleBase::GlobalFunc::ZEROS(rho_save[is], nrxx);
 		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], ngmc);
-		if(XC_Functional::get_func_type() == 3)
+		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 		{
 			kin_r[is] = new double[nrxx];
 			ModuleBase::GlobalFunc::ZEROS(kin_r[is], nrxx);
@@ -511,7 +511,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in, ModulePW::P
 			rho_in[is][ir] = rho_in[is][ir] / ne_tot * nelec;
 
 	//wenfei 2021-7-29 : initial tau = 3/5 rho^2/3, Thomas-Fermi
-	if(XC_Functional::get_func_type() == 3)
+	if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 	{
 		const double pi = 3.141592653589790;
 		double fact = (3.0/5.0)*pow(3.0*pi*pi,2.0/3.0);
@@ -727,7 +727,7 @@ void Charge::sum_band(void)
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::rhopw->nrxx);
-		if (XC_Functional::get_func_type() == 3)
+		if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 		{
 			ModuleBase::GlobalFunc::ZEROS(kin_r[is], GlobalC::rhopw->nrxx);	
 		}
@@ -826,7 +826,7 @@ void Charge::sum_band_k(void)
 			}
 
 			//kinetic energy density
-			if (XC_Functional::get_func_type() == 3)
+			if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 			{
 				for (int j=0; j<3; j++)
 				{
@@ -964,7 +964,7 @@ void Charge::rho_mpi(void)
 	double *tau_tot;
 	double *tau_tot_aux;
 
-	if(XC_Functional::get_func_type() == 3)
+	if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 	{
     	tau_tmp = new double[GlobalC::rhopw->nrxx];
 	    tau_tot = new double[GlobalC::rhopw->nxyz];
@@ -975,19 +975,19 @@ void Charge::rho_mpi(void)
     for (int is=0; is< GlobalV::NSPIN; is++)
     {
         ModuleBase::GlobalFunc::ZEROS(rho_tot, GlobalC::rhopw->nxyz);
-		if(XC_Functional::get_func_type() == 3) ModuleBase::GlobalFunc::ZEROS(tau_tot, GlobalC::rhopw->nxyz);
+		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5) ModuleBase::GlobalFunc::ZEROS(tau_tot, GlobalC::rhopw->nxyz);
 
 		for (ir=0;ir<GlobalC::rhopw->nrxx;ir++)
 		{
 			rho_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
-			if(XC_Functional::get_func_type() == 3)
+			if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 			{
 				tau_tmp[ir] = this->kin_r[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
 			}
 		}
 
         MPI_Allgatherv(rho_tmp, GlobalC::rhopw->nrxx, MPI_DOUBLE, rho_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
-		if(XC_Functional::get_func_type() == 3)
+		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 		{
         	MPI_Allgatherv(tau_tmp, GlobalC::rhopw->nrxx, MPI_DOUBLE, tau_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
 		}
@@ -996,7 +996,7 @@ void Charge::rho_mpi(void)
         // this is the most complicated part !!
         //=================================================================
         ModuleBase::GlobalFunc::ZEROS(rho_tot_aux, GlobalC::rhopw->nxyz);
-		if(XC_Functional::get_func_type() == 3)
+		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 		{
         	ModuleBase::GlobalFunc::ZEROS(tau_tot_aux, GlobalC::rhopw->nxyz);
 		}
@@ -1039,7 +1039,7 @@ void Charge::rho_mpi(void)
 					// -------------------------------------------------
                     rho_tot_aux[GlobalC::rhopw->nz*ir    + start_z[ip]      + iz]
                       = rho_tot[num_z[ip]*ir + start_z[ip]*ncxy + iz];
-					if(XC_Functional::get_func_type() == 3)
+					if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 					{
                     	tau_tot_aux[GlobalC::rhopw->nz*ir    + start_z[ip]      + iz]
                       	  = tau_tot[num_z[ip]*ir + start_z[ip]*ncxy + iz];
@@ -1053,14 +1053,14 @@ void Charge::rho_mpi(void)
 		if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it temporarily.
 		{
 			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
-			if(XC_Functional::get_func_type() == 3)
+			if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 			{
 				MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
 			}
 		}
 		else
         MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-		if(XC_Functional::get_func_type() == 3)
+		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 		{
    	    	MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		}
@@ -1073,7 +1073,7 @@ void Charge::rho_mpi(void)
             for (iz=0;iz<num_z[GlobalV::RANK_IN_POOL];iz++)
             {
                 this->rho[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = rho_tot[GlobalC::rhopw->nz*ir + GlobalC::rhopw->startz_current + iz ];
-				if(XC_Functional::get_func_type() == 3)
+				if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 				{
                 	this->kin_r[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = tau_tot[GlobalC::rhopw->nz*ir + GlobalC::rhopw->startz_current + iz ];
 				}	
@@ -1084,7 +1084,7 @@ void Charge::rho_mpi(void)
     delete[] rho_tot;
     delete[] rho_tmp;
     
-	if(XC_Functional::get_func_type() == 3)
+	if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
 	{
 		delete[] tau_tot_aux;
     	delete[] tau_tot;
@@ -1106,7 +1106,7 @@ void Charge::save_rho_before_sum_band(void)
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
     	ModuleBase::GlobalFunc::DCOPY( rho[is], rho_save[is], GlobalC::rhopw->nrxx);
-    	if(XC_Functional::get_func_type() == 3) ModuleBase::GlobalFunc::DCOPY( kin_r[is], kin_r_save[is], GlobalC::rhopw->nrxx);
+    	if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5) ModuleBase::GlobalFunc::DCOPY( kin_r[is], kin_r_save[is], GlobalC::rhopw->nrxx);
     }
     return;
 }

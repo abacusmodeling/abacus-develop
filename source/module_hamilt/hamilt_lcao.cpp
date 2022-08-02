@@ -72,7 +72,7 @@ template <> void HamiltLCAO<double>::updateHk(const int ik)
     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
     {
         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
-        if(XC_Functional::get_func_type()==3)
+        if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
         {
             GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(GlobalV::CURRENT_SPIN, ir);
         }
@@ -154,7 +154,7 @@ template <> void HamiltLCAO<std::complex<double>>::updateHk(const int ik)
     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
     {
         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
-        if(XC_Functional::get_func_type()==3)
+        if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
         {
             GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(GlobalV::CURRENT_SPIN, ir);
         }
@@ -177,7 +177,7 @@ template <> void HamiltLCAO<std::complex<double>>::updateHk(const int ik)
         // rememeber to delete the #include	
         if (GlobalV::VL_IN_H)
         {
-            if(XC_Functional::get_func_type()==3)
+            if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
             {
                 Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, 0, Gint_Tools::job_type::vlocal_meta);
                 this->uhm->GK.cal_gint(&inout);
@@ -198,13 +198,13 @@ template <> void HamiltLCAO<std::complex<double>>::updateHk(const int ik)
                     for (int ir = 0; ir < GlobalC::rhopw->nrxx; ir++)
                     {
                         GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
-                        if(XC_Functional::get_func_type()==3)
+                        if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
                         {
                             GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(is, ir);
                         }
                     }
                     
-                    if(XC_Functional::get_func_type()==3)
+                    if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
                     {
                         Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, is, Gint_Tools::job_type::vlocal_meta);
                         this->uhm->GK.cal_gint(&inout);

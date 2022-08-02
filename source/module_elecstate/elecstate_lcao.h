@@ -41,6 +41,7 @@ class ElecStateLCAO : public ElecState
     virtual void print_psi(const psi::Psi<std::complex<double>>& psi_in)override;
 
     static int out_wfc_lcao;
+    static bool need_psi_grid;
 
   private:
     // calculate electronic charge density on grid points or density matrix in real space

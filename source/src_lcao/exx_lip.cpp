@@ -56,7 +56,7 @@ t_phi_cal += my_time(t);
 		for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 			for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
 				sum1[iw_l*GlobalV::NLOCAL+iw_r] = std::complex<double> (0.0,0.0);
-		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type || Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type)
 		{
 			sum2_factor = 0.0;
 			if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
@@ -74,7 +74,7 @@ t_qkg2_exp += my_time(t);
 			{
 				b_cal(ik, iq, ib);
 t_b_cal += my_time(t);
-				if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+				if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type || Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type)
 					if(iq==iq_vecik)
 						sum3_cal(iq,ib);
 t_sum3_cal += my_time(t);
@@ -211,7 +211,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in,  ModulePW::PW_Basi
 
 		sum1 = new std::complex<double> [GlobalV::NLOCAL*GlobalV::NLOCAL];
 
-		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type || Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type)
 			if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 			{
 				b0 = new std::complex<double> [GlobalV::NLOCAL];
@@ -277,7 +277,7 @@ Exx_Lip::~Exx_Lip()
 
 		delete[] sum1;		sum1=NULL;
 
-		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type || Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type)
 			if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 			{
 				delete[] b0;	b0=NULL;
@@ -436,7 +436,7 @@ void Exx_Lip::qkg2_exp(int ik, int iq)
 	for( int ig=0; ig<rho_basis->npw; ++ig)
 	{
 		const double qkg2 = ( (q_pack->kv_ptr->kvec_c[iq] - k_pack->kv_ptr->kvec_c[ik] + rho_basis->gcar[ig]) *(ModuleBase::TWO_PI/ucell_ptr->lat0)).norm2();
-		if( (Exx_Global::Hybrid_Type::PBE0==info.hybrid_type) || (Exx_Global::Hybrid_Type::HF==info.hybrid_type) )
+		if( (Exx_Global::Hybrid_Type::PBE0==info.hybrid_type) || (Exx_Global::Hybrid_Type::HF==info.hybrid_type) || (Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type))
 		{
 			if( abs(qkg2)<1e-10 )
 				recip_qkg2[ig] = 0.0;												// 0 to ignore bb/qkg2 when qkg2==0
@@ -488,7 +488,7 @@ void Exx_Lip::b_cal( int ik, int iq, int ib)
 		}
 		std::complex<double> * const b_w = b+iw*rho_basis->npw;
 		rho_basis->real2recip( porter, b_w);
-		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type || Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type)
 			if((iq==iq_vecik) && (gzero_rank_in_pool==GlobalV::RANK_IN_POOL))							/// need to check while use k_point parallel
 				b0[iw] = b_w[rho_basis->ig_gge0];
 		
@@ -525,7 +525,7 @@ void Exx_Lip::b_sum( int iq, int ib)			// Peize Lin change 2019-04-14
 void Exx_Lip::sum_all(int ik)
 {
 	double sum2_factor_g(0.0);
-	if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+	if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type || Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type)
 		#ifdef __MPI
 		MPI_Reduce( &sum2_factor, &sum2_factor_g, 1, MPI_DOUBLE, MPI_SUM, gzero_rank_in_pool, POOL_WORLD);
 		#endif
@@ -538,7 +538,7 @@ void Exx_Lip::sum_all(int ik)
 		for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
 		{
 			exx_matrix[ik][iw_l][iw_r] = 2.0* (-4*ModuleBase::PI/ucell_ptr->omega *sum1[iw_l*GlobalV::NLOCAL+iw_r]);
-			if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+			if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type || Exx_Global::Hybrid_Type::SCAN0==info.hybrid_type)
 				if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 				{
 					exx_matrix[ik][iw_l][iw_r] += 2.0* (4*ModuleBase::PI/ucell_ptr->omega *sum3[iw_l][iw_r] *sum2_factor_g );
