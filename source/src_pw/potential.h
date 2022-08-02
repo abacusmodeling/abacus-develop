@@ -13,8 +13,6 @@ class Potential
     friend class Hamilt_PW;
     friend class Electrons;
     friend class ELEC_scf;
-    //friend class ModuleESolver::ESolver_KS_LCAO;
-    //friend class ModuleESolver::ESolver_KS_LCAO_TDDFT;
 
     // constructor and deconstructor
     Potential();
@@ -56,6 +54,8 @@ class Potential
 
     void set_vr_eff(void);
 
+    void set_vrs_tddft(const int istep);
+
     void newd(void);
 
   public:
@@ -83,7 +83,6 @@ class Potential
 
     double *vextold;
 
-    void set_vrs_tddft(const int istep);
 };
 
 #endif // POTENTIAL_H
