@@ -1,7 +1,7 @@
 '''
 Date: 2021-12-29 10:27:01
 LastEditors: jiyuyang
-LastEditTime: 2022-07-29 11:48:18
+LastEditTime: 2022-08-02 11:36:22
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
@@ -58,7 +58,7 @@ class Band:
             x = X.flatten()
         else:
             data = np.loadtxt(filename, dtype=float)
-            X, Z, y = np.split(data, [1, 2, data.shape[-1]], axis=1)
+            X, Z, y, _ = np.split(data, [1, 2, data.shape[-1]], axis=1)
             x = X.flatten()
             z = Z.flatten()
 
