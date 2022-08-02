@@ -366,6 +366,295 @@ namespace Gint_Tools
 		return;
 	}
 
+	void cal_ddpsir_ylm(
+		const int na_grid, 					// number of atoms on this grid 
+		const int grid_index, 				// 1d index of FFT index (i,j,k) 
+		const double delta_r, 				// delta_r of the uniform FFT grid
+		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
+		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
+		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		double*const*const ddpsir_ylm_xx,
+		double*const*const ddpsir_ylm_xy,
+		double*const*const ddpsir_ylm_xz,
+		double*const*const ddpsir_ylm_yy,
+		double*const*const ddpsir_ylm_yz,
+		double*const*const ddpsir_ylm_zz)
+	{
+		for (int id=0; id<na_grid; id++)
+		{
+			const int mcell_index = GlobalC::GridT.bcell_start[grid_index] + id;
+			const int imcell = GlobalC::GridT.which_bigcell[mcell_index];
+			int iat = GlobalC::GridT.which_atom[mcell_index];
+			const int it = GlobalC::ucell.iat2it[iat];
+			const int ia = GlobalC::ucell.iat2ia[iat];
+			Atom *atom = &GlobalC::ucell.atoms[it];
+
+			const double mt[3]={
+				GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0],
+				GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1],
+				GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2]};
+
+			for(int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
+			{
+				double*const p_ddpsi_xx=&ddpsir_ylm_xx[ib][block_index[id]];
+				double*const p_ddpsi_xy=&ddpsir_ylm_xy[ib][block_index[id]];
+				double*const p_ddpsi_xz=&ddpsir_ylm_xz[ib][block_index[id]];
+				double*const p_ddpsi_yy=&ddpsir_ylm_yy[ib][block_index[id]];
+				double*const p_ddpsi_yz=&ddpsir_ylm_yz[ib][block_index[id]];
+				double*const p_ddpsi_zz=&ddpsir_ylm_zz[ib][block_index[id]];
+				if(!cal_flag[ib][id]) 
+				{
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_xx, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_xy, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_xz, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_yy, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_yz, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p_ddpsi_zz, block_size[id]);
+				}
+				else
+				{
+					const double dr[3]={						// vectors between atom and grid
+						GlobalC::GridT.meshcell_pos[ib][0] + mt[0],
+						GlobalC::GridT.meshcell_pos[ib][1] + mt[1],
+						GlobalC::GridT.meshcell_pos[ib][2] + mt[2]};
+					double distance = std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
+
+					// for some unknown reason, the finite difference between dpsi and ddpsi
+					// using analytical expression is always wrong; as a result,
+					// I switch to explicit finite difference method for evaluating
+					// the second derivatives of the orbitals
+					if(/*distance < 1e-9*/true)
+					{
+						double*** dpsi = new double** [atom->nw];
+						for(int i=0;i<atom->nw;i++)
+						{
+							dpsi[i] = new double*[6];
+							for(int j=0;j<6;j++)
+							{
+								dpsi[i][j] = new double[3];
+								ModuleBase::GlobalFunc::ZEROS(dpsi[i][j], 3);
+							}
+						}
+
+						double* dr1 = new double[3];
+
+						double** displ = new double* [6];
+						for(int i=0;i<6;i++)
+						{
+							displ[i] = new double[3];
+							ModuleBase::GlobalFunc::ZEROS(displ[i], 3);
+						}
+						displ[0][0] = 0.0001; // in x direction
+						displ[1][0] = -0.0001;
+						displ[2][1] = 0.0001; // in y direction
+						displ[3][1] = -0.0001;
+						displ[4][2] = 0.0001; // in z direction
+						displ[5][2] = -0.0001;
+
+						for(int i=0;i<6;i++)
+						{
+							dr1[0] = dr[0] + displ[i][0];
+							dr1[1] = dr[1] + displ[i][1];
+							dr1[2] = dr[2] + displ[i][2];
+
+							//array to store spherical harmonics and its derivatives
+							std::vector<double> rly;
+							std::vector<std::vector<double>> grly;
+							ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr1[0], dr1[1], dr1[2], rly, grly);
+
+							double distance1 = std::sqrt(dr1[0]*dr1[0] + dr1[1]*dr1[1] + dr1[2]*dr1[2]);
+							if(distance1 < 1e-9)  distance1 = 1e-9;
+
+							const double position = distance1 / delta_r;
+								
+							const double iq = static_cast<int>(position);
+							const double x0 = position - iq;
+							const double x1 = 1.0 - x0;
+							const double x2 = 2.0 - x0;
+							const double x3 = 3.0 - x0;
+							const double x12 = x1*x2 / 6;
+							const double x03 = x0*x3 / 2;
+						
+							double tmp, dtmp;
+
+							for (int iw=0; iw< atom->nw; ++iw)
+							{
+								// this is a new 'l', we need 1D orbital wave
+								// function from interpolation method.
+								if ( atom->iw2_new[iw] )
+								{
+									const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(
+											atom->iw2l[iw],
+											atom->iw2n[iw]);
+
+									//if ( iq[id] >= philn.nr_uniform-4)
+									if ( iq >= philn.nr_uniform-4)
+									{
+										tmp = dtmp = 0.0;
+									}
+									else
+									{
+										// use Polynomia Interpolation method to get the 
+										// wave functions
+
+										tmp = x12*(philn.psi_uniform[iq]*x3
+												+philn.psi_uniform[iq+3]*x0)
+											+ x03*(philn.psi_uniform[iq+1]*x2
+													-philn.psi_uniform[iq+2]*x1);
+
+										dtmp = x12*(philn.dpsi_uniform[iq]*x3
+												+philn.dpsi_uniform[iq+3]*x0)
+												+ x03*(philn.dpsi_uniform[iq+1]*x2
+													-philn.dpsi_uniform[iq+2]*x1);
+									}
+								}//new l is used.
+								
+								// get the 'l' of this localized wave function
+								const int ll = atom->iw2l[iw];
+								const int idx_lm = atom->iw2_ylm[iw];
+
+								const double rl = pow(distance1, ll);
+
+								// derivative of wave functions with respect to atom positions.
+								const double tmpdphi_rly = (dtmp  - tmp * ll / distance1) / rl * rly[idx_lm] / distance1;
+								const double tmprl = tmp/rl;
+
+								dpsi[iw][i][0] = tmpdphi_rly * dr1[0]  + tmprl * grly[idx_lm][0];
+								dpsi[iw][i][1] = tmpdphi_rly * dr1[1]  + tmprl * grly[idx_lm][1];
+								dpsi[iw][i][2] = tmpdphi_rly * dr1[2]  + tmprl * grly[idx_lm][2];
+							} // end iw
+						}//end i = 0-6
+
+						for(int iw=0;iw<atom->nw;iw++)
+						{
+							p_ddpsi_xx[iw] = (dpsi[iw][0][0] - dpsi[iw][1][0]) / 0.0002;
+							p_ddpsi_xy[iw] = ((dpsi[iw][2][0] - dpsi[iw][3][0])+(dpsi[iw][0][1] - dpsi[iw][1][1])) / 0.0004;
+							p_ddpsi_xz[iw] = ((dpsi[iw][4][0] - dpsi[iw][5][0])+(dpsi[iw][0][2] - dpsi[iw][1][2])) / 0.0004;
+							p_ddpsi_yy[iw] = (dpsi[iw][2][1] - dpsi[iw][3][1]) / 0.0002;
+							p_ddpsi_yz[iw] = ((dpsi[iw][4][1] - dpsi[iw][5][1])+(dpsi[iw][2][2] - dpsi[iw][3][2])) / 0.0004;
+							p_ddpsi_zz[iw] = (dpsi[iw][4][2] - dpsi[iw][5][2]) / 0.0002;
+						}
+
+						for(int i=0;i<atom->nw;i++)
+						{
+							for(int j=0;j<6;j++)
+							{
+								delete[] dpsi[i][j];
+							}
+							delete dpsi[i];
+						}
+						delete[] dpsi;
+
+						delete[] dr1;
+						for(int i=0;i<6;i++)
+						{
+							delete[] displ[i];
+						}
+						delete[] displ;
+					}
+					else
+					// the analytical method for evaluating 2nd derivatives
+					// it is not used currently
+					{
+						//array to store spherical harmonics and its derivatives
+						std::vector<double> rly;
+						std::vector<std::vector<double>> grly;
+						std::vector<std::vector<double>> hrly;
+						ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
+						ModuleBase::Ylm::hes_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], hrly);
+						const double position = distance / delta_r;
+								
+						const double iq = static_cast<int>(position);
+						const double x0 = position - iq;
+						const double x1 = 1.0 - x0;
+						const double x2 = 2.0 - x0;
+						const double x3 = 3.0 - x0;
+						const double x12 = x1*x2 / 6;
+						const double x03 = x0*x3 / 2;
+						
+						double tmp, dtmp, ddtmp;
+
+						for (int iw=0; iw< atom->nw; ++iw)
+						{
+							// this is a new 'l', we need 1D orbital wave
+							// function from interpolation method.
+							if ( atom->iw2_new[iw] )
+							{
+								const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(
+										atom->iw2l[iw],
+										atom->iw2n[iw]);
+
+								//if ( iq[id] >= philn.nr_uniform-4)
+								if ( iq >= philn.nr_uniform-4)
+								{
+									tmp = dtmp = ddtmp = 0.0;
+								}
+								else
+								{
+									// use Polynomia Interpolation method to get the 
+									// wave functions
+
+									tmp = x12*(philn.psi_uniform[iq]*x3
+											+philn.psi_uniform[iq+3]*x0)
+										+ x03*(philn.psi_uniform[iq+1]*x2
+												-philn.psi_uniform[iq+2]*x1);
+
+									dtmp = x12*(philn.dpsi_uniform[iq]*x3
+											+philn.dpsi_uniform[iq+3]*x0)
+											+ x03*(philn.dpsi_uniform[iq+1]*x2
+												-philn.dpsi_uniform[iq+2]*x1);
+
+								    ddtmp = x12*(philn.ddpsi_uniform[iq]*x3
+											+philn.ddpsi_uniform[iq+3]*x0)
+											+ x03*(philn.ddpsi_uniform[iq+1]*x2
+												-philn.ddpsi_uniform[iq+2]*x1);
+								}
+							}//new l is used.
+							
+							// get the 'l' of this localized wave function
+							const int ll = atom->iw2l[iw];
+							const int idx_lm = atom->iw2_ylm[iw];
+
+							const double rl = pow(distance, ll);
+							const double r_lp2 = pow(distance, ll+2);
+
+							// d/dr (R_l / r^l)
+							const double tmpdphi = (dtmp - tmp * ll / distance) / rl;
+							const double term1 = ddtmp / r_lp2;
+							const double term2 = (2 * ll + 1) * dtmp / r_lp2 / distance;
+							const double term3 = ll * (ll + 2) * tmp / r_lp2 / distance / distance;
+							const double term4 = tmpdphi / distance;
+							const double term5 = term1 - term2 + term3;
+
+							// hessian of (R_l / r^l)
+							const double term_xx = term4 + dr[0]*dr[0]*term5;
+							const double term_xy = dr[0]*dr[1]*term5;
+							const double term_xz = dr[0]*dr[2]*term5;
+							const double term_yy = term4 + dr[1]*dr[1]*term5;
+							const double term_yz = dr[1]*dr[2]*term5;
+							const double term_zz = term4 + dr[2]*dr[2]*term5;
+
+							// d/dr (R_l / r^l) * alpha / r
+							const double term_1x = dr[0] * term4;
+							const double term_1y = dr[1] * term4;
+							const double term_1z = dr[2] * term4;
+
+							p_ddpsi_xx[iw] = term_xx * rly[idx_lm] + 2.0*term_1x*grly[idx_lm][0] + tmp/rl*hrly[idx_lm][0];
+							p_ddpsi_xy[iw] = term_xy * rly[idx_lm] + term_1x*grly[idx_lm][1] + term_1y*grly[idx_lm][0] + tmp/rl*hrly[idx_lm][1];
+							p_ddpsi_xz[iw] = term_xz * rly[idx_lm] + term_1x*grly[idx_lm][2] + term_1z*grly[idx_lm][0] + tmp/rl*hrly[idx_lm][2];
+							p_ddpsi_yy[iw] = term_yy * rly[idx_lm] + 2.0*term_1y*grly[idx_lm][1] + tmp/rl*hrly[idx_lm][3];
+							p_ddpsi_yz[iw] = term_yz * rly[idx_lm] + term_1y*grly[idx_lm][2] + term_1z*grly[idx_lm][1] + tmp/rl*hrly[idx_lm][4];
+							p_ddpsi_zz[iw] = term_zz * rly[idx_lm] + 2.0*term_1z*grly[idx_lm][2] + tmp/rl*hrly[idx_lm][5];
+							
+						}//iw
+					} // end if
+				}//else
+			}//end ib
+		}//end id(atom)
+
+		return;
+	}
+
 	void cal_dpsirr_ylm(
 		const int na_grid, 					// number of atoms on this grid 
 		const int grid_index, 				// 1d index of FFT index (i,j,k) 
@@ -439,7 +728,7 @@ namespace Gint_Tools
 
 		return;
 	}
-
+	
 	// atomic basis sets
 	// psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(
@@ -485,7 +774,7 @@ namespace Gint_Tools
 		const double*const*const psi,	    // psir_vlbr3[GlobalC::bigpw->bxyz][LD_pool]
 		double ** psi_DM,
 		const double*const*const DM,
-		const int job)
+		const int job) // 1: density, 2: force
 	{
 		constexpr char side='L', uplo='U';
 		constexpr char transa='N', transb='N';
@@ -498,7 +787,7 @@ namespace Gint_Tools
 			case 1:
 				alpha_gemm=2.0;
 				break;
-			case 2:
+			case 2: 
 				alpha_gemm=1.0;
 				break;
 			default:
