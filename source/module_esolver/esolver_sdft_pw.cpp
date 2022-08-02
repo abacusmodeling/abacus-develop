@@ -157,7 +157,7 @@ void ESolver_SDFT_PW::postprocess()
     int nche_test = 0;
     if(INPUT.cal_cond)  nche_test = std::max(nche_test, INPUT.cond_nche);
     if(INPUT.out_dos)  nche_test = std::max(nche_test, INPUT.dos_nche);
-    check_che(nche_test);
+    if(nche_test > 0)   check_che(nche_test);
     
     if(INPUT.cal_cond)
 	{
