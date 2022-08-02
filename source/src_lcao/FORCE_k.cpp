@@ -1,11 +1,13 @@
 #include "FORCE_k.h"
-#include "../src_pw/global.h"
-#include "../src_parallel/parallel_reduce.h"
-#include <unordered_map>
-#include <map>
+
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../src_pw/global.h"
 #include "module_elecstate/cal_dm.h"
+
+#include <map>
+#include <unordered_map>
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -20,24 +22,23 @@ Force_LCAO_k::~Force_LCAO_k()
 }
 
 // be called in Force_LCAO::start_force_calculation
-void Force_LCAO_k::ftable_k (
-		const bool isforce,
-		const bool isstress,
-        Record_adj &ra, 
-        const psi::Psi<std::complex<double>>* psi,
-        Local_Orbital_Charge &loc, 
-		ModuleBase::matrix& foverlap,
-		ModuleBase::matrix& ftvnl_dphi,
-		ModuleBase::matrix& fvnl_dbeta,	
-		ModuleBase::matrix& fvl_dphi,
-		ModuleBase::matrix& soverlap,
-		ModuleBase::matrix& stvnl_dphi,
-		ModuleBase::matrix& svnl_dbeta,
+void Force_LCAO_k::ftable_k(const bool isforce,
+                            const bool isstress,
+                            Record_adj& ra,
+                            const psi::Psi<std::complex<double>>* psi,
+                            Local_Orbital_Charge& loc,
+                            ModuleBase::matrix& foverlap,
+                            ModuleBase::matrix& ftvnl_dphi,
+                            ModuleBase::matrix& fvnl_dbeta,
+                            ModuleBase::matrix& fvl_dphi,
+                            ModuleBase::matrix& soverlap,
+                            ModuleBase::matrix& stvnl_dphi,
+                            ModuleBase::matrix& svnl_dbeta,
 #ifdef __DEEPKS
                             ModuleBase::matrix& svl_dphi,
                             ModuleBase::matrix& svnl_dalpha,
 #else
-                            ModuleBase::matrix& svl_dphi,
+                              ModuleBase::matrix& svl_dphi,
 #endif
                             LCAO_Hamilt& uhm)
 {
@@ -49,8 +50,8 @@ void Force_LCAO_k::ftable_k (
     const Parallel_Orbitals* pv = loc.ParaV;
     this->allocate_k(*pv);
 
-	// calculate the energy density matrix
-	// and the force related to overlap matrix and energy density matrix.
+    // calculate the energy density matrix
+    // and the force related to overlap matrix and energy density matrix.
     this->cal_foverlap_k(isforce, isstress, ra, psi, loc, foverlap, soverlap);
 
     // calculate the density matrix
@@ -266,14 +267,13 @@ void Force_LCAO_k::finish_k(void)
 }
 
 #include "record_adj.h"
-void Force_LCAO_k::cal_foverlap_k(
-	const bool isforce, 
-    const bool isstress,
-    Record_adj &ra, 
-    const psi::Psi<std::complex<double>>* psi,
-    Local_Orbital_Charge &loc,
-    ModuleBase::matrix& foverlap,
-	ModuleBase::matrix& soverlap)
+void Force_LCAO_k::cal_foverlap_k(const bool isforce,
+                                  const bool isstress,
+                                  Record_adj& ra,
+                                  const psi::Psi<std::complex<double>>* psi,
+                                  Local_Orbital_Charge& loc,
+                                  ModuleBase::matrix& foverlap,
+                                  ModuleBase::matrix& soverlap)
 {
     ModuleBase::TITLE("Force_LCAO_k", "cal_foverlap_k");
     ModuleBase::timer::tick("Force_LCAO_k", "cal_foverlap_k");
@@ -316,9 +316,7 @@ void Force_LCAO_k::cal_foverlap_k(
     }
     else
     {
-        elecstate::cal_dm(loc.ParaV, wgEkb,
-        psi[0],
-        edm_k);
+        elecstate::cal_dm(loc.ParaV, wgEkb, psi[0], edm_k);
     }
 
     loc.cal_dm_R(edm_k, ra, edm2d);
@@ -1177,9 +1175,29 @@ void Force_LCAO_k::cal_fvl_dphi_k(const bool isforce,
         // fvl_dphi can not be set to zero here if Vna is used
         if (isstress || isforce)
         {
-            Gint_inout
-                inout(DM_R, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
-            this->UHM->GK.cal_gint(&inout);
+            if (XC_Functional::get_func_type() == 3)
+            {
+                Gint_inout inout(DM_R,
+                                 GlobalC::pot.vr_eff1,
+                                 GlobalC::pot.vofk_eff1,
+                                 isforce,
+                                 isstress,
+                                 &fvl_dphi,
+                                 &svl_dphi,
+                                 Gint_Tools::job_type::force_meta);
+                this->UHM->GK.cal_gint(&inout);
+            }
+            else
+            {
+                Gint_inout inout(DM_R,
+                                 GlobalC::pot.vr_eff1,
+                                 isforce,
+                                 isstress,
+                                 &fvl_dphi,
+                                 &svl_dphi,
+                                 Gint_Tools::job_type::force);
+                this->UHM->GK.cal_gint(&inout);
+            }
         }
     }
 
