@@ -58,9 +58,12 @@ class Band:
             x = X.flatten()
         else:
             data = np.loadtxt(filename, dtype=float)
-            X, Z, y, _ = np.split(data, [1, 2, data.shape[-1]], axis=1)
-            x = X.flatten()
-            z = Z.flatten()
+            #X, Z, y, _ = np.split(data, [1, 2, data.shape[-1]], axis=1)
+            #x = X.flatten()
+            #z = Z.flatten()
+            x = data[:, 0]     # k-index
+            z = data[:, 1]     # k-points
+            y = data[:, 2:]    # band
 
         return x, y, z
 
