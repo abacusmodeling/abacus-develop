@@ -874,9 +874,9 @@ void UnitCell_pseudo::check_structure(double factor)
  
 		for (int ia1 =0;ia1 <this->atoms[it1].na;ia1++)
 		{
-			double x1 = this->atoms[it1].tau[ia1].x;
-			double y1 = this->atoms[it1].tau[ia1].y;
-			double z1 = this->atoms[it1].tau[ia1].z;
+			double x1 = this->atoms[it1].taud[ia1].x;
+			double y1 = this->atoms[it1].taud[ia1].y;
+			double z1 = this->atoms[it1].taud[ia1].z;
 
 			for(int it2=0;it2 <ntype;it2++)
 			{
@@ -908,9 +908,9 @@ void UnitCell_pseudo::check_structure(double factor)
 								else if(it1==it2 && ia1==ia2 && a==0 && b==0 && c==0)
 									continue;	
 
-								double x2 = this->atoms[it2].tau[ia2].x + a;
-								double y2 = this->atoms[it2].tau[ia2].y + b;
-								double z2 = this->atoms[it2].tau[ia2].z + c;
+								double x2 = this->atoms[it2].taud[ia2].x + a;
+								double y2 = this->atoms[it2].taud[ia2].y + b;
+								double z2 = this->atoms[it2].taud[ia2].z + c;
 
 								double bond_length = sqrt(pow((x2-x1)*this->a1.x + (y2-y1)*this->a2.x + (z2-z1)*this->a3.x,2) + 
 														  pow((x2-x1)*this->a1.y + (y2-y1)*this->a2.y + (z2-z1)*this->a3.y,2) +
