@@ -1136,8 +1136,16 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// fvl_dphi can not be set to zero here if Vna is used
 		if(isstress||isforce) 
 		{
-			Gint_inout inout(DM_R, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
-			this->UHM->GK.cal_gint(&inout);
+			if(XC_Functional::get_func_type()==3)
+			{
+				Gint_inout inout(DM_R, GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force_meta);
+				this->UHM->GK.cal_gint(&inout);
+			}
+			else
+			{
+				Gint_inout inout(DM_R, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
+				this->UHM->GK.cal_gint(&inout);
+			}
 		}
 	}
 

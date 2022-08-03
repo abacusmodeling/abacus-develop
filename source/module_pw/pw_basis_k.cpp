@@ -39,7 +39,6 @@ void PW_Basis_K:: initparameters(
         double kmod = sqrt(this->kvec_c[ik] * this->kvec_c[ik]);
         if(kmod > kmaxmod)  kmaxmod = kmod;
     }
-    // MPI_Allreduce(MPI_IN_PLACE, &kmaxmod, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
     this->gk_ecut = gk_ecut_in/this->tpiba2;
     this->ggecut = pow(sqrt(this->gk_ecut) + kmaxmod, 2);
     if(this->ggecut > this->gridecut_lat)

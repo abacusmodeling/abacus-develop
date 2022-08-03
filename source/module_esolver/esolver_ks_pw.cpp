@@ -335,7 +335,7 @@ namespace ModuleESolver
                     ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
                     GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
                     ss1 << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG.cube";
-                    GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ssc.str(), 3);
+                    GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
                 }
             }
             //output wavefunctions
@@ -546,6 +546,8 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::postprocess()
     {
+        //print occupation in istate.info
+	    GlobalC::en.print_occ();
         // compute density of states
         GlobalC::en.perform_dos_pw();
 
@@ -598,6 +600,11 @@ namespace ModuleESolver
         {
             Write_Wfc_Realspace::write_wfc_realspace_1(this->psi[0], "wfc_realspace", true);
         }	
+
+        if(INPUT.cal_cond)
+	    {
+            this->KG(INPUT.cond_nche,INPUT.cond_fwhm,INPUT.cond_wcut,INPUT.cond_dw,INPUT.cond_wenlarge);
+        }
     }
 
     void ESolver_KS_PW::hamilt2estates(const double ethr)
@@ -623,15 +630,20 @@ namespace ModuleESolver
         //========================================
         // diagonalization of the KS hamiltonian
         // =======================================
-        double diag_ethr = this->phsol->set_diagethr(1, 1, drho);
+        double diag_ethr = GlobalV::PW_DIAG_THR;
+        if(diag_ethr - 1e-2 > -1e-5)   
+            diag_ethr = std::max(1e-13, 0.1*std::min(1e-2,GlobalV::SCF_THR / this->pelec->charge->nelec));
+        GlobalV::ofs_running << " PW_DIAG_THR  = "<< diag_ethr << std::endl;
 
         this->hamilt2estates(diag_ethr);
+        this->pelec->calculate_weights();
 
         for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
         {
             for(int ib=0; ib<this->pelec->ekb.nc; ++ib)
             {
                 GlobalC::wf.ekb[ik][ib] = this->pelec->ekb(ik, ib);
+                GlobalC::wf.wg(ik, ib) = this->pelec->wg(ik, ib);
             }
         }
 
