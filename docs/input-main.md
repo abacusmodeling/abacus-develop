@@ -8,23 +8,23 @@
 
 - [System variables](#system-variables)
 
-    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) |  [pseudo_rcut](#pseudo-rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem-saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline) | [kspacing](#kspacing)
+    [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [symmetry](#symmetry) | [kpar](#kpar) | [bndpar](#bndpar) | [latname](#latname) | [init_wfc](#init_wfc) | [init_chg](#init_chg) | [init_vel](#init_vel) | [nelec](#nelec) | [tot_magnetization](#tot_magnetization) | [dft_functional](#dft_functional) | [pseudo_type](#pseudo_type) |  [pseudo_rcut](#pseudo_rcut) | [pseudo_mesh](#pseudo_mesh) | [mem_saver](#mem_saver) | [diago_proc](#diago_proc) | [nbspline](#nbspline) | [kspacing](#kspacing)
 
 - [Variables related to input files](#variables-related-to-input-files)
 
-    [stru_file](#stru_file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [orbital_dir](#orbital-dir) | [read_file_dir](#read-file-dir)
+    [stru_file](#stru_file) | [kpoint_file](#kpoint_file) | [pseudo_dir](#pseudo_dir) | [orbital_dir](#orbital_dir) | [read_file_dir](#read_file_dir)
 
 - [Plane wave related variables](#plane-wave-related-variables)
 
-    [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx) | [pw_seed](#pw_seed) | [pw_diag_thr](#pw_diag_thr) | [pw_diag_nmax](#diago-cg-maxiter) | [pw_diag_ndim](#pw_diag_ndim)
+    [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx-ny-nz) | [pw_seed](#pw_seed) | [pw_diag_thr](#pw_diag_thr) | [pw_diag_nmax](#pw_diag_nmax) | [pw_diag_ndim](#pw_diag_ndim)
 
 - [Numerical atomic orbitals related variables](#numerical-atomic-orbitals-related-variables)
 
-    [nb2d](#nb2d) | [lmaxmax](#lmaxmax) | [lcao_ecut](lcao-ecut) | [lcao_dk](#lcao-dk) | [lcao_dr](#lcao-dr) | [lcao_rmax](#lcao-rmax) | [search_radius](#search-radius) | [search_pbc](#search-pbc)
+    [nb2d](#nb2d) | [lmaxmax](#lmaxmax) | [lcao_ecut](#lcao_ecut) | [lcao_dk](#lcao_dk) | [lcao_dr](#lcao_dr) | [lcao_rmax](#lcao_rmax) | [search_radius](#search_radius) | [search_pbc](#search_pbc)
 
 - [Electronic structure](#electronic-structure)
 
-    [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap)
+    [basis_type](#basis_type) | [ks_solver](#ks_solver) | [nbands](#nbands) | [nbands_istate](#nbands_istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing_method](#smearing_method) | [smearing_sigma](#smearing_sigma) | [mixing_type](#mixing_type) | [mixing_beta](#mixing_beta) | [mixing_ndim](#mixing_ndim) | [mixing_gg0](#mixing_gg0) | [gamma_only](#gamma_only) | [printe](#printe) | [scf_nmax](#scf_nmax) | [scf_thr](#scf_thr) | [chg_extrap](#chg_extrap)
 
 - [Electronic structure (SDFT)](#electronic-structure-sdft)
 
@@ -32,11 +32,11 @@
 
 - [Geometry relaxation](#geometry-relaxation)
 
-    [relax_nmax](#relax_nmax) | [relax_method](#relax_method) | [relax_cg_thr](#relax_cg_thr) | [relax_bfgs_w1](#bfgs-w1) | [relax_bfgs_w2](#bfgs-w2) | [relax_bfgs_rmax](#relax_bfgs_rmax) | [relax_bfgs_rmin](#relax_bfgs_rmin) | [relax_bfgs_init](#relax_bfgs_init) | [cal_force](#cal_force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [cal_stress](#cal_stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [cell_factor](#cell-factor)
+    [relax_nmax](#relax_nmax) | [relax_method](#relax_method) | [relax_cg_thr](#relax_cg_thr) | [relax_bfgs_w1](#relax_bfgs_w1) | [relax_bfgs_w2](#relax_bfgs_w2) | [relax_bfgs_rmax](#relax_bfgs_rmax) | [relax_bfgs_rmin](#relax_bfgs_rmin) | [relax_bfgs_init](#relax_bfgs_init) | [cal_force](#cal_force) | [force_thr](#force_thr) | [force_thr_ev](#force_thr_ev) | [cal_stress](#cal_stress) | [stress_thr](#stress_thr) | [press1, press2, press3](#press1-press2-press3) | [fixed_axes](#fixed_axes) | [cell_factor](#cell_factor)
 
 - [Variables related to output information](#variables-related-to-output-information)
 
-    [out_force](#out_force) | [out_mul](#out_mul) | [out_freq_elec](#out_freq_elec) | [out_freq_ion](#out_freq_ion) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out-dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out-dos) | [out_band](#out-band) | [out_proj_band](#out-proj-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
+    [out_force](#out_force) | [out_mul](#out_mul) | [out_freq_elec](#out_freq_elec) | [out_freq_ion](#out_freq_ion) | [out_chg](#out_chg) | [out_pot](#out_pot) | [out_dm](#out_dm) | [out_wfc_pw](#out_wfc_pw) | [out_wfc_r](#out_wfc_r) | [out_wfc_lcao](#out_wfc_lcao) | [out_dos](#out_dos) | [out_band](#out_band) | [out_proj_band](#out_proj_band) | [out_stru](#out_stru) | [out_level](#out_level) | [out_alllog](#out_alllog) | [out_mat_hs](#out_mat_hs) | [out_mat_r](#out_mat_r) | [out_mat_hs2](#out_mat_hs2) | [out_element_info](#out_element_info) | [restart_save](#restart_save) | [restart_load](#restart_load)
 
 - [Density of states](#density-of-states)
 
@@ -44,21 +44,21 @@
 
 - [Exact exchange](#exact-exchange) (Under tests)
 
-    [exx_hybrid_type](#exx-hybrid-type) | [exx_hybrid_alpha](#exx-hybrid-alpha) | [exx_hse_omega](#exx-hse-omega) | [exx_separate_loop](#exx-separate-loop) | [exx_hybrid_step](#exx-hybrid-step) | [exx_lambda](#exx-lambda) | [exx_pca_threshold](#exx-pca-threshold) | [exx_c_threshold](#exx-c-threshold) | [exx_v_threshold](#exx-v-threshold) | [exx_dm_threshold](#exx-dm-threshold) | [exx_schwarz_threshold](#exx-schwarz-threshold) | [exx_cauchy_threshold](#exx-cauchy-threshold) | [exx_ccp_threshold](#exx-ccp-threshold) | [exx_ccp_rmesh_times](#exx-ccp-rmesh-times) | [exx_distribute_type](#exx-distribute-type) | [exx_opt_orb_lmax](#exx-opt-orb-lmax) | [exx_opt_orb_ecut](#exx-opt-orb-ecut) | [exx_opt_orb_tolerence](#exx-opt-orb-tolerence)
+    [exx_hybrid_type](#exx_hybrid_type) | [exx_hybrid_alpha](#exx_hybrid_alpha) | [exx_hse_omega](#exx_hse_omega) | [exx_separate_loop](#exx_separate_loop) | [exx_hybrid_step](#exx_hybrid_step) | [exx_lambda](#exx_lambda) | [exx_pca_threshold](#exx_pca_threshold) | [exx_c_threshold](#exx_c_threshold) | [exx_v_threshold](#exx_v_threshold) | [exx_dm_threshold](#exx_dm_threshold) | [exx_schwarz_threshold](#exx_schwarz_threshold) | [exx_cauchy_threshold](#exx_cauchy_threshold) | [exx_ccp_threshold](#exx_ccp_threshold) | [exx_ccp_rmesh_times](#exx_ccp_rmesh_times) | [exx_distribute_type](#exx_distribute_type) | [exx_opt_orb_lmax](#exx_opt_orb_lmax) | [exx_opt_orb_ecut](#exx_opt_orb_ecut) | [exx_opt_orb_tolerence](#exx_opt_orb_tolerence)
 
 - [Molecular dynamics](#molecular-dynamics)
 
-    [md_type](#md-type) | [md_nstep](#md_nstep) | [md_ensolver](#md-ensolver) | [md_restart](#md-restart) | [md_dt](#md-dt) | [md_t](#md-t) | [md_dumpfreq](#md-dumpfreq) | [md_restartfreq](#md-restartfreq) | [md_seed](#md-seed) | [md_tfreq](#md-tfreq) | [md_mnhc](#md-mnhc) | [lj_rcut](#lj-rcut) | [lj_epsilon](#lj-epsilon) | [lj_sigma](#lj-sigma) | [msst_direction](#msst-direction) | [msst_vel](#msst-vel) | [msst_vis](#msst-vis) | [msst_tscale](#msst-tscale) | [msst_qmass](#msst-qmass) | [md_damp](#md-damp)
+    [md_type](#md_type) | [md_nstep](#md_nstep) | [md_ensolver](#md_ensolver) | [md_restart](#md_restart) | [md_dt](#md_dt) | [md_t](#md_t) | [md_dumpfreq](#md_dumpfreq) | [md_restartfreq](#md_restartfreq) | [md_seed](#md_seed) | [md_tfreq](#md_tfreq) | [md_mnhc](#md_mnhc) | [lj_rcut](#lj_rcut) | [lj_epsilon](#lj_epsilon) | [lj_sigma](#lj_sigma) | [msst_direction](#msst_direction) | [msst_vel](#msst_vel) | [msst_vis](#msst_vis) | [msst_tscale](#msst_tscale) | [msst_qmass](#msst_qmass) | [md_damp](#md_damp)
 
 - [vdW correction](#vdw-correction)
 
-    [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
+    [vdw_method](#vdw_method) | [vdw_s6](#vdw_s6) | [vdw_s8](#vdw_s8) | [vdw_a1](#vdw_a1) | [vdw_a2](#vdw_a2) | [vdw_d](#vdw_d) | [vdw_abc](#vdw_abc) | [vdw_C6_file](#vdw_C6_file) | [vdw_C6_unit](#vdw_C6_unit) | [vdw_R0_file](#vdw_R0_file) | [vdw_R0_unit](#vdw_R0_unit) | [vdw_model](#vdw_model) | [vdw_radius](#vdw_radius) | [vdw_radius_unit](#vdw_radius_unit) | [vdw_cn_radius](#vdw_cn_radius) | [vdw_cn_radius_unit](#vdw_cn_radius_unit) | [vdw_period](#vdw_period)
 
 - [Berry phase and wannier90 interface](#berry-phase-and-wannier90-interface)
 
-    [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin)
+    [berry_phase](#berry_phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier_spin)
 
-- [TDDFT: time dependent density functional theory](#TDDFT-doc) (Under tests)
+- [TDDFT: time dependent density functional theory](#tddft-time-dependent-density-functional-theory) (Under tests)
 
     [tddft](#tddft) | [td_scf_thr](#td_scf_thr) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout) | [ocp](#ocp) | [ocp_set](#ocp_set)
 
@@ -68,11 +68,11 @@
 
 - [Variables useful for debugging](#variables-useful-for-debugging)
 
-    [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour) | [test_just_neighbor](#test-just-neighbor)
+    [nurse](#nurse) | [t_in_h](#t_in_h) | [vl_in_h](#vl_in_h) | [vnl_in_h](#vnl_in_h) | [test_force](#test_force) | [test_stress](#test_stress) | [colour](#colour) | [test_just_neighbor](#test_just_neighbor)
 
 - [DeePKS](#deepks)
 
-    [deepks_out_labels](#out-descriptor) | [deepks_descriptor_lmax](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [deepks_model](#model-file)
+    [deepks_out_labels](#deepks_out_labels) | [deepks_descriptor_lmax](#deepks_descriptor_lmax) | [deepks_scf](#deepks_scf) | [deepks_model](#deepks_model)
 
 - [Electric field and dipole correction](#electric-field-and-dipole-correction)
 
@@ -588,7 +588,7 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 #### method_sto
 
 - **Type**: Integer
-- **Description**: 
+- **Description**:
   - Different method to do SDFT.
   - 1: SDFT calculates $T_n(\hat{h})\ket{\chi}$ twice, where $T_n(x)$ is the n-th order Chebyshev polynomial and $\hat{h}=\frac{\hat{H}-\bar{E}}{\Delta E}$ owning eigen-value $\in(-1,1)$. This method cost less memory but slow.
   - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is fast but when memory is not enough, only method 1 can be used.
@@ -598,8 +598,8 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 #### nbands_sto
 
 - **Type**: Integer
-- **Description**: 
-  - nbands_sto>0: Number of stochastic orbitals to calculate in SDFT and MDFT.  More bands obtain more precise results or smaller stochastic errors ($ \propto 1/\sqrt{N_{\chi}}$); 
+- **Description**:
+  - nbands_sto>0: Number of stochastic orbitals to calculate in SDFT and MDFT.  More bands obtain more precise results or smaller stochastic errors ($ \propto 1/\sqrt{N_{\chi}}$);
   - nbands_sto=0: Complete basis will be used to replace stochastic orbitals with the Chebyshev method (CT) and it will get the results the same as KSDFT without stochastic errors.
   - If you want to do MDFT. [nbands](#nbands) which represents the number of KS orbitals should be set.
 - **Default**: 256
@@ -980,7 +980,7 @@ This part of variables are relevant to electric field and dipole correction
 
 - **Type**: Boolean
 - **Description**: If set to true, a saw-like potential simulating an electric field
-is added to the bare ionic potential. 
+is added to the bare ionic potential.
 - **Default**: false
 
 #### dip_cor_flag
@@ -1008,7 +1008,7 @@ added to the bare ionic potential. If you want no electric field, parameter efie
 - **Description**: Zone in the unit cell where the saw-like potential decreases, 0 < efield_pos_dec < 1. Used only if efield_flag == true.
 - **Default**: 0.1
 
-#### efield_amp 
+#### efield_amp
 
 - **Type**: Real
 - **Description**: Amplitude of the electric field, in ***Hartree*** a.u.; 1 a.u. = 51.4220632*10^10 V/m. Used only if efield_flag == true. The saw-like potential increases with slope efield_amp  in the region from (efield_pos_max+efield_pos_dec-1) to (efield_pos_max), then decreases until (efield_pos_max+efield_pos_dec), in units of the crystal vector efield_dir. Important: the change of slope of this potential must be located in the empty region, or else unphysical forces will result.
@@ -1054,13 +1054,13 @@ adial integration for pseudopotentials, in Bohr.
 #### exx_c_threshold
 
 - **Type**: Real
-- **Description**: See also the entry [exx_pca_threshold](#exx-pca-threshold). Smaller components (less than exx_c_threshold) of the $C^{k}_{ij}$ matrix is neglected to accelerate calculation. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-4.
+- **Description**: See also the entry [exx_pca_threshold](#exx_pca_threshold). Smaller components (less than exx_c_threshold) of the $C^{k}_{ij}$ matrix is neglected to accelerate calculation. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-4.
 - **Default**: 0
 
 #### exx_v_threshold
 
 - **Type**: Real
-- **Description**: See also the entry [exx_pca_threshold](#exx-pca-threshold). With the approximation $\Phi_{i}\Phi_{j}\sim C^{k}_{ij}P_{k}$, the four-center integral in Fock exchange is expressed as $(ik|jl)=\Sigma_{a,b}C^{a}_{ij}V_{ab}C^{b}_{kl}$, where $V_{ab}=(P_{a}|P_{b})$ is a double-center integral. Smaller values of the V matrix can be truncated to accelerate calculation. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 0, i.e. no truncation.
+- **Description**: See also the entry [exx_pca_threshold](#exx_pca_threshold). With the approximation $\Phi_{i}\Phi_{j}\sim C^{k}_{ij}P_{k}$, the four-center integral in Fock exchange is expressed as $(ik|jl)=\Sigma_{a,b}C^{a}_{ij}V_{ab}C^{b}_{kl}$, where $V_{ab}=(P_{a}|P_{b})$ is a double-center integral. Smaller values of the V matrix can be truncated to accelerate calculation. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 0, i.e. no truncation.
 - **Default**: 0
 
 #### exx_dm_threshold
@@ -1102,19 +1102,19 @@ adial integration for pseudopotentials, in Bohr.
 #### exx_opt_orb_lmax
 
 - **Type**: Integer
-- **Description**: See also the entry [exx_hybrid_type](#exx-hybrid-type). This parameter is only relevant when exx_hybrid_type=`opt_orb`. The radial part of opt-ABFs are generated as linear combinations of spherical Bessel functions. exx_opt_orb_lmax gives the maximum l of the spherical Bessel functions. A reasonable choice is 2.
+- **Description**: See also the entry [exx_hybrid_type](#exx_hybrid_type). This parameter is only relevant when exx_hybrid_type=`opt_orb`. The radial part of opt-ABFs are generated as linear combinations of spherical Bessel functions. exx_opt_orb_lmax gives the maximum l of the spherical Bessel functions. A reasonable choice is 2.
 - **Default**: 0
 
 #### exx_opt_orb_ecut
 
 - **Type**: Real
-- **Description**: See also the entry [exx_hybrid_type](#exx-hybrid-type). This parameter is only relevant when exx_hybrid_type=`opt_orb`. A plane wave basis is used to optimize the radial ABFs. This parameter thus gives the cut-off of plane wave expansion, in Ry. A reasonable choice is 60.
+- **Description**: See also the entry [exx_hybrid_type](#exx_hybrid_type). This parameter is only relevant when exx_hybrid_type=`opt_orb`. A plane wave basis is used to optimize the radial ABFs. This parameter thus gives the cut-off of plane wave expansion, in Ry. A reasonable choice is 60.
 - **Default**: 0
 
 #### exx_opt_orb_tolerence
 
 - **Type**: Real
-- **Description**: See also the entry [exx_hybrid_type](#exx-hybrid-type). This parameter is only relevant when exx_hybrid_type=`opt_orb`. exx_opt_orb_tolerence determines the threshold when solving for the zeros of spherical Bessel functions. A reasonable choice is 1e-12.
+- **Description**: See also the entry [exx_hybrid_type](#exx_hybrid_type). This parameter is only relevant when exx_hybrid_type=`opt_orb`. exx_opt_orb_tolerence determines the threshold when solving for the zeros of spherical Bessel functions. A reasonable choice is 1e-12.
 - **Default**: 0
 
 ### Molecular dynamics
@@ -1131,7 +1131,7 @@ This part of variables are used to control the molecular dynamics calculations.
   - 2: NVT ensemble with Langevin method;
   - 3: NVT ensemble with Anderson thermostat;
   - 4: MSST method;
-  
+
   ***Note: when md_type is set to 1, md_tfreq is required to stablize temperature. It is an empirical parameter whose value is system-dependent, ranging from 1/(40\*md_dt) to 1/(100\*md_dt). An improper choice of its value might lead to failure of job.***
 - **Default**: 1
 
@@ -1185,7 +1185,7 @@ This part of variables are used to control the molecular dynamics calculations.
 #### md_seed
 
 - **Type**: Integer
-- **Description**: 
+- **Description**:
   - md_seed < 0: No srand() in MD initialization.
   - md_seed >= 0: srand(md_seed) in MD initialization.
 - **Default**: -1
@@ -1195,7 +1195,7 @@ This part of variables are used to control the molecular dynamics calculations.
 - **Type**: Real
 - **Description**:
   - When md_type = 1, md_tfreq controls the frequency of the temperature oscillations during the simulation. If it is too large, the
-temperature will fluctuate violently; if it is too small, the temperature will take a very long time to equilibrate with the atomic system. 
+temperature will fluctuate violently; if it is too small, the temperature will take a very long time to equilibrate with the atomic system.
   - When md_type = 3, md_tfreq*md_dt is the collision probability in Anderson method.
   - If md_tfreq is not set in INPUT, md_tfreq will be autoset to be 1/40/md_dt.
 - **Default**: 1/40/md_dt
