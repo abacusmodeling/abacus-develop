@@ -17,9 +17,9 @@ Stochastic_Iter::Stochastic_Iter()
 
 Stochastic_Iter::~Stochastic_Iter()
 {
-    if(p_che != nullptr)        delete p_che;
-    if(spolyv != nullptr)       delete[] spolyv;
-    if(chiallorder != nullptr)  delete[] chiallorder;
+    delete p_che;
+    delete[] spolyv;
+    delete[] chiallorder;
 }
 
 void Stochastic_Iter::init(const int dim, int* nchip_in, const int method_in, Stochastic_WF& stowf)
@@ -88,17 +88,24 @@ void Stochastic_Iter::orthog(const int& ik, psi::Psi<std::complex<double>>& psi,
     }
 }
 
-void Stochastic_Iter::checkemm(const int& ik, const int iter, Stochastic_WF& stowf)
+void Stochastic_Iter::checkemm(const int& ik, const int istep, const int iter, Stochastic_WF& stowf)
 {
     ModuleBase::TITLE("Stochastic_Iter","checkemm");
-    if(iter > 5)
-	{
-        return;
-	}
+    //iter = 1,2,...   istep = 0,1,2,...
+    if( istep%INPUT.initsto_freq != 0 )    return;
+    if(istep == 0)
+    {
+        if( (GlobalV::NBANDS > 0 && iter > 3) || (GlobalV::NBANDS == 0 && iter > 1)) 
+            return;
+    }
+    else
+    {
+        if(iter > 1) return;
+    }
         
     const int norder = p_che->norder;
     std::complex<double> * pchi;
-    int ntest = 1;
+    int ntest = 2;
 
     if (nchip[ik] < ntest) 
 	{
@@ -333,15 +340,27 @@ double Stochastic_Iter::calne(elecstate::ElecState* pes)
         }
     }
     KS_ne /= GlobalV::NPROC_IN_POOL;
-	MPI_Allreduce(MPI_IN_PLACE, &KS_ne, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
-
 #ifdef __MPI
-        MPI_Allreduce(MPI_IN_PLACE, &sto_ne, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
+	MPI_Allreduce(MPI_IN_PLACE, &KS_ne, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &sto_ne, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
 #endif
 
     totne = KS_ne + sto_ne;
     ModuleBase::timer::tick("Stochastic_Iter","calne");
     return totne;
+}
+
+void Stochastic_Iter::calHsqrtchi(Stochastic_WF& stowf)
+{
+    p_che->calcoef_real(&stofunc,&Sto_Func<double>::nroot_fd);
+    for(int ik = 0; ik < GlobalC::kv.nks; ++ik)
+    {
+        //init k
+        if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
+        stohchi.current_ik = ik;
+
+        this->calTnchi_ik(ik, stowf);
+    }
 }
 
 void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pes)
@@ -352,7 +371,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     int npwx = GlobalC::wf.npwx;
     const int norder = p_che->norder;
 
-    //cal demet
+    //---------------cal demet-----------------------
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nfdlnfd);
     double stodemet = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
 
@@ -369,15 +388,14 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
         }
     }
     pes->demet /= GlobalV::NPROC_IN_POOL;
+#ifdef __MPI
 	MPI_Allreduce(MPI_IN_PLACE, &pes->demet, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
-
-    //cal eband
+#endif
+    //--------------------cal eband------------------------
     p_che->calcoef_real(&stofunc,&Sto_Func<double>::nxfd);
     double sto_eband = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
 
-    //cal rho
-    p_che->calcoef_real(&stofunc,&Sto_Func<double>::nroot_fd);
-    
+    //---------------------cal rho-------------------------
     double *sto_rho = new double [nrxx];
     //int npwall = npwx * nchip;
 
@@ -400,12 +418,6 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     
     for(int ik = 0; ik < GlobalC::kv.nks; ++ik)
     {
-        //init k
-        if(GlobalC::kv.nks > 1) GlobalC::hm.hpw.init_k(ik);
-        stohchi.current_ik = ik;
-
-        this->calTnchi(ik, stowf);
-
         std::complex<double> *tmpout = stowf.shchi[ik].c;
         for(int ichi = 0; ichi < nchip[ik] ; ++ichi)
         {
@@ -474,7 +486,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     return;
 }
 
-void Stochastic_Iter::calTnchi(const int& ik, Stochastic_WF& stowf)
+void Stochastic_Iter::calTnchi_ik(const int& ik, Stochastic_WF& stowf)
 {
     const int npw = GlobalC::kv.ngk[ik];
     std::complex<double> * out = stowf.shchi[ik].c;
@@ -507,4 +519,12 @@ void Stochastic_Iter::calTnchi(const int& ik, Stochastic_WF& stowf)
     
 }
 
+void Stochastic_Iter::cleanchiallorder()
+{
+    if(this->method==2) 
+    {
+        delete[] chiallorder;
+        chiallorder = nullptr;
+    }
+}
 
