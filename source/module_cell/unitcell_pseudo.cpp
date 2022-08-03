@@ -286,7 +286,7 @@ void UnitCell_pseudo::setup_cell(
 		}
 	}
 
-	this->check_structure(GlobalV::MIN_DIST_FACT);
+	this->check_structure(GlobalV::MIN_DIST_COEF);
 
 	// setup the total number of PAOs
 	this->cal_natomwfc(log);
@@ -937,7 +937,7 @@ void UnitCell_pseudo::check_structure(double factor)
 		std::stringstream mess;
 		mess << "\nERROR: There have some atoms are too close, please check the structure!!!" << std::endl;
 		mess << errorlog.str();
-		mess << "\nIf this structure is what you want, you can set 'min_dist_fact' as" << std::endl;
+		mess << "\nIf this structure is what you want, you can set 'min_dist_coef' as" << std::endl;
 		mess << "a smaller value (the current value is " << factor << ") in 'INPUT' file." << std::endl;
 
 		GlobalV::ofs_running << mess.str();
