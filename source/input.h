@@ -72,6 +72,12 @@ class Input
     int bndpar; //parallel for stochastic/deterministic bands
     int initsto_freq; //frequency to init stochastic orbitals when running md
     int method_sto; //different methods for sdft, 1: slow, less memory  2: fast, more memory
+    bool cal_cond; //calculate electronic conductivities
+    int cond_nche; //orders of Chebyshev expansions for conductivities
+    double cond_dw; //d\omega for conductivities
+    double cond_wcut; //cutoff \omega for conductivities
+    int cond_wenlarge;
+    double cond_fwhm; //FWHM for conductivities 
 
     //==========================================================
     // electrons / spin
@@ -221,6 +227,9 @@ class Input
     double dos_emax_ev;
     double dos_edelta_ev;
     double dos_scale;
+    int dos_nche; //orders of Chebyshev expansions for dos
+    bool dos_setemin = false; //true: emin is set
+    bool dos_setemax = false; //true: emax is set
 
     double b_coef; //  pengfei 2014-10-13
 

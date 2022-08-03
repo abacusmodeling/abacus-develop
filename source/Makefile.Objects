@@ -226,7 +226,9 @@ OBJS_ESOLVER=esolver.o\
     esolver_ks.o\
     esolver_fp.o\
     esolver_ks_pw.o\
+    esolver_ks_pw_tool.o\
     esolver_sdft_pw.o\
+	esolver_sdft_pw_tool.o\
     esolver_ks_lcao.o\
     esolver_ks_lcao_tddft.o\
     esolver_ks_lcao_elec.o\
