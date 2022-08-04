@@ -151,7 +151,7 @@ void Input::Default(void)
     NNKP = "seedname.nnkp";
     wannier_spin = "up";
     kspacing = 0.0;
-    min_dist_coef = 0.8;
+    min_dist_coef = 0.2;
     //----------------------------------------------------------
     // electrons / spin
     //----------------------------------------------------------

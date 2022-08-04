@@ -850,10 +850,11 @@ void UnitCell_pseudo::check_structure(double factor)
 	//and compare with the covalent_bond_length,
 	//if there has bond length is shorter than covalent_bond_length * factor,
 	//we think this structure is unreasonable.
-
+	const double warning_coef = 0.6;
 	assert(ntype>0);
 	std::stringstream errorlog;
 	bool all_pass = true;
+	bool no_warning = true;
 	for (int it1 = 0;it1 < ntype; it1++)
 	{ 
 		std::string symbol1 = this->atoms[it1].psd;
@@ -916,13 +917,23 @@ void UnitCell_pseudo::check_structure(double factor)
 														  pow((x2-x1)*this->a1.y + (y2-y1)*this->a2.y + (z2-z1)*this->a3.y,2) +
 														  pow((x2-x1)*this->a1.z + (y2-y1)*this->a2.z + (z2-z1)*this->a3.z,2) ) * this->lat0;
 
-								if (bond_length < covalent_length*factor)
+								if (bond_length < covalent_length*factor || bond_length < covalent_length*warning_coef)
 								{
-									all_pass = false;
-									errorlog << ia1+1 << "-th " << this->atoms[it1].label << ", " << ia2+1 << "-th " << this->atoms[it1].label;
-									errorlog << " (cell:" << a << " " << b << " " << c << ")"; 
-									errorlog << ", bond length= " << std::setprecision(3) << bond_length << " Bohr (";
+									errorlog.setf(ios_base::fixed, ios_base::floatfield);
+									errorlog << std::setw(3) << ia1+1 << "-th " << std::setw(3) << this->atoms[it1].label << ", "; 
+									errorlog << std::setw(3) << ia2+1 << "-th " << std::setw(3) << this->atoms[it2].label;
+									errorlog << " (cell:" << std::setw(2) << a << " " << std::setw(2) << b << " " << std::setw(2) << c << ")"; 
+									errorlog << ", distance= " << std::setprecision(3) << bond_length << " Bohr (";
 									errorlog << bond_length*ModuleBase::BOHR_TO_A << " Angstrom)" << std::endl;
+
+									if (bond_length < covalent_length*factor)
+									{
+										all_pass = false;
+									}
+									else
+									{
+										no_warning = false;
+									}
 								}
 							}//c
 						}//b
@@ -932,16 +943,24 @@ void UnitCell_pseudo::check_structure(double factor)
 		}//ia1	
 	}//it1
 
-	if (!all_pass)
+	if (!all_pass || !no_warning)
 	{
 		std::stringstream mess;
-		mess << "\nERROR: There have some atoms are too close, please check the structure!!!" << std::endl;
-		mess << errorlog.str();
-		mess << "\nIf this structure is what you want, you can set 'min_dist_coef' as" << std::endl;
-		mess << "a smaller value (the current value is " << factor << ") in 'INPUT' file." << std::endl;
-
-		GlobalV::ofs_running << mess.str();
+		mess << "\nWARNING: There have some atoms are too close, " << std::endl;
+		mess << "please check the nearest-neighbor list in log file." << std::endl;
+		GlobalV::ofs_running << mess.str() << errorlog.str();
 		std::cout << mess.str();
-		ModuleBase::WARNING_QUIT("Input", "The structure is unreasonable!");
+
+		if (!all_pass)
+		{
+			mess.clear();
+			mess.str("");
+			mess << "If this structure is what you want, you can set 'min_dist_coef'" << std::endl;
+			mess << "as a smaller value (the current value is " << factor << ") in INPUT file." << std::endl;
+			GlobalV::ofs_running << mess.str();
+			std::cout << mess.str();
+			ModuleBase::WARNING_QUIT("Input", "The structure is unreasonable!");
+		}
+		
 	}
 }

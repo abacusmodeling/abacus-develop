@@ -304,8 +304,8 @@ This part of variables are used to control general system parameters.
 #### min_dist_coef
 
 - **Type**: double
-- **Descrption**: a factor related to the allowed minimum distance between two atoms. At the begining, ABACUS will check the structure, and if there has the distance of two atoms is shorter than min_dist_coef*(standard covalent bond length), we think this structure is unreasonable. If you want to calculate some structures in extreme condition like high pressure, you should set this parameter as a smaller value.
-- **Default**: 0.8
+- **Descrption**: a factor related to the allowed minimum distance between two atoms. At the begining, ABACUS will check the structure, and if the distance of two atoms is shorter than min_dist_coef*(standard covalent bond length), we think this structure is unreasonable. If you want to calculate some structures in extreme condition like high pressure, you should set this parameter as a smaller value or even 0.
+- **Default**: 0.2
 
 ### Variables related to input files
 
