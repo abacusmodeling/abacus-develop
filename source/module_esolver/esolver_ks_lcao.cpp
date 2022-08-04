@@ -42,12 +42,27 @@ namespace ModuleESolver
 
     void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     {
-        ESolver_KS::Init(inp,ucell);
-
+        ModuleBase::TITLE("ESolver_KS_LCAO","Init");
         // if we are only calculating S, then there is no need
         // to prepare for potentials and so on
-        if(GlobalV::CALCULATION!="calc_S")
+
+        if(GlobalV::CALCULATION== "get_S")
         {
+            if (ModuleSymmetry::Symmetry::symm_flag)
+            {
+                GlobalC::symm.analy_sys(ucell, GlobalV::ofs_running);
+                ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
+            }
+
+            // Setup the k points according to symmetry.
+            GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
+
+            Print_Info::setup_parameters(ucell, GlobalC::kv);
+        }
+        else
+        {
+            ESolver_KS::Init(inp,ucell);
 #ifdef __MPI 
             if (GlobalV::CALCULATION == "nscf")
             {
@@ -93,7 +108,7 @@ namespace ModuleESolver
             int ion_step = 0;
             GlobalC::pot.init_pot(ion_step, GlobalC::sf.strucFac);
             ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");      
-        } // end ifnot calc_S
+        } // end ifnot get_S
 
         //------------------init Basis_lcao----------------------
         // Init Basis should be put outside of Ensolver.
@@ -271,7 +286,6 @@ namespace ModuleESolver
         this->orb_con.calculation = GlobalV::CALCULATION;
         this->orb_con.ks_solver = GlobalV::KS_SOLVER;
         this->orb_con.setup_2d = true;
-
         // * reading the localized orbitals/projectors
         // * construct the interpolation tables.
         this->orb_con.read_orb_first(
@@ -321,6 +335,7 @@ namespace ModuleESolver
 
         if (this->orb_con.setup_2d)
             this->orb_con.setup_2d_division(GlobalV::ofs_running, GlobalV::ofs_warning);
+
     }
 
 
