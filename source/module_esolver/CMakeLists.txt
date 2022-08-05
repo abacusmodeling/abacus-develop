@@ -10,6 +10,7 @@ add_library(
     esolver_sdft_pw_tool.cpp
     esolver_ks_lcao.cpp
     esolver_ks_lcao_elec.cpp
+    esolver_ks_lcao_tddft.cpp
     esolver_lj.cpp
     esolver_dp.cpp
 )
