@@ -946,10 +946,9 @@ void UnitCell_pseudo::check_structure(double factor)
 	if (!all_pass || !no_warning)
 	{
 		std::stringstream mess;
-		mess << "\nWARNING: There have some atoms are too close, " << std::endl;
-		mess << "please check the nearest-neighbor list in log file." << std::endl;
-		GlobalV::ofs_running << mess.str() << errorlog.str();
-		std::cout << mess.str();
+		mess << "\nWARNING: Some atoms are too close." << std::endl;
+		GlobalV::ofs_running << mess.str() << errorlog.str() << std::endl;
+		std::cout << mess.str() << "Please check the nearest-neighbor list in log file.\n" << std::endl;
 
 		if (!all_pass)
 		{
