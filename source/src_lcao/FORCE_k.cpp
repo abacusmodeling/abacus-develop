@@ -820,6 +820,11 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(double** dm2d,
     ModuleBase::timer::tick("Force_LCAO_k", "cal_fvnl_dbeta_k_new");
     const Parallel_Orbitals* pv = this->ParaV;
 
+	//Step 1 : generate <psi|dbeta>
+	//type of atom; distance; atomic basis; projectors
+	std::vector<std::map<key_tuple,std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_tot;;
+    nlm_tot.resize(GlobalC::ucell.nat);
+
     for (int iat = 0; iat < GlobalC::ucell.nat; iat++)
     {
 
@@ -829,12 +834,11 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(double** dm2d,
         // Step 1 : generate <psi|beta>
         // type of atom; distance; atomic basis; projectors
 
-        std::map<key_tuple, std::unordered_map<int, std::vector<std::vector<double>>>> nlm_tot;
-        nlm_tot.clear();
-
         const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[it].get_rcut_max();
         const ModuleBase::Vector3<double> tau = GlobalC::ucell.atoms[it].tau[ia];
         GlobalC::GridD.Find_atom(GlobalC::ucell, tau, it, ia);
+
+        nlm_tot[iat].clear();
 
         for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum() + 1; ++ad)
         {
@@ -889,243 +893,265 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(double** dm2d,
             const int ry1 = GlobalC::GridD.getBox(ad).y;
             const int rz1 = GlobalC::GridD.getBox(ad).z;
             key_tuple key_1(iat1, rx1, ry1, rz1);
-            nlm_tot[key_1] = nlm_cur;
+            nlm_tot[iat][key_1] = nlm_cur;
         } // end ad
+    }
 
-        //=======================================================
-        // Step2:
-        // calculate sum_(L0,M0) beta<psi_i|beta><beta|psi_j>
-        // and accumulate the value to Hloc_fixedR(i,j)
-        //=======================================================
-        int iir = 0;
-        ModuleBase::Vector3<double> tau1;
-        ModuleBase::Vector3<double> tau2;
-        ModuleBase::Vector3<double> dtau;
-        ModuleBase::Vector3<double> tau0;
-        ModuleBase::Vector3<double> dtau1;
-        ModuleBase::Vector3<double> dtau2;
+    //=======================================================
+    // Step2:
+    // calculate sum_(L0,M0) beta<psi_i|beta><beta|psi_j>
+    // and accumulate the value to Hloc_fixedR(i,j)
+    //=======================================================
+	int nnr = 0;
+    ModuleBase::Vector3<double> tau1;
+    ModuleBase::Vector3<double> tau2;
+    ModuleBase::Vector3<double> dtau;
+    ModuleBase::Vector3<double> tau0;
+    ModuleBase::Vector3<double> dtau1;
+    ModuleBase::Vector3<double> dtau2;
 
-        double rcut;
-        double distance;
+    double rcut;
+    double distance;
 
-        double rcut1;
-        double rcut2;
-        double distance1;
-        double distance2;
+    double rcut1;
+    double rcut2;
+    double distance1;
+    double distance2;
 
-        for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
+    for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
+    {
+        const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+
+        for (int I1 = 0; I1 < atom1->na; ++I1)
         {
-            const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+            tau1 = atom1->tau[I1];
 
-            for (int I1 = 0; I1 < atom1->na; ++I1)
+            GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
+            const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+
+            for (int ad2 = 0; ad2 < GlobalC::GridD.getAdjacentNum() + 1; ++ad2)
             {
-                tau1 = atom1->tau[I1];
+				const int T2 = GlobalC::GridD.getType(ad2);
+				const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				
+				const int I2 = GlobalC::GridD.getNatom(ad2);
+				const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+				tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 
-                GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-                const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-
-                for (int ad2 = 0; ad2 < GlobalC::GridD.getAdjacentNum() + 1; ++ad2)
+				const int rx2=GlobalC::GridD.getBox(ad2).x;
+				const int ry2=GlobalC::GridD.getBox(ad2).y;
+				const int rz2=GlobalC::GridD.getBox(ad2).z;
+					
+				dtau = tau2 - tau1;
+				distance = dtau.norm2() * pow(GlobalC::ucell.lat0,2);
+				// this rcut is in order to make nnr consistent 
+				// with other matrix.
+				rcut = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut(),2);
+                
+                // check if this a adjacent atoms.
+                bool is_adj = false;
+                if (distance < rcut) is_adj = true;
+                else if (distance >= rcut)
                 {
-                    const int T2 = GlobalC::GridD.getType(ad2);
-                    const Atom* atom2 = &GlobalC::ucell.atoms[T2];
-                    const int I2 = GlobalC::GridD.getNatom(ad2);
-                    const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
-                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                    tau2 = GlobalC::GridD.getAdjacentTau(ad2);
-
-                    dtau = tau2 - tau1;
-                    distance = dtau.norm() * GlobalC::ucell.lat0;
-                    rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
-
-                    // check if this a adjacent atoms.
-                    bool is_adj = false;
-                    if (distance < rcut)
-                        is_adj = true;
-                    else if (distance >= rcut)
+                    for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum() + 1; ++ad0)
                     {
-                        for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum() + 1; ++ad0)
+                        const int T0 = GlobalC::GridD.getType(ad0);
+                        if (GlobalC::ucell.infoNL.nproj[T0] == 0)
+                            continue;
+                        const int I0 = GlobalC::GridD.getNatom(ad0);
+                        // const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+                        // const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+
+                        tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+                        dtau1 = tau0 - tau1;
+                        distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+                        rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+
+                        dtau2 = tau0 - tau2;
+                        distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+                        rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+
+                        if (distance1 < rcut1 && distance2 < rcut2)
                         {
-                            const int T0 = GlobalC::GridD.getType(ad0);
-                            if (GlobalC::ucell.infoNL.nproj[T0] == 0)
-                                continue;
-                            const int I0 = GlobalC::GridD.getNatom(ad0);
-                            // const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
-                            // const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-
-                            tau0 = GlobalC::GridD.getAdjacentTau(ad0);
-                            dtau1 = tau0 - tau1;
-                            distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-                            rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-
-                            dtau2 = tau0 - tau2;
-                            distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-                            rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-
-                            if (distance1 < rcut1 && distance2 < rcut2)
-                            {
-                                is_adj = true;
-                                break;
-                            }
+                            is_adj = true;
+                            break;
                         }
                     }
+                }
 
-                    if (is_adj)
+                if (is_adj)
+                {
+                    for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum() + 1; ++ad0)
                     {
+						const int T0 = GlobalC::GridD.getType(ad0);
+						const int I0 = GlobalC::GridD.getNatom(ad0);
+						const int iat = GlobalC::ucell.itia2iat(T0,I0);
 
-                        const int rx2 = GlobalC::GridD.getBox(ad2).x;
-                        const int ry2 = GlobalC::GridD.getBox(ad2).y;
-                        const int rz2 = GlobalC::GridD.getBox(ad2).z;
+						// mohan add 2010-12-19
+						if( GlobalC::ucell.infoNL.nproj[T0] == 0) continue;
 
-                        // < psi1 | all projectors | psi2 >
-                        // ----------------------------- enter the nnr increaing zone -------------------------
-                        for (int j = 0; j < atom1->nw; ++j)
-                        {
-                            const int iw1_all = start1 + j;
-                            const int mu = pv->trace_loc_row[iw1_all];
-                            if (mu < 0)
-                                continue;
-                            for (int k = 0; k < atom2->nw; ++k)
-                            {
-                                const int iw2_all = start2 + k;
-                                const int nu = pv->trace_loc_col[iw2_all];
-                                if (nu < 0)
-                                    continue;
+						//const int I0 = GlobalC::GridD.getNatom(ad0);
+						//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 
-                                for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum() + 1; ++ad0)
+						dtau1 = tau0 - tau1;
+						dtau2 = tau0 - tau2;
+						const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+						const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+
+						// seems a bug here!! mohan 2011-06-17
+						rcut1 = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+						rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+
+                        double r0[3];
+                        double r1[3];
+                        r1[0] = (tau1.x - tau0.x);
+                        r1[1] = (tau1.y - tau0.y);
+                        r1[2] = (tau1.z - tau0.z);
+                        r0[0] = (tau2.x - tau0.x);
+                        r0[1] = (tau2.y - tau0.y);
+                        r0[2] = (tau2.z - tau0.z);
+
+						if(distance1 >= rcut1 || distance2 >= rcut2)
+						{
+							continue;
+						}
+
+						const int rx0=GlobalC::GridD.getBox(ad0).x;
+						const int ry0=GlobalC::GridD.getBox(ad0).y;
+						const int rz0=GlobalC::GridD.getBox(ad0).z;
+                        key_tuple key1(iat1, -rx0, -ry0, -rz0);
+                        key_tuple key2(iat2, rx2 - rx0, ry2 - ry0, rz2 - rz0);
+
+                        int nnr_inner = 0;
+						for (int j=0; j<atom1->nw*GlobalV::NPOL; j++)
+						{
+							const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
+							const int iw1_all = start1 + j;
+							const int mu = pv->trace_loc_row[iw1_all];
+							if(mu < 0)continue; 
+
+							for (int k=0; k<atom2->nw*GlobalV::NPOL; k++)
+							{
+								const int k0 = k/GlobalV::NPOL;
+								const int iw2_all = start2 + k;
+								const int nu = pv->trace_loc_col[iw2_all];						
+								if(nu < 0)continue;
+
+                                // const Atom* atom0 = &GlobalC::ucell.atoms[T0];
+                                double nlm[3] = {0, 0, 0};
+                                std::vector<double> nlm_1 = nlm_tot[iat][key2][iw2_all][0];
+                                std::vector<std::vector<double>> nlm_2;
+                                nlm_2.resize(3);
+                                for (int i = 0; i < 3; i++)
                                 {
-                                    const int T0 = GlobalC::GridD.getType(ad0);
-                                    if (GlobalC::ucell.infoNL.nproj[T0] == 0)
-                                        continue;
-                                    const int I0 = GlobalC::GridD.getNatom(ad0);
-                                    if (T0 != it || I0 != ia)
-                                        continue;
+                                    nlm_2[i] = nlm_tot[iat][key1][iw1_all][i + 1];
+                                }
 
-                                    const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
-                                    // const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-                                    tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+                                assert(nlm_1.size() == nlm_2[0].size());
 
-                                    dtau1 = tau0 - tau1;
-                                    distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-                                    rcut1 = GlobalC::ORB.Phi[T1].getRcut()
-                                            + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-
-                                    dtau2 = tau0 - tau2;
-                                    distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-                                    rcut2 = GlobalC::ORB.Phi[T2].getRcut()
-                                            + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-
-                                    double r0[3];
-                                    double r1[3];
-                                    r1[0] = (tau1.x - tau0.x);
-                                    r1[1] = (tau1.y - tau0.y);
-                                    r1[2] = (tau1.z - tau0.z);
-                                    r0[0] = (tau2.x - tau0.x);
-                                    r0[1] = (tau2.y - tau0.y);
-                                    r0[2] = (tau2.z - tau0.z);
-
-                                    if (distance1 < rcut1 && distance2 < rcut2)
+                                const int nproj = GlobalC::ucell.infoNL.nproj[T0];
+                                int ib = 0;
+                                for (int nb = 0; nb < nproj; nb++)
+                                {
+                                    const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
+                                    for (int m = 0; m < 2 * L0 + 1; m++)
                                     {
-                                        const int rx0 = GlobalC::GridD.getBox(ad0).x;
-                                        const int ry0 = GlobalC::GridD.getBox(ad0).y;
-                                        const int rz0 = GlobalC::GridD.getBox(ad0).z;
-                                        key_tuple key1(iat1, -rx0, -ry0, -rz0);
-                                        key_tuple key2(iat2, rx2 - rx0, ry2 - ry0, rz2 - rz0);
-
-                                        // const Atom* atom0 = &GlobalC::ucell.atoms[T0];
-                                        double nlm[3] = {0, 0, 0};
-                                        std::vector<double> nlm_1 = nlm_tot[key2][iw2_all][0];
-                                        std::vector<std::vector<double>> nlm_2;
-                                        nlm_2.resize(3);
-                                        for (int i = 0; i < 3; i++)
+                                        for (int ir = 0; ir < 3; ir++)
                                         {
-                                            nlm_2[i] = nlm_tot[key1][iw1_all][i + 1];
+                                            nlm[ir] += nlm_2[ir][ib] * nlm_1[ib]
+                                                        * GlobalC::ucell.atoms[T0].dion(nb, nb);
                                         }
+                                        ib += 1;
+                                    }
+                                }
+                                assert(ib == nlm_1.size());
 
-                                        assert(nlm_1.size() == nlm_2[0].size());
+                                double nlm1[3] = {0, 0, 0};
+                                if (isstress)
+                                {
+                                    std::vector<double> nlm_1 = nlm_tot[iat][key1][iw1_all][0];
+                                    std::vector<std::vector<double>> nlm_2;
+                                    nlm_2.resize(3);
+                                    for (int i = 0; i < 3; i++)
+                                    {
+                                        nlm_2[i] = nlm_tot[iat][key2][iw2_all][i + 1];
+                                    }
 
-                                        const int nproj = GlobalC::ucell.infoNL.nproj[T0];
-                                        int ib = 0;
-                                        for (int nb = 0; nb < nproj; nb++)
+                                    assert(nlm_1.size() == nlm_2[0].size());
+
+                                    const int nproj = GlobalC::ucell.infoNL.nproj[T0];
+                                    int ib = 0;
+                                    for (int nb = 0; nb < nproj; nb++)
+                                    {
+                                        const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
+                                        for (int m = 0; m < 2 * L0 + 1; m++)
                                         {
-                                            const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
-                                            for (int m = 0; m < 2 * L0 + 1; m++)
+                                            for (int ir = 0; ir < 3; ir++)
                                             {
-                                                for (int ir = 0; ir < 3; ir++)
-                                                {
-                                                    nlm[ir] += nlm_2[ir][ib] * nlm_1[ib]
-                                                               * GlobalC::ucell.atoms[T0].dion(nb, nb);
-                                                }
-                                                ib += 1;
+                                                nlm1[ir] += nlm_2[ir][ib] * nlm_1[ib]
+                                                            * GlobalC::ucell.atoms[T0].dion(nb, nb);
                                             }
+                                            ib += 1;
                                         }
-                                        assert(ib == nlm_1.size());
+                                    }
+                                    assert(ib == nlm_1.size());
+                                }
 
-                                        double nlm1[3] = {0, 0, 0};
+                                /// only one projector for each atom force, but another projector for stress
+                                for (int is = 0; is < GlobalV::NSPIN; ++is)
+                                {
+                                    double dm2d2 = 2.0 * dm2d[is][nnr+nnr_inner];
+                                    for (int jpol = 0; jpol < 3; jpol++)
+                                    {
+                                        if (isforce)
+                                        {
+                                            fvnl_dbeta(iat, jpol) -= dm2d2 * nlm[jpol];
+                                        }
                                         if (isstress)
                                         {
-                                            std::vector<double> nlm_1 = nlm_tot[key1][iw1_all][0];
-                                            std::vector<std::vector<double>> nlm_2;
-                                            nlm_2.resize(3);
-                                            for (int i = 0; i < 3; i++)
+                                            for (int ipol = jpol; ipol < 3; ipol++)
                                             {
-                                                nlm_2[i] = nlm_tot[key2][iw2_all][i + 1];
-                                            }
-
-                                            assert(nlm_1.size() == nlm_2[0].size());
-
-                                            const int nproj = GlobalC::ucell.infoNL.nproj[T0];
-                                            int ib = 0;
-                                            for (int nb = 0; nb < nproj; nb++)
-                                            {
-                                                const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
-                                                for (int m = 0; m < 2 * L0 + 1; m++)
-                                                {
-                                                    for (int ir = 0; ir < 3; ir++)
-                                                    {
-                                                        nlm1[ir] += nlm_2[ir][ib] * nlm_1[ib]
-                                                                    * GlobalC::ucell.atoms[T0].dion(nb, nb);
-                                                    }
-                                                    ib += 1;
-                                                }
-                                            }
-                                            assert(ib == nlm_1.size());
-                                        }
-                                        /// only one projector for each atom force, but another projector for stress
-                                        for (int is = 0; is < GlobalV::NSPIN; ++is)
-                                        {
-                                            double dm2d2 = 2.0 * dm2d[is][iir];
-                                            for (int jpol = 0; jpol < 3; jpol++)
-                                            {
-                                                if (isforce)
-                                                {
-                                                    fvnl_dbeta(iat0, jpol) -= dm2d2 * nlm[jpol];
-                                                }
-                                                if (isstress)
-                                                {
-                                                    for (int ipol = jpol; ipol < 3; ipol++)
-                                                    {
-                                                        svnl_dbeta(jpol, ipol)
-                                                            += dm2d[is][iir]
-                                                               * (nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
-                                                    }
-                                                }
+                                                svnl_dbeta(jpol, ipol)
+                                                    += dm2d[is][nnr+nnr_inner]
+                                                        * (nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
                                             }
                                         }
-
-                                    } // distance
-                                } // ad0
-
-                                ++iir;
+                                    }
+                                }
+                                nnr_inner++;
                             } // k
                         } // j
-                    } // distance
-                } // ad2
-            } // I1
-        } // T1
+                    } // ad0
 
-        assert(iir == pv->nnr);
-    } // iat
+					//outer circle : accumulate nnr
+					for (int j=0; j<atom1->nw*GlobalV::NPOL; j++)
+					{
+						const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
+						const int iw1_all = start1 + j;
+						const int mu = pv->trace_loc_row[iw1_all];
+						if(mu < 0)continue; 
+
+						// fix a serious bug: atom2[T2] -> atom2
+						// mohan 2010-12-20
+						for (int k=0; k<atom2->nw*GlobalV::NPOL; k++)
+						{
+							const int k0 = k/GlobalV::NPOL;
+							const int iw2_all = start2 + k;
+							const int nu = pv->trace_loc_col[iw2_all];						
+							if(nu < 0)continue;
+
+							nnr++;
+						}
+					}
+                } // is_adj
+            } // ad2
+        } // I1
+    } // T1
+
+    assert(nnr == pv->nnr);
 
     if (isstress)
     {
