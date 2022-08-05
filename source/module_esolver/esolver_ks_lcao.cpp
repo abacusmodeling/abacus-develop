@@ -30,26 +30,107 @@
 namespace ModuleESolver
 {
 
-ESolver_KS_LCAO::ESolver_KS_LCAO()
-{
-    classname = "ESolver_KS_LCAO";
-    basisname = "LCAO";
-}
-ESolver_KS_LCAO::~ESolver_KS_LCAO()
-{
-    this->orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::deepks_setorb, GlobalC::ucell.infoNL.nproj);
-}
+    ESolver_KS_LCAO::ESolver_KS_LCAO()
+    {
+        classname = "ESolver_KS_LCAO";
+        basisname = "LCAO";
+    }
+    ESolver_KS_LCAO::~ESolver_KS_LCAO()
+    {
+        this->orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::deepks_setorb, GlobalC::ucell.infoNL.nproj);
+    }
+
+    void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
+    {
+        ModuleBase::TITLE("ESolver_KS_LCAO","Init");
+        // if we are only calculating S, then there is no need
+        // to prepare for potentials and so on
+
+        if(GlobalV::CALCULATION== "get_S")
+        {
+            if (ModuleSymmetry::Symmetry::symm_flag)
+            {
+                GlobalC::symm.analy_sys(ucell, GlobalV::ofs_running);
+                ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
+            }
+
+            // Setup the k points according to symmetry.
+            GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
+
+            Print_Info::setup_parameters(ucell, GlobalC::kv);
+        }
+        else
+        {
+            ESolver_KS::Init(inp,ucell);
+#ifdef __MPI 
+            if (GlobalV::CALCULATION == "nscf")
+            {
+                switch (GlobalC::exx_global.info.hybrid_type)
+                {
+                case Exx_Global::Hybrid_Type::HF:
+                case Exx_Global::Hybrid_Type::PBE0:
+                case Exx_Global::Hybrid_Type::SCAN0:
+                case Exx_Global::Hybrid_Type::HSE:
+                    XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
+                    break;
+                }
+            }
+#endif
 
 void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
 {
     ESolver_KS::Init(inp, ucell);
 
-    // if we are only calculating S, then there is no need
-    // to prepare for potentials and so on
-    if (GlobalV::CALCULATION != "calc_S")
-    {
-#ifdef __MPI
-        if (GlobalV::CALCULATION == "nscf")
+            // Initialize the local wave functions.
+            // npwx, eigenvalues, and weights
+            // npwx may change according to cell change
+            // this function belongs to cell LOOP
+            GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
+
+            // Initialize the FFT.
+            // this function belongs to cell LOOP
+
+            // output is GlobalC::ppcell.vloc 3D local pseudopotentials
+            // without structure factors
+            // this function belongs to cell LOOP
+            GlobalC::ppcell.init_vloc(GlobalC::ppcell.vloc, GlobalC::rhopw);
+
+            // Initialize the sum of all local potentials.
+            // if ion_step==0, read in/initialize the potentials
+            // this function belongs to ions LOOP
+            int ion_step = 0;
+            GlobalC::pot.init_pot(ion_step, GlobalC::sf.strucFac);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");      
+        } // end ifnot get_S
+
+        //------------------init Basis_lcao----------------------
+        // Init Basis should be put outside of Ensolver.
+        // * reading the localized orbitals/projectors
+        // * construct the interpolation tables.
+        this->Init_Basis_lcao(this->orb_con, inp, ucell);
+        //------------------init Basis_lcao----------------------
+
+        if(GlobalV::CALCULATION=="get_S")
+        {
+            //pass Hamilt-pointer to Operator
+            this->UHM.genH.LM = this->UHM.LM = &this->LM;
+            //pass basis-pointer to EState and Psi
+            this->LOC.ParaV = this->LOWF.ParaV = this->LM.ParaV;
+            return;
+        }
+        
+        //------------------init Hamilt_lcao----------------------
+        // * allocate H and S matrices according to computational resources
+        // * set the 'trace' between local H/S and global H/S
+        this->LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, orb_con.ParaV);
+        //------------------init Hamilt_lcao----------------------
+
+#ifdef __MPI  
+        // PLEASE simplify the Exx_Global interface
+        // mohan add 2021-03-25
+        // Peize Lin 2016-12-03
+        if (GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
         {
             switch (GlobalC::exx_global.info.hybrid_type)
             {
@@ -249,17 +330,34 @@ void ESolver_KS_LCAO::cal_Stress(ModuleBase::matrix& stress)
 {
     if (!this->have_force)
     {
-        ModuleBase::matrix fcs;
-        this->cal_Force(fcs);
-    }
-    stress = this->scs; // copy the stress
-    this->have_force = false;
-}
-
-void ESolver_KS_LCAO::postprocess()
-{
-    GlobalC::en.perform_dos(this->psid, this->psi, this->UHM);
-}
+        // Set the variables first
+        this->orb_con.gamma_only = GlobalV::GAMMA_ONLY_LOCAL;
+        this->orb_con.nlocal = GlobalV::NLOCAL;
+        this->orb_con.nbands = GlobalV::NBANDS;
+        this->orb_con.ParaV.nspin = GlobalV::NSPIN;
+        this->orb_con.dsize = GlobalV::DSIZE;
+        this->orb_con.nb2d = GlobalV::NB2D;
+        this->orb_con.dcolor = GlobalV::DCOLOR;
+        this->orb_con.drank = GlobalV::DRANK;
+        this->orb_con.myrank = GlobalV::MY_RANK;
+        this->orb_con.calculation = GlobalV::CALCULATION;
+        this->orb_con.ks_solver = GlobalV::KS_SOLVER;
+        this->orb_con.setup_2d = true;
+        // * reading the localized orbitals/projectors
+        // * construct the interpolation tables.
+        this->orb_con.read_orb_first(
+            GlobalV::ofs_running,
+            GlobalC::ORB,
+            ucell.ntype,
+            ucell.lmax,
+            inp.lcao_ecut,
+            inp.lcao_dk,
+            inp.lcao_dr,
+            inp.lcao_rmax,
+            GlobalV::deepks_setorb,
+            inp.out_mat_r,
+            GlobalV::CAL_FORCE,
+            GlobalV::MY_RANK);
 
 void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell_pseudo& ucell)
 {
@@ -317,9 +415,11 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
                                  ucell.infoNL.Beta);
 #endif
 
-    if (this->orb_con.setup_2d)
-        this->orb_con.setup_2d_division(GlobalV::ofs_running, GlobalV::ofs_warning);
-}
+        if (this->orb_con.setup_2d)
+            this->orb_con.setup_2d_division(GlobalV::ofs_running, GlobalV::ofs_warning);
+
+    }
+
 
 void ESolver_KS_LCAO::eachiterinit(const int istep, const int iter)
 {
