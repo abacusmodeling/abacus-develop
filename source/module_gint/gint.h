@@ -96,6 +96,19 @@ class Gint
         ModuleBase::matrix* fvl_dphi,
         ModuleBase::matrix* svl_dphi);
 
+    void gint_kernel_force_meta(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        double* vkdr3,
+        const int LD_pool,
+        double** DM_in,
+        const bool isforce,
+        const bool isstress,
+        ModuleBase::matrix* fvl_dphi,
+        ModuleBase::matrix* svl_dphi);
+
     void cal_meshball_force(
         const int grid_index,
         const int na_grid,  					    // how many atoms on this (i,j,k) grid
@@ -162,18 +175,6 @@ class Gint
         double** dpsiy_dm,
         double** dpsiz_dm,
         double* rho);
-
-    void cal_meshball_crosstaus(
-        const int na_grid,
-        int* block_index,
-        int* vindex,
-        double** dpsix,
-        double** dpsiy,
-        double** dpsiz,
-        double** dpsix_dm,
-        double** dpsiy_dm,
-        double** dpsiz_dm,
-        double** crosstaus);
 
     // dimension: [GlobalC::LNNR.nnrg] 
     // save the < phi_0i | V | phi_Rj > in sparse H matrix.

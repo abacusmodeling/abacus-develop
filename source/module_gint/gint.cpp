@@ -69,7 +69,7 @@ void Gint::cal_gint(Gint_inout *inout)
 
 			ModuleBase::matrix fvl_dphi_thread;
 			ModuleBase::matrix svl_dphi_thread;
-			if(inout->job==Gint_Tools::job_type::force)
+			if(inout->job==Gint_Tools::job_type::force || inout->job==Gint_Tools::job_type::force_meta)
 			{
 				if(inout->isforce)
 				{
@@ -88,7 +88,6 @@ void Gint::cal_gint(Gint_inout *inout)
             // entering the main loop of grid points
 			for(int grid_index = 0; grid_index < GlobalC::bigpw->nbxx; grid_index++)
 			{
-
 				// get the value: how many atoms has orbital value on this grid.
 				const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
 
@@ -101,11 +100,11 @@ void Gint::cal_gint(Gint_inout *inout)
 					this->gint_kernel_rho(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
 					delete[] vindex;
 				}
-				else if(inout->job == Gint_Tools::job_type::tau || inout->job == Gint_Tools::job_type::crosstaus)
+				else if(inout->job == Gint_Tools::job_type::tau)
 				{
 					int* vindex = Gint_Tools::get_vindex(GlobalC::GridT.start_ind[grid_index], ncyz);
 					this->gint_kernel_tau(na_grid, grid_index, delta_r, vindex, LD_pool, inout);
-					delete[] vindex;					
+					delete[] vindex;
 				}
 				else if(inout->job == Gint_Tools::job_type::force)
 				{
@@ -169,7 +168,26 @@ void Gint::cal_gint(Gint_inout *inout)
 					#endif
 					delete[] vldr3;
 					delete[] vkdr3;
-				}				
+				}
+				else if(inout->job == Gint_Tools::job_type::force_meta)
+				{
+					double* vldr3 = Gint_Tools::get_vldr3(inout->vl, GlobalC::GridT.start_ind[grid_index], ncyz, dv);
+					double* vkdr3 = Gint_Tools::get_vldr3(inout->vofk, GlobalC::GridT.start_ind[grid_index], ncyz, dv);
+					double** DM_in;
+					if(GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM[GlobalV::CURRENT_SPIN];
+					if(!GlobalV::GAMMA_ONLY_LOCAL) DM_in = inout->DM_R;
+					#ifdef _OPENMP
+						this->gint_kernel_force_meta(na_grid, grid_index, delta_r, vldr3, vkdr3, LD_pool, 
+							DM_in, inout->isforce, inout->isstress,
+							&fvl_dphi_thread, &svl_dphi_thread);
+					#else
+						this->gint_kernel_force_meta(na_grid, grid_index, delta_r, vldr3, vkdr3, LD_pool, 
+							DM_in, inout->isforce, inout->isstress,
+							inout->fvl_dphi, inout->svl_dphi);
+					#endif
+					delete[] vldr3;
+					delete[] vkdr3;
+				}			
 			} // int grid_index
 
 #ifdef _OPENMP
@@ -195,7 +213,7 @@ void Gint::cal_gint(Gint_inout *inout)
                 }
 			}
 
-			if(inout->job==Gint_Tools::job_type::force)
+			if(inout->job==Gint_Tools::job_type::force  || inout->job==Gint_Tools::job_type::force_meta)
 			{
 				if(inout->isforce)
 				{
