@@ -4,6 +4,8 @@
 #include "../src_io/print_info.h"
 #ifdef __MPI
 #include "mpi.h"
+#else
+#include "chrono"
 #endif
 
 //--------------Temporary----------------

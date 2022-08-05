@@ -2431,7 +2431,7 @@ void Input::Check(void)
         // if(basis_type == "pw" ) ModuleBase::WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
         if (mdp.md_dt < 0)
             ModuleBase::WARNING_QUIT("Input::Check", "time interval of MD calculation should be set!");
-        if (mdp.md_tfirst < 0)
+        if (mdp.md_tfirst < 0 && tddft==0)
             ModuleBase::WARNING_QUIT("Input::Check", "temperature of MD calculation should be set!");
         if (mdp.md_tlast < 0.0)
             mdp.md_tlast = mdp.md_tfirst;
