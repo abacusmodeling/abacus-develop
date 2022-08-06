@@ -159,6 +159,7 @@ extern std::string global_stru_dir;   // liuyu add 2022-05-24 for MD STRU
 
 extern std::ofstream ofs_running;
 extern std::ofstream ofs_warning;
+extern std::ofstream ofs_info;
 
 //==========================================================
 // EXPLAIN : test level for each class
