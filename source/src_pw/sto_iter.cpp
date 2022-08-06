@@ -93,20 +93,19 @@ void Stochastic_Iter::checkemm(const int& ik, const int istep, const int iter, S
 {
     ModuleBase::TITLE("Stochastic_Iter","checkemm");
     //iter = 1,2,...   istep = 0,1,2,...
-    if( istep%INPUT.initsto_freq != 0 )    return;
+    // if( istep%INPUT.initsto_freq != 0 )    return;
     if(istep == 0)
     {
-        if( (GlobalV::NBANDS > 0 && iter > 3) || (GlobalV::NBANDS == 0 && iter > 1)) 
-            return;
+        if(iter > 5)    return;
     }
     else
     {
-        if(iter > 1) return;
+        if(iter > 1)    return;
     }
         
     const int norder = p_che->norder;
     std::complex<double> * pchi;
-    int ntest = 2;
+    int ntest = 1;
 
     if (nchip[ik] < ntest)
     {
