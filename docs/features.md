@@ -43,7 +43,7 @@ We also provide a [detailed instruction](generate-basis.md) on generating basis 
 ## Pseudopotentials
 
 Currently ABACUS uses norm-conserving pseudopotentials in the (old) format of UPF, which
-is the standard pseudopotential format for uantum ESPRESSO. To run a calculation, the pseudopotential needs to be set in STRU file. For example:
+is the standard pseudopotential format for Quantum ESPRESSO. To run a calculation, the pseudopotential needs to be set in STRU file. For example:
 
 ```
 ATOMIC_SPECIES
