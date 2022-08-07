@@ -68,7 +68,8 @@ public:
 	void prepare_midmatrix_pblas(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, std::complex<double> *&midmatrix, const Parallel_Orbitals &pv);
     std::complex<double> det_berryphase(const int ik_L, const int ik_R,
         const ModuleBase::Vector3<double> dk, const int occ_bands,
-        Local_Orbital_wfc &lowf);
+        Local_Orbital_wfc &lowf,
+		const psi::Psi<std::complex<double>>* psi_in);
 
 	void test(std::complex<double>*** wfc_k_grid);
 	

@@ -311,14 +311,15 @@ void Hamilt_PW::diagH_subspace(const int ik,
 				}
 			}
 		};
-		if(XC_Functional::get_func_type()==4)
+		if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
 		{
 			if ( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type ) // HF
 			{
 				add_Hexx(1);
 			}
 			else if (Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
-					Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type) // PBE0 or HSE
+					Exx_Global::Hybrid_Type::SCAN0  == GlobalC::exx_lcao.info.hybrid_type ||
+					Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type) // SCAN0, PBE0 or HSE
 			{
 				add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
 			}
@@ -343,6 +344,7 @@ void Hamilt_PW::diagH_subspace(const int ik,
 		{
 		case Exx_Global::Hybrid_Type::HF:
 		case Exx_Global::Hybrid_Type::PBE0:
+		case Exx_Global::Hybrid_Type::SCAN0:
 		case Exx_Global::Hybrid_Type::HSE:
 			GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
 			break;
@@ -1568,7 +1570,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 	// (4) the metaGGA part
 	//------------------------------------
 	// timer::tick("Hamilt_PW","meta");
-	if (XC_Functional::get_func_type() == 3)
+	if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
 	{
 		tmhpsi = hpsi;
 		tmpsi_in = psi_in;
