@@ -1846,9 +1846,21 @@ bool Input::Read(const std::string &fn)
         }
     }
 
-    if (basis_type == "pw") // pengfei Li add 2015-1-31
+    if (basis_type == "pw" && gamma_only !=0) // pengfei Li add 2015-1-31
     {
         gamma_only = 0;
+        GlobalV::ofs_running << " WARNING : gamma_only has not been implemented for pw yet" << std::endl;
+        GlobalV::ofs_running << " the INPUT parameter gamma_only has been reset to 0" << std::endl;
+        GlobalV::ofs_running << " and a new KPT is generated with gamma point as the only k point" << std::endl;
+
+		GlobalV::ofs_warning << " Auto generating k-points file: " << GlobalV::global_kpoint_card << std::endl;
+		std::ofstream ofs(GlobalV::global_kpoint_card.c_str());
+		ofs << "K_POINTS" << std::endl;
+		ofs << "0" << std::endl;
+		ofs << "Gamma" << std::endl;
+		ofs << "1 1 1 0 0 0" << std::endl;
+		ofs.close();
+
         // std::cout << "gamma_only =" << gamma_only << std::endl;
     }
     else if ((basis_type == "lcao" || basis_type == "lcao_in_pw") && (gamma_only == 1))
