@@ -34,7 +34,7 @@ In the INPUT file, the keyword basis_type controls what basis type to use:
 
 The default value of basis_type is pw. When choosing lcao or lcao_in_pw, the user should prepare atomic orbitals first.
 
-Information on the keyword basis_type can also be found in [the list of input keywords](input-main.md#basis-type).
+Information on the keyword basis_type can also be found in [the list of input keywords](input-main.md#basis_type).
 
 We also provide a [detailed instruction](generate-basis.md) on generating basis functions.
 
@@ -43,7 +43,7 @@ We also provide a [detailed instruction](generate-basis.md) on generating basis 
 ## Pseudopotentials
 
 Currently ABACUS uses norm-conserving pseudopotentials in the (old) format of UPF, which
-is the standard pseudopotential format for uantum ESPRESSO. To run a calculation, the pseudopotential needs to be set in STRU file. For example:
+is the standard pseudopotential format for Quantum ESPRESSO. To run a calculation, the pseudopotential needs to be set in STRU file. For example:
 
 ```
 ATOMIC_SPECIES
@@ -63,7 +63,7 @@ vectors of the supercell are set in the STRU file.
 
 For the input k-point (KPT) file, the file should either contain the k-point coordinates and weights or the mesh size for creating the k-point gird. Both options are allowed in ABACUS.
 
-More information on k-points is provided in this [instruction](#docs/input-kpt.md)
+More information on k-points is provided in this [instruction](input-kpt.md)
 
 [back to top](#features)
 
@@ -86,7 +86,7 @@ hpseps can not be used with plane wave basis.
 
 Then the user has to correct the input file and restart the calculation.
 
-Information on the keyword ks_solver is also given in the [list of input variables](input-main.md#ks-solver).
+Information on the keyword ks_solver is also given in the [list of input variables](input-main.md#ks_solver).
 
 [back to top](#features)
 
@@ -126,6 +126,6 @@ The user can set the XC functional type in INPUT file with the parameter, dft_fu
 
 If the functional specified by the user is not consistent with the pseudopotential file, the program will stop with an error message.
 
-Information on the keyword ks_solver is also given in the [list of input variables](input-main.md#dft-functional).
+Information on the keyword ks_solver is also given in the [list of input variables](input-main.md#dft_functional).
 
 [back to top](#features)

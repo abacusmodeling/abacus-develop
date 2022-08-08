@@ -158,11 +158,10 @@ void PW_Basis::get_ig2isz_is2fftixy(
                 if (z < 0) z += this->nz;
                 this->ig2isz[pw_filled] = st_move * this->nz + z;
                 pw_filled++;
-                // assert(pw_filled <= this->npw);
             }
             this->is2fftixy[st_move] = ixy;
             st_move++;
-            // assert(st_move <= this->nst);
+            if(xprime && ixy/fftny == 0) ng_xeq0 = pw_filled;
         }
         if (st_move == this->nst && pw_filled == this->npw) break;
     }
