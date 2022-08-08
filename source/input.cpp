@@ -2698,6 +2698,10 @@ void Input::Check(void)
         ModuleBase::WARNING("Input", "gamma_only_local algorithm is not used.");
     }
 
+    if (basis_type == "lcao" && kpar > 1)
+    {
+        ModuleBase::WARNING_QUIT("Input", "kpar > 1 has not been supported for lcao calculation.");
+    }
     // new rule, mohan add 2012-02-11
     // otherwise, there need wave functions transfers
     // if(diago_type=="cg") xiaohui modify 2013-09-01
