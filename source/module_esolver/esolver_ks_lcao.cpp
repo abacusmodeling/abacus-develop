@@ -940,6 +940,11 @@ void ESolver_KS_LCAO::afterscf()
     {
         this->output_HS_R(); // LiuXh add 2019-07-15
     }
+
+    if(!GlobalV::CAL_FORCE && !GlobalV::CAL_STRESS)
+    {
+        RA.delete_grid();
+    }
 }
 
 bool ESolver_KS_LCAO::do_after_converge(int& iter)
