@@ -385,9 +385,8 @@ void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
         GlobalC::pot.set_vrs_tddft(istep);
     }
 
-    ///*
     // store wfc
-    if (this->conv_elec & istep >= 1)
+    if (istep >= 1 && this->conv_elec )
     {
         if (this->psi_laststep == nullptr)
 #ifdef __MPI
@@ -404,10 +403,11 @@ void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
             psi_laststep[0].get_pointer()[index] = tmp[index];
         if (istep > 1)
             this->cal_edm_tddft();
-    } //*/
+    }
 
-    if (this->conv_elec){
-    GlobalV::ofs_running
+    if (this->conv_elec)
+    {
+        GlobalV::ofs_running
             << "------------------------------------------------------------------------------------------------"
             << endl;
         GlobalV::ofs_running << "Eii : ";
@@ -421,7 +421,8 @@ void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
         GlobalV::ofs_running << endl;
         GlobalV::ofs_running
             << "------------------------------------------------------------------------------------------------"
-            << endl;}
+            << endl;
+    }
 }
 
 void ESolver_KS_LCAO_TDDFT::afterscf()
