@@ -576,7 +576,6 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(double* NLloc, const bool &calc_deri
 	int nnr = 0;
 	ModuleBase::Vector3<double> tau1, tau2, dtau;
 	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
-	ModuleBase::Vector3<float> dtau1_f, dtau2_f;
 	double distance = 0.0;
 	double rcut = 0.0;
 	double rcut1, rcut2;
