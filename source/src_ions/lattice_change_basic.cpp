@@ -68,7 +68,6 @@ void Lattice_Change_Basic::setup_gradient(double *lat, double *grad, ModuleBase:
 
 void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 {
-    std::cout << "change_lattice called" << std::endl;
     ModuleBase::TITLE("Lattice_Change_Basic", "change_lattice");
 
     assert(move != NULL);
@@ -151,7 +150,6 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
        "<<std::setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"
        "<<GlobalC::ucell.latvec.e33<<std::endl;
     */
-    std::cout << "why not print cif? out_stru = " << out_stru << std::endl;
     if (out_stru == 1)
         GlobalC::ucell.print_cell_cif("STRU_NOW.cif");
 

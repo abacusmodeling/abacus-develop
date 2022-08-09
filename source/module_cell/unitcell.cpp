@@ -171,7 +171,6 @@ void UnitCell::print_cell(std::ofstream& ofs) const
 
 void UnitCell::print_cell_cif(const std::string& fn) const
 {
-    std::cout << "print_cell_cif called" << std::endl;
     if (GlobalV::test_unitcell)
         ModuleBase::TITLE("UnitCell", "print_cell_cif");
 
