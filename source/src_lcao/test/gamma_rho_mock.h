@@ -597,6 +597,7 @@ bool UnitCell_pseudo::read_atom_positions(LCAO_Orbitals &orb,
             if (na > 0)
             {
                 atoms[it].tau = new ModuleBase::Vector3<double>[na];
+				atoms[it].tau_original = new ModuleBase::Vector3<double>[na];
                 atoms[it].taud = new ModuleBase::Vector3<double>[na];
                 atoms[it].vel = new ModuleBase::Vector3<double>[na];
                 for (int ia = 0; ia < na; ia++)
