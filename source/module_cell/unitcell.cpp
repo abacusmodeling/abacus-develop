@@ -336,7 +336,6 @@ void UnitCell::update_pos_tau(const ModuleBase::Vector3<double>* posd_in)
         }
     }
     assert(iat == this->nat);
->>>>>>> 844eeb391cfb566dd7e413fd94a2d14bd8fb9a88
     return;
 }
 
