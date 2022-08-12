@@ -3,7 +3,7 @@
 #include "../module_base/timer.h"
 #include "global.h"
 
-//calculate the mGGA stress correction in PW and LCAO
+//calculate the Pulay term of mGGA stress correction in PW
 void Stress_Func::stress_mgga(ModuleBase::matrix& sigma, const psi::Psi<complex<double>>* psi_in) 
 {
 	ModuleBase::timer::tick("Stress_Func","stress_mgga");

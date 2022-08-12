@@ -2,6 +2,7 @@ INPUT_PARAMETERS
 #Parameters (1.General)
 suffix			autotest
 calculation     sto-scf
+method_sto      2
 ntype			1
 symmetry		0
 pseudo_dir      ../tools/PP_ORB/
@@ -31,4 +32,4 @@ smearing_sigma		0.6
 #Parameters (5.Mixing)
 mixing_type		broyden
 mixing_beta		0.4
-method_sto      2
+
