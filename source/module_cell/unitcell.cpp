@@ -276,59 +276,59 @@ void UnitCell::set_iat2itia(void)
 void UnitCell::update_pos_tau(const double* pos)
 {
     int iat = 0;
-	for(int it = 0;it < this->ntype;it++)
-	{
-		Atom* atom = &this->atoms[it];
-		for(int ia =0;ia< atom->na;ia++)
-		{		
-			if(atom->mbl[ia].x!=0)
-			{
-                atom->tau_original[ia].x += (pos[3*iat] / this->lat0 - atom->tau[ia].x);
-				atom->tau[ia].x = pos[3*iat] / this->lat0;
-			}
-			if(atom->mbl[ia].y!=0)
-			{
-                atom->tau_original[ia].y += (pos[3*iat+1] / this->lat0 - atom->tau[ia].y);
-				atom->tau[ia].y = pos[3*iat+1] / this->lat0;
-			}
-			if(atom->mbl[ia].z!=0)
-			{
-                atom->tau_original[ia].z += (pos[3*iat+2] / this->lat0 - atom->tau[ia].z);
-				atom->tau[ia].z = pos[3*iat+2] / this->lat0;
-			}
+    for (int it = 0; it < this->ntype; it++)
+    {
+        Atom* atom = &this->atoms[it];
+        for (int ia = 0; ia < atom->na; ia++)
+        {
+            if (atom->mbl[ia].x != 0)
+            {
+                atom->tau_original[ia].x += (pos[3 * iat] / this->lat0 - atom->tau[ia].x);
+                atom->tau[ia].x = pos[3 * iat] / this->lat0;
+            }
+            if (atom->mbl[ia].y != 0)
+            {
+                atom->tau_original[ia].y += (pos[3 * iat + 1] / this->lat0 - atom->tau[ia].y);
+                atom->tau[ia].y = pos[3 * iat + 1] / this->lat0;
+            }
+            if (atom->mbl[ia].z != 0)
+            {
+                atom->tau_original[ia].z += (pos[3 * iat + 2] / this->lat0 - atom->tau[ia].z);
+                atom->tau[ia].z = pos[3 * iat + 2] / this->lat0;
+            }
 
-			// the direct coordinates also need to be updated.
-			atom->taud[ia] = atom->tau[ia] * this->GT;
-			iat++;
-		}
-	}
-	assert(iat == this->nat);
+            // the direct coordinates also need to be updated.
+            atom->taud[ia] = atom->tau[ia] * this->GT;
+            iat++;
+        }
+    }
+    assert(iat == this->nat);
     return;
 }
 
 void UnitCell::update_pos_tau(const ModuleBase::Vector3<double>* posd_in)
 {
     int iat = 0;
-	for(int it = 0; it < this->ntype; ++it)
-	{
-		Atom* atom = &this->atoms[it];
-		for(int ia = 0; ia < atom->na; ++ia)
-		{		
-			if(atom->mbl[ia].x!=0)
-			{
+    for (int it = 0; it < this->ntype; ++it)
+    {
+        Atom* atom = &this->atoms[it];
+        for (int ia = 0; ia < atom->na; ++ia)
+        {
+            if (atom->mbl[ia].x != 0)
+            {
                 atom->tau_original[ia].x += (posd_in[iat].x / this->lat0 - atom->tau[ia].x);
-				atom->tau[ia].x = posd_in[iat].x / this->lat0;
-			}
-			if(atom->mbl[ia].y!=0)
-			{
+                atom->tau[ia].x = posd_in[iat].x / this->lat0;
+            }
+            if (atom->mbl[ia].y != 0)
+            {
                 atom->tau_original[ia].y += (posd_in[iat].y / this->lat0 - atom->tau[ia].y);
-				atom->tau[ia].y = posd_in[iat].y / this->lat0;
-			}
-			if(atom->mbl[ia].z!=0)
-			{
+                atom->tau[ia].y = posd_in[iat].y / this->lat0;
+            }
+            if (atom->mbl[ia].z != 0)
+            {
                 atom->tau_original[ia].z += (posd_in[iat].z / this->lat0 - atom->tau[ia].z);
-				atom->tau[ia].z = posd_in[iat].z / this->lat0;
-			}
+                atom->tau[ia].z = posd_in[iat].z / this->lat0;
+            }
 
             // the direct coordinates also need to be updated.
             atom->taud[ia] = atom->tau[ia] * this->GT;
@@ -425,17 +425,17 @@ void UnitCell::bcast_atoms_tau()
 #endif
 }
 
-void UnitCell::save_cartesian_position(double* pos)const
+void UnitCell::save_cartesian_position(double* pos) const
 {
-    int iat=0;
-	for(int it = 0;it < this->ntype;it++)
-	{
-		Atom* atom = &this->atoms[it];
-		for(int ia =0; ia<atom->na; ia++)
-		{	
-			pos[3*iat  ] = atom->tau[ia].x*this->lat0;
-			pos[3*iat+1] = atom->tau[ia].y*this->lat0;
-			pos[3*iat+2] = atom->tau[ia].z*this->lat0;
+    int iat = 0;
+    for (int it = 0; it < this->ntype; it++)
+    {
+        Atom* atom = &this->atoms[it];
+        for (int ia = 0; ia < atom->na; ia++)
+        {
+            pos[3 * iat] = atom->tau[ia].x * this->lat0;
+            pos[3 * iat + 1] = atom->tau[ia].y * this->lat0;
+            pos[3 * iat + 2] = atom->tau[ia].z * this->lat0;
             iat++;
         }
     }
@@ -443,13 +443,13 @@ void UnitCell::save_cartesian_position(double* pos)const
     return;
 }
 
-void UnitCell::save_cartesian_position(ModuleBase::Vector3<double>* pos)const
+void UnitCell::save_cartesian_position(ModuleBase::Vector3<double>* pos) const
 {
     int iat = 0;
-    for(int it = 0; it < this->ntype; ++it)
+    for (int it = 0; it < this->ntype; ++it)
     {
         Atom* atom = &this->atoms[it];
-        for(int ia = 0; ia < atom->na; ++ia)
+        for (int ia = 0; ia < atom->na; ++ia)
         {
             pos[iat] = atom->tau_original[ia] * this->lat0;
             iat++;
@@ -459,17 +459,17 @@ void UnitCell::save_cartesian_position(ModuleBase::Vector3<double>* pos)const
     return;
 }
 
-void UnitCell::save_cartesian_position_original(double* pos)const
+void UnitCell::save_cartesian_position_original(double* pos) const
 {
-    int iat=0;
-	for(int it = 0;it < this->ntype;it++)
-	{
-		Atom* atom = &this->atoms[it];
-		for(int ia =0; ia<atom->na; ia++)
-		{	
-			pos[3*iat  ] = atom->tau_original[ia].x*this->lat0;
-			pos[3*iat+1] = atom->tau_original[ia].y*this->lat0;
-			pos[3*iat+2] = atom->tau_original[ia].z*this->lat0;
+    int iat = 0;
+    for (int it = 0; it < this->ntype; it++)
+    {
+        Atom* atom = &this->atoms[it];
+        for (int ia = 0; ia < atom->na; ia++)
+        {
+            pos[3 * iat] = atom->tau_original[ia].x * this->lat0;
+            pos[3 * iat + 1] = atom->tau_original[ia].y * this->lat0;
+            pos[3 * iat + 2] = atom->tau_original[ia].z * this->lat0;
             iat++;
         }
     }
@@ -477,13 +477,13 @@ void UnitCell::save_cartesian_position_original(double* pos)const
     return;
 }
 
-void UnitCell::save_cartesian_position_original(ModuleBase::Vector3<double>* pos)const
+void UnitCell::save_cartesian_position_original(ModuleBase::Vector3<double>* pos) const
 {
     int iat = 0;
-    for(int it = 0; it < this->ntype; ++it)
+    for (int it = 0; it < this->ntype; ++it)
     {
         Atom* atom = &this->atoms[it];
-        for(int ia = 0; ia < atom->na; ++ia)
+        for (int ia = 0; ia < atom->na; ++ia)
         {
             pos[iat] = atom->tau_original[ia] * this->lat0;
             iat++;
@@ -493,7 +493,7 @@ void UnitCell::save_cartesian_position_original(ModuleBase::Vector3<double>* pos
     return;
 }
 
-bool UnitCell::judge_big_cell(void)const
+bool UnitCell::judge_big_cell(void) const
 {
     double diameter = 2 * GlobalV::SEARCH_RADIUS;
 
