@@ -2,6 +2,7 @@
 #include "esolver_ks_pw.h"
 #include "esolver_sdft_pw.h"
 #include "esolver_ks_lcao.h"
+#include "esolver_ks_lcao_tddft.h"
 #include "esolver_of.h"
 #include "esolver_lj.h"
 #include "esolver_dp.h"
@@ -24,6 +25,10 @@ namespace ModuleESolver
         else if (use_esol == "ksdft_lcao")
         {
             p_esolver = new ESolver_KS_LCAO();
+        }
+        else if (use_esol == "ksdft_lcao_tddft")
+        {
+            p_esolver = new ESolver_KS_LCAO_TDDFT();
         }
         else if (use_esol == "sdft_pw")
         {

@@ -3,6 +3,7 @@
 #include "ylm.h"
 #include "constants.h"
 #include "timer.h"
+#include "tool_quit.h"
 
 namespace ModuleBase
 {
@@ -1056,7 +1057,235 @@ void Ylm::grad_rl_sph_harm
 			
 	return;
 }
+
+void Ylm::hes_rl_sph_harm
+(
+ 	const int& Lmax, //max momentum of L
+ 	const double& x,
+	const double& y,
+	const double& z,
+	std::vector<std::vector<double>>& hrly
+)
+{
+	hrly.resize( (Lmax+1)*(Lmax+1), std::vector<double>(6) );
+
+	double radius2 = x*x+y*y+z*z;
+	double coeff;
 	
+	//begin calculation
+	/***************************
+			 L = 0
+	***************************/
+	hrly[0][0] = hrly[0][1] = hrly[0][2] = 0.0;
+	hrly[0][3] = hrly[0][4] = hrly[0][5] = 0.0;
+	if (Lmax == 0) return;
+
+	/***************************
+			 L = 1
+	***************************/
+	hrly[1][0] = hrly[1][1] = hrly[1][2] = 0.0;
+	hrly[1][3] = hrly[1][4] = hrly[1][5] = 0.0;
+	
+	hrly[2][0] = hrly[2][1] = hrly[2][2] = 0.0;
+	hrly[2][3] = hrly[2][4] = hrly[2][5] = 0.0;
+	
+	hrly[3][0] = hrly[3][1] = hrly[3][2] = 0.0;
+	hrly[3][3] = hrly[3][4] = hrly[3][5] = 0.0;
+	
+	if (Lmax == 1) return;
+
+	/***************************
+			 L = 2
+	***************************/
+	//m=0 : 3z^2-r^2
+	coeff = sqrt(5.0 / ModuleBase::PI) / 4.0;
+	hrly[4][0] = hrly[4][3] = -2.0 * coeff;
+	hrly[4][5] = 4.0 * coeff;
+	hrly[4][1] = hrly[4][2] = hrly[4][4] = 0.0;
+	
+	//m=1 : xz
+	coeff = sqrt(15.0 / ModuleBase::PI) / 2.0;
+	hrly[5][2] = coeff;
+	hrly[5][0] = hrly[5][1] = 0.0;
+	hrly[5][3] = hrly[5][4] = hrly[5][5] = 0.0;
+	
+	//m=-1 : yz
+	hrly[6][4] = coeff;
+	hrly[6][0] = hrly[6][1] = 0.0;
+	hrly[6][2] = hrly[6][3] = hrly[6][5] = 0.0;
+
+	//m=-2 : xy
+	hrly[8][1] = coeff;
+	hrly[8][0] = hrly[8][2] = 0.0;
+	hrly[8][3] = hrly[8][4] = hrly[8][5] = 0.0;
+
+	//m=2 : (x^2-y^2)
+	coeff = sqrt(15.0 / ModuleBase::PI) / 4.0;
+	hrly[7][0] =  2.0 * coeff;
+	hrly[7][3] = -2.0 * coeff;
+	hrly[7][1] = hrly[7][2] = 0.0;
+	hrly[7][4] = hrly[7][5] = 0.0;
+
+	if (Lmax == 2) return;
+	
+	/***************************
+			 L = 3
+	***************************/
+	//m=0 : (5z^3-3zr^2)
+	coeff = sqrt(7.0 / ModuleBase::PI) / 4.0;
+	hrly[9][0] = hrly[9][3] = -6.0 * z * coeff;
+	hrly[9][1] =  0.0;
+	hrly[9][2] = -6.0 * x * coeff;
+	hrly[9][4] = -6.0 * y * coeff;
+	hrly[9][5] = 12.0 * z * coeff;
+	
+	//m=1 : x(5z^2-r^2)
+	coeff = sqrt(21.0 / 2.0 / ModuleBase::PI) / 4.0;
+	hrly[10][0] = -6.0 * x * coeff;
+	hrly[10][1] = -2.0 * y * coeff;
+	hrly[10][2] =  8.0 * z * coeff;
+	hrly[10][3] = -2.0 * x * coeff;
+	hrly[10][4] =  0.0;
+	hrly[10][5] =  8.0 * x * coeff;
+	
+	//m=-1 : y(5z^2-r^2)
+	hrly[11][0] = -2.0 * y * coeff;
+	hrly[11][1] = -2.0 * x * coeff;
+	hrly[11][2] =  0.0;
+	hrly[11][3] = -6.0 * y * coeff;
+	hrly[11][4] =  8.0 * z * coeff;
+	hrly[11][5] =  8.0 * y * coeff;
+
+	//m=2 : (x^2-y^2)z
+	coeff = sqrt(105.0 / ModuleBase::PI) / 4.0;
+	hrly[12][0] =  2.0 * z * coeff;
+	hrly[12][1] =  0.0;
+	hrly[12][2] =  2.0 * x * coeff;
+	hrly[12][3] = -hrly[12][0];
+	hrly[12][4] = -2.0 * y * coeff;
+	hrly[12][5] =  0.0;
+	
+	//m=-2 : xyz
+	coeff = sqrt(105.0 / ModuleBase::PI) / 2.0;
+	hrly[13][0] = 0.0;
+	hrly[13][1] = z * coeff;
+	hrly[13][2] = y * coeff;
+	hrly[13][3] = 0.0;
+	hrly[13][4] = x * coeff;
+	hrly[13][5] = 0.0;
+
+	//m=3 : x(x^2-3y^2)
+	coeff = sqrt(35.0 / 2.0 / ModuleBase::PI) / 4.0;
+	hrly[14][0] =  6.0 * x * coeff;
+	hrly[14][1] = -6.0 * y * coeff;
+	hrly[14][2] = 0.0;
+	hrly[14][3] = -hrly[14][0];
+	hrly[14][4] = 0.0;
+	hrly[14][5] = 0.0;
+
+	//m=-3 : y(3x^2-y^2)
+	hrly[15][0] =  6.0 * y * coeff;
+	hrly[15][1] =  6.0 * x * coeff;
+	hrly[15][2] =  0.0;
+	hrly[15][3] = -hrly[15][0];
+	hrly[15][4] =  0.0;
+	hrly[15][5] =  0.0;
+
+	if (Lmax == 3) return;
+	
+	/***************************
+			 L = 4
+	***************************/
+	//m=0 : (35z^4 - 30z^2r^2 + 3r^4)
+	coeff = sqrt(1.0 / ModuleBase::PI) * 3.0 / 16.0;
+	hrly[16][0] =  12.0 * (3.0 * x*x + y*y - 4.0 * z*z) * coeff;
+	hrly[16][1] =  24.0 * x * y * coeff;
+	hrly[16][2] = -96.0 * x * z * coeff;
+	hrly[16][3] =  12.0 * (x*x + 3.0 * y*y - 4.0 * z*z) * coeff;
+	hrly[16][4] = -96.0 * y * z * coeff;
+	hrly[16][5] = -48.0 * (x*x + y*y -2.0 * z*z) * coeff;
+
+	//m=1 : x(7z^3 - 3zr^2)
+	coeff = 3.0 / 4.0 * sqrt(5.0 / 2.0 / ModuleBase::PI);
+	hrly[17][0] = -18.0 * x * z * coeff;
+	hrly[17][1] =  -6.0 * y * z * coeff;
+	hrly[17][2] =  -3.0 * (3.0 * x*x + y*y  - 4.0 * z*z) * coeff;
+	hrly[17][3] =  -6.0 * x * z * coeff;
+	hrly[17][4] =  -6.0 * x * y * coeff;
+	hrly[17][5] =  24.0 * x * z * coeff;
+	
+	//m=-1 : y(7z^3 - 3zr^2)
+	hrly[18][0] =  -6.0 * y * z * coeff;
+	hrly[18][1] =  -6.0 * x * z * coeff;
+	hrly[18][2] =  -6.0 * x * y * coeff;
+	hrly[18][3] = -18.0 * y * z * coeff;
+	hrly[18][4] =  -3.0 * (x*x + 3.0 * y*y  - 4.0 * z*z) * coeff;
+	hrly[18][5] =  24.0 * y * z * coeff;
+
+	//m=2 : (x^2 - y^2)(7z^2 - r^2)
+	coeff = 3.0 / 8.0 * sqrt(5.0 / ModuleBase::PI);
+	hrly[19][0] = -12.0 * (x*x - z*z) * coeff;
+	hrly[19][1] =  0.0;
+	hrly[19][2] =  24.0 * x * z * coeff;
+	hrly[19][3] =  12.0 * (y*y - z*z) * coeff;
+	hrly[19][4] = -24.0 * y * z * coeff;
+	hrly[19][5] =  12.0 * (x*x - y*y) * coeff;
+	
+	//m=-2 : xy(7z^2 - r^2)
+	coeff = 3.0 / 4.0 * sqrt(5.0 / ModuleBase::PI);
+	hrly[20][0] = -6.0 * x * y * coeff;
+	hrly[20][1] = -3.0 * (x*x + y*y - 2.0 * z*z) * coeff;
+	hrly[20][2] =  2.0 * y * z * coeff;
+	hrly[20][3] =  hrly[20][0];
+	hrly[20][4] = 12.0 * x * z * coeff;
+	hrly[20][5] = 12.0 * x * y * coeff;
+
+	//m=3 : x(x^2-3y^2)z
+	coeff = 3.0 / 4.0 * sqrt(35.0 / 2.0 / ModuleBase::PI);
+	hrly[21][0] =  6.0 * x * z * coeff;
+	hrly[21][1] = -6.0 * y * z * coeff;
+	hrly[21][2] =  3.0 * (x*x - y*y) * coeff;
+	hrly[21][3] = -6.0 * x * z * coeff;
+	hrly[21][4] = -6.0 * x * y * coeff;
+	hrly[21][5] =  0.0;
+
+	//m=-3 : y(3x^2-y^2)z
+	hrly[22][0] =  6.0 * y * z * coeff;
+	hrly[22][1] =  6.0 * x * z * coeff;
+	hrly[22][2] =  6.0 * x * y * coeff;
+	hrly[22][3] = -6.0 * y * z * coeff;
+	hrly[22][4] =  3.0 * (x*x - y*y) * coeff;
+	hrly[22][5] =  0.0;
+	
+	//m=4 : x^4 + y^4 - 6 x^2y^2
+	coeff = 3.0 / 16.0 * sqrt(35.0 / ModuleBase::PI);
+	hrly[23][0] =  12.0 * (x*x - y*y) * coeff;
+	hrly[23][1] = -24.0 * x * y * coeff;
+	hrly[23][2] =   0.0;
+	hrly[23][3] =  -hrly[23][0];
+	hrly[23][4] =   0.0;
+	hrly[23][5] =   0.0;
+	
+	//m=-4 : xy(x^2 - y^2)
+	coeff = 3.0 / 4.0 * sqrt(35.0 / ModuleBase::PI);
+	hrly[24][0] =  6.0 * x * y * coeff;
+	hrly[24][1] =  3.0 * (x*x - y*y) * coeff;
+	hrly[24][2] =  0.0;
+	hrly[24][3] = -hrly[24][0];
+	hrly[24][4] =  0.0;
+	hrly[24][5] =  0.0;
+
+	if (Lmax == 4) return;
+
+	/***************************
+			 L > 4
+	***************************/
+	ModuleBase::WARNING_QUIT("hes_rl_sph_harm","l>4 not implemented!");
+	
+			
+	return;
+}
+
 void Ylm::set_coefficients(void)
 {
 	Ylm::ylmcoef[0] = 1.0 / sqrt(ModuleBase::FOUR_PI);

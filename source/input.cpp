@@ -145,12 +145,20 @@ void Input::Default(void)
     kpar = 1;
     initsto_freq = 1000;
     method_sto = 1;
+    cal_cond = false;
+    dos_nche = 100;
+    cond_nche = 20;
+    cond_dw = 0.1;
+    cond_wcut = 10;
+    cond_wenlarge = 10;
+    cond_fwhm = 0.3;
     berry_phase = false;
     gdir = 3;
     towannier90 = false;
     NNKP = "seedname.nnkp";
     wannier_spin = "up";
     kspacing = 0.0;
+    min_dist_coef = 0.2;
     //----------------------------------------------------------
     // electrons / spin
     //----------------------------------------------------------
@@ -548,6 +556,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, kspacing);
         }
+        else if (strcmp("min_dist_coef", word) == 0)
+        {
+            read_value(ifs, min_dist_coef);
+        }
         else if (strcmp("nbands_istate", word) == 0) // number of atom bands
         {
             read_value(ifs, nbands_istate);
@@ -582,6 +594,30 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("method_sto", word) == 0)
         {
             read_value(ifs, method_sto);
+        }
+        else if (strcmp("cal_cond", word) == 0)
+        {
+            read_value(ifs, cal_cond);
+        }
+        else if (strcmp("cond_nche", word) == 0)
+        {
+            read_value(ifs, cond_nche);
+        }
+        else if (strcmp("cond_dw", word) == 0)
+        {
+            read_value(ifs, cond_dw);
+        }
+        else if (strcmp("cond_wcut", word) == 0)
+        {
+            read_value(ifs, cond_wcut);
+        }
+        else if (strcmp("cond_wenlarge", word) == 0)
+        {
+            read_value(ifs, cond_wenlarge);
+        }
+        else if (strcmp("cond_fwhm", word) == 0)
+        {
+            read_value(ifs, cond_fwhm);
         }
         else if (strcmp("bndpar", word) == 0)
         {
@@ -1057,10 +1093,12 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("dos_emin_ev", word) == 0)
         {
             read_value(ifs, dos_emin_ev);
+            dos_setemin = true;
         }
         else if (strcmp("dos_emax_ev", word) == 0)
         {
             read_value(ifs, dos_emax_ev);
+            dos_setemax = true;
         }
         else if (strcmp("dos_edelta_ev", word) == 0)
         {
@@ -1073,6 +1111,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("dos_sigma", word) == 0)
         {
             read_value(ifs, b_coef);
+        }
+        else if (strcmp("dos_nche", word) == 0)
+        {
+            read_value(ifs, dos_nche);
         }
 
         //----------------------------------------------------------
@@ -1809,9 +1851,21 @@ bool Input::Read(const std::string &fn)
         }
     }
 
-    if (basis_type == "pw") // pengfei Li add 2015-1-31
+    if (basis_type == "pw" && gamma_only !=0) // pengfei Li add 2015-1-31
     {
         gamma_only = 0;
+        GlobalV::ofs_running << " WARNING : gamma_only has not been implemented for pw yet" << std::endl;
+        GlobalV::ofs_running << " the INPUT parameter gamma_only has been reset to 0" << std::endl;
+        GlobalV::ofs_running << " and a new KPT is generated with gamma point as the only k point" << std::endl;
+
+		GlobalV::ofs_warning << " Auto generating k-points file: " << GlobalV::global_kpoint_card << std::endl;
+		std::ofstream ofs(GlobalV::global_kpoint_card.c_str());
+		ofs << "K_POINTS" << std::endl;
+		ofs << "0" << std::endl;
+		ofs << "Gamma" << std::endl;
+		ofs << "1 1 1 0 0 0" << std::endl;
+		ofs.close();
+
         // std::cout << "gamma_only =" << gamma_only << std::endl;
     }
     else if ((basis_type == "lcao" || basis_type == "lcao_in_pw") && (gamma_only == 1))
@@ -1912,6 +1966,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(nbands_sto);
     Parallel_Common::bcast_int(nbands_istate);
     Parallel_Common::bcast_double(kspacing);
+    Parallel_Common::bcast_double(min_dist_coef);
     Parallel_Common::bcast_int(nche_sto);
     Parallel_Common::bcast_int(seed_sto);
     Parallel_Common::bcast_int(pw_seed);
@@ -1919,6 +1974,12 @@ void Input::Bcast()
     Parallel_Common::bcast_double(emin_sto);
     Parallel_Common::bcast_int(initsto_freq);
     Parallel_Common::bcast_int(method_sto);
+    Parallel_Common::bcast_bool(cal_cond);
+    Parallel_Common::bcast_int(cond_nche);
+    Parallel_Common::bcast_double(cond_dw);
+    Parallel_Common::bcast_double(cond_wcut);
+    Parallel_Common::bcast_int(cond_wenlarge);
+    Parallel_Common::bcast_double(cond_fwhm);
     Parallel_Common::bcast_int(bndpar);
     Parallel_Common::bcast_int(kpar);
     Parallel_Common::bcast_bool(berry_phase);
@@ -2044,6 +2105,9 @@ void Input::Bcast()
     Parallel_Common::bcast_double(dos_emax_ev);
     Parallel_Common::bcast_double(dos_edelta_ev);
     Parallel_Common::bcast_double(dos_scale);
+    Parallel_Common::bcast_bool(dos_setemin);
+    Parallel_Common::bcast_bool(dos_setemax);
+    Parallel_Common::bcast_int(dos_nche);
     Parallel_Common::bcast_double(b_coef);
 
     // mohan add 2009-11-11
@@ -2300,15 +2364,14 @@ void Input::Check(void)
         if (!this->relax_nmax)
             this->relax_nmax = 50;
     }
-
-    else if (calculation == "nscf")
+    else if (calculation == "nscf" || calculation == "get_S")
     {
         GlobalV::CALCULATION = "nscf";
         this->relax_nmax = 1;
         out_stru = 0;
 
         // if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
-        if (basis_type == "pw") // xiaohui add 2013-09-01. Attention! maybe there is some problem
+        if (basis_type == "pw" && calculation == "get_S") // xiaohui add 2013-09-01. Attention! maybe there is some problem
         {
             if (pw_diag_thr > 1.0e-3)
             {
@@ -2386,7 +2449,7 @@ void Input::Check(void)
         // if(basis_type == "pw" ) ModuleBase::WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
         if (mdp.md_dt < 0)
             ModuleBase::WARNING_QUIT("Input::Check", "time interval of MD calculation should be set!");
-        if (mdp.md_tfirst < 0)
+        if (mdp.md_tfirst < 0 && tddft==0)
             ModuleBase::WARNING_QUIT("Input::Check", "temperature of MD calculation should be set!");
         if (mdp.md_tlast < 0.0)
             mdp.md_tlast = mdp.md_tfirst;
@@ -2647,6 +2710,10 @@ void Input::Check(void)
         ModuleBase::WARNING("Input", "gamma_only_local algorithm is not used.");
     }
 
+    if (basis_type == "lcao" && kpar > 1)
+    {
+        ModuleBase::WARNING_QUIT("Input", "kpar > 1 has not been supported for lcao calculation.");
+    }
     // new rule, mohan add 2012-02-11
     // otherwise, there need wave functions transfers
     // if(diago_type=="cg") xiaohui modify 2013-09-01
@@ -2742,7 +2809,7 @@ void Input::Check(void)
         }
     }
 
-    if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "hse")
+    if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "hse" || dft_functional == "scan0")
     {
         if (exx_hybrid_alpha < 0 || exx_hybrid_alpha > 1)
         {

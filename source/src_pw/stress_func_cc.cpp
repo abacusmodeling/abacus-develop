@@ -35,10 +35,28 @@ void Stress_Func::stress_cc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_b
 	}
 
 	//recalculate the exchange-correlation potential
-    const auto etxc_vtxc_v = XC_Functional::v_xc(rho_basis->nrxx, rho_basis->nxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
-	GlobalC::en.etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
-	GlobalC::en.vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
-	const ModuleBase::matrix vxc = std::get<2>(etxc_vtxc_v);
+	ModuleBase::matrix vxc;
+	if(XC_Functional::get_func_type() == 3)
+	{
+#ifdef USE_LIBXC
+    	const auto etxc_vtxc_v = XC_Functional::v_xc_meta(
+            rho_basis->nrxx, rho_basis->nxyz, GlobalC::ucell.omega,
+            GlobalC::CHR.rho, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+        
+        GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+        GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
+        vxc = std::get<2>(etxc_vtxc_v);
+#else
+        ModuleBase::WARNING_QUIT("cal_force_cc","to use mGGA, compile with LIBXC");
+#endif
+	}
+	else
+	{
+    	const auto etxc_vtxc_v = XC_Functional::v_xc(rho_basis->nrxx, rho_basis->nxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+		GlobalC::en.etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
+		GlobalC::en.vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
+		vxc = std::get<2>(etxc_vtxc_v);
+	}
 
 	std::complex<double> * psic = new std::complex<double> [rho_basis->nmaxgr];
 

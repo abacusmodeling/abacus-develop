@@ -205,7 +205,7 @@ void Hamilt_PW::init_k(const int ik)
 	//if (GlobalC::ppcell.nkb > 0 && !LINEAR_SCALING) xiaohui modify 2013-09-02
 	if(GlobalC::ppcell.nkb > 0 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
 	{
-		GlobalC::ppcell.getvnl(ik);
+		GlobalC::ppcell.getvnl(ik, GlobalC::ppcell.vkb);
 	}
 
 	// (5) The number of wave functions.
@@ -300,13 +300,14 @@ void Hamilt_PW::diagH_subspace(
 				}
 			}
 		};
-		if(XC_Functional::get_func_type()==4)
+		if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
 		{
 			if ( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type ) // HF
 			{
 				add_Hexx(1);
 			}
 			else if (Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+					Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type ||
 					Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type) // PBE0 or HSE
 			{
 				add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
@@ -333,6 +334,7 @@ void Hamilt_PW::diagH_subspace(
 		{
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
+			case Exx_Global::Hybrid_Type::SCAN0:
 			case Exx_Global::Hybrid_Type::HSE:
 				GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
 				break;

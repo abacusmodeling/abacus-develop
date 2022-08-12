@@ -751,7 +751,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
         // generate vkb
         if (GlobalC::ppcell.nkb > 0)
         {
-            GlobalC::ppcell.getvnl(ik);
+            GlobalC::ppcell.getvnl(ik, GlobalC::ppcell.vkb);
         }
 
         // get becp according to wave functions and vkb
@@ -814,82 +814,79 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
             }
             std::complex<double>* pdbecp = &dbecp(ipol, 0, 0);
             zgemm_(&transa,
-                   &transb,
-                   &nkb,
-                   &npm,
-                   &nbasis,
-                   &ModuleBase::ONE,
-                   vkb1.c,
-                   &GlobalC::wf.npwx,
-                   psi_in[0].get_pointer(),
-                   &GlobalC::wf.npwx,
-                   &ModuleBase::ZERO,
-                   pdbecp,
-                   &nkb);
-        } // end ipol
+                &transb,
+                &nkb,
+                &npm,
+                &nbasis,
+                &ModuleBase::ONE,
+                vkb1.c,
+                &GlobalC::wf.npwx,
+                psi_in[0].get_pointer(),
+                &GlobalC::wf.npwx,
+                &ModuleBase::ZERO,
+                pdbecp,
+                &nkb);
+        }// end ipol
 
-        //		don't need to reduce here, keep dbecp different in each processor,
-        //		and at last sum up all the forces.
-        //		Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
+//		don't need to reduce here, keep dbecp different in each processor,
+//		and at last sum up all the forces.
+//		Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
 
-        //		double *cf = new double[GlobalC::ucell.nat*3];
-        //		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
-        for (int ib = 0; ib < nbands_occ; ib++)
-        {
-            double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
-            int iat = 0;
-            int sum = 0;
-            for (int it = 0; it < GlobalC::ucell.ntype; it++)
-            {
-                const int Nprojs = GlobalC::ucell.atoms[it].nh;
-                for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
-                {
-                    for (int ip = 0; ip < Nprojs; ip++)
+//		double *cf = new double[GlobalC::ucell.nat*3];
+//		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
+		for (int ib=0; ib<nbands_occ; ib++)
+		{
+			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
+        	int iat = 0;
+        	int sum = 0;
+			for (int it=0; it<GlobalC::ucell.ntype; it++)
+			{
+				const int Nprojs = GlobalC::ucell.atoms[it].nh;
+				for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+				{
+					for (int ip=0; ip<Nprojs; ip++)
+					{
+						double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
+						const int inkb = sum + ip; 
+						//out<<"\n ps = "<<ps;
+
+						for (int ipol=0; ipol<3; ipol++)
+						{
+							const double dbb = ( conj( dbecp( ipol, ib, inkb) ) * becp( ib, inkb) ).real();
+							forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
+							//cf[iat*3+ipol] += ps * fac * dbb;
+						}
+					}
+
+                    if(GlobalC::ppcell.multi_proj)
                     {
-                        double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip);
-                        const int inkb = sum + ip;
-                        // out<<"\n ps = "<<ps;
-
-                        for (int ipol = 0; ipol < 3; ipol++)
+                        for (int ip=0; ip<Nprojs; ip++)
                         {
-                            const double dbb = (conj(dbecp(ipol, ib, inkb)) * becp(ib, inkb)).real();
-                            forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
-                            // cf[iat*3+ipol] += ps * fac * dbb;
-                        }
-                    }
-
-                    // if ( GlobalC::ucell.atoms[it].nbeta > GlobalC::ucell.atoms[it].lmax+1 )    //{zws add 20160110
-                    //{
-                    // std::cout << " \n multi-projector force calculation ... " << std::endl;
-                    for (int ip = 0; ip < Nprojs; ip++)
-                    {
-                        const int inkb = sum + ip;
-                        // for (int ip2=0; ip2<Nprojs; ip2++)
-                        for (int ip2 = ip + 1; ip2 < Nprojs; ip2++)
-                        {
-                            // if ( ip != ip2 )
-                            //{
-                            const int jnkb = sum + ip2;
-                            double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip2, ip);
-
-                            for (int ipol = 0; ipol < 3; ipol++)
+                            const int inkb = sum + ip;
+                            //for (int ip2=0; ip2<Nprojs; ip2++)
+                            for (int ip2=0; ip2<Nprojs; ip2++)
                             {
-                                const double dbb = 2.0 * (conj(dbecp(ipol, ib, inkb)) * becp(ib, jnkb)).real();
-                                // const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib) ).real();
-                                forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
-                                // cf[iat*3+ipol] += ps * fac * dbb;
+                                if ( ip != ip2 )
+                                {
+                                    const int jnkb = sum + ip2;
+                                    double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) ;
+
+                                    for (int ipol=0; ipol<3; ipol++)
+                                    {
+                                        const double dbb = ( conj( dbecp( ipol, ib, inkb) ) * becp( ib, jnkb) ).real();
+                                        forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
+                                    }
+                                }
                             }
-                            //}
                         }
                     }
-                    //}    //}zws add 20160110
 
-                    ++iat;
-                    sum += Nprojs;
-                }
-            } // end it
-        } // end band
-    } // end ik
+					++iat;
+					sum+=Nprojs;
+				}
+			} //end it
+		} //end band
+    }// end ik
 
     // sum up forcenl from all processors
     Parallel_Reduce::reduce_double_all(forcenl.c, forcenl.nr * forcenl.nc);

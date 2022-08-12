@@ -122,6 +122,7 @@ gint_k_pvpr.o\
 gint_k_sparse.o\
 gint_rho.o\
 gint_vl.o\
+gint_tau.o\
 gint.o\
 ORB_control.o\
 ORB_read.o\
@@ -225,8 +226,11 @@ OBJS_ESOLVER=esolver.o\
     esolver_ks.o\
     esolver_fp.o\
     esolver_ks_pw.o\
+    esolver_ks_pw_tool.o\
     esolver_sdft_pw.o\
+	esolver_sdft_pw_tool.o\
     esolver_ks_lcao.o\
+    esolver_ks_lcao_tddft.o\
     esolver_ks_lcao_elec.o\
     esolver_lj.o\
     esolver_dp.o\
@@ -266,6 +270,7 @@ pw_transform.o\
 pw_transform_k.o
 
 OBJ_HSOLVER=diago_blas.o\
+diago_lapack.o\
 diago_cg.o\
 diago_david.o\
 diago_elpa.o\
@@ -277,13 +282,18 @@ hsolver_pw_sdft.o
 OBJ_ELECSTATES=elecstate.o\
 dm2d_to_grid.o\
 elecstate_lcao.o\
+elecstate_lcao_tddft.o\
 elecstate_pw.o\
 elecstate_pw_sdft.o
 
 OBJ_PSI=psi.o
 
-OBJ_HAMILT=hamilt_lcao.o\
-hamilt_pw.o
+OBJ_OPERATOR=hamilt_lcao.o\
+hamilt_pw.o\
+ekinetic_pw.o\
+meta_pw.o\
+veff_pw.o\
+nonlocal_pw.o
 
 OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\
@@ -295,7 +305,7 @@ $(OBJ_PLANEWAVE)\
 $(OBJ_HSOLVER)\
 $(OBJ_ELECSTATES)\
 $(OBJ_PSI)\
-${OBJ_HAMILT}\
+${OBJ_OPERATOR}\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \

@@ -42,7 +42,7 @@ void Sph_Bessel::jlx(
         return;
     }
 
-    if (abs(q) < 1.0e-8)
+    if (std::abs(q) < 1.0e-8)
     {
         if (l == -1)
         {
@@ -65,7 +65,7 @@ void Sph_Bessel::jlx(
     }
     else
     {
-        if (abs(q * r [0]) > 1.0e-8)
+        if (std::abs(q * r [0]) > 1.0e-8)
         {
             ir0 = 0;//mohan modify 2007-10-13
         }
@@ -249,14 +249,14 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 	for (i=1;i<=maxit;i++) {
 		b += xi2;
 		d=b-d;
-		if (fabs(d) < fpmin) d=fpmin;
+		if (std::abs(d) < fpmin) d=fpmin;
 		c=b-1.0/c;
-		if (fabs(c) < fpmin) c=fpmin;
+		if (std::abs(c) < fpmin) c=fpmin;
 		d=1.0/d;
 		del=c*d;
 		h=del*h;
 		if (d < 0.0) isign = -isign;
-		if (fabs(del-1.0) < eps) break;
+		if (std::abs(del-1.0) < eps) break;
 	}
 	if (i > maxit)
 	{
@@ -280,17 +280,17 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 	if (x < xmin) {
 		x2=0.5*x;
 		pimu=pi*xmu;
-		fact = (fabs(pimu) < eps ? 1.0 : pimu/sin(pimu));
+		fact = (std::abs(pimu) < eps ? 1.0 : pimu/sin(pimu));
 		d = -log(x2);
 		e=xmu*d;
-		fact2 = (fabs(e) < eps ? 1.0 : sinh(e)/e);
+		fact2 = (std::abs(e) < eps ? 1.0 : sinh(e)/e);
 		this->BESCHB(xmu,&gam1,&gam2,&gampl,&gammi);
 		ff=2.0/pi*fact*(gam1*cosh(e)+gam2*fact2*d);
 		e=exp(e);
 		p=e/(gampl*pi);
 		q=1.0/(e*pi*gammi);
 		pimu2=0.5*pimu;
-		fact3 = (fabs(pimu2) < eps ? 1.0 : sin(pimu2)/pimu2);
+		fact3 = (std::abs(pimu2) < eps ? 1.0 : sin(pimu2)/pimu2);
 		r=pi*pimu2*fact3*fact3;
 		c=1.0;
 		d = -x2*x2;
@@ -305,7 +305,7 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 			sum += del;
 			del1=c*p-i*del;
 			sum1 += del1;
-			if (fabs(del) < (1.0+fabs(sum))*eps) break;
+			if (std::abs(del) < (1.0+std::abs(sum))*eps) break;
 		}
 		if (i > maxit)
 		{
@@ -339,11 +339,11 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 			bi += 2.0;
 			dr=a*dr+br;
 			di=a*di+bi;
-			if (fabs(dr)+fabs(di) < fpmin) dr=fpmin;
+			if (std::abs(dr)+std::abs(di) < fpmin) dr=fpmin;
 			fact=a/(cr*cr+ci*ci);
 			cr=br+cr*fact;
 			ci=bi-ci*fact;
-			if (fabs(cr)+fabs(ci) < fpmin) cr=fpmin;
+			if (std::abs(cr)+std::abs(ci) < fpmin) cr=fpmin;
 			den=dr*dr+di*di;
 			dr /= den;
 			di /= -den;
@@ -352,7 +352,7 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 			temp=p*dlr-q*dli;
 			q=p*dli+q*dlr;
 			p=temp;
-			if (fabs(dlr-1.0)+fabs(dli) < eps) break;
+			if (std::abs(dlr-1.0)+std::abs(dli) < eps) break;
 		}
 		if (i > maxit)
 		{
@@ -364,8 +364,8 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		rjmu=sqrt(w/((p-f)*gam+q));
 
 		//rjmu=SIGN(rjmu,rjl);
-		if (rjl >=0 ) rjmu = fabs(rjmu);
-		else rjmu = -fabs(rjmu);
+		if (rjl >=0 ) rjmu = std::abs(rjmu);
+		else rjmu = -std::abs(rjmu);
 
 		rymu=rjmu*gam;
 		rymup=rymu*(p+q/gam);

@@ -106,7 +106,6 @@ void Force_Stress_LCAO::getForceStress(
 				sigmacc,
 				sigmaxc);
 	}
-
 	//--------------------------------------------------------
 	// implement four terms which needs integration
 	//--------------------------------------------------------
@@ -827,6 +826,7 @@ void Force_Stress_LCAO::calStressPwPart(
 	}
 	//Exchange-correlation for PBE
 	sc_pw.stress_gga(sigmaxc);
+
 	return;
 }
 

@@ -14,6 +14,7 @@ namespace hsolver
                            psi::Psi<std::complex<double>>& psi, 
                            elecstate::ElecState* pes, 
                            Stochastic_WF& stowf,
+						   const int istep,
                            const int iter,
                            const std::string method_in, 
                            const bool skip_charge)
@@ -29,29 +30,22 @@ namespace hsolver
 
         // select the method of diagonalization
         this->method = method_in;
-        this->initpdiagh();
+        this->initDiagh();
 
         // part of KSDFT to get KS orbitals
 	    for (int ik = 0; ik < nks; ++ik)
 	    {
+			pHamilt->updateHk(ik);
 		    if(nbands > 0 && GlobalV::MY_STOGROUP == 0)
 		    {
-                pHamilt->updateHk(ik);
-                psi.fix_k(ik);
-
+				this->updatePsiK(pHamilt, psi, ik);
                 // template add precondition calculating here
                 update_precondition(precondition, ik, this->wfc_basis->npwk[ik]);
 		    	/// solve eigenvector and eigenvalue for H(k)
                 double* p_eigenvalues = &(pes->ekb(ik, 0));
                 this->hamiltSolvePsiK(pHamilt, psi, p_eigenvalues);
 		    }
-		    else
-		    {
-		    	pHamilt->updateHk(ik);
-                psi.fix_k(ik);
-		    	//In fact, hm.hpw.init_k has been done in wf.wfcinit();
-		    }
-
+            
 		    stoiter.stohchi.current_ik = ik;
 		
 #ifdef __MPI
@@ -62,7 +56,7 @@ namespace hsolver
 			}
 #endif
 			stoiter.orthog(ik,psi,stowf);
-			stoiter.checkemm(ik,iter, stowf);	//check and reset emax & emin
+			stoiter.checkemm(ik,istep, iter, stowf);	//check and reset emax & emin
 		}
 		// DiagoCG would keep 9*nbasis memory in cache during loop-k
         // it should be deleted before calculating charge
@@ -71,6 +65,8 @@ namespace hsolver
             delete pdiagh;
             pdiagh = nullptr;
         }
+
+		this->endDiagh();
 
 		for (int ik = 0;ik < nks;ik++)
 		{
@@ -81,6 +77,12 @@ namespace hsolver
 		}
 
 		stoiter.itermu(iter,pes);
+		stoiter.calHsqrtchi(stowf);
+		if(skip_charge)
+    	{
+    	    ModuleBase::timer::tick(this->classname, "solve");
+    	    return;
+    	}
 		//(5) calculate new charge density 
 		// calculate KS rho.
 		if(nbands > 0)
@@ -99,7 +101,7 @@ namespace hsolver
 		}
 		// calculate stochastic rho
 		stoiter.sum_stoband(stowf,pes);
-		
+
 
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.

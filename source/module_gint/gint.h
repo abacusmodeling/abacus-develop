@@ -48,6 +48,15 @@ class Gint
         const int LD_pool,
         double* pvpR_reduced);
 
+    void gint_kernel_vlocal_meta(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        double* vkdr3,
+        const int LD_pool,
+        double* pvpR_reduced);
+
 	void cal_meshball_vlocal_gamma(
 		const int na_grid,  						// how many atoms on this (i,j,k) grid
 		const int LD_pool,
@@ -82,6 +91,19 @@ class Gint
         double* vldr3,
         const int LD_pool,
         double**DM_R,
+        const bool isforce,
+        const bool isstress,
+        ModuleBase::matrix* fvl_dphi,
+        ModuleBase::matrix* svl_dphi);
+
+    void gint_kernel_force_meta(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        double* vldr3,
+        double* vkdr3,
+        const int LD_pool,
+        double** DM_in,
         const bool isforce,
         const bool isstress,
         ModuleBase::matrix* fvl_dphi,
@@ -128,6 +150,30 @@ class Gint
         int* vindex,
         double** psir_ylm,
         double** psir_DMR,
+        double* rho);
+
+    //------------------------------------------------------
+    // in gint_k_rho.cpp 
+    //------------------------------------------------------
+    // calculate the charge density via grid integrals
+    void gint_kernel_tau(
+        const int na_grid,
+        const int grid_index,
+        const double delta_r,
+        int* vindex,
+        const int LD_pool,
+        Gint_inout *inout);
+
+    void cal_meshball_tau(
+        const int na_grid,
+        int* block_index,
+        int* vindex,
+        double** dpsix,
+        double** dpsiy,
+        double** dpsiz,
+        double** dpsix_dm,
+        double** dpsiy_dm,
+        double** dpsiz_dm,
         double* rho);
 
     // dimension: [GlobalC::LNNR.nnrg] 

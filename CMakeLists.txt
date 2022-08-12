@@ -30,11 +30,25 @@ include_directories(${ABACUS_SOURCE_DIR})
 add_executable(${ABACUS_BIN_NAME} source/main.cpp)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_compile_options(-O2 -g)
 add_compile_options(-Wno-write-strings)
+set(FETCHCONTENT_QUIET FALSE) # Notify user when cloning git repo
+
+find_program(CCACHE ccache)
+if (CCACHE)
+  set (CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE} ${CMAKE_CXX_COMPILER_LAUNCHER})
+  set (CMAKE_C_COMPILER_LAUNCHER ${CCACHE} ${CMAKE_C_COMPILER_LAUNCHER})
+endif()
+
+# Select 'Release' configuration for best performance;
+#   this will disable all assertions.
+# Other default configurations are also available, see:
+# https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#default-and-custom-configurations
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  add_compile_options(-O2 -g) # default flag
+endif()
 
 find_package(Cereal REQUIRED)
-include_directories(${Cereal_INCLUDE_DIR})
+include_directories(${CEREAL_INCLUDE_DIR})
 add_compile_definitions(USE_CEREAL_SERIALIZATION)
 
 find_package(ELPA REQUIRED)

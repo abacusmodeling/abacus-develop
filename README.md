@@ -17,6 +17,7 @@ ABACUS is an electronic structure package based on density functional theory(DFT
 Please refer to our [GitHub repository](https://github.com/deepmodeling/abacus-develop) for more information and support.
 # Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Features](#features)
 - [Download and install](#download-and-install)
 - [Quickstart guide](#quickstart-guide)
@@ -27,6 +28,7 @@ Please refer to our [GitHub repository](https://github.com/deepmodeling/abacus-d
 - [Citations](#citations)
 - [Development team](#development-team)
 - [Communicating and making contributions](#communicating-and-making-contributions)
+- [Miscellaneous](#miscellaneous)
 
 # Features
 
@@ -52,6 +54,8 @@ ABACUS provides the following features and functionalities:
 18. Orbital-free DFT.
 19. (subsidiary tool)Plot_tools for plot PDOS and PBANDS.
 20. (subsidiary tool)Generator for second generation numerical orbital basis.
+21. Interface with DPGEN
+22. Interface with phonopy
 
 [back to top](#readme-top)
 
@@ -91,7 +95,7 @@ The following files are the central input files for ABACUS. Before executing the
 
 - The numerical orbital files
 
-    This part is only required in LCAO calculations. 
+    This part is only required in LCAO calculations.
     The filename for each element’s numerical orbital basis needs to be specified in the STRU file, together with the directory of the orbital files unless they are already present in the working directory.
     ABACUS provides numerical atomic basis sets of different accuracy levels for most elements commonly used. Users can download these basis sets from the [website](http://abacus.ustc.edu.cn/pseudo/list.htm). Moreover, users can generate numerical atomic orbitals by themselves, and the procedure is provided in this [short introduction](docs/generate-basis.md).
 
@@ -132,14 +136,14 @@ into which the following output files will be generated:
 [back to top](#readme-top)
 
 ## Hands-on examples
-The following provides basic sample jobs in ABACUS. More can be found in the directories `examples/` and `tests/`, with an introduction [here](tests/README.md), and the corresponding reference outputs can be found in the file `result.ref` under each subdirectory.
+The following provides basic sample jobs in ABACUS. More can be found in the directories `examples/` and `tests/`, and the corresponding reference outputs can be found in the file `result.ref` under each subdirectory.
 
 *Note that the examples there are intended as quick hands-on jobs, and the results are NOT converged with regard to basis set or k point sampling.*
 
 - [Basic electronic structure calculation with PW basis set](docs/examples/basic-pw.md)
 - [Basic electronic structure calculation with LCAO basis set](docs/examples/basic-lcao.md)
 - [DFT + dispersion calculations](docs/examples/dispersion.md)
-- [DOS, wave functions](docs/examples/dos.md)
+- [Density of states](docs/examples/dos.md)
 - [Band structure](docs/examples/band-struc.md)
 - [Magnetic properties](docs/examples/magnetic.md)
 - [Force calculation and structure relaxation](docs/examples/force.md)
@@ -153,6 +157,10 @@ The following provides basic sample jobs in ABACUS. More can be found in the dir
 - [Hybrid functional](docs/examples/hybrid.md)
 - [Electric field and dipole correction](docs/examples/electric_dipole.md)
 - [Stochastic DFT and mix stochastic-deterministic DFT](docs/examples/stochastic.md)
+- [Wave functions](docs/examples/wavefunction.md)
+- [BSSE for molecular formation energy](docs/examples/BSSE.md)
+- [ABACUS-DPGEN interface](docs/examples/dpgen.md)
+- [ABACUS-phonopy interface](docs/examples/phonopy.md)
 
 [back to top](#readme-top)
 
@@ -163,13 +171,13 @@ The following references are required to be cited when using ABACUS. Specificall
 - **For general purpose:**
 
     [1]. Mohan Chen, G. C. Guo, and Lixin He. "Systematically improvable optimized atomic basis sets for ab initio calculations." Journal of Physics: Condensed Matter 22.44 (2010): 445501.
-    
+
     [2]. Pengfei Li, et al. "Large-scale ab initio simulations based on systematically improvable atomic basis." Computational Materials Science 112 (2016): 503-517.
 
 - **If Stochastic DFT is used:**
 
     [1]. Qianrui Liu, and Mohan Chen. "Plane-Wave-Based Stochastic-Deterministic Density Functional Theory for Extended Systems." https://arxiv.org/abs/2204.05662.
-    
+
 - **If DFT+U is used:**
 
     [1]. Xin Qu, et al. "DFT+ U within the framework of linear combination of numerical atomic orbitals." The Journal of Chemical Physics (2022).
@@ -181,17 +189,17 @@ The following references are required to be cited when using ABACUS. Specificall
 - **If berry curvature calculation is used in LCAO base:**
 
     [1]. Gan Jin, Daye Zheng, and Lixin He. "Calculation of Berry curvature using non-orthogonal atomic orbitals." Journal of Physics: Condensed Matter 33.32 (2021): 325503.
-    
+
 - **If DeePKS is used:**
 
     [1]. Wenfei Li, Qi Ou, et al. "DeePKS+ABACUS as a Bridge between Expensive Quantum Mechanical Models and Machine Learning Potentials." https://arxiv.org/abs/2206.10093.
-    
+
 - **If hybrid functional is used:**
-    
+
     [1]. Peize Lin, Xinguo Ren, and Lixin He. "Efficient Hybrid Density Functional Calculations for Large Periodic Systems Using Numerical Atomic Orbitals." Journal of Chemical Theory and Computation 2021, 17(1), 222–239.
-    
+
     [2]. Peize Lin, Xinguo Ren, and Lixin He. "Accuracy of Localized Resolution of the Identity in Periodic Hybrid Functional Calculations with Numerical Atomic Orbitals." Journal of Physical Chemistry Letters 2020, 11, 3082-3088.
-    
+
 [back to top](#readme-top)
 
 # Development team
@@ -224,4 +232,3 @@ If you find a bug or have some questions, please refer to our GitHub [issue trac
 - [Exchange-correlation functionals](docs/features.md#exchange-correlation-functionals)
 
 [back to top](#readme-top)
-

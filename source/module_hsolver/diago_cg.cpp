@@ -10,9 +10,10 @@
 namespace hsolver
 {
 
-DiagoCG::DiagoCG(Hamilt_PW *hpw_in, const double *precondition_in)
+typedef hamilt::Operator::hpsi_info hp_info;
+
+DiagoCG::DiagoCG(const double *precondition_in)
 {
-    this->hpw = hpw_in;
     this->precondition = precondition_in;
     test_cg = 0;
     reorder = false;
@@ -21,11 +22,11 @@ DiagoCG::~DiagoCG()
 {
 }
 
-void DiagoCG::diag_mock(psi::Psi<std::complex<double>> &phi, double *eigenvalue_in)
+void DiagoCG::diag_mock(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &phi, double *eigenvalue_in)
 {
     if (test_cg == 1)
-        ModuleBase::TITLE("DiagoCG", "ccgdiagg");
-    ModuleBase::timer::tick("DiagoCG", "diag");
+        ModuleBase::TITLE("DiagoCG", "diag_once");
+    ModuleBase::timer::tick("DiagoCG", "diag_once");
 
     /// out : record for states of convergence
     this->notconv = 0;
@@ -44,33 +45,46 @@ void DiagoCG::diag_mock(psi::Psi<std::complex<double>> &phi, double *eigenvalue_
     // "poor man" iterative diagonalization of a complex hermitian matrix
     // through preconditioned conjugate gradient algorithm
     // Band-by-band algorithm with minimal use of memory
-    // Calls h_1phi and s_1phi to calculate H|phi> and S|phi>
+    // Calls hPhi and sPhi to calculate H|phi> and S|phi>
     // Works for generalized eigenvalue problem (US pseudopotentials) as well
     //-------------------------------------------------------------------
-    this->sphi.resize(this->dim, ModuleBase::ZERO);
-    this->scg.resize(this->dim, ModuleBase::ZERO);
+    this->phi_m = new psi::Psi<std::complex<double>>(phi, 1, 1);
     this->hphi.resize(this->dim, ModuleBase::ZERO);
-    this->gradient.resize(this->dim, ModuleBase::ZERO);
-    this->cg.resize(this->dim, ModuleBase::ZERO);
-    this->g0.resize(this->dim, ModuleBase::ZERO);
+    this->sphi.resize(this->dim, ModuleBase::ZERO);
+
+    this->cg = new psi::Psi<std::complex<double>>(phi, 1, 1);
+    this->scg.resize(this->dim, ModuleBase::ZERO);
     this->pphi.resize(this->dim, ModuleBase::ZERO);
+
+    //in band_by_band CG method, only the first band in phi_m would be calculated
+    psi::Range cg_hpsi_range(0);
+
+    this->gradient.resize(this->dim, ModuleBase::ZERO);
+    this->g0.resize(this->dim, ModuleBase::ZERO);
     this->lagrange.resize(this->n_band, ModuleBase::ZERO);
-    this->phi_m.resize(this->dim, ModuleBase::ZERO);
 
     for (int m = 0; m < this->n_band; m++)
     {
         if (test_cg > 2)
             GlobalV::ofs_running << "Diagonal Band : " << m << std::endl;
-        for (int i = 0; i < this->dim; i++)
+        //copy psi_in into internal psi, m=0 has been done in Constructor
+        if(m>0)
         {
-            phi_m[i] = phi(m, i);
+            const std::complex<double>* psi_m_in = &(phi(m, 0));
+            auto pphi_m = this->phi_m->get_pointer();
+            ModuleBase::GlobalFunc::COPYARRAY(psi_m_in, pphi_m, this->dim);
         }
-
-        this->hpw->s_1psi(this->dim, this->phi_m.data(), this->sphi.data()); // sphi = S|psi(m)>
+        phm_in->sPsi(this->phi_m->get_pointer(), this->sphi.data(), (size_t)this->dim); // sphi = S|psi(m)>
         this->schmit_orth(m, phi);
-        this->hpw->h_1psi(this->dim, this->phi_m.data(), this->hphi.data(), this->sphi.data());
+        phm_in->sPsi(this->phi_m->get_pointer(), this->sphi.data(), (size_t)this->dim); // sphi = S|psi(m)>
 
-        this->eigenvalue[m] = ModuleBase::GlobalFunc::ddot_real(this->dim, this->phi_m.data(), this->hphi.data());
+        //do hPsi, actually the result of hpsi stored in Operator,
+        //the necessary of copying operation should be checked later
+        hp_info cg_hpsi_in(this->phi_m, cg_hpsi_range);
+        const std::complex<double>* hpsi_out = std::get<0>(phm_in->ops->hPsi(cg_hpsi_in))->get_pointer();
+        ModuleBase::GlobalFunc::COPYARRAY(hpsi_out, this->hphi.data(), this->dim);
+
+        this->eigenvalue[m] = ModuleBase::GlobalFunc::ddot_real(this->dim, this->phi_m->get_pointer(), this->hphi.data());
 
         int iter = 0;
         double gg_last = 0.0;
@@ -80,17 +94,21 @@ void DiagoCG::diag_mock(psi::Psi<std::complex<double>> &phi, double *eigenvalue_
         for (iter = 0; iter < DiagoIterAssist::PW_DIAG_NMAX; iter++)
         {
             this->calculate_gradient();
-            this->orthogonal_gradient(phi, m);
+            this->orthogonal_gradient(phm_in, phi, m);
             this->calculate_gamma_cg(iter, gg_last, cg_norm, theta);
+            
+            hp_info cg_hpsi_in(this->cg, cg_hpsi_range);
+            const std::complex<double>* cg_hpsi = std::get<0>(phm_in->ops->hPsi(cg_hpsi_in))->get_pointer();
+            ModuleBase::GlobalFunc::COPYARRAY(cg_hpsi, this->pphi.data(), this->dim);
+            phm_in->sPsi(this->cg->get_pointer(), this->scg.data(), (size_t)this->dim);
             converged = this->update_psi(cg_norm, theta, this->eigenvalue[m]);
+
             if (converged)
                 break;
         } // end iter
 
-        for (int i = 0; i < this->dim; i++)
-        {
-            phi(m, i) = phi_m[i];
-        }
+        std::complex<double>* psi_temp = &(phi(m, 0));
+        ModuleBase::GlobalFunc::COPYARRAY(this->phi_m->get_pointer(), psi_temp, this->dim);
 
         if (!converged)
         {
@@ -117,27 +135,20 @@ void DiagoCG::diag_mock(psi::Psi<std::complex<double>> &phi, double *eigenvalue_
 
                 // last calculated eigenvalue should be in the i-th position: reorder
                 double e0 = eigenvalue[m];
-                // dcopy(phi, m, pphi);
-                for (int ig = 0; ig < this->dim; ig++)
-                {
-                    pphi[ig] = phi(m, ig);
-                }
+                ModuleBase::GlobalFunc::COPYARRAY(psi_temp, pphi.data(), this->dim);
 
                 for (int j = m; j >= i + 1; j--)
                 {
                     eigenvalue[j] = eigenvalue[j - 1];
-                    for (int ig = 0; ig < this->dim; ig++)
-                    {
-                        phi(j, ig) = phi(j - 1, ig);
-                    }
+                    std::complex<double>* phi_j = &phi(j, 0);
+                    std::complex<double>* phi_j1 = &phi(j-1, 0);
+                    ModuleBase::GlobalFunc::COPYARRAY(phi_j1, phi_j, this->dim);
                 }
 
                 eigenvalue[i] = e0;
                 // dcopy(pphi, phi, i);
-                for (int ig = 0; ig < this->dim; ig++)
-                {
-                    phi(i, ig) = pphi[ig];
-                }
+                std::complex<double>* phi_pointer = &phi(i, 0);
+                ModuleBase::GlobalFunc::COPYARRAY(pphi.data(), phi_pointer, this->dim);
                 // this procedure should be good if only a few inversions occur,
                 // extremely inefficient if eigenvectors are often in bad order
                 // (but this should not happen)
@@ -149,7 +160,10 @@ void DiagoCG::diag_mock(psi::Psi<std::complex<double>> &phi, double *eigenvalue_
     avg /= this->n_band;
     DiagoIterAssist::avg_iter += avg;
 
-    ModuleBase::timer::tick("DiagoCG", "diag");
+    delete this->phi_m;
+    delete this->cg;
+
+    ModuleBase::timer::tick("DiagoCG", "diag_once");
     return;
 } // end subroutine ccgdiagg
 
@@ -188,13 +202,13 @@ void DiagoCG::calculate_gradient()
     return;
 }
 
-void DiagoCG::orthogonal_gradient(const psi::Psi<std::complex<double>> &eigenfunction, const int m)
+void DiagoCG::orthogonal_gradient(hamilt::Hamilt *phm_in, const psi::Psi<std::complex<double>> &eigenfunction, const int m)
 {
     if (test_cg == 1)
         ModuleBase::TITLE("DiagoCG", "orthogonal_gradient");
     // ModuleBase::timer::tick("DiagoCG","orth_grad");
 
-    this->hpw->s_1psi(this->dim, this->gradient.data(), this->scg.data());
+    phm_in->sPsi(this->gradient.data(), this->scg.data(), (size_t)this->dim);
     int inc = 1;
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // qianrui replace 2021-3-15
@@ -270,6 +284,8 @@ void DiagoCG::calculate_gamma_cg(const int iter, double &gg_last, const double &
     if (test_cg == 1)
         ModuleBase::TITLE("DiagoCG", "calculate_gamma_cg");
     // ModuleBase::timer::tick("DiagoCG","gamma_cg");
+    auto pcg = this->cg->get_pointer();
+    auto pphi_m = this->phi_m->get_pointer();
     double gg_inter;
     if (iter > 0)
     {
@@ -300,10 +316,7 @@ void DiagoCG::calculate_gamma_cg(const int iter, double &gg_last, const double &
         gg_last = gg_now;
         // (50) cg direction first value : |g>
         // |cg> = |g>
-        for (int i = 0; i < this->dim; i++)
-        {
-            this->cg[i] = this->gradient[i];
-        }
+        ModuleBase::GlobalFunc::COPYARRAY(this->gradient.data(), pcg, this->dim);
     }
     else
     {
@@ -317,14 +330,17 @@ void DiagoCG::calculate_gamma_cg(const int iter, double &gg_last, const double &
         // (6) Update cg direction !(need gamma and |go> ):
         for (int i = 0; i < this->dim; i++)
         {
-            this->cg[i] = gamma * this->cg[i] + this->gradient[i];
+            pcg[i] = gamma * pcg[i] + this->gradient[i];
         }
 
         const double norma = gamma * cg_norm * sin(theta);
-        for (int i = 0; i < this->dim; i++)
+        std::complex<double> znorma(norma * -1, 0.0);
+        const int one = 1;
+        zaxpy_(&this->dim, &znorma, pphi_m, &one, pcg, &one);
+        /*for (int i = 0; i < this->dim; i++)
         {
-            this->cg[i] -= norma * this->phi_m[i];
-        }
+            pcg[i] -= norma * pphi_m[i];
+        }*/
     }
     // ModuleBase::timer::tick("DiagoCG","gamma_cg");
     return;
@@ -335,16 +351,17 @@ bool DiagoCG::update_psi(double &cg_norm, double &theta, double &eigenvalue)
     if (test_cg == 1)
         ModuleBase::TITLE("DiagoCG", "update_psi");
     // ModuleBase::timer::tick("DiagoCG","update");
-    this->hpw->h_1psi(this->dim, this->cg.data(), this->pphi.data(), this->scg.data());
-    cg_norm = sqrt(ModuleBase::GlobalFunc::ddot_real(this->dim, this->cg.data(), this->scg.data()));
+    cg_norm = sqrt(ModuleBase::GlobalFunc::ddot_real(this->dim, this->cg->get_pointer(), this->scg.data()));
 
     if (cg_norm < 1.0e-10)
         return 1;
 
+    std::complex<double>* phi_m_pointer = this->phi_m->get_pointer();
+
     const double a0
-        = ModuleBase::GlobalFunc::ddot_real(this->dim, this->phi_m.data(), this->pphi.data()) * 2.0 / cg_norm;
+        = ModuleBase::GlobalFunc::ddot_real(this->dim, phi_m_pointer, this->pphi.data()) * 2.0 / cg_norm;
     const double b0
-        = ModuleBase::GlobalFunc::ddot_real(this->dim, this->cg.data(), this->pphi.data()) / (cg_norm * cg_norm);
+        = ModuleBase::GlobalFunc::ddot_real(this->dim, this->cg->get_pointer(), this->pphi.data()) / (cg_norm * cg_norm);
 
     const double e0 = eigenvalue;
     theta = atan(a0 / (e0 - b0)) / 2.0;
@@ -369,9 +386,10 @@ bool DiagoCG::update_psi(double &cg_norm, double &theta, double &eigenvalue)
     //	std::cout << "\n cg_norm_fac = "<< cg_norm * cg_norm;
     //	std::cout << "\n overlap = "  << this->ddot(dim, phi_m, phi_m);
 
+    auto pcg = this->cg->get_pointer();
     for (int i = 0; i < this->dim; i++)
     {
-        this->phi_m[i] = this->phi_m[i] * cost + sint_norm * this->cg[i];
+        phi_m_pointer[i] = phi_m_pointer[i] * cost + sint_norm * pcg[i];
     }
 
     //	std::cout << "\n overlap2 = "  << this->ddot(dim, phi_m, phi_m);
@@ -393,7 +411,8 @@ bool DiagoCG::update_psi(double &cg_norm, double &theta, double &eigenvalue)
     }
 }
 
-void DiagoCG::schmit_orth(const int &m, // end
+void DiagoCG::schmit_orth(
+                          const int &m, // end
                           const psi::Psi<std::complex<double>> &psi)
 {
     //	ModuleBase::TITLE("DiagoCG","schmit_orth");
@@ -451,7 +470,7 @@ void DiagoCG::schmit_orth(const int &m, // end
            lagrange_so.data(),
            &inc,
            &ModuleBase::ONE,
-           this->phi_m.data(),
+           this->phi_m->get_pointer(),
            &inc);
     psi_norm -= ModuleBase::GlobalFunc::ddot_real(m, lagrange_so.data(), lagrange_so.data(), false);
     //======================================================================
@@ -480,11 +499,11 @@ void DiagoCG::schmit_orth(const int &m, // end
 
     psi_norm = sqrt(psi_norm);
 
+    auto pphi_m = this->phi_m->get_pointer();
     for (int ig = 0; ig < this->dim; ig++)
     {
-        this->phi_m[ig] /= psi_norm;
+        pphi_m[ig] /= psi_norm;
     }
-    this->hpw->s_1psi(this->dim, this->phi_m.data(), this->sphi.data()); // sphi = S|psi(m)>
 
     // ModuleBase::timer::tick("DiagoCG","schmit_orth");
     return;
@@ -499,13 +518,13 @@ void DiagoCG::diag(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &psi, 
     {
         if(DiagoIterAssist::need_subspace || ntry > 0)
         {
-            DiagoIterAssist::diagH_subspace(this->hpw, psi, psi, eigenvalue_in);
+            DiagoIterAssist::diagH_subspace(phm_in, psi, psi, eigenvalue_in);
         }
 
         DiagoIterAssist::avg_iter += 1.0;
         this->reorder = true;
 
-        this->diag_mock(psi, eigenvalue_in);
+        this->diag_mock(phm_in, psi, eigenvalue_in);
 
         ++ntry;
     } while (DiagoIterAssist::test_exit_cond(ntry, this->notconv));

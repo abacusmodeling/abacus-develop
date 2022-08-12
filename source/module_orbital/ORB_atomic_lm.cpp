@@ -178,7 +178,7 @@ void Numerical_Orbital_Lm::copy_parameter(
     // assert(r_radial_in[nr-1]<50);						// Peize Lin delete 2017-08-18
     this->rcut = r_radial_in[nr-1];
     assert(nk_in>1);
-    assert(nk_in<10000);
+    //assert(nk_in<10000);				// Jiyy delete 2022-07-18
     this->nk = nk_in;
     assert(nk%2!=0);
     assert(dk_in>0);
@@ -244,6 +244,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	// calculate the dpsi_uniform
 	//----------------------------------------------	 
 	this->dpsi_uniform.resize(this->nr_uniform);
+	this->ddpsi_uniform.resize(this->nr_uniform);
 
 	double* y2 = new double[nr];
 
@@ -297,7 +298,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	//	ModuleBase::Mathzone_Add1::SplineD2 (rad, psi_uniform, nr_uniform, 0.0, 0.0, ddpsi_uniform);
 	double* tmp = new double[nr_uniform];
 	ModuleBase::Mathzone_Add1::Cubic_Spline_Interpolation(ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), y2, 
-			nr, rad, nr_uniform, tmp, ModuleBase::GlobalFunc::VECTOR_TO_PTR(dpsi_uniform) );
+			nr, rad, nr_uniform, tmp, ModuleBase::GlobalFunc::VECTOR_TO_PTR(dpsi_uniform));
 
 	// calculate zty
 	// liaochen add 2010-08

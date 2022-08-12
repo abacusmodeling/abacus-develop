@@ -4,6 +4,8 @@
 #include "../src_io/print_info.h"
 #ifdef __MPI
 #include "mpi.h"
+#else
+#include "chrono"
 #endif
 
 //--------------Temporary----------------
@@ -55,6 +57,10 @@ namespace ModuleESolver
         {
             XC_Functional::set_xc_type("pbe");
         }
+        else if (ucell.atoms[0].xc_func == "SCAN0")
+        {
+            XC_Functional::set_xc_type("scan");
+        }
         else
         {
             XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
@@ -77,7 +83,9 @@ namespace ModuleESolver
         Print_Info::setup_parameters(ucell, GlobalC::kv);
 
         //new plane wave basis
+#ifdef __MPI
         this->pw_wfc->initmpi(GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL, POOL_WORLD);
+#endif
         this->pw_wfc->initgrids(ucell.lat0, ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
         this->pw_wfc->initparameters(false, inp.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
 #ifdef __MPI
@@ -164,7 +172,7 @@ namespace ModuleESolver
         {
             ModuleBase::timer::tick(this->classname, "Run");
 
-            this->printhead(); //print the headline on the screen.
+            if(this->maxniter > 0)  this->printhead(); //print the headline on the screen.
             this->beforescf(istep); //Something else to do before the iter loop
 
             bool firstscf = true;
@@ -239,8 +247,8 @@ namespace ModuleESolver
                 printiter(iter, drho, duration, diag_ethr);
                 if (this->conv_elec)
                 {
-                    int stop = this->do_after_converge(iter);
                     this->niter = iter;
+                    bool stop = this->do_after_converge(iter);
                     if(stop) break;
                 }
             }

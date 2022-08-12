@@ -128,6 +128,22 @@ class Ylm
 			std::vector<double>& rly,
 			std::vector<std::vector<double>>& grly);
 
+	/**
+	 * @brief Get the hessian of r^l Ylm (used in getting derivative of overlap)
+	 * 
+	 * @param Lmax [in] maximum angular quantum number
+	 * @param x [in] x
+	 * @param y [in] y
+	 * @param z [in] z
+	 * @param hrly [out] hessian of Ylm, [dY00/dx2, dY00/dxy, dY00/dxz, dY00/dyy, dY00/dyz, dY00/dzz] , ...
+	 */
+	static void hes_rl_sph_harm(
+			const int& Lmax,
+			const double& x,
+			const double& y,
+			const double& z,
+			std::vector<std::vector<double>>& hrly);
+
 	//calculate the coefficient of Ylm, ylmcoef.		
 	static void set_coefficients ();
 	static std::vector<double> ylmcoef;
