@@ -459,9 +459,6 @@ void Charge_Extra::find_alpha_and_beta(void)
         c   += (pos_now[i] - pos_next[i]).norm2();
     }
 
-    std::cout << "a : " << a11 << " " << a12 << " " << a22 << std::endl;
-    std::cout << "bc : " << b1 << " " << b2 << " " << c <<std::endl;
-
     a21 = a12;
     det = a11 * a22 - a12 * a21;
 
