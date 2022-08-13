@@ -36,8 +36,9 @@ extern "C"
 	double dznrm2_( const int *n, const std::complex<double> *X, const int *incX );
 
 	// level 2: matrix-std::vector operations, O(n^2) data and O(n^2) work.
-	void dgemv_(const char *transa, const int *m, const int *n, const double *alpha,  const double *a,  
-		const int *lda, const double *x, const int *incx, const double *beta, double *y, const int *incy);
+	void dgemv_(const char*const transa, const int*const m, const int*const n,
+		const double*const alpha, const double*const a, const int*const lda, const double*const x, const int*const incx,
+		const double*const beta, double*const y, const int*const incy);
 		
 	void zgemv_(const char *trans, const int *m, const int *n, const std::complex<double> *alpha,
 			const std::complex<double> *a, const int *lda, const std::complex<double> *x, const int *incx,
