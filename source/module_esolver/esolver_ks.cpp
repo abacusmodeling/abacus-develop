@@ -197,37 +197,37 @@ namespace ModuleESolver
                 //they do not occupy all processors, for example wavefunctions uses 20 processors while density uses 10.
                 if(GlobalV::MY_STOGROUP == 0)
                 {
-                // double drho = this->estate.caldr2(); 
-                // EState should be used after it is constructed.
-                drho = GlobalC::CHR.get_drho();
-                double hsolver_error = 0.0;
-                if (firstscf)
-                {
-                    firstscf = false;
-                    hsolver_error = this->phsol->cal_hsolerror();
-                    // The error of HSolver is larger than drho, so a more precise HSolver should be excuconv_elected.
-                    if (hsolver_error > drho)
+                    // double drho = this->estate.caldr2(); 
+                    // EState should be used after it is constructed.
+                    drho = GlobalC::CHR.get_drho();
+                    double hsolver_error = 0.0;
+                    if (firstscf)
                     {
-                        diag_ethr = this->phsol->reset_diagethr(GlobalV::ofs_running, hsolver_error, drho);
-                        this->hamilt2density(istep, iter, diag_ethr);
-                        drho = GlobalC::CHR.get_drho();
+                        firstscf = false;
                         hsolver_error = this->phsol->cal_hsolerror();
+                        // The error of HSolver is larger than drho, so a more precise HSolver should be excuconv_elected.
+                        if (hsolver_error > drho)
+                        {
+                            diag_ethr = this->phsol->reset_diagethr(GlobalV::ofs_running, hsolver_error, drho);
+                            this->hamilt2density(istep, iter, diag_ethr);
+                            drho = GlobalC::CHR.get_drho();
+                            hsolver_error = this->phsol->cal_hsolerror();
+                        }
                     }
-                }
 
-                this->conv_elec = (drho < this->scf_thr);
+                    this->conv_elec = (drho < this->scf_thr);
 
-                // If drho < hsolver_error in the first iter or drho < scf_thr, we do not change rho.
-                if (drho < hsolver_error || this->conv_elec)
-                {
-                    if (drho < hsolver_error)    GlobalV::ofs_warning << " drho < hsolver_error, keep charge density unchanged." << std::endl;
-                }
-                else
-                {
-                    //charge mixing
-                    //conv_elec = this->estate.mix_rho();
-                    GlobalC::CHR.mix_rho(iter);
-                }
+                    // If drho < hsolver_error in the first iter or drho < scf_thr, we do not change rho.
+                    if (drho < hsolver_error || this->conv_elec)
+                    {
+                        if (drho < hsolver_error)    GlobalV::ofs_warning << " drho < hsolver_error, keep charge density unchanged." << std::endl;
+                    }
+                    else
+                    {
+                        //charge mixing
+                        //conv_elec = this->estate.mix_rho();
+                        GlobalC::CHR.mix_rho(iter);
+                    }
                 }
 #ifdef __MPI
 		        MPI_Bcast(&drho, 1, MPI_DOUBLE , 0, PARAPW_WORLD);

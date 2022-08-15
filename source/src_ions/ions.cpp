@@ -81,51 +81,12 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 		int eiter=0;		
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")  // pengfei 2014-10-13
         {
-#ifdef __LCAO
-#ifdef __MPI
-			if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
-			{	
-#endif
-#endif		
-				p_esolver->Run(istep-1,GlobalC::ucell);
-				eiter = p_esolver->getniter();
-#ifdef __LCAO
-#ifdef __MPI
-			}
-			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
-			{
-				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-			}
-			else	// Peize Lin add 2019-03-09
-			{
-				if( GlobalC::exx_global.info.separate_loop )
-				{
-					for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
-					{
-						p_esolver->Run(istep-1,GlobalC::ucell);
-						eiter += p_esolver->getniter();
-						if( elec.iter==1 || hybrid_step==GlobalC::exx_global.info.hybrid_step-1 )		// exx converge
-							break;
-						XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);					
-						GlobalC::exx_lip.cal_exx();
-					}						
-				}
-				else
-				{
-					p_esolver->Run(istep-1,GlobalC::ucell);
-					eiter += p_esolver->getniter();
-					XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-					p_esolver->Run(istep-1,GlobalC::ucell);
-					eiter += p_esolver->getniter();
-				}
-			}
-#endif //__MPI
-#endif //__LCAO
+			p_esolver->Run(istep-1,GlobalC::ucell);
+			eiter = p_esolver->getniter();
         }
         else if(GlobalV::CALCULATION=="nscf")
         {
 			p_esolver->nscf();
-            //elec.non_self_consistent(istep-1);
 			eiter = p_esolver->getniter();
         }
 

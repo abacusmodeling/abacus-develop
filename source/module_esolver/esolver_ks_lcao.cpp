@@ -971,6 +971,7 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
                 //update exx and redo scf
                 XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                 iter = 0;
+                std::cout << " Entering 2nd SCF, where EXX is updated" << std::endl;
                 this->two_level_step++;
                 return false;
             }
@@ -988,6 +989,7 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
             GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
             
             iter = 0;
+            std::cout << " Updating EXX and rerun SCF" << std::endl;
             this->two_level_step++;
             return false;
         }
