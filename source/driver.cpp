@@ -2,10 +2,8 @@
 
 #include "input.h"
 #include "input_conv.h"
-#include "run_pw.h"
 #include "src_pw/global.h"
 #ifdef __LCAO
-#include "run_lcao.h"
 #include "src_lcao/global_fp.h"
 #endif
 #include "module_base/memory.h"
@@ -94,25 +92,10 @@ void Driver::atomic_world(void)
     // lcao: linear combination of atomic orbitals
     //--------------------------------------------------
 
-    //Initialzie Esolver
-    ModuleESolver::ESolver *p_esolver = nullptr;
-    ModuleESolver::init_esolver(p_esolver);
-    
-    if (GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
-    {
-        Run_pw::plane_wave_line(p_esolver);
-        ModuleESolver::clean_esolver(p_esolver);
-    }
-#ifdef __LCAO
-    else if (GlobalV::BASIS_TYPE == "lcao")
-    {
-        Run_lcao::lcao_line(p_esolver);
-        ModuleESolver::clean_esolver(p_esolver);
-    }
-#endif
+    // where the actual stuff is done
+    this->driver_run();
 
     ModuleBase::timer::finish(GlobalV::ofs_running);
-
     ModuleBase::Memory::print_all(GlobalV::ofs_running);
 
     return;
