@@ -30,15 +30,6 @@ Run_MD_LCAO::~Run_MD_LCAO()
 {
 }
 
-void Run_MD_LCAO::opt_cell(ModuleESolver::ESolver* p_esolver)
-{
-    ModuleBase::TITLE("Run_MD_LCAO", "opt_cell");
-
-    opt_ions(p_esolver);
-
-    return;
-}
-
 void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver* p_esolver)
 {
     ModuleBase::TITLE("Run_MD_LCAO", "opt_ions");

@@ -5,7 +5,7 @@
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"
 #include "module_neighbor/sltk_atom_arrange.h"
-#include "src_lcao/LOOP_cell.h"
+#include "src_lcao/LOOP_ions.h"
 #include "src_io/print_info.h"
 #include "src_lcao/run_md_lcao.h"
 
@@ -73,13 +73,12 @@ void Run_lcao::lcao_line(ModuleESolver::ESolver* p_esolver)
     if (GlobalV::CALCULATION == "md")
     {
         Run_MD_LCAO run_md_lcao;
-        run_md_lcao.opt_cell(p_esolver);
+        run_md_lcao.opt_ions(p_esolver);
     }
     else // cell relaxations
     {
-        LOOP_cell lc;
-        //keep wfc_gamma or wfc_k remaining
-        lc.opt_cell(p_esolver);
+        LOOP_ions ions; 
+        ions.opt_ions(p_esolver);
     }
     //---------------------------MD/Relax------------------
 

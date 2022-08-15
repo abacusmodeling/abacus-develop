@@ -6,7 +6,7 @@
 #include "src_io/numerical_basis.h"
 #include "src_io/numerical_descriptor.h"
 #include "src_io/print_info.h"
-#include "src_ions/Cell_PW.h"
+#include "src_ions/ions.h"
 #include "src_pw/run_md_pw.h"
 
 Run_pw::Run_pw(){}
@@ -44,12 +44,12 @@ void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
     if(GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
     {
         Run_MD_PW run_md_pw;
-        run_md_pw.md_cells_pw(p_esolver);
+        run_md_pw.md_ions_pw(p_esolver);
     }
     else
     {
-        Cell_PW cpws;
-        cpws.opt_cells_pw(p_esolver);
+        Ions ions;
+        ions.opt_ions_pw(p_esolver);
     }
 
     // cout<<"cpws SUCCESS"<<endl;
