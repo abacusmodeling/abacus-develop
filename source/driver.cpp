@@ -93,27 +93,19 @@ void Driver::atomic_world(void)
     // lcao_in_pw: LCAO expaned by plane wave basis set
     // lcao: linear combination of atomic orbitals
     //--------------------------------------------------
-    string use_ensol;
+
+    //Initialzie Esolver
     ModuleESolver::ESolver *p_esolver = nullptr;
+    ModuleESolver::init_esolver(p_esolver);
+    
     if (GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
     {
-        if (GlobalV::CALCULATION.substr(0, 3) == "sto")
-            use_ensol = "sdft_pw";
-        else
-            use_ensol = "ksdft_pw";
-        // We set it temporarily
-        // Finally, we have ksdft_pw, ksdft_lcao, sdft_pw, ofdft, lj, eam, etc.
-        ModuleESolver::init_esolver(p_esolver, use_ensol);
         Run_pw::plane_wave_line(p_esolver);
         ModuleESolver::clean_esolver(p_esolver);
     }
 #ifdef __LCAO
     else if (GlobalV::BASIS_TYPE == "lcao")
     {
-        use_ensol = "ksdft_lcao";
-        if (INPUT.tddft == 1)
-            use_ensol = "ksdft_lcao_tddft";
-        ModuleESolver::init_esolver(p_esolver, use_ensol);
         Run_lcao::lcao_line(p_esolver);
         ModuleESolver::clean_esolver(p_esolver);
     }
