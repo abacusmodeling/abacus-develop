@@ -24,8 +24,7 @@ DiagoCG::~DiagoCG()
 
 void DiagoCG::diag_mock(hamilt::Hamilt *phm_in, psi::Psi<std::complex<double>> &phi, double *eigenvalue_in)
 {
-    if (test_cg == 1)
-        ModuleBase::TITLE("DiagoCG", "diag_once");
+    ModuleBase::TITLE("DiagoCG", "diag_once");
     ModuleBase::timer::tick("DiagoCG", "diag_once");
 
     /// out : record for states of convergence
