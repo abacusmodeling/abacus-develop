@@ -37,13 +37,13 @@ void Driver::driver_run()
 
     // mohan add 2010-10-10, just to test the symmetry of a variety
     // of systems.
-    if(GlobalV::CALCULATION == "test")
+    if(GlobalV::CALCULATION == "test_memory")
     {
         Cal_Test::test_memory();
         ModuleBase::QUIT();
     }
 
-    if (INPUT.test_just_neighbor && GlobalV::BASIS_TYPE=="lcao")
+    if (GlobalV::CALCULATION == "test_neighbour" && GlobalV::BASIS_TYPE=="lcao")
     {
         //test_search_neighbor();
         GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
@@ -60,7 +60,7 @@ void Driver::driver_run()
             GlobalC::ucell,
             GlobalV::SEARCH_RADIUS,
             GlobalV::test_atom_input,
-            INPUT.test_just_neighbor);
+            1);
     }
 
     //------------------------------------------------------------

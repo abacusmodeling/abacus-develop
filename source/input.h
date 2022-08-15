@@ -418,11 +418,6 @@ class Input
     double comp_center;
     int comp_dim;
 
-    //==========================================================
-    // variables for test only
-    //==========================================================
-    bool test_just_neighbor;
-
   private:
     //==========================================================
     // MEMBER FUNCTIONS :

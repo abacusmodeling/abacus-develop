@@ -404,11 +404,6 @@ void Input::Default(void)
     restart_load = false;
 
     //==========================================================
-    // test only
-    //==========================================================
-    test_just_neighbor = false;
-
-    //==========================================================
     //    DFT+U     Xin Qu added on 2020-10-29
     //==========================================================
     dft_plus_u = false; // 1:DFT+U correction; 0：standard DFT calcullation
@@ -1501,10 +1496,6 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, cell_factor);
         }
-        else if (strcmp("test_just_neighbor", word) == 0)
-        {
-            read_value(ifs, test_just_neighbor);
-        }
         //--------------
         //----------------------------------------------------------------------------------
         //         Xin Qu added on 2020-10-29 for DFT+U
@@ -2202,7 +2193,6 @@ void Input::Bcast()
     Parallel_Common::bcast_int(td_vexttype);
     Parallel_Common::bcast_int(td_vextout);
     Parallel_Common::bcast_int(td_dipoleout);
-    Parallel_Common::bcast_bool(test_just_neighbor);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
     Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10
@@ -2498,9 +2488,12 @@ void Input::Check(void)
         if (!this->relax_nmax)
             this->relax_nmax = 50;
     }
-    else if (calculation == "test")
+    else if (calculation == "test_memory")
     {
         this->relax_nmax = 1;
+    }
+    else if(calculation == "test_neighbour")
+    {
     }
     else
     {
