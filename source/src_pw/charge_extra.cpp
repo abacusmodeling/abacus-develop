@@ -491,7 +491,7 @@ void Charge_Extra::find_alpha_and_beta(void)
 
 void Charge_Extra::save_pos_next(const UnitCell_pseudo& ucell)
 {
-    ucell.save_cartesian_position(this->pos_next);
+    ucell.save_cartesian_position_original(this->pos_next);
     return;
 }
 
@@ -508,6 +508,6 @@ void Charge_Extra::update_all_pos(const UnitCell_pseudo& ucell)
         this->pos_old2[i] = this->pos_old1[i];
         this->pos_old1[i] = this->pos_now[i];
     }
-    ucell.save_cartesian_position(this->pos_now);
+    ucell.save_cartesian_position_original(this->pos_now);
     return;
 }
