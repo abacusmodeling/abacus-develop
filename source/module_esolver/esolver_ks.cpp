@@ -82,6 +82,11 @@ namespace ModuleESolver
         // mohan add 2021-01-30
         Print_Info::setup_parameters(ucell, GlobalC::kv);
 
+        // initialize the real-space uniform grid for FFT and parallel
+        // distribution of plane waves
+        GlobalC::Pgrid.init(GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, GlobalC::rhopw->nplane,
+            GlobalC::rhopw->nrxx, GlobalC::bigpw->nbz, GlobalC::bigpw->bz); // mohan add 2010-07-22, update 2011-05-04
+            
         // Calculate Structure factor
         GlobalC::sf.setup_structure_factor(&GlobalC::ucell, GlobalC::rhopw);
 
