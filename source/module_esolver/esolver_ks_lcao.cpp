@@ -63,20 +63,11 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     else
     {
         ESolver_KS::Init(inp, ucell);
-#ifdef __MPI
-        if (GlobalV::CALCULATION == "nscf")
-        {
-            switch (GlobalC::exx_global.info.hybrid_type)
-            {
-            case Exx_Global::Hybrid_Type::HF:
-            case Exx_Global::Hybrid_Type::PBE0:
-            case Exx_Global::Hybrid_Type::SCAN0:
-            case Exx_Global::Hybrid_Type::HSE:
-                XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
-                break;
-            }
-        }
-#endif
+
+        // initialize the real-space uniform grid for FFT and parallel
+        // distribution of plane waves
+        GlobalC::Pgrid.init(GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz, GlobalC::rhopw->nplane,
+            GlobalC::rhopw->nrxx, GlobalC::bigpw->nbz, GlobalC::bigpw->bz); // mohan add 2010-07-22, update 2011-05-04
 
 #ifdef __DEEPKS
         // wenfei 2021-12-19
@@ -133,6 +124,19 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     //------------------init Hamilt_lcao----------------------
 
 #ifdef __MPI
+    if (GlobalV::CALCULATION == "nscf")
+    {
+        switch (GlobalC::exx_global.info.hybrid_type)
+        {
+        case Exx_Global::Hybrid_Type::HF:
+        case Exx_Global::Hybrid_Type::PBE0:
+        case Exx_Global::Hybrid_Type::SCAN0:
+        case Exx_Global::Hybrid_Type::HSE:
+            XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
+            break;
+        }
+    }
+
     // PLEASE simplify the Exx_Global interface
     // mohan add 2021-03-25
     // Peize Lin 2016-12-03

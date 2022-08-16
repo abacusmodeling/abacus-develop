@@ -72,7 +72,7 @@ namespace ModuleESolver
 
     protected:
         std::string basisname; //PW or LCAO
-    private:
+    protected:
         void print_wfcfft(Input& inp, ofstream &ofs);
 
     };

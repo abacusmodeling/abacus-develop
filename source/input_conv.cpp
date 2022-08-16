@@ -453,6 +453,10 @@ void Input_Conv::Convert(void)
     {
         elecstate::ElecStateLCAO::need_psi_grid = false;
     }
+    if(INPUT.calculation == "test_neighbour" && GlobalV::NPROC>1)
+    {
+        ModuleBase::WARNING_QUIT("Input_conv", "test_neighbour must be done with 1 processor");
+    }
 #endif
 
     GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;

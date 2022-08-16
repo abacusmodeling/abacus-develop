@@ -29,14 +29,13 @@ void Variable_Cell::init_after_vc(ModuleESolver::ESolver *p_esolver)
     GlobalC::rhopw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
     GlobalC::rhopw->collect_local_pw(); 
     GlobalC::rhopw->collect_uniqgg();
-    GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::wfcpw->nx, GlobalC::wfcpw->ny, GlobalC::wfcpw->nz);
-    GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
-    GlobalC::wfcpw->collect_local_pw(); 
-
     GlobalC::sf.setup_structure_factor(&GlobalC::ucell,GlobalC::rhopw);
 
     if(GlobalV::BASIS_TYPE=="pw")
     {
+        GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::wfcpw->nx, GlobalC::wfcpw->ny, GlobalC::wfcpw->nz);
+        GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+        GlobalC::wfcpw->collect_local_pw(); 
         GlobalC::wf.init_after_vc(GlobalC::kv.nks, p_esolver->psi);
         GlobalC::wf.init_at_1();
     }

@@ -23,6 +23,7 @@
 #include "../module_deepks/LCAO_deepks.h"
 #endif
 #include "../src_pw/H_Ewald_pw.h"
+#include "src_io/cal_test.h"
 
 namespace ModuleESolver
 {
@@ -284,6 +285,34 @@ namespace ModuleESolver
             this->get_S();
             return;
         }
+        
+        if(GlobalV::CALCULATION == "test_memory")
+        {
+            Cal_Test::test_memory();
+            return;
+        }
+
+        if(GlobalV::CALCULATION == "test_neighbour")
+        {
+            //test_search_neighbor();
+            GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+                GlobalV::ofs_running,
+                GlobalV::OUT_LEVEL,
+                GlobalC::ORB.get_rcutmax_Phi(),
+                GlobalC::ucell.infoNL.get_rcutmax_Beta(),
+                GlobalV::GAMMA_ONLY_LOCAL);
+
+            atom_arrange::search(
+                GlobalV::SEARCH_PBC,
+                GlobalV::ofs_running,
+                GlobalC::GridD,
+                GlobalC::ucell,
+                GlobalV::SEARCH_RADIUS,
+                GlobalV::test_atom_input,
+                1);
+            return;
+        }
+
         this->beforesolver(istep);
         // self consistent calculations for electronic ground state
         if (GlobalV::CALCULATION == "nscf")

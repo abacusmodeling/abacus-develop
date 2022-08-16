@@ -48,6 +48,8 @@ namespace ModuleESolver
         {
             esolver_type = "dp_pot";
         }
+
+        GlobalV::ofs_running << " The esolver type has been set to : " << esolver_type << std::endl;
         return esolver_type;
     }
 
