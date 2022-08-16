@@ -2,7 +2,6 @@
 #include "src_pw/global.h"
 #include "input.h"
 #include "src_io/optical.h"
-#include "src_io/cal_test.h"
 #include "src_io/winput.h"
 #include "module_neighbor/sltk_atom_arrange.h"
 #include "src_lcao/LOOP_ions.h"
@@ -20,7 +19,7 @@ void Driver::driver_run()
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
 
-    // 1. Initialzie Esolver
+    // 1. Initialzie type of Esolver
     ModuleESolver::ESolver *p_esolver = nullptr;
     ModuleESolver::init_esolver(p_esolver);
 
@@ -35,37 +34,17 @@ void Driver::driver_run()
     GlobalC::ucell.setup_cell(GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
 #endif
 
-    // mohan add 2010-10-10, just to test the symmetry of a variety
-    // of systems.
-    if(GlobalV::CALCULATION == "test_memory")
+    // 3. For these two types of calculations
+    // nothing else need to be initialized
+    if(GlobalV::CALCULATION == "test_neighbour" || GlobalV::CALCULATION == "test_memory")
     {
-        Cal_Test::test_memory();
+        p_esolver->Run(0, GlobalC::ucell);
         ModuleBase::QUIT();
     }
 
-    if (GlobalV::CALCULATION == "test_neighbour" && GlobalV::BASIS_TYPE=="lcao")
-    {
-        //test_search_neighbor();
-        GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
-            GlobalV::ofs_running,
-            GlobalV::OUT_LEVEL,
-            GlobalC::ORB.get_rcutmax_Phi(),
-            GlobalC::ucell.infoNL.get_rcutmax_Beta(),
-            GlobalV::GAMMA_ONLY_LOCAL);
-
-        atom_arrange::search(
-            GlobalV::SEARCH_PBC,
-            GlobalV::ofs_running,
-            GlobalC::GridD,
-            GlobalC::ucell,
-            GlobalV::SEARCH_RADIUS,
-            GlobalV::test_atom_input,
-            1);
-    }
-
-    //------------------------------------------------------------
-    //---------------------Init ESolver-------------------------
+    // 4. Initialize Esolver
     p_esolver->Init(INPUT, GlobalC::ucell);
+
     if(GlobalV::BASIS_TYPE=="lcao" && GlobalV::CALCULATION=="get_S")
     {
         p_esolver->Run(0, GlobalC::ucell);
@@ -74,6 +53,7 @@ void Driver::driver_run()
     }
     //------------------------------------------------------------
 
+    // This part onward needs to be refactored.
     //---------------------------MD/Relax------------------
     if(GlobalV::BASIS_TYPE=="lcao")
     {
