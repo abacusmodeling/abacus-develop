@@ -7,6 +7,7 @@
 #include "module_hamilt/hamilt.h"
 #include "module_elecstate/elecstate.h"
 #include "module_pw/pw_basis_k.h"
+#include "src_io/cal_test.h"
 // #include "estates.h"
 // #include "h2e.h"
 namespace ModuleESolver
@@ -50,7 +51,6 @@ namespace ModuleESolver
         virtual void updatepot(const int istep, const int iter) {};
         // choose strategy when charge density convergence achieved
         virtual bool do_after_converge(int& iter){return true;}
-
 
         //TOOLS:
     protected:

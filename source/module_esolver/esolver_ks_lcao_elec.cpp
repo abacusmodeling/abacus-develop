@@ -23,7 +23,6 @@
 #include "../module_deepks/LCAO_deepks.h"
 #endif
 #include "../src_pw/H_Ewald_pw.h"
-#include "src_io/cal_test.h"
 
 namespace ModuleESolver
 {

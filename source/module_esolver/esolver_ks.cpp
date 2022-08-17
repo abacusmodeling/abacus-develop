@@ -146,7 +146,6 @@ namespace ModuleESolver
         ModuleBase::GlobalFunc::DONE(ofs, "INIT PLANEWAVE");
     }
 
-
     void ESolver_KS::Run(const int istep, UnitCell_pseudo& ucell)
     {
         if (!(GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md"

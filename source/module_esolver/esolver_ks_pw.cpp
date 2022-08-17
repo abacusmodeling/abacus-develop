@@ -212,6 +212,30 @@ namespace ModuleESolver
         }
     } 
 
+    void ESolver_KS_PW::othercalculation(const int istep)
+    {
+        ModuleBase::TITLE("ESolver_KS_PW", "othercalculation");
+        ModuleBase::timer::tick("ESolver_KS_PW", "othercalculation");
+        if(GlobalV::CALCULATION == "test_memory")
+        {
+            Cal_Test::test_memory();
+            return;
+        }
+
+        // self consistent calculations for electronic ground state
+        if (GlobalV::CALCULATION == "nscf")
+        {
+            this->nscf();
+        }        
+        else
+        {
+            ModuleBase::WARNING_QUIT("ESolver_KS_LCAO::othercalculation", "CALCULATION type not supported");
+        }
+
+        ModuleBase::timer::tick("ESolver_KS_PW", "othercalculation");
+        return;
+    }
+
     void ESolver_KS_PW::eachiterinit(const int istep, const int iter)
     {
         // mohan add 2010-07-16
