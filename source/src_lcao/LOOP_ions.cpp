@@ -108,7 +108,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
 			ss << GlobalV::RELAX_METHOD << istep;
 			
 			std::cout << " " << std::setw(7) << ss.str() 
-			<< std::setw(5) << eiter 
+			<< std::setw(5) << p_esolver->getniter()
 			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV 
 			<< std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
 			<< std::setprecision(3)
