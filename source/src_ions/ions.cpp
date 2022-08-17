@@ -52,18 +52,8 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			Print_Info::print_screen(stress_step, force_step, istep);
 		}
 
-		// mohan added eiter to count for the electron iteration number, 2021-01-28
-		int eiter=0;		
-        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")  // pengfei 2014-10-13
-        {
-			p_esolver->Run(istep-1,GlobalC::ucell);
-			eiter = p_esolver->getniter();
-        }
-        else if(GlobalV::CALCULATION=="nscf")
-        {
-			p_esolver->nscf();
-			eiter = p_esolver->getniter();
-        }
+		// mohan added eiter to count for the electron iteration number, 2021-01-28	
+		p_esolver->Run(istep-1,GlobalC::ucell);
 
 		time_t eend = time(NULL);
 		time_t fstart = time(NULL);
@@ -83,7 +73,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			ss << GlobalV::RELAX_METHOD << istep;
 			
 			std::cout << " " << std::setw(7) << ss.str() 
-			<< std::setw(5) << eiter 
+			<< std::setw(5) << p_esolver->getniter()
 			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV 
 			<< std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
 			<< std::setprecision(3)
@@ -114,13 +104,13 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 	ModuleBase::matrix force;
 	if(GlobalV::CAL_FORCE)
 	{
-		this->gather_force_pw(p_esolver, force);
+		p_esolver->cal_Force(force);
 	}
 	//calculate and gather all parts of stress
 	ModuleBase::matrix stress;
 	if(GlobalV::CAL_STRESS)
 	{
-		this->gather_stress_pw(p_esolver, stress);
+		p_esolver->cal_Stress(stress);
 	}
 	//stop in last step
 	if(istep==GlobalV::RELAX_NMAX)
@@ -154,31 +144,6 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 	}
 
     return 1;
-}
-void Ions::gather_force_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix &force)
-{
-	ModuleBase::TITLE("Ions","gather_force_pw");
-	// Forces fcs;
-	// fcs.init(force);
-	p_esolver->cal_Force(force);
-}
-
-void Ions::gather_stress_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix& stress)
-{
-	ModuleBase::TITLE("Ions","gather_stress_pw");
-	//basic stress
-	// Stress_PW ss;
-	// ss.cal_stress(stress);
-	p_esolver->cal_Stress(stress);
-	//external stress
-	double unit_transform = 0.0;
-	unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
-	double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
-	for(int i=0;i<3;i++)
-	{
-		stress(i,i) -= external_stress[i]/unit_transform;
-	}
-	GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 }
 
 bool Ions::if_do_relax()
@@ -257,6 +222,7 @@ void Ions::reset_after_relax(const int& istep)
 	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
 	//GlobalC::wf.wfcinit();
 }
+
 void Ions::reset_after_cellrelax(int& f_step, int& s_step, ModuleESolver::ESolver *p_esolver)
 {
 	ModuleBase::TITLE("Ions","reset_after_cellrelax");
