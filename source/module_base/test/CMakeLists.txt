@@ -2,7 +2,7 @@ remove_definitions(-D__MPI)
 AddTest(
   TARGET base_blas_connector
   LIBS ${math_libs}
-  SOURCES blas_connector_test.cpp ../gather_math_lib_info.cpp
+  SOURCES blas_connector_test.cpp
 )
 AddTest(
   TARGET base_timer

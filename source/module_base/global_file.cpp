@@ -142,10 +142,12 @@ void ModuleBase::Global_File::make_dir_out(
     if(rank==0)
     {
         open_log(GlobalV::ofs_warning, "warning", calculation, restart);
-#ifdef GATHER_INFO
-        open_log(GlobalV::ofs_info, "math_info", calculation, restart);
-#endif
     }
+
+#ifdef GATHER_INFO
+    open_log(GlobalV::ofs_info, "math_info_" + std::to_string(rank), calculation, restart);
+#endif
+
     return;
 }
 
@@ -224,10 +226,11 @@ void ModuleBase::Global_File::close_all_log(const int rank, const bool out_alllo
     if (rank==0)
     {
         close_log(GlobalV::ofs_warning, "warning.log");
-#ifdef GATHER_INFO
-        close_log(GlobalV::ofs_info, "math_info");
-#endif
     }
+
+#ifdef GATHER_INFO
+    close_log(GlobalV::ofs_info, "math_info");
+#endif
     return;
 }
 }
