@@ -312,7 +312,7 @@ namespace ModuleESolver
         if(GlobalV::CALCULATION == "get_S")
         {
             this->get_S();
-            return;
+            ModuleBase::QUIT();
         }
         
         if(GlobalV::CALCULATION == "test_memory")

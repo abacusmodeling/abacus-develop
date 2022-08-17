@@ -156,11 +156,6 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver* p_esolver)
         GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); // output 'Hartree + local pseudopot'
     }
 
-    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-    GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
-    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
-
 	// mohan update 2021-02-10
     delete verlet;
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 

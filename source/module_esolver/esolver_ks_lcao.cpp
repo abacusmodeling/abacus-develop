@@ -272,6 +272,12 @@ void ESolver_KS_LCAO::cal_Stress(ModuleBase::matrix& stress)
 
 void ESolver_KS_LCAO::postprocess()
 {
+
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+    GlobalV::ofs_running << std::setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
+
     GlobalC::en.perform_dos(this->psid, this->psi, this->UHM);
 }
 

@@ -429,8 +429,6 @@ namespace ModuleESolver
         }
         if (this->conv_elec)
         {
-            //GlobalV::ofs_running << " convergence is achieved" << std::endl;			
-            //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
             GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
             GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
         }
@@ -438,6 +436,15 @@ namespace ModuleESolver
         {
             GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;
         }
+
+		if(GlobalC::pot.out_pot == 2)
+		{
+			std::stringstream ssp;
+			std::stringstream ssp_ave;
+			ssp << GlobalV::global_out_dir << "ElecStaticPot";
+			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
+			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
+		}
 
         if (GlobalV::OUT_LEVEL != "m")
         {
@@ -569,6 +576,12 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::postprocess()
     {
+
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+        GlobalV::ofs_running << std::setprecision(16);
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
+        
         //print occupation in istate.info
 	    GlobalC::en.print_occ();
         // compute density of states

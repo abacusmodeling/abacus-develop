@@ -63,18 +63,8 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			eiter = p_esolver->getniter();
         }
 
-		if(GlobalC::pot.out_pot == 2)
-		{
-			std::stringstream ssp;
-			std::stringstream ssp_ave;
-			ssp << GlobalV::global_out_dir << "ElecStaticPot";
-			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
-		}
-
 		time_t eend = time(NULL);
 		time_t fstart = time(NULL);
-
 
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")
         {
@@ -105,15 +95,6 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 		++istep;
 
     }
-
-    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")
-    {
-        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-        GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
-        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
-    }
-
 
 	if(GlobalV::OUT_LEVEL=="i")
 	{

@@ -45,14 +45,7 @@ void Driver::driver_run()
     // 4. Initialize Esolver
     p_esolver->Init(INPUT, GlobalC::ucell);
 
-    if(GlobalV::BASIS_TYPE=="lcao" && GlobalV::CALCULATION=="get_S")
-    {
-        p_esolver->Run(0, GlobalC::ucell);
-        ModuleBase::timer::tick("Driver_run", "driver_line");
-        return;
-    }
     //------------------------------------------------------------
-
     // This part onward needs to be refactored.
     //---------------------------MD/Relax------------------
     if(GlobalV::BASIS_TYPE=="lcao")
@@ -86,11 +79,10 @@ void Driver::driver_run()
             Optical opt;
             opt.cal_epsilon2(GlobalV::NBANDS);            
         }
-
-        p_esolver->postprocess();
     }
     //---------------------------MD/Relax------------------
 
+    p_esolver->postprocess();
     ModuleESolver::clean_esolver(p_esolver);
 
     ModuleBase::timer::tick("Driver", "driver_line");

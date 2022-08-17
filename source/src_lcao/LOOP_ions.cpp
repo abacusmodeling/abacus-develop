@@ -123,17 +123,6 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
         ++istep;
     }
 
-    if (GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
-    {
-        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-        GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
-        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
-
-    }
-
-    p_esolver->postprocess();
-
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
     return;
 }
