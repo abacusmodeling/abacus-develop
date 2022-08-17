@@ -44,20 +44,18 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
     }
 
     // Geometry optimization algorithm setup.
-    if (GlobalV::CAL_FORCE)
+    if (GlobalV::CALCULATION=="relax")
     {
         //Ions_Move_Methods
         IMM.allocate();
-        //Charge_Extrapolation
-        // CE.allocate_ions();
     }
-
-    // pengfei Li 2018-05-14
-    if (GlobalV::CAL_STRESS)
+    if (GlobalV::CALCULATION=="cell-relax")
     {
+        //Ions_Move_Methods
+        IMM.allocate();
         // allocate arrays related to changes of lattice vectors
         LCM.allocate();
-    }
+    } 
 
     this->istep = 1;
     int force_step = 1;
@@ -73,34 +71,6 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
             Print_Info::print_screen(stress_step, force_step, istep);
         }
 
-        //----------------------------------------------------------
-        // about vdw, jiyy add vdwd3 and linpz add vdwd2
-        //----------------------------------------------------------
-        if (INPUT.vdw_method == "d2")
-        {
-            // setup vdwd2 parameters
-            GlobalC::vdwd2_para.initial_parameters(INPUT);
-            GlobalC::vdwd2_para.initset(GlobalC::ucell);
-        }
-        if (INPUT.vdw_method == "d3_0" || INPUT.vdw_method == "d3_bj")
-        {
-            GlobalC::vdwd3_para.initial_parameters(INPUT);
-        }
-        // Peize Lin add 2014.04.04, update 2021.03.09
-        if (GlobalC::vdwd2_para.flag_vdwd2)
-        {
-            Vdwd2 vdwd2(GlobalC::ucell, GlobalC::vdwd2_para);
-            vdwd2.cal_energy();
-            GlobalC::en.evdw = vdwd2.get_energy();
-        }
-        // jiyy add 2019-05-18, update 2021.05.02
-        else if (GlobalC::vdwd3_para.flag_vdwd3)
-        {
-            Vdwd3 vdwd3(GlobalC::ucell, GlobalC::vdwd3_para);
-            vdwd3.cal_energy();
-            GlobalC::en.evdw = vdwd3.get_energy();
-        }
-
         // solve electronic structures in terms of LCAO
         p_esolver->Run(this->istep - 1, GlobalC::ucell);
 
@@ -110,19 +80,6 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
         if (GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
         {
             CE.update_all_pos(GlobalC::ucell);
-        }
-
-        // PLEASE design a proper interface to output potentials,
-        // not only electrostatic potential but also others
-        // mohan add 2021-03-25
-        // we need to have a proper
-        if (GlobalC::pot.out_pot == 2)
-        {
-            std::stringstream ssp;
-            std::stringstream ssp_ave;
-            ssp << GlobalV::global_out_dir << "ElecStaticPot";
-            ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
         }
 
         time_t fstart = time(NULL);
@@ -135,7 +92,7 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
         // PLEASE move the details of CE to other places
         // mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
-        if (GlobalV::CAL_FORCE)
+        if (GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
         {
             CE.save_pos_next(GlobalC::ucell);
         }
@@ -162,14 +119,6 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
                 << std::setprecision(2) << std::setw(10) << etime_min + ftime_min;
             std::cout << std::endl;
         }
-
-        //#ifdef __MPI
-        //    MPI_Barrier(MPI_COMM_WORLD);
-        //    for (int i=0;i<GlobalC::ucell.ntype;i++)
-        //    {
-        //        GlobalC::ucell.atoms[i].bcast_atom(); // bcast tau array
-        //    }
-        //#endif
 
         ++istep;
     }
@@ -259,29 +208,6 @@ bool LOOP_ions::force_stress(
             return 1;
         }
 
-        // mohan update 2013-04-11
-        // setup the structure factor
-        // and do the density extraploation.
-        // for both ionic iteration and
-        // force calculations.
-
-        //xiaohui modify 2014-08-09
-        //GlobalC::sf.setup_structure_factor();
-
-        // charge extrapolation if istep>0.
-        //xiaohui modify 2014-08-09
-        //CE.extrapolate_charge();
-
-/*xiaohui modify 2014-08-09
-        if(GlobalC::pot.chg_extrap==4)
-        {
-            // done after grid technique.
-        }
-        else
-        {
-            GlobalC::pot.init_pot( istep );
-        }
-xiaohui modify 2014-08-09*/
     }
 
     //    static bool converged_force = false;

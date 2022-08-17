@@ -686,14 +686,15 @@ void ESolver_KS_LCAO::afterscf()
             ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT";
             GlobalC::pot.write_potential(is, 0, ssp.str(), GlobalC::pot.vr_eff, precision);
         }
+    }
 
-        // LiuXh modify 20200701
-        /*
-        //fuxiang add 2017-03-15
-        std::stringstream sse;
-        sse << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
-        GlobalC::CHR.write_rho_dipole(GlobalC::CHR.rho_save, is, 0, sse.str());
-        */
+    if (GlobalC::pot.out_pot == 2)
+    {
+        std::stringstream ssp;
+        std::stringstream ssp_ave;
+        ssp << GlobalV::global_out_dir << "ElecStaticPot";
+        ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
+        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
     }
 
     if (this->conv_elec)
