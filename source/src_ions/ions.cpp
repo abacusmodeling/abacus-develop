@@ -24,17 +24,19 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
         <<std::endl;
 	}
 
-	// allocation for ion movement.	
-	if(GlobalV::CAL_FORCE)
-	{
-		IMM.allocate();
-		// CE.allocate_ions();
-	}
-
-	if(GlobalV::CAL_STRESS)                    // pengfei Li 2018-05-14
-	{
-		LCM.allocate();
-	}
+    // Geometry optimization algorithm setup.
+    if (GlobalV::CALCULATION=="relax")
+    {
+        //Ions_Move_Methods
+        IMM.allocate();
+    }
+    if (GlobalV::CALCULATION=="cell-relax")
+    {
+        //Ions_Move_Methods
+        IMM.allocate();
+        // allocate arrays related to changes of lattice vectors
+        LCM.allocate();
+    } 
 
     this->istep = 1;
 	int force_step = 1;           // pengfei Li 2018-05-14

@@ -31,17 +31,20 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
     ModuleBase::TITLE("LOOP_ions", "opt_ions");
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
 
-    if (GlobalV::OUT_LEVEL == "i")
-    {
-        std::cout << std::setprecision(12);
-        std::cout << " " << std::setw(7) << "ISTEP"
-            << std::setw(5) << "NE"
-            << std::setw(18) << "ETOT(eV)"
-            << std::setw(10) << "dE(meV)"
-            << std::setw(10) << "F(eV/A)"
-            << std::setw(10) << "T(MIN)"
-            << std::endl;
-    }
+	if(GlobalV::OUT_LEVEL=="i")
+	{
+		std::cout << std::setprecision(12);
+    	std::cout<< " " << std::setw(7)<< "ISTEP" 
+		<<std::setw(5)<< "NE"
+		<<std::setw(15)<< "ETOT(eV)"
+		<<std::setw(15)<< "EDIFF(eV)"
+        <<std::setw(15)<< "MAX_F(eV/A)"
+        <<std::setw(15)<< "TRADIUS(Bohr)"
+		<<std::setw(8)<< "UPDATE"
+		<<std::setw(11)<< "ETIME(MIN)"
+		<<std::setw(11)<< "FTIME(MIN)"
+        <<std::endl;
+	}
 
     // Geometry optimization algorithm setup.
     if (GlobalV::CALCULATION=="relax")
@@ -97,28 +100,24 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver* p_esolver)
             CE.save_pos_next(GlobalC::ucell);
         }
 
-        if (GlobalV::OUT_LEVEL == "i")
-        {
-            double etime_min = difftime(eend, estart) / 60.0;
-            double ftime_min = difftime(fend, fstart) / 60.0;
-            std::stringstream ss;
-            ss << GlobalV::RELAX_METHOD << istep;
-
-            std::cout << std::setiosflags(ios::scientific)
-                << " " << std::setw(7) << ss.str()
-                << std::setw(5) << p_esolver->getniter()
-                << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV;
-
-            std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)
-                << std::setw(10) << IMM.get_ediff() * ModuleBase::Ry_to_eV * 1000
-                << std::setw(10) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / ModuleBase::BOHR_TO_A;
-            //<< std::setw(12) << IMM.get_trust_radius();
-
-            std::cout << std::resetiosflags(ios::scientific)
-                //            << std::setw(8) << IMM.get_update_iter()
-                << std::setprecision(2) << std::setw(10) << etime_min + ftime_min;
-            std::cout << std::endl;
-        }
+		if(GlobalV::OUT_LEVEL=="i")
+		{
+			double etime_min = difftime(eend, estart)/60.0; 
+			double ftime_min = difftime(fend, fstart)/60.0; 
+			std::stringstream ss;
+			ss << GlobalV::RELAX_METHOD << istep;
+			
+			std::cout << " " << std::setw(7) << ss.str() 
+			<< std::setw(5) << eiter 
+			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV 
+			<< std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
+			<< std::setprecision(3)
+			<< std::setw(15) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / 0.529177
+			<< std::setw(15) << IMM.get_trust_radius()
+			<< std::setw(8) << IMM.get_update_iter()
+			<< std::setprecision(2) << std::setw(11) << etime_min
+			<< std::setw(11) << ftime_min << std::endl;
+		}
 
         ++istep;
     }
