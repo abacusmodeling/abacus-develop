@@ -22,7 +22,7 @@ class Charge_Extra
     void update_all_pos(const UnitCell_pseudo& ucell);
 
     private:
-    int istep;
+    int istep = 0;
     int natom;
     int pot_order;
     int rho_extr;

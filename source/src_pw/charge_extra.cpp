@@ -497,7 +497,16 @@ void Charge_Extra::save_pos_next(const UnitCell_pseudo& ucell)
 
 void Charge_Extra::update_istep(const int &step)
 {
-    this->istep = step;
+    //This is because md and relaxation are not unified yet
+    //will update later
+    if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+    {
+        this->istep++;
+    }
+    else
+    {
+        this->istep = step;
+    }
     return;
 }
 
@@ -507,7 +516,12 @@ void Charge_Extra::update_all_pos(const UnitCell_pseudo& ucell)
     {
         this->pos_old2[i] = this->pos_old1[i];
         this->pos_old1[i] = this->pos_now[i];
+        if(GlobalV::CALCULATION=="relax"||GlobalV::CALCULATION=="cell-relax")
+        {
+            this->pos_now[i] = this->pos_next[i];
+        }
     }
-    ucell.save_cartesian_position_original(this->pos_now);
+    if(GlobalV::CALCULATION=="md"||GlobalV::CALCULATION=="sto-md")
+        ucell.save_cartesian_position_original(this->pos_now);
     return;
 }

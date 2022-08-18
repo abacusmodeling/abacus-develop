@@ -100,6 +100,10 @@ void Ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &force_step, int &stress_step)
 {
 	ModuleBase::TITLE("Ions","after_scf");
+
+	// should not do it this way, will change later
+	GlobalC::ucell.ionic_position_updated = false;
+
 	//calculate and gather all parts of total ionic forces
 	ModuleBase::matrix force;
 	if(GlobalV::CAL_FORCE)
@@ -127,6 +131,7 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 		if(!converged) 
 		{
 			this->reset_after_relax(istep);
+			GlobalC::ucell.ionic_position_updated = true;
 			return converged;
 		}
 		else if(GlobalV::CALCULATION!="cell-relax")
@@ -191,8 +196,6 @@ bool Ions::if_do_cellrelax()
 bool Ions::do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy)
 {
 	ModuleBase::TITLE("Ions","do_relax");
-	CE.update_istep(jstep);
-	CE.update_all_pos(GlobalC::ucell);
 	IMM.cal_movement(istep, jstep, ionic_force, total_energy);
 	++jstep;
 	return IMM.get_converged();
@@ -211,6 +214,8 @@ void Ions::reset_after_relax(const int& istep)
 
 	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
 	// charge extrapolation if istep>0.
+	CE.update_istep(istep);
+	CE.update_all_pos(GlobalC::ucell);
 	CE.extrapolate_charge();
 	CE.save_pos_next(GlobalC::ucell);
 
