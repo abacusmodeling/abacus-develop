@@ -144,7 +144,7 @@ void Input::Default(void)
     bndpar = 1;
     kpar = 1;
     initsto_freq = 1000;
-    method_sto = 1;
+    method_sto = 2;
     cal_cond = false;
     dos_nche = 100;
     cond_nche = 20;
@@ -1940,6 +1940,10 @@ void Input::Default_2(void) // jiyy add 2019-08-04
     }
     if(calculation.substr(0,3) != "sto")    bndpar = 1;
     if(bndpar > GlobalV::NPROC) bndpar = GlobalV::NPROC;
+    if(method_sto != 1 || method_sto != 2) 
+    {
+        method_sto = 2;
+    }
 }
 #ifdef __MPI
 void Input::Bcast()

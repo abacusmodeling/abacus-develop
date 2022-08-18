@@ -27,7 +27,7 @@ Stochastic_Iter::Stochastic_Iter()
 {
     change = false;
     mu0 = 0;
-    method = 1;
+    method = 2;
 }
 
 Stochastic_Iter::~Stochastic_Iter()
@@ -46,12 +46,12 @@ void Stochastic_Iter::init(const int dim, int* nchip_in, const int method_in, St
     delete[] spolyv;
     const int norder = p_che->norder;
     this->method = method_in;
-    if(method == 1 || method ==2)   spolyv = new double [norder];
+    if(method == 1)                 spolyv = new double [norder];
     else                            spolyv = new double [norder*norder];
     stofunc.Emin = INPUT.emin_sto;
     stofunc.Emax = INPUT.emax_sto;
     
-    if(this->method == 2 || this->method == 3)
+    if(this->method == 2)
     {
         double tot = 0;
         for (int ik = 0; ik < GlobalC::kv.nks; ++ik)
@@ -184,7 +184,7 @@ void Stochastic_Iter::check_precision(const double ref, const double thr, const 
     //precision check
     //==============================
     double error = 0;
-    if(this->method == 1 || this->method == 2)
+    if(this->method == 1)
     {
         error = p_che->coef_real[p_che->norder-1] * spolyv[p_che->norder-1];
     }
@@ -316,7 +316,7 @@ void Stochastic_Iter::calPn(const int& ik, Stochastic_WF& stowf)
     const int nchip_ik = nchip[ik];
     if(ik==0)   
     {
-        if(this->method == 1 || this->method == 2)
+        if(this->method == 1)
             ModuleBase::GlobalFunc::ZEROS(spolyv, norder);
         else
             ModuleBase::GlobalFunc::ZEROS(spolyv, norder*norder);
@@ -338,22 +338,13 @@ void Stochastic_Iter::calPn(const int& ik, Stochastic_WF& stowf)
         p_che->calpolyvec_complex(&stohchi, &Stochastic_hchi::hchi_norm, pchi, this->chiallorder[ik].c, GlobalC::kv.ngk[ik], GlobalC::wf.npwx, nchip_ik);
         double* vec_all= (double *) this->chiallorder[ik].c;
         char trans = 'T';
+        char normal = 'N';
         double one = 1;
         int LDA = GlobalC::wf.npwx * nchip_ik * 2;
         int M = GlobalC::wf.npwx * nchip_ik * 2; //Do not use kv.ngk[ik]
         int N = norder;
         double kweight = GlobalC::kv.wk[ik];
-        if(this->method == 2)
-        {
-            int inc = 1;
-            double* vec= (double *) pchi;
-            dgemv_(&trans, &M, &N, &kweight, vec_all, &LDA, vec, &inc, &one, spolyv, &inc);
-        }
-        else if(this->method == 3)
-        {
-            char normal = 'N';
-            dgemm_(&trans,&normal, &N,&N,&M,&kweight,vec_all,&LDA,vec_all,&LDA,&one,spolyv,&N);
-        }
+        dgemm_(&trans,&normal, &N,&N,&M,&kweight,vec_all,&LDA,vec_all,&LDA,&one,spolyv,&N);
     }
     ModuleBase::timer::tick("Stochastic_Iter", "calPn");
     return;
@@ -366,7 +357,7 @@ double Stochastic_Iter::calne(elecstate::ElecState* pes)
     KS_ne = 0;
     const int norder = p_che->norder;
     double sto_ne;
-    if(this->method == 1 || this->method == 2)
+    if(this->method == 1)
     {
         //Note: spolyv contains kv.wk[ik]
         p_che->calcoef_real(&stofunc,&Sto_Func<double>::nfd);
@@ -422,7 +413,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
 
     //---------------cal demet-----------------------
     double stodemet;
-    if(this->method == 1 || this->method == 2)
+    if(this->method == 1)
     {
         p_che->calcoef_real(&stofunc,&Sto_Func<double>::nfdlnfd);
         stodemet = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
@@ -456,12 +447,12 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
 
     //--------------------cal eband------------------------
     double sto_eband = 0;
-    if(this->method == 1 || this->method == 2)
+    if(this->method == 1)
     {
         p_che->calcoef_real(&stofunc,&Sto_Func<double>::nxfd);
         sto_eband = BlasConnector::dot(norder,p_che->coef_real,1,spolyv,1);
     }
-    else if(this->method == 3)
+    else
     {
         for(int ik = 0; ik < GlobalC::kv.nks; ++ik)
         {
@@ -584,7 +575,7 @@ void Stochastic_Iter::calTnchi_ik(const int& ik, Stochastic_WF& stowf)
         pchi = stowf.chiortho[ik].c;
     else
         pchi = stowf.chi0[ik].c;
-    if(this->method==2 || this->method == 3)
+    if(this->method==2)
     {
         char transa = 'N';
         std::complex<double> one = 1;
@@ -609,7 +600,7 @@ void Stochastic_Iter::calTnchi_ik(const int& ik, Stochastic_WF& stowf)
 
 void Stochastic_Iter::cleanchiallorder()
 {
-    if(this->method == 2 || this->method == 3) 
+    if(this->method == 2) 
     {
         delete[] chiallorder;
         chiallorder = nullptr;
