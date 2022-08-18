@@ -51,7 +51,7 @@ void force_cor_one(const UnitCell &cell, ModulePW::PW_Basis* rho_basis , ModuleB
                 forcesol(iat, 1) *= 2 ;
                 forcesol(iat, 2) *= 2 ;
 
-                cout<<"Force1"<<iat<<":"<<" "<<forcesol(iat, 0)<<" "<<forcesol(iat, 1)<<" "<<forcesol(iat, 2)<<endl;
+                //cout<<"Force1"<<iat<<":"<<" "<<forcesol(iat, 0)<<" "<<forcesol(iat, 1)<<" "<<forcesol(iat, 2)<<endl;
                
             ++iat;
         }
@@ -131,7 +131,7 @@ void force_cor_two(const UnitCell &cell, ModulePW::PW_Basis* rho_basis , ModuleB
                 forcesol(iat, 1) *= 2 ;
                 forcesol(iat, 2) *= 2 ;
 
-                cout<<"Force2"<<iat<<":"<<" "<<forcesol(iat, 0)<<" "<<forcesol(iat, 1)<<" "<<forcesol(iat, 2)<<endl;
+                //cout<<"Force2"<<iat<<":"<<" "<<forcesol(iat, 0)<<" "<<forcesol(iat, 1)<<" "<<forcesol(iat, 2)<<endl;
 
             ++iat;
         }
