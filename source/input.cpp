@@ -158,6 +158,7 @@ void Input::Default(void)
     NNKP = "seedname.nnkp";
     wannier_spin = "up";
     kspacing = 0.0;
+    min_dist_coef = 0.2;
     //----------------------------------------------------------
     // electrons / spin
     //----------------------------------------------------------
@@ -554,6 +555,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("kspacing", word) == 0)
         {
             read_value(ifs, kspacing);
+        }
+        else if (strcmp("min_dist_coef", word) == 0)
+        {
+            read_value(ifs, min_dist_coef);
         }
         else if (strcmp("nbands_istate", word) == 0) // number of atom bands
         {
@@ -1846,9 +1851,21 @@ bool Input::Read(const std::string &fn)
         }
     }
 
-    if (basis_type == "pw") // pengfei Li add 2015-1-31
+    if (basis_type == "pw" && gamma_only !=0) // pengfei Li add 2015-1-31
     {
         gamma_only = 0;
+        GlobalV::ofs_running << " WARNING : gamma_only has not been implemented for pw yet" << std::endl;
+        GlobalV::ofs_running << " the INPUT parameter gamma_only has been reset to 0" << std::endl;
+        GlobalV::ofs_running << " and a new KPT is generated with gamma point as the only k point" << std::endl;
+
+		GlobalV::ofs_warning << " Auto generating k-points file: " << GlobalV::global_kpoint_card << std::endl;
+		std::ofstream ofs(GlobalV::global_kpoint_card.c_str());
+		ofs << "K_POINTS" << std::endl;
+		ofs << "0" << std::endl;
+		ofs << "Gamma" << std::endl;
+		ofs << "1 1 1 0 0 0" << std::endl;
+		ofs.close();
+
         // std::cout << "gamma_only =" << gamma_only << std::endl;
     }
     else if ((basis_type == "lcao" || basis_type == "lcao_in_pw") && (gamma_only == 1))
@@ -1949,6 +1966,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(nbands_sto);
     Parallel_Common::bcast_int(nbands_istate);
     Parallel_Common::bcast_double(kspacing);
+    Parallel_Common::bcast_double(min_dist_coef);
     Parallel_Common::bcast_int(nche_sto);
     Parallel_Common::bcast_int(seed_sto);
     Parallel_Common::bcast_int(pw_seed);
@@ -2431,7 +2449,7 @@ void Input::Check(void)
         // if(basis_type == "pw" ) ModuleBase::WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
         if (mdp.md_dt < 0)
             ModuleBase::WARNING_QUIT("Input::Check", "time interval of MD calculation should be set!");
-        if (mdp.md_tfirst < 0)
+        if (mdp.md_tfirst < 0 && tddft==0)
             ModuleBase::WARNING_QUIT("Input::Check", "temperature of MD calculation should be set!");
         if (mdp.md_tlast < 0.0)
             mdp.md_tlast = mdp.md_tfirst;
@@ -2692,6 +2710,10 @@ void Input::Check(void)
         ModuleBase::WARNING("Input", "gamma_only_local algorithm is not used.");
     }
 
+    if (basis_type == "lcao" && kpar > 1)
+    {
+        ModuleBase::WARNING_QUIT("Input", "kpar > 1 has not been supported for lcao calculation.");
+    }
     // new rule, mohan add 2012-02-11
     // otherwise, there need wave functions transfers
     // if(diago_type=="cg") xiaohui modify 2013-09-01

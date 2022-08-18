@@ -163,6 +163,7 @@ Next, for the "dpgen run" step, the following `run_param.json` should be provide
     "fp_pp_path": "./",
     "fp_pp_files": ["Al_ONCV_PBE-1.0.upf"],   # the pseudopotential file
     "fp_orb_files": ["Al_gga_9au_100Ry_4s4p1d.orb"],  # the orbital file (use only in LCAO calculation)
+    "k_points":[2, 2, 2, 0, 0, 0],  # k-mesh setting
     "user_fp_params":{  # All the ABACUS input paramters are defined here
     "ntype": 1,         # defining input parameters from INPUT files is not supported yet.
     "ecutwfc": 80,      
@@ -175,7 +176,6 @@ Next, for the "dpgen run" step, the following `run_param.json` should be provide
     "smearing_sigma": 0.002,
     "scf_thr":1e-8,
     "cal_force":1,        # calculate force must be set to 1 in dpgen calculation
-    "k_points":[2, 2, 2, 0, 0, 0],  # k-mesh setting
     "kspacing": 0.01  # when KSPACING is set, the above k_points setting becomes invalid.
     }
 }
