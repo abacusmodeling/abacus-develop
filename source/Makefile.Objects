@@ -138,7 +138,6 @@ ORB_gen_tables.o\
 local_orbital_wfc.o\
 local_orbital_charge.o\
 ELEC_evolve.o\
-LOOP_ions.o\
 run_md_lcao.o\
 DM_gamma.o\
 DM_k.o\

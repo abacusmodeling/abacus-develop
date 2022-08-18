@@ -39,7 +39,6 @@ void Driver::init()
     Print_Info::print_time(time_start, time_finish);
 
     // (4) close all of the running logs
-
     INPUT.close_log();
 
     return;

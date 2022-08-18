@@ -1,23 +1,24 @@
 #include "driver.h"
 #include "src_pw/global.h"
 #include "input.h"
-#include "src_io/optical.h"
 #include "src_io/winput.h"
 #include "module_neighbor/sltk_atom_arrange.h"
-#include "src_lcao/LOOP_ions.h"
 #include "src_io/print_info.h"
 #include "src_lcao/run_md_lcao.h"
 #include "src_pw/run_md_pw.h"
 
+// This is the driver function which defines the workflow of ABACUS calculations
+// It relies on the class Esolver, which is a class that organizes workflows of single point calculations.
+// For calculations involving change of configuration (lattice parameter & ionic motion),
+// this driver calls Esolver::Run and the configuration-changing subroutine
+// in a alternating manner.
+// Information is passed between the two subroutines by class UnitCell_Pseudo
+// Esolver::Run takes in a configuration and provides force and stress, 
+// the configuration-changing subroutine takes force and stress and updates the configuration
 void Driver::driver_run()
 {
     ModuleBase::TITLE("Driver", "driver_line");
     ModuleBase::timer::tick("Driver", "driver_line");
-
-    //-----------------------init Cell--------------------------
-    // Setup the unitcell.
-    // improvement: a) separating the first reading of the atom_card and subsequent
-    // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
 
     // 1. Initialzie type of Esolver
     ModuleESolver::ESolver *p_esolver = nullptr;
@@ -48,40 +49,24 @@ void Driver::driver_run()
     //------------------------------------------------------------
     // This part onward needs to be refactored.
     //---------------------------MD/Relax------------------
-    if(GlobalV::BASIS_TYPE=="lcao")
+    if(GlobalV::CALCULATION == "md" && GlobalV::BASIS_TYPE=="lcao")
     {
-        if (GlobalV::CALCULATION == "md")
-        {
-            Run_MD_LCAO run_md_lcao;
-            run_md_lcao.opt_ions(p_esolver);
-        }
-        else // cell relaxations
-        {
-            LOOP_ions ions; 
-            ions.opt_ions(p_esolver);
-        }
+        Run_MD_LCAO run_md_lcao;
+        run_md_lcao.opt_ions(p_esolver);
     }
-    else
+    else if(GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
     {
-        if(GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
-        {
-            Run_MD_PW run_md_pw;
-            run_md_pw.md_ions_pw(p_esolver);
-        }
-        else
-        {
-            Ions ions;
-            ions.opt_ions_pw(p_esolver);
-        }
-
-        if(Optical::opt_epsilon2)
-        {
-            Optical opt;
-            opt.cal_epsilon2(GlobalV::NBANDS);            
-        }
+        Run_MD_PW run_md_pw;
+        run_md_pw.md_ions_pw(p_esolver);
+    }
+    else // cell relaxations
+    {
+        Ions ions;
+        ions.opt_ions(p_esolver);
     }
     //---------------------------MD/Relax------------------
 
+    // 6. clean up esolver
     p_esolver->postprocess();
     ModuleESolver::clean_esolver(p_esolver);
 

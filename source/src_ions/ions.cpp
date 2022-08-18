@@ -4,10 +4,10 @@
 #include "variable_cell.h" // mohan add 2021-02-01
 #include "src_io/write_wfc_realspace.h"
 
-void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
+void Ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 {
-	ModuleBase::TITLE("Ions","opt_ions_pw");
-	ModuleBase::timer::tick("Ions","opt_ions_pw");
+	ModuleBase::TITLE("Ions","opt_ions");
+	ModuleBase::timer::tick("Ions","opt_ions");
 	
 	if(GlobalV::OUT_LEVEL=="i")
 	{

@@ -426,7 +426,7 @@ namespace ModuleESolver
     #endif
 
         // mohan add 2021-02-09
-        // in LOOP_ions, istep starts from 1,
+        // in ions, istep starts from 1,
         // then when the istep is a variable of scf or nscf,
         // istep becomes istep-1, this should be fixed in future
         int istep = 0;

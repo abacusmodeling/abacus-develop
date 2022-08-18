@@ -18,7 +18,7 @@ class Ions
     Ions(){};
     ~Ions(){};
 
-    void opt_ions_pw(ModuleESolver::ESolver *p_esolver);
+    void opt_ions(ModuleESolver::ESolver *p_esolver);
 
 	private:
 
