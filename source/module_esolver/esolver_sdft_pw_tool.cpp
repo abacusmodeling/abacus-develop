@@ -56,7 +56,7 @@ void ESolver_SDFT_PW::check_che(const int nche_in)
             while(1)
             {
                 bool converge;
-                converge= chetest.checkconverge(&stohchi, &Stochastic_hchi::hchi_reciprocal, 
+                converge= chetest.checkconverge(&stohchi, &Stochastic_hchi::hchi_norm, 
 	        	    	pchi, npw, stohchi.Emax, stohchi.Emin, 5.0);
                 
                 if(!converge)
@@ -263,10 +263,10 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
         ModuleBase::GlobalFunc::COPYARRAY(hj1sfpsi_out, j2sfpsi.get_pointer(), ndim*totbands_per*npwx);
 
         /*
-        // stohchi.hchi_reciprocal(psi0.get_pointer(), hpsi0.get_pointer(), totbands_per);
-        // stohchi.hchi_reciprocal(sfpsi0.get_pointer(), hsfpsi0.get_pointer(), totbands_per);
-        // stohchi.hchi_reciprocal(j1psi.get_pointer(), j2psi.get_pointer(), ndim*totbands_per);
-        // stohchi.hchi_reciprocal(j1sfpsi.get_pointer(), j2sfpsi.get_pointer(), ndim*totbands_per);
+        // stohchi.hchi_norm(psi0.get_pointer(), hpsi0.get_pointer(), totbands_per);
+        // stohchi.hchi_norm(sfpsi0.get_pointer(), hsfpsi0.get_pointer(), totbands_per);
+        // stohchi.hchi_norm(j1psi.get_pointer(), j2psi.get_pointer(), ndim*totbands_per);
+        // stohchi.hchi_norm(j1sfpsi.get_pointer(), j2sfpsi.get_pointer(), ndim*totbands_per);
         // double Ebar = (stohchi.Emin + stohchi.Emax)/2;
 	    // double DeltaE = (stohchi.Emax - stohchi.Emin)/2;
 	    // for(int ib = 0 ; ib < totbands_per ; ++ib)
@@ -307,8 +307,8 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
 
         //(1-f)
         che.calcoef_real(&stoiter.stofunc,&Sto_Func<double>::n_fd);
-        che.calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_reciprocal, j1sfpsi.get_pointer(), j1sfpsi.get_pointer(), npw, npwx, totbands_per*ndim);
-        che.calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_reciprocal, j2sfpsi.get_pointer(), j2sfpsi.get_pointer(), npw, npwx, totbands_per*ndim);
+        che.calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_norm, j1sfpsi.get_pointer(), j1sfpsi.get_pointer(), npw, npwx, totbands_per*ndim);
+        che.calfinalvec_real(&stohchi, &Stochastic_hchi::hchi_norm, j2sfpsi.get_pointer(), j2sfpsi.get_pointer(), npw, npwx, totbands_per*ndim);
         
         psi::Psi<std::complex<double>> *p_j1psi = &j1psi; 
         psi::Psi<std::complex<double>> *p_j2psi = &j2psi; 
@@ -361,9 +361,9 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
             }
             
             //exp(iHdt)|chi>
-            chet.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, &exppsi(ksbandper,0), &exppsi(ksbandper,0), npw, npwx, nchip);
+            chet.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_norm, &exppsi(ksbandper,0), &exppsi(ksbandper,0), npw, npwx, nchip);
             //exp(-iHdt)|shchi>
-            chet2.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_reciprocal, &expsfpsi(ksbandper,0), &expsfpsi(ksbandper,0), npw, npwx, nchip);
+            chet2.calfinalvec_complex(&stohchi, &Stochastic_hchi::hchi_norm, &expsfpsi(ksbandper,0), &expsfpsi(ksbandper,0), npw, npwx, nchip);
             psi::Psi<std::complex<double>> *p_exppsi = &exppsi;
 #ifdef __MPI
             psi::Psi<std::complex<double>> exppsi_tot;
@@ -480,7 +480,7 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
             pchi = stowf.chiortho[ik].c;
         else
             pchi = stowf.chi0[ik].c;
-        che.tracepolyA(&stohchi, &Stochastic_hchi::hchi_reciprocal, pchi, npw, npwx, nchip);
+        che.tracepolyA(&stohchi, &Stochastic_hchi::hchi_norm, pchi, npw, npwx, nchip);
         for(int i = 0 ; i < nche_dos ; ++i)
         {
             spolyv[i] += che.polytrace[i] * GlobalC::kv.wk[ik] / 2 ;

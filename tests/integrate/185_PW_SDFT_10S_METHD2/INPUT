@@ -12,7 +12,7 @@ nbands_sto		10
 
 nche_sto		120
 seed_sto        20000
-kpar            1
+bndpar          2
 cal_force       1
 cal_stress      1
 

@@ -591,7 +591,7 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 - **Description**: 
   - Different method to do SDFT.
   - 1: SDFT calculates $T_n(\hat{h})\ket{\chi}$ twice, where $T_n(x)$ is the n-th order Chebyshev polynomial and $\hat{h}=\frac{\hat{H}-\bar{E}}{\Delta E}$ owning eigen-value $\in(-1,1)$. This method cost less memory but slow.
-  - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is fast but when memory is not enough, only method 1 can be used.
+  - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is much faster. Besides, it calculate $N_e$ with $\bra{\chi}\sqrt{\hat f}\sqrt{\hat f}\ket{\chi}$, which needs smaller [nche_sto](#nche_sto). However, when memory is not enough, only method 1 can be used.
   - other: use 1
 - **Default**: 1
 

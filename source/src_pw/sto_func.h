@@ -19,6 +19,7 @@ public:
     REAL nxfd(REAL e);
     REAL fdlnfd(REAL e);
     REAL nfdlnfd(REAL e);
+    REAL n_root_fdlnfd(REAL e);
     REAL n_fd(REAL e);
 
 public:
