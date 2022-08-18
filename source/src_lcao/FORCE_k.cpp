@@ -820,8 +820,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(double** dm2d,
     ModuleBase::timer::tick("Force_LCAO_k", "cal_fvnl_dbeta_k_new");
     const Parallel_Orbitals* pv = this->ParaV;
 
-    // Step 1 : generate <psi|dbeta>
-    // type of atom; distance; atomic basis; projectors
+    // Data structure for storing <psi|beta>, for a detailed description
+    // check out the same data structure in build_Nonlocal_mu_new
     std::vector<std::map<key_tuple, std::unordered_map<int, std::vector<std::vector<double>>>>> nlm_tot;
 
     nlm_tot.resize(GlobalC::ucell.nat);
@@ -871,10 +871,6 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(double** dm2d,
                     continue;
                 const int iw1_0 = iw1 / GlobalV::NPOL;
                 std::vector<std::vector<double>> nlm;
-                // 2D, but first dimension is only 1 here
-                // for force, the right hand side is the gradient
-                // and the first dimension is then 3
-                // inner loop : all projectors (L0,M0)
                 GlobalC::UOT.snap_psibeta_half(GlobalC::ORB,
                                                GlobalC::ucell.infoNL,
                                                nlm,
