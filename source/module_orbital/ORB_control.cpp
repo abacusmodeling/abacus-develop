@@ -529,6 +529,8 @@ int ORB_control::mat_2d(MPI_Comm vu,
     }
     pv->nloc_wfc = pv->ncol_bands * LM.row_num;
 
+    pv->nloc_Eij= pv->ncol_bands * pv->ncol_bands;
+    
     return 0;
 }
 #endif

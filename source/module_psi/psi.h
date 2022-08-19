@@ -236,7 +236,13 @@ public:
     // solve Range: return(pointer of begin, number of bands or k-points)
     std::tuple<const T*, int> to_range(const Range& range)const
     {
-        if(range.k_first != this->k_first || range.index_1<0 || range.range_1<0 || range.range_2<range.range_1
+        int index_1_in = range.index_1;
+        //mem_saver=1 case, only k==0 memory space is avaliable
+        if(index_1_in>0 & this->nk == 1)
+        {
+            index_1_in = 0;
+        }
+        if(range.k_first != this->k_first || index_1_in<0 || range.range_1<0 || range.range_2<range.range_1
         || (range.k_first && range.range_2>=this->nbands)
         || (!range.k_first && (range.range_2>=this->nk || range.index_1>=this->nbands) ) ) 
         {
@@ -244,7 +250,7 @@ public:
         }
         else
         {
-            const T* p = &this->psi[(range.index_1 * this->nbands + range.range_1) * this->nbasis];
+            const T* p = &this->psi[(index_1_in * this->nbands + range.range_1) * this->nbasis];
             int m = (range.range_2 - range.range_1 + 1)* this->npol;
             return std::tuple<const T*, int>(p, m);
         }

@@ -10,7 +10,7 @@
 
 namespace Gint_Tools
 {
-    enum class job_type{vlocal, rho, force, tau, vlocal_meta, crosstaus};
+    enum class job_type{vlocal, rho, force, tau, vlocal_meta, force_meta};
 	//Hamiltonian, electron density, force, kinetic energy density, Hamiltonian for mGGA
 }
 
@@ -24,7 +24,6 @@ class Gint_inout
         double*** DM;
         double* vl;
 		double* vofk;
-		double** crosstaus;
         bool isforce;
         bool isstress;
         int ispin;
@@ -45,19 +44,9 @@ class Gint_inout
             job = job_in;
         }
 
-	// crosstaus, multi-k
-        Gint_inout(double **DM_R_in, double** crosstaus_in, Gint_Tools::job_type job_in)
-        {
-            DM_R = DM_R_in;
-            crosstaus = crosstaus_in;
-            job = job_in;
-        }
-
 	// force, multi-k
-        Gint_inout(double** DM_R_in, double* vl_in,
-            bool isforce_in, bool isstress_in,
-            ModuleBase::matrix* fvl_dphi_in,
-            ModuleBase::matrix* svl_dphi_in,
+        Gint_inout(double** DM_R_in, double* vl_in, bool isforce_in, bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in, ModuleBase::matrix* svl_dphi_in,
             Gint_Tools::job_type job_in)
         {
             DM_R = DM_R_in;
@@ -69,10 +58,23 @@ class Gint_inout
             job = job_in;
         }
 
-	// vlocal, multi-k
-        Gint_inout(double* vl_in,
-            int ispin_in,
+	// force (mGGA), multi-k
+        Gint_inout(double** DM_R_in, double* vl_in, double* vofk_in, const bool isforce_in, const bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in, ModuleBase::matrix* svl_dphi_in,
             Gint_Tools::job_type job_in)
+        {
+            DM_R = DM_R_in;
+            vl = vl_in;
+			vofk = vofk_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
+	// vlocal, multi-k
+        Gint_inout(double* vl_in, int ispin_in, Gint_Tools::job_type job_in)
         {
             vl = vl_in;
             ispin = ispin_in;
@@ -80,10 +82,7 @@ class Gint_inout
         }
 
 	// mGGA vlocal, multi-k
-        Gint_inout(double* vl_in,
-			double* vofk_in,
-            int ispin_in,
-            Gint_Tools::job_type job_in)
+        Gint_inout(double* vl_in, double* vofk_in, int ispin_in, Gint_Tools::job_type job_in)
         {
             vl = vl_in;
 			vofk = vofk_in;
@@ -100,10 +99,8 @@ class Gint_inout
         }
 
 	// force, gamma point
-        Gint_inout(double*** DM_in, double* vl_in,
-            const bool isforce_in, const bool isstress_in,
-            ModuleBase::matrix* fvl_dphi_in,
-            ModuleBase::matrix* svl_dphi_in,
+        Gint_inout(double*** DM_in, double* vl_in, const bool isforce_in, const bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in, ModuleBase::matrix* svl_dphi_in,
             Gint_Tools::job_type job_in)
         {
             DM = DM_in;
@@ -115,10 +112,23 @@ class Gint_inout
             job = job_in;
         }
 
-	// vlocal, gamma point
-		Gint_inout(double* vl_in,
-            LCAO_Matrix *lm_in,
+	// force (mGGA), gamma point
+        Gint_inout(double*** DM_in, double* vl_in, double* vofk_in, const bool isforce_in, const bool isstress_in,
+            ModuleBase::matrix* fvl_dphi_in, ModuleBase::matrix* svl_dphi_in,
             Gint_Tools::job_type job_in)
+        {
+            DM = DM_in;
+            vl = vl_in;
+			vofk = vofk_in;
+            isforce = isforce_in;
+            isstress = isstress_in;
+            fvl_dphi = fvl_dphi_in;
+            svl_dphi = svl_dphi_in;
+            job = job_in;
+        }
+
+	// vlocal, gamma point
+		Gint_inout(double* vl_in, LCAO_Matrix *lm_in, Gint_Tools::job_type job_in)
         {
             vl = vl_in;
             lm = lm_in;
@@ -126,10 +136,7 @@ class Gint_inout
         }
 
 	// mGGA vlocal, gamma point
-		Gint_inout(double* vl_in,
-			double* vofk_in,
-            LCAO_Matrix *lm_in,
-            Gint_Tools::job_type job_in)
+		Gint_inout(double* vl_in, double* vofk_in, LCAO_Matrix *lm_in, Gint_Tools::job_type job_in)
         {
             vl = vl_in;
 			vofk = vofk_in;
@@ -154,31 +161,18 @@ namespace Gint_Tools
 	};
 	
 	// vindex[pw.bxyz]
-	int* get_vindex(
-		const int ncyz,
-		const int ibx,
-		const int jby,
-		const int kbz);
+	int* get_vindex( const int ncyz, const int ibx, const int jby, const int kbz);
 	
-	int* get_vindex(
-		const int start_ind,
-		const int ncyz);
+	int* get_vindex(const int start_ind, const int ncyz);
 
 	// extract the local potentials.
 	// vldr3[GlobalC::bigpw->bxyz]
-    double* get_vldr3(
-		const double* const vlocal,
-		const int ncyz,
-		const int ibx,
-		const int jby,
-		const int kbz,
+    double* get_vldr3(const double* const vlocal,
+		const int ncyz, const int ibx, const int jby, const int kbz,
 		const double dv);
 
-    double* get_vldr3(
-		const double* const vlocal,
-		const int start_ind,
-		const int ncyz,
-		const double dv);
+    double* get_vldr3(const double* const vlocal,
+		const int start_ind, const int ncyz, const double dv);
 
 	//------------------------------------------------------
 	// na_grid : #. atoms for this group of grids
@@ -187,13 +181,8 @@ namespace Gint_Tools
 	// block_index : size na_grid+1, start from 0, accumulates block_size
 	// cal_flag : whether the atom-grid distance is larger than cutoff
 	//------------------------------------------------------
-	void get_block_info(
-		const int na_grid,
-		const int grid_index,
-		int * &block_iw,
-		int * &block_index,
-		int * &block_size,
-		bool** &cal_flag
+	void get_block_info(const int na_grid, const int grid_index,
+		int * &block_iw, int * &block_index, int * &block_size, bool** &cal_flag
 	);		
 
 	// psir_ylm[pw.bxyz][LD_pool]
@@ -226,15 +215,23 @@ namespace Gint_Tools
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
 		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		double*const*const dpsir_ylm_x,
-		double*const*const dpsir_ylm_y,
-		double*const*const dpsir_ylm_z,
-		double*const*const dpsir_ylm_xx,
-		double*const*const dpsir_ylm_xy,
-		double*const*const dpsir_ylm_xz,
-		double*const*const dpsir_ylm_yy,
-		double*const*const dpsir_ylm_yz,
-		double*const*const dpsir_ylm_zz);
+		double*const*const dpsir_ylm_x, double*const*const dpsir_ylm_y, double*const*const dpsir_ylm_z,
+		double*const*const dpsir_ylm_xx, double*const*const dpsir_ylm_xy, double*const*const dpsir_ylm_xz,
+		double*const*const dpsir_ylm_yy, double*const*const dpsir_ylm_yz, double*const*const dpsir_ylm_zz);
+
+	void cal_ddpsir_ylm(
+		const int na_grid, 					// number of atoms on this grid 
+		const int grid_index, 				// 1d index of FFT index (i,j,k) 
+		const double delta_r, 				// delta_r of the uniform FFT grid
+		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
+		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
+		const bool*const*const cal_flag,    // cal_flag[GlobalC::bigpw->bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		double*const*const ddpsir_ylm_xx,
+		double*const*const ddpsir_ylm_xy,
+		double*const*const ddpsir_ylm_xz,
+		double*const*const ddpsir_ylm_yy,
+		double*const*const ddpsir_ylm_yz,
+		double*const*const ddpsir_ylm_zz);
 
 	// psir_ylm * vldr3
 	Gint_Tools::Array_Pool<double> get_psir_vlbr3(

@@ -1,14 +1,9 @@
-#include "./math_chebyshev.h" 
+#include "./math_chebyshev.h"
 #include "./constants.h"
 #include "./blas_connector.h"
 #include "./global_function.h"
 namespace ModuleBase
 {
-//we only have two examples: double and float.
-template class Chebyshev<double>;
-#ifdef __MIX_PRECISION
-template class Chebyshev<float>;
-#endif
 
 FFTW<double>::FFTW(const int norder2_in)
 {
@@ -122,4 +117,11 @@ REAL Chebyshev<REAL>:: ddot_real(
     }
     return result;
 }
-}
+
+//we only have two examples: double and float.
+template class Chebyshev<double>;
+#ifdef __MIX_PRECISION
+template class Chebyshev<float>;
+#endif
+
+}  // namespace ModuleBase
