@@ -42,6 +42,8 @@ To compile ABACUS, please make sure that the following prerequisites are present
 - [ELPA](https://elpa.mpcdf.mpg.de/) >= 2017.
 - [CEREAL](https://uscilab.github.io/cereal/).
 
+> GCC version 5.1 or later is required: Intel compilers also use GCC headers and libraries[(ref)]( https://www.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compatibility-and-portability/gcc-compatibility-and-interoperability.html#gcc-compatibility-and-interoperability_GUID-52CB6FE0-83DA-4028-9EF4-0DFAF1652736). 
+
 These packages can be installed with popular package management system, such as `apt` and `yum`:
 
 ```bash
