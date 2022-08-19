@@ -211,7 +211,7 @@ void Stochastic_Iter::check_precision(const double ref, const double thr, const 
         ss.clear();
         ss<<thr;
         ss>>tartxt;
-        string warningtxt = "( "+info+" Chebyshev error = "+fractxt+" > threshold = "+tartxt+" ) Please add more expansion terms for Chebychev expansion.";
+        string warningtxt = "( "+info+" Chebyshev error = "+fractxt+" > threshold = "+tartxt+" ) Maybe you should increase the parameter \"nche_sto\" for more accuracy.";
         ModuleBase::WARNING("Stochastic_Chebychev", warningtxt);
     }
     //===============================
@@ -232,6 +232,7 @@ void Stochastic_Iter::itermu(const int iter, elecstate::ElecState* pes)
     {
         dmu = 0.1;
         th_ne = 1e-2 * GlobalV::SCF_THR * GlobalC::CHR.nelec;
+        th_ne = std::min(th_ne, 1e-5);
     }
     this->stofunc.mu = mu0 - dmu;
     double ne1 = calne(pes);
@@ -484,7 +485,6 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     pes->eband += sto_eband;
     //---------------------cal rho-------------------------
     double *sto_rho = new double [nrxx];
-    //int npwall = npwx * nchip;
 
     double dr3 = GlobalC::ucell.omega / GlobalC::wfcpw->nxyz;
     double tmprho, tmpne;
@@ -519,6 +519,7 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     }
     delete[] porter;
 #ifdef __MPI
+    //temporary, rho_mpi should be rewrite as a tool function! Now it only treats pes->charge->rho
     pes->charge->rho_mpi();
 #endif
     for (int ir = 0; ir < nrxx; ++ir)
@@ -534,17 +535,15 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
     MPI_Allreduce(MPI_IN_PLACE,&sto_ne,1,MPI_DOUBLE,MPI_SUM,PARAPW_WORLD);
     MPI_Allreduce(MPI_IN_PLACE,sto_rho,nrxx,MPI_DOUBLE,MPI_SUM,PARAPW_WORLD);
 #endif
-
-    double factor;
-    if(abs(sto_ne) > 1e-15)
+    double factor = targetne/(KS_ne+sto_ne);
+    if(abs(factor-1) > 1e-10)
     {
-        factor = (targetne - KS_ne) / sto_ne;
         GlobalV::ofs_running<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
     }
     else
         factor = 1;
 
-    if (GlobalV::MY_STOGROUP == 0)
+    if(GlobalV::MY_STOGROUP == 0)
     {
         if (GlobalV::NBANDS > 0)
             ModuleBase::GlobalFunc::DCOPY(ksrho, pes->charge->rho[0], nrxx);
@@ -552,15 +551,18 @@ void Stochastic_Iter::sum_stoband(Stochastic_WF& stowf, elecstate::ElecState* pe
             ModuleBase::GlobalFunc::ZEROS(pes->charge->rho[0], nrxx);
     }
 
-    if (GlobalV::MY_STOGROUP == 0)
+
+    if(GlobalV::MY_STOGROUP == 0)
+    {
         for (int is = 0; is < 1; ++is)
         {
             for (int ir = 0; ir < nrxx; ++ir)
             {
-                pes->charge->rho[is][ir] += sto_rho[ir] * factor;
+                pes->charge->rho[is][ir] += sto_rho[ir];
+                pes->charge->rho[is][ir] *= factor;
             }
         }
-
+    }
     delete[] sto_rho;
     delete[] ksrho;
     ModuleBase::timer::tick("Stochastic_Iter", "sum_stoband");

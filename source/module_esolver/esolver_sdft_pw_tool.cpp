@@ -456,7 +456,9 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
 
 void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const double emin, const double emax, const double de)
 {
-    cout<<"Calculating Dos...."<<endl;
+    cout<<"========================="<<endl;
+    cout<<"###Calculating Dos....###"<<endl;
+    cout<<"========================="<<endl;
     ModuleBase::Chebyshev<double> che(nche_dos);
     const int nk = GlobalC::kv.nks;
     Stochastic_Iter& stoiter = ((hsolver::HSolverPW_SDFT*)phsol)->stoiter;
@@ -465,8 +467,10 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
 
     double * spolyv = new double [nche_dos];
     ModuleBase::GlobalFunc::ZEROS(spolyv, nche_dos);
+    cout<<"1. TracepolyA:"<<endl;
     for (int ik = 0;ik < nk;ik++)
 	{
+        cout<<"ik: "<<ik+1<<endl;
 		if(nk > 1) 
         {
             this->phami->updateHk(ik);
@@ -486,6 +490,7 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
             spolyv[i] += che.polytrace[i] * GlobalC::kv.wk[ik] / 2 ;
         }
     }
+
     string dosfile = GlobalV::global_out_dir+"DOS1_smearing.dat";
     ofstream ofsdos(dosfile.c_str());
     int ndos = int((emax-emin) / de)+1;
@@ -495,6 +500,9 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
     double sum = 0; 
     double error = 0;
     ofsdos<<setw(8)<<"## E(eV) "<<setw(20)<<"dos(eV^-1)"<<setw(20)<<"sum"<<setw(20)<<"Error(eV^-1)"<<endl;
+    cout<<"2. Dos:"<<endl;
+    int n10 = ndos/10;
+    int percent = 10;
 	for(int ie = 0; ie < ndos; ++ie)
 	{
 		stoiter.stofunc.targ_e = (emin + ie * de) / ModuleBase::Ry_to_eV;
@@ -525,7 +533,14 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
         dos[ie] = (KS_dos + sto_dos) / ModuleBase::Ry_to_eV;
         sum += dos[ie];
 		ofsdos <<setw(8)<< emin + ie * de <<setw(20)<<dos[ie]<<setw(20)<<sum * de <<setw(20) <<error <<endl;
+        if(ie%n10 == n10 -1) 
+        {
+            cout<<percent<<"%"<<" ";
+            percent+=10;
+        }
 	}
+    cout<<endl;
+    cout<<"Finish DOS"<<endl;
     cout<<scientific<<"DOS max Chebyshev Error: "<<error<<endl;
     delete[] dos;
     delete[] spolyv;
