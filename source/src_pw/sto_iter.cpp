@@ -11,10 +11,10 @@
 
 double vTMv(const double *v, const double * M, const int n)
 {
-    char normal = 'N';
-    double one = 1;
-    int inc = 1;
-    double zero = 0;
+    const char normal = 'N';
+    const double one = 1;
+    const int inc = 1;
+    const double zero = 0;
     double *y = new double [n];
     dgemv_(&normal,&n,&n,&one,M,&n,v,&inc,&zero,y,&inc);
     double result = BlasConnector::dot(n,y,1,v,1);
@@ -200,11 +200,12 @@ void Stochastic_Iter::check_precision(const double ref, const double thr, const 
 #ifdef __MPI
     MPI_Allreduce(MPI_IN_PLACE, &error, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
 #endif
-    GlobalV::ofs_running<<info<<" Chebyshev Precision: "<<abs(error/ref)*1e9<<"E-09"<<std::endl;
-    if(error/ref > thr)
+    double relative_error = abs(error/ref);
+    GlobalV::ofs_running<<info<<" Chebyshev Precision: "<<relative_error*1e9<<"E-09"<<std::endl;
+    if(relative_error > thr)
     {
         stringstream ss;
-        ss<<abs(error/ref);
+        ss<<relative_error;
         string fractxt,tartxt;
         ss>>fractxt;
         ss.clear();

@@ -144,7 +144,6 @@ void ESolver_SDFT_PW::postprocess()
 {
     GlobalC::en.print_occ();
 
-    ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
     if(this->maxniter == 0)
     {
         int iter = 1;
@@ -153,6 +152,7 @@ void ESolver_SDFT_PW::postprocess()
         hsolver::DiagoIterAssist::PW_DIAG_THR = std::max(std::min(1e-5, 0.1 * GlobalV::SCF_THR / std::max(1.0, GlobalC::CHR.nelec)),1e-12);
         hsolver::DiagoIterAssist::need_subspace = false;
         this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf,istep, iter, GlobalV::KS_SOLVER, true);
+        ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
     }
     int nche_test = 0;
     if(INPUT.cal_cond)  nche_test = std::max(nche_test, INPUT.cond_nche);
