@@ -19,8 +19,6 @@ Parallel_Orbitals::Parallel_Orbitals()
     // default value of nb is 1,
 	// but can change to larger value from input.
     nb = 1;
-	MatrixInfo.row_set = nullptr;
-    MatrixInfo.col_set = nullptr;
 
     //in multi-k, 2D-block-division variables for FT (R<->k)
     nnr = 1;
@@ -43,8 +41,6 @@ Parallel_Orbitals::~Parallel_Orbitals()
 		}
 		delete[] Z_LOC;
 	}
-    delete[] MatrixInfo.row_set;
-    delete[] MatrixInfo.col_set;
     
     delete[] nlocdim;
 	delete[] nlocstart;
@@ -270,8 +266,7 @@ void ORB_control::divide_HS_2d
     this->set_parameters(ofs_running, ofs_warning);
     pv->MatrixInfo.row_b = 1;
 	pv->MatrixInfo.row_num = nlocal;
-	delete[] pv->MatrixInfo.row_set;
-	pv->MatrixInfo.row_set = new int[nlocal];
+	pv->MatrixInfo.row_set.resize(nlocal);
 	for(int i=0; i<nlocal; i++)
 	{
 		pv->MatrixInfo.row_set[i]=i;
@@ -280,8 +275,7 @@ void ORB_control::divide_HS_2d
 
 	pv->MatrixInfo.col_b = 1;
 	pv->MatrixInfo.col_num = nlocal;
-	delete[] pv->MatrixInfo.col_set;
-	pv->MatrixInfo.col_set = new int[nlocal];
+	pv->MatrixInfo.col_set.resize(nlocal);
 	for(int i=0; i<nlocal; i++)
 	{
 		pv->MatrixInfo.col_set[i]=i;
