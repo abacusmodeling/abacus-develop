@@ -142,6 +142,7 @@ void Atom::bcast_atom(void)
     {
         assert(na!=0);
         delete[] tau;
+        delete[] tau_original;
 		delete[] taud;
 	    delete[] vel;
         delete[] mag;
