@@ -532,7 +532,7 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
         if(error < tmpre) error = tmpre;
         dos[ie] = (KS_dos + sto_dos) / ModuleBase::Ry_to_eV;
         sum += dos[ie];
-		ofsdos <<setw(8)<< emin + ie * de <<setw(20)<<dos[ie]<<setw(20)<<sum * de <<setw(20) <<error <<endl;
+		ofsdos <<setw(8)<< emin + ie * de <<setw(20)<<dos[ie]<<setw(20)<<sum * de <<setw(20) <<tmpre <<endl;
         if(ie%n10 == n10 -1) 
         {
             cout<<percent<<"%"<<" ";
