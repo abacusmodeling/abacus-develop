@@ -211,8 +211,9 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	}
 	
 	double* tmp = new double[nr_uniform];
+	double* tmp1 = new double[nr_uniform];
 	ModuleBase::Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, beta_r, y2, 
-					nr, rad, nr_uniform, tmp, dbeta_uniform );
+					nr, rad, nr_uniform, tmp, dbeta_uniform);
 
 	for(int ir= 0 ; ir<nr_uniform; ir++)
 	{
@@ -222,6 +223,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	delete [] y2;
 	delete [] rad;	
 	delete [] tmp;
+	delete [] tmp1;
 	return;
 }
 

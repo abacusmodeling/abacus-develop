@@ -4,6 +4,7 @@
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
 #include "module_cell/unitcell.h"
+#include "module_surchem/surchem.h"
 #include "module_symmetry/symmetry.h"
 #include "src_io/berryphase.h"
 #include "src_io/chi0_hilbert.h"
@@ -14,7 +15,6 @@
 #include "src_ions/ions_move_basic.h"
 #include "src_pw/global.h"
 #include "src_pw/occupy.h"
-#include "module_surchem/surchem.h"
 #ifdef __EXX
 #include "src_ri/exx_abfs-jle.h"
 #endif
@@ -27,10 +27,9 @@
 #include "src_lcao/local_orbital_charge.h"
 #endif
 #include "module_base/timer.h"
-#include "module_surchem/efield.h"
-
 #include "module_elecstate/elecstate_lcao.h"
 #include "module_hsolver/hsolver_lcao.h"
+#include "module_surchem/efield.h"
 
 void Input_Conv::Convert(void)
 {
@@ -53,6 +52,7 @@ void Input_Conv::Convert(void)
     GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
 
     GlobalV::KSPACING = INPUT.kspacing;
+    GlobalV::MIN_DIST_COEF = INPUT.min_dist_coef;
     GlobalV::NBANDS = INPUT.nbands;
     GlobalC::wf.pw_seed = INPUT.pw_seed;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
@@ -96,6 +96,7 @@ void Input_Conv::Convert(void)
     Ions_Move_Basic::relax_bfgs_rmin = INPUT.relax_bfgs_rmin;
     Ions_Move_Basic::relax_bfgs_init = INPUT.relax_bfgs_init;
     Ions_Move_Basic::out_stru = INPUT.out_stru; // mohan add 2012-03-23
+    Lattice_Change_Basic::out_stru = INPUT.out_stru;
 
     GlobalV::CAL_STRESS = INPUT.cal_stress;
 
@@ -202,15 +203,15 @@ void Input_Conv::Convert(void)
         GlobalV::NPOL = 1;
     }
 
-//----------------------------------------------------------
-// Yu Liu add 2022-05-18
-//----------------------------------------------------------
+    //----------------------------------------------------------
+    // Yu Liu add 2022-05-18
+    //----------------------------------------------------------
     GlobalV::EFIELD_FLAG = INPUT.efield_flag;
     GlobalV::DIP_COR_FLAG = INPUT.dip_cor_flag;
     Efield::efield_dir = INPUT.efield_dir;
     Efield::efield_pos_max = INPUT.efield_pos_max;
     Efield::efield_pos_dec = INPUT.efield_pos_dec;
-    Efield::efield_amp  = INPUT.efield_amp ;
+    Efield::efield_amp = INPUT.efield_amp;
 
 //----------------------------------------------------------
 // Fuxiang He add 2016-10-26
@@ -307,7 +308,7 @@ void Input_Conv::Convert(void)
         if (GlobalV::MY_RANK == 0)
             system(command0.c_str());
         if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse"
-            || INPUT.dft_functional == "opt_orb" || INPUT.dft_functional == "scan0" )
+            || INPUT.dft_functional == "opt_orb" || INPUT.dft_functional == "scan0")
         {
             GlobalC::restart.info_save.save_charge = true;
             GlobalC::restart.info_save.save_H = true;
@@ -448,7 +449,7 @@ void Input_Conv::Convert(void)
     hsolver::HSolverLCAO::out_mat_hs = INPUT.out_mat_hs;
     hsolver::HSolverLCAO::out_mat_hsR = INPUT.out_mat_hs2; // LiuXh add 2019-07-16
     elecstate::ElecStateLCAO::out_wfc_lcao = INPUT.out_wfc_lcao;
-    if(INPUT.calculation == "nscf" && !INPUT.towannier90 && !INPUT.berry_phase)
+    if (INPUT.calculation == "nscf" && !INPUT.towannier90 && !INPUT.berry_phase)
     {
         elecstate::ElecStateLCAO::need_psi_grid = false;
     }

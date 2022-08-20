@@ -116,7 +116,11 @@ namespace ModuleESolver
         {   
             if(this->psi == nullptr)
             {
+                #ifdef __MPI
                 int ncol = this->LOWF.ParaV->ncol_bands;
+                #else
+                int ncol = GlobalV::NBANDS;
+                #endif
 #ifdef __CUSOLVER_LCAO
                 if(GlobalV::KS_SOLVER=="cusolver")
                 {

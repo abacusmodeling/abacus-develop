@@ -21,6 +21,11 @@ class OperatorPW : public Operator
 
         std::complex<double> *tmhpsi = this->get_hpsi(input);
         const std::complex<double> *tmpsi_in = std::get<0>(psi_info);
+        //if range in hpsi_info is illegal, the first return of to_range() would be nullptr
+        if(tmpsi_in == nullptr)
+        {
+            ModuleBase::WARNING_QUIT("OperatorPW", "please choose correct range of psi for hPsi()!");
+        }
 
         this->act(std::get<0>(input), n_npwx, tmpsi_in, tmhpsi);
         OperatorPW* node((OperatorPW*)this->next_op);
