@@ -407,6 +407,7 @@ void Input::Default(void)
     // test only
     //==========================================================
     test_just_neighbor = false;
+    test_skip_ewald = false;
 
     //==========================================================
     //    DFT+U     Xin Qu added on 2020-10-29
@@ -1505,6 +1506,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, test_just_neighbor);
         }
+        else if (strcmp("test_skip_ewald", word) == 0)
+        {
+            read_value(ifs, test_skip_ewald);
+        }
         //--------------
         //----------------------------------------------------------------------------------
         //         Xin Qu added on 2020-10-29 for DFT+U
@@ -2203,6 +2208,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(td_vextout);
     Parallel_Common::bcast_int(td_dipoleout);
     Parallel_Common::bcast_bool(test_just_neighbor);
+    Parallel_Common::bcast_bool(test_skip_ewald);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
     Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10

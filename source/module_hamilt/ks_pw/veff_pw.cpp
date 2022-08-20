@@ -52,7 +52,6 @@ void Veff<OperatorPW>::act
             // but the 3DFFT can not be skipped, it will cause stuck
             if(this->veff->nc != 0)
             {
-                GlobalV::ofs_running<<__FILE__<<__LINE__<<" "<<this->veff->nr<<" "<<this->veff->nc<<std::endl;
                 const double* current_veff = &(this->veff[0](current_spin, 0));
                 for (int ir = 0; ir < this->veff->nc; ++ir)
                 {
