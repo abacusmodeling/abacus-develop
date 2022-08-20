@@ -33,6 +33,7 @@ public:
     REAL targ_e;
     REAL gauss(REAL e);
     REAL ngauss(REAL e);
+    REAL nroot_gauss(REAL e);
 
 };
 

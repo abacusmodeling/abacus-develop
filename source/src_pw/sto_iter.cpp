@@ -9,7 +9,7 @@
 #include "global.h"
 #include "occupy.h"
 
-double vTMv(const double *v, const double * M, const int n)
+double Stochastic_Iter::vTMv(const double *v, const double * M, const int n)
 {
     const char normal = 'N';
     const double one = 1;
@@ -193,7 +193,7 @@ void Stochastic_Iter::check_precision(const double ref, const double thr, const 
         const int norder = p_che->norder;
         double last_coef = p_che->coef_real[norder-1];
         double last_spolyv = spolyv[norder*norder - 1];
-        error += last_coef *(BlasConnector::dot(norder,p_che->coef_real,1,spolyv+norder*(norder-1),1)
+        error = last_coef *(BlasConnector::dot(norder,p_che->coef_real,1,spolyv+norder*(norder-1),1)
                     + BlasConnector::dot(norder,p_che->coef_real,1,spolyv+norder-1,norder)-last_coef*last_spolyv);
     }
 

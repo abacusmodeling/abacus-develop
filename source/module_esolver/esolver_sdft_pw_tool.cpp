@@ -465,8 +465,19 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
     Stochastic_hchi& stohchi = stoiter.stohchi;
     const int npwx = GlobalC::wf.npwx;
 
-    double * spolyv = new double [nche_dos];
-    ModuleBase::GlobalFunc::ZEROS(spolyv, nche_dos);
+    double * spolyv = nullptr;
+    std::complex<double> *allorderchi = nullptr;
+    if(stoiter.method == 1)
+    {
+        spolyv = new double [nche_dos];
+        ModuleBase::GlobalFunc::ZEROS(spolyv, nche_dos);
+    }
+    else
+    {
+        spolyv = new double [nche_dos*nche_dos];
+        ModuleBase::GlobalFunc::ZEROS(spolyv, nche_dos*nche_dos);
+        allorderchi = new std::complex<double> [this->stowf.nchip_max * npwx * nche_dos];
+    }
     cout<<"1. TracepolyA:"<<endl;
     for (int ik = 0;ik < nk;ik++)
 	{
@@ -477,19 +488,37 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
         }
         stohchi.current_ik = ik;
         const int npw = GlobalC::kv.ngk[ik];
-        const int nchip = this->stowf.nchip[ik];
+        const int nchipk = this->stowf.nchip[ik];
         
         complex<double> * pchi;
         if(GlobalV::NBANDS > 0)
             pchi = stowf.chiortho[ik].c;
         else
             pchi = stowf.chi0[ik].c;
-        che.tracepolyA(&stohchi, &Stochastic_hchi::hchi_norm, pchi, npw, npwx, nchip);
-        for(int i = 0 ; i < nche_dos ; ++i)
+        if(stoiter.method == 1)
         {
-            spolyv[i] += che.polytrace[i] * GlobalC::kv.wk[ik] / 2 ;
+            che.tracepolyA(&stohchi, &Stochastic_hchi::hchi_norm, pchi, npw, npwx, nchipk);
+            for(int i = 0 ; i < nche_dos ; ++i)
+            {
+                spolyv[i] += che.polytrace[i] * GlobalC::kv.wk[ik] / 2 ;
+            }
+        }
+        else
+        {
+            ModuleBase::GlobalFunc::ZEROS(allorderchi, this->stowf.nchip_max * npwx * nche_dos);
+            che.calpolyvec_complex(&stohchi, &Stochastic_hchi::hchi_norm, pchi, allorderchi, npw, npwx, nchipk);
+            double* vec_all= (double *) allorderchi;
+            char trans = 'T';
+            char normal = 'N';
+            double one = 1;
+            int LDA = npwx * nchipk * 2;
+            int M = npwx * nchipk * 2;
+            int N = nche_dos;
+            double kweight = GlobalC::kv.wk[ik] / 2;
+            dgemm_(&trans,&normal, &N,&N,&M,&kweight,vec_all,&LDA,vec_all,&LDA,&one,spolyv,&N);
         }
     }
+    if(stoiter.method == 2) delete[] allorderchi;
 
     string dosfile = GlobalV::global_out_dir+"DOS1_smearing.dat";
     ofstream ofsdos(dosfile.c_str());
@@ -498,17 +527,26 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
     ModuleBase::GlobalFunc::ZEROS(dos,ndos);
     stoiter.stofunc.sigma = sigmain / ModuleBase::Ry_to_eV;
     double sum = 0; 
-    double error = 0;
+    double maxerror = 0;
     ofsdos<<setw(8)<<"## E(eV) "<<setw(20)<<"dos(eV^-1)"<<setw(20)<<"sum"<<setw(20)<<"Error(eV^-1)"<<endl;
     cout<<"2. Dos:"<<endl;
     int n10 = ndos/10;
     int percent = 10;
 	for(int ie = 0; ie < ndos; ++ie)
 	{
-		stoiter.stofunc.targ_e = (emin + ie * de) / ModuleBase::Ry_to_eV;
-        che.calcoef_real(&stoiter.stofunc, &Sto_Func<double>::ngauss);
         double KS_dos = 0;
-		double sto_dos = BlasConnector::dot(nche_dos,che.coef_real,1,spolyv,1);
+        double sto_dos = 0;
+        stoiter.stofunc.targ_e = (emin + ie * de) / ModuleBase::Ry_to_eV;
+        if(stoiter.method == 1)
+        {
+            che.calcoef_real(&stoiter.stofunc, &Sto_Func<double>::ngauss);
+		    sto_dos = BlasConnector::dot(nche_dos,che.coef_real,1,spolyv,1);
+        }
+        else
+        {
+            che.calcoef_real(&stoiter.stofunc, &Sto_Func<double>::nroot_gauss);
+            sto_dos = stoiter.vTMv(che.coef_real,spolyv,nche_dos);
+        }
         if(GlobalV::NBANDS > 0)
         {
             for(int ik = 0; ik < nk; ++ik)
@@ -525,11 +563,23 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
 	    MPI_Allreduce(MPI_IN_PLACE, &KS_dos, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
         MPI_Allreduce(MPI_IN_PLACE, &sto_dos, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
 #endif
-        double tmpre = che.coef_real[nche_dos-1] * spolyv[nche_dos-1];
+        double tmpre = 0;
+        if(stoiter.method == 1)
+        {
+            tmpre = che.coef_real[nche_dos-1] * spolyv[nche_dos-1];
+        }
+        else
+        {
+            const int norder = nche_dos;
+            double last_coef = che.coef_real[norder-1];
+            double last_spolyv = spolyv[norder*norder - 1];
+            tmpre = last_coef *(BlasConnector::dot(norder,che.coef_real,1,spolyv+norder*(norder-1),1)
+                        + BlasConnector::dot(norder,che.coef_real,1,spolyv+norder-1,norder)-last_coef*last_spolyv);
+        } 
 #ifdef __MPI
         MPI_Allreduce(MPI_IN_PLACE, &tmpre, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
 #endif
-        if(error < tmpre) error = tmpre;
+        if(maxerror < tmpre) maxerror = tmpre;
         dos[ie] = (KS_dos + sto_dos) / ModuleBase::Ry_to_eV;
         sum += dos[ie];
 		ofsdos <<setw(8)<< emin + ie * de <<setw(20)<<dos[ie]<<setw(20)<<sum * de <<setw(20) <<tmpre <<endl;
@@ -541,7 +591,7 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
 	}
     cout<<endl;
     cout<<"Finish DOS"<<endl;
-    cout<<scientific<<"DOS max Chebyshev Error: "<<error<<endl;
+    cout<<scientific<<"DOS max Chebyshev Error: "<<maxerror<<endl;
     delete[] dos;
     delete[] spolyv;
     return;

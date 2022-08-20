@@ -66,6 +66,8 @@ class Stochastic_Iter
     void calPn(const int& ik, Stochastic_WF& stowf);
     //cal Tnchi = \sum_n C_n*T_n(\hat{h})|\chi>
     void calTnchi_ik(const int& ik, Stochastic_WF& stowf);
+    //cal v^T*M*v
+    double vTMv(const double *v, const double * M, const int n);
 
 };
 
