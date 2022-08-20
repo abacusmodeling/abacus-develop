@@ -241,9 +241,9 @@ This part of installation is based on [Installation](#installation). If DeePKS f
 
 ### Extra prerequisites
 
-- C++ compiler, supporting **C++14**. For example, Intel C++ compiler 18
-- [LibTorch](https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.0%2Bcpu.zip) for cpu, with c++11 ABI;
-- [Libnpy](https://github.com.cnpmjs.org/llohse/libnpy/);
+- C++ compiler, supporting **C++14**
+- [LibTorch](https://pytorch.org/) with cxx11 ABI supporting CPU
+- [Libnpy](https://github.com/llohse/libnpy/)
 
 ### Extra settings for building
 
