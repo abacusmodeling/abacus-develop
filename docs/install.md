@@ -95,13 +95,13 @@ cmake -B build -DFFTW3_ROOT=/opt/fftw3
 
 If environment variable `MKLROOT` exists, `cmake` will take MKL as a preference, i.e. not using `LAPACK` and `ScaLAPACK`. To disable MKL, unset environment variable `MKLROOT`, or pass `-DMKLROOT=OFF` to `cmake`.
 
-You can also choose to build with which components.
+You can also choose to build with which components, e.g.:
 
 ```bash
 cmake -B build -DUSE_LIBXC=1 -DUSE_CUDA=1
 ```
 
-If Libxc is not installed in standard path (i.e. installed with a custom prefix path), you may add the installation prefix of `FindLibxc.cmake` to `CMAKE_MODULE_PATH` environment variable, or set `Libxc_DIR` to the directory containing the file.
+If Libxc is not installed in standard path (i.e. installed with a custom prefix path), you can set `Libxc_DIR` to the corresponding directory.
 
 ```bash
 cmake -B build -DLibxc_DIR=~/libxc

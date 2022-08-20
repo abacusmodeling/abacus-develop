@@ -217,7 +217,7 @@ if(ENABLE_DEEPKS)
     HINTS ${libnpy_INCLUDE_DIR}
   )
   if(NOT libnpy_SOURCE_DIR)
-  include(FetchContent)
+    include(FetchContent)
     FetchContent_Declare(
       libnpy
       GIT_REPOSITORY https://github.com/llohse/libnpy.git
@@ -237,14 +237,22 @@ if(DEFINED Libxc_DIR)
   set(ENABLE_LIBXC ON)
 endif()
 if(ENABLE_LIBXC)
-  find_package(Libxc)
+  find_package(Libxc HINTS ${Libxc_DIR}/share/cmake/Libxc)
   if(${Libxc_FOUND})
     message("Using Libxc.")
     add_compile_definitions(USE_LIBXC)
     target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
     include_directories(${Libxc_INCLUDE_DIRS})
   else()
-    message(WARNING "Will not use Libxc.")
+    include(FetchContent)
+    FetchContent_Declare(
+      Libxc
+      GIT_REPOSITORY https://gitlab.com/libxc/libxc.git
+      GIT_TAG "5.2.3"
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE
+    )
+    FetchContent_MakeAvailable(Libxc)
   endif()
 endif()
 
@@ -319,7 +327,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     pw
     ri
     driver
-    xc
+    xc_
     hsolver
     elecstate
     hamilt
