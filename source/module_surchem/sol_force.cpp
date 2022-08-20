@@ -11,7 +11,8 @@ void force_cor_one(const UnitCell &cell, ModulePW::PW_Basis* rho_basis , ModuleB
     std::complex<double> *delta_phi_g = new complex<double>[rho_basis->npw];
     //ModuleBase::GlobalFunc::ZEROS(delta_phi_g, rho_basis->npw);
 
-    GlobalC::UFFT.ToReciSpace(GlobalC::solvent_model.delta_phi, delta_phi_g,rho_basis);
+    rho_basis->real2recip(GlobalC::solvent_model.delta_phi, delta_phi_g);
+    //GlobalC::UFFT.ToReciSpace(GlobalC::solvent_model.delta_phi, delta_phi_g,rho_basis);
     double Ael=0;double Ael1 = 0;
     //ModuleBase::GlobalFunc::ZEROS(vg, ngmc);
     int iat = 0;
@@ -85,8 +86,8 @@ void force_cor_two(const UnitCell &cell, ModulePW::PW_Basis* rho_basis , ModuleB
 		}
 	}
 
-    GlobalC::UFFT.ToReciSpace(Vcav_sum, Vcav_g, rho_basis);
-    GlobalC::UFFT.ToReciSpace(GlobalC::solvent_model.epspot, Vel_g, rho_basis);
+    rho_basis->real2recip(Vcav_sum, Vcav_g);
+    rho_basis->real2recip(GlobalC::solvent_model.epspot, Vel_g);
 
     int iat = 0;
     double Ael1 = 0;
