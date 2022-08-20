@@ -20,6 +20,7 @@ option(USE_OPENMP " Enable OpenMP in abacus." ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
+option(INFO "Enable gathering of math library information" OFF)
 
 set(ABACUS_BIN_NAME abacus)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
@@ -268,6 +269,12 @@ add_compile_definitions(
   TEST_EXX_LCAO=0
   TEST_EXX_RADIAL=1
 )
+
+if(INFO)
+  message(STATUS "Will gather math lib info.")
+  add_compile_definitions(GATHER_INFO)
+  # modifications on blas_connector and lapack_connector
+endif()
 
 IF (BUILD_TESTING)
   set(CMAKE_CXX_STANDARD 14) # Required in orbital
