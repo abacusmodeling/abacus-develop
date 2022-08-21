@@ -4,7 +4,7 @@ for module in "_PW_" "_NO_" "_NP_"; do
 
 echo $module
 
-for directory in *"$($module)"*; do
+for directory in "$($module)"; do
 
 	#--------------------------------------------
 	# delete log.txt (if it exists) 
