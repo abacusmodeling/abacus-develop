@@ -166,17 +166,21 @@ void ESolver_SDFT_PW::postprocess()
     if(INPUT.out_dos)
 	{
         double emax, emin;
-        if(INPUT.dos_setemax)	emax = INPUT.dos_emax_ev;
-		if(INPUT.dos_setemin)	emin = INPUT.dos_emin_ev;
+        if(INPUT.dos_setemax)	
+            emax = INPUT.dos_emax_ev;
+        else
+            emax =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emax*ModuleBase::Ry_to_eV;
+		if(INPUT.dos_setemin)
+        	emin = INPUT.dos_emin_ev;
+        else
+            emin =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emin*ModuleBase::Ry_to_eV;
 		if(!INPUT.dos_setemax && !INPUT.dos_setemin)
 		{
-            emax =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emax;
-            emin =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emin;
 			double delta=(emax-emin)*INPUT.dos_scale;
 			emax=emax+delta/2.0;
 			emin=emin-delta/2.0;
 		}
-        this->caldos(INPUT.dos_nche, INPUT.b_coef, emin, emax, INPUT.dos_edelta_ev );
+        this->caldos(INPUT.dos_nche, INPUT.b_coef, emin, emax, INPUT.dos_edelta_ev, INPUT.npart_sto );
     }
 }
 

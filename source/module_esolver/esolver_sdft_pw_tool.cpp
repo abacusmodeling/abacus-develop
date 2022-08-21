@@ -454,7 +454,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
     ModuleBase::timer::tick(this->classname,"sKG");
 }
 
-void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const double emin, const double emax, const double de)
+void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const double emin, const double emax, const double de, const int npart)
 {
     cout<<"========================="<<endl;
     cout<<"###Calculating Dos....###"<<endl;
@@ -476,7 +476,8 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
     {
         spolyv = new double [nche_dos*nche_dos];
         ModuleBase::GlobalFunc::ZEROS(spolyv, nche_dos*nche_dos);
-        allorderchi = new std::complex<double> [this->stowf.nchip_max * npwx * nche_dos];
+        int nchip_new = ceil((double)this->stowf.nchip_max / npart);
+        allorderchi = new std::complex<double> [nchip_new * npwx * nche_dos];
     }
     cout<<"1. TracepolyA:"<<endl;
     for (int ik = 0;ik < nk;ik++)
@@ -490,7 +491,7 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
         const int npw = GlobalC::kv.ngk[ik];
         const int nchipk = this->stowf.nchip[ik];
         
-        complex<double> * pchi;
+        std::complex<double> * pchi;
         if(GlobalV::NBANDS > 0)
             pchi = stowf.chiortho[ik].c;
         else
@@ -505,17 +506,28 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
         }
         else
         {
-            ModuleBase::GlobalFunc::ZEROS(allorderchi, this->stowf.nchip_max * npwx * nche_dos);
-            che.calpolyvec_complex(&stohchi, &Stochastic_hchi::hchi_norm, pchi, allorderchi, npw, npwx, nchipk);
-            double* vec_all= (double *) allorderchi;
+            int N = nche_dos;
+            double kweight = GlobalC::kv.wk[ik] / 2;
             char trans = 'T';
             char normal = 'N';
             double one = 1;
-            int LDA = npwx * nchipk * 2;
-            int M = npwx * nchipk * 2;
-            int N = nche_dos;
-            double kweight = GlobalC::kv.wk[ik] / 2;
-            dgemm_(&trans,&normal, &N,&N,&M,&kweight,vec_all,&LDA,vec_all,&LDA,&one,spolyv,&N);
+            for(int ipart = 0 ; ipart < npart ; ++ipart)
+            {
+                int nchipk_new = nchipk / npart;
+                int start_nchipk = ipart * nchipk_new + nchipk % npart;
+                if(ipart < nchipk % npart)
+                {
+                    nchipk_new++;
+                    start_nchipk = ipart * nchipk_new;
+                }
+                ModuleBase::GlobalFunc::ZEROS(allorderchi, nchipk_new * npwx * nche_dos);
+                std::complex<double> *tmpchi = pchi + start_nchipk * npwx;
+                che.calpolyvec_complex(&stohchi, &Stochastic_hchi::hchi_norm, tmpchi, allorderchi, npw, npwx, nchipk_new);
+                double* vec_all= (double *) allorderchi;
+                int LDA = npwx * nchipk_new * 2;
+                int M = npwx * nchipk_new * 2;
+                dgemm_(&trans,&normal, &N,&N,&M,&kweight,vec_all,&LDA,vec_all,&LDA,&one,spolyv,&N);
+            }
         }
     }
     if(stoiter.method == 2) delete[] allorderchi;

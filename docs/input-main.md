@@ -642,6 +642,12 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 - **Description**: Frequency (once each initsto_freq steps) to generate new stochastic orbitals when running md.
 - **Default**:1000
 
+#### npart_sto
+
+- **Type**: Integer
+- **Description**: Make memory cost to 1/npart_sto times of previous one when running post process of SDFT like DOS with method_sto = 2.
+- **Default**:1
+
 ### Geometry relaxation
 
 This part of variables are used to control the geometry relaxation.
