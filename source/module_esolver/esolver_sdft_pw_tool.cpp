@@ -94,6 +94,7 @@ void ESolver_SDFT_PW::check_che(const int nche_in)
 void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double wcut, 
                           const double dw_in, const int times)
 {
+     ModuleBase::TITLE(this->classname,"sKG");
     ModuleBase::timer::tick(this->classname,"sKG");
     cout<<"Calculating conductivity...."<<endl;
     
@@ -456,6 +457,8 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
 
 void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const double emin, const double emax, const double de, const int npart)
 {
+    ModuleBase::TITLE(this->classname,"caldos");
+    ModuleBase::timer::tick(this->classname,"caldos");
     cout<<"========================="<<endl;
     cout<<"###Calculating Dos....###"<<endl;
     cout<<"========================="<<endl;
@@ -479,6 +482,7 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
         int nchip_new = ceil((double)this->stowf.nchip_max / npart);
         allorderchi = new std::complex<double> [nchip_new * npwx * nche_dos];
     }
+    ModuleBase::timer::tick(this->classname,"Tracepoly");
     cout<<"1. TracepolyA:"<<endl;
     for (int ik = 0;ik < nk;ik++)
 	{
@@ -532,32 +536,32 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
     }
     if(stoiter.method == 2) delete[] allorderchi;
 
-    string dosfile = GlobalV::global_out_dir+"DOS1_smearing.dat";
-    ofstream ofsdos(dosfile.c_str());
+    ofstream ofsdos;
     int ndos = int((emax-emin) / de)+1;
-    double *dos = new double [ndos];
-    ModuleBase::GlobalFunc::ZEROS(dos,ndos);
     stoiter.stofunc.sigma = sigmain / ModuleBase::Ry_to_eV;
-    double sum = 0; 
-    double maxerror = 0;
-    ofsdos<<setw(8)<<"## E(eV) "<<setw(20)<<"dos(eV^-1)"<<setw(20)<<"sum"<<setw(20)<<"Error(eV^-1)"<<endl;
+    ModuleBase::timer::tick(this->classname,"Tracepoly");
+
     cout<<"2. Dos:"<<endl;
+    ModuleBase::timer::tick(this->classname,"DOS Loop");
     int n10 = ndos/10;
     int percent = 10;
+    double *sto_dos = new double [ndos];
+    double *ks_dos = new double [ndos];
+    double *error = new double [ndos];
 	for(int ie = 0; ie < ndos; ++ie)
 	{
-        double KS_dos = 0;
-        double sto_dos = 0;
+        double tmpks = 0;
+        double tmpsto = 0;
         stoiter.stofunc.targ_e = (emin + ie * de) / ModuleBase::Ry_to_eV;
         if(stoiter.method == 1)
         {
             che.calcoef_real(&stoiter.stofunc, &Sto_Func<double>::ngauss);
-		    sto_dos = BlasConnector::dot(nche_dos,che.coef_real,1,spolyv,1);
+		    tmpsto = BlasConnector::dot(nche_dos,che.coef_real,1,spolyv,1);
         }
         else
         {
             che.calcoef_real(&stoiter.stofunc, &Sto_Func<double>::nroot_gauss);
-            sto_dos = stoiter.vTMv(che.coef_real,spolyv,nche_dos);
+            tmpsto = stoiter.vTMv(che.coef_real,spolyv,nche_dos);
         }
         if(GlobalV::NBANDS > 0)
         {
@@ -566,46 +570,66 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
                 double *en=&(this->pelec->ekb(ik, 0));
                 for(int ib = 0; ib < GlobalV::NBANDS; ++ib)
                 {
-                    KS_dos += stoiter.stofunc.gauss(en[ib]) * GlobalC::kv.wk[ik] / 2 ;
+                    tmpks += stoiter.stofunc.gauss(en[ib]) * GlobalC::kv.wk[ik] / 2 ;
                 }
             }
         }
-        KS_dos /= GlobalV::NPROC_IN_POOL;
-#ifdef __MPI
-	    MPI_Allreduce(MPI_IN_PLACE, &KS_dos, 1, MPI_DOUBLE, MPI_SUM , STO_WORLD);
-        MPI_Allreduce(MPI_IN_PLACE, &sto_dos, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
-#endif
-        double tmpre = 0;
+        tmpks /= GlobalV::NPROC_IN_POOL;
+
+        double tmperror = 0;
         if(stoiter.method == 1)
         {
-            tmpre = che.coef_real[nche_dos-1] * spolyv[nche_dos-1];
+            tmperror = che.coef_real[nche_dos-1] * spolyv[nche_dos-1];
         }
         else
         {
             const int norder = nche_dos;
             double last_coef = che.coef_real[norder-1];
             double last_spolyv = spolyv[norder*norder - 1];
-            tmpre = last_coef *(BlasConnector::dot(norder,che.coef_real,1,spolyv+norder*(norder-1),1)
+            tmperror = last_coef *(BlasConnector::dot(norder,che.coef_real,1,spolyv+norder*(norder-1),1)
                         + BlasConnector::dot(norder,che.coef_real,1,spolyv+norder-1,norder)-last_coef*last_spolyv);
         } 
-#ifdef __MPI
-        MPI_Allreduce(MPI_IN_PLACE, &tmpre, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
-#endif
-        if(maxerror < tmpre) maxerror = tmpre;
-        dos[ie] = (KS_dos + sto_dos) / ModuleBase::Ry_to_eV;
-        sum += dos[ie];
-		ofsdos <<setw(8)<< emin + ie * de <<setw(20)<<dos[ie]<<setw(20)<<sum * de <<setw(20) <<tmpre <<endl;
+
         if(ie%n10 == n10 -1) 
         {
             cout<<percent<<"%"<<" ";
             percent+=10;
         }
+        sto_dos[ie] = tmpsto;
+        ks_dos[ie] = tmpks;
+        error[ie] = tmperror;
 	}
-    cout<<endl;
-    cout<<"Finish DOS"<<endl;
-    cout<<scientific<<"DOS max Chebyshev Error: "<<maxerror<<endl;
-    delete[] dos;
+#ifdef __MPI
+	    MPI_Allreduce(MPI_IN_PLACE, ks_dos, ndos, MPI_DOUBLE, MPI_SUM , STO_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, sto_dos, ndos, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, error, ndos, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
+#endif
+    if(GlobalV::MY_RANK == 0)
+    {
+        string dosfile = GlobalV::global_out_dir+"DOS1_smearing.dat";
+        ofsdos.open(dosfile.c_str());
+        double maxerror = 0;
+        double sum = 0; 
+        ofsdos<<setw(8)<<"## E(eV) "<<setw(20)<<"dos(eV^-1)"<<setw(20)<<"sum"<<setw(20)<<"Error(eV^-1)"<<endl;
+        for(int ie = 0 ; ie < ndos ; ++ie)
+        {
+            double tmperror = abs(error[ie]);
+            if(maxerror < tmperror) maxerror = tmperror;
+            double dos = (ks_dos[ie] + sto_dos[ie]) / ModuleBase::Ry_to_eV;
+            sum += dos;
+	    	ofsdos <<setw(8)<< emin + ie * de <<setw(20)<< dos <<setw(20)<< sum * de <<setw(20)<< tmperror <<endl;
+        }
+        cout<<endl;
+        cout<<"Finish DOS"<<endl;
+        cout<<scientific<<"DOS max Chebyshev Error: "<<maxerror<<endl;
+        ofsdos.close();
+    }
+    delete[] sto_dos;
+    delete[] ks_dos;
+    delete[] error;
     delete[] spolyv;
+    ModuleBase::timer::tick(this->classname,"DOS Loop");
+    ModuleBase::timer::tick(this->classname,"caldos");
     return;
 }
 
