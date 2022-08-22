@@ -161,6 +161,8 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::beforescf(int istep)
     {
+        ModuleBase::TITLE("ESolver_KS_PW", "beforescf");
+
         //init Hamilt, this should be allocated before each scf loop
         //Operators in HamiltPW should be reallocated once cell changed
         //delete Hamilt if not first scf
@@ -174,7 +176,6 @@ namespace ModuleESolver
         {
             this->phami = new hamilt::HamiltPW();
         }
-
 
         //----------------------------------------------------------
         // about vdw, jiyy add vdwd3 and linpz add vdwd2
@@ -219,6 +220,15 @@ namespace ModuleESolver
         if(GlobalV::CALCULATION == "test_memory")
         {
             Cal_Test::test_memory();
+            return;
+        }
+
+        if (GlobalV::CALCULATION == "gen_jle")
+        {
+            // caoyu add 2020-11-24, mohan updat 2021-01-03
+            Numerical_Descriptor nc;
+            nc.output_descriptor(this->psi[0], INPUT.deepks_descriptor_lmax);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
             return;
         }
 
@@ -620,14 +630,6 @@ namespace ModuleESolver
 	    GlobalC::en.print_occ();
         // compute density of states
         GlobalC::en.perform_dos_pw();
-
-        // caoyu add 2020-11-24, mohan updat 2021-01-03
-        if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
-        {
-            Numerical_Descriptor nc;
-            nc.output_descriptor(this->psi[0], INPUT.deepks_descriptor_lmax);
-            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
-        }
 
         if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
         {

@@ -59,7 +59,7 @@ void Driver::driver_run()
         Run_MD_PW run_md_pw;
         run_md_pw.md_ions_pw(p_esolver);
     }
-    else // cell relaxations
+    else // scf; cell relaxation; nscf; etc
     {
         Ions ions;
         ions.opt_ions(p_esolver);

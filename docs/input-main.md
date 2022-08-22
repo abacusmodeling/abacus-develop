@@ -150,6 +150,7 @@ This part of variables are used to control general system parameters.
   - *sto-md*: molecular dynamics with [stochastic DFT](#electronic-structure-sdft)
   - *test_memory* : checks memory required for the calculation. The number is not quite reliable, please use with care
   - *test_neighbour* : only performs neighbouring atom search
+  - *gen_jle* : generates projectors for DeePKS; see also deepks_lmax_descriptor
 
   > Note: *istate* and *ienvelope* only work for LCAO basis set and are not working right now.
 - **Default**: scf
@@ -965,8 +966,8 @@ Warning: this function is not robust enough for the current version. Please try 
 #### deepks_descriptor_lmax
 
 - **Type**: Integer
-- **Description**: control the max angular momentum of descriptor basis.
-- **Default**: 0
+- **Description**: when generating projectors, this variable controls the max angular momentum of descriptor basis.
+- **Default**: 2
 
 #### deepks_scf
 

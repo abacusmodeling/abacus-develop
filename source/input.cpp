@@ -2494,6 +2494,15 @@ void Input::Check(void)
     }
     else if(calculation == "test_neighbour")
     {
+        this->relax_nmax = 1;
+    }
+    else if(calculation == "gen_jle")
+    {
+        this->relax_nmax = 1;
+        if(basis_type != "pw")
+        {
+            ModuleBase::WARNING_QUIT("Input","to generate descriptors, please use pw basis");
+        }
     }
     else
     {
