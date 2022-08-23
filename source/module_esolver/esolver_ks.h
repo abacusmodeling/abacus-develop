@@ -8,6 +8,7 @@
 #include "module_elecstate/elecstate.h"
 #include "module_pw/pw_basis_k.h"
 #include "src_io/cal_test.h"
+#include "../src_pw/charge_extra.h"
 // #include "estates.h"
 // #include "h2e.h"
 namespace ModuleESolver
@@ -69,6 +70,7 @@ namespace ModuleESolver
     elecstate::ElecState* pelec = nullptr;
     hamilt::Hamilt* phami = nullptr;
     ModulePW::PW_Basis_K* pw_wfc = nullptr;
+    Charge_Extra CE;
 
     protected:
         std::string basisname; //PW or LCAO

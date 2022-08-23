@@ -33,8 +33,6 @@ class Ions
 
 	//MD md; //mohan add 2011-11-07
 
-	Charge_Extra CE;
-	
 	Lattice_Change_Methods LCM;
 
 	//seperate force_stress function first

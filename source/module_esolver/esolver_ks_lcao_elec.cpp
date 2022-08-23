@@ -232,6 +232,24 @@ namespace ModuleESolver
         ModuleBase::TITLE("ESolver_KS_LCAO", "beforescf");
         ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");
 
+        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+        {
+            if(GlobalC::ucell.ionic_position_updated)
+            {
+                GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
+                // charge extrapolation if istep>0.
+                CE.update_istep(istep);
+                CE.update_all_pos(GlobalC::ucell);
+                CE.extrapolate_charge();
+                CE.save_pos_next(GlobalC::ucell);
+
+                GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
+                // calculate the new potential accordint to
+                // the new charge density.
+                GlobalC::pot.init_pot( istep-1, GlobalC::sf.strucFac );
+            }
+        }
+
         //----------------------------------------------------------
         // about vdw, jiyy add vdwd3 and linpz add vdwd2
         //----------------------------------------------------------

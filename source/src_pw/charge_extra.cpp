@@ -8,6 +8,38 @@
 
 Charge_Extra::Charge_Extra()
 {
+}
+
+Charge_Extra::~Charge_Extra()
+{
+    if(pot_order > 1)
+    {
+        for(int is=0; is<GlobalV::NSPIN; is++)
+        {
+            delete[] delta_rho1[is];
+            delete[] delta_rho2[is];
+        }
+        delete[] delta_rho1;
+        delete[] delta_rho2;
+    }
+
+    // if(pot_order > 2)
+    // {
+    //     for(int is=0; is<GlobalV::NSPIN; is++)
+    //     {
+    //         delete[] delta_rho3[is];
+    //     }	
+    //     delete[] delta_rho3;
+    // }
+
+    delete[] pos_old1;
+    delete[] pos_old2;
+    delete[] pos_now;
+    delete[] pos_next;
+}
+
+void Charge_Extra::Init_CE()
+{
     if(GlobalC::pot.chg_extrap == "none")
     {
         pot_order = 0;
@@ -61,35 +93,6 @@ Charge_Extra::Charge_Extra()
 
     alpha = 1.0;
     beta  = 0.0;
-}
-
-
-Charge_Extra::~Charge_Extra()
-{
-    if(pot_order > 1)
-    {
-        for(int is=0; is<GlobalV::NSPIN; is++)
-        {
-            delete[] delta_rho1[is];
-            delete[] delta_rho2[is];
-        }
-        delete[] delta_rho1;
-        delete[] delta_rho2;
-    }
-
-    // if(pot_order > 2)
-    // {
-    //     for(int is=0; is<GlobalV::NSPIN; is++)
-    //     {
-    //         delete[] delta_rho3[is];
-    //     }	
-    //     delete[] delta_rho3;
-    // }
-
-    delete[] pos_old1;
-    delete[] pos_old2;
-    delete[] pos_now;
-    delete[] pos_next;
 }
 
 void Charge_Extra::extrapolate_charge()

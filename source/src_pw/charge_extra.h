@@ -16,6 +16,12 @@ class Charge_Extra
     Charge_Extra();
     ~Charge_Extra();
 
+    //When Esolver is initialized, ucell.natom is not determined
+    //As a result, data structures in Charge_Extra cannot be allocated
+    //This is a temporary solution by delaying the allocation
+    //But after ucell and Esolver are fully decoupled
+    //Init_CE will be removed and everything put back in the constructor
+    void Init_CE();
     void extrapolate_charge(void);
     void save_pos_next(const UnitCell_pseudo& ucell);
     void update_istep(const int &step);

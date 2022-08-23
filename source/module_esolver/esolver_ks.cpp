@@ -95,6 +95,9 @@ namespace ModuleESolver
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
         // Initializee the potential.
         GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
+
+        // Initialize charge extrapolation
+        CE.Init_CE();
     }
 
     void ESolver_KS::hamilt2density(const int istep, const int iter, const double ethr)

@@ -24,6 +24,7 @@
 Run_MD_LCAO::Run_MD_LCAO()
 {
     cellchange = false;
+    CE.Init_CE();
 }
 
 Run_MD_LCAO::~Run_MD_LCAO()

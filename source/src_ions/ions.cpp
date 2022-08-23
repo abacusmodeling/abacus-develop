@@ -64,7 +64,6 @@ void Ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 		}
 		time_t fend = time(NULL);
 
-
 		if(GlobalV::OUT_LEVEL=="i")
 		{
 			double etime_min = difftime(eend, estart)/60.0; 
@@ -211,21 +210,6 @@ void Ions::reset_after_relax(const int& istep)
 	ModuleBase::TITLE("Ions","reset_after_relax");
 	GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 	GlobalC::sf.setup_structure_factor(&GlobalC::ucell,GlobalC::rhopw);
-
-	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
-	// charge extrapolation if istep>0.
-	CE.update_istep(istep);
-	CE.update_all_pos(GlobalC::ucell);
-	CE.extrapolate_charge();
-	CE.save_pos_next(GlobalC::ucell);
-
-	GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
-	// calculate the new potential accordint to
-	// the new charge density.
-	GlobalC::pot.init_pot( istep, GlobalC::sf.strucFac );
-
-	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
-	//GlobalC::wf.wfcinit();
 }
 
 void Ions::reset_after_cellrelax(int& f_step, int& s_step, ModuleESolver::ESolver *p_esolver)

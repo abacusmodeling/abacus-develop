@@ -13,6 +13,7 @@
 Run_MD_PW::Run_MD_PW()
 {
     cellchange = false;
+    CE.Init_CE();
 }
 
 Run_MD_PW::~Run_MD_PW(){}
