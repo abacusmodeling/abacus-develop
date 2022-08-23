@@ -201,7 +201,7 @@ void Stochastic_Iter::check_precision(const double ref, const double thr, const 
     MPI_Allreduce(MPI_IN_PLACE, &error, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
 #endif
     double relative_error = abs(error/ref);
-    GlobalV::ofs_running<<info<<" Chebyshev Precision: "<<relative_error*1e9<<"E-09"<<std::endl;
+    GlobalV::ofs_running<<info<<"Relative Chebyshev Precision: "<<relative_error*1e9<<"E-09"<<std::endl;
     if(relative_error > thr)
     {
         stringstream ss;
@@ -211,7 +211,7 @@ void Stochastic_Iter::check_precision(const double ref, const double thr, const 
         ss.clear();
         ss<<thr;
         ss>>tartxt;
-        string warningtxt = "( "+info+" Chebyshev error = "+fractxt+" > threshold = "+tartxt+" ) Maybe you should increase the parameter \"nche_sto\" for more accuracy.";
+        string warningtxt = "( "+info+" relative Chebyshev error = "+fractxt+" > threshold = "+tartxt+" ) Maybe you should increase the parameter \"nche_sto\" for more accuracy.";
         ModuleBase::WARNING("Stochastic_Chebychev", warningtxt);
     }
     //===============================

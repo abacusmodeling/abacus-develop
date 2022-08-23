@@ -133,7 +133,7 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
     stoiter.stofunc.t = dt;
     chet.calcoef_pair(&stoiter.stofunc, &Sto_Func<double>::ncos, &Sto_Func<double>::nsin);
     chet2.calcoef_pair(&stoiter.stofunc, &Sto_Func<double>::ncos, &Sto_Func<double>::n_sin);
-    cout<<"Chebyshev precision: "<<abs(chet.coef_complex[nche_KG-1]/chet.coef_complex[0])<<endl;
+    cout<<"Relative Chebyshev precision: "<<abs(chet.coef_complex[nche_KG-1]/chet.coef_complex[0])<<endl;
     ofstream cheofs("Chebycoef");
     for(int i  = 0 ; i < nche_KG ; ++i)
     {
@@ -621,7 +621,7 @@ void ESolver_SDFT_PW:: caldos( const int nche_dos, const double sigmain, const d
         }
         cout<<endl;
         cout<<"Finish DOS"<<endl;
-        cout<<scientific<<"DOS max Chebyshev Error: "<<maxerror<<endl;
+        cout<<scientific<<"DOS max absolute Chebyshev Error: "<<maxerror<<endl;
         ofsdos.close();
     }
     delete[] sto_dos;
