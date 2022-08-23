@@ -144,7 +144,8 @@ void Input::Default(void)
     bndpar = 1;
     kpar = 1;
     initsto_freq = 1000;
-    method_sto = 1;
+    method_sto = 2;
+    npart_sto = 1;
     cal_cond = false;
     dos_nche = 100;
     cond_nche = 20;
@@ -589,6 +590,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("method_sto", word) == 0)
         {
             read_value(ifs, method_sto);
+        }
+        else if (strcmp("npart_sto", word) == 0)
+        {
+            read_value(ifs, npart_sto);
         }
         else if (strcmp("cal_cond", word) == 0)
         {
@@ -1931,6 +1936,10 @@ void Input::Default_2(void) // jiyy add 2019-08-04
     }
     if(calculation.substr(0,3) != "sto")    bndpar = 1;
     if(bndpar > GlobalV::NPROC) bndpar = GlobalV::NPROC;
+    if(method_sto != 1 && method_sto != 2) 
+    {
+        method_sto = 2;
+    }
 }
 #ifdef __MPI
 void Input::Bcast()
@@ -1965,6 +1974,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double(emin_sto);
     Parallel_Common::bcast_int(initsto_freq);
     Parallel_Common::bcast_int(method_sto);
+    Parallel_Common::bcast_int(npart_sto);
     Parallel_Common::bcast_bool(cal_cond);
     Parallel_Common::bcast_int(cond_nche);
     Parallel_Common::bcast_double(cond_dw);

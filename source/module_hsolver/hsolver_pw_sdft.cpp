@@ -100,7 +100,7 @@ namespace hsolver
 			}
 		}
 		// calculate stochastic rho
-		stoiter.sum_stoband(stowf,pes);
+		stoiter.sum_stoband(stowf,pes,pHamilt);
 
 
 		//(6) calculate the delta_harris energy 

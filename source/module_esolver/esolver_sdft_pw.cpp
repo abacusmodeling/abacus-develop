@@ -147,7 +147,6 @@ void ESolver_SDFT_PW::postprocess()
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     GlobalC::en.print_occ();
 
-    ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
     if(this->maxniter == 0)
     {
         int iter = 1;
@@ -156,6 +155,7 @@ void ESolver_SDFT_PW::postprocess()
         hsolver::DiagoIterAssist::PW_DIAG_THR = std::max(std::min(1e-5, 0.1 * GlobalV::SCF_THR / std::max(1.0, GlobalC::CHR.nelec)),1e-12);
         hsolver::DiagoIterAssist::need_subspace = false;
         this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf,istep, iter, GlobalV::KS_SOLVER, true);
+        ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
     }
     int nche_test = 0;
     if(INPUT.cal_cond)  nche_test = std::max(nche_test, INPUT.cond_nche);
@@ -169,17 +169,21 @@ void ESolver_SDFT_PW::postprocess()
     if(INPUT.out_dos)
 	{
         double emax, emin;
-        if(INPUT.dos_setemax)	emax = INPUT.dos_emax_ev;
-		if(INPUT.dos_setemin)	emin = INPUT.dos_emin_ev;
+        if(INPUT.dos_setemax)	
+            emax = INPUT.dos_emax_ev;
+        else
+            emax =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emax*ModuleBase::Ry_to_eV;
+		if(INPUT.dos_setemin)
+        	emin = INPUT.dos_emin_ev;
+        else
+            emin =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emin*ModuleBase::Ry_to_eV;
 		if(!INPUT.dos_setemax && !INPUT.dos_setemin)
 		{
-            emax =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emax;
-            emin =  ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.stohchi.Emin;
 			double delta=(emax-emin)*INPUT.dos_scale;
 			emax=emax+delta/2.0;
 			emin=emin-delta/2.0;
 		}
-        this->caldos(INPUT.dos_nche, INPUT.b_coef, emin, emax, INPUT.dos_edelta_ev );
+        this->caldos(INPUT.dos_nche, INPUT.b_coef, emin, emax, INPUT.dos_edelta_ev, INPUT.npart_sto );
     }
 }
 
