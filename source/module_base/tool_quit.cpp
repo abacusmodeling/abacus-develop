@@ -128,4 +128,25 @@ void WARNING_QUIT(const std::string &file,const std::string &description)
     QUIT();
 }
 
+
+//Input judgement and communicate , if any judgement is true, do WARNING_QUIT
+void CHECK_WARNING_QUIT(bool error_in, const std::string &file,const std::string &description)
+{
+	int error = (int)error_in;
+#ifdef __NORMAL
+// only for UT, do nothing here
+#else
+#ifdef __MPI
+	int error_max = error;
+	MPI_Reduce(&error, &error_max, 1, MPI_INT, MPI_MAX, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&error_max, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	error = error_max;
+#endif
+#endif
+	if(error)
+	{
+		WARNING_QUIT(file, description);
+	}
+}
+
 }

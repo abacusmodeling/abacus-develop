@@ -422,7 +422,8 @@ class Input
     //==========================================================
     // variables for test only
     //==========================================================
-    bool test_just_neighbor;
+    bool test_just_neighbor = false;
+    bool test_skip_ewald = false;
 
   private:
     //==========================================================

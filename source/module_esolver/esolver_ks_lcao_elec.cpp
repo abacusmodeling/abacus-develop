@@ -256,7 +256,10 @@ namespace ModuleESolver
 #endif
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
+        if(!GlobalV::test_skip_ewald)
+        {
+            H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
+        }
 
         //2. the electron charge density should be symmetrized,
         // here is the initialization

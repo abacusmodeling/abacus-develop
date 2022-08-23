@@ -157,6 +157,8 @@ int test_wf = 0;
 int test_charge = 0;
 int test_potential = 0;
 int test_energy = 0;
+// for test purpose, skip ewald calculation
+bool test_skip_ewald = false;
 //----------------------------------------------------------
 // src_lcao
 //----------------------------------------------------------
