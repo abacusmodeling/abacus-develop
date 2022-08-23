@@ -222,7 +222,10 @@ namespace ModuleESolver
 		}
 
         //calculate ewald energy
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
+        if(!GlobalV::test_skip_ewald)
+        {
+            H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
+        }
         //Symmetry_rho should be moved to Init()
         Symmetry_rho srho;
         for (int is = 0; is < GlobalV::NSPIN; is++)

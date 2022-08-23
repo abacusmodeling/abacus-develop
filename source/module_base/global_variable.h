@@ -180,6 +180,7 @@ extern int test_wf;
 extern int test_charge;
 extern int test_potential;
 extern int test_energy;
+extern bool test_skip_ewald;
 //==========================================================
 // src_onscaling
 //==========================================================

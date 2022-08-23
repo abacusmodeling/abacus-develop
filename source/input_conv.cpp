@@ -141,6 +141,7 @@ void Input_Conv::Convert(void)
     GlobalV::VION_IN_H = INPUT.vion_in_h;
     GlobalV::TEST_FORCE = INPUT.test_force;
     GlobalV::TEST_STRESS = INPUT.test_stress;
+    GlobalV::test_skip_ewald = INPUT.test_skip_ewald;
 
     //----------------------------------------------------------
     // iteration (1/3)
