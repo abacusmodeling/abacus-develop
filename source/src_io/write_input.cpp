@@ -111,6 +111,7 @@ void Input::Print(const std::string &fn) const
     
     ofs << "\n#Parameters (3.Stochastic DFT)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "method_sto", method_sto, "1: slow and save memory, 2: fast and waste memory");
+    ModuleBase::GlobalFunc::OUTP(ofs, "npart_sto", npart_sto, "Reduce memory when calculating Stochastic DOS");
     ModuleBase::GlobalFunc::OUTP(ofs, "nbands_sto", nbands_sto, "number of stochstic orbitals");
     ModuleBase::GlobalFunc::OUTP(ofs, "nche_sto", nche_sto, "Chebyshev expansion orders");
     ModuleBase::GlobalFunc::OUTP(ofs, "emin_sto", emin_sto, "trial energy to guess the lower bound of eigen energies of the Hamitonian operator");
