@@ -69,6 +69,8 @@ void PW_Basis_K::setupIndGk()
     //count npwk
     this->npwk_max = 0;
     delete[] this->npwk; this->npwk = new int [this->nks];
+    //minimun npw, only for check
+    int npwk_min = this->npw;
     for (int ik = 0; ik < this->nks; ik++)
     {
         int ng = 0;
@@ -80,7 +82,6 @@ void PW_Basis_K::setupIndGk()
                 ++ng;
             }
         }
-        ModuleBase::CHECK_WARNING_QUIT((ng==0), "PW_Basis_K::setupIndGk", "some cores have no plane waves!");
         this->npwk[ik] = ng;
         if(ng == 0)
         {
@@ -90,7 +91,12 @@ void PW_Basis_K::setupIndGk()
         {
             this->npwk_max = ng;
         }
+        if ( npwk_min > ng)
+        {
+            npwk_min = ng;
+        }
     }
+    ModuleBase::CHECK_WARNING_QUIT((npwk_min==0), "PW_Basis_K::setupIndGk", "some cores have no plane waves!");
 
     //get igl2isz_k and igl2ig_k
     delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
