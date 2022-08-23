@@ -10,7 +10,7 @@
 namespace hsolver
 {
 
-typedef hamilt::Operator::hpsi_info hp_info;
+typedef hamilt::Operator<std::complex<double>>::hpsi_info hp_info;
 
 DiagoCG::DiagoCG(const double *precondition_in)
 {

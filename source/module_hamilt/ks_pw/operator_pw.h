@@ -6,7 +6,7 @@
 namespace hamilt
 {
 
-class OperatorPW : public Operator
+class OperatorPW : public Operator<std::complex<double>>
 {
     public:
     virtual ~OperatorPW(){};

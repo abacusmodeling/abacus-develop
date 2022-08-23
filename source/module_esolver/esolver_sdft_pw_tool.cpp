@@ -245,20 +245,20 @@ void ESolver_SDFT_PW::sKG(const int nche_KG, const double fwhmin, const double w
         // this->phami->hPsi(j1psi.get_pointer(), j2psi.get_pointer(), ndim*totbands_per*npwx);
         // this->phami->hPsi(j1sfpsi.get_pointer(), j2sfpsi.get_pointer(), ndim*totbands_per*npwx);
         psi::Range allbands(1,0,0,totbands_per-1);
-        hamilt::Operator::hpsi_info info_psi0(&psi0, allbands);
+        hamilt::Operator<std::complex<double>>::hpsi_info info_psi0(&psi0, allbands);
         const std::complex<double>* hpsi_out = std::get<0>(this->phami->ops->hPsi(info_psi0))->get_pointer();
         ModuleBase::GlobalFunc::COPYARRAY(hpsi_out, hpsi0.get_pointer(), totbands_per*npwx);
 
-        hamilt::Operator::hpsi_info info_sfpsi0(&sfpsi0, allbands);
+        hamilt::Operator<std::complex<double>>::hpsi_info info_sfpsi0(&sfpsi0, allbands);
         const std::complex<double>* hsfpsi_out = std::get<0>(this->phami->ops->hPsi(info_sfpsi0))->get_pointer();
         ModuleBase::GlobalFunc::COPYARRAY(hsfpsi_out, hsfpsi0.get_pointer(), totbands_per*npwx);
 
         psi::Range allndimbands(1,0,0,ndim*totbands_per-1);
-        hamilt::Operator::hpsi_info info_j1psi(&j1psi, allndimbands);
+        hamilt::Operator<std::complex<double>>::hpsi_info info_j1psi(&j1psi, allndimbands);
         const std::complex<double>* hj1psi_out = std::get<0>(this->phami->ops->hPsi(info_j1psi))->get_pointer();
         ModuleBase::GlobalFunc::COPYARRAY(hj1psi_out, j2psi.get_pointer(), ndim*totbands_per*npwx);
 
-        hamilt::Operator::hpsi_info info_j1sfpsi(&j1sfpsi, allndimbands);
+        hamilt::Operator<std::complex<double>>::hpsi_info info_j1sfpsi(&j1sfpsi, allndimbands);
         const std::complex<double>* hj1sfpsi_out = std::get<0>(this->phami->ops->hPsi(info_j1sfpsi))->get_pointer();
         ModuleBase::GlobalFunc::COPYARRAY(hj1sfpsi_out, j2sfpsi.get_pointer(), ndim*totbands_per*npwx);
 

@@ -51,7 +51,7 @@ void DiagoIterAssist::diagH_subspace(hamilt::Hamilt* pHamilt,
     const std::complex<double> *ppsi = psi.get_pointer();
 
     psi::Range all_bands_range(1, psi.get_current_k(), 0, psi.get_nbands()-1);
-    hamilt::Operator::hpsi_info hpsi_in(&psi, all_bands_range);
+    hamilt::Operator<std::complex<double>>::hpsi_info hpsi_in(&psi, all_bands_range);
     const std::complex<double> *aux = std::get<0>(pHamilt->ops->hPsi(hpsi_in))->get_pointer();
 
     char trans1 = 'C';
@@ -188,7 +188,7 @@ void DiagoIterAssist::diagH_subspace_init(hamilt::Hamilt* pHamilt,
     const std::complex<double> *ppsi = psi_temp.get_pointer();
 
     psi::Range all_bands_range(1, 0, 0, nstart-1);
-    hamilt::Operator::hpsi_info hpsi_in(&psi_temp, all_bands_range);
+    hamilt::Operator<std::complex<double>>::hpsi_info hpsi_in(&psi_temp, all_bands_range);
     const std::complex<double> *aux = std::get<0>(pHamilt->ops->hPsi(hpsi_in))->get_pointer();
 
     char trans1 = 'C';

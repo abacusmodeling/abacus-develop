@@ -8,7 +8,7 @@
 
 namespace hsolver
 {
-typedef hamilt::Operator::hpsi_info hp_info;
+typedef hamilt::Operator<std::complex<double>>::hpsi_info hp_info;
 
 int DiagoDavid::PW_DIAG_NDIM = 4;
 

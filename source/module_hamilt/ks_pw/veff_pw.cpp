@@ -7,9 +7,6 @@
 namespace hamilt
 {
 
-template class Veff<OperatorPW>;
-
-template<>
 Veff<OperatorPW>::Veff(
     const int* isk_in,
     const ModuleBase::matrix* veff_in,
@@ -26,7 +23,6 @@ Veff<OperatorPW>::Veff(
     }
 }
 
-template<>
 void Veff<OperatorPW>::act
 (
     const psi::Psi<std::complex<double>> *psi_in, 

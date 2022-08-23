@@ -8,6 +8,11 @@
 namespace hamilt
 {
 
+// Basic class for operator module, 
+// it is designed for "O|psi>" and "<psi|O|psi>"
+// Operator "O" might have several different types, which should be calculated one by one.
+// In basic class , function add() is designed for combine all operators together with a chain. 
+template<typename T>
 class Operator
 {
     public:
@@ -25,11 +30,11 @@ class Operator
         } 
     }
 
-    typedef std::tuple<const psi::Psi<std::complex<double>>*, const psi::Range> hpsi_info;
+    //this is the core function for Operator
+    // do H|psi> from input |psi> , 
+    // output of hpsi would be first member of the returned tuple 
+    typedef std::tuple<const psi::Psi<T>*, const psi::Range> hpsi_info;
     virtual hpsi_info hPsi(const hpsi_info& input)const {return hpsi_info(nullptr, 0);}
-
-    virtual void act(std::complex<double> *hk_matrix)const {return;}
-    virtual void act(double *hk_matrix)const {return;}
 
     virtual void init(const int ik_in)
     {
@@ -67,9 +72,9 @@ class Operator
     Operator* next_op = nullptr;
 
     //if this Operator is first node in chain table, hpsi would not be empty
-    mutable psi::Psi<std::complex<double>>* hpsi = nullptr;
+    mutable psi::Psi<T>* hpsi = nullptr;
 
-    std::complex<double>* get_hpsi(const hpsi_info& info)const
+    T* get_hpsi(const hpsi_info& info)const
     {
         const int nbands_range = (std::get<1>(info).range_2 - std::get<1>(info).range_1 + 1);
         //recursive call of hPsi, hpsi inputs as new psi, 
@@ -87,9 +92,9 @@ class Operator
             this->recursive = true;
         }
         //create a new hpsi
-        this->hpsi = new psi::Psi<std::complex<double>>(std::get<0>(info)[0], 1, nbands_range);
+        this->hpsi = new psi::Psi<T>(std::get<0>(info)[0], 1, nbands_range);
         
-        std::complex<double>* pointer_hpsi = this->hpsi->get_pointer();
+        T* pointer_hpsi = this->hpsi->get_pointer();
         size_t total_hpsi_size = nbands_range * this->hpsi->get_nbasis();
         ModuleBase::GlobalFunc::ZEROS(pointer_hpsi, total_hpsi_size);
         return pointer_hpsi;
