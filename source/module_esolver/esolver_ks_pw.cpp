@@ -69,6 +69,21 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::Init_GlobalC(Input& inp, UnitCell_pseudo& cell)
     {
+        //new plane wave basis
+#ifdef __MPI
+        this->pw_wfc->initmpi(GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL, POOL_WORLD);
+#endif
+        this->pw_wfc->initgrids(cell.lat0, cell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
+        this->pw_wfc->initparameters(false, inp.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+#ifdef __MPI
+        if(INPUT.pw_seed > 0)    MPI_Allreduce(MPI_IN_PLACE, &this->pw_wfc->ggecut, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
+        //qianrui add 2021-8-13 to make different kpar parameters can get the same results
+#endif
+        this->pw_wfc->setuptransform();
+        for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)   GlobalC::kv.ngk[ik] = this->pw_wfc->npwk[ik];
+        this->pw_wfc->collect_local_pw(); 
+        ESolver_KS::print_wfcfft(inp, GlobalV::ofs_running);
+
         this->psi = GlobalC::wf.allocate(GlobalC::kv.nks);
 
         // cout<<GlobalC::rhopw->nrxx<<endl;
@@ -122,25 +137,6 @@ namespace ModuleESolver
             GlobalC::wf.wfcinit(this->psi);
         }
 
-#ifdef __LCAO
-#ifdef __MPI
-        switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
-        {
-        case Exx_Global::Hybrid_Type::HF:
-        case Exx_Global::Hybrid_Type::PBE0:
-        case Exx_Global::Hybrid_Type::SCAN0:
-        case Exx_Global::Hybrid_Type::HSE:
-            GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, GlobalC::wfcpw, GlobalC::rhopw, &GlobalC::ucell);
-            break;
-        case Exx_Global::Hybrid_Type::No:
-            break;
-        case Exx_Global::Hybrid_Type::Generate_Matrix:
-        default:
-            throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-        }
-#endif
-#endif
-
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
     }
 
@@ -165,6 +161,26 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::beforescf(int istep)
     {
+        ModuleBase::TITLE("ESolver_KS_PW", "beforescf");
+
+        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+        {
+            if(GlobalC::ucell.ionic_position_updated)
+            {
+                GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
+                // charge extrapolation if istep>0.
+                CE.update_istep(istep);
+                CE.update_all_pos(GlobalC::ucell);
+                CE.extrapolate_charge();
+                CE.save_pos_next(GlobalC::ucell);
+
+                GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
+                // calculate the new potential accordint to
+                // the new charge density.
+                GlobalC::pot.init_pot( istep-1, GlobalC::sf.strucFac );
+            }
+        }
+
         //init Hamilt, this should be allocated before each scf loop
         //Operators in HamiltPW should be reallocated once cell changed
         //delete Hamilt if not first scf
@@ -179,6 +195,32 @@ namespace ModuleESolver
             this->phami = new hamilt::HamiltPW();
         }
 
+        //----------------------------------------------------------
+        // about vdw, jiyy add vdwd3 and linpz add vdwd2
+        //----------------------------------------------------------	
+        if(INPUT.vdw_method=="d2")
+        {
+			// setup vdwd2 parameters
+			GlobalC::vdwd2_para.initial_parameters(INPUT);
+	        GlobalC::vdwd2_para.initset(GlobalC::ucell);
+        }
+        if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
+        {
+            GlobalC::vdwd3_para.initial_parameters(INPUT);
+        }
+		if(GlobalC::vdwd2_para.flag_vdwd2)		//Peize Lin add 2014-04-03, update 2021-03-09
+		{
+			Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
+			vdwd2.cal_energy();
+			GlobalC::en.evdw = vdwd2.get_energy();
+		}
+		if(GlobalC::vdwd3_para.flag_vdwd3)		//jiyy add 2019-05-18, update 2021-05-02
+		{
+			Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
+			vdwd3.cal_energy();
+			GlobalC::en.evdw = vdwd3.get_energy();
+		}
+
         //calculate ewald energy
         if(!GlobalV::test_skip_ewald)
         {
@@ -191,6 +233,39 @@ namespace ModuleESolver
             srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
         }
     } 
+
+    void ESolver_KS_PW::othercalculation(const int istep)
+    {
+        ModuleBase::TITLE("ESolver_KS_PW", "othercalculation");
+        ModuleBase::timer::tick("ESolver_KS_PW", "othercalculation");
+        if(GlobalV::CALCULATION == "test_memory")
+        {
+            Cal_Test::test_memory();
+            return;
+        }
+
+        if (GlobalV::CALCULATION == "gen_jle")
+        {
+            // caoyu add 2020-11-24, mohan updat 2021-01-03
+            Numerical_Descriptor nc;
+            nc.output_descriptor(this->psi[0], INPUT.deepks_descriptor_lmax);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
+            return;
+        }
+
+        // self consistent calculations for electronic ground state
+        if (GlobalV::CALCULATION == "nscf")
+        {
+            this->nscf();
+        }        
+        else
+        {
+            ModuleBase::WARNING_QUIT("ESolver_KS_LCAO::othercalculation", "CALCULATION type not supported");
+        }
+
+        ModuleBase::timer::tick("ESolver_KS_PW", "othercalculation");
+        return;
+    }
 
     void ESolver_KS_PW::eachiterinit(const int istep, const int iter)
     {
@@ -409,8 +484,6 @@ namespace ModuleESolver
         }
         if (this->conv_elec)
         {
-            //GlobalV::ofs_running << " convergence is achieved" << std::endl;			
-            //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
             GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
             GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
         }
@@ -418,6 +491,15 @@ namespace ModuleESolver
         {
             GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;
         }
+
+		if(GlobalC::pot.out_pot == 2)
+		{
+			std::stringstream ssp;
+			std::stringstream ssp_ave;
+			ssp << GlobalV::global_out_dir << "ElecStaticPot";
+			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
+			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
+		}
 
         if (GlobalV::OUT_LEVEL != "m")
         {
@@ -545,22 +627,30 @@ namespace ModuleESolver
     {
         Stress_PW ss;
         ss.cal_stress(stress, this->psi);
+
+        //external stress
+        double unit_transform = 0.0;
+        unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+        double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
+        for(int i=0;i<3;i++)
+        {
+            stress(i,i) -= external_stress[i]/unit_transform;
+        }
+        GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
     }
 
     void ESolver_KS_PW::postprocess()
     {
+
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+        GlobalV::ofs_running << std::setprecision(16);
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
+        
         //print occupation in istate.info
 	    GlobalC::en.print_occ();
         // compute density of states
         GlobalC::en.perform_dos_pw();
-
-        // caoyu add 2020-11-24, mohan updat 2021-01-03
-        if(GlobalV::BASIS_TYPE=="pw" && GlobalV::deepks_out_labels)
-        {
-            Numerical_Descriptor nc;
-            nc.output_descriptor(this->psi[0], INPUT.deepks_descriptor_lmax);
-            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
-        }
 
         if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
         {

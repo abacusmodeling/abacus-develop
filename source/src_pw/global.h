@@ -3,7 +3,6 @@
 
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
-#include "../run_pw.h"
 #include "../src_io/restart.h"
 #include "../src_ions/ions.h"
 #include "../src_lcao/exx_lip.h"

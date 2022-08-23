@@ -74,6 +74,12 @@ public:
     ModuleBase::Matrix3 GGT0;
     ModuleBase::Matrix3 invGGT0;
 	
+    //I'm doing a bad thing here! Will change later
+    bool ionic_position_updated = false; //whether the ionic position has been updated
+
+private:
+    ModuleBase::Matrix3 stress; //calculate stress on the cell
+
 public:
     UnitCell();
     ~UnitCell();
@@ -93,7 +99,8 @@ public:
     void save_cartesian_position_original(ModuleBase::Vector3<double>* pos)const;
     bool judge_big_cell(void)const;
 
-
+    void update_stress(ModuleBase::matrix &scs); //updates stress
+    void update_force(ModuleBase::matrix &fcs); //updates force in Atom
 
     double *atom_mass;
     std::string *atom_label;
