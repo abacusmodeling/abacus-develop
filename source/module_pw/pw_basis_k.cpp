@@ -80,6 +80,7 @@ void PW_Basis_K::setupIndGk()
                 ++ng;
             }
         }
+        ModuleBase::CHECK_WARNING_QUIT((ng==0), "PW_Basis_K::setupIndGk", "some cores have no plane waves!");
         this->npwk[ik] = ng;
         if(ng == 0)
         {
