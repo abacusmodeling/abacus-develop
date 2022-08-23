@@ -59,7 +59,7 @@ REAL Sto_Func<REAL>:: nxfd(REAL rawe)
 	REAL DeltaE = (Emax - Emin)/2;
     REAL e = rawe * DeltaE + Ebar;
     REAL ne_mu = (e - mu) / this->tem ;
-    if(ne_mu > 40)
+    if(ne_mu > 36)
         return 0;
     else
         return e / (1 + exp(ne_mu));
@@ -94,6 +94,23 @@ REAL Sto_Func<REAL>:: nfdlnfd(REAL rawe)
     {
         REAL f = 1 / (1 + exp(ne_mu));
         return f * log(f) + (1-f) * log(1-f);
+    }
+}
+
+template<typename REAL>
+REAL Sto_Func<REAL>:: n_root_fdlnfd(REAL rawe)
+{
+    REAL Ebar = (Emin + Emax)/2;
+	REAL DeltaE = (Emax - Emin)/2;
+    REAL ne_mu = (rawe * DeltaE + Ebar - mu) / this->tem ;
+    if(ne_mu > 72)
+        return 0;
+    else if(ne_mu < -72)
+        return 0;
+    else
+    {
+        REAL f = 1 / (1 + exp(ne_mu));
+        return sqrt(-f * log(f) - (1-f) * log(1-f));
     }
 }
 
@@ -153,10 +170,23 @@ REAL Sto_Func<REAL>::ngauss(REAL rawe)
 	REAL DeltaE = (Emax - Emin)/2;
     REAL e = rawe * DeltaE + Ebar;
     REAL a = pow((targ_e-e),2)/2.0/pow(sigma,2);
-    if(a > 72)
+    if(a > 32)
         return 0;
     else
         return  exp(-a) /sqrt(TWOPI) / sigma ;
+}
+
+template<typename REAL>
+REAL Sto_Func<REAL>::nroot_gauss(REAL rawe)
+{
+    REAL Ebar = (Emin + Emax)/2;
+	REAL DeltaE = (Emax - Emin)/2;
+    REAL e = rawe * DeltaE + Ebar;
+    REAL a = pow((targ_e-e),2)/4.0/pow(sigma,2);
+    if(a > 32)
+        return 0;
+    else
+        return  exp(-a) /sqrt(sqrt(TWOPI) * sigma) ;
 }
 
 //we only have two examples: double and float.

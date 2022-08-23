@@ -33,7 +33,7 @@ public:
              const double dw_in, const int times);
     //calculate DOS
     void caldos(const int nche_dos, const double sigmain, 
-            const double emin, const double emax, const double de);
+            const double emin, const double emax, const double de, const int npart);
 
 private:
     int nche_sto; //norder of Chebyshev

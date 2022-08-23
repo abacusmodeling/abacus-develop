@@ -18,14 +18,10 @@ Stochastic_WF::Stochastic_WF()
 
 Stochastic_WF::~Stochastic_WF()
 {
-    if (chi0 != nullptr)
-        delete[] chi0;
-    if (shchi != nullptr)
-        delete[] shchi;
-    if (chiortho != nullptr)
-        delete[] chiortho;
-    if (nchip != nullptr)
-        delete[] nchip;
+    delete[] chi0;
+    delete[] shchi;
+    delete[] chiortho;
+    delete[] nchip;
 }
 
 void Stochastic_WF::init(const int nks_in)
@@ -83,6 +79,7 @@ void Init_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in)
                     stowf.chi0[ik].c[i] = 1.0 / sqrt(double(nchi));
             }
     }
+    stowf.nchip_max = tmpnchip;
 }
 
 void Update_Sto_Orbitals(Stochastic_WF& stowf, const int seed_in)
@@ -153,6 +150,7 @@ void Init_Com_Orbitals(Stochastic_WF& stowf, K_Vectors& kv)
             ++tmpnchip;
         stowf.nchip[ik] = tmpnchip;
         stowf.chi0[ik].create(tmpnchip, ndim, true);
+        stowf.nchip_max = std::max(tmpnchip,stowf.nchip_max);
 
         const int re = totnpw[ik] % ngroup;
         int ip = 0, ig0 = 0;
@@ -195,7 +193,9 @@ void Init_Com_Orbitals(Stochastic_WF& stowf, K_Vectors& kv)
     const int ndim = GlobalC::wf.npwx;
     for (int ik = 0; ik < kv.nks; ++ik)
     {
+        stowf.nchip[ik] = ndim;
         stowf.chi0[ik].create(stowf.nchip[ik], ndim, true);
+        stowf.nchip_max = ndim;
         for (int ichi = 0; ichi < kv.ngk[ik]; ++ichi)
         {
             stowf.chi0[ik](ichi, ichi) = 1;

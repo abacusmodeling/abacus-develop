@@ -7,12 +7,13 @@ ntype			1
 symmetry		0
 pseudo_dir      ../tools/PP_ORB/
 
-nbands			5
+nbands			10
 nbands_sto		10
 
 nche_sto		120
 seed_sto        20000
-kpar            1
+kpar            2
+bndpar          2
 cal_force       1
 cal_stress      1
 
