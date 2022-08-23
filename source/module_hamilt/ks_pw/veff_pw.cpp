@@ -48,8 +48,8 @@ void Veff<OperatorPW>::act
         {
             wfcpw->recip2real(tmpsi_in, porter, ik);
             // NOTICE: when MPI threads are larger than number of Z grids
-            // veff would contain nothing, and nothing should be do in real space
-            // but the 3DFFT can not be skipped, it will cause stuck
+            // veff would contain nothing, and nothing should be done in real space
+            // but the 3DFFT can not be skipped, it will cause hanging
             if(this->veff->nc != 0)
             {
                 const double* current_veff = &(this->veff[0](current_spin, 0));
