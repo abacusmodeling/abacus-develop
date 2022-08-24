@@ -107,8 +107,11 @@ class surchem
                                            ModulePW::PW_Basis* rho_basis,
                                            const int &nspin,
                                            const double *const *const rho);
-    
-    ModuleBase::matrix v_compensating(const UnitCell &cell, ModulePW::PW_Basis *pwb);
+
+    ModuleBase::matrix v_compensating(const UnitCell &cell,
+                                      ModulePW::PW_Basis *rho_basis,
+                                      const int &nspin,
+                                      const double *const *const rho);
 
     void test_V_to_N(ModuleBase::matrix &v, const UnitCell &cell, ModulePW::PW_Basis *rho_basis, const double *const *const rho);
     

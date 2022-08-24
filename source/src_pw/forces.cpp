@@ -152,7 +152,6 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
             }
         }
     }
-    }
 
     if (ModuleSymmetry::Symmetry::symm_flag)
     {
