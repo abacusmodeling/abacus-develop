@@ -63,20 +63,6 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     else
     {
         ESolver_KS::Init(inp, ucell);
-#ifdef __MPI
-        if (GlobalV::CALCULATION == "nscf")
-        {
-            switch (GlobalC::exx_global.info.hybrid_type)
-            {
-            case Exx_Global::Hybrid_Type::HF:
-            case Exx_Global::Hybrid_Type::PBE0:
-            case Exx_Global::Hybrid_Type::SCAN0:
-            case Exx_Global::Hybrid_Type::HSE:
-                XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
-                break;
-            }
-        }
-#endif
 
 #ifdef __DEEPKS
         // wenfei 2021-12-19
@@ -133,6 +119,19 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     //------------------init Hamilt_lcao----------------------
 
 #ifdef __MPI
+    if (GlobalV::CALCULATION == "nscf")
+    {
+        switch (GlobalC::exx_global.info.hybrid_type)
+        {
+        case Exx_Global::Hybrid_Type::HF:
+        case Exx_Global::Hybrid_Type::PBE0:
+        case Exx_Global::Hybrid_Type::SCAN0:
+        case Exx_Global::Hybrid_Type::HSE:
+            XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
+            break;
+        }
+    }
+
     // PLEASE simplify the Exx_Global interface
     // mohan add 2021-03-25
     // Peize Lin 2016-12-03
@@ -273,6 +272,12 @@ void ESolver_KS_LCAO::cal_Stress(ModuleBase::matrix& stress)
 
 void ESolver_KS_LCAO::postprocess()
 {
+
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+    GlobalV::ofs_running << std::setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
+
     GlobalC::en.perform_dos(this->psid, this->psi, this->UHM);
 }
 
@@ -687,14 +692,15 @@ void ESolver_KS_LCAO::afterscf()
             ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT";
             GlobalC::pot.write_potential(is, 0, ssp.str(), GlobalC::pot.vr_eff, precision);
         }
+    }
 
-        // LiuXh modify 20200701
-        /*
-        //fuxiang add 2017-03-15
-        std::stringstream sse;
-        sse << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
-        GlobalC::CHR.write_rho_dipole(GlobalC::CHR.rho_save, is, 0, sse.str());
-        */
+    if (GlobalC::pot.out_pot == 2)
+    {
+        std::stringstream ssp;
+        std::stringstream ssp_ave;
+        ssp << GlobalV::global_out_dir << "ElecStaticPot";
+        ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
+        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
     }
 
     if (this->conv_elec)
@@ -971,6 +977,7 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
                 //update exx and redo scf
                 XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                 iter = 0;
+                std::cout << " Entering 2nd SCF, where EXX is updated" << std::endl;
                 this->two_level_step++;
                 return false;
             }
@@ -988,6 +995,7 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
             GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
             
             iter = 0;
+            std::cout << " Updating EXX and rerun SCF" << std::endl;
             this->two_level_step++;
             return false;
         }

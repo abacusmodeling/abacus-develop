@@ -13,6 +13,7 @@
 Run_MD_PW::Run_MD_PW()
 {
     cellchange = false;
+    CE.Init_CE();
 }
 
 Run_MD_PW::~Run_MD_PW(){}
@@ -151,23 +152,6 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
     delete verlet;
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
     return;
-}
-
-void Run_MD_PW::md_cells_pw(ModuleESolver::ESolver *p_esolver)
-{
-    ModuleBase::TITLE("Run_MD_PW", "md_cells_pw");
-    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
-
-    // ion optimization begins
-    // electron density optimization is included in ion optimization
-    this->md_ions_pw(p_esolver);
-
-    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-    GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
-    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
-
-    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 }
 
 void Run_MD_PW::md_force_virial(

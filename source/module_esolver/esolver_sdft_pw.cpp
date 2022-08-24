@@ -87,8 +87,6 @@ void ESolver_SDFT_PW::afterscf()
     }
     if(this->conv_elec)
     {
-        //GlobalV::ofs_running << " convergence is achieved" << std::endl;			
-        //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
         GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
         GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
     }
@@ -142,6 +140,11 @@ void ESolver_SDFT_PW::cal_Stress(ModuleBase::matrix &stress)
 }
 void ESolver_SDFT_PW::postprocess()
 {
+
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+    GlobalV::ofs_running << std::setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     GlobalC::en.print_occ();
 
     if(this->maxniter == 0)

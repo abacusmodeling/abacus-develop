@@ -89,6 +89,12 @@ void Input_Conv::Convert(void)
     Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 #endif
 
+    if((INPUT.calculation=="relax" || INPUT.calculation=="cell-relax") && INPUT.chg_extrap!="atomic")
+    {
+        std::cout << " For relaxation, charge extrapolation is set to atomic." << std::endl;
+        INPUT.chg_extrap="atomic";
+    }
+
     BFGS_Basic::relax_bfgs_w1 = INPUT.relax_bfgs_w1;
     BFGS_Basic::relax_bfgs_w2 = INPUT.relax_bfgs_w2;
 
@@ -453,6 +459,10 @@ void Input_Conv::Convert(void)
     if (INPUT.calculation == "nscf" && !INPUT.towannier90 && !INPUT.berry_phase)
     {
         elecstate::ElecStateLCAO::need_psi_grid = false;
+    }
+    if(INPUT.calculation == "test_neighbour" && GlobalV::NPROC>1)
+    {
+        ModuleBase::WARNING_QUIT("Input_conv", "test_neighbour must be done with 1 processor");
     }
 #endif
 

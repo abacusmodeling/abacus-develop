@@ -2,10 +2,8 @@
 
 #include "input.h"
 #include "input_conv.h"
-#include "run_pw.h"
 #include "src_pw/global.h"
 #ifdef __LCAO
-#include "run_lcao.h"
 #include "src_lcao/global_fp.h"
 #endif
 #include "module_base/memory.h"
@@ -41,7 +39,6 @@ void Driver::init()
     Print_Info::print_time(time_start, time_finish);
 
     // (4) close all of the running logs
-
     INPUT.close_log();
 
     return;
@@ -93,34 +90,11 @@ void Driver::atomic_world(void)
     // lcao_in_pw: LCAO expaned by plane wave basis set
     // lcao: linear combination of atomic orbitals
     //--------------------------------------------------
-    string use_ensol;
-    ModuleESolver::ESolver *p_esolver = nullptr;
-    if (GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
-    {
-        if (GlobalV::CALCULATION.substr(0, 3) == "sto")
-            use_ensol = "sdft_pw";
-        else
-            use_ensol = "ksdft_pw";
-        // We set it temporarily
-        // Finally, we have ksdft_pw, ksdft_lcao, sdft_pw, ofdft, lj, eam, etc.
-        ModuleESolver::init_esolver(p_esolver, use_ensol);
-        Run_pw::plane_wave_line(p_esolver);
-        ModuleESolver::clean_esolver(p_esolver);
-    }
-#ifdef __LCAO
-    else if (GlobalV::BASIS_TYPE == "lcao")
-    {
-        use_ensol = "ksdft_lcao";
-        if (INPUT.tddft == 1)
-            use_ensol = "ksdft_lcao_tddft";
-        ModuleESolver::init_esolver(p_esolver, use_ensol);
-        Run_lcao::lcao_line(p_esolver);
-        ModuleESolver::clean_esolver(p_esolver);
-    }
-#endif
+
+    // where the actual stuff is done
+    this->driver_run();
 
     ModuleBase::timer::finish(GlobalV::ofs_running);
-
     ModuleBase::Memory::print_all(GlobalV::ofs_running);
 
     return;

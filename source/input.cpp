@@ -2514,9 +2514,21 @@ void Input::Check(void)
         if (!this->relax_nmax)
             this->relax_nmax = 50;
     }
-    else if (calculation == "test")
+    else if (calculation == "test_memory")
     {
         this->relax_nmax = 1;
+    }
+    else if(calculation == "test_neighbour")
+    {
+        this->relax_nmax = 1;
+    }
+    else if(calculation == "gen_jle")
+    {
+        this->relax_nmax = 1;
+        if(basis_type != "pw")
+        {
+            ModuleBase::WARNING_QUIT("Input","to generate descriptors, please use pw basis");
+        }
     }
     else
     {

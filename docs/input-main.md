@@ -68,7 +68,7 @@
 
 - [Variables useful for debugging](#variables-useful-for-debugging)
 
-    [nurse](#nurse) | [t_in_h](#t_in_h) | [vl_in_h](#vl_in_h) | [vnl_in_h](#vnl_in_h) | [test_force](#test_force) | [test_stress](#test_stress) | [colour](#colour) | [test_just_neighbor](#test_just_neighbor)
+    [nurse](#nurse) | [t_in_h](#t_in_h) | [vl_in_h](#vl_in_h) | [vnl_in_h](#vnl_in_h) | [test_force](#test_force) | [test_stress](#test_stress) | [colour](#colour)
 
 - [DeePKS](#deepks)
 
@@ -148,6 +148,9 @@ This part of variables are used to control general system parameters.
   - *md*: molecular dynamics
   - *sto-scf*: do self-consistent electronic structure calculation with [stochastic DFT](#electronic-structure-sdft)
   - *sto-md*: molecular dynamics with [stochastic DFT](#electronic-structure-sdft)
+  - *test_memory* : checks memory required for the calculation. The number is not quite reliable, please use with care
+  - *test_neighbour* : only performs neighbouring atom search
+  - *gen_jle* : generates projectors for DeePKS; see also deepks_lmax_descriptor
 
   > Note: *istate* and *ienvelope* only work for LCAO basis set and are not working right now.
 - **Default**: scf
@@ -969,8 +972,8 @@ Warning: this function is not robust enough for the current version. Please try 
 #### deepks_descriptor_lmax
 
 - **Type**: Integer
-- **Description**: control the max angular momentum of descriptor basis.
-- **Default**: 0
+- **Description**: when generating projectors, this variable controls the max angular momentum of descriptor basis.
+- **Default**: 2
 
 #### deepks_scf
 
@@ -1588,12 +1591,6 @@ This part of variables are used to control berry phase and wannier90 interfacae 
 
 - **Type**: Boolean
 - **Description**: If set to 1, output to terminal will have some color.
-- **Default**: 0
-
-#### test_just_neighbor
-
-- **Type**: Boolean
-- **Description**: If set to 1, then only perform the neighboring atoms search.
 - **Default**: 0
 
 ### Electronic conductivities

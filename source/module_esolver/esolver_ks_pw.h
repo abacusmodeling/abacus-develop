@@ -33,6 +33,7 @@ namespace ModuleESolver
         virtual void updatepot(const int istep, const int iter) override;
         virtual void eachiterfinish(const int iter) override;
         virtual void afterscf() override;
+        virtual void othercalculation(const int istep)override;
 
         //temporary, this will be removed in the future;
         //Init Global class
