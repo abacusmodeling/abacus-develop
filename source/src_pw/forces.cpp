@@ -9,6 +9,7 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 #include "../module_surchem/efield.h"
+#include "../module_surchem/surchem.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -81,6 +82,17 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
         }
     }
 
+    ModuleBase::matrix forcesol;
+    if (GlobalV::imp_sol)
+    {
+        forcesol.create(GlobalC::ucell.nat, 3);
+        GlobalC::solvent_model.cal_force_sol(GlobalC::ucell, GlobalC::rhopw, forcesol);
+        if(GlobalV::TEST_FORCE)
+        {
+            Forces::print("IMP_SOL      FORCE (Ry/Bohr)", forcesol);
+        }
+    }
+
     //impose total force = 0
     int iat = 0;
 	for (int ipol = 0; ipol < 3; ipol++)
@@ -108,6 +120,11 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
 				{
 					force(iat,ipol) = force(iat, ipol) + force_e(iat, ipol);
 				}
+
+                if(GlobalV::imp_sol)
+                {
+                    force(iat,ipol) = force(iat, ipol) + forcesol(iat, ipol);
+                }
 
 				sum += force(iat, ipol);
 
@@ -213,6 +230,7 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
 		Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
 		if(GlobalV::EFIELD_FLAG) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+        if(GlobalV::imp_sol) Forces::print("IMP_SOL   FORCE (eV/Angstrom)", forcesol,0);
 	}
 	Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 

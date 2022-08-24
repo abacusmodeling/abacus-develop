@@ -68,7 +68,7 @@
 
 - [Variables useful for debugging](#variables-useful-for-debugging)
 
-    [nurse](#nurse) | [t_in_h](#t_in_h) | [vl_in_h](#vl_in_h) | [vnl_in_h](#vnl_in_h) | [test_force](#test_force) | [test_stress](#test_stress) | [colour](#colour) | [test_just_neighbor](#test_just_neighbor)
+    [nurse](#nurse) | [t_in_h](#t_in_h) | [vl_in_h](#vl_in_h) | [vnl_in_h](#vnl_in_h) | [test_force](#test_force) | [test_stress](#test_stress) | [colour](#colour)
 
 - [DeePKS](#deepks)
 
@@ -148,6 +148,9 @@ This part of variables are used to control general system parameters.
   - *md*: molecular dynamics
   - *sto-scf*: do self-consistent electronic structure calculation with [stochastic DFT](#electronic-structure-sdft)
   - *sto-md*: molecular dynamics with [stochastic DFT](#electronic-structure-sdft)
+  - *test_memory* : checks memory required for the calculation. The number is not quite reliable, please use with care
+  - *test_neighbour* : only performs neighbouring atom search
+  - *gen_jle* : generates projectors for DeePKS; see also deepks_lmax_descriptor
 
   > Note: *istate* and *ienvelope* only work for LCAO basis set and are not working right now.
 - **Default**: scf
@@ -597,9 +600,9 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 - **Description**:
   - Different method to do SDFT.
   - 1: SDFT calculates $T_n(\hat{h})\ket{\chi}$ twice, where $T_n(x)$ is the n-th order Chebyshev polynomial and $\hat{h}=\frac{\hat{H}-\bar{E}}{\Delta E}$ owning eigen-value $\in(-1,1)$. This method cost less memory but slow.
-  - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is fast but when memory is not enough, only method 1 can be used.
-  - other: use 1
-- **Default**: 1
+  - 2: SDFT calculates $T_n(\hat{h})\ket{\chi}$ once but need much more memory. This method is much faster. Besides, it calculate $N_e$ with $\bra{\chi}\sqrt{\hat f}\sqrt{\hat f}\ket{\chi}$, which needs smaller [nche_sto](#nche_sto). However, when memory is not enough, only method 1 can be used.
+  - other: use 2
+- **Default**: 2
 
 #### nbands_sto
 
@@ -641,6 +644,12 @@ This part of variables are used to control the parameters of stochastic DFT (SDF
 - **Type**: Integer
 - **Description**: Frequency (once each initsto_freq steps) to generate new stochastic orbitals when running md.
 - **Default**:1000
+
+#### npart_sto
+
+- **Type**: Integer
+- **Description**: Make memory cost to 1/npart_sto times of previous one when running post process of SDFT like DOS with method_sto = 2.
+- **Default**:1
 
 ### Geometry relaxation
 
@@ -963,8 +972,8 @@ Warning: this function is not robust enough for the current version. Please try 
 #### deepks_descriptor_lmax
 
 - **Type**: Integer
-- **Description**: control the max angular momentum of descriptor basis.
-- **Default**: 0
+- **Description**: when generating projectors, this variable controls the max angular momentum of descriptor basis.
+- **Default**: 2
 
 #### deepks_scf
 
@@ -1595,12 +1604,6 @@ This part of variables are used to control berry phase and wannier90 interfacae 
 
 - **Type**: Boolean
 - **Description**: If set to 1, output to terminal will have some color.
-- **Default**: 0
-
-#### test_just_neighbor
-
-- **Type**: Boolean
-- **Description**: If set to 1, then only perform the neighboring atoms search.
 - **Default**: 0
 
 ### Electronic conductivities

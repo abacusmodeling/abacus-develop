@@ -567,6 +567,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			if (na > 0)
 			{
        			delete[] atoms[it].tau;
+				delete[] atoms[it].tau_original;
 				delete[] atoms[it].taud;
 				delete[] atoms[it].vel;
        			delete[] atoms[it].mbl;

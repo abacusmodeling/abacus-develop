@@ -4,10 +4,10 @@
 #include "variable_cell.h" // mohan add 2021-02-01
 #include "src_io/write_wfc_realspace.h"
 
-void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
+void Ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 {
-	ModuleBase::TITLE("Ions","opt_ions_pw");
-	ModuleBase::timer::tick("Ions","opt_ions_pw");
+	ModuleBase::TITLE("Ions","opt_ions");
+	ModuleBase::timer::tick("Ions","opt_ions");
 	
 	if(GlobalV::OUT_LEVEL=="i")
 	{
@@ -24,17 +24,19 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
         <<std::endl;
 	}
 
-	// allocation for ion movement.	
-	if(GlobalV::CAL_FORCE)
-	{
-		IMM.allocate();
-		// CE.allocate_ions();
-	}
-
-	if(GlobalV::CAL_STRESS)                    // pengfei Li 2018-05-14
-	{
-		LCM.allocate();
-	}
+    // Geometry optimization algorithm setup.
+    if (GlobalV::CALCULATION=="relax")
+    {
+        //Ions_Move_Methods
+        IMM.allocate();
+    }
+    if (GlobalV::CALCULATION=="cell-relax")
+    {
+        //Ions_Move_Methods
+        IMM.allocate();
+        // allocate arrays related to changes of lattice vectors
+        LCM.allocate();
+    } 
 
     this->istep = 1;
 	int force_step = 1;           // pengfei Li 2018-05-14
@@ -50,104 +52,17 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			Print_Info::print_screen(stress_step, force_step, istep);
 		}
 
-	//----------------------------------------------------------
-    // about vdw, jiyy add vdwd3 and linpz add vdwd2
-    //----------------------------------------------------------	
-        if(INPUT.vdw_method=="d2")
-        {
-			// setup vdwd2 parameters
-			GlobalC::vdwd2_para.initial_parameters(INPUT);
-	        GlobalC::vdwd2_para.initset(GlobalC::ucell);
-        }
-        if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
-        {
-            GlobalC::vdwd3_para.initial_parameters(INPUT);
-        }
-		if(GlobalC::vdwd2_para.flag_vdwd2)		//Peize Lin add 2014-04-03, update 2021-03-09
-		{
-			Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
-			vdwd2.cal_energy();
-			GlobalC::en.evdw = vdwd2.get_energy();
-		}
-		if(GlobalC::vdwd3_para.flag_vdwd3)		//jiyy add 2019-05-18, update 2021-05-02
-		{
-			Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
-			vdwd3.cal_energy();
-			GlobalC::en.evdw = vdwd3.get_energy();
-		}
-
-
-		// mohan added eiter to count for the electron iteration number, 2021-01-28
-		int eiter=0;		
-        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")  // pengfei 2014-10-13
-        {
-#ifdef __LCAO
-#ifdef __MPI
-			if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
-			{	
-#endif
-#endif		
-				p_esolver->Run(istep-1,GlobalC::ucell);
-				eiter = p_esolver->getniter();
-#ifdef __LCAO
-#ifdef __MPI
-			}
-			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
-			{
-				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-			}
-			else	// Peize Lin add 2019-03-09
-			{
-				if( GlobalC::exx_global.info.separate_loop )
-				{
-					for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
-					{
-						p_esolver->Run(istep-1,GlobalC::ucell);
-						eiter += p_esolver->getniter();
-						if( elec.iter==1 || hybrid_step==GlobalC::exx_global.info.hybrid_step-1 )		// exx converge
-							break;
-						XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);					
-						GlobalC::exx_lip.cal_exx();
-					}						
-				}
-				else
-				{
-					p_esolver->Run(istep-1,GlobalC::ucell);
-					eiter += p_esolver->getniter();
-					XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-					p_esolver->Run(istep-1,GlobalC::ucell);
-					eiter += p_esolver->getniter();
-				}
-			}
-#endif //__MPI
-#endif //__LCAO
-        }
-        else if(GlobalV::CALCULATION=="nscf")
-        {
-			p_esolver->nscf();
-            //elec.non_self_consistent(istep-1);
-			eiter = p_esolver->getniter();
-        }
-
-		if(GlobalC::pot.out_pot == 2)
-		{
-			std::stringstream ssp;
-			std::stringstream ssp_ave;
-			ssp << GlobalV::global_out_dir << "ElecStaticPot";
-			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
-		}
+		// mohan added eiter to count for the electron iteration number, 2021-01-28	
+		p_esolver->Run(istep-1,GlobalC::ucell);
 
 		time_t eend = time(NULL);
 		time_t fstart = time(NULL);
-
 
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")
         {
 			stop = this->after_scf(p_esolver, istep, force_step, stress_step);    // pengfei Li 2018-05-14
 		}
 		time_t fend = time(NULL);
-
 
 		if(GlobalV::OUT_LEVEL=="i")
 		{
@@ -157,7 +72,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 			ss << GlobalV::RELAX_METHOD << istep;
 			
 			std::cout << " " << std::setw(7) << ss.str() 
-			<< std::setw(5) << eiter 
+			<< std::setw(5) << p_esolver->getniter()
 			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV 
 			<< std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
 			<< std::setprecision(3)
@@ -172,15 +87,6 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 
     }
 
-    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION.substr(0,3)=="sto")
-    {
-        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-        GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
-        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
-    }
-
-
 	if(GlobalV::OUT_LEVEL=="i")
 	{
 		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
@@ -193,17 +99,21 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &force_step, int &stress_step)
 {
 	ModuleBase::TITLE("Ions","after_scf");
+
+	// should not do it this way, will change later
+	GlobalC::ucell.ionic_position_updated = false;
+
 	//calculate and gather all parts of total ionic forces
 	ModuleBase::matrix force;
 	if(GlobalV::CAL_FORCE)
 	{
-		this->gather_force_pw(p_esolver, force);
+		p_esolver->cal_Force(force);
 	}
 	//calculate and gather all parts of stress
 	ModuleBase::matrix stress;
 	if(GlobalV::CAL_STRESS)
 	{
-		this->gather_stress_pw(p_esolver, stress);
+		p_esolver->cal_Stress(stress);
 	}
 	//stop in last step
 	if(istep==GlobalV::RELAX_NMAX)
@@ -220,6 +130,7 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 		if(!converged) 
 		{
 			this->reset_after_relax(istep);
+			GlobalC::ucell.ionic_position_updated = true;
 			return converged;
 		}
 		else if(GlobalV::CALCULATION!="cell-relax")
@@ -237,31 +148,6 @@ bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &f
 	}
 
     return 1;
-}
-void Ions::gather_force_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix &force)
-{
-	ModuleBase::TITLE("Ions","gather_force_pw");
-	// Forces fcs;
-	// fcs.init(force);
-	p_esolver->cal_Force(force);
-}
-
-void Ions::gather_stress_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix& stress)
-{
-	ModuleBase::TITLE("Ions","gather_stress_pw");
-	//basic stress
-	// Stress_PW ss;
-	// ss.cal_stress(stress);
-	p_esolver->cal_Stress(stress);
-	//external stress
-	double unit_transform = 0.0;
-	unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
-	double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
-	for(int i=0;i<3;i++)
-	{
-		stress(i,i) -= external_stress[i]/unit_transform;
-	}
-	GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 }
 
 bool Ions::if_do_relax()
@@ -309,8 +195,6 @@ bool Ions::if_do_cellrelax()
 bool Ions::do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy)
 {
 	ModuleBase::TITLE("Ions","do_relax");
-	CE.update_istep(jstep);
-	CE.update_all_pos(GlobalC::ucell);
 	IMM.cal_movement(istep, jstep, ionic_force, total_energy);
 	++jstep;
 	return IMM.get_converged();
@@ -326,20 +210,8 @@ void Ions::reset_after_relax(const int& istep)
 	ModuleBase::TITLE("Ions","reset_after_relax");
 	GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 	GlobalC::sf.setup_structure_factor(&GlobalC::ucell,GlobalC::rhopw);
-
-	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
-	// charge extrapolation if istep>0.
-	CE.extrapolate_charge();
-	CE.save_pos_next(GlobalC::ucell);
-
-	GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
-	// calculate the new potential accordint to
-	// the new charge density.
-	GlobalC::pot.init_pot( istep, GlobalC::sf.strucFac );
-
-	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
-	//GlobalC::wf.wfcinit();
 }
+
 void Ions::reset_after_cellrelax(int& f_step, int& s_step, ModuleESolver::ESolver *p_esolver)
 {
 	ModuleBase::TITLE("Ions","reset_after_cellrelax");

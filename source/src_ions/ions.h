@@ -18,7 +18,7 @@ class Ions
     Ions(){};
     ~Ions(){};
 
-    void opt_ions_pw(ModuleESolver::ESolver *p_esolver);
+    void opt_ions(ModuleESolver::ESolver *p_esolver);
 
 	private:
 
@@ -33,14 +33,10 @@ class Ions
 
 	//MD md; //mohan add 2011-11-07
 
-	Charge_Extra CE;
-	
 	Lattice_Change_Methods LCM;
 
 	//seperate force_stress function first
 	bool after_scf(ModuleESolver::ESolver *p_esolver,const int &istep, int &force_step, int &stress_step);
-	void gather_force_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix &force);
-	void gather_stress_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix& stress);
 	bool if_do_relax();
 	bool if_do_cellrelax();
 	bool do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy);
