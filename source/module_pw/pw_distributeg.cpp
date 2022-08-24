@@ -25,6 +25,7 @@ void PW_Basis::distribute_g()
     {
         ModuleBase::WARNING_QUIT("divide", "No such division type.");
     }
+    ModuleBase::CHECK_WARNING_QUIT((this->npw == 0), "pw_distributeg.cpp", "Current core has no plane waves! Please reduce the cores.");
     ModuleBase::timer::tick(this->classname, "distributeg");
     return;
 }
