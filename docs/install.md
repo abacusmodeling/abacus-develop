@@ -98,7 +98,7 @@ If environment variable `MKLROOT` exists, `cmake` will take MKL as a preference,
 You can also choose to build with which components.
 
 ```bash
-cmake -B build -DUSE_LIBXC=1 -DUSE_CUDA=1
+cmake -B build -DENABLE_LIBXC=1 -DUSE_CUDA=1
 ```
 
 If Libxc is not installed in standard path (i.e. installed with a custom prefix path), you may add the installation prefix of `FindLibxc.cmake` to `CMAKE_MODULE_PATH` environment variable, or set `Libxc_DIR` to the directory containing the file.
