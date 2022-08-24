@@ -28,8 +28,6 @@ ModuleBase::matrix surchem::v_correction(const UnitCell &cell,
 
     GlobalC::UFFT.ToReciSpace(Porter, Porter_g, rho_basis);
 
-    this->Porter_g_anchor = Porter_g[rho_basis->ig_gge0];
-
     complex<double> *N = new complex<double>[rho_basis->npw];
     complex<double> *TOTN = new complex<double>[rho_basis->npw];
     complex<double> *PS_TOTN = new complex<double>[rho_basis->npw];
@@ -71,7 +69,10 @@ void surchem::add_comp_chg(const UnitCell &cell,
         for (int ig = 0; ig < rho_basis->npw; ig++)
         {
             if (ig == rho_basis->ig_gge0)
+            {
+                NG[ig] = complex<double>(tmp_q * l / L, 0.0);
                 continue;
+            }
             double GX = rho_basis->gcar[ig][0];
             double GY = rho_basis->gcar[ig][1];
             double GZ = rho_basis->gcar[ig][2];
@@ -92,7 +93,10 @@ void surchem::add_comp_chg(const UnitCell &cell,
         for (int ig = 0; ig < rho_basis->npw; ig++)
         {
             if (ig == rho_basis->ig_gge0)
+            {
+                NG[ig] = complex<double>(tmp_q * l / L, 0.0);
                 continue;
+            }
             double GX = rho_basis->gcar[ig][0];
             double GY = rho_basis->gcar[ig][1];
             double GZ = rho_basis->gcar[ig][2];
@@ -113,7 +117,10 @@ void surchem::add_comp_chg(const UnitCell &cell,
         for (int ig = 0; ig < rho_basis->npw; ig++)
         {
             if (ig == rho_basis->ig_gge0)
+            {
+                NG[ig] = complex<double>(tmp_q * l / L, 0.0);
                 continue;
+            }
             double GX = rho_basis->gcar[ig][0];
             double GY = rho_basis->gcar[ig][1];
             double GZ = rho_basis->gcar[ig][2];
@@ -171,16 +178,37 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
     // save compensating charge in real space
     GlobalC::UFFT.ToRealSpace(comp_reci, this->comp_real, rho_basis);
 
+    // test sum of comp_real -> 0
+    // for (int i = 0; i < rho_basis->nz;i++)
+    // {
+    //     cout << comp_real[i] << endl;
+    // }
+    // double sum = 0;
+    // for (int i = 0; i < rho_basis->nxyz; i++)
+    // {
+    //     sum += comp_real[i];
+    // }
+    // sum = sum * cell.omega / rho_basis->nxyz;
+    // cout << "sum:" << sum << endl;
+    // int pp;
+    // cin >> pp;
+
     for (int ig = 0; ig < rho_basis->npw; ig++)
     {
-        if (rho_basis->gg[ig] >= 1.0e-12) // LiuXh 20180410
+        if (ig == rho_basis->ig_gge0)
+        {
+            cout << ig << endl;
+            continue;
+        }
+        else
         {
             const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (cell.tpiba2 * rho_basis->gg[ig]);
             phi_comp_G[ig] = fac * comp_reci[ig];
         }
     }
 
-    GlobalC::UFFT.ToRealSpace(phi_comp_G, phi_comp_R, rho_basis);
+    rho_basis->recip2real(phi_comp_G, phi_comp_R);
+
     ModuleBase::matrix v_comp(GlobalV::NSPIN, rho_basis->nrxx);
     if (GlobalV::NSPIN == 4)
     {
@@ -206,88 +234,90 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
     return v_comp;
 }
 
-// void cal_comp_force_bak(ModuleBase::matrix &force_comp, ModulePW::PW_Basis *rho_basis)
-// {
-//     ModuleBase::timer::tick("surchem", "cal_comp_force");
+/*
+void cal_comp_force_bak(ModuleBase::matrix &force_comp, ModulePW::PW_Basis *rho_basis)
+{
+    ModuleBase::timer::tick("surchem", "cal_comp_force");
 
-//     std::complex<double> *aux = new std::complex<double>[rho_basis->nmaxgr];
-//     ModuleBase::GlobalFunc::ZEROS(aux, rho_basis->nrxx);
+    std::complex<double> *aux = new std::complex<double>[rho_basis->nmaxgr];
+    ModuleBase::GlobalFunc::ZEROS(aux, rho_basis->nrxx);
 
-//     // get nuclear chg
-//     complex<double> *vloc_g = new complex<double>[rho_basis->npw];
-//     complex<double> *n_reci = new complex<double>[rho_basis->npw];
-//     double *n_real = new double[rho_basis->nrxx];
-//     GlobalC::UFFT.ToReciSpace(GlobalC::pot.vltot, vloc_g, rho_basis); // now n is vloc in Recispace
-//     for (int ig = 0; ig < rho_basis->npw; ig++) {
-//         if(ig==rho_basis->ig_gge0)
-//         {
-//             n_reci[ig] = Porter_g_anchor; // saved zero item
-//             continue;
-//         }
-//         const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI /
-//                             (GlobalC::ucell.tpiba2 * rho_basis->gg[ig]);
+    // get nuclear chg
+    complex<double> *vloc_g = new complex<double>[rho_basis->npw];
+    complex<double> *n_reci = new complex<double>[rho_basis->npw];
+    double *n_real = new double[rho_basis->nrxx];
+    GlobalC::UFFT.ToReciSpace(GlobalC::pot.vltot, vloc_g, rho_basis); // now n is vloc in Recispace
+    for (int ig = 0; ig < rho_basis->npw; ig++) {
+        if(ig==rho_basis->ig_gge0)
+        {
+            n_reci[ig] = Porter_g_anchor; // saved zero item
+            continue;
+        }
+        const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI /
+                            (GlobalC::ucell.tpiba2 * rho_basis->gg[ig]);
 
-//         n_reci[ig] = -vloc_g[ig] / fac;
-//     }
+        n_reci[ig] = -vloc_g[ig] / fac;
+    }
 
-//     GlobalC::UFFT.ToRealSpace(n_reci, n_real, rho_basis);
+    GlobalC::UFFT.ToRealSpace(n_reci, n_real, rho_basis);
 
-//     // for (int i = 0; i < rho_basis->nz; i++)
-//     // {
-//     //     cout << n_real[i] << endl;
-//     // }
+    // for (int i = 0; i < rho_basis->nz; i++)
+    // {
+    //     cout << n_real[i] << endl;
+    // }
 
-//     for (int is = 0; is < GlobalV::NSPIN; is++)
-//     {
-//         for (int ir = 0; ir < rho_basis->nrxx; ir++)
-//         {
-//             aux[ir] += std::complex<double>(n_real[ir], 0.0);
-//         }
-//     }
+    for (int is = 0; is < GlobalV::NSPIN; is++)
+    {
+        for (int ir = 0; ir < rho_basis->nrxx; ir++)
+        {
+            aux[ir] += std::complex<double>(n_real[ir], 0.0);
+        }
+    }
 
-//     // to G space.
-//     rho_basis->real2recip(aux, aux);
+    // to G space.
+    rho_basis->real2recip(aux, aux);
 
-//     int iat = 0;
-//     for (int it = 0; it < GlobalC::ucell.ntype; it++)
-//     {
-//         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
-//         {
-//             for (int ig = 0; ig < rho_basis->npw; ig++)
-//             {
-//                 const double phase = ModuleBase::TWO_PI * (rho_basis->gcar[ig] * GlobalC::ucell.atoms[it].tau[ia]);
-//                 const double factor
-//                     = phi_comp_R[rho_basis->ig2igg[ig]] * (cos(phase) * aux[ig].imag() + sin(phase) * aux[ig].real());
-//                 force_comp(iat, 0) += rho_basis->gcar[ig][0] * factor;
-//                 force_comp(iat, 1) += rho_basis->gcar[ig][1] * factor;
-//                 force_comp(iat, 2) += rho_basis->gcar[ig][2] * factor;
-//             }
-//             for (int ipol = 0; ipol < 3; ipol++)
-//             {
-//                 force_comp(iat, ipol) *= (GlobalC::ucell.tpiba * GlobalC::ucell.omega);
-//             }
-//             ++iat;
-//         }
-//     }
-//     // for (int i = 0; i < rho_basis->nz; i++)
-//     // {
-//     //     cout << GlobalC::CHR.rho[0][i] << endl;
-//     // }
-//     // cout << force_comp(0, 0) << " ";
-//     // cout << force_comp(0, 1) << " ";
-//     // cout << force_comp(0, 2) << endl;
-//     // cout << force_comp(1, 0) << " ";
-//     // cout << force_comp(1, 1) << " ";
-//     // cout << force_comp(1, 2) << endl;
-//     // this->print(GlobalV::ofs_running, "comp forces", force_comp);
-//     Parallel_Reduce::reduce_double_pool(force_comp.c, force_comp.nr * force_comp.nc);
-//     delete[] aux;
-//     delete[] vloc_g;
-//     delete[] n_real;
-//     delete[] n_reci;
-//     ModuleBase::timer::tick("surchem", "cal_comp_force");
-//     return;
-// }
+    int iat = 0;
+    for (int it = 0; it < GlobalC::ucell.ntype; it++)
+    {
+        for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
+        {
+            for (int ig = 0; ig < rho_basis->npw; ig++)
+            {
+                const double phase = ModuleBase::TWO_PI * (rho_basis->gcar[ig] * GlobalC::ucell.atoms[it].tau[ia]);
+                const double factor
+                    = phi_comp_R[rho_basis->ig2igg[ig]] * (cos(phase) * aux[ig].imag() + sin(phase) * aux[ig].real());
+                force_comp(iat, 0) += rho_basis->gcar[ig][0] * factor;
+                force_comp(iat, 1) += rho_basis->gcar[ig][1] * factor;
+                force_comp(iat, 2) += rho_basis->gcar[ig][2] * factor;
+            }
+            for (int ipol = 0; ipol < 3; ipol++)
+            {
+                force_comp(iat, ipol) *= (GlobalC::ucell.tpiba * GlobalC::ucell.omega);
+            }
+            ++iat;
+        }
+    }
+    // for (int i = 0; i < rho_basis->nz; i++)
+    // {
+    //     cout << GlobalC::CHR.rho[0][i] << endl;
+    // }
+    // cout << force_comp(0, 0) << " ";
+    // cout << force_comp(0, 1) << " ";
+    // cout << force_comp(0, 2) << endl;
+    // cout << force_comp(1, 0) << " ";
+    // cout << force_comp(1, 1) << " ";
+    // cout << force_comp(1, 2) << endl;
+    // this->print(GlobalV::ofs_running, "comp forces", force_comp);
+    Parallel_Reduce::reduce_double_pool(force_comp.c, force_comp.nr * force_comp.nc);
+    delete[] aux;
+    delete[] vloc_g;
+    delete[] n_real;
+    delete[] n_reci;
+    ModuleBase::timer::tick("surchem", "cal_comp_force");
+    return;
+}
+*/
 
 void surchem::cal_comp_force(ModuleBase::matrix &force_comp, ModulePW::PW_Basis *rho_basis)
 {

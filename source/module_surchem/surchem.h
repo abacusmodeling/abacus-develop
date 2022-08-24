@@ -104,15 +104,16 @@ class surchem
                complex<double> *lp);
 
     ModuleBase::matrix v_correction(const UnitCell &cell,
-                                    ModulePW::PW_Basis *rho_basis,
-                                    const int &nspin,
-                                    const double *const *const rho);
+                                           ModulePW::PW_Basis* rho_basis,
+                                           const int &nspin,
+                                           const double *const *const rho);
+    
+    ModuleBase::matrix v_compensating(const UnitCell &cell, ModulePW::PW_Basis *pwb);
 
-    ModuleBase::matrix v_compensating(const UnitCell &cell,
-                                      ModulePW::PW_Basis *rho_basis,
-                                      const int &nspin,
-                                      const double *const *const rho);
-
+    void test_V_to_N(ModuleBase::matrix &v, const UnitCell &cell, ModulePW::PW_Basis *rho_basis, const double *const *const rho);
+    
+    void cal_force_sol(const UnitCell &cell, ModulePW::PW_Basis* rho_basis , ModuleBase::matrix& forcesol);
+ 
   private:
 };
 

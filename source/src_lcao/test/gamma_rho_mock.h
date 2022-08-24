@@ -40,7 +40,7 @@
 #include "module_orbital/ORB_table_beta.h"
 #include "module_orbital/ORB_table_phi.h"
 #include "module_orbital/parallel_orbitals.h"
-#include "run_lcao.h"
+#include "driver.h"
 #include "src_io/wf_local.h"
 #include "module_gint/gint_gamma.h"
 #include "module_gint/gint_tools.h"
@@ -597,6 +597,7 @@ bool UnitCell_pseudo::read_atom_positions(LCAO_Orbitals &orb,
             if (na > 0)
             {
                 atoms[it].tau = new ModuleBase::Vector3<double>[na];
+				atoms[it].tau_original = new ModuleBase::Vector3<double>[na];
                 atoms[it].taud = new ModuleBase::Vector3<double>[na];
                 atoms[it].vel = new ModuleBase::Vector3<double>[na];
                 for (int ia = 0; ia < na; ia++)

@@ -7,8 +7,7 @@ void surchem::cal_totn(const UnitCell &cell, ModulePW::PW_Basis* rho_basis,
     complex<double> *vloc_g = new complex<double>[rho_basis->npw];
     ModuleBase::GlobalFunc::ZEROS(vloc_g, rho_basis->npw);
 
-    GlobalC::UFFT.ToReciSpace(GlobalC::pot.vltot,
-                                  vloc_g, rho_basis); // now n is vloc in Recispace
+    rho_basis->real2recip(GlobalC::pot.vltot, vloc_g);  // now n is vloc in Recispace
     for (int ig = 0; ig < rho_basis->npw; ig++) {
         if(ig==rho_basis->ig_gge0)
         {

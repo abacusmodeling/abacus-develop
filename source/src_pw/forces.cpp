@@ -9,8 +9,6 @@
 #include "../module_base/timer.h"
 #include "../module_surchem/efield.h"
 #include "../module_surchem/surchem.h"
-#include "../module_xc/xc_functional.h"
-#include "../src_parallel/parallel_reduce.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).
 
@@ -85,6 +83,17 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
         }
     }
 
+    ModuleBase::matrix forcesol;
+    if (GlobalV::imp_sol)
+    {
+        forcesol.create(GlobalC::ucell.nat, 3);
+        GlobalC::solvent_model.cal_force_sol(GlobalC::ucell, GlobalC::rhopw, forcesol);
+        if(GlobalV::TEST_FORCE)
+        {
+            Forces::print("IMP_SOL      FORCE (Ry/Bohr)", forcesol);
+        }
+    }
+
     ModuleBase::matrix forcecomp;
     if (GlobalV::comp_chg)
     {
@@ -123,17 +132,26 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
                     force(iat, ipol) = force(iat, ipol) + forcecomp(iat, ipol);
                 }
 
-                sum += force(iat, ipol);
+                if(GlobalV::imp_sol)
+                {
+                    force(iat,ipol) = force(iat, ipol) + forcesol(iat, ipol);
+                }
+
+				sum += force(iat, ipol);
 
                 iat++;
             }
         }
 
-        double compen = sum / GlobalC::ucell.nat;
-        for (int iat = 0; iat < GlobalC::ucell.nat; ++iat)
+        if(!(GlobalV::comp_chg && GlobalC::solvent_model.comp_q!=0 && ipol==GlobalC::solvent_model.comp_dim))
         {
-            force(iat, ipol) = force(iat, ipol) - compen;
+            double compen = sum / GlobalC::ucell.nat;
+            for (int iat = 0; iat < GlobalC::ucell.nat; ++iat)
+            {
+                force(iat, ipol) = force(iat, ipol) - compen;
+            }
         }
+    }
     }
 
     if (ModuleSymmetry::Symmetry::symm_flag)
@@ -242,17 +260,17 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
     // output force in unit eV/Angstrom
     GlobalV::ofs_running << std::endl;
 
-    if (GlobalV::TEST_FORCE)
-    {
-        Forces::print("LOCAL    FORCE (eV/Angstrom)", forcelc, 0);
-        Forces::print("NONLOCAL FORCE (eV/Angstrom)", forcenl, 0);
-        Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc, 0);
-        Forces::print("ION      FORCE (eV/Angstrom)", forceion, 0);
-        Forces::print("SCC      FORCE (eV/Angstrom)", forcescc, 0);
-        if (GlobalV::EFIELD_FLAG)
-            Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e, 0);
-    }
-    Forces::print("   TOTAL-FORCE (eV/Angstrom)", force, 0);
+	if(GlobalV::TEST_FORCE)
+	{
+		Forces::print("LOCAL    FORCE (eV/Angstrom)", forcelc,0);
+		Forces::print("NONLOCAL FORCE (eV/Angstrom)", forcenl,0);
+		Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc,0);
+		Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
+		Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
+		if(GlobalV::EFIELD_FLAG) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+        if(GlobalV::imp_sol) Forces::print("IMP_SOL   FORCE (eV/Angstrom)", forcesol,0);
+	}
+	Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 
     return;
 }

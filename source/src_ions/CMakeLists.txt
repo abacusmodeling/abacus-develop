@@ -1,7 +1,6 @@
 add_library(
     ions
     OBJECT
-    Cell_PW.cpp
     bfgs_basic.cpp
     ions.cpp
     ions_move_basic.cpp
