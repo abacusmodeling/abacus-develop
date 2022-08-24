@@ -285,7 +285,7 @@ OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 
 - src_external
 - src_global
 - src_io
-- src_ions
+- module_relaxation
 - src_lcao
 - src_parallel
 - src_pdiag

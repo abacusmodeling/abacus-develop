@@ -1,5 +1,5 @@
 add_library(
-    ions
+    relax
     OBJECT
     bfgs_basic.cpp
     ions.cpp

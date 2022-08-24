@@ -10,6 +10,12 @@
 #include "lattice_change_methods.h"
 #include "module_esolver/esolver.h"
 
+
+//The workflow opt_ions should be moved outside module_relaxation
+//since the latter is intended to perform the sole task of
+//creating the next step structure based on force and stress
+//according to some relaxation algorithm
+//However, it will remain this way until the ucell class and MD module are sorted out
 class Ions
 {
 
