@@ -11,6 +11,7 @@
 #include "global_file.h"
 #include "timer.h"
 #include "memory.h"
+#include "input.h"
 #endif
 
 namespace ModuleBase
@@ -129,24 +130,41 @@ void WARNING_QUIT(const std::string &file,const std::string &description)
 }
 
 
-//Input judgement and communicate , if any judgement is true, do WARNING_QUIT
-void CHECK_WARNING_QUIT(bool error_in, const std::string &file,const std::string &description)
+//Check and print warning information for all cores.
+//Maybe in the future warning.log should be replaced by error.log.
+void CHECK_WARNING_QUIT(const bool error_in, const std::string &file,const std::string &description)
 {
-	int error = (int)error_in;
 #ifdef __NORMAL
 // only for UT, do nothing here
 #else
-#ifdef __MPI
-	int error_max = error;
-	MPI_Reduce(&error, &error_max, 1, MPI_INT, MPI_MAX, 0, MPI_COMM_WORLD);
-	MPI_Bcast(&error_max, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	error = error_max;
-#endif
-#endif
-	if(error)
+	if(error_in)
 	{
-		WARNING_QUIT(file, description);
+		//All cores will print inforamtion
+		std::cout.clear();
+		if(!GlobalV::ofs_running.is_open()) 
+		{
+			string logfile = GlobalV::global_out_dir + "running_" + GlobalV::CALCULATION + ".log";
+			GlobalV::ofs_running.open( logfile.c_str(), std::ios::app );
+		}
+		if(!GlobalV::ofs_warning.is_open()) 
+		{
+			string warningfile = GlobalV::global_out_dir + "warning.log";
+			GlobalV::ofs_warning.open( warningfile.c_str(), std::ios::app );
+		}
+
+		//print error information
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		std::cout << " ERROR! " << description << std::endl;
+		std::cout << " CHECK IN FILE : " << GlobalV::global_out_dir << "warning.log" << std::endl;
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		GlobalV::ofs_running << " ERROR! CHECK IN FILE : " << GlobalV::global_out_dir << "warning.log" << std::endl;
+		GlobalV::ofs_warning << std::endl;
+		GlobalV::ofs_warning << " ERROR! " << file << ", core " << GlobalV::MY_RANK+1 << ": " << description << std::endl;
+		GlobalV::ofs_warning << std::endl;
+		exit(0);
 	}
+#endif
+	return;
 }
 
 }

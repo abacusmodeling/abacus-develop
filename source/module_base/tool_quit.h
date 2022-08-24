@@ -49,7 +49,7 @@ void WARNING_QUIT(const std::string &file, const std::string &description);
  * @param file The file where warning happens
  * @param description The warning information
  */
-void CHECK_WARNING_QUIT(bool error, const std::string &file,const std::string &description);
+void CHECK_WARNING_QUIT(const bool error, const std::string &file,const std::string &description);
 
 } // namespace ModuleBase
 
