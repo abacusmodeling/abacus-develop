@@ -97,7 +97,8 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
 
             if(cellchange)
             {
-                Variable_Cell::init_after_vc(p_esolver);
+                GlobalC::ucell.cell_parameter_updated = true;
+                Variable_Cell::init_after_vc();
             }
 
             // reset local potential and initial wave function

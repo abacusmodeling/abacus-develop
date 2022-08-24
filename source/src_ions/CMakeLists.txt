@@ -12,4 +12,5 @@ add_library(
     lattice_change_cg.cpp
     lattice_change_methods.cpp
     variable_cell.cpp
+    relaxation.cpp
 )

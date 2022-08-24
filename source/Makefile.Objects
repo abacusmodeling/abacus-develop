@@ -339,7 +339,8 @@ write_wfc_realspace.o\
 magnetism.o\
 optical.o\
 run_md_pw.o\
-ions.o \
+ions.o\
+relaxation.o\
 ions_move_methods.o\
 ions_move_bfgs.o\
 ions_move_cg.o\

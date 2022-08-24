@@ -180,7 +180,14 @@ namespace ModuleESolver
                 GlobalC::pot.init_pot( istep-1, GlobalC::sf.strucFac );
             }
         }
-
+        if(GlobalC::ucell.cell_parameter_updated)
+        {
+            GlobalC::wfcpw->initgrids(GlobalC::ucell.lat0, GlobalC::ucell.latvec, GlobalC::wfcpw->nx, GlobalC::wfcpw->ny, GlobalC::wfcpw->nz);
+            GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
+            GlobalC::wfcpw->collect_local_pw(); 
+            GlobalC::wf.init_after_vc(GlobalC::kv.nks, this->psi);
+            GlobalC::wf.init_at_1();
+        }
         //init Hamilt, this should be allocated before each scf loop
         //Operators in HamiltPW should be reallocated once cell changed
         //delete Hamilt if not first scf

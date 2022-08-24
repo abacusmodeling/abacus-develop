@@ -229,10 +229,6 @@ void Potential::init_pot(const int &istep, // number of ionic steps
             GlobalC::restart.info_load.load_charge_finish = true;
         }
     }
-    else
-    {
-        // the extrapolation part moves to ions.cpp.
-    }
 
     // renormalize the charge density
     GlobalC::CHR.renormalize_rho();
