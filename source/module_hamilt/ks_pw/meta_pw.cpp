@@ -61,11 +61,13 @@ void Meta<OperatorPW>::act
             }
 
             wfcpw->recip2real(porter, porter, ik);
-
-            const double* pvk = &(this->vk[0](current_spin, 0));
-            for (int ir = 0; ir < this->vk->nc; ir++)
+            if(this->vk->nc != 0)
             {
-                porter[ir] *= pvk[ir];
+                const double* pvk = &(this->vk[0](current_spin, 0));
+                for (int ir = 0; ir < this->vk->nc; ir++)
+                {
+                    porter[ir] *= pvk[ir];
+                }
             }
             wfcpw->real2recip(porter, porter, ik);
 
