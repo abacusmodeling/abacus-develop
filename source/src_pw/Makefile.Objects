@@ -50,7 +50,8 @@ OBJS_IONS=MD_basic.o\
 MD_thermo.o\
 MD_fire.o\
 MD_func.o\
-ions.o \
+ions.o\
+relaxation.o\
 ions_move_methods.o\
 ions_move_bfgs.o\
 ions_move_cg.o\

@@ -76,6 +76,7 @@ public:
 	
     //I'm doing a bad thing here! Will change later
     bool ionic_position_updated = false; //whether the ionic position has been updated
+    bool cell_parameter_updated = false; //whether the cell parameters are updated
 
 private:
     ModuleBase::Matrix3 stress; //calculate stress on the cell

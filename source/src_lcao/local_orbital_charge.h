@@ -109,7 +109,7 @@ private:
 	int lgd_last;// sub-FFT-mesh orbitals number in previous step.
 	int lgd_now;// sub-FFT-mesh orbitals number in this step.
 
-	int nnrg_last;// sub-FFT-mesh orbtials number in previous step, with k.
+	int nnrg_last = 0;// sub-FFT-mesh orbtials number in previous step, with k.
 	int nnrg_now; // sub-FFT-mesh orbitals number in this step, with k.
 
 	// add by yshen on 9/22/2014
