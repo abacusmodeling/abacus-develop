@@ -97,6 +97,23 @@ public:
             else for(size_t index=0; index<this->size();++index) psi[index] = tmp[index];
         }
     }
+
+    //Constructor 5: a wrapper of a data pointer, used for Operator::hPsi()
+    //in this case, fix_k can not be used
+    Psi(T* psi_pointer, const Psi& psi_in, const int nk_in, int nband_in=0)
+    {
+        assert(nk_in<=psi_in.get_nk());
+        if(nband_in == 0)
+        {
+            nband_in = psi_in.get_nbands();
+        }
+        this->ngk = psi_in.ngk;
+        this->npol = psi_in.npol;
+        this->nk = nk_in;
+        this->nbands = nband_in;
+        this->nbasis = psi_in.nbasis;
+        this->psi_current = psi_pointer;
+    }
     // initialize the wavefunction coefficient
     // only resize and construct function now is used
     

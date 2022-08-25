@@ -10,9 +10,6 @@
 namespace hamilt
 {
 
-template class Meta<OperatorPW>;
-
-template<>
 Meta<OperatorPW>::Meta(
     double tpiba_in, 
     const int* isk_in,
@@ -31,7 +28,6 @@ Meta<OperatorPW>::Meta(
     }
 }
 
-template<>
 void Meta<OperatorPW>::act
 (
     const psi::Psi<std::complex<double>> *psi_in, 
