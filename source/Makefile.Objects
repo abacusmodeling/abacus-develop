@@ -16,8 +16,7 @@ OBJS_MAIN=driver.o\
 input.o \
 write_input.o\
 input_conv.o\
-run_pw.o\
-run_lcao.o\
+driver_run.o
 
 OBJS_PW=xc_3.o \
 vdwd2.o\
