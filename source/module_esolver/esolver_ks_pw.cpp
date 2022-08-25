@@ -69,21 +69,6 @@ namespace ModuleESolver
 
     void ESolver_KS_PW::Init_GlobalC(Input& inp, UnitCell_pseudo& cell)
     {
-        //new plane wave basis
-#ifdef __MPI
-        this->pw_wfc->initmpi(GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL, POOL_WORLD);
-#endif
-        this->pw_wfc->initgrids(cell.lat0, cell.latvec, GlobalC::rhopw->nx, GlobalC::rhopw->ny, GlobalC::rhopw->nz);
-        this->pw_wfc->initparameters(false, inp.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
-#ifdef __MPI
-        if(INPUT.pw_seed > 0)    MPI_Allreduce(MPI_IN_PLACE, &this->pw_wfc->ggecut, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
-        //qianrui add 2021-8-13 to make different kpar parameters can get the same results
-#endif
-        this->pw_wfc->setuptransform();
-        for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)   GlobalC::kv.ngk[ik] = this->pw_wfc->npwk[ik];
-        this->pw_wfc->collect_local_pw(); 
-        ESolver_KS::print_wfcfft(inp, GlobalV::ofs_running);
-
         this->psi = GlobalC::wf.allocate(GlobalC::kv.nks);
 
         // cout<<GlobalC::rhopw->nrxx<<endl;
