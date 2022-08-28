@@ -9,7 +9,7 @@
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"
 #include "../src_io/print_info.h"
-#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
+#include "../module_relaxation/variable_cell.h" // mohan add 2021-02-01
 #include "../src_ri/exx_abfs.h"
 #include "../src_ri/exx_opt_orb.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
@@ -24,19 +24,11 @@
 Run_MD_LCAO::Run_MD_LCAO()
 {
     cellchange = false;
+    CE.Init_CE();
 }
 
 Run_MD_LCAO::~Run_MD_LCAO()
 {
-}
-
-void Run_MD_LCAO::opt_cell(ModuleESolver::ESolver* p_esolver)
-{
-    ModuleBase::TITLE("Run_MD_LCAO", "opt_cell");
-
-    opt_ions(p_esolver);
-
-    return;
 }
 
 void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver* p_esolver)
@@ -110,7 +102,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver* p_esolver)
 
             if (cellchange)
             {
-                Variable_Cell::init_after_vc(p_esolver);
+                Variable_Cell::init_after_vc();
             }
 
             // reset local potential
@@ -164,11 +156,6 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver* p_esolver)
         ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
         GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); // output 'Hartree + local pseudopot'
     }
-
-    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-    GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
-    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
 	// mohan update 2021-02-10
     delete verlet;

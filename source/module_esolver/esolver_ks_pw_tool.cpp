@@ -158,7 +158,7 @@ void ESolver_KS_PW::calcondw(const int nt,const double dt,const double fwhmin,co
     double * cw11 = new double [nw];
     double * cw12 = new double [nw];
     double * cw22 = new double [nw];
-    double * kappa = new double [(int)ceil(wcut/dw_in)];
+    double * kappa = new double [nw];
     ModuleBase::GlobalFunc::ZEROS(cw11,nw);
     ModuleBase::GlobalFunc::ZEROS(cw12,nw);
     ModuleBase::GlobalFunc::ZEROS(cw22,nw);

@@ -94,9 +94,10 @@ void PW_Basis::getstartgr()
 /// 
 void PW_Basis::collect_local_pw()
 {
-   delete[] this->gg; this->gg = new double[this->npw];
-   delete[] this->gdirect; this->gdirect = new ModuleBase::Vector3<double>[this->npw];
-   delete[] this->gcar; this->gcar = new ModuleBase::Vector3<double>[this->npw];
+    if(this->npw <= 0) return;
+    delete[] this->gg; this->gg = new double[this->npw];
+    delete[] this->gdirect; this->gdirect = new ModuleBase::Vector3<double>[this->npw];
+    delete[] this->gcar; this->gcar = new ModuleBase::Vector3<double>[this->npw];
 
     ModuleBase::Vector3<double> f;
     for(int ig = 0 ; ig < this-> npw ; ++ig)
@@ -128,6 +129,7 @@ void PW_Basis::collect_local_pw()
 /// 
 void PW_Basis::collect_uniqgg()
 {
+    if(this->npw <= 0) return;
     delete[] this->ig2igg; this->ig2igg = new int [this->npw];
     int *sortindex = new int [this->npw];
     double *tmpgg = new double [this->npw];

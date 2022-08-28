@@ -129,7 +129,7 @@ std::string global_wannier_card;
 std::string global_pseudo_dir = "";
 std::string global_orbital_dir = ""; // liuyu add 2021-08-14
 
-std::string global_pseudo_type = "auto"; 
+std::string global_pseudo_type = "auto";
 std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified
@@ -137,6 +137,7 @@ std::string global_stru_dir;
 
 std::ofstream ofs_running;
 std::ofstream ofs_warning;
+std::ofstream ofs_info; // output math lib info
 
 //----------------------------------------------------------
 // EXPLAIN : test level for each class
@@ -156,6 +157,8 @@ int test_wf = 0;
 int test_charge = 0;
 int test_potential = 0;
 int test_energy = 0;
+// for test purpose, skip ewald calculation
+bool test_skip_ewald = false;
 //----------------------------------------------------------
 // src_lcao
 //----------------------------------------------------------

@@ -1,7 +1,6 @@
 add_library(
-    ions
+    relax
     OBJECT
-    Cell_PW.cpp
     bfgs_basic.cpp
     ions.cpp
     ions_move_basic.cpp
@@ -13,4 +12,5 @@ add_library(
     lattice_change_cg.cpp
     lattice_change_methods.cpp
     variable_cell.cpp
+    relaxation.cpp
 )

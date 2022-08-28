@@ -40,7 +40,7 @@
 #include "module_orbital/ORB_table_beta.h"
 #include "module_orbital/ORB_table_phi.h"
 #include "module_orbital/parallel_orbitals.h"
-#include "run_lcao.h"
+#include "driver.h"
 #include "src_io/wf_local.h"
 #include "module_gint/gint_gamma.h"
 #include "module_gint/gint_tools.h"

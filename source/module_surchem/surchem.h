@@ -100,7 +100,9 @@ class surchem
     ModuleBase::matrix v_compensating(const UnitCell &cell, ModulePW::PW_Basis *pwb);
 
     void test_V_to_N(ModuleBase::matrix &v, const UnitCell &cell, ModulePW::PW_Basis *rho_basis, const double *const *const rho);
-
+    
+    void cal_force_sol(const UnitCell &cell, ModulePW::PW_Basis* rho_basis , ModuleBase::matrix& forcesol);
+ 
   private:
 };
 

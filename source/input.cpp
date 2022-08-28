@@ -144,7 +144,8 @@ void Input::Default(void)
     bndpar = 1;
     kpar = 1;
     initsto_freq = 1000;
-    method_sto = 1;
+    method_sto = 2;
+    npart_sto = 1;
     cal_cond = false;
     dos_nche = 100;
     cond_nche = 20;
@@ -407,6 +408,7 @@ void Input::Default(void)
     // test only
     //==========================================================
     test_just_neighbor = false;
+    test_skip_ewald = false;
 
     //==========================================================
     //    DFT+U     Xin Qu added on 2020-10-29
@@ -594,6 +596,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("method_sto", word) == 0)
         {
             read_value(ifs, method_sto);
+        }
+        else if (strcmp("npart_sto", word) == 0)
+        {
+            read_value(ifs, npart_sto);
         }
         else if (strcmp("cal_cond", word) == 0)
         {
@@ -1505,6 +1511,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, test_just_neighbor);
         }
+        else if (strcmp("test_skip_ewald", word) == 0)
+        {
+            read_value(ifs, test_skip_ewald);
+        }
         //--------------
         //----------------------------------------------------------------------------------
         //         Xin Qu added on 2020-10-29 for DFT+U
@@ -1940,6 +1950,10 @@ void Input::Default_2(void) // jiyy add 2019-08-04
     }
     if(calculation.substr(0,3) != "sto")    bndpar = 1;
     if(bndpar > GlobalV::NPROC) bndpar = GlobalV::NPROC;
+    if(method_sto != 1 && method_sto != 2) 
+    {
+        method_sto = 2;
+    }
 }
 #ifdef __MPI
 void Input::Bcast()
@@ -1974,6 +1988,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double(emin_sto);
     Parallel_Common::bcast_int(initsto_freq);
     Parallel_Common::bcast_int(method_sto);
+    Parallel_Common::bcast_int(npart_sto);
     Parallel_Common::bcast_bool(cal_cond);
     Parallel_Common::bcast_int(cond_nche);
     Parallel_Common::bcast_double(cond_dw);
@@ -2203,6 +2218,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(td_vextout);
     Parallel_Common::bcast_int(td_dipoleout);
     Parallel_Common::bcast_bool(test_just_neighbor);
+    Parallel_Common::bcast_bool(test_skip_ewald);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
     Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10
@@ -2498,9 +2514,21 @@ void Input::Check(void)
         if (!this->relax_nmax)
             this->relax_nmax = 50;
     }
-    else if (calculation == "test")
+    else if (calculation == "test_memory")
     {
         this->relax_nmax = 1;
+    }
+    else if(calculation == "test_neighbour")
+    {
+        this->relax_nmax = 1;
+    }
+    else if(calculation == "gen_jle")
+    {
+        this->relax_nmax = 1;
+        if(basis_type != "pw")
+        {
+            ModuleBase::WARNING_QUIT("Input","to generate descriptors, please use pw basis");
+        }
     }
     else
     {

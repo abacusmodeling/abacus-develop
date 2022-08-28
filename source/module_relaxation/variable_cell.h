@@ -18,8 +18,7 @@ class Variable_Cell
     Variable_Cell();
     ~Variable_Cell();
 
-
-    static void init_after_vc(ModuleESolver::ESolver *p_esolver); //LiuXh add 20180515
+    static void init_after_vc(); //LiuXh add 20180515
 
 };
 

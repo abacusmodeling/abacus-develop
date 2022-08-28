@@ -160,6 +160,7 @@ extern std::string global_stru_dir;   // liuyu add 2022-05-24 for MD STRU
 
 extern std::ofstream ofs_running;
 extern std::ofstream ofs_warning;
+extern std::ofstream ofs_info;
 
 //==========================================================
 // EXPLAIN : test level for each class
@@ -179,6 +180,7 @@ extern int test_wf;
 extern int test_charge;
 extern int test_potential;
 extern int test_energy;
+extern bool test_skip_ewald;
 //==========================================================
 // src_onscaling
 //==========================================================
