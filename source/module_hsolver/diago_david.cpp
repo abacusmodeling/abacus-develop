@@ -9,7 +9,7 @@
 
 namespace hsolver
 {
-typedef hamilt::Operator::hpsi_info hp_info;
+typedef hamilt::Operator<std::complex<double>>::hpsi_info hp_info;
 
 int DiagoDavid::PW_DIAG_NDIM = 4;
 
@@ -105,9 +105,8 @@ void DiagoDavid::diag_mock(hamilt::Hamilt* phm_in, psi::Psi<std::complex<double>
         }*/
     }
     //end of SchmitOrth and calculate H|psi>
-    hp_info dav_hpsi_in(&basis, psi::Range(1, 0, 0, nband-1));
-    auto hp_psi = std::get<0>(phm_in->ops->hPsi(dav_hpsi_in));
-    ModuleBase::GlobalFunc::COPYARRAY(hp_psi->get_pointer(), &hp(0, 0), hp_psi->get_nbasis() * nband);
+    hp_info dav_hpsi_in(&basis, psi::Range(1, 0, 0, nband-1), &hp(0, 0));
+    phm_in->ops->hPsi(dav_hpsi_in);
 
     hc.zero_out();
     sc.zero_out();
@@ -380,10 +379,10 @@ void DiagoDavid::cal_grad(hamilt::Hamilt* phm_in,
         phm_in->sPsi(ppsi, spsi, (size_t)npw);
 
     }
-    hp_info dav_hpsi_in(&basis, psi::Range(1, 0, nbase, nbase + notconv-1));
-    auto hp_psi = std::get<0>(phm_in->ops->hPsi(dav_hpsi_in));
-    ModuleBase::GlobalFunc::COPYARRAY(hp_psi->get_pointer(), &hp(nbase, 0), hp_psi->get_nbasis()*notconv);
-
+    //calculate H|psi> for not convergence bands
+    hp_info dav_hpsi_in(&basis, psi::Range(1, 0, nbase, nbase + notconv-1), &hp(nbase, 0));
+    phm_in->ops->hPsi(dav_hpsi_in);
+    
     ModuleBase::timer::tick("DiagoDavid", "cal_grad");
     return;
 }

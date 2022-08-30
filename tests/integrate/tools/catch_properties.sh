@@ -46,11 +46,7 @@ gamma_only=`grep gamma_only INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 imp_sol=`grep imp_sol INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
-if [ $base == "pw" ]; then word="plane_wave_line" 
-else
-word="lcao_line"
-fi
-#echo $word
+word="driver_line"
 test -e $1 && rm $1
 #--------------------------------------------
 # if NOT non-self-consistent calculations
@@ -66,7 +62,7 @@ fi
 
 #echo $etot
 #echo "hasforce:"$has_force
-if ! test -z "$has_force" && [ $has_force -eq 1 ]; then
+if ! test -z "$has_force" && [ $has_force == 1 ]; then
 	nn3=`echo "$natom + 4" |bc`
 	#nn1=`echo "$natom + 1" |bc`
 	#nn5=`echo "$natom + 6" |bc`
@@ -79,7 +75,7 @@ fi
 
 #echo $total_force
 #echo "has_stress:"$has_stress
-if ! test -z "$has_stress" && [  $has_stress -eq 1 ]; then
+if ! test -z "$has_stress" && [  $has_stress == 1 ]; then
 	#grep -A6 "TOTAL-STRESS" $running_path|sed '1,4d'|sed '4,8d' >stress.txt
     grep -A6 "TOTAL-STRESS" $running_path| awk 'NF==3' | tail -3> stress.txt
 	total_stress=`sum_file stress.txt`
@@ -89,14 +85,14 @@ fi
 
 
 #echo $total_stress
-#if ! test -z "$has_charge" && [  $has_charge -eq 1 ]; then
+#if ! test -z "$has_charge" && [  $has_charge == 1 ]; then
 #	total_charge=`sum_file OUT.autotest/SPIN1_CHG`
 #	echo "totalchargeref $total_charge" >>$1
 #fi
 
 
 #echo $total_charge
-if ! test -z "$has_dos"  && [  $has_dos -eq 1 ]; then
+if ! test -z "$has_dos"  && [  $has_dos == 1 ]; then
 	total_dos=`cat OUT.autotest/DOS1_smearing.dat | awk 'END {print}' | awk '{print $3}'`
 	echo "totaldosref $total_dos" >> $1
 fi
@@ -104,7 +100,7 @@ fi
 #	echo "totaldossmearing $smearing_dos" >> $1
 
 #echo Onsager coefficiency
-if ! test -z "$has_cond"  && [  $has_cond -eq 1 ]; then
+if ! test -z "$has_cond"  && [  $has_cond == 1 ]; then
 	onref=refOnsager.txt
 	oncal=Onsager.txt
 	python3 ../tools/CompareFile.py $onref $oncal 2
@@ -114,13 +110,13 @@ fi
 
 #echo total_dos
 #echo $has_band
-if ! test -z "$has_band"  && [  $has_band -eq 1 ]; then
+if ! test -z "$has_band"  && [  $has_band == 1 ]; then
 	total_band=`sum_file OUT.autotest/BANDS_1.dat`
 	echo "totalbandref $total_band" >>$1
 fi
 #echo $has_hs
-if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
-	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
+if ! test -z "$has_hs"  && [  $has_hs == 1 ]; then
+	if ! test -z "$gamma_only"  && [ $gamma_only == 1 ]; then
 		href=data-0-H.ref
 		hcal=OUT.autotest/data-0-H
 		sref=data-0-H.ref
@@ -139,7 +135,7 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 fi
 
 #echo $has_hs2
-if ! test -z "$has_hs2"  && [  $has_hs2 -eq 1 ]; then
+if ! test -z "$has_hs2"  && [  $has_hs2 == 1 ]; then
     python3 ../tools/CompareFile.py data-HR-sparse_SPIN0.csr.ref OUT.autotest/data-HR-sparse_SPIN0.csr 8
     echo "CompareHR_pass $?" >>$1
     python3 ../tools/CompareFile.py data-SR-sparse_SPIN0.csr.ref OUT.autotest/data-SR-sparse_SPIN0.csr 8
@@ -147,7 +143,7 @@ if ! test -z "$has_hs2"  && [  $has_hs2 -eq 1 ]; then
 fi
 
 # echo "$has_wfc_r" ## test out_wfc_r > 0
-if ! test -z "$has_wfc_r"  && [ $has_wfc_r -eq 1 ]; then
+if ! test -z "$has_wfc_r"  && [ $has_wfc_r == 1 ]; then
 	if [[ ! -f OUT.autotest/running_scf.log ]];then
 		echo "Can't find file OUT.autotest/running_scf.log"
 		exit 1
@@ -168,7 +164,7 @@ if ! test -z "$has_wfc_r"  && [ $has_wfc_r -eq 1 ]; then
 fi	
 
 # echo "$has_wfc_pw" ## test out_wfc_pw > 0
-if ! test -z "$has_wfc_pw"  && [ $has_wfc_pw -eq 1 ]; then
+if ! test -z "$has_wfc_pw"  && [ $has_wfc_pw == 1 ]; then
 	if [[ ! -f OUT.autotest/WAVEFUNC1.txt ]];then
 		echo "Can't find file OUT.autotest/WAVEFUNC1.txt"
 		exit 1
@@ -189,8 +185,8 @@ if ! test -z "$has_wfc_pw"  && [ $has_wfc_pw -eq 1 ]; then
 fi
 
 # echo "$has_lowf" ## test out_wfc_lcao > 0
-if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
-	if ! test -z "$gamma_only"  && [ $gamma_only -eq 1 ]; then
+if ! test -z "$has_lowf"  && [ $has_lowf == 1 ]; then
+	if ! test -z "$gamma_only"  && [ $gamma_only == 1 ]; then
 		wfc_cal=OUT.autotest/LOWF_GAMMA_S1.dat
 		wfc_ref=LOWF_GAMMA_S1.dat.ref	
 	else
@@ -214,7 +210,7 @@ if ! test -z "$has_lowf"  && [ $has_lowf -eq 1 ]; then
 	echo "Compare_wfc_lcao_pass $?" >>$1
 fi
 
-if ! test -z "$out_dm"  && [ $out_dm -eq 1 ]; then
+if ! test -z "$out_dm"  && [ $out_dm == 1 ]; then
       dmfile=`ls OUT.autotest/ | grep "^SPIN1_DM"`
       if test -z "$dmfile"; then
               echo "Can't find DM files"
@@ -241,7 +237,7 @@ if ! test -z "$out_dm"  && [ $out_dm -eq 1 ]; then
       fi
 fi
 
-if ! test -z "$out_mul"  && [ $out_mul -eq 1 ]; then
+if ! test -z "$out_mul"  && [ $out_mul == 1 ]; then
     python3 ../tools/CompareFile.py mulliken.txt.ref OUT.autotest/mulliken.txt 8
 	echo "Compare_mulliken_pass $?" >>$1
 fi
@@ -287,7 +283,7 @@ if [ $calculation == "istate" ]; then
 	fi
 fi
 
-if ! test -z "$imp_sol" && [ $imp_sol -eq 1 ]; then
+if ! test -z "$imp_sol" && [ $imp_sol == 1 ]; then
 	esol_el=`grep E_sol_el $running_path | awk '{print $3}'`
 	esol_cav=`grep E_sol_cav $running_path | awk '{print $3}'`
 	echo "esolelref $esol_el" >>$1
@@ -298,14 +294,14 @@ fi
 ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1
 
-if ! test -z "$deepks_out_labels" && [ $deepks_out_labels -eq 1 ]; then
+if ! test -z "$deepks_out_labels" && [ $deepks_out_labels == 1 ]; then
 	sed '/n_des/d' descriptor.dat > des_tmp.txt
 	total_des=`sum_file des_tmp.txt 5`
 	rm des_tmp.txt
 	echo "totaldes $total_des" >>$1
 fi
 
-if ! test -z "$deepks_bandgap" && [ $deepks_bandgap -eq 1 ]; then
+if ! test -z "$deepks_bandgap" && [ $deepks_bandgap == 1 ]; then
 	odelta=`python3 get_odelta.py`
 	echo "odelta $odelta" >>$1
 	oprec=`python3 get_oprec.py`

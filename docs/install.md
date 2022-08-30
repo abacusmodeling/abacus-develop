@@ -100,7 +100,7 @@ If environment variable `MKLROOT` exists, `cmake` will take MKL as a preference,
 You can also choose to build with which components, e.g.:
 
 ```bash
-cmake -B build -DUSE_LIBXC=1 -DUSE_CUDA=1
+cmake -B build -DENABLE_LIBXC=1 -DUSE_CUDA=1
 ```
 
 If Libxc is not installed in standard path (i.e. installed with a custom prefix path), you can set `Libxc_DIR` to the corresponding directory.
@@ -285,7 +285,7 @@ OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 
 - src_external
 - src_global
 - src_io
-- src_ions
+- module_relaxation
 - src_lcao
 - src_parallel
 - src_pdiag

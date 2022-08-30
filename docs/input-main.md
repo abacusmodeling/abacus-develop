@@ -1051,13 +1051,26 @@ This part of variables are relevant when using hybrid functionals
 
 #### exx_hse_omega
 
-- **Type**:
+- **Type**: Real
 - **Description**: range-separation parameter in HSE functional, such that $1/r=erfc(\omega r)/r+erf(\omega r)/r$.
 - **Default**: 0.11
 
-adial integration for pseudopotentials, in Bohr.
-@@ -214,6 +279,13 @@ This part of variables are used to control general system para
+#### exx_separate_loop
 
+- **Type**: Boolean
+- **Description**: There are two types of iterative approach provided by ABACUS to evaluate Fock exchange. If this parameter is set to 0, it will start with a GGA-Loop, and then Hybrid-Loop, in which EXX Hamiltonian $H_{exx}$ is updated with electronic iterations. If this parameter is set to 1, a two-step method is employed, i.e. in the inner iterations, density matrix is updated, while in the outer iterations, $H_{exx}$ is calculated based on density matrix that converges in the inner iteration. 
+- **Default**: 1
+
+#### exx_hybrid_step
+
+- **Type**: Integer
+- **Description**: This variable indicates the maximal electronic iteration number in the evaluation of Fock exchange.
+- **Default**: 100
+
+#### exx_lambda
+
+- **Type**: Real
+- **Description**: It is used to compensate for divergence points at G=0 in the evaluation of Fock exchange using *lcao_in_pw* method.
 - **Default**: 0.3
 
 #### exx_pca_threshold

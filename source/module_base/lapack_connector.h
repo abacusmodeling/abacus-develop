@@ -60,8 +60,8 @@ extern "C"
     // Peize Lin add dsptrf and dsptri 2016-06-21, to compute inverse real symmetry indefinit matrix.
     // dpotrf computes the Cholesky factorization of a real symmetric positive definite matrix
     // while dpotri taks its output to perform matrix inversion
-    void dpotrf_(const char* uplo,const int* n, double* A, const int* lda, int *info);
-    void dpotri_(const char* uplo,const int* n, double* A, const int* lda, int *info);
+    void dpotrf_(const char*const uplo, const int*const n, double*const A, const int*const lda, int*const info);
+    void dpotri_(const char*const uplo, const int*const n, double*const A, const int*const lda, int*const info);
 
     // zgetrf computes the LU factorization of a general matrix
     // while zgetri takes its output to perform matrix inversion
@@ -345,20 +345,34 @@ public:
 
 	// Peize Lin add 2016-07-09
 	static inline
-	void dpotrf( char uplo, const int n, ModuleBase::matrix &a, const int lda, int *info )
+	void dpotrf( const char &uplo, const int &n, double*const A, const int &lda, int &info )
 	{
 		const char uplo_changed = change_uplo(uplo);
-		dpotrf_( &uplo_changed, &n, a.c, &lda, info );
-	}
+		dpotrf_( &uplo_changed, &n, A, &lda, &info );
+	}	
+	
+	// Peize Lin add 2016-07-09
+	static inline
+	void dpotri( const char &uplo, const int &n, double*const A, const int &lda, int &info )
+	{
+		const char uplo_changed = change_uplo(uplo);
+		dpotri_( &uplo_changed, &n, A, &lda, &info);		
+	}	
 
 	// Peize Lin add 2016-07-09
 	static inline
-	void dpotri( char uplo, const int n, ModuleBase::matrix &a, const int lda, int *info )
+	void dpotrf( const char &uplo, const int &n, ModuleBase::matrix &A, const int &lda, int &info )
 	{
-		const char uplo_changed = change_uplo(uplo);
-		dpotri_( &uplo_changed, &n, a.c, &lda, info);
-	}
-
+		dpotrf( uplo, n, A.c, lda, info );
+	}	
+	
+	// Peize Lin add 2016-07-09
+	static inline
+	void dpotri( const char &uplo, const int &n, ModuleBase::matrix &A, const int &lda, int &info )
+	{
+		dpotri( uplo, n, A.c, lda, info);		
+	}	
+	
 	// Peize Lin add 2019-04-14
 	// if trans=='N':	C = a * A * A.H + b * C
 	// if trans=='C':	C = a * A.H * A + b * C

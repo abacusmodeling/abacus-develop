@@ -9,7 +9,7 @@
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"
 #include "../src_io/print_info.h"
-#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
+#include "../module_relaxation/variable_cell.h" // mohan add 2021-02-01
 #include "../src_ri/exx_abfs.h"
 #include "../src_ri/exx_opt_orb.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
@@ -102,7 +102,7 @@ void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver* p_esolver)
 
             if (cellchange)
             {
-                Variable_Cell::init_after_vc(p_esolver);
+                Variable_Cell::init_after_vc();
             }
 
             // reset local potential

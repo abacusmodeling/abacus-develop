@@ -69,8 +69,6 @@ void PW_Basis_K::setupIndGk()
     //count npwk
     this->npwk_max = 0;
     delete[] this->npwk; this->npwk = new int [this->nks];
-    //minimun npw, only for check
-    int npwk_min = this->npw;
     for (int ik = 0; ik < this->nks; ik++)
     {
         int ng = 0;
@@ -83,22 +81,16 @@ void PW_Basis_K::setupIndGk()
             }
         }
         this->npwk[ik] = ng;
-        if(ng == 0)
-        {
-            std::cout<<"Some proc has no plane waves. You can reduce the number of proc to avoid waste!"<<std::endl;
-        }
+        ModuleBase::CHECK_WARNING_QUIT((ng == 0), "pw_basis_k.cpp", "Current core has no plane waves! Please reduce the cores.");
         if ( this->npwk_max < ng)
         {
             this->npwk_max = ng;
         }
-        if ( npwk_min > ng)
-        {
-            npwk_min = ng;
-        }
     }
-    ModuleBase::CHECK_WARNING_QUIT((npwk_min==0), "PW_Basis_K::setupIndGk", "some cores have no plane waves!");
+    
 
     //get igl2isz_k and igl2ig_k
+    if(this->npwk_max <= 0) return;
     delete[] igl2isz_k; this->igl2isz_k = new int [this->nks * this->npwk_max];
     delete[] igl2ig_k; this->igl2ig_k = new int [this->nks * this->npwk_max];
     for (int ik = 0; ik < this->nks; ik++)
@@ -140,6 +132,7 @@ void PW_Basis_K::setuptransform()
 
 void PW_Basis_K::collect_local_pw()
 {
+    if(this->npwk_max <= 0) return;
     delete[] gk2;
     delete[] gcar;
     this->gk2 = new double[this->npwk_max * this->nks];
