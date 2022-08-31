@@ -99,7 +99,6 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
     {
         forcecomp.create(GlobalC::ucell.nat, 3);
         GlobalC::solvent_model.cal_comp_force(forcecomp, GlobalC::rhopw);
-        cout << "hello" << endl;
     }
 
     // impose total force = 0

@@ -95,13 +95,9 @@ void surchem::cal_Acomp(const UnitCell &cell,
     delete[] n_elec_R;
     delete[] n_nucl_R;
 
-    cout << "Acomp1(self, Ry): " << Acomp1 << endl;
-    cout << "Acomp1(electrons, Ry): " << Acomp2 << endl;
-    cout << "Acomp1(nuclear, Ry): " << Acomp3 << endl;
-
-    // res[0] = Acomp1 * 2;
-    // res[1] = Acomp2 * 2;
-    // res[2] = -Acomp3 * 2;
+    // cout << "Acomp1(self, Ry): " << Acomp1 << endl;
+    // cout << "Acomp1(electrons, Ry): " << Acomp2 << endl;
+    // cout << "Acomp1(nuclear, Ry): " << Acomp3 << endl;
 
     res[0] = Acomp1;
     res[1] = Acomp2;
