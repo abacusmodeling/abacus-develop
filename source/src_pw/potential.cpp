@@ -364,22 +364,10 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
         if(GlobalV::comp_chg)
         {
             v += GlobalC::solvent_model.v_compensating(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, rho_in);
-            vector<double> tmp(3, 0);
-            GlobalC::solvent_model.cal_Acomp(GlobalC::ucell, GlobalC::rhopw, rho_in, tmp);
-            ModuleBase::matrix forcecomp(GlobalC::ucell.nat, 3);
-            GlobalC::solvent_model.cal_comp_force(forcecomp, GlobalC::rhopw);
-            int p;
-            // cin >> p;
         }
         if (GlobalV::imp_sol)
         {
             v += GlobalC::solvent_model.v_correction(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, rho_in);
-            /*
-            // test energy outside
-            cout << "energy Outside: " << endl;
-            GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::rhopw);
-            GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::rhopw);
-            */
         }
     }
 
@@ -390,6 +378,12 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
     {
         v += Efield::add_efield(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, rho_in);
     }
+
+    // test get ntot_reci
+    // complex<double> *tmpn = new complex<double>[GlobalC::rhopw->npw];
+    // ModuleBase::GlobalFunc::ZEROS(tmpn, GlobalC::rhopw->npw);
+    // GlobalC::solvent_model.get_totn_reci(GlobalC::ucell, GlobalC::rhopw, tmpn);
+    // delete[] tmpn;
 
     ModuleBase::timer::tick("Potential", "v_of_rho");
     return v;

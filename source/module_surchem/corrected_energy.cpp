@@ -41,7 +41,7 @@ void surchem::cal_Acomp(const UnitCell &cell,
     ModuleBase::GlobalFunc::ZEROS(phi_comp_R, rho_basis->nrxx);
 
     // part1: comp & comp
-    GlobalC::UFFT.ToReciSpace(comp_real, comp_reci, rho_basis);
+    rho_basis->real2recip(comp_real, comp_reci);
     for (int ig = 0; ig < rho_basis->npw; ig++)
     {
         if (rho_basis->gg[ig] >= 1.0e-12) // LiuXh 20180410
@@ -72,7 +72,7 @@ void surchem::cal_Acomp(const UnitCell &cell,
     }
 
     // part2: electrons
-    GlobalC::UFFT.ToRealSpace(phi_comp_G, phi_comp_R, rho_basis);
+    rho_basis->recip2real(phi_comp_G, phi_comp_R);
     for (int ir = 0; ir < rho_basis->nrxx; ir++)
     {
         Acomp2 += n_elec_R[ir] * phi_comp_R[ir];

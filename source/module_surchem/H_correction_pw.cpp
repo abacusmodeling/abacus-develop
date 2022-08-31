@@ -26,7 +26,7 @@ ModuleBase::matrix surchem::v_correction(const UnitCell &cell,
     complex<double> *Porter_g = new complex<double>[rho_basis->npw];
     ModuleBase::GlobalFunc::ZEROS(Porter_g, rho_basis->npw);
 
-    GlobalC::UFFT.ToReciSpace(Porter, Porter_g, rho_basis);
+    rho_basis->real2recip(Porter, Porter_g);
 
     complex<double> *N = new complex<double>[rho_basis->npw];
     complex<double> *TOTN = new complex<double>[rho_basis->npw];
@@ -57,7 +57,8 @@ void surchem::add_comp_chg(const UnitCell &cell,
                            double l,
                            double center,
                            complex<double> *NG,
-                           int dim)
+                           int dim,
+                           bool flag)
 {
     // x dim
     double tmp_q = 0.0;
@@ -70,7 +71,10 @@ void surchem::add_comp_chg(const UnitCell &cell,
         {
             if (ig == rho_basis->ig_gge0)
             {
-                NG[ig] = complex<double>(tmp_q * l / L, 0.0);
+                if(flag)
+                {
+                    NG[ig] = complex<double>(tmp_q * l / L, 0.0);
+                }
                 continue;
             }
             double GX = rho_basis->gcar[ig][0];
@@ -94,7 +98,10 @@ void surchem::add_comp_chg(const UnitCell &cell,
         {
             if (ig == rho_basis->ig_gge0)
             {
-                NG[ig] = complex<double>(tmp_q * l / L, 0.0);
+                if(flag)
+                {
+                    NG[ig] = complex<double>(tmp_q * l / L, 0.0);
+                }
                 continue;
             }
             double GX = rho_basis->gcar[ig][0];
@@ -118,7 +125,10 @@ void surchem::add_comp_chg(const UnitCell &cell,
         {
             if (ig == rho_basis->ig_gge0)
             {
-                NG[ig] = complex<double>(tmp_q * l / L, 0.0);
+                if(flag)
+                {
+                    NG[ig] = complex<double>(tmp_q * l / L, 0.0);
+                }
                 continue;
             }
             double GX = rho_basis->gcar[ig][0];
@@ -154,7 +164,7 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
     complex<double> *Porter_g = new complex<double>[rho_basis->npw];
     ModuleBase::GlobalFunc::ZEROS(Porter_g, rho_basis->npw);
 
-    GlobalC::UFFT.ToReciSpace(Porter, Porter_g, rho_basis);
+    rho_basis->real2recip(Porter, Porter_g);
 
     this->Porter_g_anchor = Porter_g[rho_basis->ig_gge0];
 
@@ -164,7 +174,7 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
     cal_totn(cell, rho_basis, Porter_g, N, TOTN);
 
     // save TOTN in real space
-    GlobalC::UFFT.ToRealSpace(TOTN, this->TOTN_real, rho_basis);
+    rho_basis->recip2real(TOTN, this->TOTN_real);
 
     complex<double> *comp_reci = new complex<double>[rho_basis->npw];
     complex<double> *phi_comp_G = new complex<double>[rho_basis->npw];
@@ -174,9 +184,9 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
     ModuleBase::GlobalFunc::ZEROS(phi_comp_G, rho_basis->npw);
     ModuleBase::GlobalFunc::ZEROS(phi_comp_R, rho_basis->nrxx);
     // get compensating charge in reci space
-    add_comp_chg(cell, rho_basis, comp_q, comp_l, comp_center, comp_reci, comp_dim);
+    add_comp_chg(cell, rho_basis, comp_q, comp_l, comp_center, comp_reci, comp_dim, true);
     // save compensating charge in real space
-    GlobalC::UFFT.ToRealSpace(comp_reci, this->comp_real, rho_basis);
+    rho_basis->recip2real(comp_reci, this->comp_real);
 
     // test sum of comp_real -> 0
     // for (int i = 0; i < rho_basis->nz;i++)
@@ -186,7 +196,7 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
     // double sum = 0;
     // for (int i = 0; i < rho_basis->nxyz; i++)
     // {
-    //     sum += comp_real[i];
+    //     sum += TOTN_real[i];
     // }
     // sum = sum * cell.omega / rho_basis->nxyz;
     // cout << "sum:" << sum << endl;
@@ -240,7 +250,7 @@ void surchem::cal_comp_force(ModuleBase::matrix &force_comp, ModulePW::PW_Basis 
     std::complex<double> *N = new std::complex<double>[rho_basis->npw];
     std::complex<double> *phi_comp_G = new complex<double>[rho_basis->npw];
     std::complex<double> *vloc_at = new std::complex<double>[rho_basis->npw];
-    GlobalC::UFFT.ToReciSpace(phi_comp_R, phi_comp_G, rho_basis);
+    rho_basis->real2recip(phi_comp_R, phi_comp_G);
 
     for (int it = 0; it < GlobalC::ucell.ntype; it++)
     {

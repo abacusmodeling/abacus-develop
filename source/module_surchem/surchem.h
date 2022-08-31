@@ -53,7 +53,8 @@ class surchem
                       double l,
                       double center,
                       complex<double> *NG,
-                      int dim);
+                      int dim,
+                      bool flag); // Set value of comp_reci[ig_gge0] when flag is true. 
 
     void cal_comp_force(ModuleBase::matrix &force_comp, ModulePW::PW_Basis *rho_basis);
 
@@ -84,7 +85,10 @@ class surchem
 
     double cal_Acav(const UnitCell &cell, ModulePW::PW_Basis *rho_basis);
 
-    void cal_Acomp(const UnitCell &cell, ModulePW::PW_Basis *rho_basis, const double *const *const rho, vector<double> &res);
+    void cal_Acomp(const UnitCell &cell,
+                   ModulePW::PW_Basis *rho_basis,
+                   const double *const *const rho,
+                   vector<double> &res);
 
     void minimize_cg(const UnitCell &ucell,
                      ModulePW::PW_Basis *rho_basis,
@@ -104,19 +108,24 @@ class surchem
                complex<double> *lp);
 
     ModuleBase::matrix v_correction(const UnitCell &cell,
-                                           ModulePW::PW_Basis* rho_basis,
-                                           const int &nspin,
-                                           const double *const *const rho);
+                                    ModulePW::PW_Basis *rho_basis,
+                                    const int &nspin,
+                                    const double *const *const rho);
 
     ModuleBase::matrix v_compensating(const UnitCell &cell,
                                       ModulePW::PW_Basis *rho_basis,
                                       const int &nspin,
                                       const double *const *const rho);
 
-    void test_V_to_N(ModuleBase::matrix &v, const UnitCell &cell, ModulePW::PW_Basis *rho_basis, const double *const *const rho);
-    
-    void cal_force_sol(const UnitCell &cell, ModulePW::PW_Basis* rho_basis , ModuleBase::matrix& forcesol);
- 
+    void test_V_to_N(ModuleBase::matrix &v,
+                     const UnitCell &cell,
+                     ModulePW::PW_Basis *rho_basis,
+                     const double *const *const rho);
+
+    void cal_force_sol(const UnitCell &cell, ModulePW::PW_Basis *rho_basis, ModuleBase::matrix &forcesol);
+
+    void get_totn_reci(const UnitCell &cell, ModulePW::PW_Basis *rho_basis, complex<double> *totn_reci);
+
   private:
 };
 
