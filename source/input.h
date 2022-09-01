@@ -46,7 +46,11 @@ class Input
 
     bool init_vel; // read velocity from STRU or not  liuyu 2021-07-14
 
-    bool symmetry; // turn on symmetry or not
+    /* symmetry level: 
+      -1, no symmetry at all; 
+      0, only basic time reversal would be considered; 
+      1, point group symmetry would be considered*/
+    int symmetry; 
     double symmetry_prec; // LiuXh add 2021-08-12, accuracy for symmetry
     int kpar; // ecch pool is for one k point
 
