@@ -325,7 +325,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     neighbor
     orb
     io
-    ions
+    relax
     lcao
     gint
     parallel

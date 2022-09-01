@@ -12,7 +12,7 @@
 #include "src_io/epsilon0_pwscf.h"
 #include "src_io/epsilon0_vasp.h"
 #include "src_io/optical.h"
-#include "src_ions/ions_move_basic.h"
+#include "module_relaxation/ions_move_basic.h"
 #include "src_pw/global.h"
 #include "src_pw/occupy.h"
 #ifdef __EXX
