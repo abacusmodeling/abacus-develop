@@ -158,7 +158,10 @@ This part of variables are used to control general system parameters.
 #### symmetry
 
 - **Type**: Integer
-- **Description**: takes value 0 and 1, if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations.
+- **Description**: takes value 1, 0 and -1. 
+  - if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations. (point groups only)
+  - if set to 0, only time reversal symmetry would be considered in symmetry operations, which implied k point and -k point would be treated as one double weight k point.
+  - if set to -1, any symmetry will not be considered.
 - **Default**: 0
 
 #### kpar
