@@ -93,7 +93,6 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
 
     double *phi_tilda_R = new double[rho_basis->nrxx];
     double *phi_tilda_R0 = new double[rho_basis->nrxx];
-    // double *delta_phi_R = new double[pwb.nrxx];
 
     rho_basis->recip2real(Sol_phi, phi_tilda_R);
     rho_basis->recip2real(Sol_phi0, phi_tilda_R0);
@@ -144,11 +143,8 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     delete[] epsilon;
     delete[] epsilon0;
     delete[] tmp_Vel;
-    // delete[] Vel2;
-    // delete[] TOTN_real;
     delete[] phi_tilda_R;
     delete[] phi_tilda_R0;
-    // delete[] delta_phi_R;
 
     ModuleBase::timer::tick("surchem", "cal_vel");
     return Vel;
