@@ -166,8 +166,6 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
 
     rho_basis->real2recip(Porter, Porter_g);
 
-    this->Porter_g_anchor = Porter_g[rho_basis->ig_gge0];
-
     complex<double> *N = new complex<double>[rho_basis->npw];
     complex<double> *TOTN = new complex<double>[rho_basis->npw];
 
@@ -178,7 +176,6 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
 
     complex<double> *comp_reci = new complex<double>[rho_basis->npw];
     complex<double> *phi_comp_G = new complex<double>[rho_basis->npw];
-    // double *phi_comp_R = new double[rho_basis->nrxx];
 
     ModuleBase::GlobalFunc::ZEROS(comp_reci, rho_basis->npw);
     ModuleBase::GlobalFunc::ZEROS(phi_comp_G, rho_basis->npw);
@@ -234,7 +231,6 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell,
 
     delete[] comp_reci;
     delete[] phi_comp_G;
-    // delete[] phi_comp_R;
     delete[] Porter;
     delete[] Porter_g;
     delete[] N;
