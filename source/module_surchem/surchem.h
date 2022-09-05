@@ -24,7 +24,6 @@ class surchem
     ModuleBase::matrix Vcav;
     ModuleBase::matrix Vel;
     double qs;
-    complex<double> Porter_g_anchor;
 
     // compensating charge (in real space, used to cal_Acomp)
     double *comp_real;

@@ -57,7 +57,6 @@ ModuleBase::matrix surchem::cal_vel(const UnitCell &cell,
     ModuleBase::TITLE("surchem", "cal_vel");
     ModuleBase::timer::tick("surchem", "cal_vel");
 
-    // double *TOTN_real = new double[pwb.nrxx];
     rho_basis->recip2real(TOTN, TOTN_real);
 
     // -4pi * TOTN(G)
