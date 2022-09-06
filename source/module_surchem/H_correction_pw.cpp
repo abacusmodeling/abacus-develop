@@ -287,6 +287,7 @@ void surchem::cal_comp_force(ModuleBase::matrix &force_comp, ModulePW::PW_Basis 
             ++iat;
         }
     }
+    Parallel_Reduce::reduce_double_pool(force_comp.c, force_comp.nr * force_comp.nc);
     delete[] vloc_at;
     delete[] N;
     delete[] phi_comp_G;
