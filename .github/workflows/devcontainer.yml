@@ -29,7 +29,7 @@ jobs:
       - name: Login to Aliyun Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ secrets.DP_HARBOR_REGISTRY }}
+          registry: registry.dp.tech
           username: ${{ secrets.DP_HARBOR_USERNAME }}
           password: ${{ secrets.DP_HARBOR_PASSWORD }}
 
@@ -37,9 +37,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           tags: |
-            ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{ matrix.dockerfile }}
-            ${{ secrets.DP_HARBOR_REGISTRY }}/dplc/abacus-${{ matrix.dockerfile }}:latest
+            ghcr.io/deepmodeling/abacus-development-kit:${{ matrix.dockerfile }}
+            registry.dp.tech/deepmodeling/abacus-${{ matrix.dockerfile }}:latest
           file: Dockerfile.${{ matrix.dockerfile }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{matrix.dockerfile}}
+          cache-from: type=registry,ref=ghcr.io/deepmodeling/abacus-development-kit:${{matrix.dockerfile}}
           cache-to: type=inline
           push: true

@@ -168,7 +168,7 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
     {
         Gint_inout inout(this->DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
         uhm.GG.cal_gint(&inout);
-        if (XC_Functional::get_func_type() == 3)
+        if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
         {
             for(int is=0; is<GlobalV::NSPIN; is++)
             {
@@ -183,7 +183,7 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
         ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
         Gint_inout inout(this->DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
         uhm.GK.cal_gint(&inout);
-        if (XC_Functional::get_func_type() == 3)
+        if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
         {
             for(int is=0; is<GlobalV::NSPIN; is++)
             {

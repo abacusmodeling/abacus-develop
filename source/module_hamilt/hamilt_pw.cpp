@@ -7,10 +7,10 @@
 #include "src_parallel/parallel_reduce.h"
 #include "src_pw/global.h"
 
-#include "veff_pw.h"
-#include "ekinetic_pw.h"
-#include "meta_pw.h"
-#include "nonlocal_pw.h"
+#include "ks_pw/veff_pw.h"
+#include "ks_pw/ekinetic_pw.h"
+#include "ks_pw/meta_pw.h"
+#include "ks_pw/nonlocal_pw.h"
 
 namespace hamilt
 {
@@ -18,100 +18,87 @@ namespace hamilt
 HamiltPW::HamiltPW()
 {
     this->classname = "HamiltPW";
-    this->ops.resize(0);
-    const int npwx = GlobalC::wf.npwx;
-    const int npol = GlobalV::NPOL;
-    const double tpiba = GlobalC::ucell.tpiba;
     const double tpiba2 = GlobalC::ucell.tpiba2;
-    const int* ngk = GlobalC::kv.ngk.data();
+    const double tpiba = GlobalC::ucell.tpiba;
     const int* isk = GlobalC::kv.isk.data();
     const double* gk2 = GlobalC::wfcpw->gk2;
 
     if (GlobalV::T_IN_H)
     {
-        Operator* ekinetic = new EkineticPW(
-            npwx, 
-            npol, 
+        Operator<std::complex<double>>* ekinetic = new Ekinetic<OperatorPW>( 
             tpiba2, 
-            ngk,
-            gk2
+            gk2,
+            GlobalC::wfcpw->npwk_max
         );
-        this->ops.push_back(ekinetic);
+        if(this->ops == nullptr)
+        {
+            this->ops = ekinetic;
+        }
+        else
+        {
+            this->ops->add(ekinetic);
+        }
     }
     if (GlobalV::VL_IN_H)
     {
-        Operator* veff = new VeffPW(
-            npwx,
-            npol,
-            ngk,
+        Operator<std::complex<double>>* veff = new Veff<OperatorPW>(
             isk,
             &(GlobalC::pot.vr_eff),
             GlobalC::wfcpw
         );
-        this->ops.push_back(veff);
+        if(this->ops == nullptr)
+        {
+            this->ops = veff;
+        }
+        else
+        {
+            this->ops->add(veff);
+        }
     }
     if (GlobalV::VNL_IN_H)
     {
-        Operator* nonlocal = new NonlocalPW(
-            npwx,
-            npol,
-            ngk,
+        Operator<std::complex<double>>* nonlocal = new Nonlocal<OperatorPW>(
             isk,
             &GlobalC::ppcell,
             &GlobalC::ucell
         );
-        this->ops.push_back(nonlocal);
+        if(this->ops == nullptr)
+        {
+            this->ops = nonlocal;
+        }
+        else
+        {
+            this->ops->add(nonlocal);
+        }
     }
-    Operator* meta = new MetaPW(
-        npwx,
-        npol,
+    Operator<std::complex<double>>* meta = new Meta<OperatorPW>(
         tpiba,
-        ngk,
         isk,
         &GlobalC::pot.vofk,
         GlobalC::wfcpw
     );
-    this->ops.push_back(meta);
+    if(this->ops == nullptr)
+    {
+        this->ops = meta;
+    }
+    else
+    {
+        this->ops->add(meta);
+    }
 }
 
 HamiltPW::~HamiltPW()
 {
     int index = 0;
-    if (GlobalV::T_IN_H)
-    {
-        delete (EkineticPW*)this->ops[index++];
-    }
-    if (GlobalV::VL_IN_H)
-    {
-        delete (VeffPW*)this->ops[index++];
-    }
-    if (GlobalV::VNL_IN_H)
-    {
-        delete (NonlocalPW*)this->ops[index++];
-    }
-    delete (MetaPW*)this->ops[index++];
+    delete this->ops;
 }
 
 void HamiltPW::updateHk(const int ik)
 {
     ModuleBase::TITLE("HamiltPW","updateHk");
 
-    for(int iter = 0; iter < this->ops.size(); ++iter)
-    {
-        this->ops[iter]->init(ik);
-    }
+    this->ops->init(ik);
 
-    return;
-}
-
-void HamiltPW::hPsi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const size_t size) const
-{
-    ModuleBase::timer::tick("HamiltPW", "h_psi");
-    for(int iter = 0; iter < this->ops.size(); ++iter)
-    {
-        this->ops[iter]->act(psi_in, hpsi, size);
-    }
-    ModuleBase::timer::tick("HamiltPW", "h_psi");
     return;
 }
 
@@ -122,10 +109,7 @@ void HamiltPW::sPsi
     size_t size
 ) const
 {
-    for (size_t i=0; i<size; i++)
-    {
-        spsi[i] = psi[i];
-    }
+    ModuleBase::GlobalFunc::COPYARRAY(psi, spsi, size);
     return;
 }
 

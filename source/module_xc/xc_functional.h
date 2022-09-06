@@ -72,7 +72,7 @@ class XC_Functional
 // This file contains subroutines for setting the functional
 // it includes 4 subroutines:
 // 1. get_func_type : which returns the type of functional (func_type):
-//		0 = none; 1 = lda; 2 = gga; 3 = mgga; 4 = hybrid
+//		0 = none; 1 = lda; 2 = gga; 3 = mgga; 4 = hybrid lda/gga; 5 = hybrid mgga
 // 2. set_xc_type : sets the value of:
 //		func_id, which is the LIBXC id of functional
 //		func_type, which is as specified in get_func_type
@@ -83,6 +83,7 @@ class XC_Functional
 
 	static int get_func_type();
 	static void set_xc_type(const std::string xc_func_in);
+	static void get_hybrid_alpha(const double alpha_in);
 #ifdef USE_LIBXC
 	static void set_xc_type_libxc(const std::string xc_func_in);
 	static std::vector<xc_func_type> init_func(const int xc_polarized);
@@ -91,8 +92,11 @@ class XC_Functional
 	private:
 
 	static std::vector<int> func_id; // libxc id of functional
-	static int func_type; //0:none, 1:lda, 2:gga, 3:mgga, 4:hybrid
+	static int func_type; //0:none, 1:lda, 2:gga, 3:mgga, 4:hybrid lda/gga, 5:hybrid mgga
 	static bool use_libxc;
+
+	//exx_hybrid_alpha for mixing exx in hybrid functional:
+	static double hybrid_alpha;
 
 //-------------------
 //  xc_functional_wrapper_xc.cpp

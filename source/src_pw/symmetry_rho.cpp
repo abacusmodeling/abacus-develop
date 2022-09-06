@@ -16,15 +16,15 @@ void Symmetry_rho::begin(const int &spin_now, const Charge_Broyden &CHR, const M
 {
 	assert(spin_now < 4);//added by zhengdy-soc
 
-	if(!ModuleSymmetry::Symmetry::symm_flag) return;
+	if(ModuleSymmetry::Symmetry::symm_flag != 1) return;
 #ifdef __MPI
 	// parallel version
 	psymm(CHR.rho[spin_now], rho_basis, Pgrid, symm);
-	if(XC_Functional::get_func_type() == 3) psymm(CHR.kin_r[spin_now],rho_basis,Pgrid,symm);
+	if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5) psymm(CHR.kin_r[spin_now],rho_basis,Pgrid,symm);
 #else
 	// series version.
 	symm.rho_symmetry(CHR.rho[spin_now], rho_basis->nx, rho_basis->ny, rho_basis->nz);
-	if(XC_Functional::get_func_type() == 3) symm.rho_symmetry(CHR.kin_r[spin_now],rho_basis->nx, rho_basis->ny, rho_basis->nz);
+	if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5) symm.rho_symmetry(CHR.kin_r[spin_now],rho_basis->nx, rho_basis->ny, rho_basis->nz);
 #endif
 	return;
 }

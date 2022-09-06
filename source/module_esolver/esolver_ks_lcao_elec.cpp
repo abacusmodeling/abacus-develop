@@ -116,7 +116,11 @@ namespace ModuleESolver
         {   
             if(this->psi == nullptr)
             {
+                #ifdef __MPI
                 int ncol = this->LOWF.ParaV->ncol_bands;
+                #else
+                int ncol = GlobalV::NBANDS;
+                #endif
 #ifdef __CUSOLVER_LCAO
                 if(GlobalV::KS_SOLVER=="cusolver")
                 {
@@ -156,7 +160,7 @@ namespace ModuleESolver
             {
                 Gint_inout inout(this->LOC.DM, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GG.cal_gint(&inout);
-                if (XC_Functional::get_func_type() == 3)
+                if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
                 {
                     for(int is=0; is<GlobalV::NSPIN; is++)
                     {
@@ -170,7 +174,7 @@ namespace ModuleESolver
             {
                 Gint_inout inout(this->LOC.DM_R, (Charge*)(&GlobalC::CHR), Gint_Tools::job_type::rho);
                 this->UHM.GK.cal_gint(&inout);
-                if (XC_Functional::get_func_type() == 3)
+                if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type()==5)
                 {
                     for(int is=0; is<GlobalV::NSPIN; is++)
                     {
@@ -227,6 +231,53 @@ namespace ModuleESolver
     {
         ModuleBase::TITLE("ESolver_KS_LCAO", "beforescf");
         ModuleBase::timer::tick("ESolver_KS_LCAO", "beforescf");
+
+        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+        {
+            if(GlobalC::ucell.ionic_position_updated)
+            {
+                GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
+                // charge extrapolation if istep>0.
+                CE.update_istep(istep);
+                CE.update_all_pos(GlobalC::ucell);
+                CE.extrapolate_charge();
+                CE.save_pos_next(GlobalC::ucell);
+
+                GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
+                // calculate the new potential accordint to
+                // the new charge density.
+                GlobalC::pot.init_pot( istep-1, GlobalC::sf.strucFac );
+            }
+        }
+
+        //----------------------------------------------------------
+        // about vdw, jiyy add vdwd3 and linpz add vdwd2
+        //----------------------------------------------------------
+        if (INPUT.vdw_method == "d2")
+        {
+            // setup vdwd2 parameters
+            GlobalC::vdwd2_para.initial_parameters(INPUT);
+            GlobalC::vdwd2_para.initset(GlobalC::ucell);
+        }
+        if (INPUT.vdw_method == "d3_0" || INPUT.vdw_method == "d3_bj")
+        {
+            GlobalC::vdwd3_para.initial_parameters(INPUT);
+        }
+        // Peize Lin add 2014.04.04, update 2021.03.09
+        if (GlobalC::vdwd2_para.flag_vdwd2)
+        {
+            Vdwd2 vdwd2(GlobalC::ucell, GlobalC::vdwd2_para);
+            vdwd2.cal_energy();
+            GlobalC::en.evdw = vdwd2.get_energy();
+        }
+        // jiyy add 2019-05-18, update 2021.05.02
+        else if (GlobalC::vdwd3_para.flag_vdwd3)
+        {
+            Vdwd3 vdwd3(GlobalC::ucell, GlobalC::vdwd3_para);
+            vdwd3.cal_energy();
+            GlobalC::en.evdw = vdwd3.get_energy();
+        }
+        
         this->beforesolver(istep);
 //Peize Lin add 2016-12-03
 #ifdef __MPI
@@ -234,7 +285,8 @@ namespace ModuleESolver
         {
             if (Exx_Info::Hybrid_Type::HF == GlobalC::exx_info.info_global.hybrid_type
                 || Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type
-                || Exx_Info::Hybrid_Type::HSE == GlobalC::exx_info.info_global.hybrid_type)
+                || Exx_Info::Hybrid_Type::HSE == GlobalC::exx_info.info_global.hybrid_type
+                || Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type)
             {
                 GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
 				if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -255,7 +307,10 @@ namespace ModuleESolver
 #endif
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
-        H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
+        if(!GlobalV::test_skip_ewald)
+        {
+            H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::rhopw);
+        }
 
         //2. the electron charge density should be symmetrized,
         // here is the initialization
@@ -278,6 +333,39 @@ namespace ModuleESolver
     {
         ModuleBase::TITLE("ESolver_KS_LCAO", "othercalculation");
         ModuleBase::timer::tick("ESolver_KS_LCAO", "othercalculation");
+        if(GlobalV::CALCULATION == "get_S")
+        {
+            this->get_S();
+            ModuleBase::QUIT();
+        }
+        
+        if(GlobalV::CALCULATION == "test_memory")
+        {
+            Cal_Test::test_memory();
+            return;
+        }
+
+        if(GlobalV::CALCULATION == "test_neighbour")
+        {
+            //test_search_neighbor();
+            GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+                GlobalV::ofs_running,
+                GlobalV::OUT_LEVEL,
+                GlobalC::ORB.get_rcutmax_Phi(),
+                GlobalC::ucell.infoNL.get_rcutmax_Beta(),
+                GlobalV::GAMMA_ONLY_LOCAL);
+
+            atom_arrange::search(
+                GlobalV::SEARCH_PBC,
+                GlobalV::ofs_running,
+                GlobalC::GridD,
+                GlobalC::ucell,
+                GlobalV::SEARCH_RADIUS,
+                GlobalV::test_atom_input,
+                1);
+            return;
+        }
+
         this->beforesolver(istep);
         // self consistent calculations for electronic ground state
         if (GlobalV::CALCULATION == "nscf")
@@ -306,6 +394,41 @@ namespace ModuleESolver
         return;
     }
 
+    void ESolver_KS_LCAO::get_S()
+    {
+        ModuleBase::TITLE("ESolver_KS_LCAO", "get_S");
+        if(GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            ModuleBase::WARNING_QUIT("ESolver_KS_LCAO::get_S", "not implemented for");
+        }
+        else
+        {
+            // (1) Find adjacent atoms for each atom.
+            GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+                GlobalV::ofs_running,
+                GlobalV::OUT_LEVEL,
+                GlobalC::ORB.get_rcutmax_Phi(),
+                GlobalC::ucell.infoNL.get_rcutmax_Beta(),
+                GlobalV::GAMMA_ONLY_LOCAL);
+
+            atom_arrange::search(
+                GlobalV::SEARCH_PBC,
+                GlobalV::ofs_running,
+                GlobalC::GridD,
+                GlobalC::ucell,
+                GlobalV::SEARCH_RADIUS,
+                GlobalV::test_atom_input);
+
+            this->RA.for_2d(this->orb_con.ParaV, GlobalV::GAMMA_ONLY_LOCAL);
+            this->UHM.genH.LM->ParaV = &this->orb_con.ParaV;
+            this->LM.allocate_HS_R(this->orb_con.ParaV.nnr);
+            this->LM.zeros_HSR('S');
+            this->UHM.genH.calculate_S_no(this->LM.SlocR.data());
+            this->output_SR("SR.csr");
+
+        }
+    }
+
     void ESolver_KS_LCAO::nscf()
     {
         ModuleBase::TITLE("ESolver_KS_LCAO", "nscf");
@@ -320,6 +443,7 @@ namespace ModuleESolver
         {
         case Exx_Info::Hybrid_Type::HF:
         case Exx_Info::Hybrid_Type::PBE0:
+        case Exx_Info::Hybrid_Type::SCAN0:
         case Exx_Info::Hybrid_Type::HSE:
             GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
             break;
@@ -327,7 +451,7 @@ namespace ModuleESolver
     #endif
 
         // mohan add 2021-02-09
-        // in LOOP_ions, istep starts from 1,
+        // in ions, istep starts from 1,
         // then when the istep is a variable of scf or nscf,
         // istep becomes istep-1, this should be fixed in future
         int istep = 0;
@@ -396,10 +520,10 @@ namespace ModuleESolver
         }
 
         // add by jingan
-        if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
+        if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag != 1)
         {
             berryphase bp(this->LOWF);
-            bp.Macroscopic_polarization(nullptr);
+            bp.Macroscopic_polarization(this->psi);
         }
 
         return;

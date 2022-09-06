@@ -83,7 +83,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
         // calculate the 'Vl' matrix using gamma-algorithms.
         if(GlobalV::VL_IN_H)
         {
-            if(XC_Functional::get_func_type()==3)
+            if(XC_Functional::get_func_type()==3 || XC_Functional::get_func_type()==5)
             {
                 Gint_inout inout(GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, this->LM, Gint_Tools::job_type::vlocal_meta);
                 this->GG.cal_vlocal(&inout);
@@ -96,9 +96,9 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
 
         #ifdef __MPI //liyuanbo 2022/2/23
             // Peize Lin add 2016-12-03
-            if(XC_Functional::get_func_type()==4)
+            if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
             {
-                if( Exx_Info::Hybrid_Type::HF == GlobalC::exx_lcao.info.hybrid_type ) //HF
+                if( Exx_Info::Hybrid_Type::HF == GlobalC::exx_info.info_global.hybrid_type ) //HF
                 {
                     //GlobalC::exx_lcao.add_Hexx(ik, 1, *this->LM);
                     RI_2D_Comm::add_Hexx(
@@ -108,7 +108,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
 						*this->LM->ParaV,
 						*this->LM);
                 }
-                else if( Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type )			// PBE0
+                else if( Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type )			// PBE0
                 {
                     //GlobalC::exx_lcao.add_Hexx(ik, GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
                     RI_2D_Comm::add_Hexx(
@@ -118,7 +118,17 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
 						*this->LM->ParaV,
 						*this->LM);
                 }
-                else if( Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// HSE
+                else if( Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type )			// SCAN0
+                {
+                    //GlobalC::exx_lcao.add_Hexx(ik, GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
+                    RI_2D_Comm::add_Hexx(
+						ik,
+						GlobalC::exx_info.info_global.hybrid_alpha,
+						GlobalC::exx_lri_double.Hexxs,
+						*this->LM->ParaV,
+						*this->LM);
+                }
+                else if( Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type )			// HSE
                 {
                     //GlobalC::exx_lcao.add_Hexx(ik, GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
                     RI_2D_Comm::add_Hexx(
@@ -263,9 +273,9 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
     #ifdef __MPI //liyuanbo 2022/2/23
         // Peize Lin add 2016-12-03
-        if(XC_Functional::get_func_type()==4)
+        if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
         {
-            if( Exx_Info::Hybrid_Type::HF  == GlobalC::exx_lcao.info.hybrid_type )				// HF
+            if( Exx_Info::Hybrid_Type::HF  == GlobalC::exx_info.info_global.hybrid_type )				// HF
             {
                 //GlobalC::exx_lcao.add_Hexx(ik,1, *this->LM);
 				RI_2D_Comm::add_Hexx(
@@ -275,7 +285,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 					*this->LM->ParaV,
 					*this->LM);
             }
-            else if( Exx_Info::Hybrid_Type::PBE0  == GlobalC::exx_lcao.info.hybrid_type )			// PBE0
+            else if( Exx_Info::Hybrid_Type::PBE0  == GlobalC::exx_info.info_global.hybrid_type )			// PBE0
             {
                 //GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
 				RI_2D_Comm::add_Hexx(
@@ -285,8 +295,18 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 					*this->LM->ParaV,
 					*this->LM);
             }
-            else if( Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// HSE
-            {			
+            else if( Exx_Info::Hybrid_Type::SCAN0  == GlobalC::exx_info.info_global.hybrid_type )			// SCAN0
+            {
+                //GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
+				RI_2D_Comm::add_Hexx(
+					ik,
+					GlobalC::exx_info.info_global.hybrid_alpha,
+					GlobalC::exx_lri_complex.Hexxs,
+					*this->LM->ParaV,
+					*this->LM);
+            }
+            else if( Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type )			// HSE
+            {
                 //GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
 				RI_2D_Comm::add_Hexx(
 					ik,
@@ -827,9 +847,10 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
     }
 
 #ifdef __MPI
-    if (GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::HF
-        || GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::PBE0
-        || GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::HSE)
+    if (GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::HF ||
+        GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::PBE0 ||
+        GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::SCAN0 ||
+        GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::HSE)
     {
         calculate_HR_exx_sparse(current_spin, sparse_threshold);
     }

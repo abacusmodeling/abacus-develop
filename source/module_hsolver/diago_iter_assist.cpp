@@ -46,11 +46,18 @@ void DiagoIterAssist::diagH_subspace(hamilt::Hamilt* pHamilt,
     const int dmax = psi.get_nbasis();
 
     // qianrui improve this part 2021-3-14
-    std::complex<double> *aux = new std::complex<double>[dmax * nstart];
-    const std::complex<double> *paux = aux;
+    //std::complex<double> *aux = new std::complex<double>[dmax * nstart];
+    //const std::complex<double> *paux = aux;
     const std::complex<double> *ppsi = psi.get_pointer();
 
-    pHamilt->hPsi(ppsi, aux, size_t(dmax * nstart));
+    //allocated hpsi 
+    std::vector<std::complex<double>> hpsi(psi.get_nbands() * psi.get_nbasis());
+    //do hPsi for all bands
+    psi::Range all_bands_range(1, psi.get_current_k(), 0, psi.get_nbands()-1);
+    hamilt::Operator<std::complex<double>>::hpsi_info hpsi_in(&psi, all_bands_range, hpsi.data());
+    pHamilt->ops->hPsi(hpsi_in);
+    //use aux as a data pointer for hpsi
+    const std::complex<double> *aux = hpsi.data();
 
     char trans1 = 'C';
     char trans2 = 'N';
@@ -62,7 +69,7 @@ void DiagoIterAssist::diagH_subspace(hamilt::Hamilt* pHamilt,
            &ModuleBase::ONE,
            ppsi,
            &dmax,
-           paux,
+           aux,
            &dmax,
            &ModuleBase::ZERO,
            hc.c,
@@ -83,8 +90,6 @@ void DiagoIterAssist::diagH_subspace(hamilt::Hamilt* pHamilt,
            sc.c,
            &nstart);
     sc = transpose(sc, false);
-
-    delete[] aux;
 
     if (GlobalV::NPROC_IN_POOL > 1)
     {
@@ -181,11 +186,20 @@ void DiagoIterAssist::diagH_subspace_init(hamilt::Hamilt* pHamilt,
     const int dmax = evc.get_nbasis();
 
     // qianrui improve this part 2021-3-14
-    std::complex<double> *aux = new std::complex<double>[dmax * nstart];
-    const std::complex<double> *paux = aux;
-    const std::complex<double> *ppsi = psi.c;
+    //std::complex<double> *aux = new std::complex<double>[dmax * nstart];
+    //const std::complex<double> *paux = aux;
+    psi::Psi<std::complex<double>> psi_temp(1, nstart, psi.nc, &evc.get_ngk(0));
+    ModuleBase::GlobalFunc::COPYARRAY(psi.c, psi_temp.get_pointer(), psi_temp.size());
+    const std::complex<double> *ppsi = psi_temp.get_pointer();
 
-    pHamilt->hPsi(ppsi, aux, size_t(dmax * nstart));
+    //allocated hpsi 
+    std::vector<std::complex<double>> hpsi(psi_temp.get_nbands() * psi_temp.get_nbasis());
+    //do hPsi for all bands
+    psi::Range all_bands_range(1, psi_temp.get_current_k(), 0, psi_temp.get_nbands()-1);
+    hamilt::Operator<std::complex<double>>::hpsi_info hpsi_in(&psi_temp, all_bands_range, hpsi.data());
+    pHamilt->ops->hPsi(hpsi_in);
+    //use aux as a data pointer for hpsi
+    const std::complex<double> *aux = hpsi.data();
 
     char trans1 = 'C';
     char trans2 = 'N';
@@ -197,7 +211,7 @@ void DiagoIterAssist::diagH_subspace_init(hamilt::Hamilt* pHamilt,
            &ModuleBase::ONE,
            ppsi,
            &dmax,
-           paux,
+           aux,
            &dmax,
            &ModuleBase::ZERO,
            hc.c,
@@ -219,8 +233,6 @@ void DiagoIterAssist::diagH_subspace_init(hamilt::Hamilt* pHamilt,
            &nstart);
     sc = transpose(sc, false);
 
-    delete[] aux;
-
     if (GlobalV::NPROC_IN_POOL > 1)
     {
         Parallel_Reduce::reduce_complex_double_pool(hc.c, nstart * nstart);
@@ -228,6 +240,18 @@ void DiagoIterAssist::diagH_subspace_init(hamilt::Hamilt* pHamilt,
     }
 
     // after generation of H and S matrix, diag them
+    ///this part only for test, eigenvector would have different phase caused by micro numerical perturbation
+    ///set 8 bit effective accuracy would help for debugging
+    /*for(int i=0;i<nstart;i++)
+    {
+        for(int j=0;j<nstart;j++)
+        {
+            if(std::norm(hc(i,j))<1e-10) hc(i,j) = ModuleBase::ZERO;
+            else hc(i,j) = std::complex<double>(double(int(hc(i,j).real()*100000000))/100000000, 0);
+            if(std::norm(sc(i,j))<1e-10) sc(i,j) = ModuleBase::ZERO;
+            else sc(i,j) = std::complex<double>(double(int(sc(i,j).real()*100000000))/100000000, 0);
+        }
+    }*/
     DiagoIterAssist::diagH_LAPACK(nstart, n_band, hc, sc, nstart, en, hvec);
 
     //=======================

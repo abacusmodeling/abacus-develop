@@ -26,7 +26,7 @@ ModuleBase::matrix surchem::v_correction(const UnitCell &cell,
     complex<double> *Porter_g = new complex<double>[rho_basis->npw];
     ModuleBase::GlobalFunc::ZEROS(Porter_g, rho_basis->npw);
 
-    GlobalC::UFFT.ToReciSpace(Porter, Porter_g, rho_basis);
+    rho_basis->real2recip(Porter, Porter_g);
 
     complex<double> *N = new complex<double>[rho_basis->npw];
     complex<double> *TOTN = new complex<double>[rho_basis->npw];
@@ -149,7 +149,7 @@ ModuleBase::matrix surchem::v_compensating(const UnitCell &cell, ModulePW::PW_Ba
     // std::cout << " ecomp=" << ecomp << std::endl;
     comp_chg_energy = ecomp;
 
-    GlobalC::UFFT.ToRealSpace(phi_comp_G, phi_comp_R, rho_basis);
+    rho_basis->recip2real(phi_comp_G, phi_comp_R);
 
     ModuleBase::matrix v_comp(GlobalV::NSPIN, rho_basis->nrxx);
     if (GlobalV::NSPIN == 4)
@@ -205,7 +205,7 @@ void surchem::test_V_to_N(ModuleBase::matrix &v,
         phi_comp_R[ir] = v(0, ir);
     }
 
-    GlobalC::UFFT.ToReciSpace(phi_comp_R, phi_comp_G, rho_basis);
+    rho_basis->real2recip(phi_comp_R, phi_comp_G);
     for (int ig = 0; ig < rho_basis->npw; ig++)
     {
         if (rho_basis->gg[ig] >= 1.0e-12) // LiuXh 20180410
@@ -214,7 +214,7 @@ void surchem::test_V_to_N(ModuleBase::matrix &v,
             comp_reci[ig] = phi_comp_G[ig] / fac;
         }
     }
-    GlobalC::UFFT.ToRealSpace(comp_reci, N_real, rho_basis);
+    rho_basis->recip2real(comp_reci, N_real);
 
     complex<double> *vloc_g = new complex<double>[rho_basis->npw];
     complex<double> *ng = new complex<double>[rho_basis->npw];
@@ -225,8 +225,7 @@ void surchem::test_V_to_N(ModuleBase::matrix &v,
     for (int ir = 0; ir < rho_basis->nrxx; ir++)
         Porter[ir] = rho[0][ir];
 
-    GlobalC::UFFT.ToReciSpace(GlobalC::pot.vltot,
-                                  vloc_g, rho_basis); // now n is vloc in Recispace
+    rho_basis->real2recip(GlobalC::pot.vltot,vloc_g);// now n is vloc in Recispace
     for (int ig = 0; ig < rho_basis->npw; ig++) {
         if (rho_basis->gg[ig] >= 1.0e-12) // LiuXh 20180410
         {
@@ -237,7 +236,7 @@ void surchem::test_V_to_N(ModuleBase::matrix &v,
         }
     }
     double *nr = new double[rho_basis->nrxx];
-    GlobalC::UFFT.ToRealSpace(ng, nr, rho_basis);
+    rho_basis->recip2real(ng, nr);
 
     double *diff = new double[rho_basis->nrxx];
     double *diff2 = new double[rho_basis->nrxx];

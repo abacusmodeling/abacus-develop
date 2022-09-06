@@ -6,8 +6,8 @@ add_executable(
 get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
 target_link_libraries(
     test_deepks
-    base cell symmetry md surchem xc
-    neighbor orb io ions gint lcao parallel mrrr pdiag pw ri driver esolver hsolver psi elecstate hamilt planewave
+    base cell symmetry md surchem xc_
+    neighbor orb io relax gint lcao parallel mrrr pdiag pw ri driver esolver hsolver psi elecstate hamilt planewave
     pthread
     deepks
     ${ABACUS_LINK_LIBRARIES}

@@ -5,7 +5,7 @@
 
 struct Exx_Info
 {
-	enum class Hybrid_Type {No,HF,PBE0,HSE,Generate_Matrix};
+	enum class Hybrid_Type {No,HF,PBE0,SCAN0,HSE,Generate_Matrix};
 
 	struct Exx_Info_Global
 	{

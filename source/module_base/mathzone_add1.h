@@ -48,6 +48,7 @@ class Mathzone_Add1
      * @param[in] rsize number of x after interpolation
      * @param[out] y    f(x) after interpolation
      * @param[out] dy   f'(x) after interpolation
+     * @param[out] ddy   f''(x) after interpolation
      */
     static void Cubic_Spline_Interpolation(const double* const rad,
                                            const double* const rad_f,

@@ -154,14 +154,15 @@ void Hamilt_PW::diagH_subspace(
 				}
 			}
 		};
-		if(XC_Functional::get_func_type()==4)
+		if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
 		{
 			if ( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type ) // HF
 			{
 				add_Hexx(1);
 			}
-			else if (Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type || 
-					Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type) // PBE0 or HSE
+			else if (Exx_Info::Hybrid_Type::PBE0  == GlobalC::exx_info.info_global.hybrid_type || 
+			         Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type || 
+					 Exx_Info::Hybrid_Type::HSE   == GlobalC::exx_info.info_global.hybrid_type) // PBE0 or HSE
 			{
 				add_Hexx(GlobalC::exx_info.info_global.hybrid_alpha);
 			}
@@ -189,6 +190,7 @@ void Hamilt_PW::diagH_subspace(
 		{
 			case Exx_Info::Hybrid_Type::HF:
 			case Exx_Info::Hybrid_Type::PBE0:
+			case Exx_Info::Hybrid_Type::SCAN0:
 			case Exx_Info::Hybrid_Type::HSE:
 				GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
 				break;

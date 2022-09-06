@@ -21,11 +21,23 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         for(int ir=0; ir<GlobalC::rhopw->nrxx; ++ir)
         {
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
+            if(XC_Functional::get_func_type()==3)
+            {
+                GlobalC::pot.vofk_eff1[ir] = GlobalC::pot.vofk(is, ir);
+            }
         }
 
-        Gint_inout inout(DM_in, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
-
-        this->UHM->GG.cal_gint(&inout);
+        if(XC_Functional::get_func_type()==3)
+        {
+            Gint_inout inout(DM_in, GlobalC::pot.vr_eff1, GlobalC::pot.vofk_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force_meta);
+            this->UHM->GG.cal_gint(&inout);
+        }
+        else
+        {
+            Gint_inout inout(DM_in, GlobalC::pot.vr_eff1, isforce, isstress, &fvl_dphi, &svl_dphi, Gint_Tools::job_type::force);
+            this->UHM->GG.cal_gint(&inout);
+        }
+        
     }
 
     if(isstress)

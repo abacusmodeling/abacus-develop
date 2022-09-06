@@ -40,7 +40,7 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sxc,
     double s,v1,v2;
     sxc = v1xc = v2xc = 0.0;
 
-    if (rho <= small || grho < small)
+    if (rho <= small || grho < smallg)
     {
         return;
     }
@@ -80,7 +80,9 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sxc,
             case XC_HYB_GGA_XC_PBEH: //PBE0
                 double sx, v1x, v2x, sc, v1c, v2c;
                 XC_Functional::pbex(rho, grho, 0, sx, v1x, v2x);
-                sx *= 0.75; v1x *= 0.75; v2x *= 0.75;
+                sx *= (1.0 - XC_Functional::hybrid_alpha); 
+                v1x *= (1.0 - XC_Functional::hybrid_alpha); 
+                v2x *= (1.0 - XC_Functional::hybrid_alpha);
                 XC_Functional::pbec(rho, grho, 0, sc, v1c, v2c);
                 s = sx + sc;
                 v1 = v1x + v1c;
@@ -179,12 +181,16 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
                 if (rhoup > small && sqrt(fabs(grhoup2)) > small)
                 {
                     XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 0, sxup, v1xup, v2xup);
-                    sxup *= 0.75; v1xup *= 0.75; v2xup *= 0.75;
+                    sxup *= (1.0 - XC_Functional::hybrid_alpha); 
+                    v1xup *= (1.0 - XC_Functional::hybrid_alpha); 
+                    v2xup *= (1.0 - XC_Functional::hybrid_alpha);
                 }
                 if (rhodw > small && sqrt(fabs(grhodw2)) > small)
                 {
                     XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, 0, sxdw, v1xdw, v2xdw);
-        	    	sxdw *= 0.75; v1xdw *= 0.75; v2xdw *= 0.75;            
+        	    	sxdw *= (1.0 - XC_Functional::hybrid_alpha); 
+                    v1xdw *= (1.0 - XC_Functional::hybrid_alpha); 
+                    v2xdw *= (1.0 - XC_Functional::hybrid_alpha);            
                 }
                 break;
             case XC_GGA_X_PBE_SOL: //PBXsol
