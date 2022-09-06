@@ -340,32 +340,32 @@ void Input_Conv::Convert(void)
 
     if (INPUT.dft_functional == "hf")
     {
-        GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+        GlobalC::exx_info.info_global.hybrid_type = Exx_Info::Hybrid_Type::HF;
     }
     else if (INPUT.dft_functional == "pbe0")
     {
-        GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+        GlobalC::exx_info.info_global.hybrid_type = Exx_Info::Hybrid_Type::PBE0;
     }
     else if (INPUT.dft_functional == "hse")
     {
-        GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+        GlobalC::exx_info.info_global.hybrid_type = Exx_Info::Hybrid_Type::HSE;
     }
     else if (INPUT.dft_functional == "opt_orb")
     {
-        GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
+        GlobalC::exx_info.info_global.hybrid_type = Exx_Info::Hybrid_Type::Generate_Matrix;
     }
     else
     {
-        GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+        GlobalC::exx_info.info_global.hybrid_type = Exx_Info::Hybrid_Type::No;
     }
 
-    if (GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
+    if (GlobalC::exx_info.info_global.hybrid_type != Exx_Info::Hybrid_Type::No)
     {
-        GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
-        GlobalC::exx_global.info.hse_omega = INPUT.exx_hse_omega;
-        GlobalC::exx_global.info.separate_loop = INPUT.exx_separate_loop;
-        GlobalC::exx_global.info.hybrid_step = INPUT.exx_hybrid_step;
-        GlobalC::exx_lip.info.lambda = INPUT.exx_lambda;
+        GlobalC::exx_info.info_global.hybrid_alpha = INPUT.exx_hybrid_alpha;
+        GlobalC::exx_info.info_global.hse_omega = INPUT.exx_hse_omega;
+        GlobalC::exx_info.info_global.separate_loop = INPUT.exx_separate_loop;
+        GlobalC::exx_info.info_global.hybrid_step = INPUT.exx_hybrid_step;
+        GlobalC::exx_info.info_lip.lambda = INPUT.exx_lambda;
         GlobalC::exx_lcao.info.pca_threshold = INPUT.exx_pca_threshold;
         GlobalC::exx_lcao.info.c_threshold = INPUT.exx_c_threshold;
         GlobalC::exx_lcao.info.v_threshold = INPUT.exx_v_threshold;
@@ -374,6 +374,15 @@ void Input_Conv::Convert(void)
         GlobalC::exx_lcao.info.cauchy_threshold = INPUT.exx_cauchy_threshold;
         GlobalC::exx_lcao.info.ccp_threshold = INPUT.exx_ccp_threshold;
         GlobalC::exx_lcao.info.ccp_rmesh_times = INPUT.exx_ccp_rmesh_times;
+
+        GlobalC::exx_info.info_ri.pca_threshold = INPUT.exx_pca_threshold;
+        GlobalC::exx_info.info_ri.C_threshold = INPUT.exx_c_threshold;
+        GlobalC::exx_info.info_ri.V_threshold = INPUT.exx_v_threshold;
+        GlobalC::exx_info.info_ri.dm_threshold = INPUT.exx_dm_threshold;
+        GlobalC::exx_info.info_ri.cauchy_threshold = INPUT.exx_cauchy_threshold;
+        GlobalC::exx_info.info_ri.ccp_threshold = INPUT.exx_ccp_threshold;
+        GlobalC::exx_info.info_ri.ccp_rmesh_times = INPUT.exx_ccp_rmesh_times;
+
         if (INPUT.exx_distribute_type == "htime")
         {
             GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;

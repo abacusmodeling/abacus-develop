@@ -10,7 +10,7 @@
 #include "VNL_in_pw.h"
 #include "charge_broyden.h"
 #include "energy.h"
-#include "../module_xc/exx_global.h"
+#include "../module_xc/exx_info.h"
 #include "hamilt.h"
 #include "klist.h"
 #include "magnetism.h"
@@ -318,7 +318,7 @@ extern ModulePW::PW_Basis_K* wfcpw;
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;
-extern Exx_Global exx_global;
+extern Exx_Info exx_info;
 extern Exx_Lip exx_lip;
 extern pseudopot_cell_vnl ppcell;
 } // namespace GlobalC

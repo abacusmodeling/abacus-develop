@@ -550,14 +550,14 @@ void energy::set_exx()
 			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	};
-	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type )				// HF
+	if( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type )				// HF
 	{
 		this->exx = exx_energy();
 	}
-	else if( Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
-			 Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// PBE0 or HSE
+	else if( Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+			 Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )			// PBE0 or HSE
 	{
-		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
+		this->exx = GlobalC::exx_info.info_global.hybrid_alpha * exx_energy();
 	}
 
 	return;

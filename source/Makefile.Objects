@@ -283,6 +283,10 @@ elecstate_pw_sdft.o
 
 OBJ_PSI=psi.o
 
+OBJ_RI=Matrix_Orbs11.o\
+Matrix_Orbs21.o\
+RI_2D_Comm.o
+
 OBJ_HAMILT=hamilt_lcao.o\
 hamilt_pw.o\
 ekinetic_pw.o\
@@ -301,6 +305,7 @@ $(OBJ_HSOLVER)\
 $(OBJ_ELECSTATES)\
 $(OBJ_PSI)\
 ${OBJ_HAMILT}\
+${OBJ_RI}\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \

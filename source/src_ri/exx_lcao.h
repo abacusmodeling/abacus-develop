@@ -10,7 +10,7 @@
 #include "exx_abfs-screen-schwarz.h"
 #include "exx_abfs-screen-cauchy.h"
 #include "../module_base/element_basis_index.h"
-#include "../module_xc/exx_global.h"
+#include "../module_xc/exx_info.h"
 #include "src_lcao/local_orbital_charge.h"
 
 #if EXX_DM==1
@@ -33,7 +33,7 @@ class Exx_Lcao
 {
 public:
 	struct{ std::string process; std::string thread; std::string matrix; } test_dir;	// Peize Lin test
-	Exx_Lcao( const Exx_Global::Exx_Info &info_global );				// Peize Lin test
+	Exx_Lcao( const Exx_Info::Exx_Info_Global &info_global );				// Peize Lin test
 public:
 	void init();
 	void cal_exx_ions(const Parallel_Orbitals &pv);
@@ -94,9 +94,9 @@ private:
 	Exx_Abfs::Screen::Cauchy cauchy;
 		
 public:
-	struct Exx_Info
+	struct Exx_Info_Lcao
 	{
-		const Exx_Global::Hybrid_Type &hybrid_type;
+		const Exx_Info::Hybrid_Type &hybrid_type;
 		
 		const double &hse_omega;
 		
@@ -112,9 +112,9 @@ public:
 		
 		Exx_Lcao::Distribute_Type distribute_type;
 
-		Exx_Info( const Exx_Global::Exx_Info &info_global );
+		Exx_Info_Lcao( const Exx_Info::Exx_Info_Global &info_global );
 	};
-	Exx_Info info;
+	Exx_Info_Lcao info;
 	
 	friend class Local_Orbital_Charge;
 	friend class LCAO_Hamilt;

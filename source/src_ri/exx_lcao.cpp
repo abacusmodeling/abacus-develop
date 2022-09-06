@@ -63,7 +63,7 @@ static ModuleBase::matrix transform (
 
 
 // Peize Lin test
-Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
+Exx_Lcao::Exx_Lcao( const Exx_Info::Exx_Info_Global &info_global )
 	:kmesh_times(4),
 	 info(info_global)
 {
@@ -191,7 +191,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 	};
 }
 
-Exx_Lcao::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
+Exx_Lcao::Exx_Info_Lcao::Exx_Info_Lcao( const Exx_Info::Exx_Info_Global &info_global )
 	:hybrid_type(info_global.hybrid_type),
 	 hse_omega(info_global.hse_omega){} 
 
@@ -531,7 +531,7 @@ gettimeofday( &t_start_all, NULL);
 //	DM.flag_mix = false;		// Peize Lin test
 
 #ifdef __MPI
-	if(GlobalC::exx_global.info.separate_loop)
+	if(GlobalC::exx_info.info_global.separate_loop)
 	{
 		Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
 		Hexx_para.mixing_beta = 0;
@@ -642,10 +642,10 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::en
 gettimeofday( &t_start, NULL);
 	switch(info.hybrid_type)
 	{
-		case Exx_Global::Hybrid_Type::HF:
-		case Exx_Global::Hybrid_Type::PBE0:
+		case Exx_Info::Hybrid_Type::HF:
+		case Exx_Info::Hybrid_Type::PBE0:
 			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, info.ccp_rmesh_times );		break;
-		case Exx_Global::Hybrid_Type::HSE:
+		case Exx_Info::Hybrid_Type::HSE:
 			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_rmesh_times );	break;
 		default:
 			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;

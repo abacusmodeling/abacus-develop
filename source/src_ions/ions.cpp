@@ -83,7 +83,7 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
         {
 #ifdef __LCAO
 #ifdef __MPI
-			if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
+			if( Exx_Info::Hybrid_Type::No==GlobalC::exx_info.info_global.hybrid_type  )
 			{	
 #endif
 #endif		
@@ -92,19 +92,19 @@ void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 #ifdef __LCAO
 #ifdef __MPI
 			}
-			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
+			else if( Exx_Info::Hybrid_Type::Generate_Matrix == GlobalC::exx_info.info_global.hybrid_type )
 			{
 				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			}
 			else	// Peize Lin add 2019-03-09
 			{
-				if( GlobalC::exx_global.info.separate_loop )
+				if( GlobalC::exx_info.info_global.separate_loop )
 				{
-					for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
+					for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_info.info_global.hybrid_step; ++hybrid_step )
 					{
 						p_esolver->Run(istep-1,GlobalC::ucell);
 						eiter += p_esolver->getniter();
-						if( elec.iter==1 || hybrid_step==GlobalC::exx_global.info.hybrid_step-1 )		// exx converge
+						if( elec.iter==1 || hybrid_step==GlobalC::exx_info.info_global.hybrid_step-1 )		// exx converge
 							break;
 						XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);					
 						GlobalC::exx_lip.cal_exx();

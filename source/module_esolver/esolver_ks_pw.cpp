@@ -124,16 +124,16 @@ namespace ModuleESolver
 
 #ifdef __LCAO
 #ifdef __MPI
-        switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
+        switch (GlobalC::exx_info.info_global.hybrid_type) // Peize Lin add 2019-03-09
         {
-        case Exx_Global::Hybrid_Type::HF:
-        case Exx_Global::Hybrid_Type::PBE0:
-        case Exx_Global::Hybrid_Type::HSE:
+        case Exx_Info::Hybrid_Type::HF:
+        case Exx_Info::Hybrid_Type::PBE0:
+        case Exx_Info::Hybrid_Type::HSE:
             GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, GlobalC::wfcpw, GlobalC::rhopw, &GlobalC::ucell);
             break;
-        case Exx_Global::Hybrid_Type::No:
+        case Exx_Info::Hybrid_Type::No:
             break;
-        case Exx_Global::Hybrid_Type::Generate_Matrix:
+        case Exx_Info::Hybrid_Type::Generate_Matrix:
         default:
             throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
         }

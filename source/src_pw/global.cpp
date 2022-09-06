@@ -15,8 +15,8 @@ wavefunc wf;
 Hamilt hm;
 #ifdef __LCAO
 #ifdef __MPI
-Exx_Global exx_global;
-Exx_Lip exx_lip(exx_global.info);
+Exx_Info exx_info;
+Exx_Lip exx_lip(exx_info.info_lip);
 #endif
 #endif
 pseudopot_cell_vnl ppcell;
