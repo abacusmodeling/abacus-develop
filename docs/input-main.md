@@ -1686,7 +1686,7 @@ This part of variables are used to control the usage of implicit solvation model
 #### tau
 
 - **Type**: Real
-- **Description**: The effective surface tension parameter, which describes the cavitation, the dispersion, and the repulsion interaction between the solute and the solvent that are not captured by the electrostatic terms. The unit is Ry/$Bohr^{2}$.
+- **Description**: The effective surface tension parameter, which describes the cavitation, the dispersion, and the repulsion interaction between the solute and the solvent that are not captured by the electrostatic terms. The unit is $Ry/Bohr^{2}$.
 - **Default**: 1.0798e-05
 
 #### sigma_k

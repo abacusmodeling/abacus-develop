@@ -23,7 +23,7 @@ nc_k                    0.00037
 - tau 
 
     The effective surface tension parameter, which describes the cavitation, the dispersion, and the repulsion interaction between the solute and the solvent that are not captured by the electrostatic terms.
-    We use the values of `tau`, `sigma_k`, `nc_k` that were obtained by a fit of the model to experimental solvation energies for molecules in water. tau = 0.525 meV/$Å^{2}$ = 1.0798e-05 Ry/$Bohr^{2}$.
+    We use the values of `tau`, `sigma_k`, `nc_k` that were obtained by a fit of the model to experimental solvation energies for molecules in water. tau = 0.525 $meV/Å^{2}$ = 1.0798e-05 $Ry/Bohr^{2}$.
 - sigma_k 
     
     We assume a diffuse cavity that is implicitly determined by the electronic structure of the solute. 
