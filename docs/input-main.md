@@ -82,6 +82,10 @@
 
     [cal_cond](#cal_cond) | [cond_nche](#cond_nche) | [cond_dw](#cond_dw) | [cond_wcut](#cond_wcut) | [cond_wenlarge](#cond_wenlarge) | [cond_fwhm ](#cond_fwhm )
 
+- [Implicit solvation model](#implicit-solvation-model)
+
+    [imp_sol](#imp_sol) | [eb_k](#eb_k) | [tau](#tau) | [sigma_k](#sigma_k) | [nc_k](#nc_k) 
+
 [back to main page](../README.md)
 
 ## Structure of the file
@@ -1662,3 +1666,39 @@ Thermal conductivities: $\kappa = \lim_{\omega\to 0}\kappa(\omega)$
 - **Type**: Integer
 - **Description**: We use gaussian functions to approxiamte $\delta(E)\approx \frac{1}{\sqrt{2\pi}\Delta E}e^{-\frac{E^2}{2{\Delta E}^2}}$. FWHM for conductivities, $FWHM=2*\sqrt{2\ln2}\cdot \Delta E$. The unit is eV.
 - **Default**: 0.3
+
+### Implicit solvation model
+
+This part of variables are used to control the usage of implicit solvation model. This approach treats the solvent as a continuous medium instead of individual “explicit” solvent molecules, which means that the solute embedded in an implicit solvent and the average over the solvent degrees of freedom becomes implicit in the properties of the solvent bath.
+
+#### imp_sol
+
+- **Type**: Boolean
+- **Description**: If set to 1, an implicit solvation correction is considered.
+- **Default**: 0
+
+#### eb_k
+
+- **Type**: Real
+- **Description**: The relative permittivity of the bulk solvent, 80 for water. Used only if `imp_sol` == true.
+- **Default**: 80
+
+#### tau
+
+- **Type**: Real
+- **Description**: The effective surface tension parameter, which describes the cavitation, the dispersion, and the repulsion interaction between the solute and the solvent that are not captured by the electrostatic terms. The unit is Ry/$Bohr^{2}$.
+- **Default**: 1.0798e-05
+
+#### sigma_k
+
+- **Type**: Real
+- **Description**: We assume a diffuse cavity that is implicitly determined by the electronic structure of the solute.
+`sigma_k` is the parameter that describes the width of the diffuse cavity.
+- **Default**: 0.6
+
+#### nc_k
+
+- **Type**: Real
+- **Description**: It determines at what value of the electron density the dielectric cavity forms. 
+The unit is $Bohr^{-3}$.
+- **Default**: 0.00037
