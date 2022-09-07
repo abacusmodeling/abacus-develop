@@ -25,12 +25,12 @@ Tensor<Tdata> Matrix_Orbs21::cal_overlap_matrix(
 	const size_t sizeB = index_B[TB].count_size;
 	switch(matrix_order)
 	{
-		case Matrix_Order::A1A2B: m = Tensor<Tdata>({sizeA1, sizeA2, sizeB});	std::cout<<"A1A2B"<<std::endl;	break;
-		case Matrix_Order::A1BA2: m = Tensor<Tdata>({sizeA1, sizeB, sizeA2});	std::cout<<"A1BA2"<<std::endl;	break;
-		case Matrix_Order::BA1A2: m = Tensor<Tdata>({sizeB, sizeA1, sizeA2});	std::cout<<"BA1A2"<<std::endl;	break;
-		case Matrix_Order::BA2A1: m = Tensor<Tdata>({sizeB, sizeA2, sizeA1});	std::cout<<"BA2A1"<<std::endl;	break;
-		case Matrix_Order::A2A1B: m = Tensor<Tdata>({sizeA2, sizeA1, sizeB});	std::cout<<"A2A1B"<<std::endl;	break;
-		case Matrix_Order::A2BA1: m = Tensor<Tdata>({sizeA2, sizeB, sizeA1});	std::cout<<"A2BA1"<<std::endl;	break;
+		case Matrix_Order::A1A2B: m = Tensor<Tdata>({sizeA1, sizeA2, sizeB});	break;
+		case Matrix_Order::A1BA2: m = Tensor<Tdata>({sizeA1, sizeB, sizeA2});	break;
+		case Matrix_Order::BA1A2: m = Tensor<Tdata>({sizeB, sizeA1, sizeA2});	break;
+		case Matrix_Order::BA2A1: m = Tensor<Tdata>({sizeB, sizeA2, sizeA1});	break;
+		case Matrix_Order::A2A1B: m = Tensor<Tdata>({sizeA2, sizeA1, sizeB});	break;
+		case Matrix_Order::A2BA1: m = Tensor<Tdata>({sizeA2, sizeB, sizeA1});	break;
 		default:	throw std::invalid_argument(std::string(__FILE__)+" line "+std::to_string(__LINE__));
 	}
 

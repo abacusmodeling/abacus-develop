@@ -13,6 +13,8 @@
 #include "src_ri/exx_abfs-util.h"
 #include "src_ri/exx_abfs-io.h"
 #include "src_ri/conv_coulomb_pot_k.h"
+#include "module_base/tool_title.h"
+#include "module_base/timer.h"
 
 #include <RI/distribute/Distribute_Equally.h>
 #include <RI/global/Map_Operator-3.h>
@@ -21,6 +23,7 @@ template<typename Tdata>
 void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
 {
 	ModuleBase::TITLE("Exx_LRI","init");
+	ModuleBase::timer::tick("Exx_LRI", "init");
 
 //	if(GlobalC::exx_info.info_global.separate_loop)
 //	{
@@ -79,12 +82,14 @@ void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
 //	
 //	this->m_abfslcaos_lcaos.init( 1, this->kmesh_times, 1 );
 //	this->m_abfslcaos_lcaos.init_radial( abfs_ccp, lcaos, lcaos );
+	ModuleBase::timer::tick("Exx_LRI", "init");
 }
 
 template<typename Tdata>
 void Exx_LRI<Tdata>::cal_exx_ions()
 {
 	ModuleBase::TITLE("Exx_LRI","cal_exx_ions");
+	ModuleBase::timer::tick("Exx_LRI", "cal_exx_ions");
 
 //	init_radial_table_ions( cal_atom_centres_core(atom_pairs_core_origin), atom_pairs_core_origin );
 
@@ -115,12 +120,15 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 
 	std::map<TA,std::map<TAC,Tensor<Tdata>>> Vs = this->cv.cal_Vs(list_A1, list_A2, this->info.V_threshold, true);
 	this->exx_lri.set_Vs(std::move(Vs), this->info.V_threshold);
+
+	ModuleBase::timer::tick("Exx_LRI", "cal_exx_ions");
 }
 
 template<typename Tdata>
 void Exx_LRI<Tdata>::cal_exx_elec(const Local_Orbital_Charge &loc, const Parallel_Orbitals &pv)
 {
 	ModuleBase::TITLE("Exx_LRI","cal_exx_elec");
+	ModuleBase::timer::tick("Exx_LRI", "cal_exx_elec");
 
 	const std::vector<std::tuple<std::set<TA>, std::set<TA>>> judge = RI_2D_Comm::get_2D_judge(pv);
 
@@ -136,8 +144,9 @@ void Exx_LRI<Tdata>::cal_exx_elec(const Local_Orbital_Charge &loc, const Paralle
 		this->exx_lri.cal_Hs();	
 		this->Hexxs[is] = Communicate_Tensors_Map_Judge::comm_map2_first(this->mpi_comm, std::move(this->exx_lri.Hs), std::get<0>(judge[is]), std::get<1>(judge[is]));
 
-		post_process_Hexx(this->Hexxs[is]);		
+		post_process_Hexx(this->Hexxs[is]);
 	}
+	ModuleBase::timer::tick("Exx_LRI", "cal_exx_elec");
 }
 
 template<typename Tdata>
@@ -155,6 +164,13 @@ void Exx_LRI<Tdata>::post_process_Hexx(std::map<TA, std::map<TAC, Tensor<Tdata>>
 	Map_Operator::for_each( Hexxs, multiply_frac );
 }
 
+template<typename Tdata>
+Tdata Exx_LRI<Tdata>::get_energy() const
+{
+	const std::map<int,double> SPIN_multiple = {{1,1}, {2,4}, {4,1}};		// why?
+	const double frac = - 0.5  * SPIN_multiple.at(GlobalV::NSPIN);			// why?		0.5 to Ry?
+	return frac * this->exx_lri.post_2D.energy;
+}
 
 /*
 post_process_old

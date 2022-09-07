@@ -543,7 +543,11 @@ void energy::set_exx()
 		}
 		else if("lcao"==GlobalV::BASIS_TYPE)
 		{
-			return GlobalC::exx_lcao.get_energy();
+//			return GlobalC::exx_lcao.get_energy();
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+				return GlobalC::exx_lri_double.get_energy();
+			else
+				return std::real(GlobalC::exx_lri_complex.get_energy());
 		}
 		else
 		{

@@ -9,6 +9,8 @@
 #include "RI_2D_Comm.h"
 #include "RI_Util.h"
 #include "src_pw/global.h"
+#include "module_base/tool_title.h"
+#include "module_base/timer.h"
 
 #include <RI/global/Global_Func-2.h>
 
@@ -21,6 +23,7 @@ auto RI_2D_Comm::split_m2D_ktoR(const std::vector<Tmatrix> &mks_2D, const Parall
 -> std::vector<std::map<TA,std::map<TAC,Tensor<Tdata>>>>
 {
 	ModuleBase::TITLE("RI_2D_Comm","split_m2D_ktoR");
+	ModuleBase::timer::tick("RI_2D_Comm", "split_m2D_ktoR");
 
 	const TC period = RI_Util::get_Born_vonKarmen_period();
 	const std::map<int,int> nspin_k = {{1,1}, {2,2}, {4,1}};
@@ -73,6 +76,7 @@ auto RI_2D_Comm::split_m2D_ktoR(const std::vector<Tmatrix> &mks_2D, const Parall
 			}
 		}
 	}
+	ModuleBase::timer::tick("RI_2D_Comm", "split_m2D_ktoR");
 	return mRs_a2D;
 }
 
@@ -86,6 +90,7 @@ void RI_2D_Comm::add_Hexx(
 	LCAO_Matrix &lm)
 {
 	ModuleBase::TITLE("RI_2D_Comm","add_Hexx");
+	ModuleBase::timer::tick("RI_2D_Comm", "add_Hexx");
 
 	const std::map<int, std::vector<int>> is_list = {{1,{0}}, {2,{GlobalC::kv.isk[ik]}}, {4,{0,1,2,3}}};
 	for(const int is_b : is_list.at(GlobalV::NSPIN))
@@ -124,6 +129,7 @@ void RI_2D_Comm::add_Hexx(
 			}
 		}
 	}
+	ModuleBase::timer::tick("RI_2D_Comm", "add_Hexx");
 }
 
 std::tuple<int,int,int>

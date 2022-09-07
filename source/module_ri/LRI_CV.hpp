@@ -10,6 +10,8 @@
 #include "src_ri/exx_abfs-abfs_index.h"
 #include "Inverse_Matrix.h"
 #include "RI_Util.h"
+#include "module_base/tool_title.h"
+#include "module_base/timer.h"
 #include <omp.h>
 
 template<typename Tdata>
@@ -34,6 +36,7 @@ void LRI_CV<Tdata>::set_orbitals(
 	const double &ccp_rmesh_times_in)
 {
 	ModuleBase::TITLE("LRI_CV", "set_orbitals");
+	ModuleBase::timer::tick("LRI_CV", "set_orbitals");
 
 	this->lcaos = lcaos_in;
 	this->abfs = abfs_in;
@@ -54,7 +57,9 @@ void LRI_CV<Tdata>::set_orbitals(
 	
 	this->m_abfslcaos_lcaos.init( 1, kmesh_times, 1 );
 	this->m_abfslcaos_lcaos.init_radial( this->abfs_ccp, this->lcaos, this->lcaos );	
-	this->m_abfslcaos_lcaos.init_radial_table();	
+	this->m_abfslcaos_lcaos.init_radial_table();
+
+	ModuleBase::timer::tick("LRI_CV", "set_orbitals");
 }
 
 
@@ -69,6 +74,7 @@ auto LRI_CV<Tdata>::cal_datas(
 -> std::map<TA,std::map<TAC,Tensor<Tdata>>>
 {
 	ModuleBase::TITLE("LRI_CV","cal_datas");
+	ModuleBase::timer::tick("LRI_CV", "cal_datas");
 
 	std::map<TA,std::map<TAC,Tensor<Tdata>>> Datas;
 	#pragma omp parallel for
@@ -101,6 +107,7 @@ auto LRI_CV<Tdata>::cal_datas(
 			}
 		}
 	}
+	ModuleBase::timer::tick("LRI_CV", "cal_datas");
 	return std::move(Datas);
 }
 

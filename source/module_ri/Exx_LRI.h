@@ -34,6 +34,7 @@ public:
 	void cal_exx_elec(const Local_Orbital_Charge &loc, const Parallel_Orbitals &pv);
 
 	std::vector< std::map<TA, std::map<TAC, Tensor<Tdata>>>> Hexxs;
+	Tdata get_energy() const;
 
 private:
 	const Exx_Info::Exx_Info_RI &info;
