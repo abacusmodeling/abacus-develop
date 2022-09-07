@@ -106,15 +106,17 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 		= {RI_Util::Vector3_to_array3(GlobalC::ucell.a1),
 		   RI_Util::Vector3_to_array3(GlobalC::ucell.a2),
 		   RI_Util::Vector3_to_array3(GlobalC::ucell.a3)};
-	const std::array<Tcell,Ndim> period = {GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
+	const std::array<Tcell,Ndim> period = {GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]};
 
 	this->exx_lri.set_parallel(this->mpi_comm, atomsR, latvec, period);
 
+	// std::max(2) for gamma_only, list_A2 should contain cell -1. In the future distribute will be neighbour.
+	const std::array<Tcell,Ndim> period_tmp = {std::max(2,GlobalC::kv.nmp[0]), std::max(2,GlobalC::kv.nmp[1]), std::max(2,GlobalC::kv.nmp[2])};
 	std::pair<std::vector<TA>, std::vector<std::vector<std::pair<TA,std::array<Tcell,Ndim>>>>>
-		list_As = Distribute_Equally::distribute_atoms_periods(this->mpi_comm, atoms, period,2);
+		list_As = Distribute_Equally::distribute_atoms_periods(this->mpi_comm, atoms, period_tmp, 2);
 	const std::vector<TA> list_A1 = std::move(list_As.first);
 	const std::vector<TAC> list_A2 = std::move(list_As.second[0]);
-	
+
 	std::map<TA,std::map<TAC,Tensor<Tdata>>> Cs = this->cv.cal_Cs(list_A1, list_A2, this->info.C_threshold, true);
 	this->exx_lri.set_Cs(std::move(Cs), this->info.C_threshold);
 

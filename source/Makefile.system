@@ -54,5 +54,5 @@ INCLUDES = -I. -Icommands -I${ELPA_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFTW
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-OPTS     = ${INCLUDES} -Ofast -traceback -std=c++17 -simd -march=native -m64 -qopenmp -Werror -Wall -pedantic -g -pthread
+OPTS     = ${INCLUDES} -Ofast -traceback -std=c++11 -simd -march=native -m64 -qopenmp -Werror -Wall -pedantic -g -pthread
 OPTS_MPI = -cxx=${CPLUSPLUS}
