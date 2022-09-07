@@ -15,7 +15,7 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
-#include "exx_global.h"
+#include "exx_info.h"
 #include "../module_pw/pw_basis_k.h"
 class XC_Functional
 {

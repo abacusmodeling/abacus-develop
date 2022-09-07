@@ -9,6 +9,8 @@
 #include "../src_parallel/parallel_common.h"
 #include "../module_base/constants.h"
 #include "../module_base/element_elec_config.h"
+#include "src_pw/global.h"
+#include "src_lcao/serialization_cereal.h"
 #include "module_base/element_covalent_radius.h"
 
 UnitCell_pseudo::UnitCell_pseudo()
@@ -138,6 +140,8 @@ void UnitCell_pseudo::setup_cell(
 	#ifdef __LCAO
 	orb.bcast_files(ntype, GlobalV::MY_RANK);
 	#endif
+
+	ModuleBase::bcast_data_cereal( GlobalC::exx_info.info_ri.files_abfs, MPI_COMM_WORLD, 0 );		// Peize Lin add 2022.09.05
 #endif
 	
 	//========================================================

@@ -121,12 +121,12 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
 #ifdef __MPI
     if (GlobalV::CALCULATION == "nscf")
     {
-        switch (GlobalC::exx_global.info.hybrid_type)
+        switch (GlobalC::exx_info.info_global.hybrid_type)
         {
-        case Exx_Global::Hybrid_Type::HF:
-        case Exx_Global::Hybrid_Type::PBE0:
-        case Exx_Global::Hybrid_Type::SCAN0:
-        case Exx_Global::Hybrid_Type::HSE:
+        case Exx_Info::Hybrid_Type::HF:
+        case Exx_Info::Hybrid_Type::PBE0:
+        case Exx_Info::Hybrid_Type::SCAN0:
+        case Exx_Info::Hybrid_Type::HSE:
             XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
             break;
         }
@@ -137,16 +137,20 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     // Peize Lin 2016-12-03
     if (GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
     {
-        switch (GlobalC::exx_global.info.hybrid_type)
+        switch (GlobalC::exx_info.info_global.hybrid_type)
         {
-        case Exx_Global::Hybrid_Type::HF:
-        case Exx_Global::Hybrid_Type::PBE0:
-        case Exx_Global::Hybrid_Type::SCAN0:
-        case Exx_Global::Hybrid_Type::HSE:
+        case Exx_Info::Hybrid_Type::HF:
+        case Exx_Info::Hybrid_Type::PBE0:
+        case Exx_Info::Hybrid_Type::SCAN0:
+        case Exx_Info::Hybrid_Type::HSE:
             GlobalC::exx_lcao.init();
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+                GlobalC::exx_lri_double.init(MPI_COMM_WORLD);
+            else
+                GlobalC::exx_lri_complex.init(MPI_COMM_WORLD);
             break;
-        case Exx_Global::Hybrid_Type::No:
-        case Exx_Global::Hybrid_Type::Generate_Matrix:
+        case Exx_Info::Hybrid_Type::No:
+        case Exx_Info::Hybrid_Type::Generate_Matrix:
             break;
         default:
             throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)
@@ -441,11 +445,15 @@ void ESolver_KS_LCAO::eachiterinit(const int istep, const int iter)
 #ifdef __MPI
     // calculate exact-exchange
     // calculate exact-exchange
-    if(Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type)
+    if(Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
     {
-        if (!GlobalC::exx_global.info.separate_loop && this->two_level_step)
+        if (!GlobalC::exx_info.info_global.separate_loop && this->two_level_step)
         {
             GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+                GlobalC::exx_lri_double.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
+            else
+                GlobalC::exx_lri_complex.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
         }
     }
 #endif
@@ -507,6 +515,10 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
         {
             XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
             GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+                GlobalC::exx_lri_double.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
+            else
+                GlobalC::exx_lri_complex.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
             GlobalC::restart.info_load.restart_exx = true;
         }
     }
@@ -957,12 +969,12 @@ void ESolver_KS_LCAO::afterscf()
 bool ESolver_KS_LCAO::do_after_converge(int& iter)
 {
 #ifdef __MPI
-    if (Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type)
+    if (Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
     {
         //no separate_loop case
-        if (!GlobalC::exx_global.info.separate_loop)
+        if (!GlobalC::exx_info.info_global.separate_loop)
         {
-            GlobalC::exx_global.info.hybrid_step = 1;
+            GlobalC::exx_info.info_global.hybrid_step = 1;
                 
             //in no_separate_loop case, scf loop only did twice
             //in first scf loop, exx updated once in beginning,
@@ -984,7 +996,7 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
         }
         //has separate_loop case
         //exx converged or get max exx steps
-        else if(this->two_level_step == GlobalC::exx_global.info.hybrid_step || (iter==1 && this->two_level_step!=0))
+        else if(this->two_level_step == GlobalC::exx_info.info_global.hybrid_step || (iter==1 && this->two_level_step!=0))
         {
             return true;
         }
@@ -993,7 +1005,10 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
             //update exx and redo scf
             XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
             GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
-            
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+				GlobalC::exx_lri_double.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
+			else
+				GlobalC::exx_lri_complex.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
             iter = 0;
             std::cout << " Updating EXX and rerun SCF" << std::endl;
             this->two_level_step++;
