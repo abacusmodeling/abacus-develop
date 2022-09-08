@@ -24,6 +24,7 @@
 #include "vdwd3_parameters.h"
 #include "wavefunc.h"
 #include "../module_xc/xc_functional.h"
+#include "../src_lcao/rpa.h"
 
 #ifdef __CUDA
 namespace CudaCheck
@@ -319,6 +320,7 @@ extern Hamilt hm;
 extern Exx_Global exx_global;
 extern Exx_Lip exx_lip;
 extern pseudopot_cell_vnl ppcell;
+extern ModuleRPA::DFT_RPA_interface rpa;
 } // namespace GlobalC
 
 #include "../module_cell/unitcell_pseudo.h"

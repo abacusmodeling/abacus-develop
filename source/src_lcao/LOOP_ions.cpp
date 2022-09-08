@@ -183,7 +183,12 @@ void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
             // Output wave functions, bands, k-points information, and etc.
             GlobalC::dmft.out_to_dmft(this->LOWF, *this->UHM.LM);
         }
-        GlobalC::rpa.out_for_RPA(this->LOWF);
+
+        if(INPUT.rpa==1)
+        {
+            GlobalC::rpa.out_for_RPA(this->LOWF,this->LOC);
+        }
+        
 
         if (Pdiag_Double::out_mat_hsR)
         {

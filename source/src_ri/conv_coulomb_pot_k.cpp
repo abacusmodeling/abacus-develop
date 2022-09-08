@@ -33,7 +33,8 @@ std::vector<double> Conv_Coulomb_Pot_K::cal_psi_hf(const std::vector<double> &ps
     // }
 
     // Sphere truction -- Spencer
-    double Rc = pow(0.75 * GlobalC::ucell.omega / (ModuleBase::PI), 0.3333334);
+    //double Rc = pow(0.75  * GlobalC::ucell.omega / (ModuleBase::PI), 0.3333334);
+    double Rc = pow(0.75 * GlobalC::kv.nks * GlobalC::ucell.omega / (ModuleBase::PI), 0.3333334);
     cout << "hf_Rc:  " << Rc << endl;
     std::vector<double> psik2_ccp(psif.size());
     for (size_t ik = 0; ik < psif.size(); ++ik)

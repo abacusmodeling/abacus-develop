@@ -10,7 +10,8 @@
 #include "../module_base/complexmatrix.h"
 #include "../module_base/matrix.h"
 #include "../src_ri/abfs-vector3_order.h"
-#include "src_lcao/local_orbital_charge.h"
+#include "local_orbital_charge.h"
+//#include "../src_ri/exx_lcao.h"
 
 #include <string>
 #include <vector>
@@ -29,7 +30,9 @@ class DFT_RPA_interface
         ;
     }
 
-    void out_for_RPA(Local_Orbital_wfc &lowf);
+    bool RPA_on=false;
+
+    void out_for_RPA(Local_Orbital_wfc &lowf,Local_Orbital_Charge &loc);
     void out_eigen_vector(Local_Orbital_wfc &lowf);
     void out_struc();
     void out_bands();
@@ -37,11 +40,16 @@ class DFT_RPA_interface
     void out_coulomb_k();
     void print_matrix(char *desc, const ModuleBase::matrix &mat);
     void print_complex_matrix(char *desc, const ModuleBase::ComplexMatrix &mat);
+
+    
+    void exx_init();
+    void exx_cal_ions();
 };
 } // namespace ModuleRPA
 namespace GlobalC
 {
 extern ModuleRPA::DFT_RPA_interface rpa;
+
 }
 
 #endif

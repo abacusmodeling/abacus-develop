@@ -27,6 +27,7 @@
 #include "src_lcao/local_orbital_charge.h"
 #endif
 #include "module_base/timer.h"
+#include "src_lcao/rpa.h"
 
 void Input_Conv::Convert(void)
 {
@@ -357,9 +358,41 @@ void Input_Conv::Convert(void)
 	}
 	else
 	{
-		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		// GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		// GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
+		// GlobalC::exx_global.info.hse_omega = INPUT.exx_hse_omega;
+		// GlobalC::exx_global.info.separate_loop = INPUT.exx_separate_loop;
+		// GlobalC::exx_global.info.hybrid_step = INPUT.exx_hybrid_step;
+		// GlobalC::exx_lip.info.lambda = INPUT.exx_lambda;
+		GlobalC::rpa_exx_lcao.info.pca_threshold = INPUT.exx_pca_threshold;
+		GlobalC::rpa_exx_lcao.info.c_threshold = INPUT.exx_c_threshold;
+		GlobalC::rpa_exx_lcao.info.v_threshold = INPUT.exx_v_threshold;
+		GlobalC::rpa_exx_lcao.info.dm_threshold = INPUT.exx_dm_threshold;
+		GlobalC::rpa_exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold;
+		GlobalC::rpa_exx_lcao.info.cauchy_threshold = INPUT.exx_cauchy_threshold;
+		GlobalC::rpa_exx_lcao.info.ccp_threshold = INPUT.exx_ccp_threshold;
+		GlobalC::rpa_exx_lcao.info.ccp_rmesh_times = INPUT.exx_ccp_rmesh_times;
+		// if (INPUT.exx_distribute_type == "htime")
+		// {
+		// 	GlobalC::rpa_exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
+		// }
+		// else if (INPUT.exx_distribute_type == "kmeans2")
+		// {
+		// 	GlobalC::rpa_exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans2;
+		// }
+		// else if (INPUT.exx_distribute_type == "kmeans1")
+		// {
+		// 	GlobalC::rpa_exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans1;
+		// }
+		// else if (INPUT.exx_distribute_type == "order")
+		// {
+		// 	GlobalC::rpa_exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
+		// }
+		// Exx_Abfs::Jle::Lmax = INPUT.exx_opt_orb_lmax;
+		// Exx_Abfs::Jle::Ecut_exx = INPUT.exx_opt_orb_ecut;
+		// Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
 	}
-
+//rongshi modified  2022-05-25
 	if(GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
 	{
 		GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
@@ -397,6 +430,11 @@ void Input_Conv::Convert(void)
 	}
 #endif
 #endif
+
+	if(INPUT.rpa==1)
+	{
+		GlobalC::rpa.RPA_on=true;
+	}
 	GlobalC::ppcell.cell_factor = INPUT.cell_factor; // LiuXh add 20180619
 
 

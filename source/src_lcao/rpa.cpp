@@ -12,22 +12,56 @@
 #include <iomanip>
 #include <mpi.h>
 
+#include "../src_ri/conv_coulomb_pot-inl.h"
+#include "../src_ri/conv_coulomb_pot.h"
+#include "../src_ri/conv_coulomb_pot_k-template.h"
+#include "../src_ri/conv_coulomb_pot_k.h"
+#include "../src_ri/exx_abfs.h"
+#include "../src_ri/exx_abfs-construct_orbs.h"
+#include "../src_ri/exx_abfs-parallel-distribute-htime.h"
+#include "../src_ri/exx_abfs-parallel-distribute-kmeans.h"
+#include "../src_ri/exx_abfs-parallel-distribute-order.h"
+#include "../src_ri/exx_abfs-parallel.h"
+#include "../src_ri/exx_abfs-util.h"
+#include "../src_ri/exx_abfs-io.h"
+#include "../src_ri/exx_abfs-abfs_index.h"
+
 namespace GlobalC
 {
 ModuleRPA::DFT_RPA_interface rpa;
+//Exx_Lcao rpa_exx_lcao(GlobalC::exx_global.info);
 }
 
 namespace ModuleRPA
 {
-void DFT_RPA_interface::out_for_RPA(Local_Orbital_wfc &lowf)
+void DFT_RPA_interface::out_for_RPA(Local_Orbital_wfc &lowf,Local_Orbital_Charge &loc)
 {
     ModuleBase::TITLE("DFT_RPA_interface", "out_for_RPA");
     this->out_bands();
     this->out_eigen_vector(lowf);
     this->out_struc();
+    
+    
+    //void exx_inti();
+    //GlobalC::rpa_exx_lcao=GlobalC::exx_lcao;
+    if(GlobalV::DFT_FUNCTIONAL=="default")
+    {
+        this->exx_init();
+        cout<<"rpa_pca_threshold: "<<GlobalC::rpa_exx_lcao.info.pca_threshold<<endl;
+        cout<<"rpa_ccp_rmesh_times: "<<GlobalC::rpa_exx_lcao.info.ccp_rmesh_times<<endl;
+        GlobalC::rpa_exx_lcao.cal_exx_ions(*lowf.ParaV);
+        GlobalC::rpa_exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
+    }
+    cout<<"rpa_lcao_exx(Ha): "<< std::fixed << std::setprecision(15)<<GlobalC::rpa_exx_lcao.get_energy()/2.0<<endl;
     this->out_Cs();
     this->out_coulomb_k();
-    cout << "EXX_energy:  " << std::setprecision(6) << GlobalC::exx_lcao.get_energy() << endl;
+    //cout << "EXX_energy(Ha):  " << std::setprecision(6) << GlobalC::exx_lcao.get_energy()/2.0 << endl;
+    cout<<"etxc(Ha):"<< std::fixed << std::setprecision(15)<<GlobalC::en.etxc/2.0<<endl;
+    cout<<"etot(Ha):"<< std::fixed << std::setprecision(15)<<GlobalC::en.etot/2.0<<endl;
+    cout<<"Etot_without_rpa(Ha):"<< std::fixed << std::setprecision(15)<<
+        (GlobalC::en.etot-GlobalC::en.etxc+GlobalC::rpa_exx_lcao.get_energy())/2.0<<endl;
+    //cout<<"Etot(Ha):"<<GlobalC::en.etot/2.0<<endl;
+    //cout<<"etxcc(Ha):"<<GlobalC::en.etxcc<<endl;
     return;
 }
 void DFT_RPA_interface::out_eigen_vector(Local_Orbital_wfc &lowf)
@@ -164,29 +198,29 @@ void DFT_RPA_interface::out_Cs()
         return atom_centres_core;
     };
 
-    const std::set<size_t> atom_centres_core = cal_atom_centres_core(GlobalC::exx_lcao.atom_pairs_core);
-    map<size_t, map<size_t, map<Abfs::Vector3_Order<int>, shared_ptr<ModuleBase::matrix>>>> Cs_temp;
-    map<size_t, map<size_t, map<Abfs::Vector3_Order<int>, shared_ptr<ModuleBase::matrix>>>> Cs_m;
-    Cs_temp = Abfs::cal_Cs(atom_centres_core,
-                           GlobalC::exx_lcao.m_abfs_abfs,
-                           GlobalC::exx_lcao.m_abfslcaos_lcaos,
-                           GlobalC::exx_lcao.index_abfs,
-                           GlobalC::exx_lcao.index_lcaos,
-                           GlobalC::exx_lcao.info.c_threshold,
-                           GlobalC::exx_lcao.Cws,
-                           GlobalC::exx_lcao.Vws);
-    Cs_m = Abfs::cal_mps(GlobalC::exx_lcao.Born_von_Karman_period, Cs_temp);
+    const std::set<size_t> atom_centres_core = cal_atom_centres_core(GlobalC::rpa_exx_lcao.atom_pairs_core);
+    // map<size_t, map<size_t, map<Abfs::Vector3_Order<int>, shared_ptr<ModuleBase::matrix>>>> Cs_temp;
+    // map<size_t, map<size_t, map<Abfs::Vector3_Order<int>, shared_ptr<ModuleBase::matrix>>>> Cs_m;
+    // Cs_temp = Abfs::cal_Cs(atom_centres_core,
+    //                        GlobalC::rpa_exx_lcao.m_abfs_abfs,
+    //                        GlobalC::rpa_exx_lcao.m_abfslcaos_lcaos,
+    //                        GlobalC::rpa_exx_lcao.index_abfs,
+    //                        GlobalC::rpa_exx_lcao.index_lcaos,
+    //                        GlobalC::rpa_exx_lcao.info.c_threshold,
+    //                        GlobalC::rpa_exx_lcao.Cws,
+    //                        GlobalC::rpa_exx_lcao.Vws);
+    // Cs_m = Abfs::cal_mps(GlobalC::rpa_exx_lcao.Born_von_Karman_period, Cs_temp);
 
     std::stringstream ss;
     ss << "Cs_data.txt";
     std::ofstream ofs;
     ofs.open(ss.str().c_str(), std::ios::out);
     ofs << atom_centres_core.size() << "    " << 0 << endl;
-    for (auto &Ip: Cs_m)
+    for (auto &Ip: GlobalC::rpa_exx_lcao.Cps)
     {
         size_t I = Ip.first;
         size_t i_num = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[I]].nw;
-        size_t mu_num = GlobalC::exx_lcao.index_abfs[GlobalC::ucell.iat2it[I]].count_size;
+        size_t mu_num = GlobalC::rpa_exx_lcao.index_abfs[GlobalC::ucell.iat2it[I]].count_size;
         for (auto &Jp: Ip.second)
         {
             size_t J = Jp.first;
@@ -210,36 +244,36 @@ void DFT_RPA_interface::out_Cs()
 
 void DFT_RPA_interface::out_coulomb_k()
 {
-    auto cal_atom_centres_core = [](const std::vector<std::pair<size_t, size_t>> &atom_pairs_core) -> std::set<size_t> {
-        std::set<size_t> atom_centres_core;
-        for (const std::pair<size_t, size_t> &atom_pair: atom_pairs_core)
-        {
-            atom_centres_core.insert(atom_pair.first);
-            atom_centres_core.insert(atom_pair.second);
-        }
-        return atom_centres_core;
-    };
-    map<size_t,
-        map<size_t,
-            map<Abfs::Vector3_Order<int>,
-                shared_ptr<ModuleBase::matrix>>>>
-        Vs_m; // Vs[iat1][iat2][box2]
-    map<size_t, map<size_t, map<Abfs::Vector3_Order<int>, shared_ptr<ModuleBase::matrix>>>> Vps_m;
-    Vs_m = Abfs::cal_Vs(GlobalC::exx_lcao.atom_pairs_core_origin,
-                        GlobalC::exx_lcao.m_abfs_abfs,
-                        GlobalC::exx_lcao.index_abfs,
-                        GlobalC::exx_lcao.info.ccp_rmesh_times,
-                        GlobalC::exx_lcao.info.v_threshold,
-                        GlobalC::exx_lcao.Vws);
-    Vps_m = Abfs::cal_mps(GlobalC::exx_lcao.Born_von_Karman_period, Vs_m);
+    // auto cal_atom_centres_core = [](const std::vector<std::pair<size_t, size_t>> &atom_pairs_core) -> std::set<size_t> {
+    //     std::set<size_t> atom_centres_core;
+    //     for (const std::pair<size_t, size_t> &atom_pair: atom_pairs_core)
+    //     {
+    //         atom_centres_core.insert(atom_pair.first);
+    //         atom_centres_core.insert(atom_pair.second);
+    //     }
+    //     return atom_centres_core;
+    // };
+    // map<size_t,
+    //     map<size_t,
+    //         map<Abfs::Vector3_Order<int>,
+    //             shared_ptr<ModuleBase::matrix>>>>
+    //     Vs_m; // Vs[iat1][iat2][box2]
+    // map<size_t, map<size_t, map<Abfs::Vector3_Order<int>, shared_ptr<ModuleBase::matrix>>>> Vps_m;
+    // Vs_m = Abfs::cal_Vs(GlobalC::rpa_exx_lcao.atom_pairs_core_origin,
+    //                     GlobalC::rpa_exx_lcao.m_abfs_abfs,
+    //                     GlobalC::rpa_exx_lcao.index_abfs,
+    //                     GlobalC::rpa_exx_lcao.info.ccp_rmesh_times,
+    //                     GlobalC::rpa_exx_lcao.info.v_threshold,
+    //                     GlobalC::rpa_exx_lcao.Vws);
+    // Vps_m = Abfs::cal_mps(GlobalC::rpa_exx_lcao.Born_von_Karman_period, Vs_m);
 
     int all_mu = 0;
-    vector<int> mu_shift(Vps_m.size());
-    for (auto &Ip: Vps_m)
+    vector<int> mu_shift(GlobalC::rpa_exx_lcao.Vps.size());
+    for (auto &Ip: GlobalC::rpa_exx_lcao.Vps)
     {
         auto I = Ip.first;
         mu_shift[I] = all_mu;
-        all_mu += GlobalC::exx_lcao.index_abfs[GlobalC::ucell.iat2it[I]].count_size;
+        all_mu += GlobalC::rpa_exx_lcao.index_abfs[GlobalC::ucell.iat2it[I]].count_size;
     }
     std::stringstream ss;
     ss << "coulomb_mat.txt";
@@ -247,14 +281,14 @@ void DFT_RPA_interface::out_coulomb_k()
     ofs.open(ss.str().c_str(), std::ios::out);
 
     ofs << GlobalC::kv.nks << endl;
-    for (auto &Ip: Vps_m)
+    for (auto &Ip: GlobalC::rpa_exx_lcao.Vps)
     {
         auto I = Ip.first;
-        size_t mu_num = GlobalC::exx_lcao.index_abfs[GlobalC::ucell.iat2it[I]].count_size;
+        size_t mu_num = GlobalC::rpa_exx_lcao.index_abfs[GlobalC::ucell.iat2it[I]].count_size;
         for (auto &Jp: Ip.second)
         {
             auto J = Jp.first;
-            size_t nu_num = GlobalC::exx_lcao.index_abfs[GlobalC::ucell.iat2it[J]].count_size;
+            size_t nu_num = GlobalC::rpa_exx_lcao.index_abfs[GlobalC::ucell.iat2it[J]].count_size;
 
             for (int ik = 0; ik != GlobalC::kv.nks; ik++)
             {
@@ -274,14 +308,182 @@ void DFT_RPA_interface::out_coulomb_k()
                 }
                 for (int i = 0; i != tmp_Vk.size; i++)
                 {
-                    ofs << std::setw(21) << std::fixed << std::setprecision(15) << tmp_Vk.c[i].real() << std::setw(21)
-                        << std::fixed << std::setprecision(15) << tmp_Vk.c[i].imag() << endl;
+                    ofs << std::setw(21) << std::fixed << std::setprecision(12) << tmp_Vk.c[i].real() << std::setw(21)
+                        << std::fixed << std::setprecision(12) << tmp_Vk.c[i].imag() << endl;
                 }
             }
         }
     }
     ofs.close();
 }
+
+void DFT_RPA_interface::exx_init()
+{
+    cout<<"rpa_exx_init!!!"<<endl;
+    #ifdef __MPI
+    if (GlobalC::exx_global.info.separate_loop)
+    {
+        GlobalC::rpa_exx_lcao.Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
+        GlobalC::rpa_exx_lcao.Hexx_para.mixing_beta = 0;
+    }
+    else
+    {
+        if ("plain" == GlobalC::CHR.mixing_mode)
+        {
+            GlobalC::rpa_exx_lcao.Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Plain;
+        }
+        else if ("pulay" == GlobalC::CHR.mixing_mode)
+        {
+            GlobalC::rpa_exx_lcao.Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Pulay;
+        }
+        else
+        {
+            throw std::invalid_argument("exx mixing error. exx_separate_loop==false, mixing_mode!=plain or pulay");
+        }
+        GlobalC::rpa_exx_lcao.Hexx_para.mixing_beta = GlobalC::CHR.mixing_beta;
+    }
+#endif
+
+    GlobalC::rpa_exx_lcao.lcaos = Exx_Abfs::Construct_Orbs::change_orbs(GlobalC::ORB, GlobalC::rpa_exx_lcao.kmesh_times);
+#ifdef __MPI
+    Exx_Abfs::Util::bcast(GlobalC::rpa_exx_lcao.info.files_abfs, 0, MPI_COMM_WORLD);
+#endif
+
+    const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs_same_atom
+        = Exx_Abfs::Construct_Orbs::abfs_same_atom(GlobalC::rpa_exx_lcao.lcaos,
+                                                   GlobalC::rpa_exx_lcao.kmesh_times,
+                                                   GlobalC::rpa_exx_lcao.info.pca_threshold); // Peize Lin test
+    if (GlobalC::rpa_exx_lcao.info.files_abfs.empty())
+    {
+        GlobalC::rpa_exx_lcao.abfs = abfs_same_atom;
+    }
+    else
+    {
+        GlobalC::rpa_exx_lcao.abfs = Exx_Abfs::IO::construct_abfs(abfs_same_atom,
+                                                          GlobalC::ORB,
+                                                          GlobalC::rpa_exx_lcao.info.files_abfs,
+                                                          GlobalC::rpa_exx_lcao.kmesh_times);
+    }
+
+    switch (GlobalC::rpa_exx_lcao.info.hybrid_type)
+    {
+    case Exx_Global::Hybrid_Type::HF:
+        GlobalC::rpa_exx_lcao.abfs_ccp
+            = Conv_Coulomb_Pot_K::cal_orbs_ccp(GlobalC::rpa_exx_lcao.abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, GlobalC::rpa_exx_lcao.info.ccp_rmesh_times);
+        break;
+    case Exx_Global::Hybrid_Type::No:
+        GlobalC::rpa_exx_lcao.abfs_ccp
+            = Conv_Coulomb_Pot_K::cal_orbs_ccp(GlobalC::rpa_exx_lcao.abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, GlobalC::rpa_exx_lcao.info.ccp_rmesh_times);
+        break;
+    case Exx_Global::Hybrid_Type::PBE0:
+        GlobalC::rpa_exx_lcao.abfs_ccp
+            = Conv_Coulomb_Pot_K::cal_orbs_ccp(GlobalC::rpa_exx_lcao.abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, GlobalC::rpa_exx_lcao.info.ccp_rmesh_times);
+        break;
+    case Exx_Global::Hybrid_Type::HSE:
+        GlobalC::rpa_exx_lcao.abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(GlobalC::rpa_exx_lcao.abfs,
+                                                    Conv_Coulomb_Pot_K::Ccp_Type::Hse,
+                                                    {{"hse_omega", GlobalC::rpa_exx_lcao.info.hse_omega}},
+                                                    GlobalC::rpa_exx_lcao.info.ccp_rmesh_times);
+        break;
+    default:
+        throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + " line "
+                                + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+        break;
+    }
+
+    for (size_t T = 0; T != GlobalC::rpa_exx_lcao.abfs.size(); ++T)
+    {
+        Exx_Abfs::Lmax = std::max(Exx_Abfs::Lmax, static_cast<int>(GlobalC::rpa_exx_lcao.abfs[T].size()) - 1);
+    }
+
+
+    const ModuleBase::Element_Basis_Index::Range &&range_lcaos = Exx_Abfs::Abfs_Index::construct_range(GlobalC::rpa_exx_lcao.lcaos);
+    GlobalC::rpa_exx_lcao.index_lcaos = ModuleBase::Element_Basis_Index::construct_index(range_lcaos);
+
+    const ModuleBase::Element_Basis_Index::Range &&range_abfs = Exx_Abfs::Abfs_Index::construct_range(GlobalC::rpa_exx_lcao.abfs);
+    GlobalC::rpa_exx_lcao.index_abfs = ModuleBase::Element_Basis_Index::construct_index(range_abfs);
+
+    GlobalC::rpa_exx_lcao.m_abfs_abfs.init(2, GlobalC::rpa_exx_lcao.kmesh_times, (1 + GlobalC::rpa_exx_lcao.info.ccp_rmesh_times) / 2.0);
+   
+    GlobalC::rpa_exx_lcao.m_abfs_abfs.init_radial(GlobalC::rpa_exx_lcao.abfs_ccp, GlobalC::rpa_exx_lcao.abfs);
+  
+  
+    GlobalC::rpa_exx_lcao.m_abfslcaos_lcaos.init(1, GlobalC::rpa_exx_lcao.kmesh_times, 1);
+  
+    GlobalC::rpa_exx_lcao.m_abfslcaos_lcaos.init_radial(GlobalC::rpa_exx_lcao.abfs_ccp, GlobalC::rpa_exx_lcao.lcaos, GlobalC::rpa_exx_lcao.lcaos);
+  
+    GlobalC::rpa_exx_lcao.Born_von_Karman_period = ModuleBase::Vector3<int>{GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]};
+  
+}
+
+void DFT_RPA_interface::exx_cal_ions()
+{
+    cout<<"rpa_exx_cal_ions!!!"<<endl;
+    auto cal_atom_centres_core = [](const std::vector<std::pair<size_t, size_t>> &atom_pairs_core) -> std::set<size_t> {
+        std::set<size_t> atom_centres_core;
+        for (const std::pair<size_t, size_t> &atom_pair: atom_pairs_core)
+        {
+            atom_centres_core.insert(atom_pair.first);
+            atom_centres_core.insert(atom_pair.second);
+        }
+        return atom_centres_core;
+    };
+
+#ifdef __MPI
+    if (GlobalC::rpa_exx_lcao.atom_pairs_core_origin.empty())
+        switch (GlobalC::rpa_exx_lcao.info.distribute_type)
+        {
+        case Exx_Lcao::Distribute_Type::Htime:
+            GlobalC::rpa_exx_lcao.atom_pairs_core_origin
+                = Exx_Abfs::Parallel::Distribute::Htime::distribute(GlobalC::rpa_exx_lcao.Born_von_Karman_period, GlobalC::rpa_exx_lcao.info.ccp_rmesh_times);
+            break;
+        case Exx_Lcao::Distribute_Type::Kmeans2:
+            GlobalC::rpa_exx_lcao.atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2(MPI_COMM_WORLD);
+            break;
+        case Exx_Lcao::Distribute_Type::Kmeans1:
+            GlobalC::rpa_exx_lcao.atom_pairs_core_origin
+                = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1(MPI_COMM_WORLD, GlobalC::rpa_exx_lcao.info.ccp_rmesh_times);
+            break;
+        case Exx_Lcao::Distribute_Type::Order:
+            GlobalC::rpa_exx_lcao.atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Order::distribute(GlobalC::rpa_exx_lcao.info.ccp_rmesh_times);
+            break;
+        default:
+            throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + " line "
+                                    + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+            break;
+         
+        }
+#endif
+   
+    GlobalC::rpa_exx_lcao.init_radial_table_ions(cal_atom_centres_core(GlobalC::rpa_exx_lcao.atom_pairs_core_origin), GlobalC::rpa_exx_lcao.atom_pairs_core_origin);
+ 
+    GlobalC::rpa_exx_lcao.Vs = Abfs::cal_Vs(GlobalC::rpa_exx_lcao.atom_pairs_core_origin, GlobalC::rpa_exx_lcao.m_abfs_abfs, GlobalC::rpa_exx_lcao.index_abfs, GlobalC::rpa_exx_lcao.info.ccp_rmesh_times, GlobalC::rpa_exx_lcao.info.v_threshold, GlobalC::rpa_exx_lcao.Vws);
+
+    Abfs::delete_empty_ptrs(GlobalC::rpa_exx_lcao.Vws);
+
+    GlobalC::rpa_exx_lcao.Vps = Abfs::cal_mps(GlobalC::rpa_exx_lcao.Born_von_Karman_period, GlobalC::rpa_exx_lcao.Vs);
+   
+    GlobalC::rpa_exx_lcao.atom_pairs_core = Abfs::get_atom_pair(GlobalC::rpa_exx_lcao.Vps);
+
+    const std::set<size_t> atom_centres_core = cal_atom_centres_core(GlobalC::rpa_exx_lcao.atom_pairs_core);
+
+    GlobalC::rpa_exx_lcao.H_atom_pairs_core = Abfs::get_H_pairs_core(GlobalC::rpa_exx_lcao.atom_pairs_core);
+   
+    // GlobalC::rpa_exx_lcao.Cs = Abfs::cal_Cs(atom_centres_core,
+    //                   GlobalC::rpa_exx_lcao.m_abfs_abfs,
+    //                   GlobalC::rpa_exx_lcao.m_abfslcaos_lcaos,
+    //                   GlobalC::rpa_exx_lcao.index_abfs,
+    //                   GlobalC::rpa_exx_lcao.index_lcaos,
+    //                   GlobalC::rpa_exx_lcao.info.c_threshold,
+    //                   GlobalC::rpa_exx_lcao.Cws,
+    //                   GlobalC::rpa_exx_lcao.Vws);
+
+    Abfs::delete_empty_ptrs(GlobalC::rpa_exx_lcao.Cws); 
+ //   GlobalC::rpa_exx_lcao.Cps = Abfs::cal_mps(GlobalC::rpa_exx_lcao.Born_von_Karman_period, GlobalC::rpa_exx_lcao.Cs);
+ 
+}
+
+
 void DFT_RPA_interface::print_matrix(char *desc, const ModuleBase::matrix &mat)
 {
     int nr = mat.nr;
@@ -306,4 +508,5 @@ void DFT_RPA_interface::print_complex_matrix(char *desc, const ModuleBase::Compl
         printf("\n");
     }
 }
+
 } // namespace ModuleRPA

@@ -119,7 +119,7 @@ public:
 	
 	friend class Local_Orbital_Charge;
 	friend class LCAO_Hamilt;
-        friend class ModuleRPA::DFT_RPA_interface;
+    friend class ModuleRPA::DFT_RPA_interface;
 };
 
 #endif	// EXX_LCAO_H
