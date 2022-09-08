@@ -57,6 +57,7 @@ list(APPEND objects
 	H_TDDFT_pw.cpp
     run_md_lcao.cpp
     dmft.cpp
+    rpa.cpp
 )
 
 add_library(
