@@ -55,7 +55,7 @@ void Input::Print(const std::string &fn) const
                                  "nbands_istate",
                                  nbands_istate,
                                  "number of bands around Fermi level for istate calulation");
-    ModuleBase::GlobalFunc::OUTP(ofs, "symmetry", symmetry, "turn symmetry on or off");
+    ModuleBase::GlobalFunc::OUTP(ofs, "symmetry", symmetry, "the control of symmetry");
     ModuleBase::GlobalFunc::OUTP(ofs, "init_vel", init_vel, "read velocity from STRU or not");
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "symmetry_prec",
