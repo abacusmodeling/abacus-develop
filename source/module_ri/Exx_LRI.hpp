@@ -15,9 +15,13 @@
 #include "src_ri/conv_coulomb_pot_k.h"
 #include "module_base/tool_title.h"
 #include "module_base/timer.h"
+#include "src_lcao/serialization_cereal.h"
 
 #include <RI/distribute/Distribute_Equally.h>
 #include <RI/global/Map_Operator-3.h>
+
+#include <fstream>
+#include <string>
 
 template<typename Tdata>
 void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
@@ -110,8 +114,8 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 
 	this->exx_lri.set_parallel(this->mpi_comm, atomsR, latvec, period);
 
-	// std::max(2) for gamma_only, list_A2 should contain cell -1. In the future distribute will be neighbour.
-	const std::array<Tcell,Ndim> period_tmp = {std::max(2,GlobalC::kv.nmp[0]), std::max(2,GlobalC::kv.nmp[1]), std::max(2,GlobalC::kv.nmp[2])};
+	// std::max(3) for gamma_only, list_A2 should contain cell {-1,0,1}. In the future distribute will be neighbour.
+	const std::array<Tcell,Ndim> period_tmp = {std::max(3,GlobalC::kv.nmp[0]), std::max(3,GlobalC::kv.nmp[1]), std::max(3,GlobalC::kv.nmp[2])};
 	std::pair<std::vector<TA>, std::vector<std::vector<std::pair<TA,std::array<Tcell,Ndim>>>>>
 		list_As = Distribute_Equally::distribute_atoms_periods(this->mpi_comm, atoms, period_tmp, 2);
 	const std::vector<TA> list_A1 = std::move(list_As.first);
@@ -169,7 +173,7 @@ void Exx_LRI<Tdata>::post_process_Hexx(std::map<TA, std::map<TAC, Tensor<Tdata>>
 template<typename Tdata>
 Tdata Exx_LRI<Tdata>::get_energy() const
 {
-	const std::map<int,double> SPIN_multiple = {{1,1}, {2,4}, {4,1}};		// why?
+	const std::map<int,double> SPIN_multiple = {{1,1}, {2,4}, {4,4}};		// why?
 	const double frac = - 0.5  * SPIN_multiple.at(GlobalV::NSPIN);			// why?		0.5 to Ry?
 	return frac * this->exx_lri.post_2D.energy;
 }
@@ -190,5 +194,23 @@ post_process_old
 	energy /= 2;					// /2 for Ry	
 }
 */
+
+template<typename Tdata>
+void Exx_LRI<Tdata>::write_Hexxs(const std::string &file_name) const
+{
+	std::ofstream ofs(file_name, std::ofstream::binary);
+	cereal::BinaryOutputArchive oar(ofs);
+	oar(this->Hexxs);
+}
+
+template<typename Tdata>
+void Exx_LRI<Tdata>::read_Hexxs(const std::string &file_name)
+{
+	std::ifstream ifs(file_name, std::ofstream::binary);
+	cereal::BinaryInputArchive iar(ifs);
+	iar(this->Hexxs);
+}
+
+
 
 #endif

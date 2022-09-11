@@ -706,6 +706,12 @@ void ESolver_KS_LCAO::afterscf()
         }
     }
 
+	const std::string file_name_exx = GlobalV::global_out_dir + "HexxR_" + std::to_string(GlobalV::MY_RANK);
+	if(GlobalV::GAMMA_ONLY_LOCAL)
+		GlobalC::exx_lri_double.write_Hexxs(file_name_exx);
+	else
+		GlobalC::exx_lri_complex.write_Hexxs(file_name_exx);
+
     if (GlobalC::pot.out_pot == 2)
     {
         std::stringstream ssp;

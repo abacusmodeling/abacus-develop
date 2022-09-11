@@ -25,6 +25,7 @@ VPATH=./src_global\
 :./module_hamilt\
 :./module_hamilt/ks_pw\
 :./module_gint\
+:./module_ri\
 :./src_pw\
 :./src_lcao\
 :./module_relaxation\
