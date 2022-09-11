@@ -35,6 +35,8 @@ public:
 
 	std::vector< std::map<TA, std::map<TAC, Tensor<Tdata>>>> Hexxs;
 	Tdata get_energy() const;
+	void write_Hexxs(const std::string &file_name) const;
+	void read_Hexxs(const std::string &file_name);
 
 private:
 	const Exx_Info::Exx_Info_RI &info;

@@ -15,9 +15,13 @@
 #include "src_ri/conv_coulomb_pot_k.h"
 #include "module_base/tool_title.h"
 #include "module_base/timer.h"
+#include "src_lcao/serialization_cereal.h"
 
 #include <RI/distribute/Distribute_Equally.h>
 #include <RI/global/Map_Operator-3.h>
+
+#include <fstream>
+#include <string>
 
 template<typename Tdata>
 void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
@@ -190,6 +194,22 @@ post_process_old
 	energy /= 2;					// /2 for Ry	
 }
 */
+
+template<typename Tdata>
+void Exx_LRI<Tdata>::write_Hexxs(const std::string &file_name) const
+{
+	std::ofstream ofs(file_name, std::ofstream::binary);
+	cereal::BinaryOutputArchive oar(ofs);
+	oar(this->Hexxs);
+}
+
+template<typename Tdata>
+void Exx_LRI<Tdata>::read_Hexxs(const std::string &file_name)
+{
+	std::ifstream ifs(file_name, std::ofstream::binary);
+	cereal::BinaryInputArchive iar(ifs);
+	iar(this->Hexxs);
+}
 
 
 

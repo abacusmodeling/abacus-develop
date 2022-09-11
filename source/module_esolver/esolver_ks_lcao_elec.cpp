@@ -446,6 +446,11 @@ namespace ModuleESolver
         case Exx_Info::Hybrid_Type::SCAN0:
         case Exx_Info::Hybrid_Type::HSE:
             GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
+			const std::string file_name_exx = GlobalV::global_out_dir + "HexxR_" + std::to_string(GlobalV::MY_RANK);
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+				GlobalC::exx_lri_double.read_Hexxs(file_name_exx);
+			else
+				GlobalC::exx_lri_complex.read_Hexxs(file_name_exx);			
             break;
         }
     #endif
