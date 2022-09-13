@@ -24,6 +24,9 @@
 #include "exx_abfs-parallel-distribute-kmeans.h"
 #include "exx_abfs-parallel-distribute-order.h"
 
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/LCAO_matrix.h"
+
 #include <thread>
 
 #ifdef _OPENMP

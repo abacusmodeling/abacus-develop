@@ -7,9 +7,16 @@
 #define RI_UTIL_HPP
 
 #include "RI_Util.h"
+#include "src_pw/global.h"
 
 namespace RI_Util
 {
+	inline std::array<int,3>
+	get_Born_vonKarmen_period()
+	{
+		return std::array<int,3>{GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]};
+	}
+
 	template<typename Tcell>
 	std::vector<std::array<Tcell,1>>
 	get_Born_von_Karmen_cells( const std::array<Tcell,1> &Born_von_Karman_period )

@@ -14,6 +14,10 @@
 #include <vector>
 #include <array>
 #include <map>
+#include <mpi.h>
+
+	class Local_Orbital_Charge;
+	class Parallel_Orbitals;
 
 template<typename Tdata>
 class Exx_LRI
