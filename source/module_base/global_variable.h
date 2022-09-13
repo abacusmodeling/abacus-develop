@@ -33,6 +33,7 @@ extern int EFIELD_FLAG; // 5 add electric field
 extern int DIP_COR_FLAG; // 7 add dipole correction
 
 extern std::string DFT_FUNCTIONAL; // 6.5 change the DFT functional from input file.
+extern double XC_TEMPERATURE;
 extern int NSPIN; // 7
 extern bool TWO_EFERMI; // 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int CURRENT_SPIN; // 8
