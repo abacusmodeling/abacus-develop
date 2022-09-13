@@ -230,10 +230,10 @@ std::vector<xc_func_type> XC_Functional::init_func(const int xc_polarized)
 
 	for(int id : func_id)
 	{
-        if( id == XC_LDA_XC_KSDT || id == XC_LDA_XC_CORRKSDT || id == XC_LDA_XC_GDSMFB) //finite temperature XC functionals
+        if(id == XC_LDA_XC_KSDT || id == XC_LDA_XC_CORRKSDT || id == XC_LDA_XC_GDSMFB) //finite temperature XC functionals
         {
-            add_func ( id );
-            double parameter_finitet[1] = { GlobalV::XC_TEMPERATURE};
+            add_func(id);
+            double parameter_finitet[1] = {GlobalV::XC_TEMPERATURE};
             xc_func_set_ext_params(&funcs.back(), parameter_finitet);
         }
 		else if( id == XC_HYB_GGA_XC_PBEH ) // PBE0
