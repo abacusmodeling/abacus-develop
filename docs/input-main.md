@@ -272,7 +272,7 @@ This part of variables are used to control general system parameters.
     
 - **Default**: same as UPF file.
 
-#### xc_termperature
+#### xc_temperature
 - **Type**: Double
 - **Description**: specifies temperature when using temperature-dependent XC functionals (KSDT and so on)
 - **Default** : 0.0
