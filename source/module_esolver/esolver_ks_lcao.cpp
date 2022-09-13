@@ -12,6 +12,7 @@
 #include "src_pw/occupy.h"
 #include "src_pw/symmetry_rho.h"
 #include "src_pw/threshold_elec.h"
+#include "module_rpa/rpa.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -941,6 +942,13 @@ void ESolver_KS_LCAO::afterscf()
 
         // Output wave functions, bands, k-points information, and etc.
         GlobalC::dmft.out_to_dmft(this->LOWF, *this->UHM.LM);
+    }
+
+    if(INPUT.rpa)
+    {
+        ModuleRPA::DFT_RPA_interface rpa_interface(GlobalC::exx_global.info);
+        rpa_interface.rpa_exx_lcao().info.files_abfs = GlobalV::rpa_orbitals;
+        rpa_interface.out_for_RPA(this->LOWF,this->LOC);
     }
 
     if (hsolver::HSolverLCAO::out_mat_hsR)
