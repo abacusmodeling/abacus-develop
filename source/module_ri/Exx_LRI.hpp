@@ -16,6 +16,8 @@
 #include "module_base/tool_title.h"
 #include "module_base/timer.h"
 #include "src_lcao/serialization_cereal.h"
+#include "src_lcao/local_orbital_charge.h"
+#include "module_orbital/parallel_orbitals.h"
 
 #include <RI/distribute/Distribute_Equally.h>
 #include <RI/global/Map_Operator-3.h>

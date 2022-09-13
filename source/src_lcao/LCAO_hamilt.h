@@ -7,6 +7,8 @@
 #include "../module_gint/gint_gamma.h"
 #include "../module_gint/gint_k.h"
 
+#include <RI/global/Tensor.h>
+
 class LCAO_Hamilt
 {
     public:
@@ -31,6 +33,8 @@ class LCAO_Hamilt
     void calculat_HR_dftu_sparse(const int &current_spin, const double &sparse_threshold);
     void calculat_HR_dftu_soc_sparse(const int &current_spin, const double &sparse_threshold);
     void calculate_HR_exx_sparse(const int &current_spin, const double &sparse_threshold);
+    template<typename Tdata> void calculate_HR_exx_sparse(const int &current_spin, const double &sparse_threshold,
+        const std::vector< std::map<int, std::map<std::pair<int,std::array<int,3>>, Tensor<Tdata>>>> &Hexxs);
     void calculate_HSR_sparse(const int &current_spin, const double &sparse_threshold);
     void calculate_SR_sparse(const double &sparse_threshold);
     void clear_zero_elements(const int &current_spin, const double &sparse_threshold);
@@ -60,5 +64,7 @@ class LCAO_Hamilt
     void calculate_STNR_k(void);
 
 };
+
+#include "LCAO_hamilt.hpp"
 
 #endif

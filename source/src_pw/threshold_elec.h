@@ -3,11 +3,11 @@
 
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
-#include "module_esolver/esolver_ks_lcao.h"
+
+	namespace ModuleESolver{ class ESolver_KS_LCAO; }
 
 class Threshold_Elec
 {
-
     friend class ModuleESolver::ESolver_KS_LCAO;
 public:
 

@@ -17,7 +17,7 @@
 #include <map>
 #include <set>
 
-class RI_2D_Comm
+namespace RI_2D_Comm
 {
 	using TA = int;
 	using Tcell = int;
@@ -25,29 +25,29 @@ class RI_2D_Comm
 	using TC = std::array<Tcell,Ndim>;
 	using TAC = std::pair<TA,TC>;
 
-public:
+//public:
 	template<typename Tdata, typename Tmatrix>
-	static std::vector<std::map<TA,std::map<TAC,Tensor<Tdata>>>>
+	extern std::vector<std::map<TA,std::map<TAC,Tensor<Tdata>>>>
 	split_m2D_ktoR(const std::vector<Tmatrix> &mks_2D, const Parallel_Orbitals &pv);
 
 	// judge[is] = {s0, s1}
-	static std::vector<std::tuple<std::set<TA>, std::set<TA>>>
+	extern std::vector<std::tuple<std::set<TA>, std::set<TA>>>
 	get_2D_judge(const Parallel_Orbitals &pv);
 
 	template<typename Tdata>
-	static void add_Hexx(
+	extern void add_Hexx(
 		const int ik,
 		const double alpha, 
 		const std::vector<std::map<TA,std::map<TAC,Tensor<Tdata>>>> &Hs,
 		const Parallel_Orbitals &pv,
 		LCAO_Matrix &lm);
 
-private:
-	static std::vector<int> get_ik_list(const int is_k);
-	inline static std::tuple<int,int,int> get_iat_iw_is_block(const int iwt);
-	inline static int get_is_block(const int is_k, const int is_row_b, const int is_col_b);
-	inline static std::tuple<int,int> split_is_block(const int is_b);
-	inline static int get_iwt(const int iat, const int iw_b, const int is_b);
+//private:
+	extern std::vector<int> get_ik_list(const int is_k);
+	extern inline std::tuple<int,int,int> get_iat_iw_is_block(const int iwt);
+	extern inline int get_is_block(const int is_k, const int is_row_b, const int is_col_b);
+	extern inline std::tuple<int,int> split_is_block(const int is_b);
+	extern inline int get_iwt(const int iat, const int iw_b, const int is_b);
 };
 
 #include "RI_2D_Comm.hpp"

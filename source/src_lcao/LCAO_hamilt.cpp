@@ -852,12 +852,15 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
         GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::SCAN0 ||
         GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::HSE)
     {
-        calculate_HR_exx_sparse(current_spin, sparse_threshold);
+        //calculate_HR_exx_sparse(current_spin, sparse_threshold);
+        if(GlobalV::GAMMA_ONLY_LOCAL)
+            this->calculate_HR_exx_sparse(current_spin, sparse_threshold, GlobalC::exx_lri_double.Hexxs);
+        else
+            this->calculate_HR_exx_sparse(current_spin, sparse_threshold, GlobalC::exx_lri_complex.Hexxs);
     }
 #endif
 
     clear_zero_elements(current_spin, sparse_threshold);
-
 }
 
 void LCAO_Hamilt::calculate_SR_sparse(const double &sparse_threshold)

@@ -11,7 +11,6 @@
 #include "exx_abfs-screen-cauchy.h"
 #include "../module_base/element_basis_index.h"
 #include "../module_xc/exx_info.h"
-#include "src_lcao/local_orbital_charge.h"
 
 #if EXX_DM==1
 #include "exx_abfs-parallel-communicate-dm.h"
@@ -28,6 +27,9 @@
 #include<memory>
 #include<limits>
 #include<omp.h>
+
+	class Local_Orbital_Charge;
+	class LCAO_Matrix;
 
 class Exx_Lcao
 {

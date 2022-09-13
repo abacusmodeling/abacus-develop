@@ -4,6 +4,7 @@
 #include "global.h"
 #include "energy.h"
 #include "../module_base/mymath.h"
+#include "../src_lcao/LCAO_hamilt.h"
 #include <vector>
 #ifdef __MPI
 #include "mpi.h"

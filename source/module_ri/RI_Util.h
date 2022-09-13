@@ -6,8 +6,6 @@
 #ifndef RI_UTIL_H
 #define RI_UTIL_H
 
-#include "src_pw/global.h"
-
 #include <RI/global/Array_Operator.h>
 #include <RI/global/Global_Func-2.h>
 
@@ -15,24 +13,21 @@
 
 namespace RI_Util
 {
-	inline std::array<int,3>
-	get_Born_vonKarmen_period()
-	{
-		return std::array<int,3>{GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]};
-	}
+	inline extern std::array<int,3>
+	get_Born_vonKarmen_period();
 
 	template<typename Tcell, size_t Ndim>
-	std::vector<std::array<Tcell,Ndim>>
+	extern std::vector<std::array<Tcell,Ndim>>
 	get_Born_von_Karmen_cells( const std::array<Tcell,Ndim> &Born_von_Karman_period );
 
 	template<typename Tcell>
-	std::array<Tcell,3>
+	inline std::array<Tcell,3>
 	Vector3_to_array3(const ModuleBase::Vector3<Tcell> &v)
 	{
 		return std::array<Tcell,3> {v.x, v.y, v.z};
 	};
 	template<typename Tcell>
-	ModuleBase::Vector3<Tcell>
+	inline ModuleBase::Vector3<Tcell>
 	array3_to_Vector3(const std::array<Tcell,3> &v)
 	{
 		return ModuleBase::Vector3<Tcell> {v[0], v[1], v[2]};
