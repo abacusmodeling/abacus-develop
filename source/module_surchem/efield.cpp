@@ -24,7 +24,8 @@ Efield::~Efield(){}
 ModuleBase::matrix Efield::add_efield(const UnitCell &cell, 
                                         ModulePW::PW_Basis *rho_basis, 
                                         const int &nspin, 
-                                        const double *const *const rho)
+                                        const double *const *const rho,
+                                        surchem &solvent)
 {
     ModuleBase::TITLE("Efield", "add_efield");
     ModuleBase::timer::tick("Efield", "add_efield");
@@ -35,12 +36,19 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
 
     double ion_dipole = 0;
     double elec_dipole = 0;
+    double induced_dipole = 0;
 
     if(GlobalV::DIP_COR_FLAG)
     {
         ion_dipole = cal_ion_dipole(cell, bmod);
         elec_dipole = cal_elec_dipole(cell, rho_basis, nspin, rho, bmod);
         tot_dipole = ion_dipole - elec_dipole;
+
+        if(GlobalV::imp_sol)
+        {
+            induced_dipole = cal_induced_dipole(cell, rho_basis, solvent, bmod);
+            tot_dipole += induced_dipole;
+        }
 
         // energy correction
         etotefield = - ModuleBase::e2 * (efield_amp  - 0.5 * tot_dipole) * tot_dipole * cell.omega / ModuleBase::FOUR_PI;
@@ -62,6 +70,10 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Computed dipole along efield_dir", efield_dir);
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Elec. dipole (Ry a.u.)", elec_dipole);
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Ion dipole (Ry a.u.)", ion_dipole);
+        if(GlobalV::imp_sol)
+        {
+            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Induced dipole (Ry a.u.)", induced_dipole);
+        }
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Total dipole (Ry a.u.)", tot_dipole);
     }
     if( abs(efield_amp ) > 0.0) 
@@ -162,6 +174,37 @@ double Efield::cal_elec_dipole(const UnitCell &cell,
     elec_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / rho_basis->nxyz;
 
     return elec_dipole;
+}
+
+double Efield::cal_induced_dipole(const UnitCell &cell, 
+                                ModulePW::PW_Basis *rho_basis, 
+                                surchem &solvent,
+                                const double &bmod)
+{
+    double induced_dipole = 0;
+
+    double *induced_rho = new double[rho_basis->nrxx];
+    solvent.induced_charge(cell, rho_basis, induced_rho);
+
+    for (int ir = 0; ir < rho_basis->nrxx; ++ir)
+    {
+        int i = ir / (rho_basis->ny * rho_basis->nplane);
+        int j = ir / rho_basis->nplane - i * rho_basis->ny;
+        int k = ir % rho_basis->nplane + rho_basis->startz_current;
+        double x = (double)i / rho_basis->nx;
+        double y = (double)j / rho_basis->ny;
+        double z = (double)k / rho_basis->nz;
+        ModuleBase::Vector3<double> pos(x, y, z);
+
+        double saw = saw_function(efield_pos_max, efield_pos_dec, pos[efield_dir]);
+
+        induced_dipole += induced_rho[ir] * saw;
+    }
+
+    Parallel_Reduce::reduce_double_pool(induced_dipole);
+    induced_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / rho_basis->nxyz;
+
+    return induced_dipole;
 }
 
 double Efield::saw_function(const double &a, const double &b, const double &x)

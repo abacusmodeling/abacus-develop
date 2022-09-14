@@ -125,6 +125,8 @@ class surchem
 
     void get_totn_reci(const UnitCell &cell, ModulePW::PW_Basis *rho_basis, complex<double> *totn_reci);
 
+    void induced_charge(const UnitCell &cell, ModulePW::PW_Basis* rho_basis, double *induced_rho);
+
   private:
 };
 

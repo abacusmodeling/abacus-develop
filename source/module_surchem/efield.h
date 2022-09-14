@@ -3,6 +3,7 @@
 
 #include "../module_cell/unitcell.h"
 #include "../module_pw/pw_basis.h"
+#include "surchem.h"
 
 class Efield
 {
@@ -13,15 +14,21 @@ public:
     static ModuleBase::matrix add_efield(const UnitCell &cell, 
                                             ModulePW::PW_Basis *rho_basis, 
                                             const int &nspin, 
-                                            const double *const *const rho);
+                                            const double *const *const rho,
+                                            surchem &solvent);
 
     static double cal_elec_dipole(const UnitCell &cell, 
                                 ModulePW::PW_Basis *rho_basis, 
                                 const int &nspin, 
                                 const double *const *const rho,
-                                const double &h_inv);
+                                const double &bmod);
 
-    static double cal_ion_dipole(const UnitCell &cell, const double &h_inv);
+    static double cal_ion_dipole(const UnitCell &cell, const double &bmod);
+
+    static double cal_induced_dipole(const UnitCell &cell, 
+                                ModulePW::PW_Basis *rho_basis, 
+                                surchem &solvent,
+                                const double &bmod);
 
     static double saw_function(const double &a, const double &b, const double &x);
 
