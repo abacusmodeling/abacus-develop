@@ -259,7 +259,6 @@ void Input::Default(void)
     //----------------------------------------------------------
     // potential / charge / wavefunction / energy
     //----------------------------------------------------------
-    restart_mode = "new";
     init_wfc = "atomic";
     mem_saver = 0;
     printe = 100; // must > 0
@@ -407,7 +406,6 @@ void Input::Default(void)
     //==========================================================
     // test only
     //==========================================================
-    test_just_neighbor = false;
     test_skip_ewald = false;
 
     //==========================================================
@@ -977,10 +975,6 @@ bool Input::Read(const std::string &fn)
         //----------------------------------------------------------
         // charge / potential / wavefunction
         //----------------------------------------------------------
-        else if (strcmp("restart_mode", word) == 0)
-        {
-            read_value(ifs, restart_mode);
-        }
         else if (strcmp("read_file_dir", word) == 0)
         {
             read_value(ifs, read_file_dir);
@@ -1506,10 +1500,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("cell_factor", word) == 0)
         {
             read_value(ifs, cell_factor);
-        }
-        else if (strcmp("test_just_neighbor", word) == 0)
-        {
-            read_value(ifs, test_just_neighbor);
         }
         else if (strcmp("test_skip_ewald", word) == 0)
         {
@@ -2084,7 +2074,6 @@ void Input::Bcast()
     Parallel_Common::bcast_int(mixing_ndim);
     Parallel_Common::bcast_double(mixing_gg0); // mohan add 2014-09-27
 
-    Parallel_Common::bcast_string(restart_mode);
     Parallel_Common::bcast_string(read_file_dir);
     Parallel_Common::bcast_string(init_wfc);
     Parallel_Common::bcast_int(mem_saver);
@@ -2217,7 +2206,6 @@ void Input::Bcast()
     Parallel_Common::bcast_int(td_vexttype);
     Parallel_Common::bcast_int(td_vextout);
     Parallel_Common::bcast_int(td_dipoleout);
-    Parallel_Common::bcast_bool(test_just_neighbor);
     Parallel_Common::bcast_bool(test_skip_ewald);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
