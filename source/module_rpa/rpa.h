@@ -32,7 +32,24 @@ class RPAExxLcao: public Exx_Lcao
         info.cauchy_threshold = INPUT.exx_cauchy_threshold;
         info.ccp_threshold = INPUT.exx_ccp_threshold;
         info.ccp_rmesh_times = INPUT.exx_ccp_rmesh_times;
-        };
+
+        if (INPUT.exx_distribute_type == "htime")
+        {
+            info.distribute_type = Distribute_Type::Htime;
+        }
+        else if (INPUT.exx_distribute_type == "kmeans2")
+        {
+            info.distribute_type = Distribute_Type::Kmeans2;
+        }
+        else if (INPUT.exx_distribute_type == "kmeans1")
+        {
+            info.distribute_type = Distribute_Type::Kmeans1;
+        }
+        else if (INPUT.exx_distribute_type == "order")
+        {
+            info.distribute_type = Distribute_Type::Order;
+        }
+    };
     ~RPAExxLcao() {};
 
     const std::map<size_t,std::map<size_t,
