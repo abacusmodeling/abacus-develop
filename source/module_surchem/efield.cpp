@@ -1,11 +1,12 @@
 #include "efield.h"
+#include "gatefield.h"
 #include "../module_base/constants.h"
 #include "../module_base/timer.h"
 #include "../module_base/global_variable.h"
 #include "../src_parallel/parallel_reduce.h"
 
 double Efield::etotefield = 0.0;
-double Efield::tot_dipole = 0.0;
+double Efield::tot_dipole;
 int Efield::efield_dir;
 double Efield::efield_pos_max;
 double Efield::efield_pos_dec;
@@ -29,32 +30,8 @@ ModuleBase::matrix Efield::add_efield(const UnitCell &cell,
     ModuleBase::timer::tick("Efield", "add_efield");
 
     double latvec;    // latvec along the efield direction
-    if(efield_dir == 0)
-    {
-        bvec[0] = cell.G.e11;
-        bvec[1] = cell.G.e12; 
-        bvec[2] = cell.G.e13; 
-        latvec = cell.a1.norm();
-    }
-    else if(efield_dir == 1)
-    {
-        bvec[0] = cell.G.e21;
-        bvec[1] = cell.G.e22; 
-        bvec[2] = cell.G.e23; 
-        latvec = cell.a2.norm();
-    }
-    else if(efield_dir == 2)
-    {
-        bvec[0] = cell.G.e31;
-        bvec[1] = cell.G.e32; 
-        bvec[2] = cell.G.e33; 
-        latvec = cell.a3.norm();
-    }
-    else
-    {
-        ModuleBase::WARNING_QUIT("Efield::add_efield", "direction is wrong!");
-    }
-    bmod = sqrt(pow(bvec[0],2) + pow(bvec[1],2) + pow(bvec[2],2));
+    double area;      // surface area along the efield direction
+    prepare(cell, latvec, area);
 
     double ion_dipole = 0;
     double elec_dipole = 0;
@@ -138,6 +115,17 @@ double Efield::cal_ion_dipole(const UnitCell &cell, const double &bmod)
         }
         ion_dipole += sum * cell.atoms[it].zv;
     }
+
+    if(GlobalV::GATE_FLAG && GlobalV::DIP_COR_FLAG)
+    {
+        double ion_charge = 0;
+        for(int it=0; it<cell.ntype; ++it)
+        {
+            ion_charge += cell.atoms[it].na * cell.atoms[it].zv;
+        }
+        ion_dipole += (GlobalV::NELEC - ion_charge) * saw_function(efield_pos_max, efield_pos_dec, Gatefield::zgate);
+    }
+
     ion_dipole *= cell.lat0 / bmod * ModuleBase::FOUR_PI / cell.omega;
 
     return ion_dipole;
@@ -229,4 +217,37 @@ void Efield::compute_force(const UnitCell &cell, ModuleBase::matrix &fdip)
             }
         }
     }
+}
+
+void Efield::prepare(const UnitCell &cell, double &latvec, double &area)
+{
+    if(efield_dir == 0)
+    {
+        bvec[0] = cell.G.e11;
+        bvec[1] = cell.G.e12; 
+        bvec[2] = cell.G.e13; 
+        latvec = cell.a1.norm();
+        area = cross(cell.a2, cell.a3).norm() * cell.lat0 * cell.lat0;
+    }
+    else if(efield_dir == 1)
+    {
+        bvec[0] = cell.G.e21;
+        bvec[1] = cell.G.e22; 
+        bvec[2] = cell.G.e23; 
+        latvec = cell.a2.norm();
+        area = cross(cell.a3, cell.a1).norm() * cell.lat0 * cell.lat0;
+    }
+    else if(efield_dir == 2)
+    {
+        bvec[0] = cell.G.e31;
+        bvec[1] = cell.G.e32; 
+        bvec[2] = cell.G.e33; 
+        latvec = cell.a3.norm();
+        area = cross(cell.a1, cell.a2).norm() * cell.lat0 * cell.lat0;
+    }
+    else
+    {
+        ModuleBase::WARNING_QUIT("Efield::prepare", "direction is wrong!");
+    }
+    bmod = sqrt(pow(bvec[0],2) + pow(bvec[1],2) + pow(bvec[2],2));
 }

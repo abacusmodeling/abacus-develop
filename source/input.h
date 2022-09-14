@@ -284,6 +284,18 @@ class Input
     double efield_amp ;        // amplitude of the electric field
 
     //==========================================================
+    // gatefield (compensating charge)
+    // Yu Liu add 2022-09-13
+    //==========================================================
+    bool gate_flag;                 // compensating charge or not
+    double zgate;                   // position of charged plate
+    bool relax;                     // allow relaxation along the specific direction
+    bool block;                     // add a block potential or not
+    double block_down;              // low bound of the block
+    double block_up;                // high bound of the block
+    double block_height;            // height of the block
+
+    //==========================================================
     // vdw
     // Peize Lin add 2014-03-31, jiyy update 2019-08-01
     //==========================================================

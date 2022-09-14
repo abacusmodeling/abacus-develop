@@ -254,7 +254,16 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs,"efield_pos_dec",efield_pos_dec,"zone in the unit cell where the saw-like potential decreases");
     ModuleBase::GlobalFunc::OUTP(ofs,"efield_amp ",efield_amp ,"amplitude of the electric field");
 
-    ofs << "\n#Parameters (11.Test)" << std::endl;
+    ofs << "\n#Parameters (11.Gate field)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs,"gate_flag",gate_flag,"compensating charge or not");
+    ModuleBase::GlobalFunc::OUTP(ofs,"zgate",zgate,"position of charged plate");
+    ModuleBase::GlobalFunc::OUTP(ofs,"relax",relax,"allow relaxation along the specific direction");
+    ModuleBase::GlobalFunc::OUTP(ofs,"block",block,"add a block potential or not");
+    ModuleBase::GlobalFunc::OUTP(ofs,"block_down",block_down,"low bound of the block");
+    ModuleBase::GlobalFunc::OUTP(ofs,"block_up",block_up,"high bound of the block");
+    ModuleBase::GlobalFunc::OUTP(ofs,"block_height",block_height,"height of the block");
+
+    ofs << "\n#Parameters (12.Test)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "out_alllog", out_alllog, "output information for each processor, when parallel");
     ModuleBase::GlobalFunc::OUTP(ofs, "nurse", nurse, "for coders");
     ModuleBase::GlobalFunc::OUTP(ofs, "colour", colour, "for coders, make their live colourful");

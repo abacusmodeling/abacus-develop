@@ -30,6 +30,7 @@
 #include "module_elecstate/elecstate_lcao.h"
 #include "module_hsolver/hsolver_lcao.h"
 #include "module_surchem/efield.h"
+#include "module_surchem/gatefield.h"
 
 void Input_Conv::Convert(void)
 {
@@ -219,6 +220,18 @@ void Input_Conv::Convert(void)
     Efield::efield_pos_max = INPUT.efield_pos_max;
     Efield::efield_pos_dec = INPUT.efield_pos_dec;
     Efield::efield_amp = INPUT.efield_amp;
+
+    //----------------------------------------------------------
+    // Yu Liu add 2022-09-13
+    //----------------------------------------------------------
+    GlobalV::GATE_FLAG = INPUT.gate_flag;
+    GlobalV::NELEC = INPUT.nelec;
+    Gatefield::zgate = INPUT.zgate;
+    Gatefield::relax = INPUT.relax;
+    Gatefield::block = INPUT.block;
+    Gatefield::block_down = INPUT.block_down;
+    Gatefield::block_up = INPUT.block_up;
+    Gatefield::block_height = INPUT.block_height;
 
 //----------------------------------------------------------
 // Fuxiang He add 2016-10-26

@@ -1,7 +1,6 @@
 #ifndef EFIELD_H
 #define EFIELD_H
 
-#include "../src_pw/structure_factor.h"
 #include "../module_cell/unitcell.h"
 #include "../module_pw/pw_basis.h"
 
@@ -28,6 +27,7 @@ public:
 
     static void compute_force(const UnitCell &cell, ModuleBase::matrix &fdip);
 
+    static void prepare(const UnitCell &cell, double &latvec, double &area);
 
 
     static double etotefield;           // dipole energy

@@ -9,6 +9,7 @@
 #include "../module_base/timer.h"
 #include "../module_surchem/efield.h"
 #include "../module_surchem/surchem.h"
+#include "../module_surchem/gatefield.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).
 
@@ -83,6 +84,17 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
         }
     }
 
+    ModuleBase::matrix force_gate;
+    if (GlobalV::GATE_FLAG)
+    {
+        force_gate.create(GlobalC::ucell.nat, 3);
+        Gatefield::compute_force(GlobalC::ucell, force_gate);
+        if (GlobalV::TEST_FORCE)
+        {
+            Forces::print("GATEFIELD      FORCE (Ry/Bohr)", force_gate);
+        }
+    }
+
     ModuleBase::matrix forcesol;
     if (GlobalV::imp_sol)
     {
@@ -124,6 +136,11 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
                 if (GlobalV::EFIELD_FLAG)
                 {
                     force(iat, ipol) = force(iat, ipol) + force_e(iat, ipol);
+                }
+
+                if (GlobalV::GATE_FLAG)
+                {
+                    force(iat, ipol) = force(iat, ipol) + force_gate(iat, ipol);
                 }
 
                 if (GlobalV::comp_chg)
@@ -266,6 +283,7 @@ void Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<double>
 		Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
 		if(GlobalV::EFIELD_FLAG) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+        if(GlobalV::GATE_FLAG) Forces::print("GATEFIELD   FORCE (eV/Angstrom)", force_gate,0);
         if(GlobalV::imp_sol) Forces::print("IMP_SOL   FORCE (eV/Angstrom)", forcesol,0);
 	}
 	Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);

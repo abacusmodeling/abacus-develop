@@ -9,6 +9,7 @@
 // new
 #include "../module_surchem/efield.h"
 #include "../module_surchem/surchem.h"
+#include "../module_surchem/gatefield.h"
 #include "H_Hartree_pw.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
@@ -299,6 +300,11 @@ void Potential::set_local_pot(double *vl_pseudo, // store the local pseudopotent
         {
             vl_pseudo[ir] += v_efield(0, ir);
         }
+    }
+
+    if( GlobalV::GATE_FLAG)
+    {
+        Gatefield::add_gatefield(vl_pseudo, GlobalC::ucell, GlobalC::rhopw, true, true);
     }
 
     delete[] vg;

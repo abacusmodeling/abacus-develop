@@ -7,6 +7,7 @@
 #include "../module_base/timer.h"
 #include "../module_surchem/efield.h"        // liuyu add 2022-05-18
 #include "../module_surchem/surchem.h"		 //sunml add 2022-08-10
+#include "../module_surchem/gatefield.h"        // liuyu add 2022-09-13
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"	//caoyu add for deepks 2021-06-03
 #endif
@@ -185,6 +186,13 @@ void Force_Stress_LCAO::getForceStress(
         fefield.create(nat, 3);
         Efield::compute_force(GlobalC::ucell, fefield);
     }
+    //implement force from gate field
+    ModuleBase::matrix fgate;
+    if(GlobalV::GATE_FLAG&&isforce)
+    {
+        fgate.create(nat, 3);
+        Gatefield::compute_force(GlobalC::ucell, fgate);
+    }
 	//Force from implicit solvation model
     ModuleBase::matrix fsol;
     if(GlobalV::imp_sol&&isforce)
@@ -263,6 +271,11 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					fcs(iat, i) += fefield(iat, i);
 				}
+                //Gate field force
+                if(GlobalV::GATE_FLAG)
+                {
+                    fcs(iat, i) += fgate(iat, i);
+                }
 				//implicit solvation model
 				if(GlobalV::imp_sol)
 				{
@@ -392,6 +405,11 @@ void Force_Stress_LCAO::getForceStress(
 				f_pw.print("EFIELD     FORCE", fefield,0);
 				//this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
+            if(GlobalV::GATE_FLAG)
+            {
+                f_pw.print("GATEFIELD     FORCE", fgate,0);
+                //this->print_force("GATEFIELD     FORCE",fgate,1,ry);
+            }
 			if(GlobalV::imp_sol)
 			{
 				f_pw.print("IMP_SOL     FORCE", fsol,0);
