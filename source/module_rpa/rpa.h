@@ -49,7 +49,7 @@ class RPAExxLcao: public Exx_Lcao
     const std::vector<std::pair<size_t,size_t>> &get_atom_pairs_core() const {return atom_pairs_core;}
 
     void exx_init();
-    void exx_cal_ions();
+    //void exx_cal_ions();
 };
 
 class DFT_RPA_interface

@@ -346,6 +346,7 @@ void RPAExxLcao::exx_init()
     Born_von_Karman_period = ModuleBase::Vector3<int>{GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]};
 }
 
+/*
 void RPAExxLcao::exx_cal_ions()
 {
     cout<<"rpa_exx_cal_ions!!!"<<endl;
@@ -401,7 +402,7 @@ void RPAExxLcao::exx_cal_ions()
 
     Abfs::delete_empty_ptrs(Cws);
 }
-
+*/
 
 void DFT_RPA_interface::print_matrix(char *desc, const ModuleBase::matrix &mat)
 {
@@ -415,6 +416,7 @@ void DFT_RPA_interface::print_matrix(char *desc, const ModuleBase::matrix &mat)
         printf("\n");
     }
 }
+
 void DFT_RPA_interface::print_complex_matrix(char *desc, const ModuleBase::ComplexMatrix &mat)
 {
     int nr = mat.nr;
