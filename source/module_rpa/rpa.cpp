@@ -24,11 +24,12 @@
 
 namespace ModuleRPA
 {
-void DFT_RPA_interface::out_for_RPA(Local_Orbital_wfc &lowf,Local_Orbital_Charge &loc)
+void DFT_RPA_interface::out_for_RPA(const Parallel_Orbitals &parav,
+                                    const psi::Psi<std::complex<double>> &psi, Local_Orbital_Charge &loc)
 {
     ModuleBase::TITLE("DFT_RPA_interface", "out_for_RPA");
     this->out_bands();
-    this->out_eigen_vector(lowf);
+    this->out_eigen_vector(parav, psi);
     this->out_struc();
 
     if(GlobalV::DFT_FUNCTIONAL=="default")
@@ -36,8 +37,8 @@ void DFT_RPA_interface::out_for_RPA(Local_Orbital_wfc &lowf,Local_Orbital_Charge
         rpa_exx_lcao_.exx_init();
         cout<<"rpa_pca_threshold: "<< rpa_exx_lcao_.info.pca_threshold<<endl;
         cout<<"rpa_ccp_rmesh_times: "<< rpa_exx_lcao_.info.ccp_rmesh_times<<endl;
-        rpa_exx_lcao_.cal_exx_ions(*lowf.ParaV);
-        rpa_exx_lcao_.cal_exx_elec(loc, lowf.wfc_k_grid);
+        rpa_exx_lcao_.cal_exx_ions(parav);
+        rpa_exx_lcao_.cal_exx_elec(loc, nullptr);
     }
     cout<<"rpa_lcao_exx(Ha): "<< std::fixed << std::setprecision(15)<<rpa_exx_lcao_.get_energy()/2.0<<endl;
     this->out_Cs();
@@ -51,7 +52,7 @@ void DFT_RPA_interface::out_for_RPA(Local_Orbital_wfc &lowf,Local_Orbital_Charge
     //cout<<"etxcc(Ha):"<<GlobalC::en.etxcc<<endl;
     return;
 }
-void DFT_RPA_interface::out_eigen_vector(Local_Orbital_wfc &lowf)
+void DFT_RPA_interface::out_eigen_vector(const Parallel_Orbitals &parav, const psi::Psi<std::complex<double>> &psi)
 {
 
     ModuleBase::TITLE("DFT_RPA_interface", "out_eigen_vector");
@@ -77,11 +78,11 @@ void DFT_RPA_interface::out_eigen_vector(Local_Orbital_wfc &lowf)
             {
                 std::vector<std::complex<double>> wfc_iks(GlobalV::NLOCAL, zero);
 
-                const int ib_local = lowf.ParaV->trace_loc_col[ib_global];
+                const int ib_local = parav.trace_loc_col[ib_global];
 
                 if (ib_local >= 0)
-                    for (int ir = 0; ir < lowf.wfc_k[ik + nks_tot * is].nc; ir++)
-                        wfc_iks[lowf.ParaV->MatrixInfo.row_set[ir]] = lowf.wfc_k[ik + nks_tot * is](ib_local, ir);
+                    for (int ir = 0; ir < psi.get_nbasis(); ir++)
+                        wfc_iks[parav.MatrixInfo.row_set[ir]] = psi(ik + nks_tot * is, ib_local, ir);
 
                 std::vector<std::complex<double>> tmp = wfc_iks;
 #ifdef __MPI

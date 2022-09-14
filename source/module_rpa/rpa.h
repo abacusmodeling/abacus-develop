@@ -70,8 +70,8 @@ class DFT_RPA_interface
 
     RPAExxLcao &rpa_exx_lcao() {return rpa_exx_lcao_;}
 
-    void out_for_RPA(Local_Orbital_wfc &lowf,Local_Orbital_Charge &loc);
-    void out_eigen_vector(Local_Orbital_wfc &lowf);
+    void out_for_RPA(const Parallel_Orbitals &parav, const psi::Psi<std::complex<double>> &psi, Local_Orbital_Charge &loc);
+    void out_eigen_vector(const Parallel_Orbitals &parav, const psi::Psi<std::complex<double>> &psi);
     void out_struc();
     void out_bands();
     void out_Cs();

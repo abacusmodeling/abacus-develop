@@ -948,7 +948,7 @@ void ESolver_KS_LCAO::afterscf()
     {
         ModuleRPA::DFT_RPA_interface rpa_interface(GlobalC::exx_global.info);
         rpa_interface.rpa_exx_lcao().info.files_abfs = GlobalV::rpa_orbitals;
-        rpa_interface.out_for_RPA(this->LOWF,this->LOC);
+        rpa_interface.out_for_RPA(*(this->LOWF.ParaV), *(this->psi), this->LOC);
     }
 
     if (hsolver::HSolverLCAO::out_mat_hsR)
