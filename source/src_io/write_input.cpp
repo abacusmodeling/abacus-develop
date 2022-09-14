@@ -173,14 +173,6 @@ void Input::Print(const std::string &fn) const
                                  "deepks_descriptor_lmax",
                                  deepks_descriptor_lmax,
                                  "lmax used in generating descriptor");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "deepks_descriptor_rcut",
-                                 deepks_descriptor_rcut,
-                                 "rcut used in generating descriptor");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "deepks_descriptor_ecut",
-                                 deepks_descriptor_ecut,
-                                 "ecut used in generating descriptor");
 
     ofs << "\n#Parameters (5.LCAO)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "basis_type", basis_type, "PW; LCAO in pw; LCAO");
