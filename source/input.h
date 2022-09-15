@@ -89,7 +89,6 @@ class Input
     //==========================================================
     std::string dft_functional; // input DFT functional.
     double xc_temperature; // only relevant if finite temperature functional is used
-    bool use_libxc; // whether to use LIBXC
     int nspin; // LDA ; LSDA ; non-linear spin
     double nelec; // total number of electrons
     int lmaxmax;
@@ -309,8 +308,6 @@ class Input
     int ocp;
     std::string ocp_set;
     int out_mul; // qifeng add 2019-9-10
-    double *atom_mag;
-    int n_mag_at;
     // added by zhengdy-soc
     bool noncolin;
     bool lspinorb;
