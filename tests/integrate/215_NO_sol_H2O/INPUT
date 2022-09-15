@@ -2,7 +2,6 @@ INPUT_PARAMETERS
 #Parameters	(General)
 suffix      	autotest
 pseudo_dir	../../PP_ORB
-orbital_dir      ../tools/PP_ORB/
 ntype			2	
 nbands			20
 calculation 	scf
