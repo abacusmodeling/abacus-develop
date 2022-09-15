@@ -1,7 +1,7 @@
 INPUT_PARAMETERS
 #Parameters	(General)
 suffix              autotest
-pseudo_dir		    ../tools/PP_ORB/
+pseudo_dir	../../PP_ORB
 ntype			    1	
 nbands			    8
 calculation         cell-relax
@@ -23,3 +23,4 @@ mixing_beta         0.7
 mixing_gg0          1.5
 
 fixed_axes          ab
+orbital_dir	../../PP_ORB
