@@ -74,6 +74,7 @@ void Input_Conv::Convert(void)
     GlobalV::PSEUDO_MESH = INPUT.pseudo_mesh;
 
     GlobalV::DFT_FUNCTIONAL = INPUT.dft_functional;
+    GlobalV::XC_TEMPERATURE = INPUT.xc_temperature;
     GlobalV::NSPIN = INPUT.nspin;
     GlobalV::CURRENT_SPIN = 0;
 
