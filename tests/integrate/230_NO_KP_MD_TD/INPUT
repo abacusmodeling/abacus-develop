@@ -2,6 +2,7 @@ INPUT_PARAMETERS
 #Parameters	(General)
 suffix          autotest
 pseudo_dir	../../PP_ORB
+orbital_dir	../../PP_ORB
 ntype			1	
 nbands			12
 calculation		md
@@ -28,4 +29,3 @@ md_tfirst       0
 val_elec_01		5
 vext			1
 vext_dire		2
-orbital_dir	../../PP_ORB

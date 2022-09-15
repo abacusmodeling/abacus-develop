@@ -6,6 +6,7 @@ nbands			4
 stru_file		STRU
 kpoint_file		KPT
 pseudo_dir	../../PP_ORB
+orbital_dir	../../PP_ORB
 gamma_only		1
 calculation             scf 		
 latname			hexagonal
@@ -17,4 +18,3 @@ scf_thr			1e-10
 
 cal_force			1
 cal_stress			1
-orbital_dir	../../PP_ORB

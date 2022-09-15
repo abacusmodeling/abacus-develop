@@ -6,6 +6,7 @@ ntype			1
 nbands			6
 symmetry		1
 pseudo_dir	../../PP_ORB
+orbital_dir	../../PP_ORB
 pseudo_type     upf201
 gamma_only      0
 
@@ -27,4 +28,3 @@ smearing_sigma			0.002
 mixing_type		pulay
 mixing_beta		0.7
 mixing_gg0      1.5
-orbital_dir	../../PP_ORB
