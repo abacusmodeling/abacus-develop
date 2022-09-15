@@ -7,7 +7,7 @@ nbands                  6
 symmetry                0
 
 #Parameters (2.Iteration)
-ecutwfc                 20
+ecutwfc                 100
 scf_thr                     1e-8
 scf_nmax                   50
 
@@ -24,7 +24,7 @@ mixing_type             pulay
 mixing_beta             0.4
 
 #Parameters (6. Bessel function)
-bessel_lmax			3
-bessel_rcut 2
+bessel_lmax			2
+bessel_rcut 5
 bessel_tol 1.0e-12
 
