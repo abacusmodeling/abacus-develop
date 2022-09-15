@@ -1,57 +1,50 @@
 #include "rpa.h"
 
-#include "../module_base/constants.h"
-#include "../module_base/global_variable.h"
-#include "../module_base/matrix3.h"
-#include "../src_pw/global.h"
+#include "../src_ri/conv_coulomb_pot-inl.h"
+#include "../src_ri/conv_coulomb_pot_k-template.h"
+#include "../src_ri/exx_abfs-abfs_index.h"
+#include "../src_ri/exx_abfs-construct_orbs.h"
+#include "../src_ri/exx_abfs-io.h"
+#include "../src_ri/exx_abfs-util.h"
 #include "src_lcao/global_fp.h"
 
-#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <mpi.h>
 
-#include "../src_ri/conv_coulomb_pot-inl.h"
-#include "../src_ri/conv_coulomb_pot_k-template.h"
-#include "../src_ri/exx_abfs-construct_orbs.h"
-#include "../src_ri/exx_abfs-parallel-distribute-htime.h"
-#include "../src_ri/exx_abfs-parallel-distribute-kmeans.h"
-#include "../src_ri/exx_abfs-parallel-distribute-order.h"
-#include "../src_ri/exx_abfs-util.h"
-#include "../src_ri/exx_abfs-io.h"
-#include "../src_ri/exx_abfs-abfs_index.h"
-
 namespace ModuleRPA
 {
 void DFT_RPA_interface::out_for_RPA(const Parallel_Orbitals &parav,
-                                    const psi::Psi<std::complex<double>> &psi, Local_Orbital_Charge &loc)
+                                    const psi::Psi<std::complex<double>> &psi,
+                                    Local_Orbital_Charge &loc)
 {
     ModuleBase::TITLE("DFT_RPA_interface", "out_for_RPA");
     this->out_bands();
     this->out_eigen_vector(parav, psi);
     this->out_struc();
 
-    if(GlobalV::DFT_FUNCTIONAL=="default")
+    if (GlobalV::DFT_FUNCTIONAL == "default")
     {
         rpa_exx_lcao_.exx_init();
-        cout<<"rpa_pca_threshold: "<< rpa_exx_lcao_.info.pca_threshold<<endl;
-        cout<<"rpa_ccp_rmesh_times: "<< rpa_exx_lcao_.info.ccp_rmesh_times<<endl;
+        std::cout << "rpa_pca_threshold: " << rpa_exx_lcao_.info.pca_threshold << std::endl;
+        std::cout << "rpa_ccp_rmesh_times: " << rpa_exx_lcao_.info.ccp_rmesh_times << std::endl;
         rpa_exx_lcao_.cal_exx_ions(parav);
         rpa_exx_lcao_.cal_exx_elec(loc, nullptr);
     }
-    cout<<"rpa_lcao_exx(Ha): "<< std::fixed << std::setprecision(15)<<rpa_exx_lcao_.get_energy()/2.0<<endl;
+    std::cout << "rpa_lcao_exx(Ha): " << std::fixed << std::setprecision(15) << rpa_exx_lcao_.get_energy() / 2.0
+              << std::endl;
     this->out_Cs();
     this->out_coulomb_k();
-    //cout << "EXX_energy(Ha):  " << std::setprecision(6) << GlobalC::exx_lcao.get_energy()/2.0 << endl;
-    cout<<"etxc(Ha):"<< std::fixed << std::setprecision(15)<<GlobalC::en.etxc/2.0<<endl;
-    cout<<"etot(Ha):"<< std::fixed << std::setprecision(15)<<GlobalC::en.etot/2.0<<endl;
-    cout<<"Etot_without_rpa(Ha):"<< std::fixed << std::setprecision(15)<<
-        (GlobalC::en.etot-GlobalC::en.etxc+rpa_exx_lcao_.get_energy())/2.0<<endl;
-    //cout<<"Etot(Ha):"<<GlobalC::en.etot/2.0<<endl;
-    //cout<<"etxcc(Ha):"<<GlobalC::en.etxcc<<endl;
+
+    std::cout << "etxc(Ha):" << std::fixed << std::setprecision(15) << GlobalC::en.etxc / 2.0 << std::endl;
+    std::cout << "etot(Ha):" << std::fixed << std::setprecision(15) << GlobalC::en.etot / 2.0 << std::endl;
+    std::cout << "Etot_without_rpa(Ha):" << std::fixed << std::setprecision(15)
+              << (GlobalC::en.etot - GlobalC::en.etxc + rpa_exx_lcao_.get_energy()) / 2.0 << std::endl;
+
     return;
 }
+
 void DFT_RPA_interface::out_eigen_vector(const Parallel_Orbitals &parav, const psi::Psi<std::complex<double>> &psi)
 {
 
@@ -72,8 +65,7 @@ void DFT_RPA_interface::out_eigen_vector(const Parallel_Orbitals &parav, const p
 
         for (int is = 0; is < npsin_tmp; is++)
         {
-            // ofs<<GlobalC::kv.isk[ik+nks_tot*is]<<endl;
-            ofs << ik + 1 << endl;
+            ofs << ik + 1 << std::endl;
             for (int ib_global = 0; ib_global < GlobalV::NBANDS; ++ib_global)
             {
                 std::vector<std::complex<double>> wfc_iks(GlobalV::NLOCAL, zero);
@@ -142,22 +134,23 @@ void DFT_RPA_interface::out_bands()
     ss << "band_out";
     std::ofstream ofs;
     ofs.open(ss.str().c_str(), std::ios::out);
-    ofs << GlobalC::kv.nks << endl;
-    ofs << GlobalV::NSPIN << endl;
-    ofs << GlobalV::NBANDS << endl;
-    ofs << GlobalV::NLOCAL << endl;
-    ofs << (GlobalC::en.ef / 2.0) << endl;
+    ofs << GlobalC::kv.nks << std::endl;
+    ofs << GlobalV::NSPIN << std::endl;
+    ofs << GlobalV::NBANDS << std::endl;
+    ofs << GlobalV::NLOCAL << std::endl;
+    ofs << (GlobalC::en.ef / 2.0) << std::endl;
 
     for (int ik = 0; ik != nks_tot; ik++)
     {
         for (int is = 0; is != nspin_tmp; is++)
         {
-            ofs << std::setw(6) << ik + 1 << std::setw(6) << is + 1 << endl;
+            ofs << std::setw(6) << ik + 1 << std::setw(6) << is + 1 << std::endl;
             for (int ib = 0; ib != GlobalV::NBANDS; ib++)
                 ofs << std::setw(5) << ib + 1 << "   " << std::setw(8) << GlobalC::wf.wg(ik, ib) * nks_tot
                     << std::setw(18) << std::fixed << std::setprecision(8)
                     << GlobalC::wf.ekb[ik + is * nks_tot][ib] / 2.0 << std::setw(18) << std::fixed
-                    << std::setprecision(8) << GlobalC::wf.ekb[ik + is * nks_tot][ib] * ModuleBase::Ry_to_eV << endl;
+                    << std::setprecision(8) << GlobalC::wf.ekb[ik + is * nks_tot][ib] * ModuleBase::Ry_to_eV
+                    << std::endl;
         }
     }
     ofs.close();
@@ -182,7 +175,7 @@ void DFT_RPA_interface::out_Cs()
     ss << "Cs_data.txt";
     std::ofstream ofs;
     ofs.open(ss.str().c_str(), std::ios::out);
-    ofs << atom_centres_core.size() << "    " << 0 << endl;
+    ofs << atom_centres_core.size() << "    " << 0 << std::endl;
     for (auto &Ip: rpa_exx_lcao_.get_Cps())
     {
         size_t I = Ip.first;
@@ -196,12 +189,12 @@ void DFT_RPA_interface::out_Cs()
             {
                 auto R = Rp.first;
                 ofs << I + 1 << "   " << J + 1 << "   " << R.x << "   " << R.y << "   " << R.z << "   " << i_num
-                    << endl;
-                ofs << j_num << "   " << mu_num << endl;
+                    << std::endl;
+                ofs << j_num << "   " << mu_num << std::endl;
                 auto &tmp_Cs = *Rp.second;
                 size_t ele_num = tmp_Cs.nr * tmp_Cs.nc;
                 for (int it = 0; it != ele_num; it++)
-                    ofs << std::setw(15) << std::fixed << std::setprecision(9) << tmp_Cs.c[it] << endl;
+                    ofs << std::setw(15) << std::fixed << std::setprecision(9) << tmp_Cs.c[it] << std::endl;
             }
         }
     }
@@ -224,7 +217,7 @@ void DFT_RPA_interface::out_coulomb_k()
     std::ofstream ofs;
     ofs.open(ss.str().c_str(), std::ios::out);
 
-    ofs << GlobalC::kv.nks << endl;
+    ofs << GlobalC::kv.nks << std::endl;
     for (auto &Ip: rpa_exx_lcao_.get_Vps())
     {
         auto I = Ip.first;
@@ -239,8 +232,8 @@ void DFT_RPA_interface::out_coulomb_k()
                 ModuleBase::ComplexMatrix tmp_Vk(mu_num, nu_num);
                 tmp_Vk.zero_out();
                 ofs << all_mu << "   " << mu_shift[I] + 1 << "   " << mu_shift[I] + mu_num << "  " << mu_shift[J] + 1
-                    << "   " << mu_shift[J] + nu_num << endl;
-                ofs << ik + 1 << "  " << GlobalC::kv.wk[ik] / 2.0 << endl;
+                    << "   " << mu_shift[J] + nu_num << std::endl;
+                ofs << ik + 1 << "  " << GlobalC::kv.wk[ik] / 2.0 << std::endl;
                 for (auto &Rp: Jp.second)
                 {
                     auto R = Rp.first;
@@ -253,7 +246,7 @@ void DFT_RPA_interface::out_coulomb_k()
                 for (int i = 0; i != tmp_Vk.size; i++)
                 {
                     ofs << std::setw(21) << std::fixed << std::setprecision(12) << tmp_Vk.c[i].real() << std::setw(21)
-                        << std::fixed << std::setprecision(12) << tmp_Vk.c[i].imag() << endl;
+                        << std::fixed << std::setprecision(12) << tmp_Vk.c[i].imag() << std::endl;
                 }
             }
         }
@@ -263,7 +256,7 @@ void DFT_RPA_interface::out_coulomb_k()
 
 void RPAExxLcao::exx_init()
 {
-    cout<<"rpa_exx_init!!!"<<endl;
+    std::cout << "rpa_exx_init!!!" << std::endl;
 #ifdef __MPI
     if (GlobalC::exx_global.info.separate_loop)
     {
@@ -316,8 +309,10 @@ void RPAExxLcao::exx_init()
         abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times);
         break;
     case Exx_Global::Hybrid_Type::HSE:
-        abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse,
-                                                    {{"hse_omega", info.hse_omega}}, info.ccp_rmesh_times);
+        abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs,
+                                                    Conv_Coulomb_Pot_K::Ccp_Type::Hse,
+                                                    {{"hse_omega", info.hse_omega}},
+                                                    info.ccp_rmesh_times);
         break;
     default:
         throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + " line "
@@ -329,8 +324,7 @@ void RPAExxLcao::exx_init()
         Exx_Abfs::Lmax = std::max(Exx_Abfs::Lmax, static_cast<int>(abfs[T].size()) - 1);
     }
 
-    const ModuleBase::Element_Basis_Index::Range &&range_lcaos
-        = Exx_Abfs::Abfs_Index::construct_range(lcaos);
+    const ModuleBase::Element_Basis_Index::Range &&range_lcaos = Exx_Abfs::Abfs_Index::construct_range(lcaos);
     index_lcaos = ModuleBase::Element_Basis_Index::construct_index(range_lcaos);
 
     const ModuleBase::Element_Basis_Index::Range &&range_abfs = Exx_Abfs::Abfs_Index::construct_range(abfs);
@@ -340,7 +334,7 @@ void RPAExxLcao::exx_init()
 
     m_abfs_abfs.init_radial(abfs_ccp, abfs);
 
-    m_abfslcaos_lcaos.init(1,kmesh_times, 1);
+    m_abfslcaos_lcaos.init(1, kmesh_times, 1);
 
     m_abfslcaos_lcaos.init_radial(abfs_ccp, lcaos, lcaos);
 
@@ -350,7 +344,7 @@ void RPAExxLcao::exx_init()
 /*
 void RPAExxLcao::exx_cal_ions()
 {
-    cout<<"rpa_exx_cal_ions!!!"<<endl;
+    std::cout<<"rpa_exx_cal_ions!!!"<<std::endl;
     auto cal_atom_centres_core = [](const std::vector<std::pair<size_t, size_t>> &atom_pairs_core) -> std::set<size_t> {
         std::set<size_t> atom_centres_core;
         for (const std::pair<size_t, size_t> &atom_pair: atom_pairs_core)

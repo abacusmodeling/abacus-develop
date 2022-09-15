@@ -6,8 +6,8 @@
 #include "../module_base/matrix.h"
 #include "../src_ri/abfs-vector3_order.h"
 #include "src_lcao/local_orbital_charge.h"
-#include "src_ri/exx_lcao.h"
 #include "src_pw/global.h"
+#include "src_ri/exx_lcao.h"
 
 #include <string>
 #include <vector>
@@ -15,15 +15,15 @@
 namespace ModuleRPA
 {
 
-class RPAExxLcao: public Exx_Lcao
+class RPAExxLcao : public Exx_Lcao
 {
     /**
      * Exx class used for RPA output
      */
 
   public:
-
-    RPAExxLcao(const Exx_Global::Exx_Info &info_global): Exx_Lcao(info_global) {
+    RPAExxLcao(const Exx_Global::Exx_Info &info_global) : Exx_Lcao(info_global)
+    {
         info.pca_threshold = INPUT.exx_pca_threshold;
         info.c_threshold = INPUT.exx_c_threshold;
         info.v_threshold = INPUT.exx_v_threshold;
@@ -76,7 +76,7 @@ class DFT_RPA_interface
      */
 
   public:
-    DFT_RPA_interface(const Exx_Global::Exx_Info &info_global):rpa_exx_lcao_(info_global)
+    DFT_RPA_interface(const Exx_Global::Exx_Info &info_global) : rpa_exx_lcao_(info_global)
     {
         ;
     }
@@ -87,7 +87,9 @@ class DFT_RPA_interface
 
     RPAExxLcao &rpa_exx_lcao() {return rpa_exx_lcao_;}
 
-    void out_for_RPA(const Parallel_Orbitals &parav, const psi::Psi<std::complex<double>> &psi, Local_Orbital_Charge &loc);
+    void out_for_RPA(const Parallel_Orbitals &parav,
+                     const psi::Psi<std::complex<double>> &psi,
+                     Local_Orbital_Charge &loc);
     void out_eigen_vector(const Parallel_Orbitals &parav, const psi::Psi<std::complex<double>> &psi);
     void out_struc();
     void out_bands();
