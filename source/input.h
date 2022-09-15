@@ -405,9 +405,9 @@ class Input
     string deepks_model; // needed when deepks_scf=1
 
     // the following 3 are used when generating jle.orb
-    int deepks_descriptor_lmax; // lmax used in descriptor, mohan added 2021-01-03
-    double deepks_descriptor_rcut;
-    double deepks_descriptor_ecut;
+    int bessel_lmax; // lmax used in descriptor, mohan added 2021-01-03
+    double bessel_rcut;
+    double bessel_tol;
 
     //==========================================================
     //    implicit solvation model       Menglin Sun added on 2022-04-04
