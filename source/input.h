@@ -309,8 +309,6 @@ class Input
     int ocp;
     std::string ocp_set;
     int out_mul; // qifeng add 2019-9-10
-    double *atom_mag;
-    int n_mag_at;
     // added by zhengdy-soc
     bool noncolin;
     bool lspinorb;
@@ -406,8 +404,6 @@ class Input
 
     // the following 3 are used when generating jle.orb
     int deepks_descriptor_lmax; // lmax used in descriptor, mohan added 2021-01-03
-    double deepks_descriptor_rcut;
-    double deepks_descriptor_ecut;
 
     //==========================================================
     //    implicit solvation model       Menglin Sun added on 2022-04-04

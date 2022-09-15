@@ -221,8 +221,6 @@ extern std::string deepks_model; // needed when deepks_scf=1
 
 // the following 3 are used when generating jle.orb
 extern int deepks_descriptor_lmax; // lmax used in descriptor, mohan added 2021-01-03
-extern double deepks_descriptor_rcut;
-extern double deepks_descriptor_ecut;
 
 // method for dealing with non-local potential in Hamiltonian matrix, 0 for old, 1 for new
 extern int vnl_method;
