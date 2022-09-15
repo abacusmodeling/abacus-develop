@@ -44,6 +44,7 @@ void Input::Print(const std::string &fn) const
                                  "0: use our own mesh to do radial renormalization; 1: use mesh as in QE");
     ModuleBase::GlobalFunc::OUTP(ofs, "lmaxmax", lmaxmax, "maximum of l channels used");
     ModuleBase::GlobalFunc::OUTP(ofs, "dft_functional", dft_functional, "exchange correlation functional");
+    ModuleBase::GlobalFunc::OUTP(ofs, "xc_temperature", xc_temperature, "temperature for finite temperature functionals");
     ModuleBase::GlobalFunc::OUTP(ofs, "calculation", calculation, "test; scf; relax; nscf; ienvelope; istate; sto-scf; sto-md");
     ModuleBase::GlobalFunc::OUTP(ofs, "ntype", ntype, "atom species number");
     ModuleBase::GlobalFunc::OUTP(ofs, "nspin", nspin, "1: single spin; 2: up and down spin; 4: noncollinear spin");
@@ -288,7 +289,6 @@ void Input::Print(const std::string &fn) const
         << " #periods of periodic structure" << std::endl;
 
     ofs << "\n#Parameters (14.exx)" << std::endl;
-    ModuleBase::GlobalFunc::OUTP(ofs, "dft_functional", dft_functional, "no, hf, pbe0, hse or opt_orb");
     ModuleBase::GlobalFunc::OUTP(ofs, "exx_hybrid_alpha", exx_hybrid_alpha, "");
     ModuleBase::GlobalFunc::OUTP(ofs, "exx_hse_omega", exx_hse_omega, "");
     ModuleBase::GlobalFunc::OUTP(ofs, "exx_separate_loop", exx_separate_loop, "0 or 1");
