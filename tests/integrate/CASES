@@ -55,11 +55,11 @@
 111_PW_S2_elec_minus
 112_PW_dipole
 112_PW_efield
+113_PW_gatefield
 114_PW_BD_15
 115_PW_sol_H2
 115_PW_sol_H2O
 116_PW_scan_Si2
-117_PW_comp_H2O
 120_PW_KP_MD_ADS
 120_PW_KP_MD_FIRE
 120_PW_KP_MD_LGV
