@@ -48,7 +48,7 @@ void Input_Conv::Convert(void)
         GlobalV::global_pseudo_dir = INPUT.pseudo_dir + "/";
     if (INPUT.orbital_dir != "")
         GlobalV::global_orbital_dir = INPUT.orbital_dir + "/";
-    GlobalV::global_pseudo_type = INPUT.pseudo_type;
+    // GlobalV::global_pseudo_type = INPUT.pseudo_type;
     GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
 
     GlobalV::KSPACING = INPUT.kspacing;

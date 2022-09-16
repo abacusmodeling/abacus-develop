@@ -103,10 +103,10 @@ void Input::Init(const std::string &fn)
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "pseudo_dir", GlobalV::global_pseudo_dir);
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "orbital_dir", GlobalV::global_orbital_dir);
 
-    ModuleBase::GlobalFunc::OUT(
-        GlobalV::ofs_running,
-        "pseudo_type",
-        pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
+    // ModuleBase::GlobalFunc::OUT(
+    //     GlobalV::ofs_running,
+    //     "pseudo_type",
+    //     pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
     ModuleBase::timer::tick("Input", "Init");
     return;
@@ -126,7 +126,7 @@ void Input::Default(void)
     pseudo_dir = "";
     orbital_dir = ""; // liuyu add 2021-08-14
     read_file_dir = "auto";
-    pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+    // pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
     wannier_card = "";
     latname = "test";
     // xiaohui modify 2015-09-15, relax -> scf
@@ -511,10 +511,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, pseudo_dir);
         }
-        else if (strcmp("pseudo_type", word) == 0) // mohan add 2013-05-20 (xiaohui add 2013-06-23)
-        {
-            read_value(ifs, pseudo_type);
-        }
+        // else if (strcmp("pseudo_type", word) == 0) // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+        // {
+        //     read_value(ifs, pseudo_type);
+        // }
         else if (strcmp("orbital_dir", word) == 0) // liuyu add 2021-08-14
         {
             read_value(ifs, orbital_dir);
@@ -1968,7 +1968,7 @@ void Input::Bcast()
     Parallel_Common::bcast_string(suffix);
     Parallel_Common::bcast_string(stru_file); // xiaohui modify 2015-02-01
     Parallel_Common::bcast_string(pseudo_dir);
-    Parallel_Common::bcast_string(pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+    // Parallel_Common::bcast_string(pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
     Parallel_Common::bcast_string(orbital_dir);
     Parallel_Common::bcast_string(kpoint_file); // xiaohui modify 2015-02-01
     Parallel_Common::bcast_string(wannier_card);

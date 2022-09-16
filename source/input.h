@@ -28,8 +28,8 @@ class Input
     std::string pseudo_dir; // directory of pseudopotential
     std::string orbital_dir; // directory of orbital file
     std::string read_file_dir; // directory of files for reading
-    std::string pseudo_type; // the type of pseudopotential, mohan add 2013-05-20, ABACUS supports
-                             // UPF format (default) and vwr format. (xiaohui add 2013-06-23)
+    // std::string pseudo_type; // the type of pseudopotential, mohan add 2013-05-20, ABACUS supports
+    //                          // UPF format (default) and vwr format. (xiaohui add 2013-06-23)
     std::string kpoint_file; // file contains k-points -- xiaohui modify 2015-02-01
     std::string wannier_card; // input card for wannier functions.
     std::string latname; // lattice name

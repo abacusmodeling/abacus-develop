@@ -36,7 +36,7 @@ void Input::Print(const std::string &fn) const
                                  "orbital_dir",
                                  GlobalV::global_orbital_dir,
                                  "the directory containing orbital files");
-    ModuleBase::GlobalFunc::OUTP(ofs, "pseudo_type", GlobalV::global_pseudo_type, "the type pseudo files");
+    // ModuleBase::GlobalFunc::OUTP(ofs, "pseudo_type", GlobalV::global_pseudo_type, "the type pseudo files");
     ModuleBase::GlobalFunc::OUTP(ofs, "pseudo_rcut", pseudo_rcut, "cut-off radius for radial integration");
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "pseudo_mesh",
