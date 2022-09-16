@@ -35,6 +35,7 @@ bool GATE_FLAG = false;    // add gate field
 double NELEC = 0;
 
 std::string DFT_FUNCTIONAL = "default";
+double XC_TEMPERATURE = 0.0;
 int NSPIN = 1; // LDA
 bool TWO_EFERMI = 0; // two fermi energy, exist only magnetization is fixed.
 int CURRENT_SPIN = 0;
@@ -68,8 +69,6 @@ double PW_DIAG_THR = 1.0e-2;
 int NB2D = 1;
 
 double SCF_THR = 1.0e-9;
-
-std::string RESTART_MODE = "new";
 
 double DQ = 0.010; // space between Q points of the reciprocal radial tab
 int NQX = 10000; // number of points describing reciprocal radial tab
@@ -131,7 +130,7 @@ std::string global_wannier_card;
 std::string global_pseudo_dir = "";
 std::string global_orbital_dir = ""; // liuyu add 2021-08-14
 
-std::string global_pseudo_type = "auto";
+// std::string global_pseudo_type = "auto";
 std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified

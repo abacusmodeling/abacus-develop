@@ -103,10 +103,10 @@ void Input::Init(const std::string &fn)
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "pseudo_dir", GlobalV::global_pseudo_dir);
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "orbital_dir", GlobalV::global_orbital_dir);
 
-    ModuleBase::GlobalFunc::OUT(
-        GlobalV::ofs_running,
-        "pseudo_type",
-        pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
+    // ModuleBase::GlobalFunc::OUT(
+    //     GlobalV::ofs_running,
+    //     "pseudo_type",
+    //     pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
     ModuleBase::timer::tick("Input", "Init");
     return;
@@ -126,7 +126,7 @@ void Input::Default(void)
     pseudo_dir = "";
     orbital_dir = ""; // liuyu add 2021-08-14
     read_file_dir = "auto";
-    pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+    // pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
     wannier_card = "";
     latname = "test";
     // xiaohui modify 2015-09-15, relax -> scf
@@ -164,6 +164,7 @@ void Input::Default(void)
     // electrons / spin
     //----------------------------------------------------------
     dft_functional = "default";
+    xc_temperature = 0.0;
     nspin = 1;
     nelec = 0.0;
     lmaxmax = 2;
@@ -259,7 +260,6 @@ void Input::Default(void)
     //----------------------------------------------------------
     // potential / charge / wavefunction / energy
     //----------------------------------------------------------
-    restart_mode = "new";
     init_wfc = "atomic";
     mem_saver = 0;
     printe = 100; // must > 0
@@ -274,7 +274,9 @@ void Input::Default(void)
     deepks_scf = 0;
     deepks_bandgap = 0;
     deepks_out_unittest = 0;
-    deepks_descriptor_lmax = 2; // mohan added 2021-01-03
+    bessel_lmax = 2; // mohan added 2021-01-03
+    bessel_rcut = 6.0;
+    bessel_tol = 1.0e-12;
 
     out_pot = 0;
     out_wfc_pw = 0;
@@ -417,7 +419,6 @@ void Input::Default(void)
     //==========================================================
     // test only
     //==========================================================
-    test_just_neighbor = false;
     test_skip_ewald = false;
 
     //==========================================================
@@ -520,10 +521,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, pseudo_dir);
         }
-        else if (strcmp("pseudo_type", word) == 0) // mohan add 2013-05-20 (xiaohui add 2013-06-23)
-        {
-            read_value(ifs, pseudo_type);
-        }
+        // else if (strcmp("pseudo_type", word) == 0) // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+        // {
+        //     read_value(ifs, pseudo_type);
+        // }
         else if (strcmp("orbital_dir", word) == 0) // liuyu add 2021-08-14
         {
             read_value(ifs, orbital_dir);
@@ -669,6 +670,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("dft_functional", word) == 0)
         {
             read_value(ifs, dft_functional);
+        }
+        else if (strcmp("xc_temperature", word) == 0)
+        {
+            read_value(ifs, xc_temperature);
         }
         else if (strcmp("nspin", word) == 0)
         {
@@ -987,10 +992,6 @@ bool Input::Read(const std::string &fn)
         //----------------------------------------------------------
         // charge / potential / wavefunction
         //----------------------------------------------------------
-        else if (strcmp("restart_mode", word) == 0)
-        {
-            read_value(ifs, restart_mode);
-        }
         else if (strcmp("read_file_dir", word) == 0)
         {
             read_value(ifs, read_file_dir);
@@ -1051,9 +1052,17 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, deepks_model);
         }
-        else if (strcmp("deepks_descriptor_lmax", word) == 0) // QO added 2021-12-15
+        else if (strcmp("bessel_lmax", word) == 0) // QO added 2021-12-15
         {
-            read_value(ifs, deepks_descriptor_lmax);
+            read_value(ifs, bessel_lmax);
+        }
+        else if (strcmp("bessel_rcut", word) == 0) // QO added 2021-12-15
+        {
+            read_value(ifs, bessel_rcut);
+        }
+        else if (strcmp("bessel_tol", word) == 0) // QO added 2021-12-15
+        {
+            read_value(ifs, bessel_tol);
         }
         else if (strcmp("out_pot", word) == 0)
         {
@@ -1461,10 +1470,6 @@ bool Input::Read(const std::string &fn)
         // exx
         // Peize Lin add 2018-06-20
         //----------------------------------------------------------
-        else if (strcmp("dft_functional", word) == 0)
-        {
-            read_value(ifs, dft_functional);
-        }
         else if (strcmp("exx_hybrid_alpha", word) == 0)
         {
             read_value(ifs, exx_hybrid_alpha);
@@ -1548,10 +1553,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("cell_factor", word) == 0)
         {
             read_value(ifs, cell_factor);
-        }
-        else if (strcmp("test_just_neighbor", word) == 0)
-        {
-            read_value(ifs, test_just_neighbor);
         }
         else if (strcmp("test_skip_ewald", word) == 0)
         {
@@ -2009,7 +2010,7 @@ void Input::Bcast()
     Parallel_Common::bcast_string(suffix);
     Parallel_Common::bcast_string(stru_file); // xiaohui modify 2015-02-01
     Parallel_Common::bcast_string(pseudo_dir);
-    Parallel_Common::bcast_string(pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+    // Parallel_Common::bcast_string(pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
     Parallel_Common::bcast_string(orbital_dir);
     Parallel_Common::bcast_string(kpoint_file); // xiaohui modify 2015-02-01
     Parallel_Common::bcast_string(wannier_card);
@@ -2046,6 +2047,7 @@ void Input::Bcast()
     Parallel_Common::bcast_string(wannier_spin);
 
     Parallel_Common::bcast_string(dft_functional);
+    Parallel_Common::bcast_double(xc_temperature);
     Parallel_Common::bcast_int(nspin);
     Parallel_Common::bcast_double(nelec);
     Parallel_Common::bcast_int(lmaxmax);
@@ -2126,7 +2128,6 @@ void Input::Bcast()
     Parallel_Common::bcast_int(mixing_ndim);
     Parallel_Common::bcast_double(mixing_gg0); // mohan add 2014-09-27
 
-    Parallel_Common::bcast_string(restart_mode);
     Parallel_Common::bcast_string(read_file_dir);
     Parallel_Common::bcast_string(init_wfc);
     Parallel_Common::bcast_int(mem_saver);
@@ -2143,8 +2144,10 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(deepks_bandgap);
     Parallel_Common::bcast_bool(deepks_out_unittest);
     Parallel_Common::bcast_string(deepks_model);
-    Parallel_Common::bcast_int(deepks_descriptor_lmax);
-
+    Parallel_Common::bcast_int(bessel_lmax);
+    Parallel_Common::bcast_double(bessel_rcut);
+    Parallel_Common::bcast_double(bessel_tol);
+    
     Parallel_Common::bcast_int(out_pot);
     Parallel_Common::bcast_int(out_wfc_pw);
     Parallel_Common::bcast_int(out_wfc_r);
@@ -2267,14 +2270,12 @@ void Input::Bcast()
     Parallel_Common::bcast_int(td_vexttype);
     Parallel_Common::bcast_int(td_vextout);
     Parallel_Common::bcast_int(td_dipoleout);
-    Parallel_Common::bcast_bool(test_just_neighbor);
     Parallel_Common::bcast_bool(test_skip_ewald);
     Parallel_Common::bcast_int(GlobalV::ocp);
     Parallel_Common::bcast_string(GlobalV::ocp_set);
     Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10
 
     // Peize Lin add 2018-06-20
-    Parallel_Common::bcast_string(dft_functional);
     Parallel_Common::bcast_double(exx_hybrid_alpha);
     Parallel_Common::bcast_double(exx_hse_omega);
     Parallel_Common::bcast_bool(exx_separate_loop);
@@ -2582,7 +2583,7 @@ void Input::Check(void)
     {
         this->relax_nmax = 1;
     }
-    else if(calculation == "gen_jle")
+    else if(calculation == "gen_bessel")
     {
         this->relax_nmax = 1;
         if(basis_type != "pw")

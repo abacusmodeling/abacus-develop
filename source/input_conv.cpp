@@ -49,7 +49,7 @@ void Input_Conv::Convert(void)
         GlobalV::global_pseudo_dir = INPUT.pseudo_dir + "/";
     if (INPUT.orbital_dir != "")
         GlobalV::global_orbital_dir = INPUT.orbital_dir + "/";
-    GlobalV::global_pseudo_type = INPUT.pseudo_type;
+    // GlobalV::global_pseudo_type = INPUT.pseudo_type;
     GlobalC::ucell.setup(INPUT.latname, INPUT.ntype, INPUT.lmaxmax, INPUT.init_vel, INPUT.fixed_axes);
 
     GlobalV::KSPACING = INPUT.kspacing;
@@ -75,6 +75,7 @@ void Input_Conv::Convert(void)
     GlobalV::PSEUDO_MESH = INPUT.pseudo_mesh;
 
     GlobalV::DFT_FUNCTIONAL = INPUT.dft_functional;
+    GlobalV::XC_TEMPERATURE = INPUT.xc_temperature;
     GlobalV::NSPIN = INPUT.nspin;
     GlobalV::CURRENT_SPIN = 0;
 
@@ -152,7 +153,6 @@ void Input_Conv::Convert(void)
     //----------------------------------------------------------
     // wavefunction / charge / potential / (2/4)
     //----------------------------------------------------------
-    GlobalV::RESTART_MODE = INPUT.restart_mode;
     GlobalC::wf.init_wfc = INPUT.init_wfc;
     GlobalC::wf.mem_saver = INPUT.mem_saver; // mohan add 2010-09-07
     GlobalC::en.printe = INPUT.printe; // mohan add 2011-03-16
