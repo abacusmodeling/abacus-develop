@@ -31,6 +31,8 @@ extern bool PSEUDO_MESH;
 extern std::string CALCULATION; // 2 "scf";"nscf" ;"symmetry"
 extern int EFIELD_FLAG; // 5 add electric field
 extern int DIP_COR_FLAG; // 7 add dipole correction
+extern bool GATE_FLAG;     // add gate field
+extern double NELEC;
 
 extern std::string DFT_FUNCTIONAL; // 6.5 change the DFT functional from input file.
 extern double XC_TEMPERATURE;

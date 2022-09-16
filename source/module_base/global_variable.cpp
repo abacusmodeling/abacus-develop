@@ -31,6 +31,8 @@ bool PSEUDO_MESH;
 std::string CALCULATION = "scf";
 int EFIELD_FLAG = 0; // 5: add electric field
 int DIP_COR_FLAG = 0; // 7: add dipole field
+bool GATE_FLAG = false;    // add gate field
+double NELEC = 0;
 
 std::string DFT_FUNCTIONAL = "default";
 double XC_TEMPERATURE = 0.0;

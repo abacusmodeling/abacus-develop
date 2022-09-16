@@ -78,6 +78,10 @@
 
     [efield_flag](#efield_flag) | [dip_cor_flag](#dip_cor_flag) | [efield_dir](#efield_dir) | [efield_pos_max](#efield_pos_max) | [efield_pos_dec](#efield_pos_dec) | [efield_amp](#efield_amp)
 
+- [Gate field (compensating charge)](#gate-field-compensating-charge)
+
+    [gate_flag](#gate_flag) | [zgate](#zgate) | [block](#block) | [block_down](#block_down) | [block_up](#block_up) | [block_height](#block_height)
+
 - [Electronic conductivities](#electronic-conductivities)
 
     [cal_cond](#cal_cond) | [cond_nche](#cond_nche) | [cond_dw](#cond_dw) | [cond_wcut](#cond_wcut) | [cond_wenlarge](#cond_wenlarge) | [cond_fwhm](#cond_fwhm)
@@ -1037,7 +1041,47 @@ added to the bare ionic potential. If you want no electric field, parameter efie
 - **Description**: Amplitude of the electric field, in ***Hartree*** a.u.; 1 a.u. = 51.4220632*10^10 V/m. Used only if efield_flag == true. The saw-like potential increases with slope efield_amp  in the region from (efield_pos_max+efield_pos_dec-1) to (efield_pos_max), then decreases until (efield_pos_max+efield_pos_dec), in units of the crystal vector efield_dir. Important: the change of slope of this potential must be located in the empty region, or else unphysical forces will result.
 - **Default**: 0.0
 
-### Exact exchange
+### Gate field (compensating charge)
+
+This part of variables are relevant to gate field (compensating charge)
+
+#### gate_flag
+
+- **Type**: Boolean
+- **Description**: In the case of charged cells, setting gate_flag == true represents the addition of compensating charge by a charged plate, which is placed at **zgate**. Note that the direction is specified by **efield_dir**.
+- **Default**: false
+
+#### zgate
+
+- **Type**: Real
+- **Description**: Specify the position of the charged plate in units of the unit cell (0 <= **zgate** < 1).
+- **Default**: 0.5
+
+#### block
+
+- **Type**: Boolean
+- **Description**: Add a potential barrier to the total potential to avoid electrons spilling into the vacuum region for electron doping. Potential barrier is from **block_down** to **block_up** and has a height of **block_height**. If **dip_cor_flag** == true, **efield_pos_dec** is used for a smooth increase and decrease of the potential barrier.
+- **Default**: false
+
+#### block_down
+
+- **Type**: Real
+- **Description**: Lower beginning of the potential barrier in units of the unit cell size (0 <= **block_down** < **block_up** < 1).
+- **Default**: 0.45
+
+#### block_up
+
+- **Type**: Real
+- **Description**: Upper beginning of the potential barrier in units of the unit cell size (0 <= **block_down** < **block_up** < 1).
+- **Default**: 0.55
+
+#### block_height
+
+- **Type**: Real
+- **Description**: Height of the potential barrier in Rydberg.
+- **Default**: 0.1
+
+### Exact Exchange
 
 This part of variables are relevant when using hybrid functionals
 
