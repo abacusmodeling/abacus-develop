@@ -79,8 +79,6 @@ extern int NB2D; // 16.5 dividsion of 2D_matrix.
 
 extern double SCF_THR; // 17
 
-extern std::string RESTART_MODE; // 18
-
 extern double DQ; // 19 mohan add 2009-09-10
 extern int NQX; // 20 mohan add 2009-09-10
 

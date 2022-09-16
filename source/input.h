@@ -201,7 +201,6 @@ class Input
     //==========================================================
     // potential / charge / wavefunction / energy
     //==========================================================
-    std::string restart_mode; //
 
     std::string init_wfc; // "file","atomic","random"
     std::string init_chg; // "file","atomic"
@@ -424,7 +423,6 @@ class Input
     //==========================================================
     // variables for test only
     //==========================================================
-    bool test_just_neighbor = false;
     bool test_skip_ewald = false;
 
   private:
