@@ -171,9 +171,17 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "deepks_model", deepks_model, "file dir of traced pytorch model: 'model.ptg");
 
     ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "deepks_descriptor_lmax",
-                                 deepks_descriptor_lmax,
-                                 "lmax used in generating descriptor");
+                                 "bessel_lmax",
+                                 bessel_lmax,
+                                 "lmax used in generating bessel functions");
+    ModuleBase::GlobalFunc::OUTP(ofs,
+                                 "bessel_rcut",
+                                 bessel_rcut,
+                                 "rcut used in generating bessel functions");
+    ModuleBase::GlobalFunc::OUTP(ofs,
+                                 "bessel_rcut",
+                                 bessel_rcut,
+                                 "tolerence level when generating bessel functions");
 
     ofs << "\n#Parameters (5.LCAO)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "basis_type", basis_type, "PW; LCAO in pw; LCAO");

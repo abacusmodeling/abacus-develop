@@ -275,7 +275,9 @@ void Input::Default(void)
     deepks_scf = 0;
     deepks_bandgap = 0;
     deepks_out_unittest = 0;
-    deepks_descriptor_lmax = 2; // mohan added 2021-01-03
+    bessel_lmax = 2; // mohan added 2021-01-03
+    bessel_rcut = 6.0;
+    bessel_tol = 1.0e-12;
 
     out_pot = 0;
     out_wfc_pw = 0;
@@ -1046,9 +1048,17 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, deepks_model);
         }
-        else if (strcmp("deepks_descriptor_lmax", word) == 0) // QO added 2021-12-15
+        else if (strcmp("bessel_lmax", word) == 0) // QO added 2021-12-15
         {
-            read_value(ifs, deepks_descriptor_lmax);
+            read_value(ifs, bessel_lmax);
+        }
+        else if (strcmp("bessel_rcut", word) == 0) // QO added 2021-12-15
+        {
+            read_value(ifs, bessel_rcut);
+        }
+        else if (strcmp("bessel_tol", word) == 0) // QO added 2021-12-15
+        {
+            read_value(ifs, bessel_tol);
         }
         else if (strcmp("out_pot", word) == 0)
         {
@@ -2103,8 +2113,10 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(deepks_bandgap);
     Parallel_Common::bcast_bool(deepks_out_unittest);
     Parallel_Common::bcast_string(deepks_model);
-    Parallel_Common::bcast_int(deepks_descriptor_lmax);
-
+    Parallel_Common::bcast_int(bessel_lmax);
+    Parallel_Common::bcast_double(bessel_rcut);
+    Parallel_Common::bcast_double(bessel_tol);
+    
     Parallel_Common::bcast_int(out_pot);
     Parallel_Common::bcast_int(out_wfc_pw);
     Parallel_Common::bcast_int(out_wfc_r);
@@ -2523,7 +2535,7 @@ void Input::Check(void)
     {
         this->relax_nmax = 1;
     }
-    else if(calculation == "gen_jle")
+    else if(calculation == "gen_bessel")
     {
         this->relax_nmax = 1;
         if(basis_type != "pw")
