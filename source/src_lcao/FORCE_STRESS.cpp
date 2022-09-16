@@ -292,10 +292,13 @@ void Force_Stress_LCAO::getForceStress(
 				sum += fcs(iat, i);
 			}
 
-			for(int iat=0; iat<nat; ++iat)
-			{
-				fcs(iat, i) -= sum/nat;
-			}
+            if(!(GlobalV::GATE_FLAG || GlobalV::EFIELD_FLAG))
+            {
+                for(int iat=0; iat<nat; ++iat)
+                {
+                    fcs(iat, i) -= sum/nat;
+                }
+            }
 
 			//xiaohui add "OUT_LEVEL", 2015-09-16
 			if(GlobalV::OUT_LEVEL != "m")
@@ -304,6 +307,11 @@ void Force_Stress_LCAO::getForceStress(
 					<< i+1 << " is " << sum/nat << std::endl;
 			}
 		}
+
+        if(GlobalV::GATE_FLAG || GlobalV::EFIELD_FLAG)
+        {
+            GlobalV::ofs_running << "Atomic forces are not shifted if gate_flag or efield_flag == true!" << std::endl;
+        }
 
 		// pengfei 2016-12-20
 		if(ModuleSymmetry::Symmetry::symm_flag)

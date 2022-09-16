@@ -82,12 +82,20 @@ void Sto_Forces::init(ModuleBase::matrix& force, const psi::Psi<std::complex<dou
 			}
 		}
 
-		double compen = sum /  GlobalC::ucell.nat;
-		for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
-		{
-			force(iat, ipol) = force(iat, ipol) - compen;
-		}	
+        if(!(GlobalV::GATE_FLAG || GlobalV::EFIELD_FLAG))
+        {
+            double compen = sum / GlobalC::ucell.nat;
+            for (int iat = 0; iat < GlobalC::ucell.nat; ++iat)
+            {
+                force(iat, ipol) = force(iat, ipol) - compen;
+            }
+        }
 	}
+
+    if(GlobalV::GATE_FLAG || GlobalV::EFIELD_FLAG)
+    {
+        GlobalV::ofs_running << "Atomic forces are not shifted if gate_flag or efield_flag == true!" << std::endl;
+    }
 	
 	if(ModuleSymmetry::Symmetry::symm_flag)
 	{
