@@ -425,12 +425,6 @@ class Input
     double tau;
     double sigma_k;
     double nc_k;
-    // compensating charge
-    bool comp_chg;
-    double comp_q;
-    double comp_l;
-    double comp_center;
-    int comp_dim;
 
     //==========================================================
     // variables for test only

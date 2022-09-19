@@ -372,14 +372,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "sigma_k", sigma_k, " the width of the diffuse cavity");
     ModuleBase::GlobalFunc::OUTP(ofs, "nc_k", nc_k, " the cut-off charge density");
 
-    ofs << "\n#Parameters (19.compensating_charge)" << std::endl;
-    ModuleBase::GlobalFunc::OUTP(ofs, "comp_chg", comp_chg, " add compensating charge");
-    ModuleBase::GlobalFunc::OUTP(ofs, "comp_q", comp_q, " total charge of compensating charge");
-    ModuleBase::GlobalFunc::OUTP(ofs, "comp_l", comp_l, " total length of compensating charge");
-    ModuleBase::GlobalFunc::OUTP(ofs, "comp_center", comp_center, " center of compensating charge on dim");
-    ModuleBase::GlobalFunc::OUTP(ofs, "comp_dim", comp_dim, " dimension of compensating charge(x, y or z)");
-
-    ofs << "\n#Parameters (20.dft+u)" << std::endl;
+    ofs << "\n#Parameters (19.dft+u)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "dft_plus_u", dft_plus_u, "true:DFT+U correction; false: standard DFT calcullation(default)");
     ModuleBase::GlobalFunc::OUTP(ofs, "dftu_type", dftu_type, "1:rotationally invarient formalism; 2:simplified form(default)");
     ModuleBase::GlobalFunc::OUTP(ofs, "double_counting", double_counting, "1:FLL(fully localized limit)(default); 2:AMF(around mean field)");
