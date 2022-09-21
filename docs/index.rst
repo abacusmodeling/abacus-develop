@@ -35,6 +35,8 @@ Hi everyone, here are ABACUS Documentations.
    :numbered:
    :caption: Citting ABACUS
 
+   CITATIONS.md
+
 .. toctree::
    :maxdepth: 2
    :numbered:
