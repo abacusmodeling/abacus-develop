@@ -18,4 +18,4 @@ Quick Start
    :maxdepth: 2
    :caption: Hands-on examples
 
-   hands-on.md
+   hands_on.md
