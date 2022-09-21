@@ -25,7 +25,6 @@ Please refer to our [GitHub repository](https://github.com/deepmodeling/abacus-d
   - [Run ABACUS](#run-abacus)
   - [Output files](#output-files)
   - [Hands-on examples](#hands-on-examples)
-- [Development team](#development-team)
 - [Communicating and making contributions](#communicating-and-making-contributions)
 - [Miscellaneous](#miscellaneous)
 
@@ -162,16 +161,6 @@ The following provides basic sample jobs in ABACUS. More can be found in the dir
 - [ABACUS-DPGEN interface](docs/examples/dpgen.md)
 - [ABACUS-phonopy interface](docs/examples/phonopy.md)
 - [Implicit solvation model](docs/examples/implicit-sol.md)
-
-[back to top](#readme-top)
-
-
-# Development team
-The current development team consists the following research groups/affiliations:
-- University of Science and Technology of China (Dr. Lixin He)
-- Peking University (Dr. Mohan Chen)
-- Institute of Physics, Chinese Academy of Sciences (Dr. Xinguo Ren)
-- AI for Science Institute
 
 [back to top](#readme-top)
 
