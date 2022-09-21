@@ -1,11 +1,8 @@
 =================================================
-Interfaces to Other Softwares
+Detailed Introduction of the Input Files
 =================================================
 
 .. toctree::
-   deepks
-   dpgen
-   deeph
-   ase
-   phonopy
-   Wannier90
+    input-main
+    stru
+    kpt
