@@ -14,33 +14,30 @@ Hi everyone, here are ABACUS Documentations.
 .. toctree::
    :maxdepth: 2
    :numbered:
-   :caption: Getting Started
+   :caption: Quick Start
 
-   install
-   features
-   generate-basis
-   input-kpt
-   input-main
-   input-stru
+   quick_start/index
 
 .. toctree::
    :maxdepth: 2
    :numbered:
    :caption: Advanced
 
-   examples/index
+   advanced/index
 
 .. toctree::
    :maxdepth: 2
    :numbered:
-   :caption: Citting ABACUS
+   :caption: Citing ABACUS
 
-   CITATIONS.md
+   CITATIONS
 
 .. toctree::
    :maxdepth: 2
    :numbered:
    :caption: Developing team
+
+   DevelopingTeam
 
 .. toctree::
    :maxdepth: 2
