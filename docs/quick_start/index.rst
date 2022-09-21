@@ -1,5 +1,5 @@
 =================================================
-Quick Started
+Quick Start
 =================================================
 
 .. toctree::
@@ -12,13 +12,10 @@ Quick Started
    :maxdepth: 2
    :caption: Inputs
 
-   input
-   stru
-   kpt
+   input.md
 
 .. toctree::
    :maxdepth: 2
    :caption: Hands-on examples
 
-   scf
-   relaxation
+   hands-on.md
