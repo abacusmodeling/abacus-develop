@@ -23,9 +23,11 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 	delete[] atom_label;
     delete[] atom_mass;
     delete[] pseudo_fn;
+	delete[] pseudo_type;
 	this->atom_mass  = new double[ntype]; //atom masses
 	this->atom_label = new std::string[ntype]; //atom labels
 	this->pseudo_fn  = new std::string[ntype]; //file name of pseudopotential
+	this->pseudo_type = new std::string[ntype]; // type of pseudopotential
 
 	std::string word;
 	//==========================================
@@ -41,12 +43,44 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			std::stringstream ss;
 			ss << "atom label for species " << i+1;
 			ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atom_label[i]);	
-			ModuleBase::GlobalFunc::READ_VALUE(ifa, pseudo_fn[i]);
+			// ModuleBase::GlobalFunc::READ_VALUE(ifa, pseudo_fn[i]);
+			ifa >> this->pseudo_fn[i];
+
+			this->pseudo_type[i] = "auto";
+			string temp;
+			temp = ifa.get();
+			while ((temp != "\n") && (ifa.eof() == false) && (temp[0] != '#'))
+			{
+				temp = ifa.get();
+				char tmp = (char)temp[0];
+				if (tmp >= 'a' && tmp <= 'z')
+				{
+					ifa.putback(tmp);
+					ModuleBase::GlobalFunc::READ_VALUE(ifa, temp);
+					if (temp=="auto" || temp=="upf" || temp=="vwr" || temp=="upf201" || temp=="blps")
+					{
+						this->pseudo_type[i] = temp;
+					}
+					else
+					{
+						GlobalV::ofs_warning << "unrecongnized pseudopotential type '" << temp << "', check your STRU file." << endl;
+						ModuleBase::WARNING_QUIT("read_atoms", "unrecongnized pseudo type.");
+					}
+					break;
+				}
+				else if (temp == "#")
+				{
+					ifa.ignore(300, '\n');
+					break;
+				}
+			} 
+			
 			if(GlobalV::test_pseudo_cell==2) 
 			{
 				ofs_running << "\n" << std::setw(6) << atom_label[i] 
 						<< std::setw(12) << atom_mass[i] 
-						<< std::setw(18) << pseudo_fn[i];
+						<< std::setw(18) << pseudo_fn[i]
+						<< std::setw(18) << pseudo_type[i];
 			}
 
 			// Peize Lin test for bsse 2021.04.07
@@ -110,10 +144,10 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 	// Peize Lin add 2016-09-23
 #ifndef __CELL
 #ifdef __MPI 
-	if( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
-	    Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
-	    Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type ||
-		Exx_Info::Hybrid_Type::SCAN0  == GlobalC::exx_lcao.info.hybrid_type)
+	if( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type || 
+	    Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type || 
+	    Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type ||
+		Exx_Info::Hybrid_Type::SCAN0  == GlobalC::exx_info.info_global.hybrid_type)
 	{
 		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
 		{
@@ -604,6 +638,13 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 
                                         string tmpid;
                                         tmpid = ifpos.get();
+
+										if( (int)tmpid[0] < 0 )
+										{
+											std::cout << "read_atom_positions, mismatch in atom number for atom type: " << atoms[it].label << std::endl;
+											exit(1); 
+										}
+
 										bool input_vec_mag=false;
 										bool input_angle_mag=false;
                                         while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
@@ -920,7 +961,7 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type, co
 	for(int it=0; it<ntype; it++)
 	{
                 //modified by zhengdy 2015-07-24
-		ofs << atom_label[it] << " " << atom_mass[it] << " " << pseudo_fn[it] << std::endl;
+		ofs << atom_label[it] << " " << atom_mass[it] << " " << pseudo_fn[it] << " " << pseudo_type[it] << std::endl;
 	}
 
 #ifdef __LCAO

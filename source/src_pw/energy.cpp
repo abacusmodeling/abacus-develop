@@ -18,6 +18,7 @@
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
 #include "../module_surchem/efield.h"    // liuyu add 2022-05-06
+#include "../module_surchem/gatefield.h"    // liuyu add 2022-09-13
 #include "../module_surchem/surchem.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -63,6 +64,7 @@ void energy::calculate_harris(const int &flag)
 		+ demet
 		+ exx
 		+ Efield::etotefield
+        + Gatefield::etotgatefield
 		+ evdw;  						// Peize Lin add evdw 2021.03.09
 
 #ifdef __LCAO
@@ -94,6 +96,7 @@ void energy::calculate_etot(void)
 	+ descf
 	+ exx
 	+ Efield::etotefield
+    + Gatefield::etotgatefield
 	+ evdw;							// Peize Lin add evdw 2021.03.09
 	if (GlobalV::imp_sol)
     {
@@ -164,7 +167,6 @@ void energy::print_etot(
 			this->print_format("E_Ewald", H_Ewald_pw::ewald_energy);
 			this->print_format("E_demet", demet); //mohan add 2011-12-02
 			this->print_format("E_descf", descf);
-			this->print_format("E_efield", Efield::etotefield);
 			if (GlobalC::vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
 			{
 				this->print_format("E_vdwD2", evdw);
@@ -182,6 +184,15 @@ void energy::print_etot(
 				this->print_format("E_sol_el", esol_el);
 				this->print_format("E_sol_cav", esol_cav);
 			}
+            if(GlobalV::EFIELD_FLAG)
+            {
+                this->print_format("E_efield", Efield::etotefield);
+            }
+            if(GlobalV::GATE_FLAG)
+            {
+                this->print_format("E_gatefield", Gatefield::etotgatefield);
+            }
+
 #ifdef __DEEPKS
 			if (GlobalV::deepks_scf)	//caoyu add 2021-08-10
 			{
@@ -555,13 +566,13 @@ void energy::set_exx()
 			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	};
-	if( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type )				// HF
+	if( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type )				// HF
 	{
 		this->exx = exx_energy();
 	}
-	else if( Exx_Info::Hybrid_Type::PBE0  == GlobalC::exx_lcao.info.hybrid_type || 
-	         Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type ||
-			 Exx_Info::Hybrid_Type::HSE   == GlobalC::exx_lcao.info.hybrid_type )			// PBE0 or HSE
+	else if( Exx_Info::Hybrid_Type::PBE0  == GlobalC::exx_info.info_global.hybrid_type || 
+	         Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type ||
+			 Exx_Info::Hybrid_Type::HSE   == GlobalC::exx_info.info_global.hybrid_type )			// PBE0 or HSE
 	{
 		this->exx = GlobalC::exx_info.info_global.hybrid_alpha * exx_energy();
 	}

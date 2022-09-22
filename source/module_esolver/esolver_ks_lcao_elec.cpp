@@ -286,7 +286,7 @@ namespace ModuleESolver
             if (Exx_Info::Hybrid_Type::HF == GlobalC::exx_info.info_global.hybrid_type
                 || Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type
                 || Exx_Info::Hybrid_Type::HSE == GlobalC::exx_info.info_global.hybrid_type
-                || Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type)
+                || Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type)
             {
                 GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
 				if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -439,7 +439,7 @@ namespace ModuleESolver
 
     #ifdef __MPI
         // Peize Lin add 2018-08-14
-        switch (GlobalC::exx_lcao.info.hybrid_type)
+        switch (GlobalC::exx_info.info_global.hybrid_type)
         {
         case Exx_Info::Hybrid_Type::HF:
         case Exx_Info::Hybrid_Type::PBE0:

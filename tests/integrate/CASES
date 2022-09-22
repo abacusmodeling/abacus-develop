@@ -7,6 +7,8 @@
 101_PW_upf201_pseudopots
 101_PW_VW_pseudopots
 101_PW_15_lowz
+101_PW_upf201_upf100_pseudopots
+101_PW_upf201_blps_pseudopots
 102_PW_DA_davidson
 103_PW_15_CS_CF
 103_PW_15_CS_CF_bspline
@@ -55,6 +57,7 @@
 111_PW_S2_elec_minus
 112_PW_dipole
 112_PW_efield
+113_PW_gatefield
 114_PW_BD_15
 115_PW_sol_H2
 115_PW_sol_H2O
@@ -143,6 +146,7 @@
 220_NO_KP_MD_NVE
 #230_NO_KP_MD_TD
 240_NO_KP_15_SO
+240_NO_KP_15_SO_average
 250_NO_KP_CR_VDW2
 250_NO_KP_CR_VDW3
 260_NO_15_PK_PU_AF

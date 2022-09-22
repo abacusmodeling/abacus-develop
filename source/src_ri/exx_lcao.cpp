@@ -639,7 +639,7 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::en
 //	Conv_Coulomb_Pot::cal_orbs_ccp( abfs, abfs_ccp, info.ccp_rmesh_times, 1 );
 //{
 //	std::ofstream ofs("exx_lcao"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-//	ofs<<static_cast<std::underlying_type<Exx_Lcao::Hybrid_Type>::type>(exx_lcao.info.hybrid_type)<<std::endl;
+//	ofs<<static_cast<std::underlying_type<Exx_Lcao::Hybrid_Type>::type>(this->info.hybrid_type)<<std::endl;
 //	ofs.close();
 //}
 
@@ -651,7 +651,7 @@ gettimeofday( &t_start, NULL);
 		case Exx_Info::Hybrid_Type::PBE0:
 			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times );		break;
 		case Exx_Info::Hybrid_Type::SCAN0:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, info.ccp_rmesh_times );		break;
+			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times );		break;
 		case Exx_Info::Hybrid_Type::HSE:
 			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_rmesh_times );	break;
 		default:
@@ -945,7 +945,7 @@ static int istep=0;
 		#error "TEST_EXX_LCAO"
 	#endif
 
-//	if( exx_lcao.cal_DM_delta() < exx_lcao.get_DM_threshold() )	break;
+//	if( this->cal_DM_delta() < this->get_DM_threshold() )	break;
 
 std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start, t_start_all;
