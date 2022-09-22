@@ -138,9 +138,9 @@ void Electrons::self_consistent(const int &istep)
 		// calculate exact-exchange
 #ifdef __MPI //liyuanbo 2022/2/23
 #ifdef __LCAO
-		if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
-			Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
-			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
+		if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type || 
+			Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type || 
+			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type )
         {
             if( !GlobalC::exx_global.info.separate_loop )
             {
