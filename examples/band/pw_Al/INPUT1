@@ -1,16 +1,15 @@
 INPUT_PARAMETERS
 #Parameters     (General)
 pseudo_dir                      ../../../tests/PP_ORB
-orbital_dir                     ../../../tests/PP_ORB
 calculation                     scf
 ntype                           1       
-nbands                          8
+symmetry                        0
 #Parameters (Methos)
-basis_type                      lcao
-symmetry                        0       
-#Parameters (Accuracy)
+basis_type                      pw
 ecutwfc                         50
-scf_thr                         1.0e-7  // about iteration
+scf_thr                         1.0e-8  // about iteration
 scf_nmax			100
+smearing_method         	gauss
+smearing_sigma          	0.01
 #Parameters (File)
 out_chg                         1
