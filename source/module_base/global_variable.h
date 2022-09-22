@@ -31,8 +31,11 @@ extern bool PSEUDO_MESH;
 extern std::string CALCULATION; // 2 "scf";"nscf" ;"symmetry"
 extern int EFIELD_FLAG; // 5 add electric field
 extern int DIP_COR_FLAG; // 7 add dipole correction
+extern bool GATE_FLAG;     // add gate field
+extern double NELEC;
 
 extern std::string DFT_FUNCTIONAL; // 6.5 change the DFT functional from input file.
+extern double XC_TEMPERATURE;
 extern int NSPIN; // 7
 extern bool TWO_EFERMI; // 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int CURRENT_SPIN; // 8
@@ -77,8 +80,6 @@ extern double PW_DIAG_THR; // 15 pw_diag_thr
 extern int NB2D; // 16.5 dividsion of 2D_matrix.
 
 extern double SCF_THR; // 17
-
-extern std::string RESTART_MODE; // 18
 
 extern double DQ; // 19 mohan add 2009-09-10
 extern int NQX; // 20 mohan add 2009-09-10
@@ -152,7 +153,7 @@ extern std::string global_kpoint_card;
 extern std::string global_wannier_card;
 
 extern std::string global_pseudo_dir;
-extern std::string global_pseudo_type; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+// extern std::string global_pseudo_type; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 extern std::string global_out_dir;
 extern std::string global_orbital_dir; // liuyu add 2021-08-14
 extern std::string global_readin_dir; // zhengdy modified
@@ -219,9 +220,9 @@ extern bool deepks_out_unittest; // if set 1, prints intermediate quantities tha
 extern std::string deepks_model; // needed when deepks_scf=1
 
 // the following 3 are used when generating jle.orb
-extern int deepks_descriptor_lmax; // lmax used in descriptor, mohan added 2021-01-03
-extern double deepks_descriptor_rcut;
-extern double deepks_descriptor_ecut;
+extern int bessel_lmax; // lmax used in descriptor, mohan added 2021-01-03
+extern double bessel_rcut;
+extern double bessel_tol;
 
 // method for dealing with non-local potential in Hamiltonian matrix, 0 for old, 1 for new
 extern int vnl_method;
@@ -236,7 +237,5 @@ extern double tau;
 extern double sigma_k;
 extern double nc_k;
 
-// compensating charge
-extern bool comp_chg;
 } // namespace GlobalV
 #endif
