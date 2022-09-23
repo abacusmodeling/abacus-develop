@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 ########################################
 
 project(ABACUS
-    VERSION 2.3.0
+    VERSION 3.0.0
     DESCRIPTION "ABACUS is an electronic structure package based on DFT."
     HOMEPAGE_URL "https://github.com/deepmodeling/abacus-develop"
     LANGUAGES CXX
@@ -32,7 +32,7 @@ add_executable(${ABACUS_BIN_NAME} source/main.cpp)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
-  message(FATAL_ERROR "GCC4 is not supported.")
+  message(WARNING "GCC4 is not fully supported.")
 endif()
 add_compile_options(-Wno-write-strings)
 set(FETCHCONTENT_QUIET FALSE) # Notify user when cloning git repo
@@ -243,6 +243,7 @@ endif()
 if(ENABLE_LIBXC)
   find_package(Libxc 5.1.7 HINTS ${Libxc_DIR}/share/cmake/Libxc)
   if(${Libxc_FOUND})
+    message(STATUS "Found Libxc: version "${Libxc_VERSION})
     target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
     include_directories(${Libxc_INCLUDE_DIRS})
   else()
@@ -257,13 +258,11 @@ if(ENABLE_LIBXC)
     FetchContent_MakeAvailable(Libxc)
   endif()
   add_compile_definitions(USE_LIBXC)
-  message(STATUS "Found Libxc: version "${Libxc_VERSION})
 endif()
 
 add_compile_definitions(
   __EXX
   __FFTW3
-  __FP
   __SELINV
   __LCAO
   METIS

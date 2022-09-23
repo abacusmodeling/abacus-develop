@@ -305,7 +305,7 @@ class Input
     std::string vdw_a2; // damping function parameter
     double vdw_d; // damping function parameter d
     bool vdw_abc; // third-order term?
-    std::string vdw_radius; // cutoff radius for std::pair interactions
+    std::string vdw_cutoff_radius; // cutoff radius for std::pair interactions
     std::string vdw_radius_unit; //"Bohr" or "Angstrom"
     double vdw_cn_thr; // cutoff radius for calculating the coordination number
     std::string vdw_cn_thr_unit; //"Bohr" or "Angstrom"
@@ -313,8 +313,8 @@ class Input
     std::string vdw_C6_unit; //"Bohr" or "Angstrom"
     std::string vdw_R0_file;
     std::string vdw_R0_unit; //"Bohr" or "Angstrom"
-    std::string vdw_model; //"period" or "radius"
-    ModuleBase::Vector3<int> vdw_period;
+    std::string vdw_cutoff_type; //"period" or "radius"
+    ModuleBase::Vector3<int> vdw_cutoff_period;
 
     int ocp;
     std::string ocp_set;
@@ -398,7 +398,7 @@ class Input
     //==========================================================
     //    DFT+DMFT       Xin Qu added on 2021-08
     //==========================================================
-    bool dft_plus_dmft; // true:DFT+U correction; false：standard DFT calcullation(default)
+    bool dft_plus_dmft; // true:DFT+DMFT; false：standard DFT calcullation(default)
 
     //==========================================================
     // DeepKS -- added by caoyu and mohan
@@ -425,12 +425,6 @@ class Input
     double tau;
     double sigma_k;
     double nc_k;
-    // compensating charge
-    bool comp_chg;
-    double comp_q;
-    double comp_l;
-    double comp_center;
-    int comp_dim;
 
     //==========================================================
     // variables for test only

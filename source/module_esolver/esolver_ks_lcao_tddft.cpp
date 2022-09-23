@@ -44,6 +44,13 @@ void ESolver_KS_LCAO_TDDFT::Init(Input& inp, UnitCell_pseudo& ucell)
 {
     ESolver_KS::Init(inp, ucell);
 
+    // Inititlize the charge density.
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
+    //GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
+    // Initializee the potential.
+    GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
+
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
     // npwx may change according to cell change
@@ -425,7 +432,7 @@ void ESolver_KS_LCAO_TDDFT::updatepot(const int istep, const int iter)
     }
 }
 
-void ESolver_KS_LCAO_TDDFT::afterscf()
+void ESolver_KS_LCAO_TDDFT::afterscf(const int istep)
 {
     for (int ik = 0; ik < this->pelec_td->ekb.nr; ++ik)
     {
@@ -520,7 +527,7 @@ void ESolver_KS_LCAO_TDDFT::afterscf()
 
     if (Pdiag_Double::out_mat_hsR)
     {
-        this->output_HS_R(); // LiuXh add 2019-07-15
+        this->output_HS_R(istep); // LiuXh add 2019-07-15
     }
 }
 
