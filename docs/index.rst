@@ -11,7 +11,6 @@ Hi everyone, here are ABACUS Documentations.
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
    :caption: Quick Start
 
    quick_start/easy_install
@@ -20,12 +19,11 @@ Hi everyone, here are ABACUS Documentations.
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
    :caption: Advanced
 
    advanced/install
    advanced/scf/index
-   advanced/pp_orb/index
+   advanced/pp_orb
    advanced/opt
    advanced/md
    advanced/elec_properties/index

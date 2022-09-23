@@ -115,12 +115,6 @@ namespace ModuleESolver
         // Calculate Structure factor
         GlobalC::sf.setup_structure_factor(&GlobalC::ucell, GlobalC::rhopw);
 
-        // Inititlize the charge density.
-        GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
-        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
-        // Initializee the potential.
-        GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
-
         // Initialize charge extrapolation
         CE.Init_CE();
     }
@@ -265,7 +259,7 @@ namespace ModuleESolver
                     if(stop) break;
                 }
             }
-            afterscf();
+            afterscf(istep);
 
             ModuleBase::timer::tick(this->classname, "Run");
         }       
