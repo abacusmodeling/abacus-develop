@@ -68,7 +68,7 @@ Gamma
 4 4 4 0 0 0
 ```
 
-Ok, now that all key input files have been set, one should be able to run the first quick example. The simplest way is to use the command line, e.g.:
+After all the above input files have been set, one should be able to run the first quick example. The simplest way is to use the command line, e.g.:
 
 ```
 mpirun -np 2 abacus
@@ -131,7 +131,7 @@ If ABAUCS finishes successfully, the total energy will be output in `OUT.MgO/run
 
 ### A quick PW example
 
-In order to run a SCF calculation with PW (Plane Wave) basis set, one has only to change the `basis_type` from `lcao` to `pw` in the `INPUT` file, and no longer need to provide orbital files under `NUMERICAL_ORBITAL` in the `STRU` file.
+In order to run a SCF calculation with PW (Plane Wave) basis set, one has only to change the tag `basis_type` from `lcao` to `pw` in the `INPUT` file, and no longer needs to provide orbital files under `NUMERICAL_ORBITAL` in the `STRU` file.
 
 The `INPUT` file follows as:
 ```
@@ -191,7 +191,7 @@ One can use the same pseudopotential and `KPT` files as the above LCAO example. 
 
 ## Running Geometry Optimization
 
-In order to run a full geometry optimization in ABACUS, the tag `calculation` in `INPUT` should be set to `cell-relax`. In addition, the convergence criteria for atomics force and cell stress can be set through the tags `force_thr_ev` and `stress_thr`, respectively. The maximum number of ionc steps is controled by `relax_nmax`.
+In order to run a full geometry optimization in ABACUS, the tag `calculation` in `INPUT` should be set to `cell-relax`. In addition, the convergence criteria for atomics force and cell stress can be set through the tags `force_thr_ev` and `stress_thr`, respectively. The maximum number of ionc steps is controlled by `relax_nmax`.
 
 ### A quick LCAO example
 
