@@ -44,7 +44,7 @@ O                       #Name of element
 0.0  0.5  0.0  0 0 0    #x,y,z, move_x, move_y, move_z
 ```
 
-Secondly, one needs to set the `INPUT` file, which sets all key parameters to direct ABACUS how to calculte and what to output:
+Next, the `INPUT` file is required, which sets all key parameters to direct ABACUS how to calculte and what to output:
 ```
 INPUT_PARAMETERS
 suffix                  MgO
@@ -59,7 +59,7 @@ calculation             scf		# this is the key parameter telling abacus to do a 
 
 The pseudopotential files of `Mg_ONCV_PBE-1.0.upf` and `O_ONCV_PBE-1.0.upf` should be provided under the directory of `pseudo_dir`, and the orbital files `Mg_gga_8au_100Ry_4s2p1d.orb` and `O_gga_8au_100Ry_2s2p1d.orb` under the directory of `orbital_dir`. The pseudopotential and orbital files can be downloaded from the [ABACUS website](http://abacus.ustc.edu.cn/pseudo/list.htm).
 
-The next mandatory input file is called `KPT`, which sets the reciprocal space k-mesh. Below is an example:
+The final mandatory input file is called `KPT`, which sets the reciprocal space k-mesh. Below is an example:
 
 ```
 K_POINTS
@@ -181,7 +181,7 @@ O                       #Name of element
 0.0  0.5  0.0  0 0 0    #x,y,z, move_x, move_y, move_z
 ```
 
-One can use the same pseudopotential and `KPT` files as the above LCAO example. The final total energy will be output:
+Use the same pseudopotential and `KPT` files as the above LCAO example. The final total energy will be output:
 
 ```
  --------------------------------------------
@@ -212,7 +212,7 @@ force_thr_ev		0.01		# the threshold of the force convergence, in unit of eV/Angs
 stress_thr		5		# the threshold of the stress convergence, in unit of kBar
 relax_nmax		100		# the maximal number of ionic iteration steps
 ```
-One can use the same `KPT`, `STRU`, pseudopotential, and orbital files as in the above SCF-LCAO example. The final optimized structure can be found in `OUT.MgO/running_cell-relax.log`.
+Use the same `KPT`, `STRU`, pseudopotential, and orbital files as in the above SCF-LCAO example. The final optimized structure can be found in `OUT.MgO/running_cell-relax.log`.
 
 ### A quick PW example
 
@@ -233,4 +233,4 @@ stress_thr		5		# the threshold of the stress convergence, in unit of kBar
 relax_nmax		100		# the maximal number of ionic iteration steps
 ```
 
-One can use the same `KPT`, `STRU`, and pseudopotential files as in the above SCF-PW examples. The final optimized structure can be found in `OUT.MgO/running_cell-relax.log`.
+Use the same `KPT`, `STRU`, and pseudopotential files as in the above SCF-PW examples. The final optimized structure can be found in `OUT.MgO/running_cell-relax.log`.
