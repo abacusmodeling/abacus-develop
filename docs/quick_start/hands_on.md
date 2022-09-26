@@ -211,8 +211,9 @@ calculation             cell-relax	# this is the key parameter telling abacus to
 force_thr_ev		0.01		# the threshold of the force convergence, in unit of eV/Angstrom
 stress_thr		5		# the threshold of the stress convergence, in unit of kBar
 relax_nmax		100		# the maximal number of ionic iteration steps
+out_stru		1
 ```
-Use the same `KPT`, `STRU`, pseudopotential, and orbital files as in the above SCF-LCAO example. The final optimized structure can be found in `OUT.MgO/running_cell-relax.log`.
+Use the same `KPT`, `STRU`, pseudopotential, and orbital files as in the above SCF-LCAO example. The final optimized structure can be found in `STRU_NOW.cif` and `OUT.MgO/running_cell-relax.log`.
 
 ### A quick PW example
 
@@ -231,6 +232,7 @@ calculation             cell-relax	# this is the key parameter telling abacus to
 force_thr_ev		0.01		# the threshold of the force convergence, in unit of eV/Angstrom
 stress_thr		5		# the threshold of the stress convergence, in unit of kBar
 relax_nmax		100		# the maximal number of ionic iteration steps
+out_stru		1
 ```
 
-Use the same `KPT`, `STRU`, and pseudopotential files as in the above SCF-PW examples. The final optimized structure can be found in `OUT.MgO/running_cell-relax.log`.
+Use the same `KPT`, `STRU`, and pseudopotential files as in the above SCF-PW examples. The final optimized structure can be found in `STRU_NOW.cif` and `OUT.MgO/running_cell-relax.log`.
