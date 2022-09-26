@@ -364,6 +364,7 @@ dftu.o\
 dftu_yukawa.o\
 dftu_relax.o\
 dmft.o \
+rpa.o\
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
