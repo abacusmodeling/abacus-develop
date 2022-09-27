@@ -158,7 +158,7 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
     
     ss << GlobalV::global_out_dir << "STRU_ION";
     
-    if (out_stru==1)
+    if (out_stru == 1)
     {
         ss << istep;
         GlobalC::ucell.print_cell_cif("STRU_NOW.cif");
