@@ -10,12 +10,14 @@ Below is an example `INPUT` file with some of the most important parameters that
 
 ```
 INPUT_PARAMETERS
-#Parameters (General)
-ntype 1
-nbands 4
-
-#Parameters (Accuracy)
-ecutwfc 60
+suffix                  MgO
+ntype                   2
+pseudo_dir              ./
+orbital_dir		./
+ecutwfc                 100             # Rydberg
+scf_thr                 1e-4		# Rydberg
+basis_type              lcao            
+calculation             scf		# this is the key parameter telling abacus to do a scf calculation
 ```
 
 The parameter list always starts with key word `INPUT_PARAMETERS`. Any content before `INPUT_PARAMETERS` will be ignored.
@@ -29,49 +31,95 @@ Depending on the input variable, the value may be an integer, a real number or a
 
 Furthermore, if a given parameter name appeared more than once in the input file, only the last value will be taken.
 
-> Note: if a parameter name is not recognized by the program, the program will stop with an error message.
+> **Note:** if a parameter name is not recognized by the program, the program will stop with an error message.
 
 In the above example, the meanings of the parameters are:
 
+- `suffix` : the name of the system, default `ABACUS`
 - `ntype` : how many types of elements in the unit cell
-- `nbands` : the number of bands to be calculated
+- `pseudo_dir` : the directory where pseudopotential files are provided
+- `orbital_dir` : the directory where orbital files are provided
 - `ecutwfc` : the plane-wave energy cutoff for the wave function expansion (UNIT: Rydberg)    
+- `scf_thr` : the threshold for the convergence of charge density (UNIT: Rydberg)    
+- `basis_type` : the type of basis set for expanding the electronic wave functions
+- `calculation` : the type of calculation to be performed by ABACUS
 
-For a complete list of input parameters, please consult this [instruction](docs/input-main.md)
+For a complete list of input parameters, please consult this [instruction](../advanced/input_files/input-main.md).
 
-> Note: Users cannot change the filename “INPUT” to other names.
+> **Note:** Users cannot change the filename “INPUT” to other names.
 
 ## *STRU*
 
 The structure file contains structural information about the system, e.g., lattice constant, lattice vectors, and positions of the atoms within a unit cell. The positions can be given either in direct or Cartesian coordinates. 
 
 An example of the `STRU` file is given as follows :
+```
+#This is the atom file containing all the information
+#about the lattice structure.
 
-XXXXXXX
+ATOMIC_SPECIES
+Mg 24.305  Mg_ONCV_PBE-1.0.upf  # element name, atomic mass, pseudopotential file
+O  15.999 O_ONCV_PBE-1.0.upf
 
-> Note : users may choose a different name for their structure file using the keyword XXXXX
+NUMERICAL_ORBITAL
+Mg_gga_8au_100Ry_4s2p1d.orb
+O_gga_8au_100Ry_2s2p1d.orb
 
-For a more detailed description of STRU file, please consult XXXXX
+LATTICE_CONSTANT
+1.8897259886 		# 1.8897259886 Bohr =  1.0 Angstrom
+
+LATTICE_VECTORS
+4.25648 0.00000 0.00000  
+0.00000 4.25648 0.00000
+0.00000 0.00000 4.25648
+
+ATOMIC_POSITIONS
+Direct                  #Cartesian(Unit is LATTICE_CONSTANT)
+Mg                      #Name of element        
+0.0                     #Magnetic for this element.
+4                       #Number of atoms
+0.0  0.0  0.0  0 0 0    #x,y,z, move_x, move_y, move_z
+0.0  0.5  0.5  0 0 0    #x,y,z, move_x, move_y, move_z
+0.5  0.0  0.5  0 0 0    #x,y,z, move_x, move_y, move_z
+0.5  0.5  0.0  0 0 0    #x,y,z, move_x, move_y, move_z
+O                       #Name of element        
+0.0                     #Magnetic for this element.
+4                       #Number of atoms
+0.5  0.0  0.0  0 0 0    #x,y,z, move_x, move_y, move_z
+0.5  0.5  0.5  0 0 0    #x,y,z, move_x, move_y, move_z
+0.0  0.0  0.5  0 0 0    #x,y,z, move_x, move_y, move_z
+0.0  0.5  0.0  0 0 0    #x,y,z, move_x, move_y, move_z
+```
+
+> **Note:** users may choose a different name for their structure file using the keyword `stru_file`
+
+For a more detailed description of STRU file, please consult [here](../advanced/input_files/stru.md).
 
 ## *KPT*
 
 This file contains information of the kpoint grid setting for the Brillouin zone sampling.
     
-An example of the `KPT` file is given by XXXXXXX
+An example of the `KPT` file is given below:
+```
+K_POINTS
+0 
+Gamma
+4 4 4 0 0 0
+```
 
-> Note : users may choose a different name for their k-point file using keyword XXXXX
+> **Note:** users may choose a different name for their k-point file using keyword `kpoint_file`
 
 
-For a more detailed description, please consult XXXXX
+For a more detailed description, please consult [here](../advanced/input_files/kpt.md).
 
 - The pseudopotential files
 
     Norm-conserving pseudopotentials are used in ABACUS, in the UPF file format.The filename of each element’s pseudopotential needs to be specified in the STRU file, together with the directory of the pseudopotential files unless they are already present in the working directory.
 
-    More information on pseudopotentials is given [here](docs/features.md#pseudopotentials).
+    More information on pseudopotentials is given [here](../advanced/pp_orb.md#pseudopotentials).
 
 - The numerical orbital files
 
     This part is only required in LCAO calculations.
     The filename for each element’s numerical orbital basis needs to be specified in the STRU file, together with the directory of the orbital files unless they are already present in the working directory.
-    ABACUS provides numerical atomic basis sets of different accuracy levels for most elements commonly used. Users can download these basis sets from the [website](http://abacus.ustc.edu.cn/pseudo/list.htm). Moreover, users can generate numerical atomic orbitals by themselves, and the procedure is provided in this [short introduction](docs/generate-basis.md).
+    ABACUS provides numerical atomic basis sets of different accuracy levels for most elements commonly used. Users can download these basis sets from the [website](http://abacus.ustc.edu.cn/pseudo/list.htm). Moreover, users can generate numerical atomic orbitals by themselves, and the procedure is provided in this [short introduction](../advanced/pp_orb.md#generating-atomic-orbital-bases).
