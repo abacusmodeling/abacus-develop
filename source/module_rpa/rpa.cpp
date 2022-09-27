@@ -62,10 +62,12 @@ void DFT_RPA_interface::out_eigen_vector(const Parallel_Orbitals &parav, const p
         std::ofstream ofs;
         if (GlobalV::MY_RANK == 0)
             ofs.open(ss.str().c_str(), std::ios::out);
-
+        std::vector<ModuleBase::ComplexMatrix> is_wfc_ib_iw(npsin_tmp);
         for (int is = 0; is < npsin_tmp; is++)
         {
             ofs << ik + 1 << std::endl;
+            
+            is_wfc_ib_iw[is].create(GlobalV::NBANDS,GlobalV::NLOCAL);
             for (int ib_global = 0; ib_global < GlobalV::NBANDS; ++ib_global)
             {
                 std::vector<std::complex<double>> wfc_iks(GlobalV::NLOCAL, zero);
@@ -81,10 +83,18 @@ void DFT_RPA_interface::out_eigen_vector(const Parallel_Orbitals &parav, const p
                 MPI_Allreduce(&tmp[0], &wfc_iks[0], GlobalV::NLOCAL, MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD);
 #endif
                 for (int iw = 0; iw < GlobalV::NLOCAL; iw++)
-                    ofs << std::setw(21) << std::fixed << std::setprecision(15) << wfc_iks[iw].real() << std::setw(21)
-                        << std::fixed << std::setprecision(15) << wfc_iks[iw].imag() << std::endl;
+                    is_wfc_ib_iw[is](ib_global,iw)=wfc_iks[iw];
             } // ib
         } // is
+        for(int iw=0; iw<GlobalV::NLOCAL; iw++)
+        {
+            for(int ib=0; ib<GlobalV::NBANDS; ib++)
+            {
+                for(int is=0; is < npsin_tmp; is++)
+                    ofs << std::setw(21) << std::fixed << std::setprecision(15) << is_wfc_ib_iw[is](ib,iw).real() << std::setw(21)
+                        << std::fixed << std::setprecision(15) << is_wfc_ib_iw[is](ib,iw).imag() << std::endl;
+            }
+        }
         ofs.close();
     } // ik
     return;
@@ -204,6 +214,8 @@ void DFT_RPA_interface::out_Cs()
 
 void DFT_RPA_interface::out_coulomb_k()
 {
+    if (GlobalV::MY_RANK != 0)
+        return;
     int all_mu = 0;
     vector<int> mu_shift(rpa_exx_lcao_.get_Vps().size());
     for (auto &Ip: rpa_exx_lcao_.get_Vps())
@@ -213,7 +225,7 @@ void DFT_RPA_interface::out_coulomb_k()
         all_mu += rpa_exx_lcao_.get_index_abfs()[GlobalC::ucell.iat2it[I]].count_size;
     }
     std::stringstream ss;
-    ss << "coulomb_mat.txt";
+    ss << "coulomb_mat_0.txt";
     std::ofstream ofs;
     ofs.open(ss.str().c_str(), std::ios::out);
 
