@@ -159,7 +159,7 @@ def main(run_params):
         time.sleep(4)
     assert(wf.query_status() == 'Succeeded')
     for ii in range(len(job_list)):
-        step = wf.query_step(name="ABACUS-EXAMPLE"+str(ii))
+        step = wf.query_step(name="ABACUS-EXAMPLE"+str(ii))[0]
         if step.phase == 'Succeeded' and step_status[ii] == 0:
             download_artifact(step.outputs.artifacts["output"])
             step_status[ii] = 1
