@@ -19,8 +19,8 @@ FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 ELPA_LIB_DIR = ${ELPA_DIR}/lib
 # comment out by mohan 2021-02-06
-ELPA_LIB     = -L${ELPA_LIB_DIR} -lelpa_openmp -Wl,-rpath=${ELPA_LIB_DIR}
-#ELPA_LIB     = -L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR}
+#ELPA_LIB     = -L${ELPA_LIB_DIR} -lelpa_openmp -Wl,-rpath=${ELPA_LIB_DIR}
+ELPA_LIB     = -L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR}
 
 LIBXC_INCLUDE_DIR = ${LIBXC_DIR}/include
 LIBXC_LIB_DIR     = ${LIBXC_DIR}/lib
