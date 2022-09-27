@@ -42,8 +42,11 @@ class AbacusExample(OP):
     @classmethod
     def get_input_sign(cls):
         return OPIOSign({
-            'input': Artifact(Path),
-            'tests': Artifact(Path),
+            "exepath": str,
+            "nproc":int,
+            "threads":int,
+            "input": Artifact(Path),
+            "tests": Artifact(Path),
         })
 
     @classmethod
@@ -56,13 +59,13 @@ class AbacusExample(OP):
     def execute(self, op_in: OPIO) -> OPIO:
         cwd = os.getcwd()
         os.chdir(op_in["input"])
-        cmd="ulimit -s unlimited \
-             && echo 'ABACUS_PATH=abacus' >> ../SETENV \
-             && echo 'ABACUS_NPROCS=8' >> ../SETENV \
-             && echo 'ABACUS_THREADS=1' >> ../SETENV \
-             && export OMPI_ALLOW_RUN_AS_ROOT=1 \
-             && export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-             && bash runall.sh" 
+        cmd= "ulimit -s unlimited && " + \
+             "echo 'ABACUS_PATH=" + op_in["exepath"] + "' >> ../SETENV && " + \
+             "echo 'ABACUS_NPROCS=%d"%op_in["nproc"] + "' >> ../SETENV && " + \
+             "echo 'ABACUS_THREADS=%d"%op_in["threads"] + "' >> ../SETENV && " + \
+             "export OMPI_ALLOW_RUN_AS_ROOT=1 && " + \
+             "export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 && " + \
+             "bash runall.sh" 
         subprocess.call(cmd, shell=True)
         os.chdir(cwd)
         op_out = OPIO({
@@ -70,12 +73,6 @@ class AbacusExample(OP):
         })
         return op_out
 
-
-cwd = os.getcwd()
-pp_dir = os.path.join(cwd,'../tests/PP_ORB/')
-os.chdir(pp_dir)
-pp_orb = glob.glob('*')
-os.chdir(cwd)
 
 ### find all directories where runall.sh has been prepared
 def FindRunDirs(path):
@@ -97,7 +94,7 @@ def FindRunDirs(path):
     return run_dir
 
 ### find all pp and orb files needed
-def FindPPORB(path):
+def FindPPORB(path,pp_orb):
     os.chdir(path)
     _stru = glob.glob('*/STRU')
     _stru.sort()
@@ -118,7 +115,12 @@ def FindPPORB(path):
         return pporb_list_tmp
 
 
-def main():
+def main(run_params):
+    cwd = os.getcwd()
+    pp_dir = os.path.join(cwd,'../tests/PP_ORB/')
+    os.chdir(pp_dir)
+    pp_orb = glob.glob('*')
+    os.chdir(cwd)
     abacus = PythonOPTemplate(AbacusExample,image='ABACUS_GNU',command=['python3'])
     jcwd = os.getcwd()
     job_list = []
@@ -127,14 +129,17 @@ def main():
     for idir in range(len(run_dir)):
         #print("")
         #print(run_dir[idir])
-        pporb_list = FindPPORB(run_dir[idir])
+        pporb_list = FindPPORB(run_dir[idir],pp_orb)
         pporb_files = []
         for ipp in range(len(pporb_list)):
             shutil.copy2(os.path.join(pp_dir,pporb_list[ipp]),os.path.join(jcwd,'PP_ORB'))
             pporb_files.append(os.path.join(jcwd,'PP_ORB',pporb_list[ipp]))
         jpath = os.path.join(jcwd,run_dir[idir])
         jobs = [jpath]
-        abacus_example = Step(name="ABACUS-EXAMPLE"+str(len(job_list)),template=abacus,artifacts={"input": upload_artifact(jobs),"tests":upload_artifact(pporb_files)})
+        abacus_example = Step(name="ABACUS-EXAMPLE"+str(len(job_list)),
+                parameters={"exepath":run_params[0],"nproc":run_params[1],"threads":run_params[2]},
+                template=abacus,
+                artifacts={"input": upload_artifact(jobs),"tests":upload_artifact(pporb_files)})
         job_list.append(abacus_example)
     
     wf = Workflow(name="abacus-test", context=lebesgue_context, host="http://xxx.xxx")
@@ -171,4 +176,8 @@ if __name__ == "__main__":
     user_id='456',
     tag='',
     )
-    main()
+    ABACUS_PATH='abacus'
+    ABACUS_NPROCS=8
+    ABACUS_THREADS=1
+    run_params = [ABACUS_PATH,ABACUS_NPROCS,ABACUS_THREADS]
+    main(run_params)
