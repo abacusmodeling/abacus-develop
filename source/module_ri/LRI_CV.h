@@ -73,7 +73,6 @@ private:
 		const int it0,
 		const int it1,
 		const Abfs::Vector3_Order<double> &R,
-		const Tdata_real threshold,
 		const bool flag_writable)>;
 	std::map<TA,std::map<TAC,Tensor<Tdata>>>
 	cal_datas(
@@ -88,14 +87,12 @@ private:
 		const int it0,
 		const int it1,
 		const Abfs::Vector3_Order<double> &R,
-		const Tdata_real threshold_V,
 		const bool flag_writable);	
 	Tensor<Tdata>
 	DPcal_C(
 		const int it0,
 		const int it1,
 		const Abfs::Vector3_Order<double> &R,
-		const Tdata_real threshold_C,
 		const bool flag_writable);	
 
 	Tensor<Tdata>

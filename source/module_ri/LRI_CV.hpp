@@ -98,8 +98,8 @@ auto LRI_CV<Tdata>::cal_datas(
 			const Abfs::Vector3_Order<double> R_delta = -tau1+tau2+(RI_Util::array3_to_Vector3(cell1)*GlobalC::ucell.latvec);
 			if( R_delta.norm()*GlobalC::ucell.lat0 < Rcut )
 			{
-				const Tensor<Tdata> Data = func_DPcal_data(it0, it1, R_delta, threshold, flag_writable);
-				if(Data)
+				const Tensor<Tdata> Data = func_DPcal_data(it0, it1, R_delta, flag_writable);
+				if(Data.norm(std::numeric_limits<double>::max()) > threshold)
 				{
 					#pragma omp critical(LRI_CV_cal_datas)
 					Datas[list_A0[i0]][list_A1[i1]] = Data;
@@ -125,8 +125,7 @@ auto LRI_CV<Tdata>::cal_Vs(
 		std::placeholders::_1,
 		std::placeholders::_2,
 		std::placeholders::_3,
-		std::placeholders::_4,
-		std::placeholders::_5);
+		std::placeholders::_4);
 	return this->cal_datas(list_A0, list_A1, threshold_V, flag_writable, func_DPcal_V);
 }
 
@@ -143,8 +142,7 @@ auto LRI_CV<Tdata>::cal_Cs(
 		std::placeholders::_1,
 		std::placeholders::_2,
 		std::placeholders::_3,
-		std::placeholders::_4,
-		std::placeholders::_5);
+		std::placeholders::_4);
 	return this->cal_datas(list_A0, list_A1, threshold_C, flag_writable, func_DPcal_C);
 }
 
@@ -156,7 +154,6 @@ LRI_CV<Tdata>::DPcal_V(
 	const int it0,
 	const int it1,
 	const Abfs::Vector3_Order<double> &R,
-	const Tdata_real threshold_V,
 	const bool flag_writable)
 {
 	pthread_rwlock_rdlock(&this->rwlock_Vw);
@@ -170,8 +167,6 @@ LRI_CV<Tdata>::DPcal_V(
 			it0, it1, {0,0,0}, R,
 			this->index_abfs, this->index_abfs,
 			Matrix_Orbs11::Matrix_Order::AB);
-		if(V.norm(std::numeric_limits<double>::max()) <= threshold_V)
-			V=Tensor<Tdata>({0});				// placeholder {0} for subsequent queries
 		if(flag_writable)
 		{
 			VT = V.transpose();
@@ -201,9 +196,6 @@ LRI_CV<Tdata>::DPcal_V(
 			pthread_rwlock_unlock(&this->rwlock_Vw);
 		}
 	}
-
-	if(!V.data->size())
-		V = Tensor<Tdata>({});
 	return V;
 }
 
@@ -215,7 +207,6 @@ LRI_CV<Tdata>::DPcal_C(
 	const int it0,
 	const int it1,
 	const Abfs::Vector3_Order<double> &R,
-	const Tdata_real threshold_C,
 	const bool flag_writable)
 {
 	auto transpose12 = [](const Tensor<Tdata> &c_in) -> Tensor<Tdata>
@@ -248,18 +239,16 @@ LRI_CV<Tdata>::DPcal_C(
 					this->index_abfs, this->index_lcaos, this->index_lcaos,
 					Matrix_Orbs21::Matrix_Order::A1A2B);
 			const size_t sa=A.shape[0], sl0=A.shape[1], sl1=A.shape[2];
-			const Tensor<Tdata> V = DPcal_V( it0, it0, {0,0,0}, 0.0, false);
+			const Tensor<Tdata> V = DPcal_V( it0, it0, {0,0,0}, true);
 			const Tensor<Tdata> L = cal_I(V);
 			Tensor<Tdata> C = Global_Func::convert<Tdata>(0.5) * (L * A.reshape({sa, sl0*sl1})).reshape({sa,sl0,sl1});					// Attention 0.5!
-			if(C.norm(std::numeric_limits<double>::max()) <= threshold_C)
-				C=Tensor<Tdata>({0});						// placeholder {0} for subsequent queries
 			if(flag_writable)
 			{
 				pthread_rwlock_wrlock(&this->rwlock_Cw);
 				this->Cws[it0][it1][{0,0,0}] = C;
 				pthread_rwlock_unlock(&this->rwlock_Cw);
 			}
-			return C.data->size() ? C : Tensor<Tdata>({});
+			return C;
 		}
 		else
 		{
@@ -275,10 +264,10 @@ LRI_CV<Tdata>::DPcal_C(
 			const size_t sa0=A[0].shape[0], sa1=A[1].shape[0], sl0=A[0].shape[1], sl1=A[0].shape[2];
 
 			const std::vector<std::vector<Tensor<Tdata>>>
-				V = {{DPcal_V(it0, it0, {0,0,0}, 0.0, false),
-				      DPcal_V(it0, it1, R,       0.0, false)},
-				     {DPcal_V(it1, it0, -R,      0.0, false),
-				      DPcal_V(it1, it1, {0,0,0}, 0.0, false)}};
+				V = {{DPcal_V(it0, it0, {0,0,0}, true),
+				      DPcal_V(it0, it1, R,       false)},
+				     {DPcal_V(it1, it0, -R,      false),
+				      DPcal_V(it1, it1, {0,0,0}, true)}};
 
 			const std::vector<std::vector<Tensor<Tdata>>>
 				L = cal_I(V);
@@ -286,9 +275,6 @@ LRI_CV<Tdata>::DPcal_C(
 			std::array<Tensor<Tdata>, 2>
 				C = {( L[0][0]*A[0].reshape({sa0,sl0*sl1}) + L[0][1]*A[1].reshape({sa1,sl0*sl1}) ).reshape({sa0,sl0,sl1}),
 				     ( L[1][0]*A[0].reshape({sa0,sl0*sl1}) + L[1][1]*A[1].reshape({sa1,sl0*sl1}) ).reshape({sa1,sl0,sl1})};
-			for(Tensor<Tdata> &c : C)
-				if(c.norm(std::numeric_limits<double>::max()) <= threshold_C)
-					c=Tensor<Tdata>({0});				// placeholder {0} for subsequent queries
 			if(flag_writable)
 			{
 				pthread_rwlock_wrlock(&this->rwlock_Cw);
@@ -296,7 +282,7 @@ LRI_CV<Tdata>::DPcal_C(
 				this->Cws[it1][it0][-R] = transpose12(C[1]);
 				pthread_rwlock_unlock(&this->rwlock_Cw);
 			}
-			return C[0].data->size() ? C[0] : Tensor<Tdata>({});
+			return C[0];
 		}
 	} // end if(!Cr[0])
 }
