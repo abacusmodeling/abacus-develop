@@ -246,7 +246,7 @@ def RandomDisturbParser():
     parser.add_argument('-post', '--post', type=int,
             default=0, help='checkout job status: 1 check, default 0')
     parser.add_argument('-find', '--find', type=int,
-            default=0, help='find directories having runall.sh 1 find, default 0')
+            default=0, help='find directories having runall.sh: 1 find, default 0')
     return parser.parse_args()
 
 
@@ -282,4 +282,10 @@ if __name__ == "__main__":
         for idir in range(len(run_dir)):
             CheckJobStatus(run_dir[idir])
     elif find == 1:
-        print(run_dir)
+        for idir in range(len(run_dir)):
+            os.chdir(run_dir[idir])
+            allfiles = glob.glob(*)
+            if "runall.sh" in allfiles:
+                print("ok",run_dir[idir],"has runall.sh" )
+            else:
+                print("Warning",run_dir[idir],"has no runall.sh" )
