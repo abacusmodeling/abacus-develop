@@ -144,7 +144,7 @@ void Input::Default(void)
     seed_sto = 0;
     bndpar = 1;
     kpar = 1;
-    initsto_freq = 1000;
+    initsto_freq = 0;
     method_sto = 2;
     npart_sto = 1;
     cal_cond = false;
@@ -427,6 +427,7 @@ void Input::Default(void)
     //==========================================================
     dft_plus_u = false; // 1:DFT+U correction; 0：standard DFT calcullation
     yukawa_potential = false;
+    yukawa_lambda = -1.0;
     double_counting = 1;
     omc = false;
     dftu_type = 2;
@@ -1897,6 +1898,10 @@ bool Input::Read(const std::string &fn)
     {
         gamma_only_local = 1;
         // std::cout << "gamma_only_local =" << gamma_only_local << std::endl;
+    }
+    if((out_mat_r || out_mat_hs2) && gamma_only_local)
+    {
+        ModuleBase::WARNING_QUIT("Input", "printing of H(R)/S(R)/r(R) is not available for gamma only calculations");
     }
 
     return true;
