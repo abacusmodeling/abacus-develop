@@ -284,7 +284,7 @@ if __name__ == "__main__":
     elif find == 1:
         for idir in range(len(run_dir)):
             os.chdir(run_dir[idir])
-            allfiles = glob.glob(*)
+            allfiles = glob.glob("*")
             if "runall.sh" in allfiles:
                 print("ok",run_dir[idir],"has runall.sh" )
             else:
