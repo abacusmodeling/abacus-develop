@@ -2,7 +2,7 @@
 
 ## Basis Set
 
-ABACUS supports both PW and LCAO basis set, controlled by keyword [basis_type](./input_files/input-main.md#basistype) in INPUT file.
+ABACUS supports both PW and LCAO basis set, controlled by keyword [basis_type](./input_files/input-main.md#basis_type) in INPUT file.
 
 The default value of basis_type is pw. The size of pw basis set is controlled by imposing an upper bound for the [kinetic energy cutoff](./input_files/input-main.md#ecutwfc) of the plane wave.
 
@@ -42,7 +42,7 @@ $$
 
 ## Pseudopotentials
 
-In ABACUS, we only supports norm-conserving pseudopotentials. We support four different formats of the pseudopotential files: UPF, UPF2, VWR, and BLPS. For more information, check the `ATOMIC_SPECIES` section in the specification of the [STRU file](./input_files/stru.md).
+In ABACUS, we only support norm-conserving pseudopotentials. We support four different formats of the pseudopotential files: UPF, UPF2, VWR, and BLPS. For more information, check the `ATOMIC_SPECIES` section in the specification of the [STRU file](./input_files/stru.md).
 
 Here we list some common sources of the pseudopotential files:
 1. [Quantum ESPRESSO](http://www.quantum-espresso.org/pseudopotentials/).
