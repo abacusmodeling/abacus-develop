@@ -289,3 +289,4 @@ if __name__ == "__main__":
                 print("ok",run_dir[idir],"has runall.sh" )
             else:
                 print("Warning",run_dir[idir],"has no runall.sh" )
+            os.chdir("../")
