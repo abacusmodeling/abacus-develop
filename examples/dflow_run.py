@@ -165,13 +165,8 @@ def main(run_params,run_dir):
     os.chdir(pp_dir)
     pp_orb = glob.glob('*')
     os.chdir(jcwd)
-    ### strip possible "&&" in the end of run_params["ENV_CMD"]
-    cmd_list = run_params["ENV_CMD"].split()
-    if cmd_list[-1]=="&&":
-        cmd_tmp = ""
-        for icmd in range(len(cmd_list)-1):
-            cmd_tmp += cmd_list[icmd] + " "
-        run_params["ENV_CMD"] = cmd_tmp
+    ### strip possible "&&" at the end of run_params["ENV_CMD"]
+    run_params["ENV_CMD"] = run_params["ENV_CMD"].strip().strip("&&")
     ### define dflow OP
     abacus = PythonOPTemplate(AbacusExample,image=run_params["LBG_IMAGE"] ,command=['python3'])
     job_list = []
