@@ -13,11 +13,12 @@ void Matrix_Orbs21::init(
 	const double kmesh_times,
 	const double rmesh_times)
 {
-	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs21","init");
+	ModuleBase::TITLE("Matrix_Orbs21","init");
+	ModuleBase::timer::tick("Matrix_Orbs21", "init");
 	//=========================================
 	// (1) MOT: make overlap table.
 	//=========================================
-	MOT.allocate(
+	this->MOT.allocate(
 		GlobalC::ORB.get_ntype(),							// number of atom types
 		std::max( GlobalC::ORB.get_lmax(), Exx_Abfs::Lmax ),	// max L used to calculate overlap
 		static_cast<int>(GlobalC::ORB.get_kmesh() * kmesh_times) | 1,				// kpoints, for integration in k space
@@ -26,9 +27,9 @@ void Matrix_Orbs21::init(
 //		GlobalC::ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
 		GlobalC::ORB.get_dk());											// Peize Lin change 2017-04-16
 	int Lmax_used, Lmax;
-	MOT.init_Table_Spherical_Bessel (3,mode, Lmax_used, Lmax, Exx_Abfs::Lmax,GlobalC::ORB, GlobalC::ucell.infoNL.Beta);
-//	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1
-//	MOT.Destroy_Table_Spherical_Bessel (Lmax_used);				// why?
+	this->MOT.init_Table_Spherical_Bessel (3,mode, Lmax_used, Lmax, Exx_Abfs::Lmax,GlobalC::ORB, GlobalC::ucell.infoNL.Beta);
+//	this->MOT.init_OV_Tpair();							// for this->MOT.OV_L2plus1
+//	this->MOT.Destroy_Table_Spherical_Bessel (Lmax_used);				// why?
 
 	//=========================================
 	// (2) init Ylm Coef
@@ -38,8 +39,10 @@ void Matrix_Orbs21::init(
 	//=========================================
 	// (3) make Gaunt coefficients table
 	//=========================================
-	MGT.init_Gaunt_CH( 2*Lmax+1 );			// why +1
-	MGT.init_Gaunt( 2*Lmax+1 );
+	this->MGT.init_Gaunt_CH( 2*Lmax+1 );			// why +1
+	this->MGT.init_Gaunt( 2*Lmax+1 );
+
+	ModuleBase::timer::tick("Matrix_Orbs21", "init");
 }
 
 
@@ -49,10 +52,10 @@ void Matrix_Orbs21::init_radial(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A2,
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B )
 {
-	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs21","init_radial");
-
+	ModuleBase::TITLE("Matrix_Orbs21","init_radial");
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial");
 	assert(orb_A1.size()==orb_A2.size());
-	for( size_t TA=0;  TA!=orb_A1.size(); ++TA )
+	for( size_t TA=0; TA!=orb_A1.size(); ++TA )
 		for( size_t TB=0; TB!=orb_B.size(); ++TB )
 			for( int LA1=0; LA1!=orb_A1[TA].size(); ++LA1 )
 				for( size_t NA1=0; NA1!=orb_A1[TA][LA1].size(); ++NA1 )
@@ -65,19 +68,20 @@ void Matrix_Orbs21::init_radial(
 											orb_A1[TA][LA1][NA1],
 											orb_A2[TA][LA2][NA2],
 											orb_B[TB][LB][NB],
-											MOT, MGT)));
+											this->MOT, this->MGT)));
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial");
 }
 
 
 void Matrix_Orbs21::init_radial(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A1,
 	const LCAO_Orbitals &orb_A2,
-	const LCAO_Orbitals &orb_B )
+	const LCAO_Orbitals &orb_B)
 {
-	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs21","init_radial");
-
+	ModuleBase::TITLE("Matrix_Orbs21","init_radial");
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial");
 	assert( orb_A1.size() == orb_A2.get_ntype() );
-	for( size_t TA=0;  TA!=orb_A1.size(); ++TA )
+	for( size_t TA=0; TA!=orb_A1.size(); ++TA )
 		for( size_t TB=0; TB!=orb_B.get_ntype(); ++TB)
 			for( int LA1=0; LA1!=orb_A1[TA].size(); ++LA1 )
 				for( size_t NA1=0; NA1!=orb_A1[TA][LA1].size(); ++NA1 )
@@ -90,14 +94,15 @@ void Matrix_Orbs21::init_radial(
 											orb_A1[TA][LA1][NA1],
 											orb_A2.Phi[TA].PhiLN(LA2,NA2),
 											orb_B.Phi[TB].PhiLN(LB,NB),
-											MOT, MGT)));
+											this->MOT, this->MGT)));
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial");
 }
 
 
 void Matrix_Orbs21::init_radial_table()
 {
-	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs21","init_radial_table");
-
+	ModuleBase::TITLE("Matrix_Orbs21","init_radial");
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial_table");
 	for( auto &coA : center2_orb21_s )
 		for( auto &coB : coA.second )
 			for( auto &coC : coB.second )
@@ -107,12 +112,13 @@ void Matrix_Orbs21::init_radial_table()
 							for( auto &coG : coF.second )
 								for( auto &coH : coG.second )
 									coH.second.init_radial_table();
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial_table");
 }
 
 void Matrix_Orbs21::init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs )
 {
-	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs21","init_radial_table_Rs");
-
+	ModuleBase::TITLE("Matrix_Orbs21","init_radial_table_Rs");
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial_table");
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
 		{
@@ -122,7 +128,7 @@ void Matrix_Orbs21::init_radial_table( const std::map<size_t,std::map<size_t,std
 				std::set<size_t> radials;
 				for( const double &R : RsB.second )
 				{
-					const double position = R * GlobalC::ucell.lat0 / MOT.dr;
+					const double position = R * GlobalC::ucell.lat0 / this->MOT.dr;
 					const size_t iq = static_cast<size_t>(position);
 					for( size_t i=0; i!=4; ++i )
 						radials.insert(iq+i);
@@ -136,4 +142,5 @@ void Matrix_Orbs21::init_radial_table( const std::map<size_t,std::map<size_t,std
 										coH.second.init_radial_table(radials);
 			}
 		}
+	ModuleBase::timer::tick("Matrix_Orbs21", "init_radial_table");
 }

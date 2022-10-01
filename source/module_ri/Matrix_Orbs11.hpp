@@ -9,14 +9,14 @@
 #include "Matrix_Orbs11.h"
 
 template<typename Tdata>
-Tensor<Tdata> Matrix_Orbs11::cal_overlap_matrix( 
-	const size_t TA, 
-	const size_t TB, 
+Tensor<Tdata> Matrix_Orbs11::cal_overlap_matrix(
+	const size_t TA,
+	const size_t TB,
 	const ModuleBase::Vector3<double> &tauA,
-	const ModuleBase::Vector3<double> &tauB, 
-	const ModuleBase::Element_Basis_Index::IndexLNM &index_A, 
+	const ModuleBase::Vector3<double> &tauB,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
-	const Matrix_Order &matrix_order ) const
+	const Matrix_Order &matrix_order) const
 {
 	Tensor<Tdata> m;
 	const size_t sizeA = index_A[TA].count_size;
@@ -27,7 +27,7 @@ Tensor<Tdata> Matrix_Orbs11::cal_overlap_matrix(
 		case Matrix_Order::BA: m = Tensor<Tdata>({sizeB, sizeA});	break;
 		default:	throw std::invalid_argument(std::string(__FILE__)+" line "+std::to_string(__LINE__));
 	}
-	
+
 	for( const auto &co3 : center2_orb11_s.at(TA).at(TB) )
 	{
 		const int LA = co3.first;
@@ -41,7 +41,7 @@ Tensor<Tdata> Matrix_Orbs11::cal_overlap_matrix(
 					const int LB = co5.first;
 					for( const auto &co6 : co5.second )
 					{
-						const size_t NB = co6.first;	
+						const size_t NB = co6.first;
 						for( size_t MB=0; MB!=2*LB+1; ++MB )
 						{
 							const Tdata overlap = co6.second.cal_overlap( tauA*GlobalC::ucell.lat0, tauB*GlobalC::ucell.lat0, MA, MB );
