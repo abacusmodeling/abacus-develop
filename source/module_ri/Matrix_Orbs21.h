@@ -22,7 +22,7 @@
 class Matrix_Orbs21
 {
 public:
-	// mode: 
+	// mode:
 	//    1: <jYs lcaos|lcaos>  <abfs lcaos|lcaos>
 	void init(
 		const int mode,
@@ -53,10 +53,20 @@ public:
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
 		const Matrix_Order &matrix_order) const;
+	template<typename Tdata>
+	std::array<Tensor<Tdata>,3> cal_grad_overlap_matrix(
+		const size_t TA,
+		const size_t TB,
+		const ModuleBase::Vector3<double> &tauA,												// unit: ucell.lat0
+		const ModuleBase::Vector3<double> &tauB,												// unit: ucell.lat0
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
+		const Matrix_Order &matrix_order) const;
 
 private:
 	ORB_table_phi MOT;
-	ORB_gaunt_table MGT;	
+	ORB_gaunt_table MGT;
 
 	std::map<size_t,                                  // TA
 		std::map<size_t,                              // TB
@@ -66,8 +76,8 @@ private:
 						std::map<size_t,              // NA2
 							std::map<int,             // LB
 								std::map<size_t,      // NB
-									Center2_Orb::Orb21>>>>>>>> center2_orb21_s;	
-	// this->center2_orb21_s[TA][TB][LA1][NA1][LA2][NA2][LB][NB]	
+									Center2_Orb::Orb21>>>>>>>> center2_orb21_s;
+	// this->center2_orb21_s[TA][TB][LA1][NA1][LA2][NA2][LB][NB]
 };
 
 #include "Matrix_Orbs21.hpp"
