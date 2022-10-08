@@ -24,14 +24,12 @@ void DFT_RPA_interface::out_for_RPA(const Parallel_Orbitals &parav,
     this->out_eigen_vector(parav, psi);
     this->out_struc();
 
-    if (GlobalV::DFT_FUNCTIONAL == "default")
-    {
-        rpa_exx_lcao_.exx_init();
-        std::cout << "rpa_pca_threshold: " << rpa_exx_lcao_.info.pca_threshold << std::endl;
-        std::cout << "rpa_ccp_rmesh_times: " << rpa_exx_lcao_.info.ccp_rmesh_times << std::endl;
-        rpa_exx_lcao_.cal_exx_ions(parav);
-        rpa_exx_lcao_.cal_exx_elec(loc, nullptr);
-    }
+    rpa_exx_lcao_.exx_init();
+    std::cout << "rpa_pca_threshold: " << rpa_exx_lcao_.info.pca_threshold << std::endl;
+    std::cout << "rpa_ccp_rmesh_times: " << rpa_exx_lcao_.info.ccp_rmesh_times << std::endl;
+    rpa_exx_lcao_.cal_exx_ions(parav);
+    rpa_exx_lcao_.cal_exx_elec(loc, nullptr);
+    
     std::cout << "rpa_lcao_exx(Ha): " << std::fixed << std::setprecision(15) << rpa_exx_lcao_.get_energy() / 2.0
               << std::endl;
     this->out_Cs();
