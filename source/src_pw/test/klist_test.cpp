@@ -132,6 +132,8 @@ TEST_F(KlistTest, ReadMP)
 
 TEST_F(KlistTest, ReadList)
 {
+	ModuleSymmetry::Symmetry::symm_flag=0; 
+	// symm_flag is required in read_kpoints for a k list
 	K_Vectors kv;
 	std::string k_file = "KPT2";
 	kv.nspin = 1;
