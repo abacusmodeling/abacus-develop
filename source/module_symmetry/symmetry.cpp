@@ -785,8 +785,7 @@ void Symmetry::lattice_type(
         ofs.close();
         
     }
-    
-    /*else
+    else
     {
         //else, store the original ones
         brav = pre_brav;
@@ -796,7 +795,7 @@ void Symmetry::lattice_type(
         }
     }
 
-
+    /*
     bool flag3;
     if (pre_brav == temp_brav) 
 	{
@@ -821,7 +820,7 @@ void Symmetry::lattice_type(
 			GlobalV::ofs_running<<" The lattice vectors have been set back!"<<std::endl;
         }
     }*/
-    brav = pre_brav;
+    //brav = pre_brav;
     //brav = temp_brav;
     //bravname = get_brav_name(brav);
     real_brav = temp_brav;     // pengfei Li 15-3-2022
