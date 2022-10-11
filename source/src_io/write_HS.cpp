@@ -42,14 +42,14 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
 
     if(bit)
     {
-        ssh << GlobalV::global_out_dir << "H_bit.ccf";
-        sss << GlobalV::global_out_dir << "S_bit.ccf";
+        ssh << GlobalV::global_file_dir << "H_bit.ccf";
+        sss << GlobalV::global_file_dir << "S_bit.ccf";
     }
     else
     {
         // mohan update 2021-02-10
-        ssh << GlobalV::global_out_dir << "H" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
-        sss << GlobalV::global_out_dir << "S" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
+        ssh << GlobalV::global_file_dir << "H" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
+        sss << GlobalV::global_file_dir << "S" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
     }
 
     if(bit)
@@ -119,13 +119,13 @@ void HS_Matrix::save_HS(const double *H, const double *S, const bool bit, const 
 
     if(bit)
     {
-        ssh << GlobalV::global_out_dir << file_name+"-H-bit";
-        sss << GlobalV::global_out_dir << file_name+"-S-bit";
+        ssh << GlobalV::global_file_dir << file_name+"-H-bit";
+        sss << GlobalV::global_file_dir << file_name+"-S-bit";
     }
     else 
     {
-        ssh << GlobalV::global_out_dir << file_name+"-H";
-        sss << GlobalV::global_out_dir << file_name+"-S";
+        ssh << GlobalV::global_file_dir << file_name+"-H";
+        sss << GlobalV::global_file_dir << file_name+"-S";
     }
 
     if (bit)
@@ -398,13 +398,13 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
 
     if(bit)
     {
-        ssh << GlobalV::global_out_dir << file_name+"-H-bit";
-        sss << GlobalV::global_out_dir << file_name+"-S-bit";
+        ssh << GlobalV::global_file_dir << file_name+"-H-bit";
+        sss << GlobalV::global_file_dir << file_name+"-S-bit";
     }
     else
     {
-        ssh << GlobalV::global_out_dir << file_name+"-H";
-        sss << GlobalV::global_out_dir << file_name+"-S";
+        ssh << GlobalV::global_file_dir << file_name+"-H";
+        sss << GlobalV::global_file_dir << file_name+"-S";
     }
 
     if (bit)
@@ -657,10 +657,10 @@ void HS_Matrix::save_HSR_tr(const int current_spin, LCAO_Matrix &lm)
     std::stringstream ssh;
     std::stringstream sss;
 
-    ssh << GlobalV::global_out_dir << "data-HR-tr_SPIN"<<current_spin;
-    sss << GlobalV::global_out_dir << "data-SR-tr_SPIN"<<current_spin;
-    //ssh << GlobalV::global_out_dir << "data-HR-tr_SPIN";
-    //sss << GlobalV::global_out_dir << "data-SR-tr_SPIN";
+    ssh << GlobalV::global_file_dir << "data-HR-tr_SPIN"<<current_spin;
+    sss << GlobalV::global_file_dir << "data-SR-tr_SPIN"<<current_spin;
+    //ssh << GlobalV::global_file_dir << "data-HR-tr_SPIN";
+    //sss << GlobalV::global_file_dir << "data-SR-tr_SPIN";
 
 #ifdef __MPI
     std::ofstream g1;
@@ -982,9 +982,9 @@ void HS_Matrix::save_HSR_sparse(
 
     std::stringstream ssh[2];
     std::stringstream sss;
-    ssh[0] << GlobalV::global_out_dir << HR_filename_up;
-    ssh[1] << GlobalV::global_out_dir << HR_filename_down;
-    sss << GlobalV::global_out_dir << SR_filename;
+    ssh[0] << GlobalV::global_file_dir << HR_filename_up;
+    ssh[1] << GlobalV::global_file_dir << HR_filename_down;
+    sss << GlobalV::global_file_dir << SR_filename;
 
     std::ofstream g1[2];
     std::ofstream g2;
@@ -1296,7 +1296,7 @@ void HS_Matrix::output_single_R(std::ofstream &ofs, const std::map<size_t, std::
     indptr.push_back(0);
 
     std::stringstream tem1;
-    tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
+    tem1 << GlobalV::global_file_dir << "temp_sparse_indices.dat";
     std::ofstream ofs_tem1;
     std::ifstream ifs_tem1;
 
@@ -1409,7 +1409,7 @@ void HS_Matrix::output_soc_single_R(std::ofstream &ofs, const std::map<size_t, s
     indptr.push_back(0);
 
     std::stringstream tem1;
-    tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
+    tem1 << GlobalV::global_file_dir << "temp_sparse_indices.dat";
     std::ofstream ofs_tem1;
     std::ifstream ifs_tem1;
 

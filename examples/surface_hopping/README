@@ -1,0 +1,2 @@
+Example case for surface-hopping. 
+Find overlap matrix file in OUT.autotest/MD_&x/data-0-S and wavefunction file in OUT.autotest/MD_&x/LOWF_GAMMA_S1.dat , where &x refer to step of MD.

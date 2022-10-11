@@ -221,7 +221,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
     if(out_wfc_lcao && myid == 0)
     {
         std::stringstream ss;
-        ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
+        ss << GlobalV::global_file_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
         WF_Local::write_lowf(ss.str(), ctot, ekb, wg);
         for (int i = 0; i < GlobalV::NBANDS; i++)
         {
@@ -301,7 +301,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(
     if (out_wfc_lcao && myid == 0)
     {
         std::stringstream ss;
-        ss << GlobalV::global_out_dir << "LOWF_K_" << ik + 1 << ".dat";
+        ss << GlobalV::global_file_dir << "LOWF_K_" << ik + 1 << ".dat";
         WF_Local::write_lowf_complex(ss.str(), ctot, ik, ekb, wg);
         for (int i = 0; i < GlobalV::NBANDS; i++)
         {

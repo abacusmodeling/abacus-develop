@@ -198,6 +198,16 @@ void Run_MD_LCAO::md_force_virial(ModuleESolver::ESolver* p_esolver,
         GlobalC::en.evdw = vdwd3.get_energy();
     }
 
+    std::stringstream md_path_new;
+    md_path_new << GlobalV::global_out_dir << "MD_" << istep << "/";
+    const std::string command0 = "test -d " + md_path_new.str() + " || mkdir " + md_path_new.str();
+    if (GlobalV::MY_RANK == 0)
+    {
+        system(command0.c_str());
+    }
+    GlobalV::global_file_dir = md_path_new.str();
+            
+
     // solve electronic structures in terms of LCAO
     // mohan add 2021-02-09
     p_esolver->Run(istep, GlobalC::ucell);

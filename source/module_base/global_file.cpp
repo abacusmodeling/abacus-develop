@@ -44,6 +44,7 @@ void ModuleBase::Global_File::make_dir_out(
 
     GlobalV::global_out_dir = prefix + suffix + "/";
     GlobalV::global_stru_dir = GlobalV::global_out_dir + "STRU/";
+    GlobalV::global_file_dir = GlobalV::global_out_dir;
 
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
