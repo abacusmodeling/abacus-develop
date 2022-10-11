@@ -720,7 +720,6 @@ void Symmetry::lattice_type(
     if ( temp_brav < pre_brav)
     {
         //if the symmetry of the new vectors is higher, store the new ones
-        //brav = temp_brav;
         for (int i = 0; i < 6; ++i)
         {
             cel_const[i] = temp_const[i];
@@ -788,7 +787,6 @@ void Symmetry::lattice_type(
     else
     {
         //else, store the original ones
-        brav = pre_brav;
         for (int i = 0; i < 6; ++i)
         {
             cel_const[i] = pre_const[i];
@@ -820,7 +818,7 @@ void Symmetry::lattice_type(
 			GlobalV::ofs_running<<" The lattice vectors have been set back!"<<std::endl;
         }
     }*/
-    //brav = pre_brav;
+    brav = pre_brav;
     //brav = temp_brav;
     //bravname = get_brav_name(brav);
     real_brav = temp_brav;     // pengfei Li 15-3-2022
