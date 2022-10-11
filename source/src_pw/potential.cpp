@@ -9,6 +9,7 @@
 // new
 #include "../module_surchem/efield.h"
 #include "../module_surchem/surchem.h"
+#include "../module_surchem/gatefield.h"
 #include "H_Hartree_pw.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
@@ -294,11 +295,16 @@ void Potential::set_local_pot(double *vl_pseudo, // store the local pseudopotent
     if (GlobalV::EFIELD_FLAG && !GlobalV::DIP_COR_FLAG)
     {
         ModuleBase::matrix v_efield(GlobalV::NSPIN, GlobalC::rhopw->nrxx);
-        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, GlobalC::CHR.rho);
+        v_efield = Efield::add_efield(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, GlobalC::CHR.rho, GlobalC::solvent_model);
         for (int ir = 0; ir < GlobalC::rhopw->nrxx; ++ir)
         {
             vl_pseudo[ir] += v_efield(0, ir);
         }
+    }
+
+    if( GlobalV::GATE_FLAG)
+    {
+        Gatefield::add_gatefield(vl_pseudo, GlobalC::ucell, GlobalC::rhopw, true, true);
     }
 
     delete[] vg;
@@ -376,7 +382,7 @@ ModuleBase::matrix Potential::v_of_rho(const double *const *const rho_in, const 
     //----------------------------------------------------------
     if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
     {
-        v += Efield::add_efield(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, rho_in);
+        v += Efield::add_efield(GlobalC::ucell, GlobalC::rhopw, GlobalV::NSPIN, rho_in, GlobalC::solvent_model);
     }
 
     // test get ntot_reci
