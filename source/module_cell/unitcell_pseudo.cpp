@@ -291,10 +291,8 @@ void UnitCell_pseudo::setup_cell(
 	// setup the total number of PAOs
 	this->cal_natomwfc(log);
 
-#ifdef __LCAO
 	// setup GlobalV::NLOCAL
 	this->cal_nwfc(log);
-#endif
 
 //	Check whether the number of valence is minimum 
 	if(GlobalV::MY_RANK==0)
@@ -946,9 +944,13 @@ void UnitCell_pseudo::check_structure(double factor)
 	if (!all_pass || !no_warning)
 	{
 		std::stringstream mess;
-		mess << "\nWARNING: Some atoms are too close." << std::endl;
-		GlobalV::ofs_running << mess.str() << errorlog.str() << std::endl;
-		std::cout << mess.str() << "Please check the nearest-neighbor list in log file.\n" << std::endl;
+		mess << "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
+		mess << "WARNING: Some atoms are too close!!!" << std::endl;
+		GlobalV::ofs_running << mess.str() << errorlog.str();
+		std::cout << mess.str() << "Please check the nearest-neighbor list in log file." << std::endl;
+		GlobalV::ofs_running << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" << std::endl;
+		std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" << std::endl;
+
 
 		if (!all_pass)
 		{
@@ -960,6 +962,7 @@ void UnitCell_pseudo::check_structure(double factor)
 			std::cout << mess.str();
 			ModuleBase::WARNING_QUIT("Input", "The structure is unreasonable!");
 		}
+		
 		
 	}
 }

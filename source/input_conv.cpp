@@ -1,5 +1,4 @@
 #include "input_conv.h"
-
 #include "input.h"
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
@@ -156,7 +155,7 @@ void Input_Conv::Convert(void)
     GlobalC::wf.init_wfc = INPUT.init_wfc;
     GlobalC::wf.mem_saver = INPUT.mem_saver; // mohan add 2010-09-07
     GlobalC::en.printe = INPUT.printe; // mohan add 2011-03-16
-
+#ifdef __LCAO
     if (INPUT.dft_plus_u)
     {
         GlobalC::dftu.dftu_type = INPUT.dftu_type;
@@ -170,6 +169,7 @@ void Input_Conv::Convert(void)
             GlobalC::dftu.J = INPUT.hund_j; // Hund exchange parameter J(ev)
         }
     }
+#endif
     /*
 #ifndef __CMD
     GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
@@ -458,7 +458,7 @@ void Input_Conv::Convert(void)
     //----------------------------------------------------------
     GlobalV::OUT_FREQ_ELEC = INPUT.out_freq_elec;
     GlobalV::OUT_FREQ_ION = INPUT.out_freq_ion;
-    GlobalC::pot.init_chg = INPUT.init_chg;
+    GlobalC::CHR.init_chg = INPUT.init_chg;
     GlobalC::pot.chg_extrap = INPUT.chg_extrap; // xiaohui modify 2015-02-01
     GlobalC::CHR.out_chg = INPUT.out_chg;
     GlobalC::CHR.nelec = INPUT.nelec;
@@ -532,14 +532,6 @@ void Input_Conv::Convert(void)
     GlobalV::sigma_k = INPUT.sigma_k;
     GlobalV::nc_k = INPUT.nc_k;
 
-    //-----------------------------------------------
-    // compensating charge
-    //-----------------------------------------------
-    GlobalV::comp_chg = INPUT.comp_chg;
-    GlobalC::solvent_model.comp_q = INPUT.comp_q;
-    GlobalC::solvent_model.comp_l = INPUT.comp_l;
-    GlobalC::solvent_model.comp_center = INPUT.comp_center;
-    GlobalC::solvent_model.comp_dim = INPUT.comp_dim;
     ModuleBase::timer::tick("Input_Conv", "Convert");
     return;
 }

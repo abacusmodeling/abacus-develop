@@ -170,7 +170,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, std::ofstream &ofs_runnin
 	this->pointgroup(this->nrot, this->pgnumber, this->pgname, this->gmatrix, ofs_running);
 	ModuleBase::GlobalFunc::OUT(ofs_running,"POINT GROUP", this->pgname);
     ofs_running<<"Warning : If the optimal symmetric configuration is not the input configuration, "<<'\n';
-    ofs_running<<"you have to manually change configurations, ABACUS would only calculate the input structure!"<<'\n';
+    ofs_running<<"you have to manually change configurations, ABACUS would only calculate the input structure."<<'\n';
 
 	test_brav = false;  // use the input ibrav to calculate
 	//ModuleBase::GlobalFunc::OUT(ofs_running,"ibrav",ibrav);
@@ -720,7 +720,6 @@ void Symmetry::lattice_type(
     if ( temp_brav < pre_brav)
     {
         //if the symmetry of the new vectors is higher, store the new ones
-        //brav = temp_brav;
         for (int i = 0; i < 6; ++i)
         {
             cel_const[i] = temp_const[i];
@@ -785,18 +784,16 @@ void Symmetry::lattice_type(
         ofs.close();
         
     }
-    
-    /*else
+    else
     {
         //else, store the original ones
-        brav = pre_brav;
         for (int i = 0; i < 6; ++i)
         {
             cel_const[i] = pre_const[i];
         }
     }
 
-
+    /*
     bool flag3;
     if (pre_brav == temp_brav) 
 	{
