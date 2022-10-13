@@ -38,6 +38,7 @@ VPATH=./src_global\
 :./src_pdiag\
 :./src_pdiag/MRRR\
 :./src_ri\
+:./module_rpa\
 :./\
 
 OBJS_MAIN=driver.o\
