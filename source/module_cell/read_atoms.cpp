@@ -160,13 +160,13 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 		}
 	}
 
-    if(GlobalV::rpa_setorb)
+    if (GlobalV::rpa_setorb)
     {
-        if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
+        if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ABFS_ORBITAL"))
         {
-            cout<<"RPA_EXX_LCAO read abfs_orb!!!"<<endl;
+            std::cout << "RPA_EXX_LCAO read abfs_orb!!!" << std::endl;
             GlobalV::rpa_orbitals.resize(ntype);
-            for(int i=0; i<ntype; i++)
+            for (int i = 0; i < ntype; i++)
             {
                 ifa >> GlobalV::rpa_orbitals[i];
             }
