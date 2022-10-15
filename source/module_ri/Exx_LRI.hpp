@@ -146,33 +146,36 @@ void Exx_LRI<Tdata>::cal_exx_elec(const Local_Orbital_Charge &loc, const Paralle
 		: RI_2D_Comm::split_m2D_ktoR<Tdata>(loc.dm_k, pv);
 
 	this->Hexxs.resize(GlobalV::NSPIN);
+	this->Eexx = 0;
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		this->exx_lri.set_Ds(std::move(Ds[is]), this->info.dm_threshold);
 		this->exx_lri.cal_Hs();	
 		this->Hexxs[is] = Communicate_Tensors_Map_Judge::comm_map2_first(this->mpi_comm, std::move(this->exx_lri.Hs), std::get<0>(judge[is]), std::get<1>(judge[is]));
-
+		this->Eexx += this->exx_lri.post_2D.energy;
 		post_process_Hexx(this->Hexxs[is]);
 	}
+	this->Eexx = post_process_Eexx(this->Eexx);
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_elec");
 }
 
 template<typename Tdata>
-void Exx_LRI<Tdata>::post_process_Hexx(std::map<TA, std::map<TAC, Tensor<Tdata>>> &Hexxs) const
+void Exx_LRI<Tdata>::post_process_Hexx( std::map<TA, std::map<TAC, Tensor<Tdata>>> &Hexxs_io ) const
 {
 	ModuleBase::TITLE("Exx_LRI","post_process_Hexx");
 	constexpr Tdata frac = -1 * 2;								// why?	Hartree to Ry?
 	const std::function<void(Tensor<Tdata>&)>
 		multiply_frac = [&frac](Tensor<Tdata> &t)
 		{ t = t*frac; };
-	Map_Operator::for_each( Hexxs, multiply_frac );
+	Map_Operator::for_each( Hexxs_io, multiply_frac );
 }
 
 template<typename Tdata>
-Tdata Exx_LRI<Tdata>::get_energy() const
+Tdata Exx_LRI<Tdata>::post_process_Eexx( const Tdata &Eexx_in ) const
 {
-	constexpr double frac = -1 * 2;								// why?	Hartree to Ry?
-	return frac * this->exx_lri.post_2D.energy;
+	const Tdata SPIN_multiple = std::map<int,Tdata>{{1,2}, {2,1}, {4,1}}.at(GlobalV::NSPIN);				// why?
+	const Tdata frac = -1 * SPIN_multiple;
+	return frac * Eexx_in;	
 }
 
 /*
