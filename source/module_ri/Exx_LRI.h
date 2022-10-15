@@ -38,7 +38,7 @@ public:
 	void cal_exx_elec(const Local_Orbital_Charge &loc, const Parallel_Orbitals &pv);
 
 	std::vector< std::map<TA, std::map<TAC, Tensor<Tdata>>>> Hexxs;
-	Tdata get_energy() const;
+	Tdata Eexx;
 	void write_Hexxs(const std::string &file_name) const;
 	void read_Hexxs(const std::string &file_name);
 
@@ -53,7 +53,8 @@ private:
 	LRI_CV<Tdata> cv;
 	Exx<TA,Tcell,Ndim,Tdata> exx_lri;
 
-	void post_process_Hexx(std::map<TA, std::map<TAC, Tensor<Tdata>>> &Hexxs) const;	
+	void post_process_Hexx( std::map<TA, std::map<TAC, Tensor<Tdata>>> &Hexxs_io ) const;
+	Tdata post_process_Eexx( const Tdata &Eexx_in ) const;
 };
 
 #include "Exx_LRI.hpp"
