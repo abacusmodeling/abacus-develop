@@ -161,22 +161,17 @@ template<typename Tdata>
 void Exx_LRI<Tdata>::post_process_Hexx(std::map<TA, std::map<TAC, Tensor<Tdata>>> &Hexxs) const
 {
 	ModuleBase::TITLE("Exx_LRI","post_process_Hexx");
-
-	const std::map<int,double> SPIN_multiple = {{1,0.5}, {2,1}, {4,1}};							// why?
-	const Tdata frac = -1 * 2 * SPIN_multiple.at(GlobalV::NSPIN);								// why?
-
+	constexpr Tdata frac = -1 * 2;								// why?	Hartree to Ry?
 	const std::function<void(Tensor<Tdata>&)>
 		multiply_frac = [&frac](Tensor<Tdata> &t)
 		{ t = t*frac; };
-	
 	Map_Operator::for_each( Hexxs, multiply_frac );
 }
 
 template<typename Tdata>
 Tdata Exx_LRI<Tdata>::get_energy() const
 {
-	const std::map<int,double> SPIN_multiple = {{1,1}, {2,4}, {4,4}};		// why?
-	const double frac = - 0.5  * SPIN_multiple.at(GlobalV::NSPIN);			// why?		0.5 to Ry?
+	constexpr double frac = -1 * 2;								// why?	Hartree to Ry?
 	return frac * this->exx_lri.post_2D.energy;
 }
 

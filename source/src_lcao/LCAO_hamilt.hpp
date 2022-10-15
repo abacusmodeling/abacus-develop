@@ -80,6 +80,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 			}
 		}
 	}
+	ModuleBase::timer::tick("LCAO_Hamilt","calculate_HR_exx_sparse");
 }
 
 #endif

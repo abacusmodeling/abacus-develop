@@ -288,7 +288,7 @@ namespace ModuleESolver
                 || Exx_Info::Hybrid_Type::HSE == GlobalC::exx_info.info_global.hybrid_type
                 || Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type)
             {
-                GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
+                //GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 					GlobalC::exx_lri_double.cal_exx_ions();
 				else
@@ -445,7 +445,7 @@ namespace ModuleESolver
         case Exx_Info::Hybrid_Type::PBE0:
         case Exx_Info::Hybrid_Type::SCAN0:
         case Exx_Info::Hybrid_Type::HSE:
-            GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
+            //GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
 			const std::string file_name_exx = GlobalV::global_out_dir + "HexxR_" + std::to_string(GlobalV::MY_RANK);
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 				GlobalC::exx_lri_double.read_Hexxs(file_name_exx);

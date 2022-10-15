@@ -449,7 +449,7 @@ void ESolver_KS_LCAO::eachiterinit(const int istep, const int iter)
     {
         if (!GlobalC::exx_info.info_global.separate_loop && this->two_level_step)
         {
-            GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
+            //GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
             if(GlobalV::GAMMA_ONLY_LOCAL)
                 GlobalC::exx_lri_double.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
             else
@@ -514,7 +514,7 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
             && !GlobalC::restart.info_load.restart_exx)
         {
             XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-            GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
+            //GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
             if(GlobalV::GAMMA_ONLY_LOCAL)
                 GlobalC::exx_lri_double.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
             else
@@ -1010,7 +1010,7 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
         {
             //update exx and redo scf
             XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-            GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
+            //GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 				GlobalC::exx_lri_double.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
 			else
