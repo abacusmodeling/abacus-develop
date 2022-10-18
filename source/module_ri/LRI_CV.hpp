@@ -12,6 +12,7 @@
 #include "RI_Util.h"
 #include "module_base/tool_title.h"
 #include "module_base/timer.h"
+#include <RI/global/Global_Func-1.h>
 #include <omp.h>
 
 template<typename Tdata>
@@ -77,7 +78,6 @@ auto LRI_CV<Tdata>::cal_datas(
 	ModuleBase::timer::tick("LRI_CV", "cal_datas");
 
 	std::map<TA,std::map<TAC,Tensor<Tdata>>> Datas;
-	#pragma omp parallel for
 	for(size_t i0=0; i0<list_A0.size(); ++i0)
 	{
 		#pragma omp parallel for
@@ -156,47 +156,54 @@ LRI_CV<Tdata>::DPcal_V(
 	const Abfs::Vector3_Order<double> &R,
 	const bool flag_writable)
 {
+	const Abfs::Vector3_Order<double> Rm = -R;
 	pthread_rwlock_rdlock(&this->rwlock_Vw);
-	Tensor<Tdata> V = this->Vws[it0][it1][R];
-	Tensor<Tdata> VT = this->Vws[it1][it0][-R];
+	const Tensor<Tdata> V_read = Global_Func::find(this->Vws, it0, it1, R);
+	const Tensor<Tdata> VT_read = Global_Func::find(this->Vws, it1, it0, Rm);
 	pthread_rwlock_unlock(&this->rwlock_Vw);
 
-	if(!V && !VT)
+	if(!V_read && !VT_read)
 	{
-		V = this->m_abfs_abfs.cal_overlap_matrix<Tdata>(
+		const Tensor<Tdata> V = this->m_abfs_abfs.cal_overlap_matrix<Tdata>(
 			it0, it1, {0,0,0}, R,
 			this->index_abfs, this->index_abfs,
 			Matrix_Orbs11::Matrix_Order::AB);
 		if(flag_writable)
 		{
-			VT = V.transpose();
+			const Tensor<Tdata> VT = V.transpose();
 			pthread_rwlock_wrlock(&this->rwlock_Vw);
 			this->Vws[it0][it1][R] = V;
-			this->Vws[it1][it0][-R] = VT;
+			this->Vws[it1][it0][Rm] = VT;
 			pthread_rwlock_unlock(&this->rwlock_Vw);
 		}
+		return V;
 	}
-	else if(V && !VT)
+	else if(V_read && !VT_read)
 	{	
 		if(flag_writable)
 		{
-			VT = V.transpose();
+			const Tensor<Tdata> VT = V_read.transpose();
 			pthread_rwlock_wrlock(&this->rwlock_Vw);
-			this->Vws[it1][it0][-R] = VT;
+			this->Vws[it1][it0][Rm] = VT;
 			pthread_rwlock_unlock(&this->rwlock_Vw);
 		}
+		return V_read;
 	}
-	else if(!V && VT)
+	else if(!V_read && VT_read)
 	{
-		V = VT.transpose();
+		const Tensor<Tdata> V = VT_read.transpose();
 		if(flag_writable)
 		{		
 			pthread_rwlock_wrlock(&this->rwlock_Vw);
 			this->Vws[it0][it1][R] = V;
 			pthread_rwlock_unlock(&this->rwlock_Vw);
 		}
+		return V;
 	}
-	return V;
+	else
+	{
+		return V_read;
+	}
 }
 
 
