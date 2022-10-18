@@ -48,7 +48,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 					for(size_t iw1=0; iw1<Hexx.shape[1]; ++iw1)
 					{
 						const int iwt1 = RI_2D_Comm::get_iwt(iat1, iw1, is1_b);
-						const int iwt1_local = this->LM->ParaV->trace_loc_col[iw1];		
+						const int iwt1_local = this->LM->ParaV->trace_loc_col[iwt1];		
 						if(iwt1_local<0)	continue;
 
 						if(std::abs(Hexx(iw0,iw1)) > sparse_threshold)

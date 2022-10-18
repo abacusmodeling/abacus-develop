@@ -37,7 +37,7 @@ namespace RI_Util
 	Tensor<Tdata>
 	Matrix_to_Tensor(const Tmatrix &m_old)
 	{
-		Tensor<Tdata> m_new({m_old.nr, m_old.nc});
+		Tensor<Tdata> m_new({static_cast<size_t>(m_old.nr), static_cast<size_t>(m_old.nc)});
 		for(int ir=0; ir<m_old.nr; ++ir)
 			for(int ic=0; ic<m_old.nc; ++ic)
 				m_new(ir,ic) = Global_Func::convert<Tdata>(m_old(ir,ic));
