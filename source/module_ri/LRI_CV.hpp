@@ -12,6 +12,7 @@
 #include "RI_Util.h"
 #include "module_base/tool_title.h"
 #include "module_base/timer.h"
+#include <RI/global/Global_Func-1.h>
 #include <omp.h>
 
 template<typename Tdata>
@@ -77,10 +78,10 @@ auto LRI_CV<Tdata>::cal_datas(
 	ModuleBase::timer::tick("LRI_CV", "cal_datas");
 
 	std::map<TA,std::map<TAC,Tensor<Tdata>>> Datas;
-	#pragma omp parallel for
+	#pragma omp parallel 
 	for(size_t i0=0; i0<list_A0.size(); ++i0)
 	{
-		#pragma omp parallel for
+		#pragma omp for schedule(dynamic) nowait
 		for(size_t i1=0; i1<list_A1.size(); ++i1)
 		{
 			const TA iat0 = list_A0[i0];
@@ -156,47 +157,54 @@ LRI_CV<Tdata>::DPcal_V(
 	const Abfs::Vector3_Order<double> &R,
 	const bool flag_writable)
 {
+	const Abfs::Vector3_Order<double> Rm = -R;
 	pthread_rwlock_rdlock(&this->rwlock_Vw);
-	Tensor<Tdata> V = this->Vws[it0][it1][R];
-	Tensor<Tdata> VT = this->Vws[it1][it0][-R];
+	const Tensor<Tdata> V_read = Global_Func::find(this->Vws, it0, it1, R);
+	const Tensor<Tdata> VT_read = Global_Func::find(this->Vws, it1, it0, Rm);
 	pthread_rwlock_unlock(&this->rwlock_Vw);
 
-	if(!V && !VT)
+	if(V_read && VT_read)
 	{
-		V = this->m_abfs_abfs.cal_overlap_matrix<Tdata>(
-			it0, it1, {0,0,0}, R,
-			this->index_abfs, this->index_abfs,
-			Matrix_Orbs11::Matrix_Order::AB);
-		if(flag_writable)
-		{
-			VT = V.transpose();
-			pthread_rwlock_wrlock(&this->rwlock_Vw);
-			this->Vws[it0][it1][R] = V;
-			this->Vws[it1][it0][-R] = VT;
-			pthread_rwlock_unlock(&this->rwlock_Vw);
-		}
+		return V_read;
 	}
-	else if(V && !VT)
+	else if(V_read && !VT_read)
 	{	
 		if(flag_writable)
 		{
-			VT = V.transpose();
+			const Tensor<Tdata> VT = V_read.transpose();
 			pthread_rwlock_wrlock(&this->rwlock_Vw);
-			this->Vws[it1][it0][-R] = VT;
+			this->Vws[it1][it0][Rm] = VT;
 			pthread_rwlock_unlock(&this->rwlock_Vw);
 		}
+		return V_read;
 	}
-	else if(!V && VT)
+	else if(!V_read && VT_read)
 	{
-		V = VT.transpose();
+		const Tensor<Tdata> V = VT_read.transpose();
 		if(flag_writable)
 		{		
 			pthread_rwlock_wrlock(&this->rwlock_Vw);
 			this->Vws[it0][it1][R] = V;
 			pthread_rwlock_unlock(&this->rwlock_Vw);
 		}
+		return V;
 	}
-	return V;
+	else
+	{
+		const Tensor<Tdata> V = this->m_abfs_abfs.cal_overlap_matrix<Tdata>(
+			it0, it1, {0,0,0}, R,
+			this->index_abfs, this->index_abfs,
+			Matrix_Orbs11::Matrix_Order::AB);
+		if(flag_writable)
+		{
+			const Tensor<Tdata> VT = V.transpose();
+			pthread_rwlock_wrlock(&this->rwlock_Vw);
+			this->Vws[it0][it1][R] = V;
+			this->Vws[it1][it0][Rm] = VT;
+			pthread_rwlock_unlock(&this->rwlock_Vw);
+		}
+		return V;
+	}
 }
 
 
@@ -219,29 +227,30 @@ LRI_CV<Tdata>::DPcal_C(
 		return c_out;
 	};
 
+	const Abfs::Vector3_Order<double> Rm = -R;
 	pthread_rwlock_rdlock(&this->rwlock_Cw);
 	const std::array<Tensor<Tdata>, 2>
-		Cr = {this->Cws[it0][it1][R],
-		      this->Cws[it1][it0][-R]};
+		C_read = {Global_Func::find(this->Cws, it0, it1, R),
+		          Global_Func::find(this->Cws, it1, it0, Rm)};
 	pthread_rwlock_unlock(&this->rwlock_Cw);
 
-	if(Cr[0])
+	if(C_read[0])
 	{
-		return Cr[0].data->size() ? Cr[0] : Tensor<Tdata>({});
+		return C_read[0];
 	}
 	else
 	{
 		if( (ModuleBase::Vector3<double>(0,0,0)==R) && (it0==it1) )
 		{
-			const Tensor<Tdata> A = 
-				this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
-					it0, it1, {0,0,0}, {0,0,0},
-					this->index_abfs, this->index_lcaos, this->index_lcaos,
-					Matrix_Orbs21::Matrix_Order::A1A2B);
+			const Tensor<Tdata>
+				A = this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
+						it0, it1, {0,0,0}, {0,0,0},
+						this->index_abfs, this->index_lcaos, this->index_lcaos,
+						Matrix_Orbs21::Matrix_Order::A1A2B);
 			const size_t sa=A.shape[0], sl0=A.shape[1], sl1=A.shape[2];
 			const Tensor<Tdata> V = DPcal_V( it0, it0, {0,0,0}, true);
 			const Tensor<Tdata> L = cal_I(V);
-			Tensor<Tdata> C = Global_Func::convert<Tdata>(0.5) * (L * A.reshape({sa, sl0*sl1})).reshape({sa,sl0,sl1});					// Attention 0.5!
+			const Tensor<Tdata> C = Global_Func::convert<Tdata>(0.5) * (L * A.reshape({sa, sl0*sl1})).reshape({sa,sl0,sl1});					// Attention 0.5!
 			if(flag_writable)
 			{
 				pthread_rwlock_wrlock(&this->rwlock_Cw);
@@ -253,38 +262,38 @@ LRI_CV<Tdata>::DPcal_C(
 		else
 		{
 			const std::array<Tensor<Tdata>, 2>
-				 A = {this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
-							it0, it1, {0,0,0}, R,
-							this->index_abfs, this->index_lcaos, this->index_lcaos,
-							Matrix_Orbs21::Matrix_Order::A1A2B),
-				      this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
-							it1, it0, {0,0,0}, -R,
-							this->index_abfs, this->index_lcaos, this->index_lcaos,
-							Matrix_Orbs21::Matrix_Order::A1BA2)};
+				A = {this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
+						it0, it1, {0,0,0}, R,
+						this->index_abfs, this->index_lcaos, this->index_lcaos,
+						Matrix_Orbs21::Matrix_Order::A1A2B),
+					 this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
+						it1, it0, {0,0,0}, Rm,
+						this->index_abfs, this->index_lcaos, this->index_lcaos,
+						Matrix_Orbs21::Matrix_Order::A1BA2)};
 			const size_t sa0=A[0].shape[0], sa1=A[1].shape[0], sl0=A[0].shape[1], sl1=A[0].shape[2];
 
 			const std::vector<std::vector<Tensor<Tdata>>>
 				V = {{DPcal_V(it0, it0, {0,0,0}, true),
 				      DPcal_V(it0, it1, R,       false)},
-				     {DPcal_V(it1, it0, -R,      false),
+				     {DPcal_V(it1, it0, Rm,      false),
 				      DPcal_V(it1, it1, {0,0,0}, true)}};
 
 			const std::vector<std::vector<Tensor<Tdata>>>
 				L = cal_I(V);
 
-			std::array<Tensor<Tdata>, 2>
+			const std::array<Tensor<Tdata>, 2>
 				C = {( L[0][0]*A[0].reshape({sa0,sl0*sl1}) + L[0][1]*A[1].reshape({sa1,sl0*sl1}) ).reshape({sa0,sl0,sl1}),
 				     ( L[1][0]*A[0].reshape({sa0,sl0*sl1}) + L[1][1]*A[1].reshape({sa1,sl0*sl1}) ).reshape({sa1,sl0,sl1})};
 			if(flag_writable)
 			{
 				pthread_rwlock_wrlock(&this->rwlock_Cw);
 				this->Cws[it0][it1][R] = C[0];
-				this->Cws[it1][it0][-R] = transpose12(C[1]);
+				this->Cws[it1][it0][Rm] = transpose12(C[1]);
 				pthread_rwlock_unlock(&this->rwlock_Cw);
 			}
 			return C[0];
 		}
-	} // end if(!Cr[0])
+	} // end if(!C_read[0])
 }
 
 

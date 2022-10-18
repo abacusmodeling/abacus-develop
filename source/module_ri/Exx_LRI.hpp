@@ -123,11 +123,11 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 	const std::vector<TA> list_A1 = std::move(list_As.first);
 	const std::vector<TAC> list_A2 = std::move(list_As.second[0]);
 
-	std::map<TA,std::map<TAC,Tensor<Tdata>>> Cs = this->cv.cal_Cs(list_A1, list_A2, this->info.C_threshold, true);
-	this->exx_lri.set_Cs(std::move(Cs), this->info.C_threshold);
-
 	std::map<TA,std::map<TAC,Tensor<Tdata>>> Vs = this->cv.cal_Vs(list_A1, list_A2, this->info.V_threshold, true);
 	this->exx_lri.set_Vs(std::move(Vs), this->info.V_threshold);
+
+	std::map<TA,std::map<TAC,Tensor<Tdata>>> Cs = this->cv.cal_Cs(list_A1, list_A2, this->info.C_threshold, true);
+	this->exx_lri.set_Cs(std::move(Cs), this->info.C_threshold);
 
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_ions");
 }

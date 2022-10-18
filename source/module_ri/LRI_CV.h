@@ -61,8 +61,8 @@ private:
 	ModuleBase::Element_Basis_Index::IndexLNM index_abfs;
 	double ccp_rmesh_times;
 
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,Tensor<Tdata>>>> Vws;
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,Tensor<Tdata>>>> Cws;
+	std::map<int,std::map<int,std::map<Abfs::Vector3_Order<double>,Tensor<Tdata>>>> Vws;
+	std::map<int,std::map<int,std::map<Abfs::Vector3_Order<double>,Tensor<Tdata>>>> Cws;
 	pthread_rwlock_t rwlock_Vw;
 	pthread_rwlock_t rwlock_Cw;
 
