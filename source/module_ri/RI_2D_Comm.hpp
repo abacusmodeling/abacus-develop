@@ -71,7 +71,7 @@ auto RI_2D_Comm::split_m2D_ktoR(const std::vector<Tmatrix> &mks_2D, const Parall
 					const int is_b = RI_2D_Comm::get_is_block(is_k, is0_b, is1_b);
 					Tensor<Tdata> &mR_a2D = mRs_a2D[is_b][iat0][{iat1,cell}];
 					if(!mR_a2D)
-						mR_a2D = Tensor<Tdata>({GlobalC::ucell.atoms[it0].nw, GlobalC::ucell.atoms[it1].nw});
+						mR_a2D = Tensor<Tdata>({static_cast<size_t>(GlobalC::ucell.atoms[it0].nw), static_cast<size_t>(GlobalC::ucell.atoms[it1].nw)});
 					mR_a2D(iw0_b,iw1_b) = mR_2D(iwt0_2D, iwt1_2D);
 				}
 			}
