@@ -78,9 +78,10 @@ auto LRI_CV<Tdata>::cal_datas(
 	ModuleBase::timer::tick("LRI_CV", "cal_datas");
 
 	std::map<TA,std::map<TAC,Tensor<Tdata>>> Datas;
+	#pragma omp parallel 
 	for(size_t i0=0; i0<list_A0.size(); ++i0)
 	{
-		#pragma omp parallel for
+		#pragma omp for schedule(dynamic) nowait
 		for(size_t i1=0; i1<list_A1.size(); ++i1)
 		{
 			const TA iat0 = list_A0[i0];
