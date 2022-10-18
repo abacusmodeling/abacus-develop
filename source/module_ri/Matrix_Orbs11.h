@@ -26,15 +26,15 @@ public:
 	//    1: <lcaos|lcaos>
 	//    2: <jYs|jYs>  <abfs|abfs>
 	void init(
-		const int mode, 
+		const int mode,
 		const double kmesh_times,  		// extend Kcut, keep dK
 		const double rmesh_times);		// extend Rcut, keep dR
 
 	void init_radial(
-		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A, 
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A,
 		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B);
 	void init_radial(
-		const LCAO_Orbitals &orb_A, 
+		const LCAO_Orbitals &orb_A,
 		const LCAO_Orbitals &orb_B);
 
 	void init_radial_table();
@@ -43,19 +43,28 @@ public:
 	enum class Matrix_Order{ AB, BA };
 
 	template<typename Tdata>
-	Tensor<Tdata> cal_overlap_matrix( 
-		const size_t TA, 
-		const size_t TB, 
+	Tensor<Tdata> cal_overlap_matrix(
+		const size_t TA,
+		const size_t TB,
 		const ModuleBase::Vector3<double> &tauA,												// unit: ucell.lat0
-		const ModuleBase::Vector3<double> &tauB,												// unit: ucell.lat0 
-		const ModuleBase::Element_Basis_Index::IndexLNM &index_A, 
+		const ModuleBase::Vector3<double> &tauB,												// unit: ucell.lat0
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
+		const Matrix_Order &matrix_order) const;
+	template<typename Tdata>
+	std::array<Tensor<Tdata>,3> cal_grad_overlap_matrix(
+		const size_t TA,
+		const size_t TB,
+		const ModuleBase::Vector3<double> &tauA,												// unit: ucell.lat0
+		const ModuleBase::Vector3<double> &tauB,												// unit: ucell.lat0
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
 		const Matrix_Order &matrix_order) const;
 
 private:
 	ORB_table_phi MOT;
 	ORB_gaunt_table MGT;
-                                               
+
 	std::map<size_t,                                // TA
 		std::map<size_t,                            // TB
 			std::map<int,                           // LA
@@ -63,7 +72,7 @@ private:
 					std::map<int,                   // LB
 						std::map<size_t,            // NB
 							Center2_Orb::Orb11>>>>>> center2_orb11_s;
-	// this->center2_orb11_s[TA][TB][LA][NA][LB][NB]	
+	// this->center2_orb11_s[TA][TB][LA][NA][LB][NB]
 };
 
 #include "Matrix_Orbs11.hpp"

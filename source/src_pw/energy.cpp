@@ -557,9 +557,9 @@ void energy::set_exx()
 		{
 //			return GlobalC::exx_lcao.get_energy();
 			if(GlobalV::GAMMA_ONLY_LOCAL)
-				return GlobalC::exx_lri_double.get_energy();
+				return GlobalC::exx_lri_double.Eexx;
 			else
-				return std::real(GlobalC::exx_lri_complex.get_energy());
+				return std::real(GlobalC::exx_lri_complex.Eexx);
 		}
 		else
 		{

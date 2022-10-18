@@ -27,6 +27,7 @@ auto RI_2D_Comm::split_m2D_ktoR(const std::vector<Tmatrix> &mks_2D, const Parall
 
 	const TC period = RI_Util::get_Born_vonKarmen_period();
 	const std::map<int,int> nspin_k = {{1,1}, {2,2}, {4,1}};
+	const double SPIN_multiple = std::map<int,double>{{1,0.5}, {2,1}, {4,1}}.at(GlobalV::NSPIN);							// why?
 
 	std::vector<std::map<TA,std::map<TAC,Tensor<Tdata>>>> mRs_a2D(GlobalV::NSPIN);
 	for(int is_k=0; is_k<nspin_k.at(GlobalV::NSPIN); ++is_k)
@@ -39,9 +40,9 @@ auto RI_2D_Comm::split_m2D_ktoR(const std::vector<Tmatrix> &mks_2D, const Parall
 			{
 				using Tdata_m = typename Tmatrix::type;
 				Tensor<Tdata_m> mk_2D = RI_Util::Matrix_to_Tensor<Tdata_m>(mks_2D[ik]);
-				const Tdata_m frac = Global_Func::convert<Tdata_m>( 
-					std::exp( -ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT
-						* (GlobalC::kv.kvec_c[ik] * (RI_Util::array3_to_Vector3(cell)*GlobalC::ucell.latvec))));
+				const Tdata_m frac = SPIN_multiple
+					* Global_Func::convert<Tdata_m>( std::exp(
+						- ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (RI_Util::array3_to_Vector3(cell)*GlobalC::ucell.latvec))));
 				if(!mR_2D)
 					mR_2D = Global_Func::convert<Tdata>(mk_2D * frac);
 				else
