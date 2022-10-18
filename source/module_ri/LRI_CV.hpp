@@ -162,21 +162,9 @@ LRI_CV<Tdata>::DPcal_V(
 	const Tensor<Tdata> VT_read = Global_Func::find(this->Vws, it1, it0, Rm);
 	pthread_rwlock_unlock(&this->rwlock_Vw);
 
-	if(!V_read && !VT_read)
+	if(V_read && VT_read)
 	{
-		const Tensor<Tdata> V = this->m_abfs_abfs.cal_overlap_matrix<Tdata>(
-			it0, it1, {0,0,0}, R,
-			this->index_abfs, this->index_abfs,
-			Matrix_Orbs11::Matrix_Order::AB);
-		if(flag_writable)
-		{
-			const Tensor<Tdata> VT = V.transpose();
-			pthread_rwlock_wrlock(&this->rwlock_Vw);
-			this->Vws[it0][it1][R] = V;
-			this->Vws[it1][it0][Rm] = VT;
-			pthread_rwlock_unlock(&this->rwlock_Vw);
-		}
-		return V;
+		return V_read;
 	}
 	else if(V_read && !VT_read)
 	{	
@@ -202,7 +190,19 @@ LRI_CV<Tdata>::DPcal_V(
 	}
 	else
 	{
-		return V_read;
+		const Tensor<Tdata> V = this->m_abfs_abfs.cal_overlap_matrix<Tdata>(
+			it0, it1, {0,0,0}, R,
+			this->index_abfs, this->index_abfs,
+			Matrix_Orbs11::Matrix_Order::AB);
+		if(flag_writable)
+		{
+			const Tensor<Tdata> VT = V.transpose();
+			pthread_rwlock_wrlock(&this->rwlock_Vw);
+			this->Vws[it0][it1][R] = V;
+			this->Vws[it1][it0][Rm] = VT;
+			pthread_rwlock_unlock(&this->rwlock_Vw);
+		}
+		return V;
 	}
 }
 
@@ -226,29 +226,30 @@ LRI_CV<Tdata>::DPcal_C(
 		return c_out;
 	};
 
+	const Abfs::Vector3_Order<double> Rm = -R;
 	pthread_rwlock_rdlock(&this->rwlock_Cw);
 	const std::array<Tensor<Tdata>, 2>
-		Cr = {this->Cws[it0][it1][R],
-		      this->Cws[it1][it0][-R]};
+		C_read = {Global_Func::find(this->Cws, it0, it1, R),
+		          Global_Func::find(this->Cws, it1, it0, Rm)};
 	pthread_rwlock_unlock(&this->rwlock_Cw);
 
-	if(Cr[0])
+	if(C_read[0])
 	{
-		return Cr[0].data->size() ? Cr[0] : Tensor<Tdata>({});
+		return C_read[0];
 	}
 	else
 	{
 		if( (ModuleBase::Vector3<double>(0,0,0)==R) && (it0==it1) )
 		{
-			const Tensor<Tdata> A = 
-				this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
-					it0, it1, {0,0,0}, {0,0,0},
-					this->index_abfs, this->index_lcaos, this->index_lcaos,
-					Matrix_Orbs21::Matrix_Order::A1A2B);
+			const Tensor<Tdata>
+				A = this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
+						it0, it1, {0,0,0}, {0,0,0},
+						this->index_abfs, this->index_lcaos, this->index_lcaos,
+						Matrix_Orbs21::Matrix_Order::A1A2B);
 			const size_t sa=A.shape[0], sl0=A.shape[1], sl1=A.shape[2];
 			const Tensor<Tdata> V = DPcal_V( it0, it0, {0,0,0}, true);
 			const Tensor<Tdata> L = cal_I(V);
-			Tensor<Tdata> C = Global_Func::convert<Tdata>(0.5) * (L * A.reshape({sa, sl0*sl1})).reshape({sa,sl0,sl1});					// Attention 0.5!
+			const Tensor<Tdata> C = Global_Func::convert<Tdata>(0.5) * (L * A.reshape({sa, sl0*sl1})).reshape({sa,sl0,sl1});					// Attention 0.5!
 			if(flag_writable)
 			{
 				pthread_rwlock_wrlock(&this->rwlock_Cw);
@@ -260,38 +261,38 @@ LRI_CV<Tdata>::DPcal_C(
 		else
 		{
 			const std::array<Tensor<Tdata>, 2>
-				 A = {this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
-							it0, it1, {0,0,0}, R,
-							this->index_abfs, this->index_lcaos, this->index_lcaos,
-							Matrix_Orbs21::Matrix_Order::A1A2B),
-				      this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
-							it1, it0, {0,0,0}, -R,
-							this->index_abfs, this->index_lcaos, this->index_lcaos,
-							Matrix_Orbs21::Matrix_Order::A1BA2)};
+				A = {this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
+						it0, it1, {0,0,0}, R,
+						this->index_abfs, this->index_lcaos, this->index_lcaos,
+						Matrix_Orbs21::Matrix_Order::A1A2B),
+					 this->m_abfslcaos_lcaos.cal_overlap_matrix<Tdata>(
+						it1, it0, {0,0,0}, Rm,
+						this->index_abfs, this->index_lcaos, this->index_lcaos,
+						Matrix_Orbs21::Matrix_Order::A1BA2)};
 			const size_t sa0=A[0].shape[0], sa1=A[1].shape[0], sl0=A[0].shape[1], sl1=A[0].shape[2];
 
 			const std::vector<std::vector<Tensor<Tdata>>>
 				V = {{DPcal_V(it0, it0, {0,0,0}, true),
 				      DPcal_V(it0, it1, R,       false)},
-				     {DPcal_V(it1, it0, -R,      false),
+				     {DPcal_V(it1, it0, Rm,      false),
 				      DPcal_V(it1, it1, {0,0,0}, true)}};
 
 			const std::vector<std::vector<Tensor<Tdata>>>
 				L = cal_I(V);
 
-			std::array<Tensor<Tdata>, 2>
+			const std::array<Tensor<Tdata>, 2>
 				C = {( L[0][0]*A[0].reshape({sa0,sl0*sl1}) + L[0][1]*A[1].reshape({sa1,sl0*sl1}) ).reshape({sa0,sl0,sl1}),
 				     ( L[1][0]*A[0].reshape({sa0,sl0*sl1}) + L[1][1]*A[1].reshape({sa1,sl0*sl1}) ).reshape({sa1,sl0,sl1})};
 			if(flag_writable)
 			{
 				pthread_rwlock_wrlock(&this->rwlock_Cw);
 				this->Cws[it0][it1][R] = C[0];
-				this->Cws[it1][it0][-R] = transpose12(C[1]);
+				this->Cws[it1][it0][Rm] = transpose12(C[1]);
 				pthread_rwlock_unlock(&this->rwlock_Cw);
 			}
 			return C[0];
 		}
-	} // end if(!Cr[0])
+	} // end if(!C_read[0])
 }
 
 
