@@ -20,7 +20,7 @@ proposing new features, raise issues, fix bugs, imporve docs, et al.
 
 Common mistakes like missing tests, PR too long, et al.
 
-## Other Questions Related To Contribution
+## Other Questions
 
 ### CI tests failed, what does it mean?
 
