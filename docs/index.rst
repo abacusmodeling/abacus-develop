@@ -60,12 +60,4 @@ the developments and applications of novel machine-learning-assisted DFT methods
 
    community/contribution_guide
    CONTRIBUTING
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Notes
-
-   notes/abacus_modules
-   notes/FAQ
-   notes/cpu_threading
-   notes/cuda
+   notes/index
