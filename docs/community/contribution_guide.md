@@ -3,7 +3,7 @@
 - [Contribution Process](#contribution-process)
 - [Getting Started](#getting-started)
 - [Common Mistakes To Avoid](#common-mistakes-to-avoid)
-- [Frequently Asked Questions](#frequently-asked-questions)
+- [Other Questions](#other-questions)
 - [On Documentation](#on-documentation)
 
 
