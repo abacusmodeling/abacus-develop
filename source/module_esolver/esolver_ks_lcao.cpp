@@ -212,8 +212,9 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     }
 }
 
-void ESolver_KS_LCAO::cal_Energy(energy& en)
+void ESolver_KS_LCAO::cal_Energy(double& etot)
 {
+    etot = GlobalC::en.etot;
 }
 
 void ESolver_KS_LCAO::cal_Force(ModuleBase::matrix& force)
