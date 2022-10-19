@@ -20,7 +20,7 @@ proposing new features, raise issues, fix bugs, imporve docs, et al.
 
 Common mistakes like missing tests, PR too long, et al.
 
-## Frequently Asked Questions
+## Other Questions Related To Contribution
 
 ### CI tests failed, what does it mean?
 
@@ -30,6 +30,6 @@ The current status of `Test Coverage` can be reported here.
 
 On how to access and improve documentation.
 
-### API
+### ABACUS API
 
 Give the link to doxygen generated API, including annotations where needed inside.
