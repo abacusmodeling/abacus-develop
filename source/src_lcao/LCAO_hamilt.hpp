@@ -10,6 +10,7 @@
 #include "module_base/global_variable.h"
 #include "src_ri/abfs-vector3_order.h"
 #include "module_ri/RI_2D_Comm.h"
+#include "module_base/timer.h"
 
 #include <RI/global/Global_Func-2.h>
 
@@ -58,7 +59,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 								auto &HR_sparse_ptr = this->LM->HR_sparse[current_spin][R][iwt0];
 								double &HR_sparse = HR_sparse_ptr[iwt1];
 								HR_sparse += Global_Func::convert<double>(frac * Hexx(iw0,iw1));
-								if(std::abs(HR_sparse) < sparse_threshold)
+								if(std::abs(HR_sparse) <= sparse_threshold)
 									HR_sparse_ptr.erase(iwt1);
 							}
 							else if(GlobalV::NSPIN==4)
@@ -66,7 +67,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 								auto &HR_sparse_ptr = this->LM->HR_soc_sparse[R][iwt0];
 								std::complex<double> &HR_sparse = HR_sparse_ptr[iwt1];
 								HR_sparse += Global_Func::convert<std::complex<double>>(frac * Hexx(iw0,iw1));
-								if(std::abs(HR_sparse) < sparse_threshold)
+								if(std::abs(HR_sparse) <= sparse_threshold)
 									HR_sparse_ptr.erase(iwt1);
 							}
 							else
