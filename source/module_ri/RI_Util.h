@@ -25,13 +25,13 @@ namespace RI_Util
 	Vector3_to_array3(const ModuleBase::Vector3<Tcell> &v)
 	{
 		return std::array<Tcell,3> {v.x, v.y, v.z};
-	};
+	}
 	template<typename Tcell>
 	inline ModuleBase::Vector3<Tcell>
 	array3_to_Vector3(const std::array<Tcell,3> &v)
 	{
 		return ModuleBase::Vector3<Tcell> {v[0], v[1], v[2]};
-	};
+	}
 
 	template<typename Tdata, typename Tmatrix>
 	Tensor<Tdata>

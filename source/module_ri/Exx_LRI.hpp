@@ -174,7 +174,7 @@ template<typename Tdata>
 Tdata Exx_LRI<Tdata>::post_process_Eexx( const Tdata &Eexx_in ) const
 {
 	const Tdata SPIN_multiple = std::map<int,Tdata>{{1,2}, {2,1}, {4,1}}.at(GlobalV::NSPIN);				// why?
-	const Tdata frac = -1 * SPIN_multiple;
+	const Tdata frac = - SPIN_multiple;
 	return frac * Eexx_in;	
 }
 
