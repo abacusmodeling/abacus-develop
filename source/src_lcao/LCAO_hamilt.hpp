@@ -77,10 +77,16 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 						}
 					}
 				}
-				this->LM->all_R_coor.insert(R);
 			}
 		}
 	}
+
+	const Abfs::Vector3_Order<int> Rs_period(GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]);
+	for(int Rx=0; Rx<Rs_period.x; ++Rx)
+		for(int Ry=0; Ry<Rs_period.y; ++Ry)
+			for(int Rz=0; Rz<Rs_period.z; ++Rz)
+				this->LM->all_R_coor.insert(Abfs::Vector3_Order<int>{Rx,Ry,Rz} % Rs_period);
+
 	ModuleBase::timer::tick("LCAO_Hamilt","calculate_HR_exx_sparse");
 }
 
