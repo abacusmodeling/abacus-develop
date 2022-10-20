@@ -1,27 +1,16 @@
 # ABACUS Contribution Guide
 
-- [Contribution Process](#contribution-process)
-- [Getting Started](#getting-started)
-- [Common Mistakes To Avoid](#common-mistakes-to-avoid)
-- [Other Questions](#other-questions)
-
-
 ## Contribution Process
 
-Elaborate an intact contribution process here: from issue to PR accepted.
+We are welcoming open source contributions from the community. The technical guide is provided in [Contributing to ABACUS](../CONTRIBUTING.md). Here is the basic contribution process:
 
-## Getting Started
+- **Find out the issues to work on.** 
+We assume you already have a good idea on what to do, otherwise the [issue tracker](#https://github.com/deepmodeling/abacus-develop/issues) and [discussion](#https://github.com/deepmodeling/abacus-develop/discussions) panel provide good starting points to find out what to work on and to get familiar with the project. 
 
-On how to start common activities of contribution:  
-proposing new features, raise issues, fix bugs, imporve docs, et al.
+- **Approach the issue.** 
+It is suggested to [submit new issues](https://github.com/deepmodeling/abacus-develop/issues/new/choose) before coding out changes to involve more discussions and suggestions from development team. Refer to the technical guide in [Contributing to ABACUS](../CONTRIBUTING.md) when needed.
 
-## Common Mistakes To Avoid
+- **Open a pull request.** The ABACUS developers review the pull request (PR) list regularly. If the work is not ready, convert it to draft until finished, then you can mark it as "Ready for review". It is suggested to fork a repo and open a new branch on you Github account before open a PR. A PR should include as much information as possible in `description` when submmited. Unittests or CI tests are required for new PRs.
 
-Common mistakes like missing tests, PR too long, et al.
-
-## Other Questions
-
-### CI tests failed, what does it mean?
-
-The current status of `Test Coverage` can be reported here.
-
+- **Iterate the pull request.**
+All pull request to be tested through CI. A pull request might need to be iterated several times before accepted, so splitting a long PR into parts reduces reviewing difficulty for us.
