@@ -26,10 +26,3 @@ Common mistakes like missing tests, PR too long, et al.
 
 The current status of `Test Coverage` can be reported here.
 
-## On Documentation
-
-On how to access and improve documentation.
-
-### ABACUS API
-
-Give the link to doxygen generated API, including annotations where needed inside.

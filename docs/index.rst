@@ -60,4 +60,4 @@ the developments and applications of novel machine-learning-assisted DFT methods
 
    community/contribution_guide
    CONTRIBUTING
-   notes/index
+   notes/faq
