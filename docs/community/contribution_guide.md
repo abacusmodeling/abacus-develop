@@ -4,7 +4,6 @@
 - [Getting Started](#getting-started)
 - [Common Mistakes To Avoid](#common-mistakes-to-avoid)
 - [Other Questions](#other-questions)
-- [On Documentation](#on-documentation)
 
 
 ## Contribution Process
