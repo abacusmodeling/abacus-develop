@@ -1,3 +1,4 @@
 # Frequently Asked Questions
 
-We will collect questions from issues/user feedbacks here.
+## What's the current test coverage of ABACUS?
+
