@@ -3,7 +3,4 @@ Notes
 =================================================
 
 .. toctree::
-   abacus_modules
-   cpu_threading
-   cuda
    faq
