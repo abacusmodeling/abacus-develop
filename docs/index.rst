@@ -59,10 +59,10 @@ the developments and applications of novel machine-learning-assisted DFT methods
    :caption: Community
 
    community/contribution_guide
-   CONTRIBUTING
+   community/CONTRIBUTING
 
 .. toctree::
    :glob:
    :titlesonly:
 
-   notes/faq
+   community/faq
