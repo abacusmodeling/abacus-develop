@@ -238,7 +238,10 @@ void MD_func::force_virial(
     ModuleBase::matrix force_temp(unit_in.nat, 3); 
     p_esolver->cal_Force(force_temp);
 
-    p_esolver->cal_Stress(stress);
+    if(GlobalV::CAL_STRESS)
+    {
+        p_esolver->cal_Stress(stress);
+    }
 
     if(mdp.md_ensolver == "FP")
     {
