@@ -148,6 +148,58 @@ auto LRI_CV<Tdata>::cal_Cs(
 }
 
 
+template<typename Tdata> template<typename To11, typename Tfunc>
+To11 LRI_CV<Tdata>::DPcal_o11(
+	const int it0,
+	const int it1,
+	const Abfs::Vector3_Order<double> &R,
+	const bool flag_writable,
+	pthread_rwlock_t &rwlock_o11,
+	std::map<int,std::map<int,std::map<Abfs::Vector3_Order<double>,To11>>> &o11_ws,
+	const Tfunc &func_cal_o11)
+{
+	const Abfs::Vector3_Order<double> Rm = -R;
+	pthread_rwlock_rdlock(&rwlock_o11);
+	const To11 o11_read = Global_Func::find(o11_ws, it0, it1, R);
+	pthread_rwlock_unlock(&rwlock_o11);
+
+	if(exist(o11_read))
+	{
+		return o11_read;
+	}
+	else
+	{
+		pthread_rwlock_rdlock(&rwlock_o11);
+		const To11 o11_transform_read = Global_Func::find(o11_ws, it1, it0, Rm);
+		pthread_rwlock_unlock(&rwlock_o11);
+
+		if(exist(o11_transform_read))
+		{
+			const To11 o11 = this->transform(o11_transform_read);
+			if(flag_writable)
+			{		
+				pthread_rwlock_wrlock(&rwlock_o11);
+				o11_ws[it0][it1][R] = o11;
+				pthread_rwlock_unlock(&rwlock_o11);
+			}
+			return o11;
+		}
+		else
+		{
+			const To11 o11 = func_cal_o11(
+				it0, it1, ModuleBase::Vector3<double>{0,0,0}, R,
+				this->index_abfs, this->index_abfs,
+				Matrix_Orbs11::Matrix_Order::AB);
+			if(flag_writable)
+			{
+				pthread_rwlock_wrlock(&rwlock_o11);
+				o11_ws[it0][it1][R] = o11;
+				pthread_rwlock_unlock(&rwlock_o11);
+			}
+			return o11;
+		} // else if(!exist(o11_transform_read))
+	} // else if(!exist(o11_read))
+}
 
 template<typename Tdata>
 Tensor<Tdata>
@@ -157,56 +209,27 @@ LRI_CV<Tdata>::DPcal_V(
 	const Abfs::Vector3_Order<double> &R,
 	const bool flag_writable)
 {
-	const Abfs::Vector3_Order<double> Rm = -R;
-	pthread_rwlock_rdlock(&this->rwlock_Vw);
-	const Tensor<Tdata> V_read = Global_Func::find(this->Vws, it0, it1, R);
-	const Tensor<Tdata> VT_read = Global_Func::find(this->Vws, it1, it0, Rm);
-	pthread_rwlock_unlock(&this->rwlock_Vw);
-
-	if(V_read && VT_read)
-	{
-		return V_read;
-	}
-	else if(V_read && !VT_read)
-	{	
-		if(flag_writable)
-		{
-			const Tensor<Tdata> VT = V_read.transpose();
-			pthread_rwlock_wrlock(&this->rwlock_Vw);
-			this->Vws[it1][it0][Rm] = VT;
-			pthread_rwlock_unlock(&this->rwlock_Vw);
-		}
-		return V_read;
-	}
-	else if(!V_read && VT_read)
-	{
-		const Tensor<Tdata> V = VT_read.transpose();
-		if(flag_writable)
-		{		
-			pthread_rwlock_wrlock(&this->rwlock_Vw);
-			this->Vws[it0][it1][R] = V;
-			pthread_rwlock_unlock(&this->rwlock_Vw);
-		}
-		return V;
-	}
-	else
-	{
-		const Tensor<Tdata> V = this->m_abfs_abfs.cal_overlap_matrix<Tdata>(
-			it0, it1, {0,0,0}, R,
-			this->index_abfs, this->index_abfs,
-			Matrix_Orbs11::Matrix_Order::AB);
-		if(flag_writable)
-		{
-			const Tensor<Tdata> VT = V.transpose();
-			pthread_rwlock_wrlock(&this->rwlock_Vw);
-			this->Vws[it0][it1][R] = V;
-			this->Vws[it1][it0][Rm] = VT;
-			pthread_rwlock_unlock(&this->rwlock_Vw);
-		}
-		return V;
-	}
+	const auto cal_overlap_matrix = std::bind(
+		&Matrix_Orbs11::cal_overlap_matrix<Tdata>,
+		&this->m_abfs_abfs,
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7);
+	return this->DPcal_o11(it0, it1, R, flag_writable, this->rwlock_Vw, this->Vws, cal_overlap_matrix);
 }
 
+template<typename Tdata>
+std::array<Tensor<Tdata>, 3>
+LRI_CV<Tdata>::DPcal_dV(
+	const int it0,
+	const int it1,
+	const Abfs::Vector3_Order<double> &R,
+	const bool flag_writable)
+{
+	const auto cal_grad_overlap_matrix = std::bind(
+		&Matrix_Orbs11::cal_grad_overlap_matrix<Tdata>,
+		&this->m_abfs_abfs,
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7);
+	return this->DPcal_o11(it0, it1, R, flag_writable, this->rwlock_dVw, this->dVws, cal_grad_overlap_matrix);
+}
 
 
 template<typename Tdata>
@@ -229,14 +252,12 @@ LRI_CV<Tdata>::DPcal_C(
 
 	const Abfs::Vector3_Order<double> Rm = -R;
 	pthread_rwlock_rdlock(&this->rwlock_Cw);
-	const std::array<Tensor<Tdata>, 2>
-		C_read = {Global_Func::find(this->Cws, it0, it1, R),
-		          Global_Func::find(this->Cws, it1, it0, Rm)};
+	const Tensor<Tdata> C_read = Global_Func::find(this->Cws, it0, it1, R);
 	pthread_rwlock_unlock(&this->rwlock_Cw);
 
-	if(C_read[0])
+	if(C_read)
 	{
-		return C_read[0];
+		return C_read;
 	}
 	else
 	{
@@ -293,7 +314,7 @@ LRI_CV<Tdata>::DPcal_C(
 			}
 			return C[0];
 		}
-	} // end if(!C_read[0])
+	} // end if(!C_read)
 }
 
 
@@ -317,6 +338,33 @@ LRI_CV<Tdata>::cal_I( const std::vector<std::vector<Tensor<Tdata>>> &ms )
 	I.input(ms);
 	I.cal_inverse( Inverse_Matrix<Tdata>::Method::potrf );
 	return I.output({ms[0][0].shape[0], ms[1][0].shape[0]}, {ms[0][0].shape[1], ms[0][1].shape[1]});
+}
+
+
+
+template<typename Tdata>
+Tensor<Tdata> LRI_CV<Tdata>::transform(const Tensor<Tdata> &V) const
+{
+	return V.transpose();
+}
+template<typename Tdata>
+std::array<Tensor<Tdata>,3> LRI_CV<Tdata>::transform(const std::array<Tensor<Tdata>,3> &dV) const
+{
+	return std::array<Tensor<Tdata>,3>{-dV[0].transpose(), -dV[1].transpose(), -dV[2].transpose()};
+}
+
+template<typename Tdata>
+bool LRI_CV<Tdata>::exist(const Tensor<Tdata> &V) const
+{
+	return V;
+}
+template<typename Tdata>
+bool LRI_CV<Tdata>::exist(const std::array<Tensor<Tdata>,3> &dV) const
+{
+	for(size_t i=0; i<3; ++i)
+		if(dV[i])
+			return true;
+	return false;
 }
 
 #endif

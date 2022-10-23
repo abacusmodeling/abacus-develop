@@ -63,8 +63,10 @@ private:
 
 	std::map<int,std::map<int,std::map<Abfs::Vector3_Order<double>,Tensor<Tdata>>>> Vws;
 	std::map<int,std::map<int,std::map<Abfs::Vector3_Order<double>,Tensor<Tdata>>>> Cws;
+	std::map<int,std::map<int,std::map<Abfs::Vector3_Order<double>,std::array<Tensor<Tdata>,3>>>> dVws;
 	pthread_rwlock_t rwlock_Vw;
 	pthread_rwlock_t rwlock_Cw;
+	pthread_rwlock_t rwlock_dVw;
 
 	Matrix_Orbs11 m_abfs_abfs;
 	Matrix_Orbs21 m_abfslcaos_lcaos;
@@ -82,7 +84,7 @@ private:
 		const bool flag_writable,
 		const T_func_DPcal_data &func_DPcal_data);
 
-	Tensor<Tdata>
+	inline Tensor<Tdata>
 	DPcal_V(
 		const int it0,
 		const int it1,
@@ -94,12 +96,31 @@ private:
 		const int it1,
 		const Abfs::Vector3_Order<double> &R,
 		const bool flag_writable);	
+	inline std::array<Tensor<Tdata>,3>
+	DPcal_dV(
+		const int it0,
+		const int it1,
+		const Abfs::Vector3_Order<double> &R,
+		const bool flag_writable);
 
-	Tensor<Tdata>
-	cal_I( const Tensor<Tdata> &m );	
-	std::vector<std::vector<Tensor<Tdata>>>
-	cal_I( const std::vector<std::vector<Tensor<Tdata>>> &ms );	
+	template<typename To11, typename Tfunc>
+	To11 DPcal_o11(
+		const int it0,
+		const int it1,
+		const Abfs::Vector3_Order<double> &R,
+		const bool flag_writable,
+		pthread_rwlock_t &rwlock_o11,
+		std::map<int,std::map<int,std::map<Abfs::Vector3_Order<double>,To11>>> &o11_ws,
+		const Tfunc &func_cal_o11);
 
+	Tensor<Tdata>                           cal_I( const Tensor<Tdata>                           &m  );	
+	std::vector<std::vector<Tensor<Tdata>>>	cal_I( const std::vector<std::vector<Tensor<Tdata>>> &ms );	
+
+	inline Tensor<Tdata>               transform(const Tensor<Tdata>               &V ) const;
+	inline std::array<Tensor<Tdata>,3> transform(const std::array<Tensor<Tdata>,3> &dV) const;
+	
+	inline bool exist(const Tensor<Tdata> &V) const;
+	inline bool exist(const std::array<Tensor<Tdata>,3> &dV) const;
 };
 
 #include "LRI_CV.hpp"
