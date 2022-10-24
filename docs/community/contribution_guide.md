@@ -2,7 +2,7 @@
 
 ## Contribution Process
 
-We are welcoming open source contributions from the community. The technical guide is provided in [Contributing to ABACUS](../CONTRIBUTING.md). Here is the basic contribution process:
+We welcome contributions from the open source community. The technical guide is provided in [Contributing to ABACUS](../CONTRIBUTING.md). Here is the basic contribution process:
 
 - **Find out issues to work on.** 
 We assume you already have a good idea on what to do, otherwise the [issue tracker](https://github.com/deepmodeling/abacus-develop/issues) and [discussion](https://github.com/deepmodeling/abacus-develop/discussions) panel provide good starting points to find out what to work on and to get familiar with the project. 
