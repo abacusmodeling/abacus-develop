@@ -316,6 +316,9 @@ IF (BUILD_TESTING)
   endfunction(AddTest)
 endif()
 
+include_directories(${LIBRI_INCLUDE_DIR})
+include_directories(${LIBCOMM_INCLUDE_DIR})
+
 add_subdirectory(source)
 
 target_link_libraries(${ABACUS_BIN_NAME}
@@ -344,6 +347,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     hamilt
     psi
     esolver
+    libri
 )
 
 install(PROGRAMS ${ABACUS_BIN_PATH}
