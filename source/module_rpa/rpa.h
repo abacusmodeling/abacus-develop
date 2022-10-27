@@ -22,7 +22,7 @@ class RPAExxLcao : public Exx_Lcao
      */
 
   public:
-    RPAExxLcao(const Exx_Global::Exx_Info &info_global) : Exx_Lcao(info_global)
+    RPAExxLcao(const Exx_Info::Exx_Info_Global &info_global) : Exx_Lcao(info_global)
     {
         info.pca_threshold = INPUT.exx_pca_threshold;
         info.c_threshold = INPUT.exx_c_threshold;
@@ -76,7 +76,7 @@ class DFT_RPA_interface
      */
 
   public:
-    DFT_RPA_interface(const Exx_Global::Exx_Info &info_global) : rpa_exx_lcao_(info_global)
+    DFT_RPA_interface(const Exx_Info::Exx_Info_Global &info_global) : rpa_exx_lcao_(info_global)
     {
         ;
     }

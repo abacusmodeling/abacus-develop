@@ -14,10 +14,8 @@ energy en;
 wavefunc wf;
 Hamilt hm;
 #ifdef __MPI
-#ifdef __EXX
-Exx_Global exx_global;
-Exx_Lip exx_lip(exx_global.info);
-#endif
+Exx_Info exx_info;
+Exx_Lip exx_lip(exx_info.info_lip);
 #endif
 pseudopot_cell_vnl ppcell;
 UnitCell_pseudo ucell;

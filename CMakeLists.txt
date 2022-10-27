@@ -55,7 +55,7 @@ if(ENABLE_COVERAGE)
   add_coverage(${ABACUS_BIN_NAME})
 endif()
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
   message(WARNING "GCC4 is not fully supported.")
@@ -371,6 +371,9 @@ IF (BUILD_TESTING)
   endfunction(AddTest)
 endif()
 
+include_directories(${LIBRI_INCLUDE_DIR})
+include_directories(${LIBCOMM_INCLUDE_DIR})
+
 add_subdirectory(source)
 
 target_link_libraries(${ABACUS_BIN_NAME}
@@ -393,6 +396,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     hamilt
     psi
     esolver
+    libri
 )
 
 if(ENABLE_LCAO)

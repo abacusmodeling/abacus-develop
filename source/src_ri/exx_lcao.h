@@ -11,8 +11,7 @@
 #include "exx_abfs-screen-schwarz.h"
 #include "exx_abfs-screen-cauchy.h"
 #include "../module_base/element_basis_index.h"
-#include "../module_xc/exx_global.h"
-#include "src_lcao/local_orbital_charge.h"
+#include "../module_xc/exx_info.h"
 
 #if EXX_DM==1
 #include "exx_abfs-parallel-communicate-dm.h"
@@ -30,12 +29,15 @@
 #include<limits>
 #include<omp.h>
 
+	class Local_Orbital_Charge;
+	class LCAO_Matrix;
+
 class Exx_Lcao
 {
 public:
 	struct{ std::string process; std::string thread; std::string matrix; } test_dir;	// Peize Lin test
-	Exx_Lcao( const Exx_Global::Exx_Info &info_global );				// Peize Lin test
-    virtual ~Exx_Lcao(){};
+	Exx_Lcao( const Exx_Info::Exx_Info_Global &info_global );
+	virtual ~Exx_Lcao(){};				// Peize Lin test
 public:
 	void init();
 	void cal_exx_ions(const Parallel_Orbitals &pv);
@@ -97,9 +99,9 @@ protected:
     void init_radial_table_ions( const std::set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core );
 		
 public:
-	struct Exx_Info
+	struct Exx_Info_Lcao
 	{
-		const Exx_Global::Hybrid_Type &hybrid_type;
+		const Exx_Info::Hybrid_Type &hybrid_type;
 		
 		const double &hse_omega;
 		
@@ -115,9 +117,9 @@ public:
 		
 		Exx_Lcao::Distribute_Type distribute_type;
 
-		Exx_Info( const Exx_Global::Exx_Info &info_global );
+		Exx_Info_Lcao( const Exx_Info::Exx_Info_Global &info_global );
 	};
-	Exx_Info info;
+	Exx_Info_Lcao info;
 	
 	friend class Local_Orbital_Charge;
 	friend class LCAO_Hamilt;

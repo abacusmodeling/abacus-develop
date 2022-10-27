@@ -267,7 +267,7 @@ void RPAExxLcao::exx_init()
 {
     std::cout << "rpa_exx_init!!!" << std::endl;
 #ifdef __MPI
-    if (GlobalC::exx_global.info.separate_loop)
+    if (GlobalC::exx_info.info_global.separate_loop)
     {
         Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
         Hexx_para.mixing_beta = 0;
@@ -308,16 +308,16 @@ void RPAExxLcao::exx_init()
 
     switch (info.hybrid_type)
     {
-    case Exx_Global::Hybrid_Type::HF:
+    case Exx_Info::Hybrid_Type::HF:
         abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times);
         break;
-    case Exx_Global::Hybrid_Type::No:
+    case Exx_Info::Hybrid_Type::No:
         abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times);
         break;
-    case Exx_Global::Hybrid_Type::PBE0:
+    case Exx_Info::Hybrid_Type::PBE0:
         abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times);
         break;
-    case Exx_Global::Hybrid_Type::HSE:
+    case Exx_Info::Hybrid_Type::HSE:
         abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs,
                                                     Conv_Coulomb_Pot_K::Ccp_Type::Hse,
                                                     {{"hse_omega", info.hse_omega}},

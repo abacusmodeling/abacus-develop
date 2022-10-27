@@ -25,7 +25,7 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 
-	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, GlobalC::exx_lcao.info.pca_threshold );
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, GlobalC::exx_info.info_ri.pca_threshold );
 
 ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 	
@@ -181,7 +181,7 @@ ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_jys_abfs",ms_jys_abfs);
 					if( TA==TB && IA==IB )
 					{
 						const size_t T=TA, I=IA;
-						if(GlobalC::exx_lcao.info.pca_threshold<=1)
+						if(GlobalC::exx_info.info_ri.pca_threshold<=1)
 						{
 							// < abfs | abfs >.I
 							const std::vector<std::vector<ModuleBase::matrix>> ms_abfs_abfs_I = cal_I( ms_abfs_abfs, T,I,T,I );
@@ -227,7 +227,7 @@ ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_jys_abfs",ms_jys_abfs);
 					}
 					else
 					{
-						if(GlobalC::exx_lcao.info.pca_threshold<=1)
+						if(GlobalC::exx_info.info_ri.pca_threshold<=1)
 						{
 							// < abfs | abfs >.I
 							const std::vector<std::vector<ModuleBase::matrix>> ms_abfs_abfs_I = cal_I( ms_abfs_abfs, TA,IA,TB,IB );

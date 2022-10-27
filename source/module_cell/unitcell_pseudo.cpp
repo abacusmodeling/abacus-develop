@@ -9,6 +9,14 @@
 #include "../src_parallel/parallel_common.h"
 #include "../module_base/constants.h"
 #include "../module_base/element_elec_config.h"
+#ifdef __LCAO
+#ifndef __CELL
+#ifdef __MPI 
+#include "src_pw/global.h"
+#include "src_lcao/serialization_cereal.h"
+#endif //__MPI
+#endif //__CELL
+#endif //__LCAO
 #include "module_base/element_covalent_radius.h"
 
 UnitCell_pseudo::UnitCell_pseudo()
@@ -135,10 +143,16 @@ void UnitCell_pseudo::setup_cell(
 	this->bcast_unitcell_pseudo();
 
 	// mohan add 2010-09-29
-	#ifdef __LCAO
+#ifdef __LCAO
 	orb.bcast_files(ntype, GlobalV::MY_RANK);
-	#endif
-#endif
+
+#ifndef __CELL
+#ifdef __EXX
+	ModuleBase::bcast_data_cereal( GlobalC::exx_info.info_ri.files_abfs, MPI_COMM_WORLD, 0 );		// Peize Lin add 2022.09.05
+#endif //__EXX
+#endif//__CELL
+#endif//__LCAO
+#endif//__MPI
 	
 	//========================================================
 	// Calculate unit cell volume

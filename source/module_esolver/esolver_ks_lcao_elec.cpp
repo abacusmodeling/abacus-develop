@@ -307,17 +307,21 @@ namespace ModuleESolver
         this->beforesolver(istep);
 //Peize Lin add 2016-12-03
 #ifdef __MPI
-        if(Exx_Global::Hybrid_Type::No != GlobalC::exx_global.info.hybrid_type)
+        if(Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
         {
-            if (Exx_Global::Hybrid_Type::HF == GlobalC::exx_lcao.info.hybrid_type
-                || Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type
-                || Exx_Global::Hybrid_Type::HSE == GlobalC::exx_lcao.info.hybrid_type
-                || Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_lcao.info.hybrid_type)
+            if (Exx_Info::Hybrid_Type::HF == GlobalC::exx_info.info_global.hybrid_type
+                || Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type
+                || Exx_Info::Hybrid_Type::HSE == GlobalC::exx_info.info_global.hybrid_type
+                || Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type)
             {
-                GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
+                //GlobalC::exx_lcao.cal_exx_ions(*this->LOWF.ParaV);
+				if(GlobalV::GAMMA_ONLY_LOCAL)
+					GlobalC::exx_lri_double.cal_exx_ions();
+				else
+					GlobalC::exx_lri_complex.cal_exx_ions();
             }
 
-            if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
+            if (Exx_Info::Hybrid_Type::Generate_Matrix == GlobalC::exx_info.info_global.hybrid_type)
             {
                 //program should be stopped after this judgement
                 Exx_Opt_Orb exx_opt_orb;
@@ -461,13 +465,18 @@ namespace ModuleESolver
 
     #ifdef __MPI
         // Peize Lin add 2018-08-14
-        switch (GlobalC::exx_lcao.info.hybrid_type)
+        switch (GlobalC::exx_info.info_global.hybrid_type)
         {
-        case Exx_Global::Hybrid_Type::HF:
-        case Exx_Global::Hybrid_Type::PBE0:
-        case Exx_Global::Hybrid_Type::SCAN0:
-        case Exx_Global::Hybrid_Type::HSE:
-            GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
+        case Exx_Info::Hybrid_Type::HF:
+        case Exx_Info::Hybrid_Type::PBE0:
+        case Exx_Info::Hybrid_Type::SCAN0:
+        case Exx_Info::Hybrid_Type::HSE:
+            //GlobalC::exx_lcao.cal_exx_elec_nscf(this->LOWF.ParaV[0]);
+			const std::string file_name_exx = GlobalV::global_out_dir + "HexxR_" + std::to_string(GlobalV::MY_RANK);
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+				GlobalC::exx_lri_double.read_Hexxs(file_name_exx);
+			else
+				GlobalC::exx_lri_complex.read_Hexxs(file_name_exx);			
             break;
         }
     #endif

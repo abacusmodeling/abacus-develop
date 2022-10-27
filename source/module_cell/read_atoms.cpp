@@ -143,10 +143,11 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 	// Peize Lin add 2016-09-23
 #ifndef __CELL
 #ifdef __MPI 
-	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
-	    Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
-		Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type ||
-		Exx_Global::Hybrid_Type::SCAN0  == GlobalC::exx_lcao.info.hybrid_type)
+#ifdef __EXX
+	if( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type || 
+	    Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type || 
+	    Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type ||
+		Exx_Info::Hybrid_Type::SCAN0  == GlobalC::exx_info.info_global.hybrid_type)
 	{
 		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
 		{
@@ -154,7 +155,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			{
 				std::string ofile;
 				ifa >> ofile;
-				GlobalC::exx_lcao.info.files_abfs.push_back(ofile);
+				GlobalC::exx_info.info_ri.files_abfs.push_back(ofile);
 			}
 		}
 	}
@@ -171,6 +172,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
             }
         }
     }
+#endif // __EXX
 #endif // __MPI
 #endif // __CELL
 #endif // __LCAO
