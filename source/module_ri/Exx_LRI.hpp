@@ -123,11 +123,22 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 	const std::vector<TA> list_A1 = std::move(list_As.first);
 	const std::vector<TAC> list_A2 = std::move(list_As.second[0]);
 
-	std::map<TA,std::map<TAC,Tensor<Tdata>>> Vs = this->cv.cal_Vs(list_A1, list_A2, this->info.V_threshold, true);
+	const bool flag_cal_dCV = false;			// tmp
+
+	std::map<TA,std::map<TAC,Tensor<Tdata>>> Vs = this->cv.cal_Vs(list_A1, list_A2, {{"writable_Vws",true}});
 	this->exx_lri.set_Vs(std::move(Vs), this->info.V_threshold);
 
-	std::map<TA,std::map<TAC,Tensor<Tdata>>> Cs = this->cv.cal_Cs(list_A1, list_A2, this->info.C_threshold, true);
+	if(flag_cal_dCV)
+		std::array<std::map<TA,std::map<TAC,Tensor<Tdata>>>,3> dVs = this->cv.cal_dVs(list_A1, list_A2, {{"writable_dVws",true}});
+
+	std::pair<std::map<TA,std::map<TAC,Tensor<Tdata>>>, std::array<std::map<TA,std::map<TAC,Tensor<Tdata>>>,3>>
+		Cs_dCs = this->cv.cal_Cs_dCs(list_A1, list_A2,
+			{{"cal_dC",flag_cal_dCV}, {"writable_Cws",true}, {"writable_dCws",true}, {"writable_Vws",false}, {"writable_dVws",false}});
+	std::map<TA,std::map<TAC,Tensor<Tdata>>> &Cs = std::get<0>(Cs_dCs);
 	this->exx_lri.set_Cs(std::move(Cs), this->info.C_threshold);
+
+	if(flag_cal_dCV)
+		std::array<std::map<TA,std::map<TAC,Tensor<Tdata>>>,3> &dCs = std::get<1>(Cs_dCs);
 
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_ions");
 }
