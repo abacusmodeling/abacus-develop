@@ -22,6 +22,7 @@ option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 option(INFO "Enable gathering of math library information" OFF)
 option(ENABLE_COVERAGE "Enable coverage build." OFF)
+option(ENABLE_LIBRI "Enable EXX with LibRI." OFF)
 
 if(ENABLE_LCAO)
   set(ABACUS_BIN_NAME abacus)
@@ -270,6 +271,25 @@ if(ENABLE_DEEPKS)
   add_compile_definitions(__DEEPKS)
 endif()
 
+if (ENABLE_LIBRI)
+  find_package(Git QUIET)
+  if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+    # Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if(GIT_SUBMODULE)
+      message(STATUS "Submodule update")
+      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+              RESULT_VARIABLE GIT_SUBMOD_RESULT)
+      if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+        message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+      endif()
+    endif()
+  endif()
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/LibRI/include)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/LibComm/include)
+endif()
+
 list(APPEND math_libs m)
 target_link_libraries(${ABACUS_BIN_NAME} ${math_libs})
 
@@ -370,9 +390,6 @@ IF (BUILD_TESTING)
     )
   endfunction(AddTest)
 endif()
-
-include_directories(${LIBRI_INCLUDE_DIR})
-include_directories(${LIBCOMM_INCLUDE_DIR})
 
 add_subdirectory(source)
 
