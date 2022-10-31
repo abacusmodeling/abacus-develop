@@ -2,7 +2,7 @@
 #define EXX_LCAO_H
 
 #include "abfs.h"
-#include "abfs-vector3_order.h"
+#include "module_base/abfs-vector3_order.h"
 #include "exx_abfs-matrix_orbs11.h" 
 #include "exx_abfs-matrix_orbs21.h" 
 #include "exx_abfs-dm.h"

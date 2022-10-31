@@ -7,7 +7,9 @@
 #include "../module_gint/gint_gamma.h"
 #include "../module_gint/gint_k.h"
 
+#ifdef __EXX
 #include <RI/global/Tensor.h>
+#endif
 
 class LCAO_Hamilt
 {

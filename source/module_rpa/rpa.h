@@ -1,10 +1,10 @@
 #ifndef ABACUS_RPA_H
 #define ABACUS_RPA_H
 
-#include "../input.h"
-#include "../module_base/complexmatrix.h"
-#include "../module_base/matrix.h"
-#include "../src_ri/abfs-vector3_order.h"
+#include "input.h"
+#include "module_base/complexmatrix.h"
+#include "module_base/matrix.h"
+#include "module_base/abfs-vector3_order.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_pw/global.h"
 #include "src_ri/exx_lcao.h"

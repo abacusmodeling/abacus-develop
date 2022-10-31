@@ -306,6 +306,7 @@ namespace ModuleESolver
         
         this->beforesolver(istep);
 //Peize Lin add 2016-12-03
+#ifdef __EXX
 #ifdef __MPI
         if(Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
         {
@@ -330,7 +331,8 @@ namespace ModuleESolver
                 return;
             }
         }
-#endif
+#endif // __MPI
+#endif // __EXX
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
         if(!GlobalV::test_skip_ewald)
@@ -463,7 +465,8 @@ namespace ModuleESolver
 
         time_t time_start = std::time(NULL);
 
-    #ifdef __MPI
+#ifdef __EXX
+#ifdef __MPI
         // Peize Lin add 2018-08-14
         switch (GlobalC::exx_info.info_global.hybrid_type)
         {
@@ -479,7 +482,8 @@ namespace ModuleESolver
 				GlobalC::exx_lri_complex.read_Hexxs(file_name_exx);			
             break;
         }
-    #endif
+#endif // __MPI
+#endif // __EXX
 
         // mohan add 2021-02-09
         // in ions, istep starts from 1,

@@ -21,7 +21,7 @@ void OperatorEXX<OperatorLCAO<T>>::contributeHR()
 template<>
 void OperatorEXX<OperatorLCAO<double>>::contributeHk(int ik)
 {
-#ifdef __MPI //liyuanbo 2022/2/23
+#ifdef __EXX
     // Peize Lin add 2016-12-03
     auto &exx_lri = GlobalC::exx_lri_double;
     auto &exx_info = GlobalC::exx_info;
@@ -44,7 +44,7 @@ void OperatorEXX<OperatorLCAO<double>>::contributeHk(int ik)
 template<>
 void OperatorEXX<OperatorLCAO<std::complex<double>>>::contributeHk(int ik)
 {
-#ifdef __MPI //liyuanbo 2022/2/23
+#ifdef __EXX
     // Peize Lin add 2016-12-03
     auto &exx_lri = GlobalC::exx_lri_complex;
     auto &exx_info = GlobalC::exx_info;
@@ -63,5 +63,4 @@ void OperatorEXX<OperatorLCAO<std::complex<double>>>::contributeHk(int ik)
     }
 #endif
 }
-
-}
+} // namespace hamilt

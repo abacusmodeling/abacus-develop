@@ -13,7 +13,7 @@ ModulePW::PW_Basis_K* wfcpw;
 energy en;
 wavefunc wf;
 Hamilt hm;
-#ifdef __MPI
+#ifdef __EXX
 Exx_Info exx_info;
 Exx_Lip exx_lip(exx_info.info_lip);
 #endif

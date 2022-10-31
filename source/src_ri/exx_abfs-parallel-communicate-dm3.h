@@ -2,7 +2,7 @@
 #define EXX_ABFS_PARALLEL_COMMUNICATE_DM3_H
 
 #include "exx_abfs-parallel.h"
-#include "abfs-vector3_order.h"
+#include "module_base/abfs-vector3_order.h"
 #include "../module_base/complexmatrix.h"
 #include "module_orbital/parallel_orbitals.h"
 #ifdef __MPI

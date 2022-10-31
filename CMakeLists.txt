@@ -56,7 +56,7 @@ if(ENABLE_COVERAGE)
   add_coverage(${ABACUS_BIN_NAME})
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
   message(WARNING "GCC4 is not fully supported.")
@@ -272,6 +272,7 @@ if(ENABLE_DEEPKS)
 endif()
 
 if (ENABLE_LIBRI)
+  set(CMAKE_CXX_STANDARD 14)
   find_package(Git QUIET)
   if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     # Update submodules as needed
@@ -288,6 +289,13 @@ if (ENABLE_LIBRI)
   endif()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/LibRI/include)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/LibComm/include)
+  add_compile_definitions(
+          __EXX
+          EXX_DM=3
+          EXX_H_COMM=2
+          TEST_EXX_LCAO=0
+          TEST_EXX_RADIAL=1
+  )
 endif()
 
 list(APPEND math_libs m)
@@ -336,11 +344,6 @@ add_compile_definitions(
   __FFTW3
   __SELINV
   METIS
-  __EXX
-  EXX_DM=3
-  EXX_H_COMM=2
-  TEST_EXX_LCAO=0
-  TEST_EXX_RADIAL=1
 )
 
 if(INFO)
@@ -403,7 +406,6 @@ target_link_libraries(${ABACUS_BIN_NAME}
     neighbor
     io
     relax
-    ri
     parallel
     pw
     driver
@@ -413,7 +415,6 @@ target_link_libraries(${ABACUS_BIN_NAME}
     hamilt
     psi
     esolver
-    libri
 )
 
 if(ENABLE_LCAO)
@@ -424,8 +425,14 @@ if(ENABLE_LCAO)
       mrrr
       pdiag
       genelpa
-      rpa
   )
+endif()
+
+if (ENABLE_LIBRI)
+  target_link_libraries(${ABACUS_BIN_NAME}
+          ri
+          libri
+          rpa)
 endif()
 
 if(ENABLE_COVERAGE)

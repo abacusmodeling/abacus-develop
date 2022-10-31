@@ -13,7 +13,9 @@
 #include "src_pw/occupy.h"
 #include "src_pw/symmetry_rho.h"
 #include "src_pw/threshold_elec.h"
+#ifdef __EXX
 #include "module_rpa/rpa.h"
+#endif
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -89,7 +91,7 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     this->LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, orb_con.ParaV);
     //------------------init Hamilt_lcao----------------------
 
-#ifdef __MPI
+#ifdef __EXX
     if (GlobalV::CALCULATION == "nscf")
     {
         switch (GlobalC::exx_info.info_global.hybrid_type)
@@ -293,18 +295,10 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
 
     ucell.infoNL.setupNonlocal(ucell.ntype, ucell.atoms, GlobalV::ofs_running, GlobalC::ORB);
 
-#ifdef __MPI
-    this->orb_con.set_orb_tables(GlobalV::ofs_running,
-                                 GlobalC::UOT,
-                                 GlobalC::ORB,
-                                 ucell.lat0,
-                                 GlobalV::deepks_setorb,
-                                 Exx_Abfs::Lmax,
-                                 ucell.infoNL.nprojmax,
-                                 ucell.infoNL.nproj,
-                                 ucell.infoNL.Beta);
-#else
     int Lmax = 0;
+#ifdef __EXX
+    Lmax = Exx_Abfs::Lmax;
+#endif
     this->orb_con.set_orb_tables(GlobalV::ofs_running,
                                  GlobalC::UOT,
                                  GlobalC::ORB,
@@ -314,7 +308,6 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
                                  ucell.infoNL.nprojmax,
                                  ucell.infoNL.nproj,
                                  ucell.infoNL.Beta);
-#endif
 
     if (this->orb_con.setup_2d)
         this->orb_con.setup_2d_division(GlobalV::ofs_running, GlobalV::ofs_warning);
@@ -417,7 +410,7 @@ void ESolver_KS_LCAO::eachiterinit(const int istep, const int iter)
         }
     }
 
-#ifdef __MPI
+#ifdef __EXX
     // calculate exact-exchange
     if(Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
     {
@@ -492,7 +485,7 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
         GlobalC::en.print_band(ik);
     }
 
-#ifdef __MPI
+#ifdef __EXX
     // add exx
     // Peize Lin add 2016-12-03
     GlobalC::en.set_exx();
@@ -702,11 +695,13 @@ void ESolver_KS_LCAO::afterscf(const int istep)
         }
     }
 
+#ifdef __EXX
 	const std::string file_name_exx = GlobalV::global_out_dir + "HexxR_" + std::to_string(GlobalV::MY_RANK);
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 		GlobalC::exx_lri_double.write_Hexxs(file_name_exx);
 	else
 		GlobalC::exx_lri_complex.write_Hexxs(file_name_exx);
+#endif
 
     if (GlobalC::pot.out_pot == 2)
     {
@@ -957,12 +952,14 @@ void ESolver_KS_LCAO::afterscf(const int istep)
         GlobalC::dmft.out_to_dmft(this->LOWF, *this->UHM.LM);
     }
 
+#ifdef __EXX
     if(INPUT.rpa)
     {
         ModuleRPA::DFT_RPA_interface rpa_interface(GlobalC::exx_info.info_global);
         rpa_interface.rpa_exx_lcao().info.files_abfs = GlobalV::rpa_orbitals;
         rpa_interface.out_for_RPA(*(this->LOWF.ParaV), *(this->psi), this->LOC);
     }
+#endif
     if (hsolver::HSolverLCAO::out_mat_hsR)
     {
         this->output_HS_R(istep); // LiuXh add 2019-07-15
@@ -992,7 +989,7 @@ void ESolver_KS_LCAO::afterscf(const int istep)
 
 bool ESolver_KS_LCAO::do_after_converge(int& iter)
 {
-#ifdef __MPI
+#ifdef __EXX
     if (Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
     {
         //no separate_loop case
@@ -1039,7 +1036,7 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
             return false;
         }
     }
-#endif // __MPI
+#endif // __EXX
     return true;
 }
 

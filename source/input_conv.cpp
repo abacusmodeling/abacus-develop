@@ -357,7 +357,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------
-#ifdef __MPI // liyuanbo 2022/2/23
+#ifdef __EXX
 #ifdef __LCAO
 
     if (INPUT.dft_functional == "hf")
@@ -410,8 +410,8 @@ void Input_Conv::Convert(void)
         //EXX does not support any symmetry analyse, force symmetry setting to -1
         ModuleSymmetry::Symmetry::symm_flag = -1;
     }
-#endif
-#endif
+#endif // __LCAO
+#endif // __EXX
     GlobalC::ppcell.cell_factor = INPUT.cell_factor; // LiuXh add 20180619
 
     //----------------------------------------------------------
