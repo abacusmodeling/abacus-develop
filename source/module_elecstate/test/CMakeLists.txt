@@ -16,7 +16,7 @@ if(ENABLE_LCAO)
 
   install(DIRECTORY support DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-  AddTest(
+  #[[AddTest(
     TARGET EState_psiToRho_lcao
     LIBS ${math_libs} ELPA::ELPA base orb cell neighbor planewave psi
     SOURCES elecstate_lcao_test.cpp ../elecstate_lcao.cpp ../dm2d_to_grid.cpp
@@ -42,7 +42,7 @@ if(ENABLE_LCAO)
   add_test(NAME EState_psiToRho_lcao_parallel
         COMMAND ${BASH} elecstate_lcao_parallel_test.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-      )
+      )]]
 endif()
 add_library(
   base_serial
