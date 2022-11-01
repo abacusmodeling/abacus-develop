@@ -383,6 +383,7 @@ void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> 
             {
                 if (j % 5 == 0) ofs << "\n";
                 ofs << ctot[i][j].real() << " " << ctot[i][j].imag() << " ";
+                GlobalV::ofs_running << ctot[i][j].real() << " " << ctot[i][j].imag() << " ";
             }
         }
         ofs.close();
