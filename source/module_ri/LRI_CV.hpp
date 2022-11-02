@@ -296,7 +296,7 @@ LRI_CV<Tdata>::DPcal_C_dC(
 	pthread_rwlock_unlock(&this->rwlock_dCw);
 	const bool flag_finish_dC = (!flags.at("cal_dC")) || LRI_CV_Tools::exist(dC_read);
 
-	if(C_read && flag_finish_dC)
+	if(!C_read.empty() && flag_finish_dC)
 	{
 		return std::make_pair(C_read, dC_read);
 	}

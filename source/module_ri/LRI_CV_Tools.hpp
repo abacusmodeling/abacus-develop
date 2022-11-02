@@ -46,14 +46,14 @@ std::array<Tensor<Tdata>,3> LRI_CV_Tools::transform_Rm(const std::array<Tensor<T
 template<typename Tdata>
 bool LRI_CV_Tools::exist(const Tensor<Tdata> &V)
 {
-	return V;
+	return !V.empty();
 }
 
 template<typename T, std::size_t N>
 bool LRI_CV_Tools::exist(const std::array<T,N> &dV)
 {
 	for(size_t i=0; i<3; ++i)
-		if(dV[i])
+		if(!dV[i].empty())
 			return true;
 	return false;
 }
