@@ -804,7 +804,7 @@ void Charge::rho_mpi(void)
 {
 	ModuleBase::TITLE("Charge","rho_mpi");
     if (GlobalV::NPROC==1) return;
-	if(GlobalV::CALCULATION.substr(0,3) == "sto" && GlobalV::NPROC_IN_STOGROUP==1) 
+	if(GlobalV::ESOLVER_TYPE == "sdft" && GlobalV::NPROC_IN_STOGROUP==1) 
 		return;//qinarui add it temporarily.
     ModuleBase::timer::tick("Charge","rho_mpi");
     int ir;//counters on real space mesh point.
@@ -972,7 +972,7 @@ void Charge::rho_mpi(void)
         //==================================
         // Reduce all the rho in each cpu
         //==================================
-		if(GlobalV::CALCULATION.substr(0,3) == "sto") //qinarui add it temporarily.
+		if(GlobalV::ESOLVER_TYPE == "sdft") //qinarui add it temporarily.
 		{
 			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::rhopw->nxyz,MPI_DOUBLE,MPI_SUM,STO_WORLD);
 			if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
@@ -1143,7 +1143,7 @@ void Charge::cal_nelec(void)
 	}
 
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"occupied bands",occupied_bands);
-	if ( GlobalV::CALCULATION.substr(0,3) != "sto" ) //qianrui 2021-2-20
+	if ( GlobalV::ESOLVER_TYPE != "sdft" ) //qianrui 2021-2-20
 	{
 	// mohan add 2010-09-04
     //std::cout << "nbands(GlobalC::ucell) = " <<GlobalV::NBANDS <<std::endl;
