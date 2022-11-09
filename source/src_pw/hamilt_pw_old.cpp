@@ -1,3 +1,6 @@
+//obsolete code, not compiled
+//please remove the globalc::hm
+
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../src_parallel/parallel_reduce.h"
@@ -178,7 +181,8 @@ void Hamilt_PW::diagH_subspace(
 	}
 
 	// after generation of H and S matrix, diag them
-    GlobalC::hm.diagH_LAPACK(nstart, n_band, hc, sc, nstart, en, hvec);
+	//obsolete: globalc::hm has been removed
+    //GlobalC::hm.diagH_LAPACK(nstart, n_band, hc, sc, nstart, en, hvec);
 
 
 	// Peize Lin add 2019-03-09

@@ -83,7 +83,8 @@ namespace ModuleESolver
         // init hamiltonian
         // only allocate in the beginning of ELEC LOOP!
         //=====================
-        GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::rhopw->nrxx);
+        //not used anymore
+        //GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::rhopw->nrxx);
 
         //=================================
         // initalize local pseudopotential
@@ -647,6 +648,10 @@ namespace ModuleESolver
             //std::cout << "\n Output Spillage Information : " << std::endl;
             // calculate spillage value.
 #ifdef __LCAO
+//We are not goint to support lcao_in_paw until
+//the obsolete GlobalC::hm is replaced by the 
+//refactored moeules (psi, hamilt, etc.)
+/*
             if ( winput::out_spillage == 3)
             {
                 GlobalV::BASIS_TYPE="pw"; 
@@ -668,6 +673,7 @@ namespace ModuleESolver
                 //Spillage sp;
                 //sp.get_both(GlobalV::NBANDS, GlobalV::NLOCAL, GlobalC::wf.wanf2, GlobalC::wf.evc);
             }
+*/
 #endif
 
             // output overlap
