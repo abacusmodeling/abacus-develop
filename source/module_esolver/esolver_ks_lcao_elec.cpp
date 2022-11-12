@@ -87,14 +87,13 @@ namespace ModuleESolver
         // 1. prepare HS matrices, prepare grid integral
         this->set_matrix_grid(this->RA);
 
-        // 2. density matrix extrapolation and prepare S,T,VNL matrices 
+        // 2. density matrix extrapolation 
 
         // set the augmented orbitals index.
         // after ParaO and GridT, 
         // this information is used to calculate
         // the force.
 
-        // init psi
         // init psi
         if (GlobalV::GAMMA_ONLY_LOCAL)
         {
@@ -130,6 +129,37 @@ namespace ModuleESolver
                 this->psi = new psi::Psi<std::complex<double>>(GlobalC::kv.nks, ncol, this->LOWF.ParaV->nrow, nullptr);
             }
         }
+
+        // init Hamiltonian
+        if (this->p_hamilt != nullptr)
+        {
+            delete this->p_hamilt;
+            this->p_hamilt = nullptr;
+        }
+        if(this->p_hamilt == nullptr)
+        {
+            // two cases for hamilt class
+            // Gamma_only case
+            if (GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                this->p_hamilt = new hamilt::HamiltLCAO<double>(&(this->UHM.GG),
+                                                            &(this->UHM.genH),
+                                                            &(this->LM),
+                                                            &(this->LOC));
+            }
+            // multi_k case
+            else
+            {
+                this->p_hamilt = new hamilt::HamiltLCAO<std::complex<double>>(&(this->UHM.GK),
+                                                                        &(this->UHM.genH),
+                                                                        &(this->LM),
+                                                                        &(this->LOC));
+            }
+        }
+
+        // prepare grid in Gint
+        this->UHM.grid_prepare();
+
         // init density kernel and wave functions.
         this->LOC.allocate_dm_wfc(GlobalC::GridT.lgd, this->LOWF, this->psid, this->psi);
 
@@ -191,10 +221,6 @@ namespace ModuleESolver
             // initialize the potential
             GlobalC::pot.init_pot(istep - 1, GlobalC::sf.strucFac);
         }
-
-
-        // 3. compute S, T, Vnl, Vna matrix.
-        this->UHM.set_lcao_matrices();
 
 #ifdef __DEEPKS
         //for each ionic step, the overlap <psi|alpha> must be rebuilt
@@ -280,6 +306,7 @@ namespace ModuleESolver
         
         this->beforesolver(istep);
 //Peize Lin add 2016-12-03
+#ifdef __EXX
 #ifdef __MPI
         if(Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
         {
@@ -304,7 +331,8 @@ namespace ModuleESolver
                 return;
             }
         }
-#endif
+#endif // __MPI
+#endif // __EXX
         // 1. calculate ewald energy.
         // mohan update 2021-02-25
         if(!GlobalV::test_skip_ewald)
@@ -320,7 +348,7 @@ namespace ModuleESolver
             srho.begin(is, GlobalC::CHR, GlobalC::rhopw, GlobalC::Pgrid, GlobalC::symm);
         }
 
-        phami->non_first_scf = istep;
+        p_hamilt->non_first_scf = istep;
 
         // for exx two_level scf
         this->two_level_step = 0;
@@ -437,7 +465,8 @@ namespace ModuleESolver
 
         time_t time_start = std::time(NULL);
 
-    #ifdef __MPI
+#ifdef __EXX
+#ifdef __MPI
         // Peize Lin add 2018-08-14
         switch (GlobalC::exx_info.info_global.hybrid_type)
         {
@@ -453,7 +482,8 @@ namespace ModuleESolver
 				GlobalC::exx_lri_complex.read_Hexxs(file_name_exx);			
             break;
         }
-    #endif
+#endif // __MPI
+#endif // __EXX
 
         // mohan add 2021-02-09
         // in ions, istep starts from 1,
@@ -464,11 +494,11 @@ namespace ModuleESolver
         {
             if(this->psi != nullptr)
             {
-                this->phsol->solve(this->phami, this->psi[0], this->pelec, GlobalV::KS_SOLVER, true);
+                this->phsol->solve(this->p_hamilt, this->psi[0], this->pelec, GlobalV::KS_SOLVER, true);
             }
             else if(this->psid != nullptr)
             {
-                this->phsol->solve(this->phami, this->psid[0], this->pelec, GlobalV::KS_SOLVER, true);
+                this->phsol->solve(this->p_hamilt, this->psid[0], this->pelec, GlobalV::KS_SOLVER, true);
             }
             for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
             {

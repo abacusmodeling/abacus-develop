@@ -1,5 +1,4 @@
 #include "input_conv.h"
-
 #include "input.h"
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
@@ -156,9 +155,10 @@ void Input_Conv::Convert(void)
     GlobalC::wf.init_wfc = INPUT.init_wfc;
     GlobalC::wf.mem_saver = INPUT.mem_saver; // mohan add 2010-09-07
     GlobalC::en.printe = INPUT.printe; // mohan add 2011-03-16
-
+#ifdef __LCAO
     if (INPUT.dft_plus_u)
     {
+        GlobalV::dft_plus_u = INPUT.dft_plus_u;
         GlobalC::dftu.dftu_type = INPUT.dftu_type;
         GlobalC::dftu.double_counting = INPUT.double_counting;
         GlobalC::dftu.Yukawa = INPUT.yukawa_potential;
@@ -170,6 +170,7 @@ void Input_Conv::Convert(void)
             GlobalC::dftu.J = INPUT.hund_j; // Hund exchange parameter J(ev)
         }
     }
+#endif
     /*
 #ifndef __CMD
     GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
@@ -356,7 +357,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------
-#ifdef __MPI // liyuanbo 2022/2/23
+#ifdef __EXX
 #ifdef __LCAO
 
     if (INPUT.dft_functional == "hf")
@@ -393,14 +394,6 @@ void Input_Conv::Convert(void)
         GlobalC::exx_info.info_global.separate_loop = INPUT.exx_separate_loop;
         GlobalC::exx_info.info_global.hybrid_step = INPUT.exx_hybrid_step;
         GlobalC::exx_info.info_lip.lambda = INPUT.exx_lambda;
-        GlobalC::exx_lcao.info.pca_threshold = INPUT.exx_pca_threshold;
-        GlobalC::exx_lcao.info.c_threshold = INPUT.exx_c_threshold;
-        GlobalC::exx_lcao.info.v_threshold = INPUT.exx_v_threshold;
-        GlobalC::exx_lcao.info.dm_threshold = INPUT.exx_dm_threshold;
-        GlobalC::exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold;
-        GlobalC::exx_lcao.info.cauchy_threshold = INPUT.exx_cauchy_threshold;
-        GlobalC::exx_lcao.info.ccp_threshold = INPUT.exx_ccp_threshold;
-        GlobalC::exx_lcao.info.ccp_rmesh_times = INPUT.exx_ccp_rmesh_times;
 
         GlobalC::exx_info.info_ri.pca_threshold = INPUT.exx_pca_threshold;
         GlobalC::exx_info.info_ri.C_threshold = INPUT.exx_c_threshold;
@@ -410,22 +403,6 @@ void Input_Conv::Convert(void)
         GlobalC::exx_info.info_ri.ccp_threshold = INPUT.exx_ccp_threshold;
         GlobalC::exx_info.info_ri.ccp_rmesh_times = INPUT.exx_ccp_rmesh_times;
 
-        if (INPUT.exx_distribute_type == "htime")
-        {
-            GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
-        }
-        else if (INPUT.exx_distribute_type == "kmeans2")
-        {
-            GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans2;
-        }
-        else if (INPUT.exx_distribute_type == "kmeans1")
-        {
-            GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans1;
-        }
-        else if (INPUT.exx_distribute_type == "order")
-        {
-            GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
-        }
         Exx_Abfs::Jle::Lmax = INPUT.exx_opt_orb_lmax;
         Exx_Abfs::Jle::Ecut_exx = INPUT.exx_opt_orb_ecut;
         Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
@@ -433,8 +410,8 @@ void Input_Conv::Convert(void)
         //EXX does not support any symmetry analyse, force symmetry setting to -1
         ModuleSymmetry::Symmetry::symm_flag = -1;
     }
-#endif
-#endif
+#endif // __LCAO
+#endif // __EXX
     GlobalC::ppcell.cell_factor = INPUT.cell_factor; // LiuXh add 20180619
 
     //----------------------------------------------------------
@@ -467,7 +444,7 @@ void Input_Conv::Convert(void)
     //----------------------------------------------------------
     GlobalV::OUT_FREQ_ELEC = INPUT.out_freq_elec;
     GlobalV::OUT_FREQ_ION = INPUT.out_freq_ion;
-    GlobalC::pot.init_chg = INPUT.init_chg;
+    GlobalC::CHR.init_chg = INPUT.init_chg;
     GlobalC::pot.chg_extrap = INPUT.chg_extrap; // xiaohui modify 2015-02-01
     GlobalC::CHR.out_chg = INPUT.out_chg;
     GlobalC::CHR.nelec = INPUT.nelec;
@@ -541,6 +518,25 @@ void Input_Conv::Convert(void)
     GlobalV::sigma_k = INPUT.sigma_k;
     GlobalV::nc_k = INPUT.nc_k;
 
+    //-----------------------------------------------
+    // sunliang add for ofdft 2022-05-11
+    //-----------------------------------------------
+    GlobalV::of_kinetic = INPUT.of_kinetic;
+    GlobalV::of_method = INPUT.of_method;
+    GlobalV::of_conv = INPUT.of_conv;
+    GlobalV::of_tole = INPUT.of_tole;
+    GlobalV::of_tolp = INPUT.of_tolp;
+    GlobalV::of_tf_weight = INPUT.of_tf_weight;
+    GlobalV::of_vw_weight = INPUT.of_vw_weight;
+    GlobalV::of_wt_alpha = INPUT.of_wt_alpha;
+    GlobalV::of_wt_beta = INPUT.of_wt_beta;
+    GlobalV::of_wt_rho0 = INPUT.of_wt_rho0;
+    GlobalV::of_hold_rho0 = INPUT.of_hold_rho0;
+    GlobalV::of_full_pw = INPUT.of_full_pw;
+    GlobalV::of_full_pw_dim = INPUT.of_full_pw_dim;
+    GlobalV::of_read_kernel = INPUT.of_read_kernel;
+    GlobalV::of_kernel_file = INPUT.of_kernel_file;
+    
     ModuleBase::timer::tick("Input_Conv", "Convert");
     return;
 }

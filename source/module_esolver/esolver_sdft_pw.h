@@ -12,7 +12,7 @@ public:
     ESolver_SDFT_PW();
     ~ESolver_SDFT_PW();
     void Init(Input &inp, UnitCell_pseudo &cell) override;
-    void cal_Energy(energy& en) override;
+    void cal_Energy(double& etot) override;
     void cal_Force(ModuleBase::matrix& force) override;
     void cal_Stress(ModuleBase::matrix& stress) override;
 public:
@@ -24,7 +24,7 @@ protected:
     // virtual void eachiterinit(int iter) override; 
     virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
     virtual void eachiterfinish(const int iter) override; 
-    virtual void afterscf() override;
+    virtual void afterscf(const int istep) override;
     virtual void postprocess() override;
 
 public:

@@ -139,7 +139,6 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 		std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3> &dCs = std::get<1>(Cs_dCs);
 		this->exx_lri.set_dCs(std::move(dCs), this->info.C_threshold);
 	}
-
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_ions");
 }
 
@@ -170,12 +169,13 @@ void Exx_LRI<Tdata>::cal_exx_elec(const Local_Orbital_Charge &loc, const Paralle
 			this->exx_lri.set_Ds(std::move(Ds[is]), this->info.dm_threshold, std::to_string(is));
 			this->exx_lri.cal_Hs({"","",std::to_string(is)});
 		}
-		this->Hexxs[is] = RI::Communicate_Tensors_Map_Judge::comm_map2_first(this->mpi_comm, std::move(this->exx_lri.Hs), std::get<0>(judge[is]), std::get<1>(judge[is]));
+		this->Hexxs[is] = RI::Communicate_Tensors_Map_Judge::comm_map2_first(
+			this->mpi_comm, std::move(this->exx_lri.Hs), std::get<0>(judge[is]), std::get<1>(judge[is]));
 		this->Eexx += this->exx_lri.energy;
 		post_process_Hexx(this->Hexxs[is]);
 	}
 	this->Eexx = post_process_Eexx(this->Eexx);
-	ModuleBase::timer::tick("Exx_LRI", "cal_exx_elec");
+	ModuleBase::timer::tick("Exx_LRI", "cal_exx_elec");	
 }
 
 template<typename Tdata>

@@ -60,10 +60,10 @@ namespace ModuleESolver
             this->pelec = nullptr;
         }
         //delete Hamilt
-        if(this->phami != nullptr)
+        if(this->p_hamilt != nullptr)
         {
-            delete (hamilt::HamiltPW*)this->phami;
-            this->phami = nullptr;
+            delete (hamilt::HamiltPW*)this->p_hamilt;
+            this->p_hamilt = nullptr;
         }
     }
 
@@ -129,9 +129,6 @@ namespace ModuleESolver
     {
         ESolver_KS::Init(inp,ucell);
 
-        //temporary
-        this->Init_GlobalC(inp,ucell);
-
         //init ElecState,
         if(this->pelec == nullptr)
         {
@@ -142,6 +139,16 @@ namespace ModuleESolver
         {
             this->phsol = new hsolver::HSolverPW(GlobalC::wfcpw);
         }
+
+        // Inititlize the charge density.
+        this->pelec->charge->allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
+        //GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
+        // Initializee the potential.
+        GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
+        
+        //temporary
+        this->Init_GlobalC(inp,ucell);
     }
 
     void ESolver_KS_PW::beforescf(int istep)
@@ -176,15 +183,15 @@ namespace ModuleESolver
         //init Hamilt, this should be allocated before each scf loop
         //Operators in HamiltPW should be reallocated once cell changed
         //delete Hamilt if not first scf
-        if(this->phami != nullptr)
+        if(this->p_hamilt != nullptr)
         {
-            delete (hamilt::HamiltPW*)this->phami;
-            this->phami = nullptr;
+            delete (hamilt::HamiltPW*)this->p_hamilt;
+            this->p_hamilt = nullptr;
         }
         //allocate HamiltPW
-        if(this->phami == nullptr)
+        if(this->p_hamilt == nullptr)
         {
-            this->phami = new hamilt::HamiltPW();
+            this->p_hamilt = new hamilt::HamiltPW();
         }
 
         //----------------------------------------------------------
@@ -299,16 +306,16 @@ namespace ModuleESolver
             // be careful that istep start from 0 and iter start from 1
             if((istep==0||istep==1)&&iter==1) 
             {
-                hsolver::DiagoIterAssist::need_subspace = false;
+                hsolver::DiagoIterAssist<double>::need_subspace = false;
             }
             else 
             {
-                hsolver::DiagoIterAssist::need_subspace = true;
+                hsolver::DiagoIterAssist<double>::need_subspace = true;
             }
 
-            hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
-            hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
-            this->phsol->solve(this->phami, this->psi[0], this->pelec, GlobalV::KS_SOLVER);
+            hsolver::DiagoIterAssist<double>::PW_DIAG_THR = ethr; 
+            hsolver::DiagoIterAssist<double>::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
+            this->phsol->solve(this->p_hamilt, this->psi[0], this->pelec, GlobalV::KS_SOLVER);
 
             // transform energy for print
             GlobalC::en.eband = this->pelec->eband;
@@ -322,7 +329,7 @@ namespace ModuleESolver
 
     // add exx
 #ifdef __LCAO
-#ifdef __MPI
+#ifdef __EXX
         GlobalC::en.set_exx();		// Peize Lin add 2019-03-09
 #endif
 #endif
@@ -425,7 +432,7 @@ namespace ModuleESolver
     }
 
 
-    void ESolver_KS_PW::afterscf()
+    void ESolver_KS_PW::afterscf(const int istep)
     {
         for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
         {
@@ -604,9 +611,9 @@ namespace ModuleESolver
 
 
 
-    void ESolver_KS_PW::cal_Energy(energy& en)
+    void ESolver_KS_PW::cal_Energy(double& etot)
     {
-
+        etot = GlobalC::en.etot;
     }
 
     void ESolver_KS_PW::cal_Force(ModuleBase::matrix& force)
@@ -696,9 +703,9 @@ namespace ModuleESolver
     {
         if(this->phsol != nullptr)
         {
-            hsolver::DiagoIterAssist::need_subspace = false;
-            hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
-            this->phsol->solve(this->phami, this->psi[0], this->pelec, GlobalV::KS_SOLVER, true);
+            hsolver::DiagoIterAssist<double>::need_subspace = false;
+            hsolver::DiagoIterAssist<double>::PW_DIAG_THR = ethr; 
+            this->phsol->solve(this->p_hamilt, this->psi[0], this->pelec, GlobalV::KS_SOLVER, true);
         }
         else
         {

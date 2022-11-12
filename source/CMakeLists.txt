@@ -21,6 +21,8 @@ add_subdirectory(src_parallel)
 add_subdirectory(src_pdiag)
 add_subdirectory(src_pw)
 add_subdirectory(src_ri)
+add_subdirectory(module_rpa)
+add_subdirectory(module_ri)
 
 add_library(
     driver
@@ -31,3 +33,7 @@ add_library(
     input_conv.cpp
     input_update.cpp
 )
+
+if(ENABLE_COVERAGE)
+  add_coverage(driver)
+endif()

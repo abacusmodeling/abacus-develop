@@ -1,21 +1,9 @@
 #include "MD_func.h"
-#include "cmd_neighbor.h"
-#include "LJ_potential.h"
-#include "DP_potential.h"
 #include "../input.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/timer.h"
-
-#ifndef __CMD
-#include "../src_pw/run_md_pw.h"
-#endif
-
-#ifdef __LCAO
-#include "../src_lcao/run_md_lcao.h"
-Parallel_Orbitals* MD_func::ParaV = nullptr;
-#endif
 
 
 double MD_func::gaussrand()
@@ -140,51 +128,54 @@ void MD_func::RandomVel(
 	const ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
-	if(!GlobalV::MY_RANK)
-	{
-		ModuleBase::Vector3<double> average;
-		ModuleBase::Vector3<double> mass;
-		average.set(0,0,0);
-		mass.set(0,0,0);
-		for(int i=0; i<numIon; i++)
-		{
-			for(int k=0; k<3; ++k)
-			{
-				if(ionmbl[i][k]==0)
-				{
-					vel[i][k] = 0;
-				}
-				else
-				{
-					vel[i][k] = rand()/double(RAND_MAX)-0.5;
-					mass[k] += allmass[i];
-				}
-			}
-			average += allmass[i]*vel[i];
-		}
+    if(!GlobalV::MY_RANK)
+    {
+        double tot_mass = 0;
+        ModuleBase::Vector3<double> tot_momentum;
+        for(int i=0; i<numIon; i++)
+        {
+            tot_mass += allmass[i];
+            double sigma = sqrt(temperature / allmass[i]);
+            for(int k=0; k<3; ++k)
+            {
+                if(ionmbl[i][k]==0)
+                {
+                    vel[i][k] = 0;
+                }
+                else
+                {
+                    vel[i][k] = gaussrand() * sigma;
+                }
 
-		for(int i=0; i<numIon; i++)
-    	{
-			for(int k=0; k<3; ++k)
-			{
-				if(ionmbl[i][k] && frozen[k]==0)
-				{
-					vel[i][k] -= average[k] / mass[k];
-				}
-			}
-		}
-	
-		double factor = 0.5*(3*numIon-frozen_freedom)*temperature/GetAtomKE(numIon, vel, allmass);
-		for(int i=0; i<numIon; i++)
-    	{
-        	vel[i] = vel[i]*sqrt(factor);
-    	}
-	}
+                if(frozen[k] == 0)
+                {
+                    tot_momentum[k] += allmass[i] * vel[i][k];
+                }
+            }
+        }
+
+        for(int k=0; k<3; ++k)
+        {
+            if(frozen[k] == 0)
+            {
+                for(int i=0; i<numIon; i++)
+                {
+                    vel[i][k] -= tot_momentum[k] / tot_mass;
+                }
+            }
+        }
+
+        double factor = 0.5*(3*numIon-frozen_freedom)*temperature/GetAtomKE(numIon, vel, allmass);
+        for(int i=0; i<numIon; i++)
+        {
+            vel[i] = vel[i]*sqrt(factor);
+        }
+    }
 
 #ifdef __MPI
-	MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
-	return;
+    return;
 }
 
 void MD_func::InitVel(
@@ -210,6 +201,7 @@ void MD_func::InitVel(
     {
         RandomVel(unit_in.nat, temperature, allmass, frozen_freedom, frozen, ionmbl, vel);
     }
+	std::cout << "--------------------------------- INITVEL DONE ------------------------------------" << std::endl;
 }
 
 void MD_func::InitPos(
@@ -232,7 +224,7 @@ void MD_func::force_virial(
 		ModuleESolver::ESolver *p_esolver,
 		const int &istep,
 		const MD_parameters &mdp,
-		const UnitCell_pseudo &unit_in,
+		UnitCell_pseudo &unit_in,
 		double &potential,
 		ModuleBase::Vector3<double> *force,
 		ModuleBase::matrix &stress)
@@ -240,65 +232,34 @@ void MD_func::force_virial(
 	ModuleBase::TITLE("MD_func", "force_stress");
     ModuleBase::timer::tick("MD_func", "force_stress");
 
-	if(mdp.md_ensolver == "LJ")
-	{
-		bool which_method = unit_in.judge_big_cell();
-		if(which_method)
-		{
-			CMD_neighbor cmd_neigh;
-			cmd_neigh.neighbor(unit_in);
+    p_esolver->Run(istep, unit_in);
 
-			potential = LJ_potential::Lennard_Jones(
-								unit_in,
-								cmd_neigh,
-								force,
-								stress);
-		}
-		else
-		{
-			Grid_Driver grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
-			atom_arrange::search(
-					GlobalV::SEARCH_PBC,
-					GlobalV::ofs_running,
-					grid_neigh,
-					unit_in, 
-					GlobalV::SEARCH_RADIUS, 
-					GlobalV::test_atom_input);
+    p_esolver->cal_Energy(potential);
 
-			potential = LJ_potential::Lennard_Jones(
-								unit_in,
-								grid_neigh,
-								force,
-								stress);
-		}
-	}
-	else if(mdp.md_ensolver == "DP")
-	{
-		DP_potential::DP_pot(unit_in, potential, force, stress);
-	}
-#ifndef __CMD
-	else if(mdp.md_ensolver == "FP")
-	{
-		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
-		{
-			Run_MD_PW md_pw;
-			md_pw.md_force_virial(p_esolver, istep, unit_in.nat, potential, force, stress);
-		}
-#ifdef __LCAO
-		else if(GlobalV::BASIS_TYPE=="lcao")
-		{
-			Run_MD_LCAO md_lcao;
-			md_lcao.md_force_virial(p_esolver,istep, unit_in.nat, potential, force, stress);
-		}
-#endif
-	}
-#endif
-	else
-	{
-		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential !");
-	}
+    ModuleBase::matrix force_temp(unit_in.nat, 3); 
+    p_esolver->cal_Force(force_temp);
 
-	ModuleBase::timer::tick("MD_func", "force_stress");
+    if(GlobalV::CAL_STRESS)
+    {
+        p_esolver->cal_Stress(stress);
+    }
+
+    if(mdp.md_ensolver == "FP")
+    {
+        potential *= 0.5;
+        force_temp *= 0.5;
+        stress *= 0.5;
+    }
+
+    for(int i=0; i<unit_in.nat; ++i)
+    {
+        for(int j=0; j<3; ++j)
+        {
+            force[i][j] = force_temp(i, j);
+        }
+    }
+
+    ModuleBase::timer::tick("MD_func", "force_stress");
 }
 
 void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matrix &stress)
@@ -415,4 +376,38 @@ void MD_func::getMassMbl(const UnitCell_pseudo &unit_in,
 			ion++;
 		}
 	}
+}
+
+void MD_func::print(const std::string& name, const ModuleBase::matrix& f, const UnitCell_pseudo &unit_in)
+{
+    ModuleBase::GlobalFunc::NEW_PART(name);
+
+    GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y"
+                         << std::setw(15) << "z" << std::endl;
+    GlobalV::ofs_running << std::setiosflags(ios::showpos);
+    GlobalV::ofs_running << std::setprecision(8);
+
+    const double fac = ModuleBase::Hartree_to_eV / 0.529177;
+
+    int iat = 0;
+    for (int it = 0; it < unit_in.ntype; it++)
+    {
+        for (int ia = 0; ia < unit_in.atoms[it].na; ia++)
+        {
+            std::stringstream ss;
+            ss << unit_in.atoms[it].label << ia + 1;
+
+            GlobalV::ofs_running << " " << std::setw(8) << ss.str();
+            GlobalV::ofs_running << std::setw(15) << f(iat, 0) * fac;
+            GlobalV::ofs_running << std::setw(15) << f(iat, 1) * fac;
+            GlobalV::ofs_running << std::setw(15) << f(iat, 2) * fac;
+            GlobalV::ofs_running << std::endl;
+
+            iat++;
+        }
+    }
+
+    GlobalV::ofs_running << std::resetiosflags(ios::showpos);
+    std::cout << std::resetiosflags(ios::showpos);
+    return;
 }

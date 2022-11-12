@@ -37,6 +37,7 @@ class Input
     std::string calculation; // "scf" : self consistent calculation.
                              // "nscf" : non-self consistent calculation.
                              // "relax" : cell relaxations
+                             // "ofdft" : orbital free dft calculations.
     double pseudo_rcut; // cut-off radius for calculating msh
     bool pseudo_mesh; // 0: use msh to normalize radial wave functions;  1: use mesh, which is used in QE.
     int ntype; // number of atom types
@@ -83,6 +84,7 @@ class Input
     double cond_wcut; //cutoff \omega for conductivities
     int cond_wenlarge;
     double cond_fwhm; //FWHM for conductivities 
+    bool cond_nonlocal; //if calculate nonlocal effects
 
     //==========================================================
     // electrons / spin
@@ -305,7 +307,7 @@ class Input
     std::string vdw_a2; // damping function parameter
     double vdw_d; // damping function parameter d
     bool vdw_abc; // third-order term?
-    std::string vdw_radius; // cutoff radius for std::pair interactions
+    std::string vdw_cutoff_radius; // cutoff radius for std::pair interactions
     std::string vdw_radius_unit; //"Bohr" or "Angstrom"
     double vdw_cn_thr; // cutoff radius for calculating the coordination number
     std::string vdw_cn_thr_unit; //"Bohr" or "Angstrom"
@@ -313,8 +315,8 @@ class Input
     std::string vdw_C6_unit; //"Bohr" or "Angstrom"
     std::string vdw_R0_file;
     std::string vdw_R0_unit; //"Bohr" or "Angstrom"
-    std::string vdw_model; //"period" or "radius"
-    ModuleBase::Vector3<int> vdw_period;
+    std::string vdw_cutoff_type; //"period" or "radius"
+    ModuleBase::Vector3<int> vdw_cutoff_period;
 
     int ocp;
     std::string ocp_set;
@@ -382,13 +384,13 @@ class Input
     //==========================================================
     //    DFT+U       Xin Qu added on 2020-10-29
     //==========================================================
-    bool dft_plus_u; // true:DFT+U correction; false：standard DFT calcullation(default)
+    bool dft_plus_u; // true:DFT+U correction; false：standard DFT calculation(default)
     int *orbital_corr; // which correlated orbitals need corrected ; d:2 ,f:3, do not need correction:-1
     double *hubbard_u; // Hubbard Coulomb interaction parameter U(ev)
     double *hund_j; // Hund exchange parameter J(ev)
     bool omc; // whether turn on occupation matrix control method or not
     bool yukawa_potential; // default:false
-    double yukawa_lambda; // default:0.0
+    double yukawa_lambda; // default:-1.0, which means we calculate lambda
 
     // The two parameters below are not usable currently
 
@@ -399,6 +401,12 @@ class Input
     //    DFT+DMFT       Xin Qu added on 2021-08
     //==========================================================
     bool dft_plus_dmft; // true:DFT+DMFT; false：standard DFT calcullation(default)
+
+    //==========================================================
+    //    RPA           Rong Shi added on 2022-04
+    //==========================================================
+    bool rpa;
+    std::string coulomb_type;
 
     //==========================================================
     // DeepKS -- added by caoyu and mohan
@@ -425,6 +433,25 @@ class Input
     double tau;
     double sigma_k;
     double nc_k;
+
+    //==========================================================
+    // OFDFT  sunliang added on 2022-05-05
+    //==========================================================
+    string of_kinetic; // Kinetic energy functional, such as TF, VW, WT, TF+
+    string of_method;  // optimization method, include cg1, cg2, tn (default), bfgs
+    string of_conv;    // select the convergence criterion, potential, energy (default), or both
+    double of_tole;    // tolerance of the energy change (in Ry) for determining the convergence, default=2e-6 Ry
+    double of_tolp;    // tolerance of potential for determining the convergence, default=1e-5 in a.u.
+    double of_tf_weight;  // weight of TF KEDF
+    double of_vw_weight;  // weight of vW KEDF
+    double of_wt_alpha;   // parameter alpha of WT KEDF
+    double of_wt_beta;    // parameter beta of WT KEDF
+    double of_wt_rho0;    // set the average density of system, in Bohr^-3
+    bool of_hold_rho0;  // If set to 1, the rho0 will be fixed even if the volume of system has changed, it will be set to 1 automaticly if of_wt_rho0 is not zero.
+    bool of_full_pw;    // If set to 1, ecut will be ignored while collecting planewaves, so that all planewaves will be used.
+    int of_full_pw_dim; // If of_full_pw = 1, the dimention of FFT will be testricted to be (0) either odd or even; (1) odd only; (2) even only.
+    bool of_read_kernel; // If set to 1, the kernel of WT KEDF will be filled from file of_kernel_file, not from formula. Only usable for WT KEDF.
+    string of_kernel_file; // The name of WT kernel file.
 
     //==========================================================
     // variables for test only

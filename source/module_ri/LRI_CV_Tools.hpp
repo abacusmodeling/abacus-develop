@@ -159,7 +159,6 @@ std::array<T,N> LRI_CV_Tools::negative(const std::array<T,N> &v_in)
 }
 
 
-
 template<typename Tdata>
 RI::Tensor<Tdata> LRI_CV_Tools::transpose12(const RI::Tensor<Tdata> &c_in)
 {

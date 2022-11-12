@@ -135,6 +135,7 @@ std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified
 std::string global_stru_dir;
+std::string global_matrix_dir;
 
 std::ofstream ofs_running;
 std::ofstream ofs_warning;
@@ -210,5 +211,27 @@ double eb_k = 80.0;
 double tau = 1.0798 * 1e-5;
 double sigma_k = 0.6;
 double nc_k = 0.00037;
+
+bool dft_plus_u = false; //DFTU control
+
+//Xinyang Dong added for rpa
+bool rpa_setorb = false;
+std::vector<std::string> rpa_orbitals;
+
+std::string of_kinetic = "wt";
+std::string of_method = "tn";
+std::string of_conv = "energy";
+double of_tole = 2e-6;
+double of_tolp = 1e-5;
+double of_tf_weight = 1.;
+double of_vw_weight = 1.;
+double of_wt_alpha = 5./6.;  
+double of_wt_beta = 5./6.;
+double of_wt_rho0 = 0.;
+bool of_hold_rho0 = false;
+bool of_full_pw = true;
+int of_full_pw_dim = 0;
+bool of_read_kernel = false;
+std::string of_kernel_file = "WTkernel.txt";
 
 } // namespace GlobalV

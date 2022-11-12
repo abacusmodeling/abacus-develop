@@ -16,7 +16,7 @@ namespace ModuleESolver
         ESolver_KS_PW();
         ~ESolver_KS_PW();
         void Init(Input& inp, UnitCell_pseudo& cell) override;
-        void cal_Energy(energy& en) override;
+        void cal_Energy(double& etot) override;
         void cal_Force(ModuleBase::matrix& force) override;
         void cal_Stress(ModuleBase::matrix& stress) override;
         virtual void hamilt2density(const int istep, const int iter, const double ethr) override;
@@ -32,7 +32,7 @@ namespace ModuleESolver
         virtual void eachiterinit(const int istep, const int iter) override;
         virtual void updatepot(const int istep, const int iter) override;
         virtual void eachiterfinish(const int iter) override;
-        virtual void afterscf() override;
+        virtual void afterscf(const int istep) override;
         virtual void othercalculation(const int istep)override;
 
         //temporary, this will be removed in the future;

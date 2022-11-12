@@ -3,6 +3,7 @@ list(APPEND objects
     H_Hartree_pw.cpp
     VL_in_pw.cpp
     VNL_in_pw.cpp
+    VNL_grad_pw.cpp
     charge.cpp
     charge_broyden.cpp
     charge_extra.cpp
@@ -24,7 +25,7 @@ list(APPEND objects
     sto_hchi.cpp
     sto_wf.cpp
     sto_func.cpp
-    sto_forces.cpp 
+    sto_forces.cpp
     sto_stress_pw.cpp
     stress_func_cc.cpp
     stress_func_ewa.cpp
@@ -47,7 +48,8 @@ list(APPEND objects
     wf_atomic.cpp
     wf_igk.cpp
     xc_3.cpp
-    run_md_pw.cpp)
+    run_md_pw.cpp
+)
 if(USE_CUDA)
     list(APPEND objects
         diago_cg.cu
@@ -78,6 +80,11 @@ add_library(
     ${objects}
 )
 
-IF (BUILD_TESTING)
+if(ENABLE_COVERAGE)
+  add_coverage(pw)
+endif()
+
+if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
+

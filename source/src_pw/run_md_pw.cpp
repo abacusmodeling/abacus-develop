@@ -130,11 +130,7 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
             file << GlobalV::global_stru_dir << "STRU_MD_" << verlet->step_ + verlet->step_rst_;
-#ifdef __LCAO
-            verlet->ucell.print_stru_file(GlobalC::ORB, file.str(), 1, 1);
-#else
             verlet->ucell.print_stru_file(file.str(), 1, 1);
-#endif
             verlet->write_restart();
         }
 
@@ -153,108 +149,4 @@ void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
     delete verlet;
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
     return;
-}
-
-void Run_MD_PW::md_force_virial(
-    ModuleESolver::ESolver *p_esolver,
-    const int &istep,
-    const int& numIon, 
-    double &potential, 
-    ModuleBase::Vector3<double>* force, 
-    ModuleBase::matrix& virial)
-{
-    //----------------------------------------------------------
-    // about vdw, jiyy add vdwd3 and linpz add vdwd2
-    //----------------------------------------------------------
-    if(INPUT.vdw_method=="d2")
-    {
-        // setup vdwd2 parameters
-	    GlobalC::vdwd2_para.initial_parameters(INPUT);
-	    GlobalC::vdwd2_para.initset(GlobalC::ucell);
-    }
-    if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
-    {
-        GlobalC::vdwd3_para.initial_parameters(INPUT);
-    }
-    if (GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-03, update 2021-03-09
-    {
-        Vdwd2 vdwd2(GlobalC::ucell, GlobalC::vdwd2_para);
-        vdwd2.cal_energy();
-        GlobalC::en.evdw = vdwd2.get_energy();
-    }
-    if (GlobalC::vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
-    {
-        Vdwd3 vdwd3(GlobalC::ucell, GlobalC::vdwd3_para);
-        vdwd3.cal_energy();
-        GlobalC::en.evdw = vdwd3.get_energy();
-    }
-
-    // mohan added eiter to count for the electron iteration number, 2021-01-28
-    int eiter = 0;
-    if (GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md")
-    {
-        Electrons elec;
-#ifdef __LCAO
-#ifdef __MPI
-        if (Exx_Info::Hybrid_Type::No == GlobalC::exx_info.info_global.hybrid_type)
-        {
-#endif
-#endif
-            p_esolver->Run(istep,GlobalC::ucell);
-			eiter = p_esolver->getniter();
-#ifdef __LCAO
-#ifdef __MPI
-        }
-        else if (Exx_Info::Hybrid_Type::Generate_Matrix == GlobalC::exx_info.info_global.hybrid_type)
-        {
-            throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-        }
-        else // Peize Lin add 2019-03-09
-        {
-            if (GlobalC::exx_info.info_global.separate_loop)
-            {
-                for (size_t hybrid_step = 0; hybrid_step != GlobalC::exx_info.info_global.hybrid_step; ++hybrid_step)
-                {
-                    p_esolver->Run(istep,GlobalC::ucell);
-					eiter += p_esolver->getniter();
-                    if (elec.iter == 1 || hybrid_step == GlobalC::exx_info.info_global.hybrid_step - 1) // exx converge
-                        break;
-                    XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-                    GlobalC::exx_lip.cal_exx();
-                }
-            }
-            else
-            {
-                p_esolver->Run(istep,GlobalC::ucell);
-				eiter += p_esolver->getniter();
-                XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
-                p_esolver->Run(istep,GlobalC::ucell);
-				eiter += p_esolver->getniter();
-            }
-        }
-#endif // __MPI
-#endif // __LCAO
-    }
-
-    ModuleBase::matrix fcs;
-	// Forces ff;
-	// ff.init(fcs);
-    p_esolver->cal_Force(fcs);
-
-	for(int ion=0;ion<numIon;ion++)
-    {
-		force[ion].x =fcs(ion, 0)/2.0;
-		force[ion].y =fcs(ion, 1)/2.0;
-		force[ion].z =fcs(ion, 2)/2.0;
-	}
-
-	if(GlobalV::CAL_STRESS)
-	{
-		// Stress_PW ss;
-		// ss.cal_stress(virial);
-        p_esolver->cal_Stress(virial);
-        virial = 0.5 * virial;
-	}
-
-    potential = GlobalC::en.etot/2;
 }

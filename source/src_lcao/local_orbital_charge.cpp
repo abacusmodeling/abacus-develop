@@ -137,10 +137,6 @@ void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
 
             this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
         }
-        else if(GlobalV::KS_SOLVER=="hpseps") //LiuXh add 2021-09-06, used for hpseps solver
-        {
-            this->cal_dk_gamma();//calculate the density matrix.
-        }
     }
     else
     {

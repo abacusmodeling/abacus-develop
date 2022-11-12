@@ -1,8 +1,10 @@
 #include "esolver.h"
 #include "esolver_ks_pw.h"
 #include "esolver_sdft_pw.h"
+#ifdef __LCAO
 #include "esolver_ks_lcao.h"
 #include "esolver_ks_lcao_tddft.h"
+#endif
 #include "esolver_of.h"
 #include "esolver_lj.h"
 #include "esolver_dp.h"
@@ -22,6 +24,8 @@ namespace ModuleESolver
         {
             if (GlobalV::CALCULATION.substr(0, 3) == "sto")
                 esolver_type = "sdft_pw";
+            else if (GlobalV::CALCULATION.substr(0, 2) == "of")
+                esolver_type = "ofdft";
             else
                 esolver_type = "ksdft_pw";
         }
@@ -64,6 +68,7 @@ namespace ModuleESolver
         {
             p_esolver = new ESolver_KS_PW();
         }
+#ifdef __LCAO
         else if (esolver_type == "ksdft_lcao")
         {
             p_esolver = new ESolver_KS_LCAO();
@@ -72,21 +77,22 @@ namespace ModuleESolver
         {
             p_esolver = new ESolver_KS_LCAO_TDDFT();
         }
+#endif
         else if (esolver_type == "sdft_pw")
         {
             p_esolver = new ESolver_SDFT_PW();
         }
-        //  else if(esolver_type == "ofdft")
-        //  {
-        //      p_esolver = new OFDFT();
-        //  }
+        else if(esolver_type == "ofdft")
+        {
+            p_esolver = new ESolver_OF();
+        }
         else if (esolver_type == "lj_pot")
         {
             p_esolver = new ESolver_LJ();
         }
         else if (esolver_type == "dp_pot")
         {
-            p_esolver = new ESolver_DP();
+            p_esolver = new ESolver_DP(INPUT.mdp.pot_file);
         }
     }
 
