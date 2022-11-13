@@ -62,6 +62,7 @@ void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
 		this->abfs = abfs_same_atom;
 	else
 		this->abfs = Exx_Abfs::IO::construct_abfs( abfs_same_atom, GlobalC::ORB, this->info.files_abfs, this->info.kmesh_times );
+	Exx_Abfs::Construct_Orbs::print_orbs_size(this->abfs, GlobalV::ofs_running);
 
 	switch(this->info.hybrid_type)
 	{

@@ -146,9 +146,9 @@ void Exx_Abfs::Matrix_Orbs21::init_radial_table()
 
 void Exx_Abfs::Matrix_Orbs21::init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs )
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
-timeval t_start;
-gettimeofday(&t_start, NULL);
+//std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+//timeval t_start;
+//gettimeofday(&t_start, NULL);
 
 	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs21","init_radial_table_Rs");
 
@@ -158,8 +158,8 @@ gettimeofday(&t_start, NULL);
 			if( auto* const center2_orb21_sAB = static_cast<std::map<int,std::map<size_t,std::map<int,std::map<size_t,std::map<int,std::map<size_t,Center2_Orb::Orb21>>>>>>*const>(
 						ModuleBase::GlobalFunc::MAP_EXIST(center2_orb21_s, RsA.first, RsB.first)) )
 			{
-timeval t_small;
-gettimeofday(&t_small, NULL);
+//timeval t_small;
+//gettimeofday(&t_small, NULL);
 				std::set<size_t> radials;
 				for( const double &R : RsB.second )
 				{
@@ -168,8 +168,8 @@ gettimeofday(&t_small, NULL);
 					for( size_t i=0; i!=4; ++i )
 						radials.insert(iq+i);
 				}
-ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
-gettimeofday(&t_small, NULL);
+//ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
+//gettimeofday(&t_small, NULL);
 				for( auto &coC : *center2_orb21_sAB )
 					for( auto &coD : coC.second )
 						for( auto &coE : coD.second )
@@ -177,11 +177,11 @@ gettimeofday(&t_small, NULL);
 								for( auto &coG : coF.second )
 									for( auto &coH : coG.second )
 										coH.second.init_radial_table(radials);
-ofs<<time_during(t_small)<<std::endl;
+//ofs<<time_during(t_small)<<std::endl;
 			}
 		}
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial_table_Rs\t"<<time_during(t_start)<<std::endl;
-ofs.close();
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial_table_Rs\t"<<time_during(t_start)<<std::endl;
+//ofs.close();
 }
 
 /*
