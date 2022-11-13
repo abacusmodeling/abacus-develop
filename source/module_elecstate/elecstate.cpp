@@ -6,6 +6,9 @@
 #include "src_parallel/parallel_reduce.h"
 #include "src_pw/global.h"
 #include "src_pw/occupy.h"
+#ifdef __LCAO
+#include "src_lcao/ELEC_evolve.h"
+#endif
 
 namespace elecstate
 {
@@ -39,7 +42,17 @@ void ElecState::calculate_weights()
         return;
     }
 
-    if (!Occupy::use_gaussian_broadening && !Occupy::use_tetrahedron_method && !Occupy::fixed_occupations)
+    if (ELEC_evolve::tddft == 0 && GlobalV::ocp == 1)
+    {
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        {
+            for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+            {
+                this->wg(ik, ib) = GlobalV::ocp_kb[ik * GlobalV::NBANDS + ib];
+            }
+        }
+    }
+    else if (!Occupy::use_gaussian_broadening && !Occupy::use_tetrahedron_method && !Occupy::fixed_occupations)
     {
         if (GlobalV::TWO_EFERMI)
         {
