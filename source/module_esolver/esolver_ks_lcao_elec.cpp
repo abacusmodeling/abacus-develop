@@ -12,7 +12,6 @@
 #include "../src_io/istate_envelope.h"
 #include "src_lcao/ELEC_evolve.h"
 //
-#include "../src_ri/exx_abfs.h"
 #include "../src_ri/exx_opt_orb.h"
 #include "../src_io/berryphase.h"
 #include "../src_io/to_wannier90.h"

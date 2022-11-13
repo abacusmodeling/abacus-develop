@@ -75,7 +75,7 @@ void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
 	}
 
 	for( size_t T=0; T!=this->abfs.size(); ++T )
-		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(this->abfs[T].size())-1 );
+		GlobalC::exx_info.info_ri.abfs_Lmax = std::max( GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(this->abfs[T].size())-1 );
 
 	this->cv.set_orbitals(
 		this->lcaos, this->abfs, this->abfs_ccp,

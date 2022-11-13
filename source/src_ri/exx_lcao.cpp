@@ -690,11 +690,9 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::
 	#endif
 
 	for( size_t T=0; T!=abfs.size(); ++T )
-	{
-		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(abfs[T].size())-1 );
-	}
+		GlobalC::exx_info.info_ri.abfs_Lmax = std::max( GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(abfs[T].size())-1 );
 
-ofs_mpi<<"Exx_Abfs::Lmax:\t"<<Exx_Abfs::Lmax<<std::endl;
+ofs_mpi<<"GlobalC::exx_info.info_ri.abfs_Lmax:\t"<<GlobalC::exx_info.info_ri.abfs_Lmax<<std::endl;
 
 	const ModuleBase::Element_Basis_Index::Range
 		&&range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );

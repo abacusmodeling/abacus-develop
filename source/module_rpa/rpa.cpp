@@ -330,7 +330,7 @@ void RPAExxLcao::exx_init()
 
     for (size_t T = 0; T != abfs.size(); ++T)
     {
-        Exx_Abfs::Lmax = std::max(Exx_Abfs::Lmax, static_cast<int>(abfs[T].size()) - 1);
+        GlobalC::exx_info.info_ri.abfs_Lmax = std::max(GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(abfs[T].size()) - 1);
     }
 
     const ModuleBase::Element_Basis_Index::Range &&range_lcaos = Exx_Abfs::Abfs_Index::construct_range(lcaos);

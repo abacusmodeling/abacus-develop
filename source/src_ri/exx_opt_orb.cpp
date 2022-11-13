@@ -34,9 +34,9 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 	
-	Exx_Abfs::Lmax = Exx_Abfs::Jle::Lmax;
+	GlobalC::exx_info.info_ri.abfs_Lmax = Exx_Abfs::Jle::Lmax;
 	for( size_t T=0; T!=abfs.size(); ++T )
-		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(abfs[T].size())-1 );
+		GlobalC::exx_info.info_ri.abfs_Lmax = std::max( GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(abfs[T].size())-1 );
 
 	const ModuleBase::Element_Basis_Index::Range    range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );
 	const ModuleBase::Element_Basis_Index::IndexLNM index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );

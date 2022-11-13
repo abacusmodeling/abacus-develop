@@ -116,6 +116,7 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
         case Exx_Info::Hybrid_Type::PBE0:
         case Exx_Info::Hybrid_Type::SCAN0:
         case Exx_Info::Hybrid_Type::HSE:
+			// GlobalC::exx_lcao.init();
             if(GlobalV::GAMMA_ONLY_LOCAL)
                 GlobalC::exx_lri_double.init(MPI_COMM_WORLD);
             else
@@ -297,7 +298,7 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
 
     int Lmax = 0;
 #ifdef __EXX
-    Lmax = Exx_Abfs::Lmax;
+    Lmax = GlobalC::exx_info.info_ri.abfs_Lmax;
 #endif
     this->orb_con.set_orb_tables(GlobalV::ofs_running,
                                  GlobalC::UOT,

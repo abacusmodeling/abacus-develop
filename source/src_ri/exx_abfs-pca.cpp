@@ -38,10 +38,10 @@ timeval t_start;
 ofs<<range_lcaos<<std::endl;
 ofs<<range_abfs<<std::endl;
 
-	const int Lmax_bak = Exx_Abfs::Lmax;
-	Exx_Abfs::Lmax = std::numeric_limits<int>::min();
+	const int Lmax_bak = GlobalC::exx_info.info_ri.abfs_Lmax;
+	GlobalC::exx_info.info_ri.abfs_Lmax = std::numeric_limits<int>::min();
 	for( size_t T=0; T!=abfs.size(); ++T )
-		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(abfs[T].size())-1 );
+		GlobalC::exx_info.info_ri.abfs_Lmax = std::max( GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(abfs[T].size())-1 );
 
 	Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;
 //gettimeofday( &t_start, NULL);
@@ -58,7 +58,7 @@ ofs<<range_abfs<<std::endl;
 	m_abfslcaos_lcaos.init_radial_table(delta_R);
 //ofs<<"TIME@m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<std::endl;
 
-	Exx_Abfs::Lmax = Lmax_bak;
+	GlobalC::exx_info.info_ri.abfs_Lmax = Lmax_bak;
 	
 	std::vector<std::vector<std::pair<std::vector<double>,ModuleBase::matrix>>> eig(abfs.size());
 	for( size_t T=0; T!=abfs.size(); ++T )

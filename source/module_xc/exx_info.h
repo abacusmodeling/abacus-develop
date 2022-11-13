@@ -52,6 +52,8 @@ struct Exx_Info
 		double ccp_rmesh_times = 10;
 		double kmesh_times = 4;
 
+		int abfs_Lmax = 0;			// tmp
+
 		Exx_Info_RI( const Exx_Info::Exx_Info_Global &info_global )
 			:hybrid_type(info_global.hybrid_type),
 			 hse_omega(info_global.hse_omega){}

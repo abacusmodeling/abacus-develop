@@ -5,7 +5,6 @@
 
 #include "Matrix_Orbs21.h"
 
-#include "src_ri/exx_abfs.h"			// tmp. for Exx_Abfs::Lmax
 #include "src_pw/global.h"
 
 void Matrix_Orbs21::init(
@@ -20,14 +19,14 @@ void Matrix_Orbs21::init(
 	//=========================================
 	this->MOT.allocate(
 		GlobalC::ORB.get_ntype(),							// number of atom types
-		std::max( GlobalC::ORB.get_lmax(), Exx_Abfs::Lmax ),	// max L used to calculate overlap
+		std::max( GlobalC::ORB.get_lmax(), GlobalC::exx_info.info_ri.abfs_Lmax ),	// max L used to calculate overlap
 		static_cast<int>(GlobalC::ORB.get_kmesh() * kmesh_times) | 1,				// kpoints, for integration in k space
 		GlobalC::ORB.get_Rmax() * rmesh_times,				// max value of radial table
 		GlobalC::ORB.get_dR(),								// delta R, for making radial table
 //		GlobalC::ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
 		GlobalC::ORB.get_dk());											// Peize Lin change 2017-04-16
 	int Lmax_used, Lmax;
-	this->MOT.init_Table_Spherical_Bessel (3,mode, Lmax_used, Lmax, Exx_Abfs::Lmax,GlobalC::ORB, GlobalC::ucell.infoNL.Beta);
+	this->MOT.init_Table_Spherical_Bessel (3,mode, Lmax_used, Lmax, GlobalC::exx_info.info_ri.abfs_Lmax, GlobalC::ORB, GlobalC::ucell.infoNL.Beta);
 //	this->MOT.init_OV_Tpair();							// for this->MOT.OV_L2plus1
 //	this->MOT.Destroy_Table_Spherical_Bessel (Lmax_used);				// why?
 
