@@ -25,36 +25,25 @@ LCAO_Hamilt::~LCAO_Hamilt()
 }
 
 //--------------------------------------------
-// 'calculate_STNR_gamma' or 
-// 'calculate_STNR_k' functions are called
+// prepare grid network for Gint(grid integral)
 //--------------------------------------------
-void LCAO_Hamilt::set_lcao_matrices(void)
+void LCAO_Hamilt::grid_prepare(void)
 {
-    ModuleBase::TITLE("LCAO_Hamilt","set_lcao_matrices");
-    ModuleBase::timer::tick("LCAO_Hamilt","set_lcao_matrices");
+    ModuleBase::TITLE("LCAO_Hamilt","grid_prepare");
+    ModuleBase::timer::tick("LCAO_Hamilt","grid_prepare");
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {   
-        // calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
-        this->calculate_STNR_gamma();
         this->GG.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);	
 
     }
     else // multiple k-points
     {
-        // calculate the 'S', 'T' and 'Vnl' matrix for k-points algorithms.
-        this->calculate_STNR_k();
-
         // calculate the grid integration of 'Vl' matrix for l-points algorithms.
         this->GK.prep_grid(GlobalC::bigpw->nbx, GlobalC::bigpw->nby, GlobalC::bigpw->nbzp, GlobalC::bigpw->nbzp_start, GlobalC::rhopw->nxyz);
     }
 
-    // initial the overlap matrix is done.	
-    this->init_s = true;
-    //std::cout << " init_s=" << init_s << std::endl; //delete 2015-09-06, xiaohui
-//	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"init_s",init_s);
-
-    ModuleBase::timer::tick("LCAO_Hamilt","set_lcao_matrices");
+    ModuleBase::timer::tick("LCAO_Hamilt","grid_prepare");
     return;
 }
 
@@ -94,13 +83,12 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
                 this->GG.cal_vlocal(&inout);
             }
 
-        #ifdef __MPI //liyuanbo 2022/2/23
+#ifdef __EXX
             // Peize Lin add 2016-12-03
             if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
             {
                 if( Exx_Info::Hybrid_Type::HF == GlobalC::exx_info.info_global.hybrid_type ) //HF
                 {
-                    //GlobalC::exx_lcao.add_Hexx(ik, 1, *this->LM);
                     RI_2D_Comm::add_Hexx(
 						ik,
 						GlobalC::exx_info.info_global.hybrid_alpha,
@@ -110,7 +98,6 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
                 }
                 else if( Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type )			// PBE0
                 {
-                    //GlobalC::exx_lcao.add_Hexx(ik, GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
                     RI_2D_Comm::add_Hexx(
 						ik,
 						GlobalC::exx_info.info_global.hybrid_alpha,
@@ -120,7 +107,6 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
                 }
                 else if( Exx_Info::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type )			// SCAN0
                 {
-                    //GlobalC::exx_lcao.add_Hexx(ik, GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
                     RI_2D_Comm::add_Hexx(
 						ik,
 						GlobalC::exx_info.info_global.hybrid_alpha,
@@ -130,7 +116,6 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
                 }
                 else if( Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type )			// HSE
                 {
-                    //GlobalC::exx_lcao.add_Hexx(ik, GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
                     RI_2D_Comm::add_Hexx(
 						ik,
 						GlobalC::exx_info.info_global.hybrid_alpha,
@@ -139,7 +124,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
 						*this->LM);
                 }
             }
-        #endif
+#endif // __EXX
         }
 
         time_t time_vlocal_end = time(NULL);
@@ -271,13 +256,12 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
         this->GK.folding_vl_k(ik, this->LM);
 
-    #ifdef __MPI //liyuanbo 2022/2/23
+#ifdef __EXX
         // Peize Lin add 2016-12-03
         if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
         {
             if( Exx_Info::Hybrid_Type::HF  == GlobalC::exx_info.info_global.hybrid_type )				// HF
             {
-                //GlobalC::exx_lcao.add_Hexx(ik,1, *this->LM);
 				RI_2D_Comm::add_Hexx(
 					ik,
 					1,
@@ -287,7 +271,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
             }
             else if( Exx_Info::Hybrid_Type::PBE0  == GlobalC::exx_info.info_global.hybrid_type )			// PBE0
             {
-                //GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
 				RI_2D_Comm::add_Hexx(
 					ik,
 					GlobalC::exx_info.info_global.hybrid_alpha,
@@ -297,7 +280,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
             }
             else if( Exx_Info::Hybrid_Type::SCAN0  == GlobalC::exx_info.info_global.hybrid_type )			// SCAN0
             {
-                //GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
 				RI_2D_Comm::add_Hexx(
 					ik,
 					GlobalC::exx_info.info_global.hybrid_alpha,
@@ -307,7 +289,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
             }
             else if( Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type )			// HSE
             {
-                //GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_info.info_global.hybrid_alpha, *this->LM);
 				RI_2D_Comm::add_Hexx(
 					ik,
 					GlobalC::exx_info.info_global.hybrid_alpha,
@@ -316,7 +297,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 					*this->LM);
             }		
         }
-    #endif
+#endif // __EXX
     }
 
     //-----------------------------------------
@@ -834,7 +815,7 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
 
     GK.cal_vlocal_R_sparseMatrix(current_spin, sparse_threshold, this->LM);
 
-    if (INPUT.dft_plus_u)
+    if (GlobalV::dft_plus_u)
     {
         if (GlobalV::NSPIN != 4)
         {
@@ -846,6 +827,7 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
         }
     }
 
+#ifdef __EXX
 #ifdef __MPI
     if (GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::HF ||
         GlobalC::exx_info.info_global.hybrid_type==Exx_Info::Hybrid_Type::PBE0 ||
@@ -858,7 +840,8 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
         else
             this->calculate_HR_exx_sparse(current_spin, sparse_threshold, GlobalC::exx_lri_complex.Hexxs);
     }
-#endif
+#endif // __MPI
+#endif // __EXX
 
     clear_zero_elements(current_spin, sparse_threshold);
 }
@@ -1097,7 +1080,7 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 
 #include "src_external/src_test/src_global/matrix-test.h"
 
-#ifdef __MPI
+#ifdef __EXX
 // Peize Lin add 2021.11.16
 void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double &sparse_threshold)
 {
@@ -1174,7 +1157,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
     
 	ModuleBase::timer::tick("LCAO_Hamilt","calculate_HR_exx_sparse");	
 }
-#endif
+#endif // __EXX
 
 // in case there are elements smaller than the threshold
 void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &sparse_threshold)
@@ -1263,9 +1246,7 @@ void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &spa
                 }
             }
         }
-
     }
-
 }
 
 void LCAO_Hamilt::destroy_all_HSR_sparse(void)

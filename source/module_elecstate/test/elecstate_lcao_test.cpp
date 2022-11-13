@@ -26,8 +26,7 @@
 #include "module_neighbor/sltk_atom_arrange.h"
 #include "module_pw/pw_basis_k.h"
 #include "module_xc/xc_functional.h"
-#include "module_xc/exx_global.h"
-#include "src_parallel/parallel_pw.h"
+#include "src_io/restart.h"
 
 Magnetism::Magnetism(){}
 Magnetism::~Magnetism(){}
@@ -35,8 +34,6 @@ K_Vectors::K_Vectors(){}
 K_Vectors::~K_Vectors(){}
 Structure_Factor::Structure_Factor(){}
 Structure_Factor::~Structure_Factor(){}
-Parallel_PW::Parallel_PW(){}
-Parallel_PW::~Parallel_PW(){}
 LCAO_Hamilt::LCAO_Hamilt(){}
 LCAO_Hamilt::~LCAO_Hamilt(){}
 LCAO_gen_fixedH::LCAO_gen_fixedH(){}
@@ -53,6 +50,8 @@ pseudopot_cell_vl::pseudopot_cell_vl(){}
 pseudopot_cell_vl::~pseudopot_cell_vl(){}
 energy::energy(){}
 energy::~energy(){}
+Parallel_Grid::Parallel_Grid(){}
+Parallel_Grid::~Parallel_Grid(){}
 namespace GlobalC
 {
     energy en;
@@ -66,24 +65,14 @@ namespace GlobalC
     wavefunc wf;
     Charge CHR;
     Grid_Driver GridD(GlobalV::test_deconstructor, GlobalV::test_grid_driver,GlobalV::test_grid);
+    Parallel_Grid Pgrid;
+    Restart restart;
 }
 
 
 XC_Functional::XC_Functional(){}
 XC_Functional::~XC_Functional(){}
 int XC_Functional::get_func_type(){return 0;}
-
-#ifdef __MPI
-#include "src_ri/exx_lcao.h"
-Exx_Lcao::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
-    :hybrid_type(info_global.hybrid_type),hse_omega(info_global.hse_omega){}
-Exx_Lcao::Exx_Lcao(const Exx_Global::Exx_Info &info_global ):info(info_global){}
-namespace GlobalC
-{
-    Exx_Global exx_global;
-    Exx_Lcao exx_lcao(GlobalC::exx_global.info); 
-}
-#endif
 
 namespace WF_Local
 {
@@ -105,6 +94,11 @@ bool Occupy::use_gaussian_broadening = false;
 bool Occupy::use_tetrahedron_method = false;
 double Magnetism::get_nelup(void) {return 0;}
 double Magnetism::get_neldw(void) {return 0;}
+#ifdef __MPI
+void Parallel_Grid::zpiece_to_all(double *zpiece, const int &iz, double *rho){}
+#endif
+
+void Restart::load_disk(const std::string mode, const int i) const {}
 
 void set_pw()
 {

@@ -35,6 +35,16 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 {
     this->nche_sto = inp.nche_sto;
     ESolver_KS::Init(inp,ucell);
+
+    
+    this->pelec = new elecstate::ElecStatePW_SDFT( GlobalC::wfcpw, (Charge*)(&(GlobalC::CHR)), (K_Vectors*)(&(GlobalC::kv)), GlobalV::NBANDS);
+
+    // Inititlize the charge density.
+    this->pelec->charge->allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT CHARGE");
+    // Initializee the potential.
+    GlobalC::pot.allocate(GlobalC::rhopw->nrxx);
+
     this->Init_GlobalC(inp,ucell);//temporary
 
 	stowf.init(GlobalC::kv.nks);
@@ -48,14 +58,16 @@ void ESolver_SDFT_PW::Init(Input &inp, UnitCell_pseudo &ucell)
             this->stowf.chiortho[ik].create(this->stowf.nchip[ik],GlobalC::wf.npwx,false);
         }
     }
+
     this->phsol = new hsolver::HSolverPW_SDFT(GlobalC::wfcpw, this->stowf, inp.method_sto);
-    this->pelec = new elecstate::ElecStatePW_SDFT( GlobalC::wfcpw, (Charge*)(&(GlobalC::CHR)), (K_Vectors*)(&(GlobalC::kv)), GlobalV::NBANDS);
+   
+
 }
 
 void ESolver_SDFT_PW::beforescf(const int istep)
 {
     ESolver_KS_PW::beforescf(istep);
-	if(istep > 0 && INPUT.nbands_sto != 0 && istep%INPUT.initsto_freq == 0) Update_Sto_Orbitals(this->stowf, INPUT.seed_sto);
+	if(istep > 0 && INPUT.nbands_sto != 0 && INPUT.initsto_freq > 0 && istep%INPUT.initsto_freq == 0) Update_Sto_Orbitals(this->stowf, INPUT.seed_sto);
 }
 
 void ESolver_SDFT_PW::eachiterfinish(int iter)
@@ -63,7 +75,7 @@ void ESolver_SDFT_PW::eachiterfinish(int iter)
 	//print_eigenvalue(GlobalV::ofs_running);
     GlobalC::en.calculate_etot();
 }
-void ESolver_SDFT_PW::afterscf()
+void ESolver_SDFT_PW::afterscf(const int istep)
 {
     for(int ik=0; ik<this->pelec->ekb.nr; ++ik)
     {
@@ -108,24 +120,24 @@ void ESolver_SDFT_PW::hamilt2density(int istep, int iter, double ethr)
     // be careful that istep start from 0 and iter start from 1
     if(istep==0&&iter==1) 
     {
-        hsolver::DiagoIterAssist::need_subspace = false;
+        hsolver::DiagoIterAssist<double>::need_subspace = false;
     }
     else 
     {
-        hsolver::DiagoIterAssist::need_subspace = true;
+        hsolver::DiagoIterAssist<double>::need_subspace = true;
 	}
-    hsolver::DiagoIterAssist::PW_DIAG_THR = ethr; 
-    hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
-    this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf, istep, iter, GlobalV::KS_SOLVER);   
+    hsolver::DiagoIterAssist<double>::PW_DIAG_THR = ethr; 
+    hsolver::DiagoIterAssist<double>::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
+    this->phsol->solve(this->p_hamilt, this->psi[0], this->pelec,this->stowf, istep, iter, GlobalV::KS_SOLVER);   
     // transform energy for print
     GlobalC::en.eband = this->pelec->eband;
     GlobalC::en.demet = this->pelec->demet;
     GlobalC::en.ef = this->pelec->ef; 
 }
 
-void ESolver_SDFT_PW::cal_Energy(energy &en)
+void ESolver_SDFT_PW::cal_Energy(double& etot)
 {
-	
+    etot = GlobalC::en.etot;
 }
 
 void ESolver_SDFT_PW::cal_Force(ModuleBase::matrix &force)
@@ -151,10 +163,10 @@ void ESolver_SDFT_PW::postprocess()
     {
         int iter = 1;
         int istep = 0;
-        hsolver::DiagoIterAssist::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
-        hsolver::DiagoIterAssist::PW_DIAG_THR = std::max(std::min(1e-5, 0.1 * GlobalV::SCF_THR / std::max(1.0, GlobalC::CHR.nelec)),1e-12);
-        hsolver::DiagoIterAssist::need_subspace = false;
-        this->phsol->solve(this->phami, this->psi[0], this->pelec,this->stowf,istep, iter, GlobalV::KS_SOLVER, true);
+        hsolver::DiagoIterAssist<double>::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
+        hsolver::DiagoIterAssist<double>::PW_DIAG_THR = std::max(std::min(1e-5, 0.1 * GlobalV::SCF_THR / std::max(1.0, GlobalC::CHR.nelec)),1e-12);
+        hsolver::DiagoIterAssist<double>::need_subspace = false;
+        this->phsol->solve(this->p_hamilt, this->psi[0], this->pelec,this->stowf,istep, iter, GlobalV::KS_SOLVER, true);
         ((hsolver::HSolverPW_SDFT*)phsol)->stoiter.cleanchiallorder();//release lots of memories
     }
     int nche_test = 0;

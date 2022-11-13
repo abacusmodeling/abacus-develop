@@ -20,6 +20,7 @@ public:
 
 //==========================================================
 // MEMBER VARIABLES :
+// init_chg : "atomic" or "file"
 // NAME : total number of electrons
 // NAME : rho (nspin,ncxyz), the charge density in real space
 // NAME : rho_save (nspin,ncxyz), for charge mixing
@@ -29,6 +30,7 @@ public:
 // NAME : rhog_core [ngm], the core charge in reciprocal space
 //==========================================================
 
+    std::string init_chg;
     double nelec;  // Yu Liu add 2021-07-03
     double** rho;
     double** rho_save;
@@ -49,6 +51,7 @@ public:
     double *start_mag_type;
     double *start_mag_atom;
 
+    void init_rho();
 	// mohan update 2021-02-20
 	void allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in);
 
@@ -86,17 +89,12 @@ public:
 		const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
 
     void write_rho_cube(const double* rho_save, const int &is, const std::string &fn, 
-		const int &precision = 11);
-
-    void write_rho_dipole(const double* rho_save, const int &is, const int &iter, const std::string &fn, 
-		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
+		const int &precision = 11);    
 
     bool read_rho(const int &is, const std::string &fn, double* rho);//mohan add 2007-10-17
     void rho_mpi(void);
 
     void sum_band_k();
-
-	
 
 	// mohan add 2021-02-20
 	int nrxx; // number of r vectors in this processor

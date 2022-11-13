@@ -326,7 +326,9 @@ LRI_CV<Tdata>::DPcal_C_dC(
 			}
 			else
 			{
-				const std::vector<size_t> sizes = {this->index_abfs[it0].count_size, this->index_lcaos[it0].count_size, this->index_lcaos[it0].count_size};
+				const std::vector<size_t> sizes = {this->index_abfs[it0].count_size,
+				                                   this->index_lcaos[it0].count_size,
+												   this->index_lcaos[it0].count_size};
 				const std::array<RI::Tensor<Tdata>,3>
 					dC({RI::Tensor<Tdata>({sizes}), RI::Tensor<Tdata>({sizes}), RI::Tensor<Tdata>({sizes})});
 				if(flags.at("writable_dCws"))
@@ -379,8 +381,8 @@ LRI_CV<Tdata>::DPcal_C_dC(
 								it0, it1, {0,0,0}, R,
 								this->index_abfs, this->index_lcaos, this->index_lcaos,
 								Matrix_Orbs21::Matrix_Order::A1A2B),
-					    	 LRI_CV_Tools::negative(
-							  this->m_abfslcaos_lcaos.cal_grad_overlap_matrix<Tdata>(
+					      LRI_CV_Tools::negative(
+					       this->m_abfslcaos_lcaos.cal_grad_overlap_matrix<Tdata>(
 								it1, it0, {0,0,0}, Rm,
 								this->index_abfs, this->index_lcaos, this->index_lcaos,
 								Matrix_Orbs21::Matrix_Order::A1BA2))};

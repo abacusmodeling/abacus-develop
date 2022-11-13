@@ -287,6 +287,7 @@ void Hamilt_PW::diagH_subspace(
 	delete []aux;
 
 	// Peize Lin add 2019-03-09
+#ifdef __EXX
 #ifdef __LCAO
 	if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{
@@ -314,7 +315,8 @@ void Hamilt_PW::diagH_subspace(
 			}
 		}
 	}
-#endif
+#endif // __LCAO
+#endif // __EXX
 
 	if(GlobalV::NPROC_IN_POOL>1)
 	{
@@ -327,6 +329,7 @@ void Hamilt_PW::diagH_subspace(
 
 
 	// Peize Lin add 2019-03-09
+#ifdef __EXX
 #ifdef __LCAO
 	if("lcao_in_pw"==GlobalV::BASIS_TYPE)
 	{
@@ -340,7 +343,8 @@ void Hamilt_PW::diagH_subspace(
 				break;
 		}
 	}
-#endif
+#endif // __LCAO
+#endif // __EXX
 
     //=======================
     //diagonize the H-matrix

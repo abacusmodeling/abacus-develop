@@ -13,11 +13,9 @@ ModulePW::PW_Basis_K* wfcpw;
 energy en;
 wavefunc wf;
 Hamilt hm;
-#ifdef __LCAO
-#ifdef __MPI
+#ifdef __EXX
 Exx_Info exx_info;
 Exx_Lip exx_lip(exx_info.info_lip);
-#endif
 #endif
 pseudopot_cell_vnl ppcell;
 UnitCell_pseudo ucell;

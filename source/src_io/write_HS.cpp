@@ -850,7 +850,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin, LCAO_Matrix &lm)
     {
         for (int j=i; j<GlobalV::NLOCAL; j++)
         {
-            // not correct for serial version; need change 
+            // not correct for sequential version; need change 
             //g1 << " " << H[i*GlobalV::NLOCAL+j];
             //g2 << " " << S[i*GlobalV::NLOCAL+j];
         }
@@ -864,6 +864,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin, LCAO_Matrix &lm)
 }
 
 void HS_Matrix::save_HSR_sparse(
+    const int &istep,
     LCAO_Matrix &lm,
     const double& sparse_threshold,
     const bool &binary,  
@@ -876,6 +877,7 @@ void HS_Matrix::save_HSR_sparse(
     ModuleBase::timer::tick("HS_Matrix","save_HSR_sparse");
 
     auto &all_R_coor_ptr = lm.all_R_coor;
+    auto &output_R_coor_ptr = lm.output_R_coor;
     auto &HR_sparse_ptr = lm.HR_sparse;
     auto &SR_sparse_ptr = lm.SR_sparse;
     auto &HR_soc_sparse_ptr = lm.HR_soc_sparse;
@@ -885,6 +887,7 @@ void HS_Matrix::save_HSR_sparse(
     int output_R_number = 0;
     int *H_nonzero_num[2] = {nullptr, nullptr};
     int *S_nonzero_num = nullptr;
+    int step = istep;
 
     S_nonzero_num = new int[total_R_num];
     ModuleBase::GlobalFunc::ZEROS(S_nonzero_num, total_R_num);
@@ -980,9 +983,18 @@ void HS_Matrix::save_HSR_sparse(
 
     std::stringstream ssh[2];
     std::stringstream sss;
-    ssh[0] << GlobalV::global_out_dir << HR_filename_up;
-    ssh[1] << GlobalV::global_out_dir << HR_filename_down;
-    sss << GlobalV::global_out_dir << SR_filename;
+    if(GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "sto-md" || GlobalV::CALCULATION == "of-md")
+    {
+        ssh[0] << GlobalV::global_matrix_dir << istep << "_" << HR_filename_up;
+        ssh[1] << GlobalV::global_matrix_dir << istep << "_" << HR_filename_down;
+        sss << GlobalV::global_matrix_dir << istep << "_" << SR_filename;
+    }
+    else
+    {
+        ssh[0] << GlobalV::global_out_dir << HR_filename_up;
+        ssh[1] << GlobalV::global_out_dir << HR_filename_down;
+        sss << GlobalV::global_out_dir << SR_filename;
+    }
     std::ofstream g1[2];
     std::ofstream g2;
 
@@ -992,12 +1004,14 @@ void HS_Matrix::save_HSR_sparse(
         {
             for (int ispin = 0; ispin < spin_loop; ++ispin)
             {
-                g1[ispin].open(ssh[ispin].str().c_str(), ios::binary);
+                g1[ispin].open(ssh[ispin].str().c_str(), ios::binary | ios::app);
+                g1[ispin].write(reinterpret_cast<char *>(&step), sizeof(int));
                 g1[ispin].write(reinterpret_cast<char *>(&GlobalV::NLOCAL), sizeof(int));
                 g1[ispin].write(reinterpret_cast<char *>(&output_R_number), sizeof(int));
             }
 
-            g2.open(sss.str().c_str(), ios::binary);
+            g2.open(sss.str().c_str(), ios::binary | ios::app);
+            g2.write(reinterpret_cast<char *>(&step), sizeof(int));
             g2.write(reinterpret_cast<char *>(&GlobalV::NLOCAL), sizeof(int));
             g2.write(reinterpret_cast<char *>(&output_R_number), sizeof(int));
         }
@@ -1005,16 +1019,20 @@ void HS_Matrix::save_HSR_sparse(
         {
             for (int ispin = 0; ispin < spin_loop; ++ispin)
             {
-                g1[ispin].open(ssh[ispin].str().c_str());
+                g1[ispin].open(ssh[ispin].str().c_str(), ios::app);
+                g1[ispin] << "STEP: " << istep << std::endl;
                 g1[ispin] << "Matrix Dimension of H(R): " << GlobalV::NLOCAL <<std::endl;
                 g1[ispin] << "Matrix number of H(R): " << output_R_number << std::endl;
             }
 
-            g2.open(sss.str().c_str());
+            g2.open(sss.str().c_str(), ios::app);
+            g2 << "STEP: " << istep <<std::endl;
             g2 << "Matrix Dimension of S(R): " << GlobalV::NLOCAL <<std::endl;
             g2 << "Matrix number of S(R): " << output_R_number << std::endl;
         }
     }
+
+    output_R_coor_ptr.clear();
 
     count = 0;
     for (auto &R_coor : all_R_coor_ptr)
@@ -1039,6 +1057,8 @@ void HS_Matrix::save_HSR_sparse(
                 continue;
             }
         }
+
+        output_R_coor_ptr.insert(R_coor);
 
         if (GlobalV::DRANK == 0)
         {

@@ -8,7 +8,7 @@
 
 #include "LCAO_hamilt.h"
 #include "module_base/global_variable.h"
-#include "src_ri/abfs-vector3_order.h"
+#include "module_base/abfs-vector3_order.h"
 #include "module_ri/RI_2D_Comm.h"
 #include "module_base/timer.h"
 

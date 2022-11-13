@@ -68,7 +68,7 @@ void energy::calculate_harris(const int &flag)
 		+ evdw;  						// Peize Lin add evdw 2021.03.09
 
 #ifdef __LCAO
-        if(INPUT.dft_plus_u) 
+        if(GlobalV::dft_plus_u) 
 		{
 			this->etot_harris += GlobalC::dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
 		}
@@ -120,7 +120,7 @@ void energy::calculate_etot(void)
 	// std::cout << " fermienergy= "<<ef<<std::endl;
 
 #ifdef __LCAO
-    if(INPUT.dft_plus_u) 
+    if(GlobalV::dft_plus_u) 
 	{
 		this->etot += GlobalC::dftu.EU;																	  
 	}
@@ -541,8 +541,8 @@ void energy::print_band(const int &ik)
 }
 
 // Peize Lin add 2016-12-03
+#ifdef __EXX
 #ifdef __LCAO
-#ifdef __MPI
 void energy::set_exx()
 {
 	ModuleBase::TITLE("energy", "set_exx");
@@ -555,7 +555,6 @@ void energy::set_exx()
 		}
 		else if("lcao"==GlobalV::BASIS_TYPE)
 		{
-//			return GlobalC::exx_lcao.get_energy();
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 				return GlobalC::exx_lri_double.Eexx;
 			else
@@ -579,5 +578,5 @@ void energy::set_exx()
 
 	return;
 }
-#endif //__MPI
-#endif //_LCAO
+#endif //__LCAO
+#endif //__EXX
