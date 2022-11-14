@@ -349,7 +349,7 @@ void Input::Default(void)
     // exx										//Peize Lin add 2018-06-20
     //----------------------------------------------------------
 
-    exx_hybrid_alpha = 0.25;
+    exx_hybrid_alpha = "default";
     exx_hse_omega = 0.11;
 
     exx_separate_loop = true;
@@ -364,7 +364,7 @@ void Input::Default(void)
     exx_schwarz_threshold = 0;
     exx_cauchy_threshold = 0;
     exx_ccp_threshold = 1E-8;
-    exx_ccp_rmesh_times = 10;
+    exx_ccp_rmesh_times = "default";
 
     exx_distribute_type = "htime";
 
@@ -2083,6 +2083,21 @@ void Input::Default_2(void) // jiyy add 2019-08-04
     if(of_wt_rho0 != 0) of_hold_rho0 = true; // sunliang add 2022-06-17
     if(!of_full_pw) of_full_pw_dim = 0; // sunliang add 2022-08-31
     if(of_kinetic != "wt") of_read_kernel = false; // sunliang add 2022-09-12
+
+    if (exx_hybrid_alpha == "default")
+    {
+        if (dft_functional == "hf")
+            exx_hybrid_alpha = "1";
+        else if (dft_functional == "pbe0" || dft_functional == "hse" || dft_functional == "scan0")
+            exx_hybrid_alpha = "0.25";
+    }
+    if (exx_ccp_rmesh_times == "default")
+    {
+        if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "scan0")
+            exx_ccp_rmesh_times = "10";
+        else if (dft_functional == "hse")
+            exx_ccp_rmesh_times = "1.5";
+    }
 }
 #ifdef __MPI
 void Input::Bcast()
@@ -2364,7 +2379,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(out_mul); // qifeng add 2019/9/10
 
     // Peize Lin add 2018-06-20
-    Parallel_Common::bcast_double(exx_hybrid_alpha);
+    Parallel_Common::bcast_string(exx_hybrid_alpha);
     Parallel_Common::bcast_double(exx_hse_omega);
     Parallel_Common::bcast_bool(exx_separate_loop);
     Parallel_Common::bcast_int(exx_hybrid_step);
@@ -2376,7 +2391,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double(exx_schwarz_threshold);
     Parallel_Common::bcast_double(exx_cauchy_threshold);
     Parallel_Common::bcast_double(exx_ccp_threshold);
-    Parallel_Common::bcast_double(exx_ccp_rmesh_times);
+    Parallel_Common::bcast_string(exx_ccp_rmesh_times);
     Parallel_Common::bcast_string(exx_distribute_type);
     Parallel_Common::bcast_int(exx_opt_orb_lmax);
     Parallel_Common::bcast_double(exx_opt_orb_ecut);
@@ -3021,15 +3036,17 @@ void Input::Check(void)
 
     if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "hse" || dft_functional == "scan0")
     {
-        if (exx_hybrid_alpha < 0 || exx_hybrid_alpha > 1)
+        const double exx_hybrid_alpha_value = std::stod(exx_hybrid_alpha);
+        if (exx_hybrid_alpha_value < 0 || exx_hybrid_alpha_value > 1)
         {
-            ModuleBase::WARNING_QUIT("INPUT", "must 0 < exx_hybrid_alpha < 1");
+            ModuleBase::WARNING_QUIT("INPUT", "must 0 <= exx_hybrid_alpha <= 1");
         }
         if (exx_hybrid_step <= 0)
         {
             ModuleBase::WARNING_QUIT("INPUT", "must exx_hybrid_step > 0");
         }
-        if (exx_ccp_rmesh_times < 1)
+        const double exx_ccp_rmesh_times_value = std::stod(exx_ccp_rmesh_times);
+        if (exx_ccp_rmesh_times_value < 1)
         {
             ModuleBase::WARNING_QUIT("INPUT", "must exx_ccp_rmesh_times >= 1");
         }

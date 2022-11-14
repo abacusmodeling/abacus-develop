@@ -101,8 +101,7 @@ protected:
 public:
 	struct Exx_Info_Lcao
 	{
-		const Exx_Info::Hybrid_Type &hybrid_type;
-		
+		const Conv_Coulomb_Pot_K::Ccp_Type &ccp_type;
 		const double &hse_omega;
 		
 		double pca_threshold = 0;

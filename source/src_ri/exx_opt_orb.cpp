@@ -23,9 +23,11 @@ std::ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::Glo
 	ModuleBase::TITLE("Exx_Opt_Orb::generate_matrix");
 ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
-	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
+		lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 
-	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, GlobalC::exx_info.info_ri.pca_threshold );
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
+		abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, GlobalC::exx_info.info_ri.pca_threshold );
 
 ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 	

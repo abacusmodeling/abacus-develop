@@ -236,23 +236,18 @@ void Force_Stress_LCAO::getForceStress(
 	//Force contribution from exx
 #ifdef __EXX
 	ModuleBase::matrix fexx;
-	switch (GlobalC::exx_info.info_global.hybrid_type)
+	if( GlobalC::exx_info.info_global.cal_exx )
 	{
-		case Exx_Info::Hybrid_Type::HF:
-		case Exx_Info::Hybrid_Type::PBE0:
-		case Exx_Info::Hybrid_Type::SCAN0:
-		case Exx_Info::Hybrid_Type::HSE:
-			if(GlobalV::GAMMA_ONLY_LOCAL)
-			{
-				GlobalC::exx_lri_double.cal_exx_force();
-				fexx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_double.Fexx;
-			}
-			else
-			{
-				GlobalC::exx_lri_complex.cal_exx_force();
-				fexx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_complex.Fexx;
-			}
-			break;
+		if(GlobalV::GAMMA_ONLY_LOCAL)
+		{
+			GlobalC::exx_lri_double.cal_exx_force();
+			fexx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_double.Fexx;
+		}
+		else
+		{
+			GlobalC::exx_lri_complex.cal_exx_force();
+			fexx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_complex.Fexx;
+		}
 	}
 #endif
 	//--------------------------------
@@ -285,14 +280,9 @@ void Force_Stress_LCAO::getForceStress(
 				}
 #ifdef __EXX
 				// Force contribution from exx
-				switch (GlobalC::exx_info.info_global.hybrid_type)
+				if( GlobalC::exx_info.info_global.cal_exx )
 				{
-					case Exx_Info::Hybrid_Type::HF:
-					case Exx_Info::Hybrid_Type::PBE0:
-					case Exx_Info::Hybrid_Type::SCAN0:
-					case Exx_Info::Hybrid_Type::HSE:
-						fcs(iat,i) += fexx(iat,i);
-						break;
+					fcs(iat,i) += fexx(iat,i);
 				}
 #endif
 				//VDW force of vdwd2 or vdwd3

@@ -144,10 +144,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 #ifndef __CELL
 #ifdef __MPI 
 #ifdef __EXX
-	if( Exx_Info::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type || 
-	    Exx_Info::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type || 
-	    Exx_Info::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type ||
-		Exx_Info::Hybrid_Type::SCAN0  == GlobalC::exx_info.info_global.hybrid_type)
+	if( GlobalC::exx_info.info_global.cal_exx )
 	{
 		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
 		{

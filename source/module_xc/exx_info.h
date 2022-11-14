@@ -2,15 +2,15 @@
 #define EXX_INFO_H
 
 #include "xc_functional.h"
+#include "../src_ri/conv_coulomb_pot_k.h"
 
 struct Exx_Info
 {
-	enum class Hybrid_Type {No,HF,PBE0,SCAN0,HSE,Generate_Matrix};
-
 	struct Exx_Info_Global
 	{
-		Exx_Info::Hybrid_Type hybrid_type;
+		bool cal_exx = false;
 
+		Conv_Coulomb_Pot_K::Ccp_Type ccp_type;
 		double hybrid_alpha = 0.25;
 		double hse_omega = 0.11;
 		
@@ -23,13 +23,12 @@ struct Exx_Info
 
 	struct Exx_Info_Lip
 	{
-		const Exx_Info::Hybrid_Type &hybrid_type;
-
+		const Conv_Coulomb_Pot_K::Ccp_Type &ccp_type;
 		const double &hse_omega;
 		double lambda;
 
 		Exx_Info_Lip( const Exx_Info::Exx_Info_Global &info_global )
-			:hybrid_type(info_global.hybrid_type),
+			:ccp_type(info_global.ccp_type),
 			 hse_omega(info_global.hse_omega){}
 	};
 	Exx_Info_Lip info_lip;	
@@ -38,8 +37,7 @@ struct Exx_Info
 
 	struct Exx_Info_RI
 	{
-		const Exx_Info::Hybrid_Type &hybrid_type;
-		
+		const Conv_Coulomb_Pot_K::Ccp_Type &ccp_type;
 		const double &hse_omega;
 		
 		double pca_threshold = 0;
@@ -55,7 +53,7 @@ struct Exx_Info
 		int abfs_Lmax = 0;			// tmp
 
 		Exx_Info_RI( const Exx_Info::Exx_Info_Global &info_global )
-			:hybrid_type(info_global.hybrid_type),
+			:ccp_type(info_global.ccp_type),
 			 hse_omega(info_global.hse_omega){}
 	};
 	Exx_Info_RI info_ri;

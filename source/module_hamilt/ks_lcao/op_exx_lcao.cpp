@@ -27,10 +27,10 @@ void OperatorEXX<OperatorLCAO<double>>::contributeHk(int ik)
     auto &exx_info = GlobalC::exx_info;
     if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
     {
-        if(Exx_Info::Hybrid_Type::HF  == GlobalC::exx_info.info_global.hybrid_type)
-        {
-            exx_info.info_global.hybrid_alpha = 1.0;
-        }
+        //if(Exx_Info::Hybrid_Type::HF  == GlobalC::exx_info.info_global.hybrid_type)	// Peize Lin delete 2022.11.13
+        //{
+        //    exx_info.info_global.hybrid_alpha = 1.0;
+        //}
         RI_2D_Comm::add_Hexx(
             ik,
             exx_info.info_global.hybrid_alpha,
@@ -50,10 +50,10 @@ void OperatorEXX<OperatorLCAO<std::complex<double>>>::contributeHk(int ik)
     auto &exx_info = GlobalC::exx_info;
     if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
     {
-        if(Exx_Info::Hybrid_Type::HF  == GlobalC::exx_info.info_global.hybrid_type)
-        {
-            exx_info.info_global.hybrid_alpha = 1.0;
-        }
+        //if(Exx_Info::Hybrid_Type::HF  == GlobalC::exx_info.info_global.hybrid_type)	// Peize Lin delete 2022.11.13
+        //{
+        //    exx_info.info_global.hybrid_alpha = 1.0;
+        //}
         RI_2D_Comm::add_Hexx(
             ik,
             exx_info.info_global.hybrid_alpha,

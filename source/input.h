@@ -330,7 +330,7 @@ class Input
     // exx
     // Peize Lin add 2018-06-20
     //==========================================================
-    double exx_hybrid_alpha;
+    std::string exx_hybrid_alpha;
     double exx_hse_omega;
 
     bool exx_separate_loop; // 0 or 1
@@ -345,7 +345,7 @@ class Input
     double exx_schwarz_threshold;
     double exx_cauchy_threshold;
     double exx_ccp_threshold;
-    double exx_ccp_rmesh_times;
+    std::string exx_ccp_rmesh_times;
 
     std::string exx_distribute_type;
 
