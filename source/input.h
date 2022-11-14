@@ -344,6 +344,9 @@ class Input
     double exx_dm_threshold;
     double exx_schwarz_threshold;
     double exx_cauchy_threshold;
+    double exx_c_grad_threshold;
+    double exx_v_grad_threshold;
+    double exx_cauchy_grad_threshold;
     double exx_ccp_threshold;
     std::string exx_ccp_rmesh_times;
 

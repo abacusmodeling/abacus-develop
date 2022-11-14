@@ -363,6 +363,9 @@ void Input::Default(void)
     exx_dm_threshold = 0;
     exx_schwarz_threshold = 0;
     exx_cauchy_threshold = 0;
+    exx_c_grad_threshold = 0;
+    exx_v_grad_threshold = 0;
+    exx_cauchy_grad_threshold = 0;
     exx_ccp_threshold = 1E-8;
     exx_ccp_rmesh_times = "default";
 
@@ -1542,6 +1545,18 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, exx_cauchy_threshold);
         }
+        else if (strcmp("exx_c_grad_threshold", word) == 0)
+        {
+            read_value(ifs, exx_c_grad_threshold);
+        }
+        else if (strcmp("exx_v_grad_threshold", word) == 0)
+        {
+            read_value(ifs, exx_v_grad_threshold);
+        }
+        else if (strcmp("exx_cauchy_grad_threshold", word) == 0)
+        {
+            read_value(ifs, exx_cauchy_grad_threshold);
+        }
         else if (strcmp("exx_ccp_threshold", word) == 0)
         {
             read_value(ifs, exx_ccp_threshold);
@@ -2390,6 +2405,9 @@ void Input::Bcast()
     Parallel_Common::bcast_double(exx_dm_threshold);
     Parallel_Common::bcast_double(exx_schwarz_threshold);
     Parallel_Common::bcast_double(exx_cauchy_threshold);
+    Parallel_Common::bcast_double(exx_c_grad_threshold);
+    Parallel_Common::bcast_double(exx_v_grad_threshold);
+    Parallel_Common::bcast_double(exx_cauchy_grad_threshold);
     Parallel_Common::bcast_double(exx_ccp_threshold);
     Parallel_Common::bcast_string(exx_ccp_rmesh_times);
     Parallel_Common::bcast_string(exx_distribute_type);

@@ -88,8 +88,6 @@ void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
 		this->lcaos, this->abfs, this->abfs_ccp,
 		this->info.kmesh_times, this->info.ccp_rmesh_times );
 
-	this->exx_lri.set_csm_threshold(this->info.cauchy_threshold);
-
 	ModuleBase::timer::tick("Exx_LRI", "init");
 }
 
@@ -131,7 +129,7 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 	if(GlobalV::CAL_FORCE || GlobalV::CAL_STRESS)
 	{
 		std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3> dVs = this->cv.cal_dVs(list_A1, list_A2, {{"writable_dVws",true}});
-		this->exx_lri.set_dVs(std::move(dVs), this->info.V_threshold);
+		this->exx_lri.set_dVs(std::move(dVs), this->info.V_grad_threshold);
 	}
 
 	std::pair<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>, std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3>>
@@ -144,7 +142,7 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 	if(GlobalV::CAL_FORCE || GlobalV::CAL_STRESS)
 	{
 		std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3> &dCs = std::get<1>(Cs_dCs);
-		this->exx_lri.set_dCs(std::move(dCs), this->info.C_threshold);
+		this->exx_lri.set_dCs(std::move(dCs), this->info.C_grad_threshold);
 	}
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_ions");
 }
@@ -161,6 +159,8 @@ void Exx_LRI<Tdata>::cal_exx_elec(const Local_Orbital_Charge &loc, const Paralle
 		GlobalV::GAMMA_ONLY_LOCAL
 		? RI_2D_Comm::split_m2D_ktoR<Tdata>(loc.dm_gamma, pv)
 		: RI_2D_Comm::split_m2D_ktoR<Tdata>(loc.dm_k, pv);
+
+	this->exx_lri.set_csm_threshold(this->info.cauchy_threshold);
 
 	this->Hexxs.resize(GlobalV::NSPIN);
 	this->Eexx = 0;
@@ -227,6 +227,8 @@ void Exx_LRI<Tdata>::cal_exx_force()
 {
 	ModuleBase::TITLE("Exx_LRI","cal_exx_force");
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_force");
+		
+	this->exx_lri.set_csm_threshold(this->info.cauchy_grad_threshold);
 
 	this->Fexx.create(GlobalC::ucell.nat, Ndim);
 	for(int is=0; is<GlobalV::NSPIN; ++is)
