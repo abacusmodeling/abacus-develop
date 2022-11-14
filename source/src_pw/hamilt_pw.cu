@@ -303,13 +303,7 @@ void Hamilt_PW::diagH_subspace(
 		};
 		if(XC_Functional::get_func_type()==4 || XC_Functional::get_func_type()==5)
 		{
-			if ( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type ) // HF
-			{
-				add_Hexx(1);
-			}
-			else if (Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type || 
-					Exx_Global::Hybrid_Type::SCAN0 == GlobalC::exx_info.info_global.hybrid_type ||
-					Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type) // PBE0 or HSE
+			if( GlobalC::exx_info.info_global.cal_exx )
 			{
 				add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
 			}
@@ -333,14 +327,9 @@ void Hamilt_PW::diagH_subspace(
 #ifdef __LCAO
 	if("lcao_in_pw"==GlobalV::BASIS_TYPE)
 	{
-		switch(GlobalC::exx_global.info.hybrid_type)
+		if( GlobalC::exx_info.info_global.cal_exx )
 		{
-			case Exx_Global::Hybrid_Type::HF:
-			case Exx_Global::Hybrid_Type::PBE0:
-			case Exx_Global::Hybrid_Type::SCAN0:
-			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
-				break;
+			GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
 		}
 	}
 #endif // __LCAO

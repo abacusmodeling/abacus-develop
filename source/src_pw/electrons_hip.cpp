@@ -152,10 +152,7 @@ void Electrons::self_consistent(const int &istep)
 
 		// calculate exact-exchange
 #ifdef __LCAO
-		if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_info.info_global.hybrid_type || 
-			Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_info.info_global.hybrid_type || 
-			Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_info.info_global.hybrid_type ||
-			Exx_Global::Hybrid_Type::SCAN0  == GlobalC::exx_info.info_global.hybrid_type)
+		if( GlobalC::exx_info.info_global.cal_exx )
 		{
 			if (!GlobalC::exx_global.info.separate_loop)
 			{

@@ -62,26 +62,31 @@ void Exx_LRI<Tdata>::init(const MPI_Comm &mpi_comm_in)
 		this->abfs = abfs_same_atom;
 	else
 		this->abfs = Exx_Abfs::IO::construct_abfs( abfs_same_atom, GlobalC::ORB, this->info.files_abfs, this->info.kmesh_times );
+	Exx_Abfs::Construct_Orbs::print_orbs_size(this->abfs, GlobalV::ofs_running);
 
-	switch(this->info.hybrid_type)
+	auto get_ccp_parameter = [this]() -> std::map<std::string,double>
 	{
-		case Exx_Info::Hybrid_Type::HF:
-		case Exx_Info::Hybrid_Type::PBE0:
-			this->abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, this->info.ccp_rmesh_times );		break;
-		case Exx_Info::Hybrid_Type::HSE:
-			this->abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",this->info.hse_omega}}, this->info.ccp_rmesh_times );	break;
-		default:
-			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
-	}
+		switch(this->info.ccp_type)
+		{
+			case Conv_Coulomb_Pot_K::Ccp_Type::Ccp:
+				return {};
+			case Conv_Coulomb_Pot_K::Ccp_Type::Hf:
+				return {};
+			case Conv_Coulomb_Pot_K::Ccp_Type::Hse:
+				return {{"hse_omega", this->info.hse_omega}};
+			default:
+				throw std::domain_error(std::string(__FILE__)+" line "+std::to_string(__LINE__));	break;
+		}
+	};
+	this->abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, info.ccp_type, get_ccp_parameter(), this->info.ccp_rmesh_times );
+
 
 	for( size_t T=0; T!=this->abfs.size(); ++T )
-		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(this->abfs[T].size())-1 );
+		GlobalC::exx_info.info_ri.abfs_Lmax = std::max( GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(this->abfs[T].size())-1 );
 
 	this->cv.set_orbitals(
 		this->lcaos, this->abfs, this->abfs_ccp,
 		this->info.kmesh_times, this->info.ccp_rmesh_times );
-
-	this->exx_lri.set_csm_threshold(this->info.cauchy_threshold);
 
 	ModuleBase::timer::tick("Exx_LRI", "init");
 }
@@ -124,7 +129,7 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 	if(GlobalV::CAL_FORCE || GlobalV::CAL_STRESS)
 	{
 		std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3> dVs = this->cv.cal_dVs(list_A1, list_A2, {{"writable_dVws",true}});
-		this->exx_lri.set_dVs(std::move(dVs), this->info.V_threshold);
+		this->exx_lri.set_dVs(std::move(dVs), this->info.V_grad_threshold);
 	}
 
 	std::pair<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>, std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3>>
@@ -137,7 +142,7 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 	if(GlobalV::CAL_FORCE || GlobalV::CAL_STRESS)
 	{
 		std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3> &dCs = std::get<1>(Cs_dCs);
-		this->exx_lri.set_dCs(std::move(dCs), this->info.C_threshold);
+		this->exx_lri.set_dCs(std::move(dCs), this->info.C_grad_threshold);
 	}
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_ions");
 }
@@ -154,6 +159,8 @@ void Exx_LRI<Tdata>::cal_exx_elec(const Local_Orbital_Charge &loc, const Paralle
 		GlobalV::GAMMA_ONLY_LOCAL
 		? RI_2D_Comm::split_m2D_ktoR<Tdata>(loc.dm_gamma, pv)
 		: RI_2D_Comm::split_m2D_ktoR<Tdata>(loc.dm_k, pv);
+
+	this->exx_lri.set_csm_threshold(this->info.cauchy_threshold);
 
 	this->Hexxs.resize(GlobalV::NSPIN);
 	this->Eexx = 0;
@@ -220,6 +227,8 @@ void Exx_LRI<Tdata>::cal_exx_force()
 {
 	ModuleBase::TITLE("Exx_LRI","cal_exx_force");
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_force");
+		
+	this->exx_lri.set_csm_threshold(this->info.cauchy_grad_threshold);
 
 	this->Fexx.create(GlobalC::ucell.nat, Ndim);
 	for(int is=0; is<GlobalV::NSPIN; ++is)

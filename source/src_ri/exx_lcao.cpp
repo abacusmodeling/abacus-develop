@@ -196,7 +196,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Info::Exx_Info_Global &info_global )
 }
 
 Exx_Lcao::Exx_Info_Lcao::Exx_Info_Lcao( const Exx_Info::Exx_Info_Global &info_global )
-	:hybrid_type(info_global.hybrid_type),
+	:ccp_type(info_global.ccp_type),
 	 hse_omega(info_global.hse_omega){} 
 
 void Exx_Lcao::init()
@@ -644,19 +644,19 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::en
 //}
 
 gettimeofday( &t_start, NULL);
-	switch(info.hybrid_type)
+	std::map<std::string,double> ccp_parameter;
+	switch(info.ccp_type)
 	{
-		case Exx_Info::Hybrid_Type::HF:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times );		break;
-		case Exx_Info::Hybrid_Type::PBE0:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times );		break;
-		case Exx_Info::Hybrid_Type::SCAN0:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times );		break;
-		case Exx_Info::Hybrid_Type::HSE:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_rmesh_times );	break;
+		case Conv_Coulomb_Pot_K::Ccp_Type::Ccp:
+			ccp_parameter = {};		break;
+		case Conv_Coulomb_Pot_K::Ccp_Type::Hf:
+			ccp_parameter = {};		break;
+		case Conv_Coulomb_Pot_K::Ccp_Type::Hse:
+			ccp_parameter = {{"hse_omega",info.hse_omega}};		break;
 		default:
-			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
+			throw std::domain_error(std::string(__FILE__)+" line "+std::to_string(__LINE__));	break;
 	}
+	abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, info.ccp_type, ccp_parameter, info.ccp_rmesh_times );
 ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::endl;
 
 	auto print_psik = [](
@@ -690,11 +690,9 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::
 	#endif
 
 	for( size_t T=0; T!=abfs.size(); ++T )
-	{
-		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(abfs[T].size())-1 );
-	}
+		GlobalC::exx_info.info_ri.abfs_Lmax = std::max( GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(abfs[T].size())-1 );
 
-ofs_mpi<<"Exx_Abfs::Lmax:\t"<<Exx_Abfs::Lmax<<std::endl;
+ofs_mpi<<"GlobalC::exx_info.info_ri.abfs_Lmax:\t"<<GlobalC::exx_info.info_ri.abfs_Lmax<<std::endl;
 
 	const ModuleBase::Element_Basis_Index::Range
 		&&range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );

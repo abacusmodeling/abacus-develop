@@ -10,8 +10,6 @@
 #include "../src_io/cal_r_overlap_R.h"
 #include "../src_io/print_info.h"
 #include "../module_relaxation/variable_cell.h" // mohan add 2021-02-01
-#include "../src_ri/exx_abfs.h"
-#include "../src_ri/exx_opt_orb.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../module_md/MD_func.h"
 #include "../module_md/FIRE.h"

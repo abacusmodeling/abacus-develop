@@ -94,14 +94,9 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
 #ifdef __EXX
     if (GlobalV::CALCULATION == "nscf")
     {
-        switch (GlobalC::exx_info.info_global.hybrid_type)
+        if (GlobalC::exx_info.info_global.cal_exx)
         {
-        case Exx_Info::Hybrid_Type::HF:
-        case Exx_Info::Hybrid_Type::PBE0:
-        case Exx_Info::Hybrid_Type::SCAN0:
-        case Exx_Info::Hybrid_Type::HSE:
             XC_Functional::set_xc_type(ucell.atoms[0].xc_func);
-            break;
         }
     }
 
@@ -110,23 +105,13 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell_pseudo& ucell)
     // Peize Lin 2016-12-03
     if (GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
     {
-        switch (GlobalC::exx_info.info_global.hybrid_type)
+        if (GlobalC::exx_info.info_global.cal_exx)
         {
-        case Exx_Info::Hybrid_Type::HF:
-        case Exx_Info::Hybrid_Type::PBE0:
-        case Exx_Info::Hybrid_Type::SCAN0:
-        case Exx_Info::Hybrid_Type::HSE:
+			// GlobalC::exx_lcao.init();
             if(GlobalV::GAMMA_ONLY_LOCAL)
                 GlobalC::exx_lri_double.init(MPI_COMM_WORLD);
             else
                 GlobalC::exx_lri_complex.init(MPI_COMM_WORLD);
-            break;
-        case Exx_Info::Hybrid_Type::No:
-        case Exx_Info::Hybrid_Type::Generate_Matrix:
-            break;
-        default:
-            throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)
-                                        + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
         }
     }
 #endif
@@ -297,7 +282,7 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
 
     int Lmax = 0;
 #ifdef __EXX
-    Lmax = Exx_Abfs::Lmax;
+    Lmax = GlobalC::exx_info.info_ri.abfs_Lmax;
 #endif
     this->orb_con.set_orb_tables(GlobalV::ofs_running,
                                  GlobalC::UOT,
@@ -412,7 +397,7 @@ void ESolver_KS_LCAO::eachiterinit(const int istep, const int iter)
 
 #ifdef __EXX
     // calculate exact-exchange
-    if(Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
+    if (GlobalC::exx_info.info_global.cal_exx)
     {
         if (!GlobalC::exx_info.info_global.separate_loop && this->two_level_step)
         {
@@ -696,11 +681,14 @@ void ESolver_KS_LCAO::afterscf(const int istep)
     }
 
 #ifdef __EXX
-	const std::string file_name_exx = GlobalV::global_out_dir + "HexxR_" + std::to_string(GlobalV::MY_RANK);
-	if(GlobalV::GAMMA_ONLY_LOCAL)
-		GlobalC::exx_lri_double.write_Hexxs(file_name_exx);
-	else
-		GlobalC::exx_lri_complex.write_Hexxs(file_name_exx);
+    if (GlobalC::exx_info.info_global.cal_exx)                         // Peize Lin add if 2022.11.14
+    {
+        const std::string file_name_exx = GlobalV::global_out_dir + "HexxR_" + std::to_string(GlobalV::MY_RANK);
+        if(GlobalV::GAMMA_ONLY_LOCAL)
+            GlobalC::exx_lri_double.write_Hexxs(file_name_exx);
+        else
+            GlobalC::exx_lri_complex.write_Hexxs(file_name_exx);
+    }
 #endif
 
     if (GlobalC::pot.out_pot == 2)
@@ -990,7 +978,7 @@ void ESolver_KS_LCAO::afterscf(const int istep)
 bool ESolver_KS_LCAO::do_after_converge(int& iter)
 {
 #ifdef __EXX
-    if (Exx_Info::Hybrid_Type::No != GlobalC::exx_info.info_global.hybrid_type)
+    if (GlobalC::exx_info.info_global.cal_exx)
     {
         //no separate_loop case
         if (!GlobalC::exx_info.info_global.separate_loop)

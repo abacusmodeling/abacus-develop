@@ -31,7 +31,7 @@ class RPAExxLcao : public Exx_Lcao
         info.schwarz_threshold = INPUT.exx_schwarz_threshold;
         info.cauchy_threshold = INPUT.exx_cauchy_threshold;
         info.ccp_threshold = INPUT.exx_ccp_threshold;
-        info.ccp_rmesh_times = INPUT.exx_ccp_rmesh_times;
+        info.ccp_rmesh_times = std::stod(INPUT.exx_ccp_rmesh_times);
 
         if (INPUT.exx_distribute_type == "htime")
         {

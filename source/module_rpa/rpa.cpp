@@ -306,31 +306,26 @@ void RPAExxLcao::exx_init()
         abfs = Exx_Abfs::IO::construct_abfs(abfs_same_atom, GlobalC::ORB, info.files_abfs, kmesh_times);
     }
 
-    switch (info.hybrid_type)
-    {
-    case Exx_Info::Hybrid_Type::HF:
-        abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times);
-        break;
-    case Exx_Info::Hybrid_Type::No:
-        abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times);
-        break;
-    case Exx_Info::Hybrid_Type::PBE0:
-        abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hf, {}, info.ccp_rmesh_times);
-        break;
-    case Exx_Info::Hybrid_Type::HSE:
-        abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp(abfs,
-                                                    Conv_Coulomb_Pot_K::Ccp_Type::Hse,
-                                                    {{"hse_omega", info.hse_omega}},
-                                                    info.ccp_rmesh_times);
-        break;
-    default:
-        throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + " line "
-                                + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-    }
+
+	auto get_ccp_parameter = [this]() -> std::map<std::string,double>
+	{
+		switch(this->info.ccp_type)
+		{
+			case Conv_Coulomb_Pot_K::Ccp_Type::Ccp:
+				return {};
+			case Conv_Coulomb_Pot_K::Ccp_Type::Hf:
+				return {};
+			case Conv_Coulomb_Pot_K::Ccp_Type::Hse:
+				return {{"hse_omega", this->info.hse_omega}};
+			default:
+				throw std::domain_error(std::string(__FILE__)+" line "+std::to_string(__LINE__));	break;
+		}
+	};
+	this->abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, info.ccp_type, get_ccp_parameter(), this->info.ccp_rmesh_times );
 
     for (size_t T = 0; T != abfs.size(); ++T)
     {
-        Exx_Abfs::Lmax = std::max(Exx_Abfs::Lmax, static_cast<int>(abfs[T].size()) - 1);
+        GlobalC::exx_info.info_ri.abfs_Lmax = std::max(GlobalC::exx_info.info_ri.abfs_Lmax, static_cast<int>(abfs[T].size()) - 1);
     }
 
     const ModuleBase::Element_Basis_Index::Range &&range_lcaos = Exx_Abfs::Abfs_Index::construct_range(lcaos);

@@ -71,7 +71,7 @@ void unkOverlap_lcao::init(std::complex<double>*** wfc_k_grid)
 
     int exx_lmax = 0;
 #ifdef __EXX
-    exx_lmax = Exx_Abfs::Lmax;
+    exx_lmax = GlobalC::exx_info.info_ri.abfs_Lmax;
 #endif
 	MOT.init_Table_Spherical_Bessel(2, 3, Lmax_used, Lmax, exx_lmax, GlobalC::ORB, GlobalC::ucell.infoNL.Beta);
 
