@@ -206,6 +206,12 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell& ucell)
         // this function belongs to ions LOOP
         int ion_step = 0;
     }
+
+    //Fix pelec->wg by ocp_kb
+    if(GlobalV::ocp)
+    {
+        this->pelec->fixed_weights(GlobalV::ocp_kb.data());
+    }
 }
 
 void ESolver_KS_LCAO::cal_Energy(double& etot)
