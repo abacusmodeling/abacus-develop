@@ -105,35 +105,44 @@ void Exx_LRI<Tdata>::cal_exx_ions()
 	std::vector<TA> atoms(GlobalC::ucell.nat);
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 		atoms[iat] = iat;
-	std::map<TA,TatomR> atomsR;
+	std::map<TA,TatomR> atoms_pos;
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
-		atomsR[iat] = RI_Util::Vector3_to_array3( GlobalC::ucell.atoms[ GlobalC::ucell.iat2it[iat] ].tau[ GlobalC::ucell.iat2ia[iat] ] );
+		atoms_pos[iat] = RI_Util::Vector3_to_array3( GlobalC::ucell.atoms[ GlobalC::ucell.iat2it[iat] ].tau[ GlobalC::ucell.iat2ia[iat] ] );
 	const std::array<TatomR,Ndim> latvec
 		= {RI_Util::Vector3_to_array3(GlobalC::ucell.a1),
 		   RI_Util::Vector3_to_array3(GlobalC::ucell.a2),
 		   RI_Util::Vector3_to_array3(GlobalC::ucell.a3)};
 	const std::array<Tcell,Ndim> period = {GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]};
 
-	this->exx_lri.set_parallel(this->mpi_comm, atomsR, latvec, period);
+	this->exx_lri.set_parallel(this->mpi_comm, atoms_pos, latvec, period);
 
 	// std::max(3) for gamma_only, list_A2 should contain cell {-1,0,1}. In the future distribute will be neighbour.
-	const std::array<Tcell,Ndim> period_tmp = {std::max(3,GlobalC::kv.nmp[0]), std::max(3,GlobalC::kv.nmp[1]), std::max(3,GlobalC::kv.nmp[2])};
-	std::pair<std::vector<TA>, std::vector<std::vector<std::pair<TA,std::array<Tcell,Ndim>>>>>
-		list_As = RI::Distribute_Equally::distribute_atoms_periods(this->mpi_comm, atoms, period_tmp, 2);
-	const std::vector<TA> list_A1 = std::move(list_As.first);
-	const std::vector<TAC> list_A2 = std::move(list_As.second[0]);
+	const std::array<Tcell,Ndim> period_Vs = LRI_CV_Tools::cal_latvec_range<Tcell>(1+this->info.ccp_rmesh_times);	
+	const std::pair<std::vector<TA>, std::vector<std::vector<std::pair<TA,std::array<Tcell,Ndim>>>>>
+		list_As_Vs = RI::Distribute_Equally::distribute_atoms_periods(this->mpi_comm, atoms, period_Vs, 2, false);
 
-	std::map<TA,std::map<TAC,RI::Tensor<Tdata>>> Vs = this->cv.cal_Vs(list_A1, list_A2, {{"writable_Vws",true}});
+	std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>
+		Vs = this->cv.cal_Vs(
+			list_As_Vs.first, list_As_Vs.second[0],
+			{{"writable_Vws",true}});
 	this->exx_lri.set_Vs(std::move(Vs), this->info.V_threshold);
 
 	if(GlobalV::CAL_FORCE || GlobalV::CAL_STRESS)
 	{
-		std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3> dVs = this->cv.cal_dVs(list_A1, list_A2, {{"writable_dVws",true}});
+		std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3>
+			dVs = this->cv.cal_dVs(
+				list_As_Vs.first, list_As_Vs.second[0],
+				{{"writable_dVws",true}});
 		this->exx_lri.set_dVs(std::move(dVs), this->info.V_grad_threshold);
 	}
 
+	const std::array<Tcell,Ndim> period_Cs = LRI_CV_Tools::cal_latvec_range<Tcell>(2);
+	const std::pair<std::vector<TA>, std::vector<std::vector<std::pair<TA,std::array<Tcell,Ndim>>>>>
+		list_As_Cs = RI::Distribute_Equally::distribute_atoms_periods(this->mpi_comm, atoms, period_Cs, 2, false);
+
 	std::pair<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>, std::array<std::map<TA,std::map<TAC,RI::Tensor<Tdata>>>,3>>
-		Cs_dCs = this->cv.cal_Cs_dCs(list_A1, list_A2,
+		Cs_dCs = this->cv.cal_Cs_dCs(
+			list_As_Cs.first, list_As_Cs.second[0],
 			{{"cal_dC",GlobalV::CAL_FORCE||GlobalV::CAL_STRESS},
 			 {"writable_Cws",true}, {"writable_dCws",true}, {"writable_Vws",false}, {"writable_dVws",false}});
 	std::map<TA,std::map<TAC,RI::Tensor<Tdata>>> &Cs = std::get<0>(Cs_dCs);

@@ -281,6 +281,19 @@ template <class T> inline Vector3<T> operator/(const Vector3<T> &u, const T &s)
 }
 
 /**
+ * @brief Overload "/" to calculate scalar/Vector3
+ *
+ * @tparam T
+ * @param s
+ * @param u
+ * @return Vector3<T>
+ */
+template <class T> inline Vector3<T> operator/(const T &s, const Vector3<T> &u)
+{
+    return Vector3<T>(s/u.x, s/u.y, s/u.z);
+}
+
+/**
  * @brief Dot productor of two Vector3
  *
  * @param u

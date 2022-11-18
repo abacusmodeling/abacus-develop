@@ -53,6 +53,9 @@ namespace LRI_CV_Tools
 	template<typename TkeyA, typename TkeyB, typename Tvalue, std::size_t N>
 	extern std::array<std::map<TkeyA,std::map<TkeyB,Tvalue>>,N>
 	change_order(std::map<TkeyA,std::map<TkeyB,std::array<Tvalue,N>>> && ds_in);
+
+	template<typename Tcell>
+	extern std::array<Tcell,3> cal_latvec_range(const double &rcut_times);	
 }
 
 #include "LRI_CV_Tools.hpp"
