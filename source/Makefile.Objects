@@ -167,7 +167,6 @@ OBJS_ELECSTAT=elecstate.o\
 
 OBJS_ELECSTAT_LCAO=elecstate_lcao.o\
       elecstate_lcao_tddft.o\
-      dm2d_to_grid.o\
 
 OBJS_ESOLVER=esolver.o\
     esolver_ks.o\
@@ -190,7 +189,6 @@ OBJS_ESOLVER_LCAO=esolver_ks_lcao.o\
 OBJS_GINT=gint.o\
       gint_gamma.o\
       gint_gamma_env.o\
-      gint_gamma_mull.o\
       gint_gamma_vl.o\
       gint_fvl.o\
       gint_rho.o\

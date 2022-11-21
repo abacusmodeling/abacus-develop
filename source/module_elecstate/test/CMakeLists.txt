@@ -26,7 +26,7 @@ if(ENABLE_LCAO)
   AddTest(
     TARGET EState_psiToRho_lcao
     LIBS ${test_math_libs} base orb cell neighbor planewave psi
-    SOURCES elecstate_lcao_test.cpp ../elecstate_lcao.cpp ../dm2d_to_grid.cpp
+    SOURCES elecstate_lcao_test.cpp ../elecstate_lcao.cpp
               ../../src_parallel/parallel_global.cpp ../../src_parallel/parallel_common.cpp ../../src_parallel/parallel_reduce.cpp
               ../../src_lcao/local_orbital_charge.cpp ../../src_lcao/DM_gamma.cpp ../../src_lcao/DM_k.cpp
               ../../src_lcao/local_orbital_wfc.cpp
