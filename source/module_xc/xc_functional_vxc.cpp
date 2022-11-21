@@ -180,8 +180,8 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
         const double * const * const rho_in,
         const double * const rho_core_in)
 {
-    ModuleBase::TITLE("XC_Functional","v_xc");
-    ModuleBase::timer::tick("XC_Functional","v_xc");
+    ModuleBase::TITLE("XC_Functional","v_xc_libxc");
+    ModuleBase::timer::tick("XC_Functional","v_xc_libxc");
 
     const int nspin = GlobalV::NSPIN;
 
@@ -385,7 +385,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
 
     finish_func(funcs);
 
-    ModuleBase::timer::tick("XC_Functional","v_xc");
+    ModuleBase::timer::tick("XC_Functional","v_xc_libxc");
     return std::make_tuple( etxc, vtxc, std::move(v) );
 }
 
@@ -409,8 +409,8 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 	const double * const rho_core_in,
 	const double * const * const kin_r_in)
 {
-    ModuleBase::TITLE("XC_Functional","v_xc");
-    ModuleBase::timer::tick("XC_Functional","v_xc");
+    ModuleBase::TITLE("XC_Functional","v_xc_meta");
+    ModuleBase::timer::tick("XC_Functional","v_xc_meta");
 
     if(GlobalV::NSPIN==4)
     {

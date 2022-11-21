@@ -233,20 +233,37 @@ void Force_Stress_LCAO::getForceStress(
 			}
 		}
 	}
-	//Force contribution from exx
 #ifdef __EXX
-	ModuleBase::matrix fexx;
+	//Force and Stress contribution from exx
+	ModuleBase::matrix force_exx;
+	ModuleBase::matrix stress_exx;
 	if( GlobalC::exx_info.info_global.cal_exx )
 	{
-		if(GlobalV::GAMMA_ONLY_LOCAL)
+		if(isforce)
 		{
-			GlobalC::exx_lri_double.cal_exx_force();
-			fexx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_double.Fexx;
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				GlobalC::exx_lri_double.cal_exx_force();
+				force_exx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_double.force_exx;
+			}
+			else
+			{
+				GlobalC::exx_lri_complex.cal_exx_force();
+				force_exx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_complex.force_exx;
+			}
 		}
-		else
+		if(isstress)
 		{
-			GlobalC::exx_lri_complex.cal_exx_force();
-			fexx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_complex.Fexx;
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				GlobalC::exx_lri_double.cal_exx_stress();
+				stress_exx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_double.stress_exx;
+			}
+			else
+			{
+				GlobalC::exx_lri_complex.cal_exx_stress();
+				stress_exx = GlobalC::exx_info.info_global.hybrid_alpha * GlobalC::exx_lri_complex.stress_exx;
+			}
 		}
 	}
 #endif
@@ -282,7 +299,7 @@ void Force_Stress_LCAO::getForceStress(
 				// Force contribution from exx
 				if( GlobalC::exx_info.info_global.cal_exx )
 				{
-					fcs(iat,i) += fexx(iat,i);
+					fcs(iat,i) += force_exx(iat,i);
 				}
 #endif
 				//VDW force of vdwd2 or vdwd3
@@ -517,6 +534,13 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					scs(i, j) += stress_dftu(i, j);
 				}
+#ifdef __EXX
+				// Stress contribution from exx
+				if( GlobalC::exx_info.info_global.cal_exx )
+				{
+					scs(i,j) += stress_exx(i,j);
+				}
+#endif
 			}
 		}
 
@@ -763,6 +787,7 @@ void Force_Stress_LCAO::calForcePwPart(
 	ModuleBase::matrix &fcc,
 	ModuleBase::matrix &fscc)
 {
+	ModuleBase::TITLE("Force_Stress_LCAO","calForcePwPart");
 	//--------------------------------------------------------
 	// local pseudopotential force:
 	// use charge density; plane wave; local pseudopotential;
@@ -863,6 +888,7 @@ void Force_Stress_LCAO::calStressPwPart(
 	ModuleBase::matrix& sigmaxc
 )
 {
+    ModuleBase::TITLE("Force_Stress_LCAO","calStressPwPart");
 	//--------------------------------------------------------
 	// local pseudopotential stress:
 	// use charge density; plane wave; local pseudopotential;

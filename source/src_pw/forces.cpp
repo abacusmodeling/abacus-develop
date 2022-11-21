@@ -430,6 +430,7 @@ void Forces::print(const std::string& name, const ModuleBase::matrix& f, bool ry
 
 void Forces::cal_force_loc(ModuleBase::matrix& forcelc, ModulePW::PW_Basis* rho_basis)
 {
+    ModuleBase::TITLE("Forces", "cal_force_loc");
     ModuleBase::timer::tick("Forces", "cal_force_loc");
 
     std::complex<double>* aux = new std::complex<double>[rho_basis->nmaxgr];
@@ -480,6 +481,7 @@ void Forces::cal_force_loc(ModuleBase::matrix& forcelc, ModulePW::PW_Basis* rho_
 #include "H_Ewald_pw.h"
 void Forces::cal_force_ew(ModuleBase::matrix& forceion, ModulePW::PW_Basis* rho_basis)
 {
+    ModuleBase::TITLE("Forces", "cal_force_ew");
     ModuleBase::timer::tick("Forces", "cal_force_ew");
 
     double fact = 2.0;
@@ -643,6 +645,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion, ModulePW::PW_Basis* rho_
 
 void Forces::cal_force_cc(ModuleBase::matrix& forcecc, ModulePW::PW_Basis* rho_basis)
 {
+    ModuleBase::TITLE("Forces", "cal_force_cc");
     // recalculate the exchange-correlation potential.
 
     ModuleBase::matrix v(GlobalV::NSPIN, rho_basis->nrxx);
@@ -924,6 +927,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl, const psi::Psi<complex<do
 
 void Forces::cal_force_scc(ModuleBase::matrix& forcescc, ModulePW::PW_Basis* rho_basis)
 {
+    ModuleBase::TITLE("Forces", "cal_force_scc");
     std::complex<double>* psic = new std::complex<double>[rho_basis->nmaxgr];
 
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)

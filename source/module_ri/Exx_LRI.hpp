@@ -239,19 +239,44 @@ void Exx_LRI<Tdata>::cal_exx_force()
 		
 	this->exx_lri.set_csm_threshold(this->info.cauchy_grad_threshold);
 
-	this->Fexx.create(GlobalC::ucell.nat, Ndim);
+	this->force_exx.create(GlobalC::ucell.nat, Ndim);
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
-		this->exx_lri.cal_Fs({"","",std::to_string(is),"",""});
-		for(std::size_t ix=0; ix<Ndim; ++ix)
-			for(const auto &force_item : this->exx_lri.force[ix])
-				this->Fexx(force_item.first, ix) += std::real(force_item.second);
+		this->exx_lri.cal_force({"","",std::to_string(is),"",""});
+		for(std::size_t idim=0; idim<Ndim; ++idim)
+			for(const auto &force_item : this->exx_lri.force[idim])
+				this->force_exx(force_item.first, idim) += std::real(force_item.second);
 	}
 
 	const double SPIN_multiple = std::map<int,double>{{1,2}, {2,1}, {4,1}}.at(GlobalV::NSPIN);				// why?
 	const double frac = -2 * SPIN_multiple;		// why?
-	this->Fexx *= frac;
+	this->force_exx *= frac;
 	ModuleBase::timer::tick("Exx_LRI", "cal_exx_force");
+}
+
+
+template<typename Tdata>
+void Exx_LRI<Tdata>::cal_exx_stress()
+{
+	ModuleBase::TITLE("Exx_LRI","cal_exx_stress");
+	ModuleBase::timer::tick("Exx_LRI", "cal_exx_stress");
+		
+	this->exx_lri.set_csm_threshold(this->info.cauchy_grad_threshold);
+
+	this->stress_exx.create(Ndim, Ndim);
+	for(int is=0; is<GlobalV::NSPIN; ++is)
+	{
+		this->exx_lri.cal_stress({"","",std::to_string(is),"",""});
+		for(std::size_t idim0=0; idim0<Ndim; ++idim0)
+			for(std::size_t idim1=0; idim1<Ndim; ++idim1)
+				this->stress_exx(idim0,idim1) += std::real(this->exx_lri.stress(idim0,idim1));
+	}
+
+	const double SPIN_multiple = std::map<int,double>{{1,2}, {2,1}, {4,1}}.at(GlobalV::NSPIN);				// why?
+	const double frac = 2 * SPIN_multiple / GlobalC::ucell.omega * GlobalC::ucell.lat0;		// why?
+	this->stress_exx *= frac;
+
+	ModuleBase::timer::tick("Exx_LRI", "cal_exx_stress");
 }
 
 template<typename Tdata>
