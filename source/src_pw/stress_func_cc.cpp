@@ -7,6 +7,7 @@
 //NLCC term, need to be tested
 void Stress_Func::stress_cc(ModuleBase::matrix& sigma, ModulePW::PW_Basis* rho_basis, const bool is_pw)
 {
+    ModuleBase::TITLE("Stress_Func","stress_cc");
 	ModuleBase::timer::tick("Stress_Func","stress_cc");
         
 	double fact=1.0;

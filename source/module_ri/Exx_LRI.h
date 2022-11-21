@@ -26,7 +26,7 @@ class Exx_LRI
 private:
 	using TA = int;
 	using Tcell = int;
-	static const size_t Ndim = 3;
+	static constexpr std::size_t Ndim = 3;
 	using TC = std::array<Tcell,Ndim>;
 	using TAC = std::pair<TA,TC>;
 	using TatomR = std::array<double,Ndim>;		// tmp
@@ -38,10 +38,12 @@ public:
 	void cal_exx_ions();
 	void cal_exx_elec(const Local_Orbital_Charge &loc, const Parallel_Orbitals &pv);
 	void cal_exx_force();
+	void cal_exx_stress();
 
 	std::vector< std::map<TA, std::map<TAC, RI::Tensor<Tdata>>>> Hexxs;
 	Tdata Eexx;
-	ModuleBase::matrix Fexx;
+	ModuleBase::matrix force_exx;
+	ModuleBase::matrix stress_exx;
 
 	void write_Hexxs(const std::string &file_name) const;
 	void read_Hexxs(const std::string &file_name);
