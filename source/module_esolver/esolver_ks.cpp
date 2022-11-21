@@ -46,7 +46,7 @@ namespace ModuleESolver
     void ESolver_KS::Init(Input& inp, UnitCell& ucell)
     {
         ESolver_FP::Init(inp,ucell);
-        GlobalC::CHR.cal_nelec();
+        chr.cal_nelec();
 
         /* it has been established that that
          xc_func is same for all elements, therefore
@@ -205,8 +205,7 @@ namespace ModuleESolver
                 {
                     // double drho = this->estate.caldr2(); 
                     // EState should be used after it is constructed.
-                    drho = GlobalC::CHR_MIX.get_drho(pelec->charge->rho, pelec->charge->rho_save,
-                        pelec->charge->rhog, pelec->charge->rhog_save, pelec->charge->nelec);
+                    drho = GlobalC::CHR_MIX.get_drho(pelec->charge, GlobalV::nelec);
                     double hsolver_error = 0.0;
                     if (firstscf)
                     {
@@ -217,8 +216,7 @@ namespace ModuleESolver
                         {
                             diag_ethr = this->phsol->reset_diagethr(GlobalV::ofs_running, hsolver_error, drho);
                             this->hamilt2density(istep, iter, diag_ethr);
-                            drho = GlobalC::CHR_MIX.get_drho(pelec->charge->rho, pelec->charge->rho_save,
-                                pelec->charge->rhog, pelec->charge->rhog_save, pelec->charge->nelec);
+                            drho = GlobalC::CHR_MIX.get_drho(pelec->charge, GlobalV::nelec);
                             hsolver_error = this->phsol->cal_hsolerror();
                         }
                     }
@@ -234,7 +232,7 @@ namespace ModuleESolver
                     {
                         //charge mixing
                         //conv_elec = this->estate.mix_rho();
-                        GlobalC::CHR_MIX.mix_rho(iter, pelec->charge->rho, pelec->charge->rho_save, pelec->charge->rhog, pelec->charge->rhog_save);
+                        GlobalC::CHR_MIX.mix_rho(iter, pelec->charge);
                     }
                 }
 #ifdef __MPI

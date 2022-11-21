@@ -271,5 +271,13 @@ extern std::string of_kernel_file; // The name of WT kernel file.
 extern std::string chg_extrap;
 extern int out_pot;
 
+extern std::string init_chg; //  output charge if out_chg > 0, and output every "out_chg" elec step.
+extern int out_chg;
+
+//Note : this is different from the capitalized NELEC
+//NELEC gives the total charge of the system
+//while nelec is the total number of valence electrons 
+extern double nelec;
+
 } // namespace GlobalV
 #endif

@@ -200,7 +200,7 @@ void Potential::write_potential(
 }
 
 
-void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave, ModulePW::PW_Basis* rho_basis)
+void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave, ModulePW::PW_Basis* rho_basis, const Charge* const chr)
 {
     ModuleBase::TITLE("Potential","write_elecstat_pot");
     ModuleBase::timer::tick("Potential","write_elecstat_pot");
@@ -219,7 +219,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     {
         for(int ir=0; ir<rho_basis->nrxx; ir++)
         {
-            vh_r[ir] += std::complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
+            vh_r[ir] += std::complex<double>( chr->rho[is][ir], 0.0 );
         }
     }
 
@@ -252,7 +252,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     if (GlobalV::EFIELD_FLAG && GlobalV::DIP_COR_FLAG)
     {
         v_efield.create(GlobalV::NSPIN, rho_basis->nrxx);
-        v_efield = elecstate::Efield::add_efield(*(this->ucell_), const_cast<ModulePW::PW_Basis *>(this->rho_basis_), GlobalV::NSPIN, GlobalC::CHR.rho, GlobalC::solvent_model);
+        v_efield = elecstate::Efield::add_efield(*(this->ucell_), const_cast<ModulePW::PW_Basis *>(this->rho_basis_), GlobalV::NSPIN, chr->rho, GlobalC::solvent_model);
     }
 
     //==========================================

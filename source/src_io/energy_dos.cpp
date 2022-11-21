@@ -516,7 +516,7 @@ void energy::perform_dos(
 		{
 			std::stringstream sp;
 			sp << GlobalV::global_out_dir << "Mulliken.dat";
-			Dos::calculate_Mulliken(sp.str(), uhm.GG);
+			Dos::calculate_Mulliken(sp.str(), uhm.GG, pelec->charge->rho);
 		}
 	
 		if(nspin0==1)

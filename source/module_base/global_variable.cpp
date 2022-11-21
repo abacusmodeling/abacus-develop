@@ -242,4 +242,7 @@ std::string of_kernel_file = "WTkernel.txt";
 std::string chg_extrap = "";
 int out_pot = 0;
 
+std::string init_chg = "";
+int out_chg = 0;
+double nelec = 0;
 } // namespace GlobalV

@@ -43,7 +43,7 @@ class Gint_Gamma : public Gint
     // in gint_gamma_mull.cpp 
     //------------------------------------------------------
 	// calculate the Mulliken charge
-	void cal_mulliken(double** mulliken);
+	void cal_mulliken(double** mulliken, double** rho);
 
 private:
 

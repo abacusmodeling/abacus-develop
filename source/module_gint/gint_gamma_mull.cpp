@@ -12,7 +12,7 @@
 // so it should be done very efficiently, very carefully.
 // I might repeat again to emphasize this: need to optimize
 // this code very efficiently, very carefully.
-void Gint_Gamma::cal_mulliken(double** mulliken)
+void Gint_Gamma::cal_mulliken(double** mulliken, double** rho)
 {
     ModuleBase::TITLE("Grid_Integral","cal_mulliken");
 
@@ -207,7 +207,7 @@ void Gint_Gamma::cal_mulliken(double** mulliken)
 
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
-								double *rhop = GlobalC::CHR.rho[is];
+								double *rhop = rho[is];
 								for (int ib=0; ib<GlobalC::bigpw->bxyz; ib++)
 								{
 									if(cal_flag[ib][ia1] && cal_flag[ib][ia2])

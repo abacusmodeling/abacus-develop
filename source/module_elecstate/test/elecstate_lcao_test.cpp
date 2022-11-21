@@ -105,7 +105,7 @@ double Magnetism::get_neldw(void) {return 0;}
 void Parallel_Grid::zpiece_to_all(double *zpiece, const int &iz, double *rho){}
 #endif
 
-void Restart::load_disk(const std::string mode, const int i) const {}
+void Restart::load_disk(const std::string mode, const int i, double** rho) const {}
 
 void set_pw()
 {

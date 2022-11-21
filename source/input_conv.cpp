@@ -69,6 +69,10 @@ void Input_Conv::Convert(void)
         {
             ModuleBase::WARNING_QUIT("Input_Conv","only CG has been implemented for relax_new");
         }
+        if(!INPUT.relax_new && (INPUT.fixed_axes == "shape" || INPUT.fixed_axes == "volume"))
+        {
+            ModuleBase::WARNING_QUIT("Input_Conv","fixed shape and fixed volume only supported for relax_new = 1");
+        }
         GlobalV::fixed_atoms = INPUT.fixed_atoms;
     }
 
@@ -251,7 +255,7 @@ void Input_Conv::Convert(void)
     // Yu Liu add 2022-09-13
     //----------------------------------------------------------
     GlobalV::GATE_FLAG = INPUT.gate_flag;
-    GlobalV::NELEC = INPUT.nelec;
+    GlobalV::nelec = INPUT.nelec;
     elecstate::Gatefield::zgate = INPUT.zgate;
     elecstate::Gatefield::relax = INPUT.relax;
     elecstate::Gatefield::block = INPUT.block;
@@ -488,10 +492,10 @@ void Input_Conv::Convert(void)
     //----------------------------------------------------------
     GlobalV::OUT_FREQ_ELEC = INPUT.out_freq_elec;
     GlobalV::OUT_FREQ_ION = INPUT.out_freq_ion;
-    GlobalC::CHR.init_chg = INPUT.init_chg;
+    GlobalV::init_chg = INPUT.init_chg;
     GlobalV::chg_extrap = INPUT.chg_extrap; // xiaohui modify 2015-02-01
-    GlobalC::CHR.out_chg = INPUT.out_chg;
-    GlobalC::CHR.nelec = INPUT.nelec;
+    GlobalV::out_chg = INPUT.out_chg;
+    GlobalV::nelec = INPUT.nelec;
     GlobalV::out_pot = INPUT.out_pot;
     GlobalC::wf.out_wfc_pw = INPUT.out_wfc_pw;
     GlobalC::wf.out_wfc_r = INPUT.out_wfc_r;

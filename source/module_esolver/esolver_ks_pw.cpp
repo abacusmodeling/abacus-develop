@@ -121,21 +121,22 @@ namespace ModuleESolver
     {
         ESolver_KS::Init(inp,ucell);
 
-        //init ElecState,
-        if(this->pelec == nullptr)
-        {
-            this->pelec = new elecstate::ElecStatePW<double>( GlobalC::wfcpw, &(GlobalC::CHR), (K_Vectors*)(&(GlobalC::kv)), GlobalV::NBANDS);
-        }
         //init HSolver
         if(this->phsol == nullptr)
         {
             this->phsol = new hsolver::HSolverPW(GlobalC::wfcpw);
         }
 
+        //init ElecState,
+        if(this->pelec == nullptr)
+        {
+            this->pelec = new elecstate::ElecStatePW<double>( GlobalC::wfcpw, &(chr), (K_Vectors*)(&(GlobalC::kv)), GlobalV::NBANDS);
+        }
+
         // Inititlize the charge density.
         this->pelec->charge->allocate(GlobalV::NSPIN, GlobalC::rhopw->nrxx, GlobalC::rhopw->npw);
 
-        // Initializee the potential.
+        // Initialize the potential.
         if(this->pelec->pot == nullptr)
         {
             this->pelec->pot = new elecstate::Potential(
@@ -167,7 +168,7 @@ namespace ModuleESolver
         {
             CE.update_istep();
             CE.save_pos_next(GlobalC::ucell);
-            CE.extrapolate_charge();
+            CE.extrapolate_charge(pelec->charge);
 
             if(GlobalC::ucell.cell_parameter_updated)
             {
@@ -185,7 +186,7 @@ namespace ModuleESolver
                 // charge extrapolation if istep>0.
                 CE.update_istep();
                 CE.update_all_pos(GlobalC::ucell);
-                CE.extrapolate_charge();
+                CE.extrapolate_charge(pelec->charge);
                 CE.save_pos_next(GlobalC::ucell);
 
                 GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
@@ -284,7 +285,7 @@ namespace ModuleESolver
 
         // mohan move harris functional to here, 2012-06-05
         // use 'rho(in)' and 'v_h and v_xc'(in)
-        GlobalC::en.deband_harris = GlobalC::en.delta_e(this->pelec->pot);
+        GlobalC::en.deband_harris = GlobalC::en.delta_e(this->pelec);
 
         //(2) save change density as previous charge,
         // prepared fox mixing.
@@ -347,12 +348,12 @@ namespace ModuleESolver
         }
 
         // compute magnetization, only for LSDA(spin==2)
-        GlobalC::ucell.magnet.compute_magnetization();
+        GlobalC::ucell.magnet.compute_magnetization(pelec->charge);
         // deband is calculated from "output" charge density calculated
         // in sum_band
         // need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
 
-        GlobalC::en.deband = GlobalC::en.delta_e(this->pelec->pot);
+        GlobalC::en.deband = GlobalC::en.delta_e(this->pelec);
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
     }
 
@@ -362,7 +363,7 @@ namespace ModuleESolver
         if (!this->conv_elec)
         {
             this->pelec->pot->update_from_charge(this->pelec->charge, &GlobalC::ucell);
-            GlobalC::en.delta_escf(this->pelec->pot);
+            GlobalC::en.delta_escf(this->pelec);
         }
         else
         {
@@ -387,7 +388,7 @@ namespace ModuleESolver
 
         if (print)
         {
-            if (pelec->charge->out_chg > 0)
+            if (GlobalV::out_chg > 0)
             {
                 for (int is = 0; is < GlobalV::NSPIN; is++)
                 {
@@ -476,7 +477,7 @@ namespace ModuleESolver
 			std::stringstream ssp_ave;
 			ssp << GlobalV::global_out_dir << "ElecStaticPot";
 			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-			this->pelec->pot->write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw); //output 'Hartree + local pseudopot'
+			this->pelec->pot->write_elecstat_pot(ssp.str(), ssp_ave.str(), GlobalC::rhopw, pelec->charge); //output 'Hartree + local pseudopot'
 		}
 
         if (GlobalV::OUT_LEVEL != "m")
@@ -598,7 +599,7 @@ namespace ModuleESolver
     void ESolver_KS_PW::cal_Force(ModuleBase::matrix& force)
     {
         Forces ff;
-        ff.init(force, this->pelec->wg, this->psi);
+        ff.init(force, this->pelec->wg, pelec->charge, this->psi);
     }
 
     void ESolver_KS_PW::cal_Stress(ModuleBase::matrix& stress)
@@ -708,7 +709,7 @@ namespace ModuleESolver
         // =======================================
         double diag_ethr = GlobalV::PW_DIAG_THR;
         if(diag_ethr - 1e-2 > -1e-5)   
-            diag_ethr = std::max(1e-13, 0.1*std::min(1e-2,GlobalV::SCF_THR / this->pelec->charge->nelec));
+            diag_ethr = std::max(1e-13, 0.1*std::min(1e-2,GlobalV::SCF_THR / GlobalV::nelec));
         GlobalV::ofs_running << " PW_DIAG_THR  = "<< diag_ethr << std::endl;
 
         this->hamilt2estates(diag_ethr);

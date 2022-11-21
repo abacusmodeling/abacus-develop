@@ -91,7 +91,6 @@ OBJS_MAIN=main.o\
     input.o \
     input_conv.o\
     driver_run.o\
-    input_update.o
 
 OBJS_BASE=complexarray.o\
     complexmatrix.o\
@@ -341,7 +340,6 @@ OBJS_IO=berryphase.o\
     energy_dos_pw.o\
     epsilon0_pwscf.o\
     epsilon0_vasp.o\
-    eximport.o\
     dos.o\
     numerical_descriptor.o\
     numerical_basis.o\

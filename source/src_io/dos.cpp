@@ -2,7 +2,7 @@
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_reduce.h"
 #ifdef __LCAO
-void Dos::calculate_Mulliken(const std::string &fa, Gint_Gamma &gg)
+void Dos::calculate_Mulliken(const std::string &fa, Gint_Gamma &gg, double** rho)
 {
 	ModuleBase::TITLE("Dos","calculate_Mulliken");
 	std::ofstream ofs;
@@ -24,7 +24,7 @@ void Dos::calculate_Mulliken(const std::string &fa, Gint_Gamma &gg)
 			ModuleBase::GlobalFunc::ZEROS(mulliken[is], GlobalV::NLOCAL);
 		}
 		
-		gg.cal_mulliken( mulliken );	
+		gg.cal_mulliken( mulliken, rho);	
 
 		if(GlobalV::MY_RANK==0)
 		{
