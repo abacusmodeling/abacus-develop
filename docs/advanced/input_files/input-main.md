@@ -457,14 +457,13 @@ calculations.
   For atomic orbitals basis,
 
   - genelpa: This method should be used if you choose localized orbitals.
-  - hpseps: deprecated.
-  - lapack: lapack can be used for localized orbitals, but is only used for a single processor.
-  - cusolver: this method needs building with the cusolver component for lcao and at least one GPU is available.
+  - scalapack-gvx: scalapack can also be used for localized orbitals.
+  - cusolver: this method needs building with the cusolver component for lcao and at least one gpu is available.
 
-  If you set ks_solver=`hpseps` for basis_type=`pw`, the program will be stopped with an error message:
+  If you set ks_solver=`genelpa` for basis_type=`pw`, the program will be stopped with an error message:
 
   ```
-  hpseps can not be used with plane wave basis.
+  genelpa can not be used with plane wave basis.
   ```
 
   Then the user has to correct the input file and restart the calculation.
