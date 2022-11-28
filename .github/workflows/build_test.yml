@@ -32,7 +32,7 @@ jobs:
           build_args: "-DENABLE_LIBXC=1 -DENABLE_DEEPKS=1 -DUSE_ELPA=0"
           name: "Build with GNU compilers and extra components without ELPA"
     name: ${{ matrix.name }}
-    container: ghcr.io/deepmodeling/abacus-development-kit:${{ matrix.tag }}
+    container: ghcr.io/deepmodeling/abacus-${{ matrix.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
