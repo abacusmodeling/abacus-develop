@@ -144,16 +144,6 @@ HamiltLCAO<T>::HamiltLCAO(
         this->opsd->add(exx);
     }
 
-    if (GlobalV::dft_plus_u)
-    {
-        Operator<double>* dftu = new OperatorDFTU<OperatorLCAO<double>>(
-            LM_in,
-            nullptr,// no explicit call yet
-            &(LM_in->Hloc)
-        );
-        this->opsd->add(dftu);
-    }
-
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
@@ -166,6 +156,17 @@ HamiltLCAO<T>::HamiltLCAO(
         this->opsd->add(deepks);
     }
 #endif
+
+    //end node should be OperatorDFTU
+    if (GlobalV::dft_plus_u)
+    {
+        Operator<double>* dftu = new OperatorDFTU<OperatorLCAO<double>>(
+            LM_in,
+            nullptr,// no explicit call yet
+            &(LM_in->Hloc)
+        );
+        this->opsd->add(dftu);
+    }
     return;
 }
 
@@ -288,16 +289,6 @@ HamiltLCAO<T>::HamiltLCAO(
         this->ops->add(nonlocal);
     }
 
-    if (GlobalV::dft_plus_u)
-    {
-        Operator<std::complex<double>>* dftu = new OperatorDFTU<OperatorLCAO<std::complex<double>>>(
-            LM_in,
-            nullptr,// no explicit call yet
-            &(LM_in->Hloc2)
-        );
-        this->ops->add(dftu);
-    }
-
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
@@ -310,6 +301,16 @@ HamiltLCAO<T>::HamiltLCAO(
         this->ops->add(deepks);
     }
 #endif
+    //end node should be OperatorDFTU
+    if (GlobalV::dft_plus_u)
+    {
+        Operator<std::complex<double>>* dftu = new OperatorDFTU<OperatorLCAO<std::complex<double>>>(
+            LM_in,
+            nullptr,// no explicit call yet
+            &(LM_in->Hloc2)
+        );
+        this->ops->add(dftu);
+    }
 
 }
 
