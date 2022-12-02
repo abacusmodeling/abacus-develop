@@ -129,14 +129,6 @@ HamiltLCAO<T>::HamiltLCAO(
             );
             this->opsd->add(meta);
         }
-
-        //exact exchange term
-        Operator<double>* exx = new OperatorEXX<OperatorLCAO<double>>(
-            LM_in,
-            nullptr, //no explicit call yet
-            &(LM_in->Hloc)
-        );
-        this->opsd->add(exx);
     }
 
 #ifdef __DEEPKS
@@ -238,14 +230,6 @@ HamiltLCAO<T>::HamiltLCAO(
             );
             this->ops->add(meta);
         }
-
-        //exact exchange term
-        Operator<std::complex<double>>* exx = new OperatorEXX<OperatorLCAO<std::complex<double>>>(
-            LM_in,
-            nullptr, //no explicit call yet
-            &(LM_in->Hloc2)
-        );
-        this->ops->add(exx);
     }
 
     // initial operator for multi-k case
