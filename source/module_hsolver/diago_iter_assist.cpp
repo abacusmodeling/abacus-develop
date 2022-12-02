@@ -418,6 +418,7 @@ void DiagoIterAssist<FPTYPE, Device>::diagH_LAPACK(
     const bool all_eigenvalues = (nstart == nbands);
 
     FPTYPE * res = e, *e_gpu = nullptr;
+    
 #if ((defined __CUDA) || (defined __ROCM))
     if (psi::device::get_device_type<Device>(ctx) == psi::GpuDevice) {
         psi::memory::resize_memory_op<FPTYPE, psi::DEVICE_GPU>()(gpu_ctx, e_gpu, nbands);
