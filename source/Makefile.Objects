@@ -38,6 +38,7 @@ VPATH=./src_global:\
 ./module_hamilt/src:\
 ./module_gint:\
 ./src_pw:\
+./src_pw/src:\
 ./src_lcao:\
 ./module_relax:\
 ./module_relax/relax_old:\
@@ -460,6 +461,7 @@ OBJS_SRCPW=H_Ewald_pw.o\
     charge_pulay.o\
     energy.o\
     forces.o\
+    force_multi_device.o\
     global.o\
     klist.o\
     magnetism.o\

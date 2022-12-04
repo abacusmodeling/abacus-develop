@@ -1062,7 +1062,7 @@ void ESolver_OF::cal_Energy(double& etot)
 
 void ESolver_OF::cal_Force(ModuleBase::matrix& force)
 {
-    Forces ff;
+    Forces<double> ff;
     ModuleBase::matrix placeholder_wg;//using a placeholder for this template interface, would be refactor later
     ff.init(force, placeholder_wg, pelec->charge);
 }
