@@ -4,12 +4,6 @@
 #ifndef LCAO_gen_fixedH_H
 #define LCAO_gen_fixedH_H
 
-#include <sys/time.h>    
-#include <unistd.h>
-#include "sys/types.h"
-#include "sys/sysinfo.h"
-#include <string.h>
-
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_orbital/ORB_gen_tables.h"
@@ -37,31 +31,15 @@ public:
 	void calculate_S_no(double* SlocR);
 	//void calculate_S_no(std::complex<double>* SlocR);
 
-
-	// 计算虚拟内存的函数
-	int parseLine(char* line);
-	int getValueVir();
-
 	private:
 
 	void build_ST_new(const char& dtype, const bool& cal_deri, const UnitCell &ucell, double* SHlocR);
-	//void build_ST_new(const char& dtype, const bool& cal_deri, const UnitCell_pseudo &ucell, std::complex<double>* SHlocR);	
+	//void build_ST_new(const char& dtype, const bool& cal_deri, const UnitCell &ucell, std::complex<double>* SHlocR);	
 	
 	// can used in gamma algorithm.
-	void build_Nonlocal_beta (double* Hloc, const bool& calc_deri);
 	void build_Nonlocal_beta_new (double* Hloc);
 
-	// used if k point is used,
-	// also can used in gamma algorithm.
-	void build_Nonlocal_mu (double* HlocR, const bool &calc_deri);
-	//void build_Nonlocal_mu (std::complex<double>* HlocR, const bool &calc_deri);
 	void build_Nonlocal_mu_new (double* HlocR, const bool &calc_deri); 
-	// sjw
-	void build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &calc_deri);
-	void build_Nonlocal_mu_new_calc_k(double* HlocR, const bool &calc_deri);
-	     
-
-	void test_Nonlocal(void);
 
 };
 

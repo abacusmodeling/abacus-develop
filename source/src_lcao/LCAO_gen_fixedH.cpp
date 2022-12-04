@@ -24,6 +24,15 @@ LCAO_gen_fixedH::~LCAO_gen_fixedH()
 void LCAO_gen_fixedH::calculate_NL_no(double* HlocR)
 {
     ModuleBase::TITLE("LCAO_gen_fixedH","calculate_NL_no");
+	// if(GlobalV::GAMMA_ONLY_LOCAL)
+	// {
+	//   	//for gamma only.
+	// 	this->build_Nonlocal_beta_new(HlocR);
+	// }
+	// else
+	// {
+	// 	this->build_Nonlocal_mu_new(HlocR, false);
+	// }
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 	  	//for gamma only.
@@ -31,7 +40,15 @@ void LCAO_gen_fixedH::calculate_NL_no(double* HlocR)
 	}
 	else
 	{
-		this->build_Nonlocal_mu_new(HlocR, false);
+		// this->build_Nonlocal_mu_new(HlocR, false);
+		bool calc_deri = false;
+		if(!calc_deri){
+
+			this->build_Nonlocal_mu_new_Nocalc_k(HlocR,false);
+		}
+		else{
+			this->build_Nonlocal_mu_new_calc_k(HlocR, false);
+		}
 	}
 
     return;
@@ -65,204 +82,248 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 
     const Parallel_Orbitals* pv = this->LM->ParaV;
 
+	vector<int> nnr_omp;
+	int len_threads = 0;          // 有多少个线程
+	#pragma omp parallel
+	{
+	
+		int tid = omp_get_thread_num();
+		int tot_threads = omp_get_num_threads();
+		int average = GlobalC::ucell.nat / tot_threads;
+		int remain = GlobalC::ucell.nat % tot_threads;
+
+		int start;
+		int end;
+		if(tid == 0){
+			start = tid * average;
+			end = start + average + remain;
+	
+		}else{
+			start = tid * average + remain;
+			end = start + average;
+		}
+		 
+		for(int i = 0; i < tot_threads; i++){
+			if(tid == i){
+				#pragma omp critical  
+				nnr_omp.push_back(end);
+			}
+		}
+
+		len_threads = tot_threads;
+	}
+	sort(nnr_omp.begin(), nnr_omp.end());
+
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>
 	ModuleBase::Vector3<double> tau1, tau2, dtau;
 	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
-    for (int T1=0; T1<ucell.ntype; ++T1)
-    {
-		Atom* atom1 = &ucell.atoms[T1];
-        for (int I1=0; I1<atom1->na; ++I1)
-        {
-			tau1 = atom1->tau[I1];
-            //GlobalC::GridD.Find_atom(tau1);
-            GlobalC::GridD.Find_atom(ucell, tau1, T1, I1);
+	const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.Find_atoms(GlobalC::ucell);
+	int count = 0;
+	for(int iat = 0; iat < GlobalC::ucell.nat; iat++)
+	{
+		if((nnr_omp[count] ) == iat) 
+		{
+ 			nnr_omp[count] = nnr;
+			count++;
+		}
+		const int it = GlobalC::ucell.iat2it[iat];                 
+		const int ia = GlobalC::ucell.iat2ia[iat];
 
-            for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
-            {
-                const int T2 = GlobalC::GridD.getType(ad);
-				const int I2 = GlobalC::GridD.getNatom(ad);
-				Atom* atom2 = &ucell.atoms[T2];
-				tau2 = GlobalC::GridD.getAdjacentTau(ad);
-				dtau = tau2 - tau1;
-				double distance = dtau.norm() * ucell.lat0;
-				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+		Atom* atom1 = &GlobalC::ucell.atoms[it];
+		tau1 = atom1->tau[ia];
+		for (int ad = 0; ad < adjs_all[iat].size(); ++ad)
+		{
+			const int T1 = std::get<0>(adjs_all[iat][ad]);
+			const int I1 = std::get<1>(adjs_all[iat][ad]);
+			// const int T2 = GlobalC::GridD.getType(ad);
+			// const int I2 = GlobalC::GridD.getNatom(ad);
+			Atom* atom2 = &ucell.atoms[T1];
+			tau2 = std::get<3>(adjs_all[iat][ad]);
+			dtau = tau2 - tau1;
+			double distance = dtau.norm() * ucell.lat0;
+			double rcut = GlobalC::ORB.Phi[it].getRcut() + GlobalC::ORB.Phi[T1].getRcut();
 
-				if(distance < rcut)
+			if(distance < rcut)
+			{
+				int iw1_all = ucell.itiaiw2iwt( it, ia, 0) ; //iw1_all = combined index (it, ia, iw)
+
+				for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
 				{
-					int iw1_all = ucell.itiaiw2iwt( T1, I1, 0) ; //iw1_all = combined index (it, ia, iw)
+					const int jj0 = jj/GlobalV::NPOL;
+					const int L1 = atom1->iw2l[jj0];
+					const int N1 = atom1->iw2n[jj0];
+					const int m1 = atom1->iw2m[jj0];
 
-					for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
+					int iw2_all = ucell.itiaiw2iwt( T1, I1, 0);//zhengdy-soc
+					for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
 					{
-						const int jj0 = jj/GlobalV::NPOL;
-						const int L1 = atom1->iw2l[jj0];
-						const int N1 = atom1->iw2n[jj0];
-						const int m1 = atom1->iw2m[jj0];
+						const int kk0 = kk/GlobalV::NPOL;
+						const int L2 = atom2->iw2l[kk0];
+						const int N2 = atom2->iw2n[kk0];
+						const int m2 = atom2->iw2m[kk0];
 
-						int iw2_all = ucell.itiaiw2iwt( T2, I2, 0);//zhengdy-soc
-						for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
+						// mohan add 2010-06-29
+						// this is in fact the same as in build_Nonlocal_mu,
+						// the difference is that here we use {L,N,m} for ccycle,
+						// build_Nonlocal_mu use atom.nw for cycle.
+						// so, here we use ParaO::in_this_processor,
+						// in build_Non... use trace_loc_row
+						// and trace_loc_col directly,
+						if (!pv->in_this_processor(iw1_all, iw2_all))
 						{
-							const int kk0 = kk/GlobalV::NPOL;
-							const int L2 = atom2->iw2l[kk0];
-							const int N2 = atom2->iw2n[kk0];
-							const int m2 = atom2->iw2m[kk0];
+							++iw2_all;
+							continue;
+						}
 
-							// mohan add 2010-06-29
-							// this is in fact the same as in build_Nonlocal_mu,
-							// the difference is that here we use {L,N,m} for ccycle,
-							// build_Nonlocal_mu use atom.nw for cycle.
-							// so, here we use ParaO::in_this_processor,
-							// in build_Non... use trace_loc_row
-                            // and trace_loc_col directly,
-                            if (!pv->in_this_processor(iw1_all, iw2_all))
-							{
-								++iw2_all;
-								continue;
-							}
+						olm[0] = olm[1] = olm[2] = 0.0;
 
-							olm[0] = olm[1] = olm[2] = 0.0;
-
-							std::complex<double> olm1[4]={ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO};
-							std::complex<double> *olm2 = &olm1[0];
-							if(!calc_deri)
-							{
-								// PLEASE use UOT as an input parameter of this subroutine
-								// mohan add 2021-03-30
-								GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 0, dtype, tau1, 
-										T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad), 
-										T2, L2, m2, N2, GlobalV::NSPIN,
-										olm2//for soc
-										);
-
-								if(GlobalV::GAMMA_ONLY_LOCAL)
-								{
-									// mohan add 2010-06-29
-									// set the value in Hloc and Sloc
-									// according to trace_loc_row and trace_loc_col
-									// the last paramete: 1 for Sloc, 2 for Hloc
-									// and 3 for Hloc_fixed.
-									this->LM->set_HSgamma(iw1_all, iw2_all, olm[0], dtype, HSloc);
-								}
-								else // k point algorithm
-								{
-									// mohan add 2010-10
-									// set the values in SlocR and Hloc_fixedR.
-									// which is a 1D array.
-									if(dtype=='S')
-									{
-                                        if (GlobalV::NSPIN != 4) HSloc[nnr] = olm[0];
-                                        else
-										{//only has diagonal term here.
-												int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
-											this->LM->SlocR_soc[nnr] = olm1[is];
-                                        }
-                                    }
-									else if(dtype=='T')
-									{
-										if(GlobalV::NSPIN!=4) HSloc[nnr] = olm[0];// <phi|kin|d phi>
-										else
-										{//only has diagonal term here.
-												int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
-											this->LM->Hloc_fixedR_soc[nnr] = olm1[is];
-                                        }
-                                    }
-									++nnr;
-								}
-							}
-							else // calculate the derivative
-							{
-								GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 1, dtype, 
-									tau1, T1, L1, m1, N1,
-									GlobalC::GridD.getAdjacentTau(ad), T2, L2, m2, N2, GlobalV::NSPIN
+						std::complex<double> olm1[4]={ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO};
+						std::complex<double> *olm2 = &olm1[0];
+						if(!calc_deri)
+						{
+							// PLEASE use UOT as an input parameter of this subroutine
+							// mohan add 2021-03-30
+							GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 0, dtype, tau1, 
+									it, L1, m1, N1,std::get<3>(adjs_all[iat][ad]), 
+									T1, L2, m2, N2, GlobalV::NSPIN,
+									olm2//for soc
 									);
 
-								if(GlobalV::GAMMA_ONLY_LOCAL)
-								{
-									this->LM->set_force (iw1_all, iw2_all,	olm[0], olm[1], olm[2], dtype);
-									if(GlobalV::CAL_STRESS) this->LM->set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
-								}
-								else // k point algorithm
-								{
-									if(dtype=='S')
-									{
-										this->LM->DSloc_Rx[nnr] = olm[0];
-										this->LM->DSloc_Ry[nnr] = olm[1];
-										this->LM->DSloc_Rz[nnr] = olm[2];
-										if(GlobalV::CAL_STRESS)
-										{
-											this->LM->DH_r[nnr*3] = dtau.x;
-											this->LM->DH_r[nnr*3 + 1] = dtau.y;
-											this->LM->DH_r[nnr*3 + 2] = dtau.z;
-										}
-									}
-									else if(dtype=='T')
-									{
-										// notice the 'sign'
-										this->LM->DHloc_fixedR_x[nnr] = olm[0];
-										this->LM->DHloc_fixedR_y[nnr] = olm[1];
-										this->LM->DHloc_fixedR_z[nnr] = olm[2];
-										if(GlobalV::CAL_STRESS)
-										{
-											this->LM->stvnl11[nnr] = olm[0] * dtau.x;
-											this->LM->stvnl12[nnr] = olm[0] * dtau.y;
-											this->LM->stvnl13[nnr] = olm[0] * dtau.z;
-											this->LM->stvnl22[nnr] = olm[1] * dtau.y;
-											this->LM->stvnl23[nnr] = olm[1] * dtau.z;
-											this->LM->stvnl33[nnr] = olm[2] * dtau.z;
-										}
-									}
-									++nnr;
-								}
-							}
-							++iw2_all;
-						}// nw2 
-						++iw1_all;
-					}// nw1
-				}// distance
-				else if(distance>=rcut && (!GlobalV::GAMMA_ONLY_LOCAL))
-				{
-					int start1 = ucell.itiaiw2iwt( T1, I1, 0);
-					int start2 = ucell.itiaiw2iwt( T2, I2, 0);
-
-					bool is_adj = false;
-					for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
-					{
-						const int T0 = GlobalC::GridD.getType(ad0);
-						//const int I0 = GlobalC::GridD.getNatom(ad0);
-						//const int iat0 = ucell.itia2iat(T0, I0);
-						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
-						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
-						dtau1 = tau0 - tau1;
-						double distance1 = dtau1.norm() * ucell.lat0;
-						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-						dtau2 = tau0 - tau2;
-						double distance2 = dtau2.norm() * ucell.lat0;
-						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-						if( distance1 < rcut1 && distance2 < rcut2 )
-						{
-							is_adj = true;
-							break;
-						}
-					}//ad0
-
-
-					if( is_adj )
-					{
-						for(int jj=0; jj<atom1->nw * GlobalV::NPOL; ++jj)
-						{
-							const int mu = pv->trace_loc_row[start1+jj];
-							if(mu<0)continue; 
-							for(int kk=0; kk<atom2->nw * GlobalV::NPOL; ++kk)
+							if(GlobalV::GAMMA_ONLY_LOCAL)
 							{
-								const int nu = pv->trace_loc_col[start2+kk];
-								if(nu<0)continue;
+								// mohan add 2010-06-29
+								// set the value in Hloc and Sloc
+								// according to trace_loc_row and trace_loc_col
+								// the last paramete: 1 for Sloc, 2 for Hloc
+								// and 3 for Hloc_fixed.
+								this->LM->set_HSgamma(iw1_all, iw2_all, olm[0], dtype, HSloc);
+							}
+							else // k point algorithm
+							{
+								// mohan add 2010-10
+								// set the values in SlocR and Hloc_fixedR.
+								// which is a 1D array.
+								if(dtype=='S')
+								{
+									if (GlobalV::NSPIN != 4) HSloc[nnr] = olm[0];
+									else
+									{//only has diagonal term here.
+											int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
+										this->LM->SlocR_soc[nnr] = olm1[is];
+									}
+								}
+								else if(dtype=='T')
+								{
+									if(GlobalV::NSPIN!=4) HSloc[nnr] = olm[0];// <phi|kin|d phi>
+									else
+									{//only has diagonal term here.
+											int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
+										this->LM->Hloc_fixedR_soc[nnr] = olm1[is];
+									}
+								}
 								++nnr;
-							}//kk
-						}//jj
+							}
+						}
+						else // calculate the derivative
+						{
+							GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 1, dtype, 
+								tau1, it, L1, m1, N1,
+								std::get<3>(adjs_all[iat][ad]), T1, L2, m2, N2, GlobalV::NSPIN
+								);
+
+							if(GlobalV::GAMMA_ONLY_LOCAL)
+							{
+								this->LM->set_force (iw1_all, iw2_all,	olm[0], olm[1], olm[2], dtype);
+								if(GlobalV::CAL_STRESS) this->LM->set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
+							}
+							else // k point algorithm
+							{
+								if(dtype=='S')
+								{
+									this->LM->DSloc_Rx[nnr] = olm[0];
+									this->LM->DSloc_Ry[nnr] = olm[1];
+									this->LM->DSloc_Rz[nnr] = olm[2];
+									if(GlobalV::CAL_STRESS)
+									{
+										this->LM->DH_r[nnr*3] = dtau.x;
+										this->LM->DH_r[nnr*3 + 1] = dtau.y;
+										this->LM->DH_r[nnr*3 + 2] = dtau.z;
+									}
+								}
+								else if(dtype=='T')
+								{
+									// notice the 'sign'
+									this->LM->DHloc_fixedR_x[nnr] = olm[0];
+									this->LM->DHloc_fixedR_y[nnr] = olm[1];
+									this->LM->DHloc_fixedR_z[nnr] = olm[2];
+									if(GlobalV::CAL_STRESS)
+									{
+										this->LM->stvnl11[nnr] = olm[0] * dtau.x;
+										this->LM->stvnl12[nnr] = olm[0] * dtau.y;
+										this->LM->stvnl13[nnr] = olm[0] * dtau.z;
+										this->LM->stvnl22[nnr] = olm[1] * dtau.y;
+										this->LM->stvnl23[nnr] = olm[1] * dtau.z;
+										this->LM->stvnl33[nnr] = olm[2] * dtau.z;
+									}
+								}
+								++nnr;
+							}
+						}
+						++iw2_all;
+					}// nw2 
+					++iw1_all;
+				}// nw1
+			}// distance
+			else if(distance>=rcut && (!GlobalV::GAMMA_ONLY_LOCAL))
+			{
+				int start1 = ucell.itiaiw2iwt( it, ia, 0);
+				int start2 = ucell.itiaiw2iwt( T1, I1, 0);
+
+				bool is_adj = false;
+				for (int ad0=0; ad0 < adjs_all[iat].size(); ++ad0)
+				{
+					// const int T0 = GlobalC::GridD.getType(ad0);
+					int T0 =  std::get<0>(adjs_all[iat][ad0]);
+					//const int I0 = GlobalC::GridD.getNatom(ad0);
+					//const int iat0 = ucell.itia2iat(T0, I0);
+					//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+					// tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+					tau0 = std::get<3>(adjs_all[iat][ad0]);
+					dtau1 = tau0 - tau1;
+					double distance1 = dtau1.norm() * ucell.lat0;
+					double rcut1 = GlobalC::ORB.Phi[it].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+					dtau2 = tau0 - tau2;
+					double distance2 = dtau2.norm() * ucell.lat0;
+					double rcut2 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+					if( distance1 < rcut1 && distance2 < rcut2 )
+					{
+						is_adj = true;
+						break;
 					}
-				}//distance
-			}// ad
-		}// I1
-	}// T1
+				}//ad0
+
+
+				if( is_adj )
+				{
+					for(int jj=0; jj<atom1->nw * GlobalV::NPOL; ++jj)
+					{
+						const int mu = pv->trace_loc_row[start1+jj];
+						if(mu<0)continue; 
+						for(int kk=0; kk<atom2->nw * GlobalV::NPOL; ++kk)
+						{
+							const int nu = pv->trace_loc_col[start2+kk];
+							if(nu<0)continue;
+							++nnr;
+						}//kk
+					}//jj
+				}
+			}//distance
+		}// ad
+	}// I1
+	
+
+	nnr_omp[nnr_omp.size() - 1] = nnr;
+	this->LM->nnr_para = nnr_omp;
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -727,6 +788,681 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(double* NLloc, const bool &calc_deri
 	ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu_new");
 	return;
 }
+
+void LCAO_gen_fixedH::build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &calc_deri){
+	ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_mu_new_Nocalc");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu_new_Nocalc");
+	const Parallel_Orbitals* pv = this->LM->ParaV;
+	// < phi1 | beta > < beta | phi2 >
+	// phi1 is within the unitcell.
+	// while beta is in the supercell.
+	// while phi2 is in the supercell.
+
+
+	//Step 1 : generate <psi|beta>
+	//type of atom; distance; atomic basis; 
+	const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.Find_atoms(GlobalC::ucell);
+	std::vector<std::map<key_tuple,std::unordered_map<int,std::vector<double>>>> nlm_tot;
+
+	nlm_tot.resize(GlobalC::ucell.nat);
+
+	int nnr_sum = 0;
+	bool is_adj;
+	// int nnr = 0;
+	int tot_threads = 0;
+
+	#pragma omp parallel shared(HlocR,nnr_sum,nlm_tot) private(is_adj)
+  	{
+		tot_threads = omp_get_num_threads();
+		#pragma omp for 
+		for(int iat = 0; iat < GlobalC::ucell.nat; iat++)    
+		{
+			const int it = GlobalC::ucell.iat2it[iat];                 
+			const int ia = GlobalC::ucell.iat2ia[iat];
+			const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[it].get_rcut_max();
+			Atom* atom0 = &GlobalC::ucell.atoms[it];
+			const ModuleBase::Vector3<double> tau = GlobalC::ucell.atoms[it].tau[ia];
+
+			nlm_tot[iat].clear();   
+			
+			for (int ad=0; ad < adjs_all[iat].size() ; ++ad)    
+			{
+				const int T1 = std::get<0>(adjs_all[iat][ad]);
+				const int I1 = std::get<1>(adjs_all[iat][ad]);
+				const int start1 =  GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+
+				const ModuleBase::Vector3<double> tau1 = std::get<3>(adjs_all[iat][ad]);
+				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+
+				const double dist1 = (tau1-tau).norm() * pow(GlobalC::ucell.lat0,2);		
+
+				if (dist1 <= pow(Rcut_Beta + Rcut_AO1,2))
+				{
+					
+					std::unordered_map<int,std::vector<double>> nlm_cur;
+					
+					nlm_cur.clear();
+					
+					for (int iw1=0; iw1<nw1_tot; ++iw1)
+					{
+						const int iw1_all = start1 + iw1;
+						const int iw1_local = pv->trace_loc_row[iw1_all];
+						const int iw2_local = pv->trace_loc_col[iw1_all];
+						if(iw1_local >= 0 || iw2_local >= 0){
+							const int iw1_0 = iw1/GlobalV::NPOL;
+							std::vector<std::vector<double>> nlm;
+							//2D, but first dimension is only 1 here
+							//for force, the right hand side is the gradient
+							//and the first dimension is then 3
+							//inner loop : all projectors (L0,M0)
+
+							GlobalC::UOT.snap_psibeta_half(
+								GlobalC::ORB,
+								GlobalC::ucell.infoNL,
+								nlm, tau1, T1,
+								atom1->iw2l[ iw1_0 ], // L1
+								atom1->iw2m[ iw1_0 ], // m1
+								atom1->iw2n[ iw1_0 ], // N1
+								tau, it, calc_deri); //R0,T0
+					
+
+							nlm_cur.insert({iw1_all,nlm[0]});
+						}
+					}//end iw
+
+					const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
+					const int rx1 = std::get<2>(adjs_all[iat][ad]).x;
+					const int ry1 = std::get<2>(adjs_all[iat][ad]).y;
+					const int rz1 = std::get<2>(adjs_all[iat][ad]).z;
+					key_tuple key_1(iat1,rx1,ry1,rz1);
+					nlm_tot[iat][key_1]=nlm_cur;
+				}
+			}//end ad
+		}			
+	// }
+		//=======================================================
+		//Step2:	
+		//calculate sum_(L0,M0) beta<psi_i|beta><beta|psi_j>
+		//and accumulate the value to Hloc_fixedR(i,j)
+		//=======================================================
+	
+	
+		int tid = omp_get_thread_num();
+		int tot_threads = omp_get_num_threads();
+		int average = GlobalC::ucell.nat / tot_threads;
+		int remain = GlobalC::ucell.nat % tot_threads;
+		int start;
+		int end;
+		if(tid == 0){
+			start = tid * average;
+			end = start + average + remain;
+	
+		}else{
+			start = tid * average + remain;
+			end = start + average;
+		}
+
+		vector<double> Hloc_mm;
+		// 不同线程分配指定长度的数组大小
+		if(tid == 0){
+			Hloc_mm.resize(this->LM->nnr_para[tid]); 
+		}else{
+			Hloc_mm.resize(this->LM->nnr_para[tid] - this->LM->nnr_para[tid - 1]);
+		}
+
+		int nnr = 0;
+	
+		for(int iat1 = start;iat1< end;iat1++)    
+		{
+			
+			const int it = GlobalC::ucell.iat2it[iat1];          
+			const int ia = GlobalC::ucell.iat2ia[iat1];
+			const int start1 = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
+			const Atom* atom1 = &GlobalC::ucell.atoms[it];
+			const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[it].get_rcut_max();
+			const ModuleBase::Vector3<double> tau1 = atom1->tau[ia];
+
+			for (int ad2=0; ad2 < adjs_all[iat1].size(); ++ad2)   
+			{
+				const int T2 = std::get<0>(adjs_all[iat1][ad2]);
+				const int I2 = std::get<1>(adjs_all[iat1][ad2]);
+				const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+				const int start2 =  GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+				
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T2].getRcut();
+				
+				const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+
+				is_adj = false;
+
+				const ModuleBase::Vector3<double> tau2 = std::get<3>(adjs_all[iat1][ad2]);
+
+				const int rx2=std::get<2>(adjs_all[iat1][ad2]).x;
+				const int ry2=std::get<2>(adjs_all[iat1][ad2]).y;
+				const int rz2=std::get<2>(adjs_all[iat1][ad2]).z;
+				
+				double distance = (tau2-tau1).norm2() * pow(GlobalC::ucell.lat0,2);
+				
+				double rcut = pow(GlobalC::ORB.Phi[it].getRcut() + GlobalC::ORB.Phi[T2].getRcut(),2);
+				if(distance < rcut) is_adj = true;
+				else if(distance >= rcut)
+				{
+					int ad0 = 0;
+					while(is_adj == false && ad0 < adjs_all[iat1].size() ){
+						const int T0 = std::get<0>(adjs_all[iat1][ad0]);
+						ModuleBase::Vector3<double> tau0 = std::get<3>(adjs_all[iat1][ad0]);
+						ModuleBase::Vector3<double> dtau1 = tau0 - tau1;
+						ModuleBase::Vector3<double> dtau2 = tau0 - tau2;
+	
+						const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+						const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+
+						double rcut1 = pow(GlobalC::ORB.Phi[it].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+						double rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+
+						if( distance1 < rcut1 && distance2 < rcut2 )
+						{
+							is_adj = true;
+						}
+						ad0++;
+					}
+				}
+		  	
+				if(is_adj)
+				{   
+					// int len = atom1->nw*GlobalV::NPOL * atom2->nw*GlobalV::NPOL;
+					// int len_eff = 0;
+					// vector<double> Hloc_mm;
+					// Hloc_mm.resize(len); 
+					
+					for (int ad0 = 0; ad0 < adjs_all[iat1].size() ; ++ad0)
+					{
+						const int T0 = std::get<0>(adjs_all[iat1][ad0]);
+						const int I0 = std::get<1>(adjs_all[iat1][ad0]);
+						const int iat3 = GlobalC::ucell.itia2iat(T0, I0);
+						
+						if( GlobalC::ucell.infoNL.nproj[T0] != 0)
+						{ 
+							ModuleBase::Vector3<double> tau0 = std::get<3>(adjs_all[iat1][ad0]);
+							ModuleBase::Vector3<double> dtau1 = tau0 - tau1;
+							ModuleBase::Vector3<double> dtau2 = tau0 - tau2;
+							const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+							const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+	
+							double rcut1 = pow(GlobalC::ORB.Phi[it].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+							double rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+							if(distance1 < rcut1 && distance2 < rcut2)
+							{		
+		
+								int rx0 = std::get<2>(adjs_all[iat1][ad0]).x;
+								int ry0 = std::get<2>(adjs_all[iat1][ad0]).y;
+								int rz0 = std::get<2>(adjs_all[iat1][ad0]).z;
+
+								key_tuple key1(iat1,-rx0,-ry0,-rz0);
+								key_tuple key2(iat2,rx2-rx0,ry2-ry0,rz2-rz0);
+
+								std::unordered_map<int,std::vector<double>> *nlm_cur1_e; //left hand side, for energy
+								std::unordered_map<int,std::vector<double>> *nlm_cur2_e; //rhs, for energy
+								
+
+								nlm_cur1_e = &nlm_tot[iat3][key1];
+								nlm_cur2_e = &nlm_tot[iat3][key2];
+								
+								int nnr_inner = 0;
+										
+								for (int j = 0; j<atom1->nw*GlobalV::NPOL; j++)
+								{									
+									const int iw1_all = start1 + j;
+									const int mu = pv->trace_loc_row[iw1_all]; 
+									if(mu >= 0){
+										// fix a serious bug: atom2[T2] -> atom2
+										// mohan 2010-12-20
+										for (int k = 0; k<atom2->nw*GlobalV::NPOL; k++)
+										{
+										
+											const int iw2_all = start2 + k;
+											const int nu = pv->trace_loc_col[iw2_all];						
+											if(nu >= 0){
+												std::vector<double> nlm_1=(*nlm_cur1_e)[iw1_all];
+												std::vector<double> nlm_2=(*nlm_cur2_e)[iw2_all];
+												double nlm_tmp = 0.0;
+
+												const int nproj = GlobalC::ucell.infoNL.nproj[T0];
+
+												int ib = 0;
+												for (int nb = 0; nb < nproj; nb++)
+												{
+													const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
+													for(int m=0;m<2*L0+1;m++)
+													{
+														if(nlm_1[ib]!=0.0 && nlm_2[ib]!=0.0)
+														{
+															
+															nlm_tmp += nlm_1[ib]*nlm_2[ib]*GlobalC::ucell.atoms[T0].ncpp.dion(nb,nb);
+															
+														}
+														ib+=1;
+													}
+												}												
+												assert(ib==nlm_1.size());		
+												
+												// Hloc_mm[nnr+nnr_inner] += nlm_tmp;		 		
+												Hloc_mm[nnr + nnr_inner] += nlm_tmp;	
+												// cout << Hloc_mm[nnr + nnr_inner] << endl;								
+												nnr_inner++;
+										
+											}//if 
+										}// k
+									} //if
+								} // j 
+								// len_eff = nnr_inner;            // 同步数据长度
+							}// if  continue 1
+						}// if continue 2
+					} // ad0
+					
+					
+					// int nnr_med = 0;
+					//outer circle : accumulate nnr
+					for (int j1=0; j1<atom1->nw*GlobalV::NPOL; j1++)
+					{
+						
+						// 	const int j0 = j1/GlobalV::NPOL;//added by zhengdy-soc
+						const int iw1_all = start1 + j1;
+						const int mu = pv->trace_loc_row[iw1_all];
+						if(mu >= 0){
+							// fix a serious bug: atom2[T2] -> atom2
+							// mohan 2010-12-20
+							for (int k1=0; k1<atom2->nw*GlobalV::NPOL; k1++)
+							{
+								// const int k0 = k1/GlobalV::NPOL;
+								const int iw2_all = start2 + k1;
+								const int nu = pv->trace_loc_col[iw2_all];					
+								if(nu >= 0){
+									// #pragma omp critical
+									nnr++;  
+								}
+							}
+						}						
+					}
+					// int tid = omp_get_thread_num();
+					
+					
+				}// end is_adj  
+			} // ad2		
+		} // iat1
+		
+	
+
+		// #pragma omp critical
+		// cout << start << " " << nnr << endl;
+		// // 汇总数据
+		int a_start = 0;
+		int a_end = 0;
+		// cout << a_start << "  " << a_end << endl;
+		nnr_sum += nnr;
+		// #pragma omp critical
+		if(tid != 0){
+			a_start = this->LM->nnr_para[tid - 1];
+		}
+		a_end = this->LM->nnr_para[tid];
+		// #pragma omp barrier
+		for(int i = a_start, j = 0; i < a_end, j < nnr; i++, j++){
+			HlocR[i] += Hloc_mm[j];
+		}
+	}
+
+	if( nnr_sum !=pv->nnr)
+	{
+		ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu_new","nnr!=LNNR.nnr");
+	}
+
+	ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu_new");
+	return;
+}
+
+void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &calc_deri)
+{
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_mu_new_calc");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu_new_calc");
+	const Parallel_Orbitals* pv = this->LM->ParaV;
+	// < phi1 | beta > < beta | phi2 >
+	// phi1 is within the unitcell.
+	// while beta is in the supercell.
+	// while phi2 is in the supercell.
+
+
+	//Step 1 : generate <psi|beta>
+	//type of atom; distance; atomic basis; 
+	const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.Find_atoms(GlobalC::ucell);
+	std::vector<std::map<key_tuple,std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_tot1;
+
+	nlm_tot1.resize(GlobalC::ucell.nat);
+
+	int nnr_sum = 0;
+	bool is_adj;
+	// int nnr = 0;
+	int tot_threads = 0;
+
+	#pragma omp parallel shared(nnr_sum,nlm_tot1) private(is_adj)
+  	{
+		tot_threads = omp_get_num_threads();
+		#pragma omp for 
+		for(int iat = 0; iat < GlobalC::ucell.nat; iat++)    
+		{
+			const int it = GlobalC::ucell.iat2it[iat];                 
+			const int ia = GlobalC::ucell.iat2ia[iat];
+			const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[it].get_rcut_max();
+			Atom* atom0 = &GlobalC::ucell.atoms[it];
+			const ModuleBase::Vector3<double> tau = GlobalC::ucell.atoms[it].tau[ia];
+
+			nlm_tot1[iat].clear(); 
+			
+			for (int ad=0; ad < adjs_all[iat].size() ; ++ad)    
+			{
+				const int T1 = std::get<0>(adjs_all[iat][ad]);
+				const int I1 = std::get<1>(adjs_all[iat][ad]);
+				const int start1 =  GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+
+				const ModuleBase::Vector3<double> tau1 = std::get<3>(adjs_all[iat][ad]);
+				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+
+				const double dist1 = (tau1-tau).norm() * pow(GlobalC::ucell.lat0,2);		
+
+				if (dist1 <= pow(Rcut_Beta + Rcut_AO1,2))
+				{
+					
+					std::unordered_map<int,std::vector<std::vector<double>>> nlm_cur1;
+					
+					nlm_cur1.clear();
+					
+					for (int iw1=0; iw1<nw1_tot; ++iw1)
+					{
+						const int iw1_all = start1 + iw1;
+						const int iw1_local = pv->trace_loc_row[iw1_all];
+						const int iw2_local = pv->trace_loc_col[iw1_all];
+						if(iw1_local >= 0 || iw2_local >= 0){
+							const int iw1_0 = iw1/GlobalV::NPOL;
+							std::vector<std::vector<double>> nlm;
+							//2D, but first dimension is only 1 here
+							//for force, the right hand side is the gradient
+							//and the first dimension is then 3
+							//inner loop : all projectors (L0,M0)
+
+							GlobalC::UOT.snap_psibeta_half(
+								GlobalC::ORB,
+								GlobalC::ucell.infoNL,
+								nlm, tau1, T1,
+								atom1->iw2l[ iw1_0 ], // L1
+								atom1->iw2m[ iw1_0 ], // m1
+								atom1->iw2n[ iw1_0 ], // N1
+								tau, it, calc_deri); //R0,T0
+					
+							nlm_cur1.insert({iw1_all,nlm});
+						}
+					}//end iw
+
+					const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
+					const int rx1 = std::get<2>(adjs_all[iat][ad]).x;
+					const int ry1 = std::get<2>(adjs_all[iat][ad]).y;
+					const int rz1 = std::get<2>(adjs_all[iat][ad]).z;
+					key_tuple key_1(iat1,rx1,ry1,rz1);
+					nlm_tot1[iat][key_1]=nlm_cur1;
+				}
+			}//end ad
+		}			
+	// }
+		//=======================================================
+		//Step2:	
+		//calculate sum_(L0,M0) beta<psi_i|beta><beta|psi_j>
+		//and accumulate the value to Hloc_fixedR(i,j)
+		//=======================================================
+	
+	
+		int tid = omp_get_thread_num();
+		int tot_threads = omp_get_num_threads();
+		int average = GlobalC::ucell.nat / tot_threads;
+		int remain = GlobalC::ucell.nat % tot_threads;
+		int start;
+		int end;
+		if(tid == 0){
+			start = tid * average;
+			end = start + average + remain;
+	
+		}else{
+			start = tid * average + remain;
+			end = start + average;
+		}
+
+		vector<double> Hloc_mm1;
+		vector<double> Hloc_mm2;
+		vector<double> Hloc_mm3;
+
+		// 不同线程分配指定长度的数组大小
+		if(tid == 0){
+			Hloc_mm1.resize(this->LM->nnr_para[tid]); 
+			Hloc_mm2.resize(this->LM->nnr_para[tid]); 
+			Hloc_mm3.resize(this->LM->nnr_para[tid]); 
+		}else{
+			Hloc_mm1.resize(this->LM->nnr_para[tid] - this->LM->nnr_para[tid - 1]);
+			Hloc_mm2.resize(this->LM->nnr_para[tid] - this->LM->nnr_para[tid - 1]);
+			Hloc_mm3.resize(this->LM->nnr_para[tid] - this->LM->nnr_para[tid - 1]);
+		}
+		int nnr = 0;
+
+		for(int iat1 = start;iat1< end;iat1++)    
+		{
+			
+			const int it = GlobalC::ucell.iat2it[iat1];          
+			const int ia = GlobalC::ucell.iat2ia[iat1];
+			const int start1 = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
+			const Atom* atom1 = &GlobalC::ucell.atoms[it];
+			const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[it].get_rcut_max();
+			const ModuleBase::Vector3<double> tau1 = atom1->tau[ia];
+
+			for (int ad2=0; ad2 < adjs_all[iat1].size(); ++ad2)   
+			{
+				const int T2 = std::get<0>(adjs_all[iat1][ad2]);
+				const int I2 = std::get<1>(adjs_all[iat1][ad2]);
+				const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+				const int start2 =  GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+				
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T2].getRcut();
+				
+				const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+
+				is_adj = false;
+
+				const ModuleBase::Vector3<double> tau2 = std::get<3>(adjs_all[iat1][ad2]);
+
+				const int rx2=std::get<2>(adjs_all[iat1][ad2]).x;
+				const int ry2=std::get<2>(adjs_all[iat1][ad2]).y;
+				const int rz2=std::get<2>(adjs_all[iat1][ad2]).z;
+				
+				double distance = (tau2-tau1).norm2() * pow(GlobalC::ucell.lat0,2);
+				
+				double rcut = pow(GlobalC::ORB.Phi[it].getRcut() + GlobalC::ORB.Phi[T2].getRcut(),2);
+				if(distance < rcut) is_adj = true;
+				else if(distance >= rcut)
+				{
+					int ad0 = 0;
+					while(is_adj == false && ad0 < adjs_all[iat1].size() ){
+						const int T0 = std::get<0>(adjs_all[iat1][ad0]);
+						ModuleBase::Vector3<double> tau0 = std::get<3>(adjs_all[iat1][ad0]);
+						ModuleBase::Vector3<double> dtau1 = tau0 - tau1;
+						ModuleBase::Vector3<double> dtau2 = tau0 - tau2;
+	
+						const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+						const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+
+						double rcut1 = pow(GlobalC::ORB.Phi[it].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+						double rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+
+						if( distance1 < rcut1 && distance2 < rcut2 )
+						{
+							is_adj = true;
+						}
+						ad0++;
+					}
+				}
+		  	
+				if(is_adj)
+				{   
+					
+					for (int ad0 = 0; ad0 < adjs_all[iat1].size() ; ++ad0)
+					{
+						const int T0 = std::get<0>(adjs_all[iat1][ad0]);
+						const int I0 = std::get<1>(adjs_all[iat1][ad0]);
+						const int iat3 = GlobalC::ucell.itia2iat(T0, I0);
+						
+						if( GlobalC::ucell.infoNL.nproj[T0] != 0)
+						{ 
+							ModuleBase::Vector3<double> tau0 = std::get<3>(adjs_all[iat1][ad0]);
+							ModuleBase::Vector3<double> dtau1 = tau0 - tau1;
+							ModuleBase::Vector3<double> dtau2 = tau0 - tau2;
+							const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+							const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+	
+							double rcut1 = pow(GlobalC::ORB.Phi[it].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+							double rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+							if(distance1 < rcut1 && distance2 < rcut2)
+							{		
+		
+								int rx0 = std::get<2>(adjs_all[iat1][ad0]).x;
+								int ry0 = std::get<2>(adjs_all[iat1][ad0]).y;
+								int rz0 = std::get<2>(adjs_all[iat1][ad0]).z;
+
+								key_tuple key1(iat1,-rx0,-ry0,-rz0);
+								key_tuple key2(iat2,rx2-rx0,ry2-ry0,rz2-rz0);
+
+								std::unordered_map<int,std::vector<std::vector<double>>> *nlm_cur1_f; //lhs, for force
+								std::unordered_map<int,std::vector<std::vector<double>>> *nlm_cur2_f; //rhs, for force
+								
+								nlm_cur1_f = &nlm_tot1[iat3][key1];
+								nlm_cur2_f = &nlm_tot1[iat3][key2];
+								
+								int nnr_inner = 0;
+										
+								for (int j = 0; j<atom1->nw*GlobalV::NPOL; j++)
+								{									
+									const int iw1_all = start1 + j;
+									const int mu = pv->trace_loc_row[iw1_all]; 
+									if(mu >= 0){
+										// fix a serious bug: atom2[T2] -> atom2
+										// mohan 2010-12-20
+										for (int k = 0; k<atom2->nw*GlobalV::NPOL; k++)
+										{
+										
+											const int iw2_all = start2 + k;
+											const int nu = pv->trace_loc_col[iw2_all];						
+											if(nu >= 0){
+												
+											
+												// mohan change the order on 2011-06-17
+												// origin: < psi1 | beta > < beta | dpsi2/dtau >
+												//now: < psi1/dtau | beta > < beta | psi2 >
+												double nlm[3]={0,0,0};
+
+												// sum all projectors for one atom.
+												std::vector<double> nlm_1 = (*nlm_cur2_f)[iw2_all][0];
+												std::vector<std::vector<double>> nlm_2;
+												nlm_2.resize(3);
+												for(int i=0;i<3;i++)
+												{
+													nlm_2[i] = (*nlm_cur1_f)[iw1_all][i+1];
+												}
+
+												assert(nlm_1.size()==nlm_2[0].size());
+
+												const int nproj = GlobalC::ucell.infoNL.nproj[T0];
+												int ib = 0;
+												for (int nb = 0; nb < nproj; nb++)
+												{
+													const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
+													for(int m=0;m<2*L0+1;m++)
+													{
+														for(int ir=0;ir<3;ir++)
+														{
+															nlm[ir] += nlm_2[ir][ib]*nlm_1[ib]*GlobalC::ucell.atoms[T0].ncpp.dion(nb,nb);
+														}
+														ib+=1;
+													}
+												}
+												assert(ib==nlm_1.size());
+
+												Hloc_mm1[nnr+nnr_inner] += nlm[0];
+												Hloc_mm2[nnr+nnr_inner] += nlm[1];
+												Hloc_mm3[nnr+nnr_inner] += nlm[2];
+									
+											
+											}//if 
+										}// k
+									} //if
+								} // j 
+								// len_eff = nnr_inner;            // 同步数据长度
+							}// if  continue 1
+						}// if continue 2
+					} // ad0
+					
+					
+					// int nnr_med = 0;
+					//outer circle : accumulate nnr
+					for (int j1=0; j1<atom1->nw*GlobalV::NPOL; j1++)
+					{
+						
+						// 	const int j0 = j1/GlobalV::NPOL;//added by zhengdy-soc
+						const int iw1_all = start1 + j1;
+						const int mu = pv->trace_loc_row[iw1_all];
+						if(mu >= 0){
+							// fix a serious bug: atom2[T2] -> atom2
+							// mohan 2010-12-20
+							for (int k1=0; k1<atom2->nw*GlobalV::NPOL; k1++)
+							{
+								// const int k0 = k1/GlobalV::NPOL;
+								const int iw2_all = start2 + k1;
+								const int nu = pv->trace_loc_col[iw2_all];					
+								if(nu >= 0){
+									// #pragma omp critical
+									nnr++;  
+								}
+							}
+						}						
+					}		
+					
+				}// end is_adj  
+			} // ad2		
+		} // iat1
+		
+		// 汇总数据
+		int a_start = 0;
+		int a_end = 0;
+		nnr_sum += nnr;
+		if(tid != 0){
+			a_start = this->LM->nnr_para[tid - 1];
+		}
+		a_end = this->LM->nnr_para[tid];
+		for(int i = a_start, j = 0; i < a_end, j < nnr; i++, j++){
+			this->LM->DHloc_fixedR_x[i] += Hloc_mm1[j];
+			this->LM->DHloc_fixedR_y[i] += Hloc_mm2[j];
+			this->LM->DHloc_fixedR_z[i] += Hloc_mm3[j];
+		}
+	}
+
+	if( nnr_sum !=pv->nnr)
+	{
+		ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu_new_calc","nnr!=LNNR.nnr");
+	}
+
+	ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu_new_calc");
+
+	return;
+}
+
 
 void LCAO_gen_fixedH::build_Nonlocal_beta_new(double* HSloc) //update by liuyu 2021-04-07
 {
