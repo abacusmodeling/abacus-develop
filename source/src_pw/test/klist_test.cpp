@@ -156,4 +156,18 @@ TEST_F(KlistTest, Kspacing)
 	remove("KPT3");
 }
 
+TEST_F(KlistTest, Renew)
+{
+	K_Vectors kv;
+    kv.renew(10);
+	EXPECT_EQ(kv.kvec_c.size(),10);
+	EXPECT_EQ(kv.kvec_d.size(),10);	
+	EXPECT_EQ(kv.wk.size(),10);	
+	EXPECT_EQ(kv.isk.size(),10);
+	EXPECT_EQ(kv.ngk.size(),10);
+
+    // check the memory allocation from Renew.
+}
+
+
 #undef private
