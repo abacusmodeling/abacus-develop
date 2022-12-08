@@ -1824,6 +1824,19 @@ bool Input::Read(const std::string &fn)
         }
     }
 
+    // sunliang added on 2022-12-06
+    // To check if ntype in INPUT is equal to the atom species in STRU, if ntype is not set in INPUT, we will set it according to STRU.
+    double ntype_stru = this->count_ntype(GlobalV::stru_file);
+    if (this->ntype == 0)
+    {
+        this->ntype = ntype_stru;
+        GlobalV::ofs_running << "ntype in INPUT is 0, and it is automatically set to " << this->ntype << " according to STRU" << std::endl;
+    }
+    else if (this->ntype != ntype_stru)
+    {
+        ModuleBase::WARNING_QUIT("Input", "The ntype in INPUT is not equal to the ntype counted in STRU, check it.");
+    }
+
     //----------------------------------------------------------
     //       DFT+U    Xin Qu  added on 2020-10-29
     //----------------------------------------------------------
@@ -3201,4 +3214,37 @@ void Input::strtolower(char *sa, char *sb)
         sb[i] = tolower(c);
     }
     sb[len] = '\0';
+}
+
+// Conut how many types of atoms are listed in STRU
+int Input::count_ntype(const std::string &fn)
+{
+	// Only RANK0 core can reach here, because this function is called during Input::Read.
+	assert(GlobalV::MY_RANK == 0); 
+
+	std::ifstream ifa(fn.c_str(), ios::in);
+	if (!ifa)
+	{
+		GlobalV::ofs_warning << fn;
+		ModuleBase::WARNING_QUIT("Input::count_ntype","Can not find the file containing atom positions.!");
+	}
+
+	int ntype_stru = 0;
+	std::string temp;
+	if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ATOMIC_SPECIES") )
+	{
+		while(true)
+		{
+			ModuleBase::GlobalFunc::READ_VALUE(ifa, temp);
+			if (temp == "LATTICE_CONSTANT" || temp == "NUMERICAL_ORBITAL" || temp == "NUMERICAL_DESCRIPTOR")
+			{
+				break;
+			}
+			else if (isalpha(temp[0]))
+			{
+				ntype_stru += 1;
+			}
+		}
+	}
+    return ntype_stru;
 }
