@@ -22,6 +22,8 @@ jobs:
           cmake --build build -j`nproc`
           cmake --install build
       - name: Testing
+        env:
+          OMP_NUM_THREADS: 1
         run: |
           cmake --build build --target test ARGS="-V --timeout 21600"
       - name: Upload Coverage to Codecov
