@@ -448,6 +448,7 @@ OBJS_SRCPW=H_Ewald_pw.o\
     energy.o\
     forces.o\
     force_multi_device.o\
+    stress_multi_device.o\
     global.o\
     klist.o\
     magnetism.o\
