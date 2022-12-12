@@ -15,4 +15,4 @@ AddTest(
    SOURCES force_multi_device_test.cpp stress_multi_device_test.cpp wf_multi_device_test.cpp ../../src_parallel/parallel_reduce.cpp ../../src_parallel/parallel_kpoints.cpp ../../src_parallel/parallel_global.cpp ../../src_parallel/parallel_common.cpp
 )
 
-install(FILES KPT KPT1 KPT2 KPT4   DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+install(FILES KPT KPT1 KPT2 KPT4 KPT5   DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
