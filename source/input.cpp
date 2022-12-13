@@ -351,7 +351,6 @@ void Input::Default(void)
     //----------------------------------------------------------
     // exx										//Peize Lin add 2018-06-20
     //----------------------------------------------------------
-
     exx_hybrid_alpha = "default";
     exx_hse_omega = 0.11;
 
@@ -360,6 +359,7 @@ void Input::Default(void)
 
     exx_lambda = 0.3;
 
+	exx_real_number = "default";
     exx_pca_threshold = 0;
     exx_c_threshold = 0;
     exx_v_threshold = 0;
@@ -1561,6 +1561,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, exx_lambda);
         }
+        else if (strcmp("exx_real_number", word) == 0)
+        {
+            read_value(ifs, exx_real_number);
+        }
         else if (strcmp("exx_pca_threshold", word) == 0)
         {
             read_value(ifs, exx_pca_threshold);
@@ -2167,6 +2171,13 @@ void Input::Default_2(void) // jiyy add 2019-08-04
         else if (dft_functional == "pbe0" || dft_functional == "hse" || dft_functional == "scan0")
             exx_hybrid_alpha = "0.25";
     }
+    if (exx_real_number == "default")
+    {
+        if (gamma_only)
+            exx_real_number = "1";
+        else
+            exx_real_number = "0";
+    }
     if (exx_ccp_rmesh_times == "default")
     {
         if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "scan0")
@@ -2472,6 +2483,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(exx_separate_loop);
     Parallel_Common::bcast_int(exx_hybrid_step);
     Parallel_Common::bcast_double(exx_lambda);
+    Parallel_Common::bcast_string(exx_real_number);
     Parallel_Common::bcast_double(exx_pca_threshold);
     Parallel_Common::bcast_double(exx_c_threshold);
     Parallel_Common::bcast_double(exx_v_threshold);
