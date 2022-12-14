@@ -315,7 +315,7 @@ These variables are used to control parameters related to input files.
 
 - **Type**: String
 - **Description**: Relevant when using ABACUS with wannier90. Tells the name of the input file related to wannier90.
-- **Default**: ""
+- **Default**: "none"
 
 [back to top](#full-list-of-input-keywords)
 
@@ -357,7 +357,7 @@ These variables are used to control the plane wave related parameters.
 
 - **Type**: Integer
 - **Description**: Only useful when you use `ks_solver = dav`. It indicates the maximal dimension for the Davidson method.
-- **Default**: 10
+- **Default**: 4
 
 [back to top](#full-list-of-input-keywords)
 
