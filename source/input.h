@@ -95,7 +95,6 @@ class Input
     double nupdown = 0.0;
     double nelec; // total number of electrons
     int lmaxmax;
-    double tot_magnetization;
 
     //==========================================================
     // LCAO parameters
@@ -237,6 +236,7 @@ class Input
     int out_proj_band; // projected band structure calculation jiyy add 2022-05-11
     int out_mat_hs; // output H matrix and S matrix in local basis.
     int out_mat_hs2; // LiuXh add 2019-07-16, output H(R) matrix and S(R) matrix in local basis.
+    int out_hs2_interval;
     int out_mat_r; // jingan add 2019-8-14, output r(R) matrix.
     bool out_wfc_lcao; // output the wave functions in local basis.
     bool out_alllog; // output all logs.
@@ -403,7 +403,7 @@ class Input
     int *orbital_corr; // which correlated orbitals need corrected ; d:2 ,f:3, do not need correction:-1
     double *hubbard_u; // Hubbard Coulomb interaction parameter U(ev)
     double *hund_j; // Hund exchange parameter J(ev)
-    bool omc; // whether turn on occupation matrix control method or not
+    int omc; // whether turn on occupation matrix control method or not
     bool yukawa_potential; // default:false
     double yukawa_lambda; // default:-1.0, which means we calculate lambda
 
@@ -500,6 +500,8 @@ class Input
 #ifdef __MPI
     void Bcast(void);
 #endif
+
+    int count_ntype(const std::string &fn); // sunliang add 2022-12-06
 
   public:
     template <class T> static void read_value(std::ifstream &ifs, T &var)

@@ -16,13 +16,12 @@ class energy
 	friend class LOOP_elec;
 	friend class Local_Orbital_Charge;
 	friend class Threshold_Elec;
-	friend class Forces; 
+	friend class Forces<double>;
 	friend class Charge;
 	friend class Potential;
 	friend class Occupy;
 	friend class wavefunc;
 	friend class Ions;
-	friend class Update_input;
 	friend class Force_Lo;
 	friend class Exx_pw;
 	friend class ON_Tests;

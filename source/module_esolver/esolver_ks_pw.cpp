@@ -585,15 +585,15 @@ namespace ModuleESolver
     template<typename FPTYPE, typename Device>
     void ESolver_KS_PW<FPTYPE, Device>::cal_Force(ModuleBase::matrix& force)
     {
-        Forces ff;
-        ff.init(force, this->pelec->wg, this->pelec->charge, this->psi);
+        Forces<FPTYPE, Device> ff;
+        ff.init(force, this->pelec->wg, this->pelec->charge, this->kspw_psi);
     }
 
     template<typename FPTYPE, typename Device>
     void ESolver_KS_PW<FPTYPE, Device>::cal_Stress(ModuleBase::matrix& stress)
     {
-        Stress_PW ss(this->pelec);
-        ss.cal_stress(stress, this->psi);
+        Stress_PW<FPTYPE, Device> ss(this->pelec);
+        ss.cal_stress(stress, this->psi, this->kspw_psi);
 
         //external stress
         FPTYPE unit_transform = 0.0;

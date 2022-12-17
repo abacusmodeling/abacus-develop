@@ -18,8 +18,10 @@ pseudopot_cell_vnl::pseudopot_cell_vnl()
 pseudopot_cell_vnl::~pseudopot_cell_vnl()
 {
 #ifdef __CUDA
-	cudaFree(this->d_deeq);
-	cudaFree(this->d_deeq_nc);
+    if (GlobalV::device_flag == "gpu") {
+        cudaFree(this->d_deeq);
+        cudaFree(this->d_deeq_nc);
+    }
 #endif
 }
 
@@ -80,9 +82,12 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		this->nhtoj.create(ntype, this->nhm);
 		this->deeq.create(GlobalV::NSPIN, GlobalC::ucell.nat, this->nhm, this->nhm);
 #ifdef __CUDA
-		cudaMalloc((void**)&d_deeq, GlobalV::NSPIN*GlobalC::ucell.nat*this->nhm*this->nhm*sizeof(double));
-		cudaMalloc((void**)&d_deeq_nc, GlobalV::NSPIN*GlobalC::ucell.nat*this->nhm*this->nhm*sizeof(std::complex<double>));
-#endif		
+        if (GlobalV::device_flag == "gpu") {
+            cudaMalloc((void **) &d_deeq, GlobalV::NSPIN * GlobalC::ucell.nat * this->nhm * this->nhm * sizeof(double));
+            cudaMalloc((void **) &d_deeq_nc,
+                       GlobalV::NSPIN * GlobalC::ucell.nat * this->nhm * this->nhm * sizeof(std::complex<double>));
+        }
+#endif
 		this->deeq_nc.create(GlobalV::NSPIN, GlobalC::ucell.nat, this->nhm, this->nhm);
 		this->dvan.create(ntype, this->nhm, this->nhm);
 		this->dvan_so.create(GlobalV::NSPIN, ntype, this->nhm, this->nhm);
@@ -172,7 +177,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik, ModuleBase::ComplexMatrix& vkb_in
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
-	ModuleBase::YlmReal::Ylm_Real(x1, npw, gk, ylm);
+	ModuleBase::YlmReal::Ylm_Real(this->cpu_ctx, x1, npw, reinterpret_cast<double *>(gk), ylm.c);
 
 	int jkb = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
@@ -724,14 +729,16 @@ void pseudopot_cell_vnl::cal_effective_D(void)
         }
     }
 #ifdef __CUDA
-    cudaMemcpy(this->d_deeq,
-               this->deeq.ptr,
-               GlobalV::NSPIN * GlobalC::ucell.nat * this->nhm * this->nhm * sizeof(double),
-               cudaMemcpyHostToDevice);
-	cudaMemcpy(this->d_deeq_nc,
-           this->deeq_nc.ptr,
-           GlobalV::NSPIN * GlobalC::ucell.nat * this->nhm * this->nhm * sizeof(std::complex<double>),
-           cudaMemcpyHostToDevice);
+    if (GlobalV::device_flag == "gpu") {
+        cudaMemcpy(this->d_deeq,
+                   this->deeq.ptr,
+                   GlobalV::NSPIN * GlobalC::ucell.nat * this->nhm * this->nhm * sizeof(double),
+                   cudaMemcpyHostToDevice);
+        cudaMemcpy(this->d_deeq_nc,
+                   this->deeq_nc.ptr,
+                   GlobalV::NSPIN * GlobalC::ucell.nat * this->nhm * this->nhm * sizeof(std::complex<double>),
+                   cudaMemcpyHostToDevice);
+    }
 #endif
     return;
 } 

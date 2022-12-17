@@ -44,6 +44,9 @@ list(APPEND device_srcs
     module_elecstate/src/elecstate_multi_device.cpp
     module_psi/src/memory_psi.cpp
     module_psi/src/device.cpp
+    src_pw/src/force_multi_device.cpp
+    src_pw/src/stress_multi_device.cpp
+    module_base/src/math_multi_device.cpp
 )
 
 if(USE_CUDA)
@@ -56,6 +59,9 @@ if(USE_CUDA)
       module_hsolver/src/cuda/math_kernel.cu
       module_elecstate/src/cuda/elecstate_multi_device.cu
       module_psi/src/cuda/memory.cu
+      src_pw/src/cuda/force_multi_device.cu
+      src_pw/src/cuda/stress_multi_device.cu
+      module_base/src/cuda/math_multi_device.cu
   )
 endif()
 

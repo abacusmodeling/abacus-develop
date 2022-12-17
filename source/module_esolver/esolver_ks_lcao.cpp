@@ -25,6 +25,7 @@
 #include "module_elecstate/elecstate_lcao.h"
 #include "module_hamilt/hamilt_lcao.h"
 #include "module_hsolver/hsolver_lcao.h"
+#include "module_hamilt/ks_lcao/op_exx_lcao.h"
 // function used by deepks
 #include "module_elecstate/cal_dm.h"
 //---------------------------------------------------
@@ -50,7 +51,7 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell& ucell)
 
     if (GlobalV::CALCULATION == "get_S")
     {
-        if (ModuleSymmetry::Symmetry::symm_flag)
+        if (ModuleSymmetry::Symmetry::symm_flag == 1)
         {
             GlobalC::symm.analy_sys(ucell, GlobalV::ofs_running);
             ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
@@ -103,21 +104,26 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell& ucell)
     //------------------init Hamilt_lcao----------------------
 
 #ifdef __EXX
-    if (GlobalV::CALCULATION == "nscf")
-    {
-        if (GlobalC::exx_info.info_global.cal_exx)
-        {
-            XC_Functional::set_xc_type(ucell.atoms[0].ncpp.xc_func);
-        }
-    }
-
     // PLEASE simplify the Exx_Global interface
     // mohan add 2021-03-25
     // Peize Lin 2016-12-03
-    if (GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "relax" || GlobalV::CALCULATION == "cell-relax")
+    if (GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "relax"
+        || GlobalV::CALCULATION == "cell-relax" || GlobalV::CALCULATION == "md")
     {
         if (GlobalC::exx_info.info_global.cal_exx)
         {
+            /* In the special "two-level" calculation case,
+            first scf iteration only calculate the functional without exact exchange.
+            but in "nscf" calculation, there is no need of "two-level" method. */
+            if (ucell.atoms[0].ncpp.xc_func == "HSE" || ucell.atoms[0].ncpp.xc_func == "PBE0")
+            {
+                XC_Functional::set_xc_type("pbe");
+            }
+            else if (ucell.atoms[0].ncpp.xc_func == "SCAN0")
+            {
+                XC_Functional::set_xc_type("scan");
+            }
+
 			// GlobalC::exx_lcao.init();
             if(GlobalV::GAMMA_ONLY_LOCAL)
                 GlobalC::exx_lri_double.init(MPI_COMM_WORLD);
@@ -277,8 +283,6 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
 
 void ESolver_KS_LCAO::eachiterinit(const int istep, const int iter)
 {
-    if (GlobalV::dft_plus_u)
-        GlobalC::dftu.iter_dftu = iter;
 
     // mohan add 2010-07-16
     // used for pulay mixing.
@@ -411,13 +415,13 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
     }
 
 #ifdef __EXX
-    // add exx
-    // Peize Lin add 2016-12-03
-    GlobalC::en.set_exx();
-
     // Peize Lin add 2020.04.04
     if (XC_Functional::get_func_type() == 4 || XC_Functional::get_func_type() == 5)
     {
+        // add exx
+        // Peize Lin add 2016-12-03
+        GlobalC::en.set_exx();
+
         if (GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish
             && !GlobalC::restart.info_load.restart_exx)
         {
@@ -430,17 +434,23 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
             GlobalC::restart.info_load.restart_exx = true;
         }
     }
+    else
+    {
+        GlobalC::en.exx = 0.;
+    }
 #endif
 
     // if DFT+U calculation is needed, this function will calculate
     // the local occupation number matrix and energy correction
     if (GlobalV::dft_plus_u)
     {
-        if (GlobalV::GAMMA_ONLY_LOCAL)
-            GlobalC::dftu.cal_occup_m_gamma(iter, this->LOC.dm_gamma);
-        else
-            GlobalC::dftu.cal_occup_m_k(iter, this->LOC.dm_k);
-
+        if(GlobalC::dftu.omc!=2)
+        {
+            if (GlobalV::GAMMA_ONLY_LOCAL)
+                GlobalC::dftu.cal_occup_m_gamma(iter, this->LOC.dm_gamma);
+            else
+                GlobalC::dftu.cal_occup_m_k(iter, this->LOC.dm_k);
+        }
         GlobalC::dftu.cal_energy_correction(istep);
         GlobalC::dftu.output();
     }
@@ -877,7 +887,10 @@ void ESolver_KS_LCAO::afterscf(const int istep)
 #endif
     if (hsolver::HSolverLCAO::out_mat_hsR)
     {
-        this->output_HS_R(istep, this->pelec->pot->get_effective_v()); // LiuXh add 2019-07-15
+        if( !(GlobalV::CALCULATION=="md" && (istep%hsolver::HSolverLCAO::out_hsR_interval!=0)) )
+        {
+            this->output_HS_R(istep, this->pelec->pot->get_effective_v()); // LiuXh add 2019-07-15
+        } // LiuXh add 2019-07-15
     }
 
     // add by jingan for out r_R matrix 2019.8.14
@@ -905,6 +918,32 @@ void ESolver_KS_LCAO::afterscf(const int istep)
 bool ESolver_KS_LCAO::do_after_converge(int& iter)
 {
 #ifdef __EXX
+
+    // Add EXX operator
+    auto add_exx_operator = [&]()
+    {
+        if(GlobalV::GAMMA_ONLY_LOCAL)
+        {
+            hamilt::Operator<double>* exx
+                = new hamilt::OperatorEXX<hamilt::OperatorLCAO<double>>(
+                    &LM,
+                    nullptr, //no explicit call yet
+                    &(LM.Hloc)
+                );
+            p_hamilt->opsd->add(exx);
+        }
+        else
+        {
+            hamilt::Operator<std::complex<double>>* exx
+                = new hamilt::OperatorEXX<hamilt::OperatorLCAO<std::complex<double>>>(
+                    &LM,
+                    nullptr, //no explicit call yet
+                    &(LM.Hloc2)
+                );
+            p_hamilt->ops->add(exx);
+        }
+    };
+
     if (GlobalC::exx_info.info_global.cal_exx)
     {
         //no separate_loop case
@@ -927,6 +966,9 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
                 iter = 0;
                 std::cout << " Entering 2nd SCF, where EXX is updated" << std::endl;
                 this->two_level_step++;
+
+                add_exx_operator();
+
                 return false;
             }
         }
@@ -939,7 +981,12 @@ bool ESolver_KS_LCAO::do_after_converge(int& iter)
         else
         {
             //update exx and redo scf
-            XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].ncpp.xc_func);
+            if (two_level_step == 0)
+            {
+                add_exx_operator();
+                XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].ncpp.xc_func);
+            }
+
             //GlobalC::exx_lcao.cal_exx_elec(this->LOC, this->LOWF.wfc_k_grid);
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 				GlobalC::exx_lri_double.cal_exx_elec(this->LOC, *this->LOWF.ParaV);

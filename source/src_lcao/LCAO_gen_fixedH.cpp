@@ -24,15 +24,6 @@ LCAO_gen_fixedH::~LCAO_gen_fixedH()
 void LCAO_gen_fixedH::calculate_NL_no(double* HlocR)
 {
     ModuleBase::TITLE("LCAO_gen_fixedH","calculate_NL_no");
-	// if(GlobalV::GAMMA_ONLY_LOCAL)
-	// {
-	//   	//for gamma only.
-	// 	this->build_Nonlocal_beta_new(HlocR);
-	// }
-	// else
-	// {
-	// 	this->build_Nonlocal_mu_new(HlocR, false);
-	// }
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 	  	//for gamma only.
@@ -81,9 +72,9 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
     int nnr = 0; // used onlyh for k points.
 
     const Parallel_Orbitals* pv = this->LM->ParaV;
-
+#ifdef _OPENMP
 	vector<int> nnr_omp;
-	int len_threads = 0;          // 有多少个线程
+	int len_threads = 0;         
 	#pragma omp parallel
 	{
 	
@@ -113,6 +104,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 		len_threads = tot_threads;
 	}
 	sort(nnr_omp.begin(), nnr_omp.end());
+#endif
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>
 	ModuleBase::Vector3<double> tau1, tau2, dtau;
@@ -121,11 +113,13 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 	int count = 0;
 	for(int iat = 0; iat < GlobalC::ucell.nat; iat++)
 	{
-		if((nnr_omp[count] ) == iat) 
+#ifdef _OPENMP
+        if((nnr_omp[count] ) == iat) 
 		{
  			nnr_omp[count] = nnr;
 			count++;
 		}
+#endif
 		const int it = GlobalC::ucell.iat2it[iat];                 
 		const int ia = GlobalC::ucell.iat2ia[iat];
 
@@ -321,10 +315,10 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 		}// ad
 	}// I1
 	
-
+#ifdef _OPENMP
 	nnr_omp[nnr_omp.size() - 1] = nnr;
 	this->LM->nnr_para = nnr_omp;
-
+#endif
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		if(nnr != pv->nnr)
@@ -810,11 +804,12 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &
 	bool is_adj;
 	// int nnr = 0;
 	int tot_threads = 0;
-
+#ifdef _OPENMP
 	#pragma omp parallel shared(HlocR,nnr_sum,nlm_tot) private(is_adj)
   	{
 		tot_threads = omp_get_num_threads();
 		#pragma omp for 
+#endif
 		for(int iat = 0; iat < GlobalC::ucell.nat; iat++)    
 		{
 			const int it = GlobalC::ucell.iat2it[iat];                 
@@ -888,7 +883,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &
 		//and accumulate the value to Hloc_fixedR(i,j)
 		//=======================================================
 	
-	
+#ifdef _OPENMP
 		int tid = omp_get_thread_num();
 		int tot_threads = omp_get_num_threads();
 		int average = GlobalC::ucell.nat / tot_threads;
@@ -905,19 +900,22 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &
 		}
 
 		vector<double> Hloc_mm;
-		// 不同线程分配指定长度的数组大小
 		if(tid == 0){
 			Hloc_mm.resize(this->LM->nnr_para[tid]); 
 		}else{
 			Hloc_mm.resize(this->LM->nnr_para[tid] - this->LM->nnr_para[tid - 1]);
 		}
-
 		int nnr = 0;
-	
 		for(int iat1 = start;iat1< end;iat1++)    
-		{
-			
-			const int it = GlobalC::ucell.iat2it[iat1];          
+		{	
+#else    
+        vector<double> Hloc_mm;
+        Hloc_mm.resize(pv->nnr);
+	    int nnr = 0;
+        for(int iat1 = start;iat1< GlobalC::ucell.nat;iat1++)
+        {
+#endif
+            const int it = GlobalC::ucell.iat2it[iat1];          
 			const int ia = GlobalC::ucell.iat2ia[iat1];
 			const int start1 = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
 			const Atom* atom1 = &GlobalC::ucell.atoms[it];
@@ -1049,16 +1047,13 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &
 												}												
 												assert(ib==nlm_1.size());		
 												
-												// Hloc_mm[nnr+nnr_inner] += nlm_tmp;		 		
 												Hloc_mm[nnr + nnr_inner] += nlm_tmp;	
-												// cout << Hloc_mm[nnr + nnr_inner] << endl;								
 												nnr_inner++;
 										
 											}//if 
 										}// k
 									} //if
 								} // j 
-								// len_eff = nnr_inner;            // 同步数据长度
 							}// if  continue 1
 						}// if continue 2
 					} // ad0
@@ -1081,7 +1076,6 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &
 								const int iw2_all = start2 + k1;
 								const int nu = pv->trace_loc_col[iw2_all];					
 								if(nu >= 0){
-									// #pragma omp critical
 									nnr++;  
 								}
 							}
@@ -1095,24 +1089,21 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_Nocalc_k(double* HlocR, const bool &
 		} // iat1
 		
 	
-
-		// #pragma omp critical
-		// cout << start << " " << nnr << endl;
-		// // 汇总数据
+#ifdef _OPENMP
 		int a_start = 0;
 		int a_end = 0;
-		// cout << a_start << "  " << a_end << endl;
 		nnr_sum += nnr;
-		// #pragma omp critical
 		if(tid != 0){
 			a_start = this->LM->nnr_para[tid - 1];
 		}
 		a_end = this->LM->nnr_para[tid];
-		// #pragma omp barrier
 		for(int i = a_start, j = 0; i < a_end, j < nnr; i++, j++){
 			HlocR[i] += Hloc_mm[j];
 		}
 	}
+#else
+    memcpy(Hloc_mm[0], HlocR[0], nnr);
+#endif
 
 	if( nnr_sum !=pv->nnr)
 	{
@@ -1143,13 +1134,13 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &ca
 
 	int nnr_sum = 0;
 	bool is_adj;
-	// int nnr = 0;
 	int tot_threads = 0;
-
+#ifdef _OPENMP
 	#pragma omp parallel shared(nnr_sum,nlm_tot1) private(is_adj)
   	{
 		tot_threads = omp_get_num_threads();
 		#pragma omp for 
+#endif        
 		for(int iat = 0; iat < GlobalC::ucell.nat; iat++)    
 		{
 			const int it = GlobalC::ucell.iat2it[iat];                 
@@ -1221,7 +1212,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &ca
 		//calculate sum_(L0,M0) beta<psi_i|beta><beta|psi_j>
 		//and accumulate the value to Hloc_fixedR(i,j)
 		//=======================================================
-	
+#ifdef _OPENMP
 	
 		int tid = omp_get_thread_num();
 		int tot_threads = omp_get_num_threads();
@@ -1242,7 +1233,6 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &ca
 		vector<double> Hloc_mm2;
 		vector<double> Hloc_mm3;
 
-		// 不同线程分配指定长度的数组大小
 		if(tid == 0){
 			Hloc_mm1.resize(this->LM->nnr_para[tid]); 
 			Hloc_mm2.resize(this->LM->nnr_para[tid]); 
@@ -1252,11 +1242,16 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &ca
 			Hloc_mm2.resize(this->LM->nnr_para[tid] - this->LM->nnr_para[tid - 1]);
 			Hloc_mm3.resize(this->LM->nnr_para[tid] - this->LM->nnr_para[tid - 1]);
 		}
-		int nnr = 0;
 
+        int nnr = 0;
 		for(int iat1 = start;iat1< end;iat1++)    
 		{
-			
+#else
+        
+        int nnr = 0;
+        for(int iat1 = start;iat1< GlobalC::ucell.nat;iat1++)
+        {
+#endif
 			const int it = GlobalC::ucell.iat2it[iat1];          
 			const int ia = GlobalC::ucell.iat2ia[iat1];
 			const int start1 = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
@@ -1394,17 +1389,20 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &ca
 													}
 												}
 												assert(ib==nlm_1.size());
-
+#ifdef _OPENMP
 												Hloc_mm1[nnr+nnr_inner] += nlm[0];
 												Hloc_mm2[nnr+nnr_inner] += nlm[1];
 												Hloc_mm3[nnr+nnr_inner] += nlm[2];
-									
+#else
+                                                this->LM->DHloc_fixedR_x[nnr+nnr_inner] += nlm[0];
+                                                this->LM->DHloc_fixedR_y[nnr+nnr_inner] += nlm[1];
+                                                this->LM->DHloc_fixedR_z[nnr+nnr_inner] += nlm[2];
+#endif
 											
 											}//if 
 										}// k
 									} //if
 								} // j 
-								// len_eff = nnr_inner;            // 同步数据长度
 							}// if  continue 1
 						}// if continue 2
 					} // ad0
@@ -1433,12 +1431,11 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &ca
 							}
 						}						
 					}		
-					
 				}// end is_adj  
 			} // ad2		
 		} // iat1
 		
-		// 汇总数据
+#ifdef _OPENMP
 		int a_start = 0;
 		int a_end = 0;
 		nnr_sum += nnr;
@@ -1452,6 +1449,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new_calc_k(double* NLloc, const bool &ca
 			this->LM->DHloc_fixedR_z[i] += Hloc_mm3[j];
 		}
 	}
+#endif
 
 	if( nnr_sum !=pv->nnr)
 	{
@@ -1476,7 +1474,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new(double* HSloc) //update by liuyu 2
     mkl_set_num_threads(1);
 #endif
 
-    const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.get_adjs(GlobalC::ucell);
+    //const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.get_adjs(GlobalC::ucell);
+    const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.Find_atoms(GlobalC::ucell);
 
 #ifdef _OPENMP
     #pragma omp parallel

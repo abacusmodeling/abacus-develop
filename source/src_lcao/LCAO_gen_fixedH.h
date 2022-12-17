@@ -38,9 +38,7 @@ public:
 	//void calculate_S_no(std::complex<double>* SlocR);
 
 
-	// 计算虚拟内存的函数
-	int parseLine(char* line);
-	int getValueVir();
+
 
 	private:
 

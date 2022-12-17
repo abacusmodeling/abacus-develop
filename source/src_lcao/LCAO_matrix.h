@@ -27,7 +27,7 @@ class LCAO_Matrix
 	void folding_fixedH(const int &ik);
 
     Parallel_Orbitals *ParaV;
-    std::vector<int> nnr_para; // sjw 2022年7月
+    std::vector<int> nnr_para; // sjw 2022-7
 private:
 
     void allocate_HS_gamma(const long &nloc);
