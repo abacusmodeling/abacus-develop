@@ -498,6 +498,8 @@ void Input_Conv::Convert(void)
     GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;
     GlobalC::en.out_proj_band = INPUT.out_proj_band;
+
+    GlobalV::out_bandgap = INPUT.out_bandgap; //QO added for bandgap printing
 #ifdef __LCAO
     Local_Orbital_Charge::out_dm = INPUT.out_dm;
     Local_Orbital_Charge::out_dm1 = INPUT.out_dm1;

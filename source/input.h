@@ -243,6 +243,8 @@ class Input
     bool out_alllog; // output all logs.
     bool out_element_info; // output infomation of all element
 
+    bool out_bandgap; // QO added for bandgap printing
+    
     double dos_emin_ev;
     double dos_emax_ev;
     double dos_edelta_ev;

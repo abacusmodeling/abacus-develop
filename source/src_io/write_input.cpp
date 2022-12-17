@@ -177,6 +177,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "relax_scale_force", relax_scale_force, "controls the size of the first CG step if relax_new is true");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_level", out_level, "ie(for electrons); i(for ions);");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_dm", out_dm, ">0 output density matrix");
+ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print out bandgap");
 
     // for deepks
     ModuleBase::GlobalFunc::OUTP(ofs, "deepks_out_labels", deepks_out_labels, ">0 compute descriptor for deepks");
