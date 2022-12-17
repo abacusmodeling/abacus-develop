@@ -404,15 +404,9 @@ class Input
     bool dft_plus_u; // true:DFT+U correction; false：standard DFT calculation(default)
     int *orbital_corr; // which correlated orbitals need corrected ; d:2 ,f:3, do not need correction:-1
     double *hubbard_u; // Hubbard Coulomb interaction parameter U(ev)
-    double *hund_j; // Hund exchange parameter J(ev)
     int omc; // whether turn on occupation matrix control method or not
     bool yukawa_potential; // default:false
     double yukawa_lambda; // default:-1.0, which means we calculate lambda
-
-    // The two parameters below are not usable currently
-
-    int dftu_type; // 1:rotationally invarient formalism; 2:simplified form(default)
-    int double_counting; // 1:FLL(fully localized limit)(default); 2:AMF(around mean field)
 
     //==========================================================
     //    DFT+DMFT       Xin Qu added on 2021-08
