@@ -552,6 +552,27 @@ namespace ModuleESolver
             }
             GlobalV::ofs_running << std::endl;
         }
+        if (GlobalV::out_bandgap)
+        {
+            if (!GlobalV::TWO_EFERMI)
+            {
+                GlobalC::en.cal_bandgap(this->pelec);
+                GlobalV::ofs_running << " E_bandgap "
+                << GlobalC::en.bandgap * ModuleBase::Ry_to_eV 
+                << " eV" << std::endl;
+            }
+            else
+            {
+                GlobalC::en.cal_bandgap_updw(this->pelec);
+                GlobalV::ofs_running << " E_bandgap_up " 
+                << GlobalC::en.bandgap_up * ModuleBase::Ry_to_eV 
+                << " eV" << std::endl;
+                GlobalV::ofs_running << " E_bandgap_dw " 
+                << GlobalC::en.bandgap_dw * ModuleBase::Ry_to_eV 
+                << " eV" << std::endl;
+            }
+        
+        }
 
         // add by jingan in 2018.11.7
         if (GlobalV::CALCULATION == "nscf" && INPUT.towannier90)

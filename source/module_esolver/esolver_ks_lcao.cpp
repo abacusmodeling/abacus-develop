@@ -402,6 +402,17 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
         GlobalC::en.eband = this->pelec->eband;
         GlobalC::en.demet = this->pelec->demet;
         GlobalC::en.ef = this->pelec->ef;
+        if (GlobalV::out_bandgap)
+        {
+            if (!GlobalV::TWO_EFERMI)
+            {
+                GlobalC::en.cal_bandgap(this->pelec);
+            }
+            else
+            {
+                GlobalC::en.cal_bandgap_updw(this->pelec);
+            }
+        }
     }
     else
     {

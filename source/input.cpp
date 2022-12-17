@@ -279,6 +279,8 @@ void Input::Default(void)
     out_dm = 0;
     out_dm1 = 0;
 
+    out_bandgap = 0; //QO added for bandgap printing
+
     deepks_out_labels = 0; // caoyu added 2020-11-24, mohan added 2021-01-03
     deepks_scf = 0;
     deepks_bandgap = 0;
@@ -1075,6 +1077,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("out_dm1", word) == 0)
         {
             read_bool(ifs, out_dm1);
+        }
+        else if (strcmp("out_bandgap", word) == 0) // for bandgap printing
+        {
+            read_bool(ifs, out_bandgap);
         }
         else if (strcmp("deepks_out_labels", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
@@ -2291,6 +2297,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(out_chg);
     Parallel_Common::bcast_bool(out_dm);
     Parallel_Common::bcast_bool(out_dm1);
+    Parallel_Common::bcast_bool(out_bandgap); //for bandgap printing
 
     Parallel_Common::bcast_bool(deepks_out_labels); // caoyu added 2020-11-24, mohan modified 2021-01-03
     Parallel_Common::bcast_bool(deepks_scf);
