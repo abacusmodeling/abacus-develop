@@ -439,9 +439,7 @@ void Input::Default(void)
     dft_plus_u = false; // 1:DFT+U correction; 0：standard DFT calcullation
     yukawa_potential = false;
     yukawa_lambda = -1.0;
-    double_counting = 1;
     omc = 0;
-    dftu_type = 2;
 
     //==========================================================
     //    DFT+DMFT     Xin Qu added on 2020-08
@@ -1661,15 +1659,9 @@ bool Input::Read(const std::string &fn)
         {
             read_bool(ifs, dft_plus_u);
         }
-        else if (strcmp("dftu_type", word) == 0)
-            ifs.ignore(150, '\n');
         else if (strcmp("yukawa_potential", word) == 0)
             ifs.ignore(150, '\n');
         else if (strcmp("hubbard_u", word) == 0)
-            ifs.ignore(150, '\n');
-        else if (strcmp("hund_j", word) == 0)
-            ifs.ignore(150, '\n');
-        else if (strcmp("double_counting", word) == 0)
             ifs.ignore(150, '\n');
         else if (strcmp("orbital_corr", word) == 0)
             ifs.ignore(150, '\n');
@@ -1852,12 +1844,6 @@ bool Input::Read(const std::string &fn)
         hubbard_u[i] = 0.0;
     }
 
-    hund_j = new double[ntype];
-    for (int i = 0; i < ntype; i++)
-    {
-        hund_j[i] = 0.0;
-    }
-
     orbital_corr = new int[ntype];
     for (int i = 0; i < ntype; i++)
     {
@@ -1875,11 +1861,7 @@ bool Input::Read(const std::string &fn)
             if(ifs.eof() != 0) break;
             strtolower(word1, word); // convert uppercase std::string to lower case; word1 --> word
 
-            if (strcmp("dftu_type", word) == 0)
-            {
-                ifs >> dftu_type;
-            }
-            else if (strcmp("yukawa_potential", word) == 0)
+            if (strcmp("yukawa_potential", word) == 0)
             {
             	read_bool(ifs, yukawa_potential);
             }
@@ -1887,24 +1869,12 @@ bool Input::Read(const std::string &fn)
             {
                 ifs >> yukawa_lambda;
             }
-            else if (strcmp("double_counting", word) == 0)
-            {
-                ifs >> double_counting;
-            }
             else if (strcmp("hubbard_u", word) == 0)
             {
                 for (int i = 0; i < ntype; i++)
                 {
                     ifs >> hubbard_u[i];
                     hubbard_u[i] /= ModuleBase::Ry_to_eV;
-                }
-            }
-            else if (strcmp("hund_j", word) == 0)
-            {
-                for (int i = 0; i < ntype; i++)
-                {
-                    ifs >> hund_j[i];
-                    hund_j[i] /= ModuleBase::Ry_to_eV;
                 }
             }
             else if (strcmp("orbital_corr", word) == 0)
@@ -1935,12 +1905,6 @@ bool Input::Read(const std::string &fn)
             if (hubbard_u[i] < -1.0e-3)
             {
                 std::cout << " WRONG ARGUMENTS OF hubbard_u " << std::endl;
-                exit(0);
-            }
-
-            if (hund_j[i] < -1.0e-3)
-            {
-                std::cout << " WRONG ARGUMENTS OF hund_j " << std::endl;
                 exit(0);
             }
 
@@ -1995,14 +1959,6 @@ bool Input::Read(const std::string &fn)
                     hubbard_u[i] /= ModuleBase::Ry_to_eV;
                 }
             }
-            else if (strcmp("hund_j", word) == 0)
-            {
-                for (int i = 0; i < ntype; i++)
-                {
-                    ifs >> hund_j[i];
-                    hund_j[i] /= ModuleBase::Ry_to_eV;
-                }
-            }
             else if (strcmp("orbital_corr", word) == 0)
             {
                 for (int i = 0; i < ntype; i++)
@@ -2023,12 +1979,6 @@ bool Input::Read(const std::string &fn)
             if (hubbard_u[i] < -1.0e-3)
             {
                 std::cout << " WRONG ARGUMENTS OF hubbard_u " << std::endl;
-                exit(0);
-            }
-
-            if (hund_j[i] < -1.0e-3)
-            {
-                std::cout << " WRONG ARGUMENTS OF hund_j " << std::endl;
                 exit(0);
             }
 
@@ -2524,20 +2474,16 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(dft_plus_u);
     Parallel_Common::bcast_bool(yukawa_potential);
     Parallel_Common::bcast_int(omc);
-    Parallel_Common::bcast_int(dftu_type);
-    Parallel_Common::bcast_int(double_counting);
     Parallel_Common::bcast_double(yukawa_lambda);
     if (GlobalV::MY_RANK != 0)
     {
         hubbard_u = new double[this->ntype];
-        hund_j = new double[this->ntype];
         orbital_corr = new int[this->ntype];
     }
 
     for (int i = 0; i < this->ntype; i++)
     {
         Parallel_Common::bcast_double(hubbard_u[i]);
-        Parallel_Common::bcast_double(hund_j[i]);
         Parallel_Common::bcast_int(orbital_corr[i]);
     }
 

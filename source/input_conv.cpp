@@ -16,7 +16,7 @@
 #include "module_orbital/ORB_read.h"
 #include "src_lcao/ELEC_evolve.h"
 #include "src_lcao/FORCE_STRESS.h"
-#include "src_lcao/dftu.h"
+#include "module_dftu/dftu.h"
 #include "src_lcao/global_fp.h"
 #include "src_lcao/local_orbital_charge.h"
 #endif
@@ -185,15 +185,15 @@ void Input_Conv::Convert(void)
     if (INPUT.dft_plus_u)
     {
         GlobalV::dft_plus_u = INPUT.dft_plus_u;
-        GlobalC::dftu.dftu_type = INPUT.dftu_type;
-        GlobalC::dftu.double_counting = INPUT.double_counting;
         GlobalC::dftu.Yukawa = INPUT.yukawa_potential;
         GlobalC::dftu.omc = INPUT.omc;
         GlobalC::dftu.orbital_corr = INPUT.orbital_corr;
         if (!INPUT.yukawa_potential)
         {
-            GlobalC::dftu.U = INPUT.hubbard_u; // Hubbard Coulomb interaction parameter U(ev)
-            GlobalC::dftu.J = INPUT.hund_j; // Hund exchange parameter J(ev)
+            // Duradev's rotational invariant formulation is implemented
+            // where only an effective U given by U-J is used
+            // unit is in eV
+            GlobalC::dftu.U = INPUT.hubbard_u;
         }
     }
 #endif
