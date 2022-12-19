@@ -589,7 +589,18 @@ void Input_Conv::Convert(void)
     GlobalV::of_full_pw_dim = INPUT.of_full_pw_dim;
     GlobalV::of_read_kernel = INPUT.of_read_kernel;
     GlobalV::of_kernel_file = INPUT.of_kernel_file;
-    
+    //-----------------------------------------------
+    // set read_file_dir
+    //-----------------------------------------------
+    if (INPUT.read_file_dir == "auto")
+    {
+        GlobalV::global_readin_dir = GlobalV::global_out_dir;
+    }
+    else
+    {
+        GlobalV::global_readin_dir = INPUT.read_file_dir + '/';
+    }
+
     ModuleBase::timer::tick("Input_Conv", "Convert");
     return;
 }
