@@ -516,33 +516,37 @@ void FFT::fftxyc2r(std::complex<double>* & in, double* & out)
 	return;
 }
 
-#if defined(__CUDA) || defined(__UT_USE_CUDA)
-void FFT::fft3D_forward(std::complex<double>* & in, std::complex<double>* & out)
+template <>
+void FFT::fft3D_forward(const psi::DEVICE_GPU * /*ctx*/, std::complex<double>* & in, std::complex<double>* & out)
 {
 //    fftw_execute_dft(
 //        this->plan3dforward,
 //        reinterpret_cast<fftw_complex *>(in),
 //        reinterpret_cast<fftw_complex *>(out));
+#if defined(__CUDA)
     cufftExecZ2Z(this->fft_handle,
           reinterpret_cast<cufftDoubleComplex*>(in),
           reinterpret_cast<cufftDoubleComplex*>(out),
           CUFFT_FORWARD);
     cudaDeviceSynchronize();
+#endif
 }
 
-void FFT::fft3D_backward(std::complex<double>* & in, std::complex<double>* & out)
+template <>
+void FFT::fft3D_backward(const psi::DEVICE_GPU * /*ctx*/, std::complex<double>* & in, std::complex<double>* & out)
 {
 //    fftw_execute_dft(
 //        this->plan3dbackward,
 //        reinterpret_cast<fftw_complex *>(in),
-//        reinterpret_cast<fftw_complex *>(out));
+//        reinterpret_cast<fftw_complex *
+#if defined(__CUDA)
     cufftExecZ2Z(this->fft_handle,
              reinterpret_cast<cufftDoubleComplex*>(in),
              reinterpret_cast<cufftDoubleComplex*>(out),
              CUFFT_INVERSE);
     cudaDeviceSynchronize();
-}
 #endif
+}
 
 
 #ifdef __MIX_PRECISION
