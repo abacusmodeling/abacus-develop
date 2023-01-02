@@ -4,8 +4,8 @@
 #include "operator_pw.h"
 #include "module_base/matrix.h"
 #include "module_pw/pw_basis_k.h"
-#include "module_hamilt/include/meta.h"
-#include "module_hsolver/include/math_kernel.h"
+#include "module_hamilt/kernels/meta_op.h"
+#include "module_hsolver/kernels/math_kernel_op.h"
 
 namespace hamilt {
 

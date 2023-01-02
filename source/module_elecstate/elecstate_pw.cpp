@@ -4,7 +4,7 @@
 #include "src_parallel/parallel_reduce.h"
 #include "src_pw/global.h"
 #include "module_base/timer.h"
-#include "module_psi/include/device.h"
+#include "module_psi/kernels/device.h"
 
 namespace elecstate
 {

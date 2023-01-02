@@ -3,8 +3,8 @@
 
 #include "elecstate.h"
 #include "module_pw/pw_basis_k.h"
-#include "module_elecstate/include/elecstate_multi_device.h"
-#include "module_hamilt/include/meta.h"
+#include "module_elecstate/kernels/elecstate_op.h"
+#include "module_hamilt/kernels/meta_op.h"
 
 namespace elecstate
 {
