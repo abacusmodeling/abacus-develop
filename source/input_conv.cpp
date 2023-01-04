@@ -90,6 +90,7 @@ void Input_Conv::Convert(void)
         GlobalV::KPAR = INPUT.kpar;
         GlobalV::NSTOGROUP = INPUT.bndpar;
     }
+    GlobalV::precision_flag = INPUT.precision;
     GlobalV::CALCULATION = INPUT.calculation;
     GlobalV::ESOLVER_TYPE = INPUT.esolver_type;
 

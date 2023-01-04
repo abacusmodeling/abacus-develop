@@ -95,12 +95,7 @@ void Stress_Func<FPTYPE, Device>::stress_nl(ModuleBase::matrix& sigma, const Mod
 		const int npw = GlobalC::kv.ngk[ik];
 		// generate vkb
 		if (GlobalC::ppcell.nkb > 0) {
-            if (this->device == psi::GpuDevice) {
-                vkb = GlobalC::ppcell.d_vkb;
-            }
-            else {
-                vkb = GlobalC::ppcell.vkb.c;
-            }
+            vkb = GlobalC::ppcell.get_vkb_data<FPTYPE>();
 			GlobalC::ppcell.getvnl(ctx, ik, vkb);
 		}
 

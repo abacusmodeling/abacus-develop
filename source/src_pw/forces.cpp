@@ -954,12 +954,7 @@ void Forces<FPTYPE, Device>::cal_force_nl(ModuleBase::matrix& forcenl, const Mod
         // generate vkb
         if (GlobalC::ppcell.nkb > 0)
         {
-            if (this->device == psi::GpuDevice) {
-                vkb = GlobalC::ppcell.d_vkb;
-            }
-            else {
-                vkb = GlobalC::ppcell.vkb.c;
-            }
+            vkb = GlobalC::ppcell.get_vkb_data<FPTYPE>();
             GlobalC::ppcell.getvnl(ctx, ik, vkb);
         }
 
