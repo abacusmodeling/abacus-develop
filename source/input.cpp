@@ -265,6 +265,7 @@ void Input::Default(void)
     mixing_ndim = 8;
     mixing_gg0 = 0.00; // used in kerker method. mohan add 2014-09-27
     mixing_tau = false;
+    mixing_dftu = false;
     //----------------------------------------------------------
     // potential / charge / wavefunction / energy
     //----------------------------------------------------------
@@ -1034,6 +1035,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("mixing_tau", word) == 0)
         {
             read_bool(ifs, mixing_tau);
+        }
+        else if (strcmp("mixing_dftu", word) == 0)
+        {
+            read_bool(ifs, mixing_dftu);
         }
         //----------------------------------------------------------
         // charge / potential / wavefunction
@@ -2505,6 +2510,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int(mixing_ndim);
     Parallel_Common::bcast_double(mixing_gg0); // mohan add 2014-09-27
     Parallel_Common::bcast_bool(mixing_tau);
+    Parallel_Common::bcast_bool(mixing_dftu);
 
     Parallel_Common::bcast_string(read_file_dir);
     Parallel_Common::bcast_string(init_wfc);
