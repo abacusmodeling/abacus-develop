@@ -41,7 +41,7 @@
   [berry_phase](#berry_phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier_spin)
 - [TDDFT: time dependent density functional theory](#tddft-time-dependent-density-functional-theory) (Under tests)
 
-  [td_scf_thr](#td_scf_thr) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout) | [ocp](#ocp) | [ocp_set](#ocp_set) | [td_val_elec_01](#td_val_elec_01) | [td_val_elec_02](#td_val_elec_02) |[td_val_elec_03](#td_val_elec_03)
+  [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_stype](#td_stype) | [td_ttype](#td_ttype | [td_tstart](#td_tstart) | [td_tend](#td_tend) | [td_lcut1](#td_lcut1) | [td_lcut2](#td_lcut2) | [td_gauss_freq](#td_gauss_freq) | [td_guass_phase](#td_gauss_phase) | [td_gauss_sigma](#td_gauss_sigma) | [td_gauss_t0](#td_gauss_t0)| [td_gauss_amp](#td_gauss_amp) | [td_trape_freq](#td_trape_freq) | [td_trape_phase](#td_trape_phase) | [td_trape_t1](#td_trape_t1) | [td_trape_t2](#td_trape_t2) | [td_trape_t3](#td_trape_t3) | [td_trape_amp](#td_trape_amp) | [td_trigo_freq1](#td_trigo_freq1) | [td_trigo_freq2](#td_trigo_freq2) | [td_trigo_phase1](#td_trigo_phase1) | [td_trigo_phase2](#td_trigo_phase2) | [td_trigo_amp](#td_trigo_amp) | [td_heavi_t0](#td_heavi_t0) | [td_heavi_amp](#td_heavi_amp) | [td_hhg_amp1](#td_hhg_amp1) | [td_hhg_amp2](#td_hhg_amp2) | [td_hhg_freq1](#td_hhg_freq1) | [td_hhg_freq2](#td_hhg_freq2) | [td_hhg_phase1](#td_hhg_phase1) | [td_hhg_phase2](#td_hhg_phase2) | [td_hhg_t0](#td_hhg_t0) | [td_hhg_sigma](#td_hhg_sigma) | [out_dipole](#out_dipole) | [ocp](#ocp) | [ocp_set](#ocp_set) | [td_val_elec_01](#td_val_elec_01) | [td_val_elec_02](#td_val_elec_02) |[td_val_elec_03](#td_val_elec_03)
 - [DFT+*U* correction](#dftu-correction) (Under development)
 
   [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [yukawa_potential](#yukawa_potential) | [yukawa_lambda](#yukawa_lambda) | [omc](#omc)
@@ -1889,18 +1889,6 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ## TDDFT: time dependent density functional theory
 
-### td_scf_thr
-
-- **Type**: Real
-- **Description**: Accuracy of electron convergence when doing time-dependent evolution.
-- **Default**: 1e-9
-
-### td_dt
-
-- **Type**: Real
-- **Description**: Time-dependent evolution time step. (fs)
-- **Default**: 0.02
-
 ### td_force_dt
 
 - **Type**: Real
@@ -1924,30 +1912,283 @@ These variables are used to control berry phase and wannier90 interface paramete
   - 3: the direction of external light field is along z axis.
 - **Default**: 1
 
-### td_timescale
-
-- **Type**: Real
-- **Description**: Time range of external electric field application. (fs)
-- **Default**: 0.5
-
-### td_vexttype
+### td_stype
 
 - **Type**: Integer
 - **Description**:
-  - 1: Gaussian-type light field.
-  - 2: Delta function form light field.
-  - 3: Trigonometric function form light field.
-- **Default**: 1
-
-### td_vextout
-
-- **Type**: Integer
-- **Description**:
-  - 1: Output external electric field.
-  - 0: do not Output external electric field.
+  type of electric field in space domain
+  - 0: length gauge.
+  - 1: velocity gauge.
 - **Default**: 0
 
-### td_dipoleout
+### td_ttype
+
+- **Type**: Integer
+- **Description**:
+  type of electric field in time domain
+  - 0: Gaussian type function.
+  - 1: Trapezoid function.
+  - 2: Trigonometric function.
+  - 3: Heaviside function.
+  - 4: HHG function.
+- **Default**: 0
+
+### td_tstart
+
+- **Type**: Integer
+- **Description**:
+  nubmer of step where electric field start
+- **Default**: 1
+
+### td_tend
+
+- **Type**: Integer
+- **Description**:
+  nubmer of step where electric field end
+- **Default**: 100
+
+### td_lcut1
+
+- **Type**: Double
+- **Description**:
+  cut1 of interval in length gauge
+  E = E0 , cut1<x<cut2
+  E = -E0/(cut1+1-cut2) , x<cut1 or cut2<x<1
+- **Default**: 0.05
+
+### td_lcut2
+
+- **Type**: Double
+- **Description**:
+  cut2 of interval in length gauge
+- **Default**: 0.05
+
+### td_gauss_freq
+
+- **Type**: Double
+- **Description**:
+  frequency of Gauss type elctric field  (fs^-1)
+  amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
+- **Default**: 22.13
+
+### td_gauss_phase
+
+- **Type**: Double
+- **Description**:
+  phase of Gauss type elctric field  
+  amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
+- **Default**: 0.0
+
+### td_gauss_sigma
+
+- **Type**: Double
+- **Description**:
+  sigma of Gauss type elctric field  (fs)
+  amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
+- **Default**: 30.0
+
+### td_gauss_t0
+
+- **Type**: Double
+- **Description**:
+  step number of time center of Gauss type elctric field  
+  amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
+- **Default**: 100
+
+### td_gauss_amp
+
+- **Type**: Double
+- **Description**:
+  amplitude of Gauss type elctric field  (V/A)
+  amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
+- **Default**: 0.25
+
+### td_trape_freq
+
+- **Type**: Double
+- **Description**:
+  frequency of Trapezoid type elctric field  (fs^-1)
+  E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
+  E = amp*cos(2pi*f*t+phase) , t1<t<t2
+  E = amp*cos(2pi*f*t+phase) (1-(t-t2)/(t3-t2)) , t2<t<t3
+  E = 0 , t>t3
+- **Default**: 1.60
+
+### td_trape_phase
+
+- **Type**: Double
+- **Description**:
+  phase of Trapezoid type elctric field  
+  E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
+  E = amp*cos(2pi*f*t+phase) , t1<t<t2
+  E = amp*cos(2pi*f*t+phase) (1-(t-t2)/(t3-t2)) , t2<t<t3
+  E = 0 , t>t3
+- **Default**: 0.0
+
+### td_trape_t1
+
+- **Type**: Double
+- **Description**:
+  step number of time interval 1 of Trapezoid type elctric field  
+  E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
+  E = amp*cos(2pi*f*t+phase) , t1<t<t2
+  E = amp*cos(2pi*f*t+phase) (1-(t-t2)/(t3-t2)) , t2<t<t3
+  E = 0 , t>t3
+- **Default**: 1875
+
+### td_trape_t2
+
+- **Type**: Double
+- **Description**:
+  step number of time interval 2 of Trapezoid type elctric field  
+  E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
+  E = amp*cos(2pi*f*t+phase) , t1<t<t2
+  E = amp*cos(2pi*f*t+phase) (1-(t-t2)/(t3-t2)) , t2<t<t3
+  E = 0 , t>t3
+- **Default**: 5625
+
+### td_trape_t3
+
+- **Type**: Double
+- **Description**:
+  step number of time interval 3 of Trapezoid type elctric field  
+  E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
+  E = amp*cos(2pi*f*t+phase) , t1<t<t2
+  E = amp*cos(2pi*f*t+phase) (1-(t-t2)/(t3-t2)) , t2<t<t3
+  E = 0 , t>t3
+- **Default**: 7500
+
+### td_trape_amp
+
+- **Type**: Double
+- **Description**:
+  amplitude of Trapezoid type elctric field  (V/A)
+  E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
+  E = amp*cos(2pi*f*t+phase) , t1<t<t2
+  E = amp*cos(2pi*f*t+phase) (1-(t-t2)/(t3-t2)) , t2<t<t3
+  E = 0 , t>t3
+- **Default**: 2.74
+
+### td_trigo_freq1
+
+- **Type**: Double
+- **Description**:
+  frequence 1 of Trigonometric type elctric field  (fs^-1)
+  amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
+- **Default**: 1.164656
+
+### td_trigo_freq2
+
+- **Type**: Double
+- **Description**:
+  frequence 2 of Trigonometric type elctric field  (fs^-1)
+  amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
+- **Default**: 0.029116
+
+### td_trigo_phase1
+
+- **Type**: Double
+- **Description**:
+  phase 1 of Trigonometric type elctric field  
+  amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
+- **Default**: 0.0
+
+### td_trigo_phase2
+
+- **Type**: Double
+- **Description**:
+  phase 2 of Trigonometric type elctric field  
+  amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
+- **Default**: 0.0
+
+### td_trigo_amp
+
+- **Type**: Double
+- **Description**:
+  amplitude of Trigonometric type elctric field  (V/A)
+  amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
+- **Default**: 2.74
+
+### td_heavi_t0
+
+- **Type**: Double
+- **Description**:
+  step number of switch time of Heaviside type elctric field 
+  E = amp , t<t0
+  E = 0.0 , t>t0
+- **Default**: 100
+### td_heavi_amp
+
+- **Type**: Double
+- **Description**:
+  amplitude of Heaviside type elctric field  (V/A)
+  E = amp , t<t0
+  E = 0.0 , t>t0
+- **Default**: 2.74
+
+### td_hhg_amp1
+
+- **Type**: Double
+- **Description**:
+  amplitude 1 of HHG type elctric field  (V/A)
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 2.74
+
+### td_hhg_amp2
+
+- **Type**: Double
+- **Description**:
+  amplitude 2 of HHG type elctric field  (V/A)
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 2.74
+
+### td_hhg_freq1
+
+- **Type**: Double
+- **Description**:
+  frequency 1 of HHG type elctric field  (fs^-1)
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 1.164656
+
+### td_hhg_freq2
+
+- **Type**: Double
+- **Description**:
+  frequency 2 of HHG type elctric field  (fs^-1)
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 0.029116
+
+### td_hhg_phase2
+
+- **Type**: Double
+- **Description**:
+  phase 2 of HHG type elctric field 
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 0.0
+### td_hhg_phase2
+
+- **Type**: Double
+- **Description**:
+  phase 2 of HHG type elctric field 
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 0.0
+
+### td_hhg_t0
+
+- **Type**: Double
+- **Description**:
+  step number of time center of HHG type elctric field 
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 700
+
+### td_hhg_sigma
+
+- **Type**: Double
+- **Description**:
+  sigma of HHG type elctric field (fs)
+  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
+- **Default**: 30
+### out_dipole
 
 - **Type**: Integer
 - **Description**:
