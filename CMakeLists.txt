@@ -74,16 +74,23 @@ if (CCACHE)
   set (CMAKE_C_COMPILER_LAUNCHER ${CCACHE} ${CMAKE_C_COMPILER_LAUNCHER})
 endif()
 
+# Choose build type from: Debug Release RelWithDebInfo MinSizeRel
 # Select 'Release' configuration for best performance;
 #   this will disable all assertions.
 # Other default configurations are also available, see:
 # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#default-and-custom-configurations
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  if(NOT ENABLE_COVERAGE)
-    add_compile_options(-O2 -g) # default flag
-  else()
-    add_compile_options(-g)
-  endif()
+# For default flags, see:
+# https://github.com/Kitware/CMake/blob/master/Modules/Compiler/GNU.cmake#L55
+
+if(ENABLE_COVERAGE)
+  set(CMAKE_BUILD_TYPE "Debug")
+endif()
+if(ENABLE_ASAN)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+  add_compile_options(-O3 -g)
 endif()
 
 if (ENABLE_NATIVE_OPTIMIZATION)
