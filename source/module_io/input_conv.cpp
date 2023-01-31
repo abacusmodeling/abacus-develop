@@ -27,7 +27,8 @@
 #include "module_elecstate/potentials/gatefield.h"
 #include "module_psi/kernels/device.h"
 
-void Input_Conv::parse_expression(const std::string &fn, std::vector<double> &vec)
+template <typename T>
+void Input_Conv::parse_expression(const std::string &fn, std::vector<T> &vec)
 {
     ModuleBase::TITLE("Input_Conv", "parse_expression");
     ModuleBase::timer::tick("Input_Conv", "parse_expression");
@@ -73,7 +74,7 @@ void Input_Conv::parse_expression(const std::string &fn, std::vector<double> &ve
         {
             int pos = sub_str.find("*");
             int num = stoi(sub_str.substr(0, pos));
-            double occ = stof(sub_str.substr(pos + 1, sub_str.size()));
+            T occ = stof(sub_str.substr(pos + 1, sub_str.size()));
             // std::vector<double> ocp_temp(num, occ);
             // const std::vector<double>::iterator dest = vec.begin() + count;
             // copy(ocp_temp.begin(), ocp_temp.end(), dest);
@@ -85,7 +86,11 @@ void Input_Conv::parse_expression(const std::string &fn, std::vector<double> &ve
         {
             // vec[count] = stof(sub_str);
             // count += 1;
-            vec.emplace_back(stof(sub_str));
+            std::stringstream convert;
+            convert << sub_str;
+            T occ;
+            convert >> occ;
+            vec.emplace_back(occ);
         }
     }
 }

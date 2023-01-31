@@ -906,11 +906,11 @@ void ESolver_KS_LCAO::afterscf(const int istep)
 
         if (hsolver::HSolverLCAO::out_mat_hsR)
         {
-            r_matrix.out_rR_other(this->LM.output_R_coor);
+            r_matrix.out_rR_other(istep, this->LM.output_R_coor);
         }
         else
         {
-            r_matrix.out_rR();
+            r_matrix.out_rR(istep);
         }
     }
 
