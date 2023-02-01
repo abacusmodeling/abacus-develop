@@ -978,7 +978,7 @@ void Forces<FPTYPE, Device>::cal_force_nl(ModuleBase::matrix& forcenl, const Mod
         ///
         int nbands_occ = GlobalV::NBANDS;
         const double threshold = ModuleBase::threshold_wg * wg(ik, 0);
-        while (wg(ik, nbands_occ - 1) < threshold)
+        while (std::fabs(wg(ik, nbands_occ - 1)) < threshold)
         {
             nbands_occ--;
             if(nbands_occ == 0) 
