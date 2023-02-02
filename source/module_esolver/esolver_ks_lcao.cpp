@@ -7,7 +7,7 @@
 #include "module_io/print_info.h"
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 #include "module_hamilt_lcao/hamilt_lcaodft/global_fp.h"
-#include "module_dftu/dftu.h"
+#include "module_hamilt_lcao/module_dftu/dftu.h"
 #include "module_elecstate/occupy.h"
 #include "module_elecstate/module_charge/symmetry_rho.h"
 #ifdef __EXX
@@ -16,7 +16,7 @@
 #endif
 
 #ifdef __DEEPKS
-#include "module_deepks/LCAO_deepks.h"
+#include "module_hamilt_lcao/module_deepks/LCAO_deepks.h"
 #endif
 //-----force& stress-------------------
 #include "module_hamilt_lcao/hamilt_lcaodft/FORCE_STRESS.h"

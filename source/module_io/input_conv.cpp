@@ -16,7 +16,7 @@
 #include "module_orbital/ORB_read.h"
 #include "module_hamilt_lcao/module_tddft/ELEC_evolve.h"
 #include "module_hamilt_lcao/hamilt_lcaodft/FORCE_STRESS.h"
-#include "module_dftu/dftu.h"
+#include "module_hamilt_lcao/module_dftu/dftu.h"
 #include "module_hamilt_lcao/hamilt_lcaodft/global_fp.h"
 #include "module_hamilt_lcao/hamilt_lcaodft/local_orbital_charge.h"
 #endif
