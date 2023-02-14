@@ -369,15 +369,15 @@ void Input::Default(void)
     exx_lambda = 0.3;
 
     exx_real_number = "default";
-    exx_pca_threshold = 0;
-    exx_c_threshold = 0;
-    exx_v_threshold = 0;
-    exx_dm_threshold = 0;
+    exx_pca_threshold = 1E-4;
+    exx_c_threshold = 1E-4;
+    exx_v_threshold = 1E-1;
+    exx_dm_threshold = 1E-4;
     exx_schwarz_threshold = 0;
-    exx_cauchy_threshold = 0;
-    exx_c_grad_threshold = 0;
-    exx_v_grad_threshold = 0;
-    exx_cauchy_grad_threshold = 0;
+    exx_cauchy_threshold = 1E-7;
+    exx_c_grad_threshold = 1E-4;
+    exx_v_grad_threshold = 1E-1;
+    exx_cauchy_grad_threshold = 1E-7;
     exx_ccp_threshold = 1E-8;
     exx_ccp_rmesh_times = "default";
 
