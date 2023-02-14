@@ -491,11 +491,6 @@ class Input
 
     string deepks_model; // needed when deepks_scf=1
 
-    // the following 3 are used when generating jle.orb
-    int bessel_lmax; // lmax used in descriptor, mohan added 2021-01-03
-    double bessel_rcut;
-    double bessel_tol;
-
     //==========================================================
     //    implicit solvation model       Menglin Sun added on 2022-04-04
     //==========================================================
@@ -523,6 +518,24 @@ class Input
     int of_full_pw_dim; // If of_full_pw = 1, the dimention of FFT will be testricted to be (0) either odd or even; (1) odd only; (2) even only.
     bool of_read_kernel; // If set to 1, the kernel of WT KEDF will be filled from file of_kernel_file, not from formula. Only usable for WT KEDF.
     string of_kernel_file; // The name of WT kernel file.
+
+    //==========================================================
+    // spherical bessel  Peize Lin added on 2022-12-15
+    //==========================================================
+    // the following are used when generating orb_matrix.dat
+		//int		bessel_nao_lmax;		// lmax used in descriptor
+	bool	bessel_nao_smooth;		// spherical bessel smooth or not
+	double	bessel_nao_sigma;		// spherical bessel smearing_sigma
+	string	bessel_nao_ecut;		// energy cutoff for spherical bessel functions(Ry)
+	double	bessel_nao_rcut;		// radial cutoff for spherical bessel functions(a.u.)
+	double	bessel_nao_tolerence;	// tolerence for spherical bessel root
+    // the following are used when generating jle.orb
+	int		bessel_descriptor_lmax;			// lmax used in descriptor
+	bool	bessel_descriptor_smooth;		// spherical bessel smooth or not
+	double	bessel_descriptor_sigma;		// spherical bessel smearing_sigma
+	string	bessel_descriptor_ecut;			// energy cutoff for spherical bessel functions(Ry)
+	double	bessel_descriptor_rcut;			// radial cutoff for spherical bessel functions(a.u.)
+	double	bessel_descriptor_tolerence;	// tolerence for spherical bessel root
 
     //==========================================================
     //    device control denghui added on 2022-11-15

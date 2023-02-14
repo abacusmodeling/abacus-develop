@@ -287,9 +287,6 @@ void Input::Default(void)
     deepks_scf = 0;
     deepks_bandgap = 0;
     deepks_out_unittest = 0;
-    bessel_lmax = 2; // mohan added 2021-01-03
-    bessel_rcut = 6.0;
-    bessel_tol = 1.0e-12;
 
     out_pot = 0;
     out_wfc_pw = 0;
@@ -539,6 +536,22 @@ void Input::Default(void)
     of_full_pw_dim = 0;
     of_read_kernel = false;
     of_kernel_file = "WTkernel.txt";
+
+    //==========================================================
+    // spherical bessel  Peize Lin added on 2022-12-15
+    //==========================================================
+	bessel_nao_smooth = true;
+	bessel_nao_sigma = 0.1;
+	bessel_nao_ecut = "default";
+	bessel_nao_rcut = 6.0;				// -1.0 for forcing manual setting
+	bessel_nao_tolerence = 1E-12;
+
+	bessel_descriptor_lmax = 2;			// -1 for forcing manual setting
+	bessel_descriptor_smooth = true;
+	bessel_descriptor_sigma = 0.1;
+	bessel_descriptor_ecut = "default";
+	bessel_descriptor_rcut = 6.0;		// -1.0 for forcing manual setting
+	bessel_descriptor_tolerence = 1E-12;
 
     //==========================================================
     //    device control denghui added on 2022-11-15
@@ -1167,18 +1180,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("deepks_model", word) == 0) // caoyu added 2021-06-03
         {
             read_value(ifs, deepks_model);
-        }
-        else if (strcmp("bessel_lmax", word) == 0) // QO added 2021-12-15
-        {
-            read_value(ifs, bessel_lmax);
-        }
-        else if (strcmp("bessel_rcut", word) == 0) // QO added 2021-12-15
-        {
-            read_value(ifs, bessel_rcut);
-        }
-        else if (strcmp("bessel_tol", word) == 0) // QO added 2021-12-15
-        {
-            read_value(ifs, bessel_tol);
         }
         else if (strcmp("out_pot", word) == 0)
         {
@@ -1971,6 +1972,50 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, of_kernel_file);
         }
+        else if (strcmp("bessel_nao_smooth", word) == 0)
+        {
+            read_value(ifs, bessel_nao_smooth);
+        }
+        else if (strcmp("bessel_nao_sigma", word) == 0)
+        {
+            read_value(ifs, bessel_nao_sigma);
+        }
+        else if (strcmp("bessel_nao_ecut", word) == 0)
+        {
+            read_value(ifs, bessel_nao_ecut);
+        }
+        else if (strcmp("bessel_nao_rcut", word) == 0)
+        {
+            read_value(ifs, bessel_nao_rcut);
+        }
+        else if (strcmp("bessel_nao_tolerence", word) == 0)
+        {
+            read_value(ifs, bessel_nao_tolerence);
+        }
+        else if (strcmp("bessel_descriptor_lmax", word) == 0)
+        {
+            read_value(ifs, bessel_descriptor_lmax);
+        }
+        else if (strcmp("bessel_descriptor_smooth", word) == 0)
+        {
+            read_value(ifs, bessel_descriptor_smooth);
+        }
+        else if (strcmp("bessel_descriptor_sigma", word) == 0)
+        {
+            read_value(ifs, bessel_descriptor_sigma);
+        }
+        else if (strcmp("bessel_descriptor_ecut", word) == 0)
+        {
+            read_value(ifs, bessel_descriptor_ecut);
+        }
+        else if (strcmp("bessel_descriptor_rcut", word) == 0)
+        {
+            read_value(ifs, bessel_descriptor_rcut);
+        }
+        else if (strcmp("bessel_descriptor_tolerence", word) == 0)
+        {
+            read_value(ifs, bessel_descriptor_tolerence);
+        }
         //----------------------------------------------------------------------------------
         //    device control denghui added on 2022-11-05
         //----------------------------------------------------------------------------------
@@ -2574,6 +2619,15 @@ void Input::Default_2(void) // jiyy add 2019-08-04
             ModuleBase::GlobalFunc::AUTO_SET("gamma_only_local", "0");
         }
     }
+    //added by linpz 2023/02/13
+	if (bessel_nao_ecut == "default")
+	{
+		bessel_nao_ecut = std::to_string(ecutwfc);
+	}
+	if (bessel_descriptor_ecut == "default")
+	{
+		bessel_descriptor_ecut = std::to_string(ecutwfc);
+	}
 }
 #ifdef __MPI
 void Input::Bcast()
@@ -2730,10 +2784,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(deepks_bandgap);
     Parallel_Common::bcast_bool(deepks_out_unittest);
     Parallel_Common::bcast_string(deepks_model);
-    Parallel_Common::bcast_int(bessel_lmax);
-    Parallel_Common::bcast_double(bessel_rcut);
-    Parallel_Common::bcast_double(bessel_tol);
-
+    
     Parallel_Common::bcast_int(out_pot);
     Parallel_Common::bcast_int(out_wfc_pw);
     Parallel_Common::bcast_bool(out_wfc_r);
@@ -2992,6 +3043,21 @@ void Input::Bcast()
     Parallel_Common::bcast_int(of_full_pw_dim);
     Parallel_Common::bcast_bool(of_read_kernel);
     Parallel_Common::bcast_string(of_kernel_file);
+
+    //==========================================================
+    // spherical bessel  Peize Lin added on 2022-12-15
+    //==========================================================
+    Parallel_Common::bcast_bool(bessel_nao_smooth);
+    Parallel_Common::bcast_double(bessel_nao_sigma);
+    Parallel_Common::bcast_string(bessel_nao_ecut);
+    Parallel_Common::bcast_double(bessel_nao_rcut);
+    Parallel_Common::bcast_double(bessel_nao_tolerence);
+    Parallel_Common::bcast_int(bessel_descriptor_lmax);
+    Parallel_Common::bcast_bool(bessel_descriptor_smooth);
+    Parallel_Common::bcast_double(bessel_descriptor_sigma);
+    Parallel_Common::bcast_string(bessel_descriptor_ecut);
+    Parallel_Common::bcast_double(bessel_descriptor_rcut);
+    Parallel_Common::bcast_double(bessel_descriptor_tolerence);
     //----------------------------------------------------------------------------------
     //    device control denghui added on 2022-11-05
     //----------------------------------------------------------------------------------
@@ -3396,6 +3462,29 @@ void Input::Check(void)
             ModuleBase::WARNING_QUIT("Input", "please set right files directory for reading in.");
         }
     }
+
+	if(true)	// Numerical_Basis::output_overlap()
+	{
+		if (std::stod(bessel_nao_ecut) < 0)
+		{
+			ModuleBase::WARNING_QUIT("INPUT", "bessel_nao_ecut must >=0");
+		}
+		if (bessel_nao_rcut < 0)
+		{
+			ModuleBase::WARNING_QUIT("INPUT", "bessel_nao_rcut must >=0");
+		}
+	}
+	if(true)	// Numerical_Descriptor::output_descriptor()
+	{
+		if (std::stod(bessel_descriptor_ecut) < 0)
+		{
+			ModuleBase::WARNING_QUIT("INPUT", "bessel_descriptor_ecut must >=0");
+		}
+		if (bessel_descriptor_rcut < 0)
+		{
+			ModuleBase::WARNING_QUIT("INPUT", "bessel_descriptor_rcut must >=0");
+		}
+	}
 
     return;
 }

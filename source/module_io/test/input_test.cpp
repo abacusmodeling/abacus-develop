@@ -152,9 +152,6 @@ TEST_F(InputTest, Default)
         EXPECT_EQ(INPUT.deepks_scf,0);
         EXPECT_EQ(INPUT.deepks_bandgap,0);
         EXPECT_EQ(INPUT.deepks_out_unittest,0);
-        EXPECT_EQ(INPUT.bessel_lmax,2);
-        EXPECT_DOUBLE_EQ(INPUT.bessel_rcut,6.0);
-        EXPECT_DOUBLE_EQ(INPUT.bessel_tol,1.0e-12);
         EXPECT_EQ(INPUT.out_pot,0);
         EXPECT_EQ(INPUT.out_wfc_pw,0);
         EXPECT_EQ(INPUT.out_wfc_r,0);
@@ -177,6 +174,18 @@ TEST_F(InputTest, Default)
         EXPECT_DOUBLE_EQ(INPUT.lcao_dk,0.01);
         EXPECT_DOUBLE_EQ(INPUT.lcao_dr,0.01);
         EXPECT_DOUBLE_EQ(INPUT.lcao_rmax,30);
+		EXPECT_TRUE(INPUT.bessel_nao_smooth);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_nao_sigma, 0.1);
+		EXPECT_EQ(INPUT.bessel_nao_ecut, "default");
+		EXPECT_DOUBLE_EQ(INPUT.bessel_nao_rcut, 6.0);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_nao_tolerence, 1E-12);
+		EXPECT_EQ(INPUT.bessel_descriptor_lmax, 2);
+		EXPECT_TRUE(INPUT.bessel_descriptor_smooth);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_descriptor_sigma, 0.1);
+		EXPECT_EQ(INPUT.bessel_descriptor_ecut, "default");
+		EXPECT_DOUBLE_EQ(INPUT.bessel_descriptor_rcut, 6.0);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_descriptor_tolerence, 1E-12);
+
         EXPECT_FALSE(INPUT.efield_flag);
         EXPECT_FALSE(INPUT.dip_cor_flag);
         EXPECT_EQ(INPUT.efield_dir,2);
@@ -471,9 +480,6 @@ TEST_F(InputTest, Read)
         EXPECT_EQ(INPUT.deepks_scf,0);
         EXPECT_EQ(INPUT.deepks_bandgap,0);
         EXPECT_EQ(INPUT.deepks_out_unittest,0);
-        EXPECT_EQ(INPUT.bessel_lmax,2);
-        EXPECT_DOUBLE_EQ(INPUT.bessel_rcut,6.0);
-        EXPECT_DOUBLE_EQ(INPUT.bessel_tol,1.0e-12);
         EXPECT_EQ(INPUT.out_pot,2);
         EXPECT_EQ(INPUT.out_wfc_pw,0);
         EXPECT_EQ(INPUT.out_wfc_r,0);
@@ -496,6 +502,17 @@ TEST_F(InputTest, Read)
         EXPECT_DOUBLE_EQ(INPUT.lcao_dk,0.01);
         EXPECT_DOUBLE_EQ(INPUT.lcao_dr,0.01);
         EXPECT_DOUBLE_EQ(INPUT.lcao_rmax,30);
+		EXPECT_TRUE(INPUT.bessel_nao_smooth);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_nao_sigma, 0.1);
+		EXPECT_EQ(INPUT.bessel_nao_ecut, "default");
+		EXPECT_DOUBLE_EQ(INPUT.bessel_nao_rcut, 6.0);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_nao_tolerence, 1E-12);
+		EXPECT_EQ(INPUT.bessel_descriptor_lmax, 2);
+		EXPECT_TRUE(INPUT.bessel_descriptor_smooth);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_descriptor_sigma, 0.1);
+		EXPECT_EQ(INPUT.bessel_descriptor_ecut, "default");
+		EXPECT_DOUBLE_EQ(INPUT.bessel_descriptor_rcut, 6.0);
+		EXPECT_DOUBLE_EQ(INPUT.bessel_descriptor_tolerence, 1E-12);
         EXPECT_FALSE(INPUT.efield_flag);
         EXPECT_FALSE(INPUT.dip_cor_flag);
         EXPECT_EQ(INPUT.efield_dir,2);

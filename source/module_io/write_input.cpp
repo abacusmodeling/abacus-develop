@@ -189,19 +189,6 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
                                  "if set 1, prints intermediate quantities that shall be used for making unit test");
     ModuleBase::GlobalFunc::OUTP(ofs, "deepks_model", deepks_model, "file dir of traced pytorch model: 'model.ptg");
 
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "bessel_lmax",
-                                 bessel_lmax,
-                                 "lmax used in generating bessel functions");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "bessel_rcut",
-                                 bessel_rcut,
-                                 "rcut used in generating bessel functions");
-    ModuleBase::GlobalFunc::OUTP(ofs,
-                                 "bessel_rcut",
-                                 bessel_rcut,
-                                 "tolerence level when generating bessel functions");
-
     ofs << "\n#Parameters (5.LCAO)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "basis_type", basis_type, "PW; LCAO in pw; LCAO");
     if (ks_solver == "HPSEPS" || ks_solver == "genelpa" || ks_solver == "scalapack_gvx" || ks_solver == "cusolver")
@@ -428,6 +415,19 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
     }
     ofs << "#which correlated orbitals need corrected ; d:2 ,f:3, do not need correction:-1" << std::endl;
 
+
+    ofs << "\n#Parameters (21.spherical bessel)" << std::endl;
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_smooth",	bessel_nao_smooth, "spherical bessel smooth or not");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_sigma",	bessel_nao_sigma, "spherical bessel smearing_sigma");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_ecut",		bessel_nao_ecut, "energy cutoff for spherical bessel functions(Ry)");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_rcut",		bessel_nao_rcut, "radial cutoff for spherical bessel functions(a.u.)");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_tolerence",bessel_nao_tolerence, "tolerence for spherical bessel root");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_lmax",		bessel_descriptor_lmax, "lmax used in generating spherical bessel functions");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_smooth",	bessel_descriptor_smooth, "spherical bessel smooth or not");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_sigma",		bessel_descriptor_sigma, "spherical bessel smearing_sigma");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_ecut",		bessel_descriptor_ecut, "energy cutoff for spherical bessel functions(Ry)");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_rcut",		bessel_descriptor_rcut, "radial cutoff for spherical bessel functions(a.u.)");
+   ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_tolerence",	bessel_descriptor_tolerence, "tolerence for spherical bessel root");
 
     ofs.close();
     return;
