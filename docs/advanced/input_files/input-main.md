@@ -41,7 +41,7 @@
   [berry_phase](#berry_phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier_spin)
 - [TDDFT: time dependent density functional theory](#tddft-time-dependent-density-functional-theory) (Under tests)
 
-  [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_stype](#td_stype) | [td_ttype](#td_ttype) | [td_tstart](#td_tstart) | [td_tend](#td_tend) | [td_lcut1](#td_lcut1) | [td_lcut2](#td_lcut2) | [td_gauss_freq](#td_gauss_freq) | [td_guass_phase](#td_gauss_phase) | [td_gauss_sigma](#td_gauss_sigma) | [td_gauss_t0](#td_gauss_t0)| [td_gauss_amp](#td_gauss_amp) | [td_trape_freq](#td_trape_freq) | [td_trape_phase](#td_trape_phase) | [td_trape_t1](#td_trape_t1) | [td_trape_t2](#td_trape_t2) | [td_trape_t3](#td_trape_t3) | [td_trape_amp](#td_trape_amp) | [td_trigo_freq1](#td_trigo_freq1) | [td_trigo_freq2](#td_trigo_freq2) | [td_trigo_phase1](#td_trigo_phase1) | [td_trigo_phase2](#td_trigo_phase2) | [td_trigo_amp](#td_trigo_amp) | [td_heavi_t0](#td_heavi_t0) | [td_heavi_amp](#td_heavi_amp) | [td_hhg_amp1](#td_hhg_amp1) | [td_hhg_amp2](#td_hhg_amp2) | [td_hhg_freq1](#td_hhg_freq1) | [td_hhg_freq2](#td_hhg_freq2) | [td_hhg_phase1](#td_hhg_phase1) | [td_hhg_phase2](#td_hhg_phase2) | [td_hhg_t0](#td_hhg_t0) | [td_hhg_sigma](#td_hhg_sigma) | [out_dipole](#out_dipole) | [ocp](#ocp) | [ocp_set](#ocp_set) | [td_val_elec_01](#td_val_elec_01) | [td_val_elec_02](#td_val_elec_02) |[td_val_elec_03](#td_val_elec_03)
+  [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_stype](#td_stype) | [td_ttype](#td_ttype) | [td_tstart](#td_tstart) | [td_tend](#td_tend) | [td_lcut1](#td_lcut1) | [td_lcut2](#td_lcut2) | [td_gauss_freq](#td_gauss_freq) | [td_guass_phase](#td_gauss_phase) | [td_gauss_sigma](#td_gauss_sigma) | [td_gauss_t0](#td_gauss_t0)| [td_gauss_amp](#td_gauss_amp) | [td_trape_freq](#td_trape_freq) | [td_trape_phase](#td_trape_phase) | [td_trape_t1](#td_trape_t1) | [td_trape_t2](#td_trape_t2) | [td_trape_t3](#td_trape_t3) | [td_trape_amp](#td_trape_amp) | [td_trigo_freq1](#td_trigo_freq1) | [td_trigo_freq2](#td_trigo_freq2) | [td_trigo_phase1](#td_trigo_phase1) | [td_trigo_phase2](#td_trigo_phase2) | [td_trigo_amp](#td_trigo_amp) | [td_heavi_t0](#td_heavi_t0) | [td_heavi_amp](#td_heavi_amp) | [out_dipole](#out_dipole) |[out_efield](#out_efield)| [ocp](#ocp) | [ocp_set](#ocp_set) | [td_val_elec_01](#td_val_elec_01) | [td_val_elec_02](#td_val_elec_02) |[td_val_elec_03](#td_val_elec_03)
 - [DFT+*U* correction](#dftu-correction) (Under development)
 
   [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [yukawa_potential](#yukawa_potential) | [yukawa_lambda](#yukawa_lambda) | [omc](#omc)
@@ -1921,7 +1921,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_vext
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**:
   - 1: add a laser material interaction (extern laser field).
   - 0: no extern laser field.
@@ -1929,8 +1929,9 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_vext_dire
 
-- **Type**: Integer
+- **Type**: String
 - **Description**:
+  If `td_vext` is true, the td_vext_dire is a string to set the number of electric field, like "1 2" representing external electric field is added to the x and y axis at the same time. Parameters of electric field can also be written as a string, like `td_gauss_phase 0 1.5707963267948966` representing the Gauss field in the x and y directions has a phase delay of Pi/2. See below for more parameters of electric field.
   - 1: the direction of external light field is along x axis.
   - 2: the direction of external light field is along y axis.
   - 3: the direction of external light field is along z axis.
@@ -1947,7 +1948,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_ttype
 
-- **Type**: Integer
+- **Type**: String
 - **Description**:
   type of electric field in time domain
   - 0: Gaussian type function.
@@ -1989,7 +1990,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_gauss_freq
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   frequency of Gauss type elctric field  (fs^-1)
   amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
@@ -1997,7 +1998,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_gauss_phase
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   phase of Gauss type elctric field  
   amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
@@ -2005,7 +2006,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_gauss_sigma
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   sigma of Gauss type elctric field  (fs)
   amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
@@ -2013,7 +2014,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_gauss_t0
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   step number of time center of Gauss type elctric field  
   amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
@@ -2021,7 +2022,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_gauss_amp
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   amplitude of Gauss type elctric field  (V/A)
   amp*cos(2pi*f(t-t0)+phase)exp(-(t-t0)^2/2sigma^2)
@@ -2029,7 +2030,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trape_freq
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   frequency of Trapezoid type elctric field  (fs^-1)
   E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
@@ -2040,7 +2041,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trape_phase
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   phase of Trapezoid type elctric field  
   E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
@@ -2051,7 +2052,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trape_t1
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   step number of time interval 1 of Trapezoid type elctric field  
   E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
@@ -2062,7 +2063,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trape_t2
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   step number of time interval 2 of Trapezoid type elctric field  
   E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
@@ -2073,7 +2074,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trape_t3
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   step number of time interval 3 of Trapezoid type elctric field  
   E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
@@ -2084,7 +2085,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trape_amp
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   amplitude of Trapezoid type elctric field  (V/A)
   E = amp*cos(2pi*f*t+phase) t/t1 , t<t1
@@ -2095,7 +2096,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trigo_freq1
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   frequence 1 of Trigonometric type elctric field  (fs^-1)
   amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
@@ -2103,7 +2104,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trigo_freq2
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   frequence 2 of Trigonometric type elctric field  (fs^-1)
   amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
@@ -2111,7 +2112,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trigo_phase1
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   phase 1 of Trigonometric type elctric field  
   amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
@@ -2119,7 +2120,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trigo_phase2
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   phase 2 of Trigonometric type elctric field  
   amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
@@ -2127,7 +2128,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_trigo_amp
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   amplitude of Trigonometric type elctric field  (V/A)
   amp*cos(2*pi*f1*t+phase1)*sin(2*pi*f2*t+phase2)^2
@@ -2135,7 +2136,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### td_heavi_t0
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   step number of switch time of Heaviside type elctric field 
   E = amp , t<t0
@@ -2143,75 +2144,13 @@ These variables are used to control berry phase and wannier90 interface paramete
 - **Default**: 100
 ### td_heavi_amp
 
-- **Type**: Double
+- **Type**: String
 - **Description**:
   amplitude of Heaviside type elctric field  (V/A)
   E = amp , t<t0
   E = 0.0 , t>t0
 - **Default**: 2.74
 
-### td_hhg_amp1
-
-- **Type**: Double
-- **Description**:
-  amplitude 1 of HHG type elctric field  (V/A)
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 2.74
-
-### td_hhg_amp2
-
-- **Type**: Double
-- **Description**:
-  amplitude 2 of HHG type elctric field  (V/A)
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 2.74
-
-### td_hhg_freq1
-
-- **Type**: Double
-- **Description**:
-  frequency 1 of HHG type elctric field  (fs^-1)
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 1.164656
-
-### td_hhg_freq2
-
-- **Type**: Double
-- **Description**:
-  frequency 2 of HHG type elctric field  (fs^-1)
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 0.029116
-
-### td_hhg_phase2
-
-- **Type**: Double
-- **Description**:
-  phase 2 of HHG type elctric field 
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 0.0
-### td_hhg_phase2
-
-- **Type**: Double
-- **Description**:
-  phase 2 of HHG type elctric field 
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 0.0
-
-### td_hhg_t0
-
-- **Type**: Double
-- **Description**:
-  step number of time center of HHG type elctric field 
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 700
-
-### td_hhg_sigma
-
-- **Type**: Double
-- **Description**:
-  sigma of HHG type elctric field (fs)
-  E = (amp1*cos(2*pi*f1*(t-t0)+phase1)+amp2*cos(2*pi*f2*(t-t0)+phase2))exp(-(t-t0)^2/2sigma^2)
-- **Default**: 30
 ### out_dipole
 
 - **Type**: Integer
@@ -2219,6 +2158,15 @@ These variables are used to control berry phase and wannier90 interface paramete
   - 1: Output dipole.
   - 0: do not Output dipole.
 - **Default**: 0
+
+### out_efield
+
+- **Type**: Integer
+- **Description**:
+  - 1: Output efield.
+  - 0: do not Output efield.
+- **Default**: 0
+
 
 ### ocp
 
