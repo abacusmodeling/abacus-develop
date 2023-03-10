@@ -23,7 +23,7 @@ jobs:
         run: |
           cmake --build build --target test ARGS="-V"
       - name: Publish Report to Dashboard
-        uses: crazy-max/ghaction-github-pages@v2
+        uses: crazy-max/ghaction-github-pages@v3
         if: ${{ ! cancelled() }}
         with:
           target_branch: dashboard
