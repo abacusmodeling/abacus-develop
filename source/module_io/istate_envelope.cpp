@@ -101,9 +101,25 @@ void IState_Envelope::begin(const psi::Psi<double>* psid, Local_Orbital_wfc& low
                 pes->charge->save_rho_before_sum_band(); //xiaohui add 2014-12-09
                 std::stringstream ss;
                 ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_s_" << is + 1 << "_ENV.cube";
-                // 0 means definitely output charge density.
-                bool for_plot = true;
-                ModuleIO::write_rho(pes->charge->rho_save[is], is, 0, ss.str(), 3, for_plot);
+                double& ef_tmp = GlobalC::en.get_ef(is,GlobalV::TWO_EFERMI);
+                ModuleIO::write_rho(
+#ifdef __MPI
+                    GlobalC::bigpw->bz,
+                    GlobalC::bigpw->nbz,
+                    GlobalC::rhopw->nplane,
+                    GlobalC::rhopw->startz_current,
+#endif
+                    pes->charge->rho_save[is],
+                    is,
+                    GlobalV::NSPIN,
+                    0,
+                    ss.str(),
+                    GlobalC::rhopw->nx,
+                    GlobalC::rhopw->ny,
+                    GlobalC::rhopw->nz,
+                    ef_tmp,
+                    &(GlobalC::ucell),
+                    3);
 
                 if (out_wfc_pw || out_wfc_r) //only for gamma_only now
                     this->set_pw_wfc(GlobalC::wfcpw, 0, ib, GlobalV::NSPIN,
@@ -212,9 +228,25 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi, Local_Orb
 
                 std::stringstream ss;
                 ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_k_" << ik / nspin0 + 1 << "_s_" << ispin + 1 << "_ENV.cube";
-
-                bool for_plot = true;   //if false, separate the output into spin up and spin down
-                ModuleIO::write_rho(pes->charge->rho[ispin], ispin, 0, ss.str(), 3, for_plot);
+                double& ef_tmp = GlobalC::en.get_ef(ispin,GlobalV::TWO_EFERMI);
+                ModuleIO::write_rho(
+#ifdef __MPI
+                    GlobalC::bigpw->bz,
+                    GlobalC::bigpw->nbz,
+                    GlobalC::rhopw->nplane,
+                    GlobalC::rhopw->startz_current,
+#endif
+                    pes->charge->rho[ispin],
+                    ispin,
+                    GlobalV::NSPIN,
+                    0,
+                    ss.str(),
+                    GlobalC::rhopw->nx,
+                    GlobalC::rhopw->ny,
+                    GlobalC::rhopw->nz,
+                    ef_tmp,
+                    &(GlobalC::ucell),
+                    3);
 
                 if (out_wf || out_wf_r) //only for gamma_only now
                 {
