@@ -12,7 +12,7 @@
 #include "module_hamilt_lcao/hamilt_lcaodft/wavefunc_in_pw.h"
 #include "module_base/lapack_connector.h"
 #include <limits>
-#include "src_parallel/parallel_global.h"
+#include "module_base/parallel_global.h"
 
 Exx_Lip::Exx_Lip( const Exx_Info::Exx_Info_Lip &info_in )
 	:init_finish(false),
@@ -743,7 +743,7 @@ void Exx_Lip::read_q_pack()
 	#ifdef __MPI
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
-		MPI_Bcast( q_pack->hvec_array[iq].c, GlobalV::NLOCAL*GlobalV::NBANDS, mpicomplex, 0, POOL_WORLD);
+		MPI_Bcast( q_pack->hvec_array[iq].c, GlobalV::NLOCAL*GlobalV::NBANDS, MPI_DOUBLE_COMPLEX, 0, POOL_WORLD);
 	}
 	#endif
 
@@ -885,7 +885,7 @@ void Exx_Lip::read_q_pack()
 	}
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
-		MPI_Bcast( q_pack.hvec_array[iq].c, GlobalV::NLOCAL*GlobalV::NBANDS, mpicomplex, 0, POOL_WORLD);
+		MPI_Bcast( q_pack.hvec_array[iq].c, GlobalV::NLOCAL*GlobalV::NBANDS, MPI_DOUBLE_COMPLEX, 0, POOL_WORLD);
 	}
 
 

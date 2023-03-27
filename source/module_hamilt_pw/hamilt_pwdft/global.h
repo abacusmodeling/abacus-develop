@@ -15,7 +15,7 @@
 #include "module_cell/klist.h"
 #include "module_elecstate/magnetism.h"
 #include "module_hamilt_pw/hamilt_pwdft/structure_factor.h"
-#include "module_pw/pw_basis_k.h"
+#include "module_basis/module_pw/pw_basis_k.h"
 #include "module_hamilt_pw/hamilt_pwdft/wavefunc.h"
 #include "module_hamilt_general/module_xc/xc_functional.h"
 
@@ -298,8 +298,8 @@ extern pseudopot_cell_vnl ppcell;
 
 #include "module_cell/unitcell.h"
 #include "module_cell/module_symmetry/symmetry.h"
-#include "src_parallel/parallel_grid.h"
-#include "src_parallel/parallel_kpoints.h"
+#include "module_hamilt_pw/hamilt_pwdft/parallel_grid.h"
+#include "module_cell/parallel_kpoints.h"
 namespace GlobalC
 {
 extern UnitCell ucell;

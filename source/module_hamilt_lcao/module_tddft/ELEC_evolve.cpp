@@ -1,7 +1,7 @@
 #include "ELEC_evolve.h"
 
 #include "module_base/timer.h"
-#include "src_parallel/parallel_reduce.h"
+#include "module_base/parallel_reduce.h"
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 #include "module_elecstate/module_charge/symmetry_rho.h"
 #include "LCAO_evolve.h"
@@ -41,6 +41,7 @@ void ELEC_evolve::evolve_psi(const int& istep,
         ModuleBase::timer::tick("Efficience", "evolve_k");
         Evolve_LCAO_Matrix ELM(lowf.ParaV);
         psi->fix_k(ik);
+        psi_laststep->fix_k(ik);
         ELM.evolve_complex_matrix(ik, phm, psi, psi_laststep, &(ekb(ik, 0)));
         ModuleBase::timer::tick("Efficience", "evolve_k");
     } // end k

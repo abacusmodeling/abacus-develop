@@ -6,7 +6,7 @@ namespace ModuleESolver
     {
         // pw_rho = new ModuleBase::PW_Basis();
         
-        pw_rho = new ModulePW::PW_Basis_Big(); 
+        pw_rho = new ModulePW::PW_Basis_Big(GlobalV::device_flag, GlobalV::precision_flag);
         GlobalC::rhopw = this->pw_rho; //Temporary
         //temporary, it will be removed
         GlobalC::bigpw = static_cast<ModulePW::PW_Basis_Big*>(pw_rho);
@@ -19,15 +19,17 @@ namespace ModuleESolver
     }
     void ESolver_FP::Init(Input& inp, UnitCell& cell)
     {
+        cell.read_pseudo(GlobalV::ofs_running);
+
 #ifdef __MPI
             this->pw_rho->initmpi(GlobalV::NPROC_IN_POOL, GlobalV::RANK_IN_POOL, POOL_WORLD);
 #endif
         if (this->classname == "ESolver_OF") this->pw_rho->setfullpw(inp.of_full_pw, inp.of_full_pw_dim);
         // Initalize the plane wave basis set
         if (inp.nx * inp.ny * inp.nz == 0)
-            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.ecutrho);
+            this->pw_rho->initgrids(inp.ref_cell_factor * cell.lat0, cell.latvec, inp.ecutrho);
 	    else
-            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.nx, inp.ny, inp.nz);
+            this->pw_rho->initgrids(inp.ref_cell_factor * cell.lat0, cell.latvec, inp.nx, inp.ny, inp.nz);
         
         this->pw_rho->initparameters(false, inp.ecutrho);
         this->pw_rho->setuptransform();
@@ -35,6 +37,19 @@ namespace ModuleESolver
         this->pw_rho->collect_uniqgg();
         this->print_rhofft(inp, GlobalV::ofs_running);
         
+    }
+
+    void ESolver_FP::init_after_vc(Input& inp, UnitCell& cell)
+    {
+        if (inp.nx * inp.ny * inp.nz == 0)
+            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.ecutrho);
+        else
+            this->pw_rho->initgrids(cell.lat0, cell.latvec, inp.nx, inp.ny, inp.nz);
+
+        this->pw_rho->initparameters(false, inp.ecutrho);
+        this->pw_rho->setuptransform();
+        this->pw_rho->collect_local_pw(); 
+        this->pw_rho->collect_uniqgg();
     }
 
     void ESolver_FP::print_rhofft(Input&inp, ofstream &ofs)

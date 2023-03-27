@@ -13,7 +13,7 @@
 #include "atom_spec.h"
 
 #ifdef __LCAO
-#include "module_orbital/ORB_read.h"
+#include "module_basis/module_ao/ORB_read.h"
 #include "setup_nonlocal.h"
 #endif
 
@@ -181,16 +181,11 @@ public:
     void print_cell_cif(const std::string &fn)const;
 
     void update_pos_tau(const double* pos);
-    void update_pos_tau(const ModuleBase::Vector3<double>* posd_in);
     void update_pos_taud(const ModuleBase::Vector3<double>* posd_in);
     void update_pos_taud(double* posd_in);
     void update_vel(const ModuleBase::Vector3<double>* vel_in);
     void periodic_boundary_adjustment();
     void bcast_atoms_tau();
-    void save_cartesian_position(double* pos)const;
-    void save_cartesian_position(ModuleBase::Vector3<double>* pos)const;
-    void save_cartesian_position_original(double* pos)const;
-    void save_cartesian_position_original(ModuleBase::Vector3<double>* pos)const;
     bool judge_big_cell(void)const;
 
     void update_stress(ModuleBase::matrix &scs); //updates stress
@@ -233,6 +228,8 @@ public:
 	int read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running); // read in the atom information for each type of atom
 	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in atomic positions
 #endif
+
+    void read_pseudo(ofstream &ofs);
 	int find_type(const std::string &label);
 	void print_tau(void)const;
 	void print_stru_file(const std::string &fn, const int &type=1, const int &level=0)const; // mohan add 2011-03-22
@@ -263,11 +260,6 @@ public:
 			const int &lmaxmax_in,
 			const bool &init_vel_in,
 			const std::string &fixed_axes_in);
-
-#ifdef __MPI
-	void bcast_unitcell_pseudo(void);
-	void bcast_unitcell_pseudo2(void);
-#endif
 
 	void check_structure(double factor);
 };

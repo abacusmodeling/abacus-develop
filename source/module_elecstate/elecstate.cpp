@@ -5,7 +5,7 @@
 #include "module_base/tool_title.h"
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 #include "occupy.h"
-#include "src_parallel/parallel_reduce.h"
+#include "module_base/parallel_reduce.h"
 
 namespace elecstate
 {
@@ -378,7 +378,7 @@ void ElecState::init_scf(const int istep, const ModuleBase::ComplexMatrix& struc
     // (2) other effective potentials need charge density,
     // choose charge density from ionic step 0.
     //--------------------------------------------------------------------
-    if (istep == 0)
+    if (istep == 0 || GlobalV::md_prec_level == 2)
     {
         this->charge->init_rho();
     }

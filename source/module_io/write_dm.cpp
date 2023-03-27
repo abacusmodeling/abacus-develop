@@ -1,7 +1,7 @@
 #include "module_io/dm_io.h"
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 #include "module_hamilt_lcao/hamilt_lcaodft/global_fp.h"
-#include "src_parallel/parallel_reduce.h"
+#include "module_base/parallel_reduce.h"
 #include "module_base/blas_connector.h"
 #include "module_base/timer.h"
 
@@ -52,10 +52,7 @@ void ModuleIO::write_dm(
 	{
 		return;
 	}
-	else if(iter % out_dm != 0)
-	{
-		return; 
-	}
+
 	ModuleBase::timer::tick("ModuleIO","write_dm");
 
 	time_t start, end;

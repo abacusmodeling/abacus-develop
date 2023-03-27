@@ -17,6 +17,7 @@ add_library(
     read_cell_pseudopots.cpp
     setup_nonlocal.cpp
     klist.cpp
+    parallel_kpoints.cpp
 )
 
 if(ENABLE_COVERAGE)
@@ -25,5 +26,6 @@ endif()
 
 if(BUILD_TESTING)
   add_subdirectory(test)
+  add_subdirectory(test_pw)
 endif()
 
