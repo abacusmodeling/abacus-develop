@@ -4,15 +4,26 @@
 #ifndef SETCELL_H
 #define SETCELL_H
 
-#include "module_io/input.h"
-#include "module_cell/unitcell.h"
 #include "module_cell/module_neighbor/sltk_atom_arrange.h"
 #include "module_cell/module_neighbor/sltk_grid_driver.h"
+#include "module_cell/unitcell.h"
+#include "module_io/input.h"
+
+Magnetism::Magnetism()
+{
+    this->tot_magnetization = 0.0;
+    this->abs_magnetization = 0.0;
+    this->start_magnetization = nullptr;
+}
+Magnetism::~Magnetism()
+{
+    delete[] this->start_magnetization;
+}
 
 class Setcell
 {
-public:
-    static void setupcell(UnitCell &ucell)
+  public:
+    static void setupcell(UnitCell& ucell)
     {
         ucell.ntype = 1;
 
@@ -30,7 +41,7 @@ public:
         ucell.lat0_angstrom = ucell.lat0 * 0.529177;
         ucell.tpiba = ModuleBase::TWO_PI / ucell.lat0;
         ucell.tpiba2 = ucell.tpiba * ucell.tpiba;
-        
+
         ucell.latvec.e11 = ucell.latvec.e22 = ucell.latvec.e33 = 10;
         ucell.latvec.e12 = ucell.latvec.e13 = ucell.latvec.e23 = 0;
         ucell.latvec.e21 = ucell.latvec.e31 = ucell.latvec.e32 = 0;
@@ -95,7 +106,7 @@ public:
         ucell.set_iat2itia();
     };
 
-    static void neighbor(Grid_Driver &grid_neigh, UnitCell &ucell)
+    static void neighbor(Grid_Driver& grid_neigh, UnitCell& ucell)
     {
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
         INPUT.mdp.lj_rcut = 8.5 * ModuleBase::ANGSTROM_AU;
@@ -111,9 +122,10 @@ public:
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
         GlobalV::CAL_STRESS = 1;
 
-        INPUT.dump_virial = true;
-        INPUT.dump_force = true;
-        INPUT.dump_vel = true;
+        INPUT.mdp.dump_virial = true;
+        INPUT.mdp.dump_force = true;
+        INPUT.mdp.dump_vel = true;
+        INPUT.mdp.cal_stress = true;
 
         INPUT.mdp.md_restart = 0;
         INPUT.mdp.md_dt = 1;

@@ -24,15 +24,13 @@ void Driver::driver_run()
     ModuleESolver::init_esolver(p_esolver);
 
     // 2. Setup cell and atom information
-#ifdef __LCAO
-    GlobalC::ucell.setup_cell(GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
-#else
+#ifndef __LCAO
     if(GlobalV::BASIS_TYPE == "lcao_in_pw" || GlobalV::BASIS_TYPE == "lcao")
     {
         ModuleBase::WARNING_QUIT("driver","to use LCAO basis, compile with __LCAO");
     }
-    GlobalC::ucell.setup_cell(GlobalV::global_pseudo_dir, GlobalV::stru_file, GlobalV::ofs_running);
 #endif
+    GlobalC::ucell.setup_cell(GlobalV::stru_file, GlobalV::ofs_running);
 
     // 3. For these two types of calculations
     // nothing else need to be initialized
@@ -50,8 +48,7 @@ void Driver::driver_run()
     //---------------------------MD/Relax-------------------------
     if(GlobalV::CALCULATION == "md")
     {
-        Run_MD run_md;
-        run_md.md_line(GlobalC::ucell, p_esolver);
+        Run_MD::md_line(GlobalC::ucell, p_esolver, INPUT.mdp);
     }
     else // scf; cell relaxation; nscf; etc
     {

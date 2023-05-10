@@ -50,10 +50,10 @@ energy::~energy()
 void energy::calculate_harris()
 {
 //	ModuleBase::TITLE("energy","calculate_harris");
-	this->etot_harris = eband + deband_harris 
-	+ (etxc - etxcc) 
-	+ H_Ewald_pw::ewald_energy 
-	+ elecstate::H_Hartree_pw::hartree_energy 
+	this->etot_harris = eband + deband_harris
+	+ (etxc - etxcc)
+	+ H_Ewald_pw::ewald_energy
+	+ elecstate::H_Hartree_pw::hartree_energy
 	+ demet
 	+ exx
 	+ elecstate::Efield::etotefield
@@ -61,7 +61,7 @@ void energy::calculate_harris()
 	+ evdw;  						// Peize Lin add evdw 2021.03.09
 
 #ifdef __LCAO
-	if(GlobalV::dft_plus_u) 
+	if(GlobalV::dft_plus_u)
 	{
 		this->etot_harris += GlobalC::dftu.get_energy();  //Energy correction from DFT+U; Quxin adds on 20201029
 	}
@@ -72,18 +72,18 @@ void energy::calculate_harris()
 		this->etot_harris += GlobalC::ld.E_delta - GlobalC::ld.e_delta_band;
 	}
 #endif
-	
+
 	return;
 }
 
-void energy::calculate_etot(void)
+void energy::calculate_etot(const int& nrxx, const int& nxyz)
 {
 	ModuleBase::TITLE("energy","calculate_etot");
 	//std::cout << "\n demet in etot = " << demet << std::endl;
-	this->etot = eband + deband 
-	+ (etxc - etxcc) 
-	+ H_Ewald_pw::ewald_energy 
-	+ elecstate::H_Hartree_pw::hartree_energy 
+	this->etot = eband + deband
+	+ (etxc - etxcc)
+	+ H_Ewald_pw::ewald_energy
+	+ elecstate::H_Hartree_pw::hartree_energy
 	+ demet
 	+ descf
 	+ exx
@@ -92,8 +92,8 @@ void energy::calculate_etot(void)
 	+ evdw;							// Peize Lin add evdw 2021.03.09
 	if (GlobalV::imp_sol)
     {
-	this->etot += GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::rhopw)
-				 + GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::rhopw);
+	this->etot += GlobalC::solvent_model.cal_Ael(GlobalC::ucell, nrxx, nxyz)
+				 + GlobalC::solvent_model.cal_Acav(GlobalC::ucell, nxyz);
 	}
 
     //Quxin adds for DFT+U energy correction on 20201029
@@ -113,9 +113,9 @@ void energy::calculate_etot(void)
 	// std::cout << " fermienergy= "<<ef<<std::endl;
 
 #ifdef __LCAO
-    if(GlobalV::dft_plus_u) 
+    if(GlobalV::dft_plus_u)
 	{
-		this->etot += GlobalC::dftu.get_energy();																	  
+		this->etot += GlobalC::dftu.get_energy();
 	}
 #endif
 #ifdef __DEEPKS
@@ -128,11 +128,13 @@ void energy::calculate_etot(void)
 }
 
 void energy::print_etot(
-	const bool converged, 
-	const int &iter_in, 
-	const double &scf_thr, 
-	const double &duration, 
-	const double &pw_diag_thr, 
+	const int& nrxx,
+	const int& nxyz,
+	const bool converged,
+	const int &iter_in,
+	const double &scf_thr,
+	const double &duration,
+	const double &pw_diag_thr,
 	const double &avg_iter,
 	bool print)
 {
@@ -166,11 +168,11 @@ void energy::print_etot(
         {
             this->print_format("E_vdwD3", evdw);
         }
-        this->print_format("E_exx", exx);	
+        this->print_format("E_exx", exx);
         if (GlobalV::imp_sol)
         {
-            esol_el = GlobalC::solvent_model.cal_Ael(GlobalC::ucell, GlobalC::rhopw);
-            esol_cav = GlobalC::solvent_model.cal_Acav(GlobalC::ucell, GlobalC::rhopw);
+            esol_el = GlobalC::solvent_model.cal_Ael(GlobalC::ucell, nrxx, nxyz);
+            esol_cav = GlobalC::solvent_model.cal_Acav(GlobalC::ucell, nxyz);
             this->print_format("E_sol_el", esol_el);
             this->print_format("E_sol_cav", esol_cav);
         }
@@ -223,7 +225,7 @@ void energy::print_etot(
 	{
 		this->etot_old = this->etot;
 	}
-	
+
 	// mohan update 2011-02-26
 	std::stringstream ss;
 
@@ -280,8 +282,8 @@ void energy::print_etot(
 		{
 			if(GlobalV::MY_RANK==0)
 			{
-				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot);	
-				//printf( "[36m%-15f[0m", GlobalC::en.etot);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot);
+				//printf( "[36m%-15f[0m", GlobalC::en.etot);
 				if(GlobalV::NSPIN==2)
 				{
 					std::cout << std::setprecision(2);
@@ -309,14 +311,14 @@ void energy::print_etot(
 					//printf( "[32m%-14e[0m", scf_thr);
 				}
 				// 34 is blue
-				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);	
-				//printf( "[36m%-15f[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);
+				//printf( "[36m%-15f[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);
 				std::cout << std::setprecision(3);
 	//			std::cout << std::setw(11) << GlobalC::en.eband;
 	//			std::cout << std::setw(11) << H_Hartree_pw::hartree_energy;
 	//			std::cout << std::setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
 				std::cout << std::resetiosflags(ios::scientific);
-				
+
 				std::cout << std::setw(11) << duration;
 				std::cout << std::endl;
 			}
@@ -355,7 +357,7 @@ void energy::print_format(const std::string &name, const double &value)
 	GlobalV::ofs_running << std::setiosflags(ios::showpos);
 	std::stringstream name2;
 	name2 << name;
-	GlobalV::ofs_running << " " << std::setw(12) << name2.str() << std::setw(30) <<  value 
+	GlobalV::ofs_running << " " << std::setw(12) << name2.str() << std::setw(30) <<  value
 	<< std::setw(30) << value * ModuleBase::Ry_to_eV << std::endl;
 	GlobalV::ofs_running << std::resetiosflags(ios::showpos);
 	return;
@@ -381,7 +383,7 @@ double energy::delta_e(const elecstate::ElecState* pelec)
 		v_ofk = pelec->pot->get_effective_vofk(0);
 	}
 
-	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
+	for (int ir = 0; ir < pelec->charge->rhopw->nrxx; ir++)
 	{
 		deband_aux -= pelec->charge->rho[0][ir] * (v_eff[ir] - v_fixed[ir]);
 		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
@@ -394,7 +396,7 @@ double energy::delta_e(const elecstate::ElecState* pelec)
 	{
 		v_eff = pelec->pot->get_effective_v(1);
 		v_ofk = pelec->pot->get_effective_vofk(1);
-		for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
+		for (int ir = 0; ir < pelec->charge->rhopw->nrxx; ir++)
 		{
 			deband_aux -= pelec->charge->rho[1][ir] * (v_eff[ir] - v_fixed[ir]);
 			if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
@@ -408,7 +410,7 @@ double energy::delta_e(const elecstate::ElecState* pelec)
 		for(int is = 1;is<4;is++)
 		{
 			v_eff = pelec->pot->get_effective_v(is);
-			for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
+			for(int ir = 0; ir < pelec->charge->rhopw->nrxx; ir++)
 			{
 				deband_aux -= pelec->charge->rho[is][ir] * v_eff[ir];
 			}
@@ -421,11 +423,11 @@ double energy::delta_e(const elecstate::ElecState* pelec)
     deband0 = deband_aux;
 #endif
 
-    deband0 *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
-	
+    deband0 *= GlobalC::ucell.omega / pelec->charge->rhopw->nxyz;
+
 	// \int rho(r) v_{exx}(r) dr = 2 E_{exx}[rho]
 	deband0 -= 2*exx;				// Peize Lin add 2017-10-16
-	
+
     return deband0;
 } // end subroutine delta_e
 
@@ -450,7 +452,7 @@ void energy::delta_escf(const elecstate::ElecState* pelec)
 		v_ofk = pelec->pot->get_effective_vofk(0);
 	}
 
-	for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
+	for (int ir=0; ir<pelec->charge->rhopw->nrxx; ir++)
 	{
 		this->descf -= ( pelec->charge->rho[0][ir] - pelec->charge->rho_save[0][ir] ) * (v_eff[ir] - v_fixed[ir]);
 		if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
@@ -466,7 +468,7 @@ void energy::delta_escf(const elecstate::ElecState* pelec)
 		{
 			v_ofk = pelec->pot->get_effective_vofk(1);
 		}
-		for (int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
+		for (int ir=0; ir<pelec->charge->rhopw->nrxx; ir++)
 		{
 			this->descf -= ( pelec->charge->rho[1][ir] - pelec->charge->rho_save[1][ir] ) * (v_eff[ir] - v_fixed[ir]);
 			if(XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
@@ -480,7 +482,7 @@ void energy::delta_escf(const elecstate::ElecState* pelec)
 		for(int is = 1;is<4;is++)
 		{
 			v_eff = pelec->pot->get_effective_v(is);
-			for(int ir=0; ir<GlobalC::rhopw->nrxx; ir++)
+			for(int ir=0; ir<pelec->charge->rhopw->nrxx; ir++)
 			{
 				this->descf -= ( pelec->charge->rho[is][ir] - pelec->charge->rho_save[is][ir] ) * v_eff[ir];
 			}
@@ -489,7 +491,7 @@ void energy::delta_escf(const elecstate::ElecState* pelec)
 
     Parallel_Reduce::reduce_double_pool( descf );
 
-    this->descf *= GlobalC::ucell.omega / GlobalC::rhopw->nxyz;
+    this->descf *= GlobalC::ucell.omega / pelec->charge->rhopw->nxyz;
     return;
 }
 
@@ -513,7 +515,7 @@ void energy::cal_bandgap(const elecstate::ElecState* pelec)
 		return;
 	}
 	int nbands = GlobalV::NBANDS;
-	int nks = GlobalC::kv.nks;
+	int nks = pelec->klist->nks;
 	double homo = pelec->ekb(0,0);
 	double lumo = pelec->ekb(0,nbands-1);
 	for (int ib=0; ib<nbands; ib++)
@@ -542,7 +544,7 @@ void energy::cal_bandgap_updw(const elecstate::ElecState* pelec)
 		return;
 	}
 	int nbands = GlobalV::NBANDS;
-	int nks = GlobalC::kv.nks;
+	int nks = pelec->klist->nks;
 	double homo_up = pelec->ekb(0,0);
 	double lumo_up = pelec->ekb(0,nbands-1);
 	double homo_dw = pelec->ekb(0,0);
@@ -590,6 +592,7 @@ double& energy::get_ef(const int& is, const bool& two_efermi)
 	else
 	{
 		ModuleBase::WARNING_QUIT("energy","Please check NSPIN when TWO_EFERMI is true");
+		__builtin_unreachable();
 	}
 }
 

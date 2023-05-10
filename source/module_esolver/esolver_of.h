@@ -9,6 +9,7 @@
 #include "module_hamilt_pw/hamilt_ofdft/kedf_tf.h"
 #include "module_hamilt_pw/hamilt_ofdft/kedf_vw.h"
 #include "module_hamilt_pw/hamilt_ofdft/kedf_wt.h"
+#include "module_hamilt_pw/hamilt_ofdft/kedf_lkt.h"
 #include "module_elecstate/module_charge/charge.h"
 
 namespace ModuleESolver
@@ -73,9 +74,11 @@ public:
         if (this->mu != NULL) delete[] this->mu;
         if (this->task != NULL) delete[] this->task;
         if (this->opt_cg_mag != NULL) delete this->opt_cg_mag;
+        delete this->ptempRho;
     }
 
     virtual void Init(Input &inp, UnitCell &ucell) override;
+    virtual void init_after_vc(Input &inp, UnitCell &ucell) override;
     virtual void Run(int istep, UnitCell& ucell) override;
     virtual void postprocess() override;
 
@@ -92,6 +95,7 @@ private:
     KEDF_TF tf;
     KEDF_vW vw;
     KEDF_WT wt;
+    KEDF_LKT lkt;
 
     // charge extrapolation liuyu add 2022-11-07
     Charge_Extra CE;
@@ -128,6 +132,8 @@ private:
     int tnSpinFlag = -1;                        // spin flag used in calV, which will be called by opt_tn
     int maxDCsrch = 200;                        // max no. of line search
     int flag = -1;                              // flag of TN
+
+    Charge* ptempRho = nullptr;                 // used in line search
 
     // // test rho convergence criterion
     // double *pdeltaRhoHar = NULL; // 4pi*rhog/k^2

@@ -13,3 +13,5 @@ Interfaces to Other Softwares
    phonopy
    Wannier90
    ase
+   pyatb
+   ShengBTE

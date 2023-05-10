@@ -2,7 +2,7 @@
 #define EXX_INFO_H
 
 #include "xc_functional.h"
-#include "src_ri/conv_coulomb_pot_k.h"
+#include "module_ri/conv_coulomb_pot_k.h"
 
 struct Exx_Info
 {
@@ -13,6 +13,7 @@ struct Exx_Info
 		Conv_Coulomb_Pot_K::Ccp_Type ccp_type;
 		double hybrid_alpha = 0.25;
 		double hse_omega = 0.11;
+		double mixing_beta_for_loop1;
 		
 		bool separate_loop = true;
 		size_t hybrid_step = 1;
@@ -50,7 +51,8 @@ struct Exx_Info
 		double cauchy_threshold = 0;
 		double C_grad_threshold  = 0;
 		double V_grad_threshold  = 0;
-		double cauchy_grad_threshold = 0;
+		double cauchy_force_threshold = 0;
+		double cauchy_stress_threshold = 0;
 		double ccp_threshold = 0;
 		double ccp_rmesh_times = 10;
 		double kmesh_times = 4;
