@@ -91,7 +91,9 @@ template <typename T> void Input_Conv::parse_expression(const std::string &fn, s
             convert >> occ;
             vec.emplace_back(occ);
         }
+        regfree(&sub_reg);
     }
+    regfree(&reg);
 }
 
 void Input_Conv::Convert(void)
