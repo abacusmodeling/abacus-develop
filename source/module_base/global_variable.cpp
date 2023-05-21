@@ -74,6 +74,7 @@ double PW_DIAG_THR = 1.0e-2;
 int NB2D = 1;
 
 double SCF_THR = 1.0e-9;
+int SCF_THR_TYPE = 1;
 
 double DQ = 0.010; // space between Q points of the reciprocal radial tab
 int NQX = 10000; // number of points describing reciprocal radial tab
@@ -89,7 +90,7 @@ int VNL_IN_H = 1;
 int VH_IN_H = 1;
 int VION_IN_H = 1;
 int ZEEMAN_IN_H = 1;
-double STRESS_THR = 1.0e-2; // LiuXh add 20180515
+double STRESS_THR = 0.5; // LiuXh add 20180515 liuyu update 2023-05-10
 
 int ocp = 0;
 std::string ocp_set = "none";
