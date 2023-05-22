@@ -44,6 +44,11 @@ AddTest(
 )
 
 AddTest(
+  TARGET potentials_base
+  SOURCES potentials_base_test.cpp
+)
+
+AddTest(
   TARGET elecstate_pw
   LIBS ${math_libs} base device
   SOURCES elecstate_pw_test.cpp
