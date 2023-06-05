@@ -1,5 +1,5 @@
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
-#include "module_hamilt_lcao/hamilt_lcaodft/global_fp.h"
+#include "module_cell/module_neighbor/sltk_grid_driver.h"
 #include "record_adj.h" //mohan add 2012-07-06
 #include "module_base/timer.h"
 #include "module_base/tool_threading.h"
@@ -289,8 +289,9 @@ int Grid_Technique::cal_RindexAtom(const int &u1, const int &u2, const int &u3, 
 	return (iat2 + (x3 + x2 * this->nB3 + x1 * this->nB2 * this->nB3) * GlobalC::ucell.nat);
 }
 
-int Grid_Technique::binary_search_find_R2_offset(int val, int iat) {
-	auto findR2 = this->find_R2[iat];
+int Grid_Technique::binary_search_find_R2_offset(int val, int iat) const
+{
+    auto findR2 = this->find_R2[iat];
 	auto findR2_index = this->find_R2_sorted_index[iat];
 
 	int left = 0;
