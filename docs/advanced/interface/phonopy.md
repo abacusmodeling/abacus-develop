@@ -8,19 +8,19 @@
 phonopy -d --dim="2 2 2" --abacus
 ```
 
-1. Calculate forces on atoms in the supercells with displacements. For each SCF calculation, you should specify `stru_file` with `STRU-{number}` and `cal_force=1` in INPUT in order to calculate force using ABACUS. Be careful not to relax the structures
+2. Calculate forces on atoms in the supercells with displacements. For each SCF calculation, you should specify `stru_file` with `STRU-{number}` and `cal_force=1` in INPUT in order to calculate force using ABACUS. Be careful not to relax the structures
 
 ```
 echo 'stru_file ./STRU-001' >> INPUT
 ```
 
-1. Then create 'FORCE_SETS' file using ABACUS inteface:
+3. Then create 'FORCE_SETS' file using ABACUS inteface:
 
 ```
 phonopy -f ./disp-{number}/OUT*/running*.log
 ```
 
-1. Calculate the phonon dispersion:
+4. Calculate the phonon dispersion:
 
 ```
 phonopy band.conf --abacus
