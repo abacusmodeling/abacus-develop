@@ -1346,6 +1346,10 @@ void Symmetry::rhog_symmetry(std::complex<double> *rhogtot,
 {
 //  if (GlobalV::test_symmetry)ModuleBase::TITLE("Symmetry","rho_symmetry");
     ModuleBase::timer::tick("Symmetry","rhog_symmetry");
+// ----------------------------------------------------------------------
+// the possible optimizing way is to cluster the FFT grid points into groups in advance.
+// you can use other methods to optimize the code if you have a better idea.
+// ----------------------------------------------------------------------
 
 	// allocate flag for each FFT grid.
     bool* symflag = new bool[fftnx*fftny*fftnz];
@@ -1371,7 +1375,16 @@ void Symmetry::rhog_symmetry(std::complex<double> *rhogtot,
     ModuleBase::Vector3<double> tmp_gdirect_double(0.0, 0.0, 0.0);
     int ipw, ixyz, ii, jj, kk=0;
     double arg=0.0;
-
+// ---------------------------------------------------
+/* This code defines a lambda function called "rotate_recip" that takes 
+    a 3x3 matrix and a 3D vector as input. It performs a rotation operation 
+    on the vector using the matrix and returns the rotated vector. 
+    Specifically, it calculates the new coordinates of the vector after 
+    the rotation and applies periodic boundary conditions to ensure that 
+    the coordinates are within the FFT-grid dimensions. 
+    The rotated vector is returned by modifying the input vector.
+*/
+// ---------------------------------------------------
     //rotate function (different from real space, without scaling gmatrix)
     auto rotate_recip = [&] (ModuleBase::Matrix3& g, ModuleBase::Vector3<int>& g0) 
     {
@@ -1395,6 +1408,17 @@ void Symmetry::rhog_symmetry(std::complex<double> *rhogtot,
         kk = kk%nz;
         return;
     };
+// -------------------------------------------
+/* This code performs symmetry operations on the reciprocal space 
+    charge density using FFT-grids. It iterates over each FFT-grid 
+    point and checks if it is within the PW-sphere. 
+    If it is, it applies a phase factor and sums the charge density 
+    over the symmetry operations, and then divides by the number of 
+    symmetry operations. Finally, it updates the charge density for 
+    each FFT-grid point using the calculated sum and marks the point 
+    as processed to avoid redundant calculations.
+*/ 
+// -------------------------------------------
     for (int i = 0; i< fftnx; ++i)
     {
         tmp_gdirect0.x=(i>int(nx/2)+1)?(i-nx):i;

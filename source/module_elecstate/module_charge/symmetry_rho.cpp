@@ -1,5 +1,6 @@
 #include "symmetry_rho.h"
 #include "module_hamilt_general/module_xc/xc_functional.h"
+#include "module_base/timer.h"
 
 Symmetry_rho::Symmetry_rho()
 {
@@ -20,6 +21,9 @@ void Symmetry_rho::begin(const int& spin_now,
 	assert(spin_now < 4);//added by zhengdy-soc
 
 	if(ModuleSymmetry::Symmetry::symm_flag != 1) return;
+
+	ModuleBase::timer::tick("Symmetry_rho", "begin");
+
 	// both parallel and serial
 	if(symm.nrot==symm.nrotk) //pure point-group, do rho_symm in real space
 	{
@@ -41,6 +45,7 @@ void Symmetry_rho::begin(const int& spin_now,
 			delete[] kin_g;
 		}	
 	}
+	ModuleBase::timer::tick("Symmetry_rho", "begin");
 	return;
 }
 
