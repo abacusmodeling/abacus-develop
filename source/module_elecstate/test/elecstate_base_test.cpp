@@ -59,7 +59,7 @@ void ModulePW::PW_Basis::distribute_r()
 void Charge::set_rho_core(ModuleBase::ComplexMatrix const&)
 {
 }
-void Charge::init_rho(elecstate::efermi&, ModuleBase::ComplexMatrix const&)
+void Charge::init_rho(elecstate::efermi&, ModuleBase::ComplexMatrix const&, const int&, const int&)
 {
 }
 void Charge::set_rhopw(ModulePW::PW_Basis*)
@@ -117,7 +117,6 @@ class MockElecState : public ElecState
         GlobalV::ESOLVER_TYPE = "ksdft";
         GlobalV::LSPINORB = false;
         GlobalV::BASIS_TYPE = "pw";
-        GlobalV::md_prec_level = 0;
         GlobalV::KPAR = 1;
         GlobalV::NPROC_IN_POOL = 1;
     }
@@ -375,7 +374,6 @@ TEST_F(ElecStateTest, InitSCF)
     elecstate::efermi efermi;
     int istep = 0;
     ModuleBase::ComplexMatrix strucfac;
-    GlobalV::md_prec_level = 2;
     elecstate->eferm = efermi;
     EXPECT_NO_THROW(elecstate->init_scf(istep, strucfac));
     // delete elecstate->pot is done in the destructor of elecstate

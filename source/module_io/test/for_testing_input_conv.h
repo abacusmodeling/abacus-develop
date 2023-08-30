@@ -114,6 +114,7 @@ int Ions_Move_Basic::out_stru = 0;
 double Ions_Move_CG::RELAX_CG_THR = -1.0;
 std::string Lattice_Change_Basic::fixed_axes = "None";
 int ModuleSymmetry::Symmetry::symm_flag = 0;
+bool ModuleSymmetry::Symmetry::symm_autoclose = false;
 
 Charge_Mixing::Charge_Mixing()
 {
@@ -210,11 +211,11 @@ UnitCell::UnitCell()
     tpiba2 = 0.0;
     omega = 0.0;
 
-    atom_label = new string[1];
+    atom_label = new std::string[1];
     atom_mass = nullptr;
-    pseudo_fn = new string[1];
-    pseudo_type = new string[1];
-    orbital_fn = new string[1];
+    pseudo_fn = new std::string[1];
+    pseudo_type = new std::string[1];
+    orbital_fn = new std::string[1];
 
     set_atom_flag = false;
 }

@@ -139,7 +139,7 @@ void ESolver_KS_LCAO::Init(Input& inp, UnitCell& ucell)
             /* In the special "two-level" calculation case,
             first scf iteration only calculate the functional without exact exchange.
             but in "nscf" calculation, there is no need of "two-level" method. */
-            if (ucell.atoms[0].ncpp.xc_func == "HSE" || ucell.atoms[0].ncpp.xc_func == "PBE0")
+            if (ucell.atoms[0].ncpp.xc_func == "HF" || ucell.atoms[0].ncpp.xc_func == "PBE0" || ucell.atoms[0].ncpp.xc_func == "HSE")
             {
                 XC_Functional::set_xc_type("pbe");
             }
@@ -415,7 +415,10 @@ void ESolver_KS_LCAO::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell
                                  ucell.infoNL.Beta);
 
     if (this->orb_con.setup_2d)
+    {
         this->orb_con.setup_2d_division(GlobalV::ofs_running, GlobalV::ofs_warning);
+        this->orb_con.ParaV.set_atomic_trace(GlobalC::ucell.get_iat2iwt(), GlobalC::ucell.nat, GlobalV::NLOCAL);
+    }
 }
 
 void ESolver_KS_LCAO::eachiterinit(const int istep, const int iter)
@@ -574,12 +577,12 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
         const Parallel_Orbitals* pv = this->LOWF.ParaV;
         if (GlobalV::GAMMA_ONLY_LOCAL)
         {
-            GlobalC::ld.cal_e_delta_band(this->LOC.dm_gamma, pv->trace_loc_row, pv->trace_loc_col, pv->nrow);
+            GlobalC::ld.cal_e_delta_band(this->LOC.dm_gamma);
         }
         else
         {
             GlobalC::ld
-                .cal_e_delta_band_k(this->LOC.dm_k, pv->trace_loc_row, pv->trace_loc_col, kv.nks, pv->nrow, pv->ncol);
+                .cal_e_delta_band_k(this->LOC.dm_k, kv.nks);
         }
     }
 #endif
@@ -735,6 +738,18 @@ void ESolver_KS_LCAO::eachiterfinish(int iter)
 
 void ESolver_KS_LCAO::afterscf(const int istep)
 {
+    // save charge difference into files for charge extrapolation
+    if (GlobalV::CALCULATION != "scf")
+    {
+        this->CE.save_files(istep,
+                            GlobalC::ucell,
+#ifdef __MPI
+                            this->pw_big,
+#endif
+                            this->pelec->charge,
+                            &this->sf);
+    }
+
     if (this->LOC.out_dm1 == 1)
     {
         this->create_Output_DM1(istep).write();
@@ -863,8 +878,8 @@ ModuleIO::Output_DM1 ESolver_KS_LCAO::create_Output_DM1(int istep)
 ModuleIO::Output_Mat_Sparse ESolver_KS_LCAO::create_Output_Mat_Sparse(int istep)
 {
     return ModuleIO::Output_Mat_Sparse(hsolver::HSolverLCAO::out_mat_hsR,
-                                       hsolver::HSolverLCAO::out_mat_t,
                                        hsolver::HSolverLCAO::out_mat_dh,
+                                       hsolver::HSolverLCAO::out_mat_t,
                                        INPUT.out_mat_r,
                                        istep,
                                        this->pelec->pot->get_effective_v(),

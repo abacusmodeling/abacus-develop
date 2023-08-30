@@ -13,6 +13,11 @@ ORB_gen_tables UOT;
 ORB_gen_tables::ORB_gen_tables() {}
 ORB_gen_tables::~ORB_gen_tables() {}
 
+const ORB_gen_tables& ORB_gen_tables::get_const_instance()
+{
+	return GlobalC::UOT;
+}
+
 /// call in hamilt_linear::init_before_ions.
 void ORB_gen_tables::gen_tables(
 	std::ofstream &ofs_in,
@@ -312,7 +317,7 @@ void ORB_gen_tables::snap_psibeta_half(
 			{
 				//triangle rule for gaunt coefficients
 				int AL = L1 + L0;
-				int SL = abs(L1 - L0);
+				int SL = std::abs(L1 - L0);
 				if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
 				{
 					continue;
@@ -448,8 +453,6 @@ void ORB_gen_tables::snap_psipsi(
 	const int &L2,
 	const int &m2,
 	const int &N2,
-	const int &nspin,
-	std::complex<double> *olm1,
 	bool cal_syns,
 	double dmax) const
 {
@@ -558,7 +561,7 @@ void ORB_gen_tables::snap_psipsi(
 			// triangle rule for L and sum of L, L1, L2 should be even
 			//===========================================================
 			int AL = L1 + L2;
-			int SL = abs(L1 - L2);
+			int SL = std::abs(L1 - L2);
 
 			if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
 				continue;
@@ -614,21 +617,7 @@ void ORB_gen_tables::snap_psipsi(
 				{
 				case 0: // calculate overlap.
 				{
-					if (nspin != 4)
-					{
-						olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
-					}
-					else if (olm1 != NULL)
-					{
-						olm1[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
-						olm1[1] += 0; //tmpOlm0 * (tmp(0,0)+tmp(0,1));
-						olm1[2] += 0; //tmpOlm0 * (tmp(1,0)+tmp(1,1));
-						olm1[3] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
-					}
-					else
-					{
-						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
-					}
+					olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
 
 					/*
 						if( abs ( tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ) > 1.0e-3 )
@@ -661,7 +650,7 @@ void ORB_gen_tables::snap_psipsi(
 		for (int L = 0; L < dim3; L++)
 		{
 			int AL = L1 + L2;
-			int SL = abs(L1 - L2);
+			int SL = std::abs(L1 - L2);
 
 			if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
 				continue;
@@ -710,21 +699,7 @@ void ORB_gen_tables::snap_psipsi(
 				{
 				case 0:
 				{
-					if (nspin != 4)
-					{
-						olm[0] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
-					}
-					else if (olm1 != NULL)
-					{
-						olm1[0] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
-						olm1[1] += 0; //tmpKem0 * (tmp(0,0)+tmp(0,1));
-						olm1[2] += 0; //tmpKem0 * (tmp(1,0)+tmp(1,1));
-						olm1[3] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
-					}
-					else
-					{
-						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong in T.");
-					}
+					olm[0] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
 					break;
 				}
 				case 1:
@@ -918,7 +893,7 @@ void ORB_gen_tables::snap_psialpha_half(
 				{
 					//triangle rule for gaunt coefficients
 					int AL = L1 + L0;
-					int SL = abs(L1 - L0);
+					int SL = std::abs(L1 - L0);
 					if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
 					{
 						continue;

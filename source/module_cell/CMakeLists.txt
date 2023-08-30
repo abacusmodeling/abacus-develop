@@ -1,5 +1,6 @@
 add_subdirectory(module_symmetry)
 add_subdirectory(module_neighbor)
+add_subdirectory(module_paw)
 
 add_library(
     cell
@@ -28,4 +29,3 @@ if(BUILD_TESTING)
   add_subdirectory(test)
   add_subdirectory(test_pw)
 endif()
-

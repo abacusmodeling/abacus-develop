@@ -124,6 +124,12 @@ AddTest(
 )
 
 AddTest(
+  TARGET base_lapack_connector
+  LIBS ${math_libs}
+  SOURCES lapack_connector_test.cpp ../lapack_connector.h
+)
+
+AddTest(
   TARGET base_opt_CG
   SOURCES opt_CG_test.cpp opt_test_tools.cpp ../opt_CG.cpp ../opt_DCsrch.cpp ../global_variable.cpp ../parallel_reduce.cpp
 )
@@ -165,7 +171,7 @@ AddTest(
 
 AddTest(
   TARGET spherical_bessel_transformer
-  SOURCES spherical_bessel_transformer_test.cpp ../spherical_bessel_transformer.cpp
+  SOURCES spherical_bessel_transformer_test.cpp ../spherical_bessel_transformer.cpp ../math_sphbes.cpp ../math_integral.cpp ../timer.cpp
   LIBS ${math_libs}
 )
 
@@ -175,3 +181,8 @@ AddTest(
   LIBS ${math_libs}
 )
 
+AddTest(
+  TARGET formatter_test
+  SOURCES ../formatter_fmt.cpp ../formatter_physfmt.cpp ../formatter_table.cpp ../formatter_contextfmt.cpp 
+          formatter_fmt_test.cpp formatter_physfmt_test.cpp formatter_table_test.cpp formatter_contextfmt_test.cpp
+)

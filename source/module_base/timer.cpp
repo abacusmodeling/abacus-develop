@@ -6,6 +6,7 @@
 #include "timer.h"
 #include "chrono"
 #include<vector>
+#include <math.h>
 
 #ifdef __MPI
 #include "mpi.h"
@@ -90,7 +91,12 @@ void timer::tick(const std::string &class_name,const std::string &name)
 		if(timer_one.start_flag)
 		{
 #ifdef __MPI
-			timer_one.cpu_start = MPI_Wtime();
+			int is_initialized;
+    		MPI_Initialized(&is_initialized);
+			if(is_initialized)
+			{
+				timer_one.cpu_start = MPI_Wtime();
+			}
 #else
 			timer_one.cpu_start = cpu_time();
 #endif
@@ -100,7 +106,12 @@ void timer::tick(const std::string &class_name,const std::string &name)
 		else
 		{
 #ifdef __MPI
-			timer_one.cpu_second += MPI_Wtime() - timer_one.cpu_start;
+			int is_initialized;
+    		MPI_Initialized(&is_initialized);
+			if(is_initialized)
+			{
+				timer_one.cpu_second += MPI_Wtime() - timer_one.cpu_start;
+			}
 #else
 			// if(class_name=="electrons"&&name=="c_bands")
 			// {
@@ -123,6 +134,80 @@ long double timer::print_until_now(void)
 	// start again
 	timer::tick("","total");
 	return timer_pool[""]["total"].cpu_second;
+}
+
+void timer::write_to_json(std::string file_name)
+{
+	// check if a double is inf, if so, return "null", else return a string of the input double
+	auto double_to_string = [](double d) -> std::string
+	{
+		if(isinf(d))
+			return "null";
+		else
+			return std::to_string(d);
+	};
+
+	// The output json file format is like this:
+	// {
+	//     "total": 1.0,
+	//     "sub": [
+	//         {
+	//             "class_name": "wavefunc",
+	//             "sub": [
+	//                 {
+	//                     "name": "evc",
+	//                     "cpu_second": 0.000318,
+	//                     "calls": 2,
+	//                     "cpu_second_per_call": 0.000159,
+	//                     "cpu_second_per_total": 0.000318
+	//                 }
+	//             ]
+	//         }
+	//     ]
+	// }
+
+	std::ofstream ofs(file_name);
+	std::string indent = "    ";
+	int order_a = 0;
+	ofs << "{\n";
+	ofs << indent << "\"total\": " << timer_pool[""]["total"].cpu_second << ",\n";
+	ofs << indent << "\"sub\": [\n";
+	for(auto &timer_pool_A : timer_pool)
+	{
+		order_a ++;
+		// if calss_name == "", it means total time, so we skip it
+		if(timer_pool_A.first == "")
+			continue;
+		int order_b = 0;
+		const std::string class_name = timer_pool_A.first;
+		ofs << indent << indent << "{\n";
+		ofs << indent << indent << indent << "\"class_name\": \"" << class_name << "\",\n";
+		ofs << indent << indent << indent << "\"sub\": [\n";
+		for(auto &timer_pool_B : timer_pool_A.second)
+		{
+			order_b ++;
+			const std::string name = timer_pool_B.first;
+			const Timer_One timer_one = timer_pool_B.second;
+			ofs << indent << indent << indent << indent << "{\n";
+			ofs << indent << indent << indent << indent << "\"name\": \"" << name << "\",\n";
+			ofs << indent << indent << indent << indent << "\"cpu_second\": " << timer_one.cpu_second << ",\n";
+			ofs << indent << indent << indent << indent << "\"calls\": " << timer_one.calls << ",\n";
+			ofs << indent << indent << indent << indent << "\"cpu_second_per_call\": " << double_to_string(timer_one.cpu_second/timer_one.calls) << ",\n";
+			ofs << indent << indent << indent << indent << "\"cpu_second_per_total\": " << double_to_string(timer_one.cpu_second/timer_pool[""]["total"].cpu_second) << "\n";
+			if (order_b == timer_pool_A.second.size())
+				ofs << indent << indent << indent << indent << "}\n";
+			else
+				ofs << indent << indent << indent << indent << "},\n";
+		}
+		ofs << indent << indent << indent << "]\n";
+		if (order_a == timer_pool.size())
+			ofs << indent << indent << "}\n";
+		else
+			ofs << indent << indent << "},\n";
+	}
+	ofs << indent << "]\n";
+	ofs << "}\n";
+	ofs.close();
 }
 
 void timer::print_all(std::ofstream &ofs)
@@ -183,6 +268,7 @@ void timer::print_all(std::ofstream &ofs)
 	}
 	std::cout<<" ----------------------------------------------------------------------------------------"<<std::endl;
 	ofs <<" ----------------------------------------------------------------------------------------"<<std::endl;
+	write_to_json("time.json");
 }
 }
 

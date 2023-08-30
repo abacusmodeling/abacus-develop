@@ -155,9 +155,9 @@ public:
                 double modulus = f * (this->GGT * f);
                 if(modulus <= this->gridecut_lat)
                 {
-                    if(n1 < abs(igx)) n1 = abs(igx);
-                    if(n2 < abs(igy)) n2 = abs(igy);
-                    if(n3 < abs(igz)) n3 = abs(igz);
+                    if(n1 < std::abs(igx)) n1 = std::abs(igx);
+                    if(n2 < std::abs(igy)) n2 = std::abs(igy);
+                    if(n3 < std::abs(igz)) n3 = std::abs(igz);
                 }
             }
         }
@@ -283,6 +283,36 @@ public:
         this->nx = nx_in;
         this->ny = ny_in;
         this->nz = nz_in;
+        // autoset bx/by/bz if not set in INPUT
+        if (!this->bz)
+        {
+        this->autoset_big_cell_size(this->bz, nz, this->poolnproc);
+        }
+        if (!this->bx)
+        {
+        // if cz == cx, autoset bx==bz for keeping same symmetry
+        if (nx == nz)
+        {
+            this->bx = this->bz;
+        }
+        else
+        {
+            this->autoset_big_cell_size(this->bx, nx);
+        }
+        }
+        if (!this->by)
+        {
+        // if cz == cy, autoset by==bz for keeping same symmetry
+        if (ny == nz)
+        {
+            this->by = this->bz;
+        }
+        else
+        {
+            this->autoset_big_cell_size(this->by, ny);
+        }
+        }
+        this->bxyz = this->bx * this->by * this->bz;
         if(this->nx%this->bx != 0) this->nx += (this->bx - this->nx % this->bx);
         if(this->ny%this->by != 0) this->ny += (this->by - this->ny % this->by);
         if(this->nz%this->bz != 0) this->nz += (this->bz - this->nz % this->bz);
@@ -306,7 +336,7 @@ public:
                 {
                     ++count;
                     if(count%this->poolnproc != this->poolrank) continue;
-                    if(abs(igx)<=ibox[0]-1 && abs(igy)<=ibox[1]-1 && abs(igz)<=ibox[2]-1 ) continue;
+                    if(std::abs(igx)<=ibox[0]-1 && std::abs(igy)<=ibox[1]-1 && std::abs(igz)<=ibox[2]-1 ) continue;
                     ModuleBase::Vector3<double> f;
                     f.x = igx;
                     f.y = igy;

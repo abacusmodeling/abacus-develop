@@ -276,10 +276,16 @@ void ESolver_KS_PW<FPTYPE, Device>::beforescf(int istep)
     {
         this->init_after_vc(INPUT, GlobalC::ucell);
     }
-    if (GlobalC::ucell.ionic_position_updated && GlobalV::md_prec_level != 2)
+    if (GlobalC::ucell.ionic_position_updated)
     {
         this->CE.update_all_dis(GlobalC::ucell);
-        this->CE.extrapolate_charge(this->pelec->charge, &this->sf);
+        this->CE.extrapolate_charge(
+#ifdef __MPI
+            &(GlobalC::Pgrid),
+#endif
+            GlobalC::ucell,
+            this->pelec->charge,
+            &this->sf);
     }
 
     // init Hamilt, this should be allocated before each scf loop
@@ -514,6 +520,18 @@ void ESolver_KS_PW<FPTYPE, Device>::afterscf(const int istep)
 {
     this->create_Output_Potential(istep).write();
 
+    // save charge difference into files for charge extrapolation
+    if (GlobalV::CALCULATION != "scf")
+    {
+        this->CE.save_files(istep,
+                            GlobalC::ucell,
+#ifdef __MPI
+                            this->pw_big,
+#endif
+                            this->pelec->charge,
+                            &this->sf);
+    }
+
     if (GlobalV::out_chg)
     {
         for (int is = 0; is < GlobalV::NSPIN; is++)
@@ -731,7 +749,7 @@ void ESolver_KS_PW<FPTYPE, Device>::postprocess()
 
     if (INPUT.cal_cond)
     {
-        this->KG(INPUT.cond_nche, INPUT.cond_fwhm, INPUT.cond_wcut, INPUT.cond_dw, INPUT.cond_dt, this->pelec->wg);
+        this->KG(INPUT.cond_fwhm, INPUT.cond_wcut, INPUT.cond_dw, INPUT.cond_dt, this->pelec->wg);
     }
 }
 

@@ -67,15 +67,38 @@ public:
 	int *iwt2iat; // iwt ==> iat.
 	int *iwt2iw; // iwt ==> iw, Peize Lin add 2018-07-02
     ModuleBase::IntArray itia2iat;//(it, ia)==>iat, the index in nat, add 2009-3-2 by mohan
-    //atom index iat to the first global index for orbital of this atom
-    std::vector<int> iat2iwt;
+
+    // ========================================================
+    // iat2iwt is the atom index iat to the first global index for orbital of this atom
+    // the size of iat2iwt is nat, the value should be sum_{i=0}^{iat-1} atoms[it].nw * npol
+    // where the npol is the number of polarizations, 1 for non-magnetic(NSPIN=1 or 2), 2 for magnetic(only NSPIN=4)
+    // this part only used for Atomic Orbital based calculation
+    // ========================================================
+  public: 
     // indexing tool for find orbital global index from it,ia,iw
     template<typename Tiait>
     inline Tiait itiaiw2iwt(const Tiait &it, const Tiait &ia, const Tiait &iw) const
     {
         return Tiait(this->iat2iwt[this->itia2iat(it, ia)] + iw);
     }
+    // initialize iat2iwt
+    void set_iat2iwt(const int& npol_in);
+    // get iat2iwt
+    inline const int* get_iat2iwt() const
+    {
+        return iat2iwt.data();
+    }
+    // get npol
+    inline const int& get_npol() const
+    {
+        return npol;
+    }
+  private:
+    std::vector<int> iat2iwt; // iat ==> iwt, the first global index for orbital of this atom
+    int npol = 1; // number of spin polarizations, initialized in set_iat2iwt
+    // ----------------- END of iat2iwt part -----------------
 
+  public:
     //========================================================
     // indexing tools for ia and it
     // return true if the last out is reset
@@ -140,6 +163,18 @@ public:
             return step_iait(ia, it);
         }
         return false;
+    }
+
+    // get tau for atom iat
+    inline const ModuleBase::Vector3<double>& get_tau(const int &iat) const
+    {
+        return atoms[iat2it[iat]].tau[iat2ia[iat]];
+    }
+
+    // calculate vector between two atoms with R cell
+    inline const ModuleBase::Vector3<double> cal_dtau(const int &iat1, const int &iat2, const ModuleBase::Vector3<int> &R) const
+    {
+        return get_tau(iat2) + double(R.x) * a1 + double(R.y) * a2 + double(R.z) * a3 - get_tau(iat1);
     }
 
     //LiuXh add 20180515
@@ -215,7 +250,7 @@ public:
 	int read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running); // read in the atom information for each type of atom
 	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in atomic positions
 
-    void read_pseudo(ofstream &ofs);
+    void read_pseudo(std::ofstream &ofs);
 	int find_type(const std::string &label);
 	void print_tau(void)const;
 	void print_stru_file(const std::string &fn, const int &type=1, const int &level=0)const; // mohan add 2011-03-22

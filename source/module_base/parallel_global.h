@@ -7,11 +7,11 @@
 #define PARALLEL_GLOBAL_H
 
 #include <complex>
-//using namespace std;
 
 #ifdef __MPI
 #include "mpi.h"
 extern MPI_Comm POOL_WORLD;
+extern MPI_Comm INTER_POOL; //communicator among different pools
 extern MPI_Comm STO_WORLD;
 extern MPI_Comm PARAPW_WORLD;
 extern MPI_Comm GRID_WORLD; //mohan add 2012-01-13

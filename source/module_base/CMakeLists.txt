@@ -48,12 +48,14 @@ add_library(
     parallel_reduce.cpp
     spherical_bessel_transformer.cpp
     cubic_spline.cpp
+    formatter_fmt.cpp
+    formatter_physfmt.cpp
+    formatter_table.cpp
+    formatter_contextfmt.cpp
     ${LIBM_SRC}
 )
 
-if(ENABLE_CONTAINER)
-  add_subdirectory(module_container)
-endif()
+add_subdirectory(module_container)
 
 if(ENABLE_COVERAGE)
   add_coverage(base)

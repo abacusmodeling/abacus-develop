@@ -5,6 +5,7 @@
 #include "../module_base/timer.h"
 #include "../module_base/constants.h"
 #include "../module_hamilt_pw/hamilt_pwdft/global.h"
+#include "module_base/formatter.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 
@@ -64,7 +65,7 @@ int UnitCell::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running)
                 }
                 else
                 {
-                    GlobalV::ofs_warning << "unrecongnized pseudopotential type: " << one_string << ", check your STRU file." << endl;
+                    GlobalV::ofs_warning << "unrecongnized pseudopotential type: " << one_string << ", check your STRU file." << std::endl;
                     ModuleBase::WARNING_QUIT("read_atom_species", "unrecongnized pseudo type.");
                 }
             }
@@ -415,16 +416,9 @@ bool UnitCell::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_runn
 			// start magnetization
 			//=======================================
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, atoms[it].label);
-			bool found = false;
-			for(int it2=0; it2<ntype; it2++)
+			if(this->atoms[it].label != this->atom_label[it])
 			{
-				if( this->atoms[it].label == this->atom_label[it] )
-				{
-					found = true;
-				}
-			}
-			if(!found)
-			{
+				ofs_warning << " Label orders in ATOMIC_POSITIONS and ATOMIC_SPECIES sections do not match!" << std::endl;
 				ofs_warning << " Label read from ATOMIC_POSITIONS is " << this->atoms[it].label << std::endl; 
 				ofs_warning << " Label from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
 				return 0;
@@ -529,7 +523,7 @@ bool UnitCell::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_runn
 										atoms[it].angle2[ia]=0;
 										atoms[it].m_loc_[ia].set(0,0,0);
 
-                                        string tmpid;
+                                        std::string tmpid;
                                         tmpid = ifpos.get();
 
 										if( (int)tmpid[0] < 0 )
@@ -612,7 +606,7 @@ bool UnitCell::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_runn
                                         {
                                                 tmpid = ifpos.get();
                                         }
-					string mags;
+					std::string mags;
 					//cout<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]<<"angle2"<<atoms[it].angle2[ia]<<'\n';
 
 					if(GlobalV::NSPIN==4)
@@ -903,16 +897,27 @@ void UnitCell::print_stru_file(const std::string &fn, const int &type, const int
 		{
             ofs << orbital_fn[it] << std::endl;
 		}
-	}
+
+        // liuyu add 2023-06-25
+        if (GlobalV::deepks_setorb)
+        {
+            ofs << "\nNUMERICAL_DESCRIPTOR" << std::endl;
+            ofs << descriptor_file << std::endl;
+        }
+    }
 
 	ofs << "\nLATTICE_CONSTANT" << std::endl;
         //modified by zhengdy 2015-07-24
 	ofs << lat0 << std::endl;
 
 	ofs << "\nLATTICE_VECTORS" << std::endl;
-	ofs << latvec.e11 << " " << latvec.e12 << " " << latvec.e13 << " #latvec1" << std::endl; 
-	ofs << latvec.e21 << " " << latvec.e22 << " " << latvec.e23 << " #latvec2" << std::endl;
-	ofs << latvec.e31 << " " << latvec.e32 << " " << latvec.e33 << " #latvec3" << std::endl;
+	context.set_context("vector3d");
+	context<<latvec.e11<<latvec.e12<<latvec.e13;
+	ofs << context.str() << " #latvec1" << std::endl; 
+	context<<latvec.e21<<latvec.e22<<latvec.e23;
+	ofs << context.str() << " #latvec2" << std::endl;
+	context<<latvec.e31<<latvec.e32<<latvec.e33;
+	ofs << context.str() << " #latvec3" << std::endl;
 	
 	ofs << "\nATOMIC_POSITIONS" << std::endl;
 
@@ -927,13 +932,20 @@ void UnitCell::print_stru_file(const std::string &fn, const int &type, const int
 			ofs << atoms[it].na << " #number of atoms" << std::endl;
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
-				ofs << atoms[it].tau[ia].x << "  " << atoms[it].tau[ia].y << "  " << atoms[it].tau[ia].z
-					<< "  m  " << atoms[it].mbl[ia].x << "  " << atoms[it].mbl[ia].y << "  " << atoms[it].mbl[ia].z;
+				context.set_context("vector3d");
+				context<<atoms[it].tau[ia].x<<atoms[it].tau[ia].y<<atoms[it].tau[ia].z;
+				ofs<<context.str()<<" m ";
+				context.set_context("vector3d_i");
+				context<<atoms[it].mbl[ia].x<<atoms[it].mbl[ia].y<<atoms[it].mbl[ia].z;
+				ofs<<context.str();
 
 				if(level == 1)
 				{
 					// output velocity
-					ofs << "  v  " << atoms[it].vel[ia].x << "  " << atoms[it].vel[ia].y << "  " << atoms[it].vel[ia].z << std::endl;
+					ofs <<" v ";
+					context.set_context("vector3d");
+					context<<atoms[it].vel[ia].x<<atoms[it].vel[ia].y<<atoms[it].vel[ia].z;
+					ofs<<context.str()<<std::endl;
 				}
 				else if(level == 2)
 				{
@@ -961,13 +973,19 @@ void UnitCell::print_stru_file(const std::string &fn, const int &type, const int
 			ofs << atoms[it].na << " #number of atoms" << std::endl;
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
-				ofs << atoms[it].taud[ia].x << "  " << atoms[it].taud[ia].y << "  " << atoms[it].taud[ia].z
-					<< "  m  " << atoms[it].mbl[ia].x << "  " << atoms[it].mbl[ia].y << "  " << atoms[it].mbl[ia].z;
+				context.set_context("vector3d");
+				context<<atoms[it].taud[ia].x<<atoms[it].taud[ia].y<<atoms[it].taud[ia].z;
+				ofs<<context.str()<<" m ";
+				context.set_context("vector3d_i");
+				context<<atoms[it].mbl[ia].x<<atoms[it].mbl[ia].y<<atoms[it].mbl[ia].z;
+				ofs<<context.str();
 
 				if(level == 1)
 				{
 					// output velocity
-					ofs << "  v  " << atoms[it].vel[ia].x << "  " << atoms[it].vel[ia].y << "  " << atoms[it].vel[ia].z << std::endl;
+					context.set_context("vector3d");
+					context<<atoms[it].vel[ia].x<<atoms[it].vel[ia].y<<atoms[it].vel[ia].z;
+					ofs <<" v "<<context.str()<<std::endl;
 				}
 				else if(level == 2)
 				{
@@ -1179,7 +1197,7 @@ void UnitCell::check_dtau(void)
 #ifdef __LCAO
 void UnitCell::read_orb_file(int it, std::string &orb_file, std::ofstream &ofs_running, Atom* atom)
 {
-	std::ifstream ifs(orb_file.c_str(), ios::in);  // pengfei 2014-10-13
+	std::ifstream ifs(orb_file.c_str(), std::ios::in);  // pengfei 2014-10-13
 	// mohan add return 2021-04-26
 	if (!ifs)
 	{

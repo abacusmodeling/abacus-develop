@@ -12,7 +12,8 @@ template <typename T>
 class OperatorLCAO : public Operator<T>
 {
   public:
-    OperatorLCAO(const std::vector<ModuleBase::Vector3<double>>& kvec_d_in):kvec_d(kvec_d_in){};
+    OperatorLCAO(LCAO_Matrix* LM_in, const std::vector<ModuleBase::Vector3<double>>& kvec_d_in)
+        : LM(LM_in), kvec_d(kvec_d_in){};
     virtual ~OperatorLCAO()
     {
         if (this->allocated_smatrix)
@@ -69,6 +70,15 @@ class OperatorLCAO : public Operator<T>
         return;
     }
 
+    /**
+     * @brief set_HR_fixed() is used for pass HR_fixed matrix to the next node in sub-chain table
+     * not used in base class, only be override in fixed Hamiltonian Operators (e.g. Ekinetic and Nonlocal)
+    */
+    virtual void set_HR_fixed(void*)
+    {
+        return;
+    }
+
     // protected:
     //  Hamiltonian matrix which are stored in LCAO_Matrix and calculated in OperatorLCAO
     LCAO_Matrix* LM = nullptr;
@@ -91,7 +101,8 @@ class OperatorLCAO : public Operator<T>
     // fixed HR matrix folding to HK
     void folding_fixed(const int ik, const std::vector<ModuleBase::Vector3<double>>& kvec_d);
 
-    // const std::vector<ModuleBase::Vector3<double>>& kvec_d;
+    // if HR is calculated
+    bool hr_done = false;
 };
 
 } // end namespace hamilt

@@ -50,7 +50,7 @@ K_Vectors::~K_Vectors()
 void Charge::set_rho_core(ModuleBase::ComplexMatrix const&)
 {
 }
-void Charge::init_rho(elecstate::efermi&, ModuleBase::ComplexMatrix const&)
+void Charge::init_rho(elecstate::efermi&, ModuleBase::ComplexMatrix const&, const int&, const int&)
 {
 }
 void Charge::set_rhopw(ModulePW::PW_Basis*)
@@ -76,7 +76,6 @@ void Set_GlobalV_Default()
     GlobalV::ESOLVER_TYPE = "ksdft";
     GlobalV::LSPINORB = false;
     GlobalV::BASIS_TYPE = "pw";
-    GlobalV::md_prec_level = 0;
     GlobalV::KPAR = 1;
     GlobalV::NPROC_IN_POOL = 1;
 }

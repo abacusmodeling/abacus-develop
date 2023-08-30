@@ -127,7 +127,7 @@ void ESolver_OF::Init(Input &inp, UnitCell &ucell)
                                                 &(this->pelec->f_en.etxc),
                                                 &(this->pelec->f_en.vtxc));
     //There is no Operator in ESolver_OF, register Potentials here!
-    std::vector<string> pot_register_in;
+    std::vector<std::string> pot_register_in;
     if (GlobalV::VION_IN_H)
     {
         pot_register_in.push_back("local");
@@ -236,7 +236,7 @@ void ESolver_OF::Init(Input &inp, UnitCell &ucell)
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT KEDF");
 
     // Initialize charge extrapolation
-    CE.Init_CE(this->pw_rho->nrxx);
+    CE.Init_CE(GlobalC::ucell.nat);
     delete this->ptempRho;
     this->ptempRho = new Charge();
     this->ptempRho->set_rhopw(this->pw_rho);
@@ -249,8 +249,126 @@ void ESolver_OF::init_after_vc(Input &inp, UnitCell &ucell)
 
     ESolver_FP::init_after_vc(inp,ucell);
 
+    this->nrxx = this->pw_rho->nrxx;
+    this->dV = ucell.omega / this->pw_rho->nxyz; // volume of one point in real space
+
+    if (GlobalV::md_prec_level == 2)
+    {
+        // initialize the real-space uniform grid for FFT and parallel
+        // distribution of plane waves
+        GlobalC::Pgrid.init(this->pw_rho->nx,
+                            this->pw_rho->ny,
+                            this->pw_rho->nz,
+                            this->pw_rho->nplane,
+                            this->pw_rho->nrxx,
+                            pw_big->nbz,
+                            pw_big->bz); // mohan add 2010-07-22, update 2011-05-04
+
+        // Calculate Structure factor
+        this->sf.setup_structure_factor(&ucell, this->pw_rho);
+    }
+
+    delete this->pelec;
+    this->pelec = new elecstate::ElecState((Charge*)(&chr), this->pw_rho, pw_big);
+
+    this->pelec->charge->allocate(GlobalV::NSPIN);
+    this->pelec->omega = GlobalC::ucell.omega;
+
+    delete this->pelec->pot;
+    this->pelec->pot = new elecstate::Potential(this->pw_rho,
+                                                &GlobalC::ucell,
+                                                &(GlobalC::ppcell.vloc),
+                                                &(this->sf),
+                                                &(this->pelec->f_en.etxc),
+                                                &(this->pelec->f_en.vtxc));
+    //There is no Operator in ESolver_OF, register Potentials here!
+    std::vector<std::string> pot_register_in;
+    if (GlobalV::VION_IN_H)
+    {
+        pot_register_in.push_back("local");
+    }
+    if (GlobalV::VH_IN_H)
+    {
+        pot_register_in.push_back("hartree");
+    }
+    //no variable can choose xc, maybe it is necessary
+    pot_register_in.push_back("xc");
+    if (GlobalV::imp_sol)
+    {
+        pot_register_in.push_back("surchem");
+    }
+    if (GlobalV::EFIELD_FLAG)
+    {
+        pot_register_in.push_back("efield");
+    }
+    if (GlobalV::GATE_FLAG)
+    {
+        pot_register_in.push_back("gatefield");
+    }
+    //only Potential is not empty, Veff and Meta are available
+    if(pot_register_in.size()>0)
+    {
+        //register Potential by gathered operator
+        this->pelec->pot->pot_register(pot_register_in);
+    }
+
+    // ================================
+    // Initialize optimization methods
+    // ================================
+    if (this->of_method == "tn")
+    {
+        this->opt_tn.allocate(this->nrxx);
+        this->opt_tn.setPara(this->dV);
+    }
+    else if (this->of_method == "cg1" || this->of_method == "cg2")
+    {
+        this->opt_cg.allocate(this->nrxx);
+        this->opt_cg.setPara(this->dV);
+        this->opt_dcsrch.set_paras(1e-4,1e-2);
+    }
+    else if (this->of_method == "bfgs")
+    {
+        ModuleBase::WARNING_QUIT("esolver_of", "BFGS is not supported now.");
+        return;
+    }
+
     GlobalC::ppcell.init_vnl(GlobalC::ucell);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"NON-LOCAL POTENTIAL");
+
+    for (int is = 0; is < GlobalV::NSPIN; ++is)
+    {
+        delete[] this->pdLdphi[is];
+        delete[] this->pdEdphi[is];
+        delete[] this->pdirect[is];
+        delete[] this->precipDir[is];
+        this->pdLdphi[is] = new double[this->nrxx];
+        this->pdEdphi[is] = new double[this->nrxx];
+        this->pdirect[is] = new double[this->nrxx];
+        this->precipDir[is] = new std::complex<double>[pw_rho->npw];
+    }
+
+    // ===================================
+    // Initialize KEDF
+    // ===================================
+    this->tf.set_para(this->nrxx, this->dV, GlobalV::of_tf_weight);
+    this->vw.set_para(this->nrxx, this->dV, GlobalV::of_vw_weight);
+    this->wt.set_para(this->nrxx,
+                      this->dV,
+                      GlobalV::of_wt_alpha,
+                      GlobalV::of_wt_beta,
+                      this->nelec[0],
+                      GlobalV::of_tf_weight,
+                      GlobalV::of_vw_weight,
+                      GlobalV::of_read_kernel,
+                      GlobalV::of_kernel_file,
+                      this->pw_rho);
+    this->lkt.set_para(this->nrxx, this->dV, GlobalV::of_lkt_a);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT KEDF");
+
+    delete this->ptempRho;
+    this->ptempRho = new Charge();
+    this->ptempRho->set_rhopw(this->pw_rho);
+    this->ptempRho->allocate(GlobalV::NSPIN);
 }
 
 void ESolver_OF::Run(int istep, UnitCell& ucell)
@@ -285,7 +403,7 @@ void ESolver_OF::Run(int istep, UnitCell& ucell)
         this->iter++;
     }
 
-    this->afterOpt();
+    this->afterOpt(istep);
 
     ModuleBase::timer::tick("ESolver_OF", "Run");
 }
@@ -299,10 +417,16 @@ void ESolver_OF::beforeOpt(const int istep)
     {
         this->init_after_vc(INPUT, GlobalC::ucell);
     }
-    if (GlobalC::ucell.ionic_position_updated && GlobalV::md_prec_level != 2)
+    if (GlobalC::ucell.ionic_position_updated)
     {
         CE.update_all_dis(GlobalC::ucell);
-        CE.extrapolate_charge(pelec->charge, &(sf));
+        CE.extrapolate_charge(
+#ifdef __MPI
+            &(GlobalC::Pgrid),
+#endif
+            GlobalC::ucell,
+            pelec->charge,
+            &(sf));
     }
 
     this->pelec->init_scf(istep, sf.strucFac);
@@ -450,12 +574,12 @@ void ESolver_OF::solveV()
     {
         if (dEdtheta[is] > dEdthetaThre)
         {
-            cout << "dEdtheta    " << dEdtheta[is] << endl;
+            std::cout << "dEdtheta    " << dEdtheta[is] << std::endl;
             ModuleBase::WARNING_QUIT("esolver_of.cpp", "dE/dtheta is too large.");
         }
         else if (dEdtheta[is] > 0)
         {
-            GlobalV::ofs_warning << "ESolver_OF: WARNING " << "dEdphi > 0, replace direct with steepest descent method." << endl;
+            GlobalV::ofs_warning << "ESolver_OF: WARNING " << "dEdphi > 0, replace direct with steepest descent method." << std::endl;
             for (int ir = 0; ir < this->nrxx; ++ir)
             {
                 this->pdirect[is][ir] = - this->pdLdphi[is][ir];
@@ -464,12 +588,12 @@ void ESolver_OF::solveV()
             this->caldEdtheta(ptempPhi, this->ptempRho, tempTheta, dEdtheta);
             if (dEdtheta[is] > dEdthetaThre)
             {
-                cout << "dEdtheta    " << dEdtheta[is] << endl;
+                std::cout << "dEdtheta    " << dEdtheta[is] << std::endl;
                 ModuleBase::WARNING_QUIT("esolver_of.cpp", "dE/dtheta is too large.");
             }
             else if (dEdtheta[is] > 0)
             {
-                GlobalV::ofs_warning << "ESolver_OF: WARNING " << "when use steepest dencent method, dEdphi > 0, so we might get minimum." << endl;
+                GlobalV::ofs_warning << "ESolver_OF: WARNING " << "when use steepest dencent method, dEdphi > 0, so we might get minimum." << std::endl;
             }
         }
     }
@@ -538,7 +662,7 @@ void ESolver_OF::solveV()
 
                 if (numDC > this->maxDCsrch)
                 {
-                    GlobalV::ofs_warning << "ESolver_OF linesearch: WARNING " << "excedd the max iter number." << endl;
+                    GlobalV::ofs_warning << "ESolver_OF linesearch: WARNING " << "excedd the max iter number." << std::endl;
                     break;
                 }
             }
@@ -549,13 +673,13 @@ void ESolver_OF::solveV()
             else if (strncmp(this->task, "WA", 2) == 0) // warning of line search
             {
                 GlobalV::ofs_warning << "ESolver_OF linesearch: WARNING " << this->task << std::endl;
-                cout << this->task << endl;
+                std::cout << this->task << std::endl;
                 break;
             }
             else if (strncmp(this->task, "ER", 2) == 0) // ERROR in line search
             {
                 GlobalV::ofs_warning << "ESolver_OF linesearch: ERROR " << this->task << std::endl;
-                cout << this->task << endl;
+                std::cout << this->task << std::endl;
                 break;
             }
         }
@@ -711,7 +835,7 @@ void ESolver_OF::getNextDirect()
         }
 
         tempTheta = normDir/tempTheta;
-        this->theta[0] = min(this->theta[0], tempTheta);
+        this->theta[0] = std::min(this->theta[0], tempTheta);
     }
     else if (GlobalV::NSPIN == 2) // theta = 0
     {
@@ -806,13 +930,13 @@ bool ESolver_OF::checkExit()
     if (this->normdLdphi < this->of_tolp)
         potConv = true;
     if (this->iter >= 3
-        && abs(this->normdLdphi - this->normdLdphi_last) < 1e-10
-        && abs(this->normdLdphi - this->normdLdphi_llast) < 1e-10)
+        && std::abs(this->normdLdphi - this->normdLdphi_last) < 1e-10
+        && std::abs(this->normdLdphi - this->normdLdphi_llast) < 1e-10)
         potHold = true;
 
     if (this->iter >= 3
-        && abs(this->energy_current - this->energy_last) < this->of_tole
-        && abs(this->energy_current - this->energy_llast) < this->of_tole)
+        && std::abs(this->energy_current - this->energy_last) < this->of_tole
+        && std::abs(this->energy_current - this->energy_llast) < this->of_tole)
         energyConv = true;
 
     if (this->of_conv == "energy" && energyConv)
@@ -829,7 +953,7 @@ bool ESolver_OF::checkExit()
     else if (this->of_conv == "potential" && potHold)
     {
         GlobalV::ofs_warning << "ESolver_OF WARNING: " <<
-        "The convergence of potential has not been reached, but the norm of potential nearly remains unchanged, set of_full_pw = 1 may work." << endl;
+        "The convergence of potential has not been reached, but the norm of potential nearly remains unchanged, set of_full_pw = 1 may work." << std::endl;
         return true;
     }
     // ====================================================================
@@ -854,8 +978,8 @@ bool ESolver_OF::checkExit()
 void ESolver_OF::printInfo()
 {
     if (this->iter == 0){
-        cout << "======================== Running OFDFT ========================" <<  endl;
-        cout << "Iter        Etot(Ha)          Theta      PotNorm     deltaE(Ha)" << endl;
+        std::cout << "======================== Running OFDFT ========================" <<  std::endl;
+        std::cout << "Iter        Etot(Ha)          Theta      PotNorm     deltaE(Ha)" << std::endl;
         // cout << "======================================== Running OFDFT ========================================" <<  endl;
         // cout << "Iter        Etot(Ha)          Theta       PotNorm        min/max(den)          min/max(dE/dPhi)" << endl;
         // cout << "============================================ OFDFT ========================================" <<  endl;
@@ -873,11 +997,11 @@ void ESolver_OF::printInfo()
     //     if (this->pdEdphi[0][i] < minPot) minPot = this->pdEdphi[0][i];
     //     if (this->pdEdphi[0][i] > maxPot) maxPot = this->pdEdphi[0][i];
     // }
-    cout << setw(6) << this->iter
-    << setw(22) << setiosflags(ios::scientific) << setprecision(12) << this->energy_current/2.
-    << setw(12) << setprecision(3) << this->theta[0]
-    << setw(12) << this->normdLdphi
-    << setw(12) << (this->energy_current - this->energy_last)/2. << endl;
+    std::cout << std::setw(6) << this->iter
+    << std::setw(22) << std::setiosflags(std::ios::scientific) << std::setprecision(12) << this->energy_current/2.
+    << std::setw(12) << std::setprecision(3) << this->theta[0]
+    << std::setw(12) << this->normdLdphi
+    << std::setw(12) << (this->energy_current - this->energy_last)/2. << std::endl;
     // ============ test new convergence criterion =================
     // << setw(12) << this->deltaRhoG
     // << setw(12) << this->deltaRhoR
@@ -888,9 +1012,21 @@ void ESolver_OF::printInfo()
     // =============================================================
 }
 
-void ESolver_OF::afterOpt()
+void ESolver_OF::afterOpt(const int istep)
 {
     ModuleIO::output_convergence_after_scf(this->conv, this->pelec->f_en.etot);
+
+    // save charge difference into files for charge extrapolation
+    if (GlobalV::CALCULATION != "scf")
+    {
+        this->CE.save_files(istep,
+                            GlobalC::ucell,
+#ifdef __MPI
+                            this->pw_big,
+#endif
+                            this->pelec->charge,
+                            &this->sf);
+    }
 
     for (int is = 0; is < GlobalV::NSPIN; is++)
     {
@@ -926,8 +1062,8 @@ void ESolver_OF::afterOpt()
             ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT.cube";
             ModuleIO::write_potential(
 #ifdef __MPI
-                pw_big->bz,
-                pw_big->nbz,
+                this->pw_big->bz,
+                this->pw_big->nbz,
                 this->pw_rho->nplane,
                 this->pw_rho->startz_current,
 #endif
@@ -940,6 +1076,23 @@ void ESolver_OF::afterOpt()
                 this->pelec->pot->get_effective_v(),
                 precision);
         }
+    }
+    if (GlobalV::out_pot == 2) // output the static electronic potential, sunliang 2023-08-11
+    {
+        int precision = 3;
+        std::stringstream ssp;
+        ssp << GlobalV::global_out_dir << "/ElecStaticPot.cube";
+        ModuleIO::write_elecstat_pot(
+#ifdef __MPI
+            this->pw_big->bz,
+            this->pw_big->nbz,
+#endif
+            ssp.str(),
+            this->pw_rho,
+            this->pelec->charge,
+            &(GlobalC::ucell),
+            this->pelec->pot->get_fixed_v()
+        );
     }
 }
 

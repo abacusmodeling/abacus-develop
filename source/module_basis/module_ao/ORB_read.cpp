@@ -6,7 +6,6 @@
 #include "module_base/parallel_common.h"
 #include <algorithm>
 #include "module_base/timer.h"
-using namespace std;
 
 //==============================
 // Define an object here! 
@@ -37,6 +36,11 @@ LCAO_Orbitals::~LCAO_Orbitals()
 {
 	delete[] Phi;
 	delete[] Alpha;
+}
+
+const LCAO_Orbitals& LCAO_Orbitals::get_const_instance()
+{
+	return GlobalC::ORB;
 }
 
 #ifdef __MPI
