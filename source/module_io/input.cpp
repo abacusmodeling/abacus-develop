@@ -234,6 +234,9 @@ void Input::Default(void)
     gamma_only_local = false;
     ecutwfc = 50.0;
     ecutrho = 0.0;
+    erf_ecut = 0.0;
+    erf_height = 0.0;
+    erf_sigma = 0.1;
     ncx = 0;
     ncy = 0;
     ncz = 0;
@@ -1011,6 +1014,18 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("bz", word) == 0)
         {
             read_value(ifs, bz);
+        }
+        else if (strcmp("erf_ecut", word) == 0)
+        {
+            read_value(ifs, erf_ecut);
+        }
+        else if (strcmp("erf_height", word) == 0)
+        {
+            read_value(ifs, erf_height);
+        }
+        else if (strcmp("erf_sigma", word) == 0)
+        {
+            read_value(ifs, erf_sigma);
         }
         //----------------------------------------------------------
         // diagonalization
@@ -2756,10 +2771,6 @@ void Input::Default_2(void) // jiyy add 2019-08-04
     {
         mdp.md_prec_level = 0;
     }
-    if (mdp.md_prec_level != 1)
-    {
-        ref_cell_factor = 1.0;
-    }
 
     if (scf_thr == -1.0)
     {
@@ -2892,6 +2903,9 @@ void Input::Bcast()
     Parallel_Common::bcast_int(bx);
     Parallel_Common::bcast_int(by);
     Parallel_Common::bcast_int(bz);
+    Parallel_Common::bcast_double(erf_ecut);
+    Parallel_Common::bcast_double(erf_height);
+    Parallel_Common::bcast_double(erf_sigma);
 
     Parallel_Common::bcast_int(diago_proc); // mohan add 2012-01-03
     Parallel_Common::bcast_int(pw_diag_nmax);
@@ -3339,10 +3353,6 @@ void Input::Check(void)
             {
                 ModuleBase::WARNING_QUIT("Input::Check", "Can not find DP model !");
             }
-        }
-        if (mdp.md_prec_level == 1 && !(mdp.md_type == "npt" && mdp.md_pmode == "iso"))
-        {
-            ModuleBase::WARNING_QUIT("Input::Check", "md_prec_level = 1 only used in isotropic vc-md currently!");
         }
     }
     else if (calculation == "gen_bessel")
