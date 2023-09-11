@@ -37,6 +37,9 @@
 #include "module_io/write_wfc_r.h"
 #include "module_psi/kernels/device.h"
 
+#ifdef USE_PAW
+#include "module_cell/module_paw/paw_cell.h"
+#endif
 #include <ATen/kernels/blas_op.h>
 #include <ATen/kernels/lapack_op.h>
 
@@ -271,6 +274,19 @@ void ESolver_KS_PW<FPTYPE, Device>::init_after_vc(Input& inp, UnitCell& ucell)
         this->wf.init_after_vc(this->kv.nks);
         this->wf.init_at_1(&this->sf);
     }
+
+#ifdef USE_PAW
+    if(GlobalV::use_paw)
+    {
+        // ecutrho / 2 = ecutwfc * 2
+        GlobalC::paw_cell.set_libpaw_ecut(INPUT.ecutwfc/2.0,INPUT.ecutwfc*2.0); //in Hartree
+        GlobalC::paw_cell.set_libpaw_fft(this->pw_wfc->nx,this->pw_wfc->ny,this->pw_wfc->nz,
+                                         this->pw_wfc->nx,this->pw_wfc->ny,this->pw_wfc->nz);
+
+        GlobalC::paw_cell.prepare_paw();
+    }
+#endif
+
     ModuleBase::timer::tick("ESolver_KS_PW", "init_after_vc");
 }
 
