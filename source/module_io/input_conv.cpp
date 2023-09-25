@@ -608,6 +608,8 @@ void Input_Conv::Convert(void)
     GlobalV::OUT_FREQ_ELEC = INPUT.out_freq_elec;
     GlobalV::OUT_FREQ_ION = INPUT.out_freq_ion;
     GlobalV::init_chg = INPUT.init_chg;
+    GlobalV::init_wfc = INPUT.init_wfc;
+    GlobalV::psi_initializer = INPUT.psi_initializer;
     GlobalV::chg_extrap = INPUT.chg_extrap; // xiaohui modify 2015-02-01
     GlobalV::out_chg = INPUT.out_chg;
     GlobalV::nelec = INPUT.nelec;
