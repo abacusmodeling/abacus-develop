@@ -1,9 +1,10 @@
 #include "elecstate_lcao.h"
 
 #include "cal_dm.h"
-#include "module_elecstate/module_dm/cal_dm_psi.h"
 #include "module_base/timer.h"
+#include "module_elecstate/module_dm/cal_dm_psi.h"
 #include "module_hamilt_general/module_xc/xc_functional.h"
+#include "module_hamilt_lcao/module_deltaspin/spin_constrain.h"
 #include "module_hamilt_lcao/module_gint/grid_technique.h"
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 
@@ -236,6 +237,19 @@ void ElecStateLCAO<TK>::init_DM(const K_Vectors* kv, const Parallel_Orbitals* pa
     this->DM = new DensityMatrix<TK,double>(kv, paraV, nspin);
 }
 
+template<>
+double ElecStateLCAO<double>::get_spin_constrain_energy()
+{
+    SpinConstrain<double, psi::DEVICE_CPU>& sc = SpinConstrain<double>::getScInstance();
+    return sc.cal_escon();
+}
+
+template<>
+double ElecStateLCAO<std::complex<double>>::get_spin_constrain_energy()
+{
+    SpinConstrain<std::complex<double>, psi::DEVICE_CPU>& sc = SpinConstrain<std::complex<double>>::getScInstance();
+    return sc.cal_escon();
+}
 
 template class ElecStateLCAO<double>; // Gamma_only case
 template class ElecStateLCAO<std::complex<double>>; // multi-k case
