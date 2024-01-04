@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 
+#ifdef __RAPIDJSON
+
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
@@ -555,3 +557,4 @@ namespace Para_Json
     }
 }
 
+#endif

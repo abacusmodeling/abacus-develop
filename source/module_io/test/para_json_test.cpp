@@ -1,9 +1,14 @@
 #include "gtest/gtest.h"
 #include "module_base/global_variable.h"
+#ifdef __RAPIDJSON 
 #include "module_base/para_json.h"
+#endif
 #ifdef __MPI
 #include "mpi.h"
 #endif
+
+
+
 #include <stdlib.h>
 #include "rapidjson/document.h"
 /************************************************
@@ -27,6 +32,7 @@ protected:
 
 #ifdef __MPI
 
+#ifdef __RAPIDJSON 
 // check if a string is a valid JSON string
 bool isValidJSON(const std::string& jsonString) {
     rapidjson::Document document;
@@ -68,7 +74,7 @@ TEST_F(ParaJsonTest,Init)
 	}
 }
 
-
+#endif
 
 int main(int argc, char **argv)
 {
@@ -78,7 +84,10 @@ int main(int argc, char **argv)
 	MPI_Comm_size(MPI_COMM_WORLD,&GlobalV::NPROC);
 	MPI_Comm_rank(MPI_COMM_WORLD,&GlobalV::MY_RANK);
 
-	int result = RUN_ALL_TESTS();
+	int result;
+#ifdef __RAPIDJSON
+	result = RUN_ALL_TESTS();
+#endif
 	MPI_Finalize();
 	return result;
 }

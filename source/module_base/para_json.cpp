@@ -1,7 +1,7 @@
-
 #include "para_json.h"
 #include "module_base/global_variable.h"
 
+#ifdef __RAPIDJSON
 
 namespace Para_Json
 {
@@ -972,3 +972,6 @@ namespace Para_Json
 
 
 }
+
+
+#endif
