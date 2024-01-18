@@ -40,7 +40,7 @@ option(ENABLE_RAPIDJSON "Enable rapid-json usage." OFF)
 
 # enable json support
 if(ENABLE_RAPIDJSON)
-  find_package(RapidJSON REQUIRED)
+  find_package(RapidJSON)
   if(NOT RapidJSON_FOUND)
     message(WARNING "Rapidjson is not found, trying downloading from github, or you can install Rapidjson first and reinstall abacus.")
     include(FetchContent)
@@ -51,7 +51,7 @@ if(ENABLE_RAPIDJSON)
       GIT_SHALLOW TRUE
       GIT_PROGRESS TRUE
     )
-    FetchContent_MakeAvailable(googletest)
+    FetchContent_MakeAvailable(rapidjson)
   endif()
   add_compile_definitions(__RAPIDJSON)
   include_directories(${RapidJSON_INCLUDE_PATH})
