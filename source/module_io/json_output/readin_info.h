@@ -1,5 +1,3 @@
-#ifndef READIN_INFO_H
-#define READIN_INFO_H
 #include "module_cell/module_symmetry/symmetry.h"
 #include "module_cell/atom_spec.h"
 #include "module_cell/unitcell.h"
@@ -18,4 +16,3 @@ namespace Json
 
 #endif
 }
-#endif

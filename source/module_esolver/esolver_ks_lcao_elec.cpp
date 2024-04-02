@@ -138,18 +138,13 @@ void ESolver_KS_LCAO<TK, TR>::beforesolver(const int istep)
     {
         elecstate::DensityMatrix<TK, double>* DM = dynamic_cast<elecstate::ElecStateLCAO<TK>*>(this->pelec)->get_DM();
         this->p_hamilt = new hamilt::HamiltLCAO<TK, TR>(GlobalV::GAMMA_ONLY_LOCAL ? &(this->UHM.GG) : nullptr,
-            GlobalV::GAMMA_ONLY_LOCAL ? nullptr : &(this->UHM.GK),
-            &(this->UHM.genH),
-            &(this->LM),
-            &(this->LOC),
-            this->pelec->pot,
-            this->kv,
-#ifdef __EXX
-            DM,
-            GlobalC::exx_info.info_ri.real_number ? &this->exd->two_level_step : &this->exc->two_level_step);
-#else
-            DM);
-#endif
+                                                        GlobalV::GAMMA_ONLY_LOCAL ? nullptr : &(this->UHM.GK),
+                                                        &(this->UHM.genH),
+                                                        &(this->LM),
+                                                        &(this->LOC),
+                                                        this->pelec->pot,
+                                                        this->kv,
+                                                        DM);
     }
     // init density kernel and wave functions.
     this->LOC.allocate_dm_wfc(this->GridT, this->pelec, this->LOWF, this->psi, this->kv, istep);
@@ -179,9 +174,6 @@ void ESolver_KS_LCAO<TK, TR>::beforesolver(const int istep)
                 this->GridT.nnrg,
                 this->GridT.trace_lo,
 #endif
-                GlobalV::GAMMA_ONLY_LOCAL,
-                GlobalV::NLOCAL,
-                GlobalV::NSPIN,
                 is,
                 ssd.str(),
                 this->LOC.DM,
@@ -301,14 +293,6 @@ void ESolver_KS_LCAO<TK, TR>::beforescf(int istep)
     }
 
     this->beforesolver(istep);
-    // Peize Lin add 2016-12-03
-#ifdef __EXX    // set xc type before the first cal of xc in pelec->init_scf
-    if (GlobalC::exx_info.info_ri.real_number)
-        this->exd->exx_beforescf(this->kv, *this->p_chgmix);
-    else
-        this->exc->exx_beforescf(this->kv, *this->p_chgmix);
-#endif // __EXX
-
     this->pelec->init_scf(istep, this->sf.strucFac);
     // initalize DMR
     // DMR should be same size with Hamiltonian(R)
@@ -323,6 +307,13 @@ void ESolver_KS_LCAO<TK, TR>::beforescf(int istep)
     {
         srho.begin(is, *(this->pelec->charge), this->pw_rho, GlobalC::Pgrid, GlobalC::ucell.symm);
     }
+// Peize Lin add 2016-12-03
+#ifdef __EXX
+    if (GlobalC::exx_info.info_ri.real_number)
+        this->exd->exx_beforescf(this->kv, *this->p_chgmix);
+    else
+        this->exc->exx_beforescf(this->kv, *this->p_chgmix);
+#endif // __EXX
        // 1. calculate ewald energy.
        // mohan update 2021-02-25
     if (!GlobalV::test_skip_ewald)
@@ -411,13 +402,7 @@ void ESolver_KS_LCAO<TK, TR>::othercalculation(const int istep)
                       this->UHM.GG,
                       INPUT.out_wfc_pw,
                       this->wf.out_wfc_r,
-                      this->kv,
-                      GlobalV::nelec,
-                      GlobalV::NBANDS_ISTATE,
-                      GlobalV::NBANDS,
-                      GlobalV::NSPIN,
-                      GlobalV::NLOCAL,
-                      GlobalV::global_out_dir);
+                      this->kv);
         else
             IEP.begin(this->psi,
                       this->pw_rho,
@@ -427,13 +412,7 @@ void ESolver_KS_LCAO<TK, TR>::othercalculation(const int istep)
                       this->UHM.GK,
                       INPUT.out_wfc_pw,
                       this->wf.out_wfc_r,
-                      this->kv,
-                      GlobalV::nelec,
-                      GlobalV::NBANDS_ISTATE,
-                      GlobalV::NBANDS,
-                      GlobalV::NSPIN,
-                      GlobalV::NLOCAL,
-                      GlobalV::global_out_dir);
+                      this->kv);
     }
     else
     {

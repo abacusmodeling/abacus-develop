@@ -74,11 +74,10 @@ class Charge_Mixing
     void mix_dmr(elecstate::DensityMatrix<std::complex<double>, double>* DM);
     
     /**
-     * @brief Get the drho between rho and rho_save, similar for get_dkin
+     * @brief Get the drho
      *
      */
     double get_drho(Charge* chr, const double nelec);
-    double get_dkin(Charge* chr, const double nelec);
 
     /**
      * @brief reset mixing, actually we only call init_mixing() to reset mixing instead of this function 

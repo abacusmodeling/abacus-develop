@@ -154,9 +154,8 @@ AddTest(
   LIBS base ${math_libs} device numerical_atomic_orbitals container orb
   SOURCES 
   to_qo_test.cpp
-  ../to_qo_kernel.cpp
-  ../to_qo_mpi.cpp
-  ../to_qo_structures.cpp
+  ../to_qo.cpp
+  ../to_qo_tools.cpp
   ../../module_cell/atom_spec.cpp
   ../../module_cell/parallel_kpoints.cpp
   ../../module_cell/test/support/mock_unitcell.cpp

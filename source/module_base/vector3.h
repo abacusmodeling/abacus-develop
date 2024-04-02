@@ -160,7 +160,7 @@ template <class T> class Vector3
     T &operator[](int index)
     {
         //return (&x)[index]; // this is undefind behavior and breaks with icpx
-        T* ptr[3] = {&x, &y, &z};
+        T* ptr[4] = {&x, &y, &z};
         return *ptr[index];
     }
 

@@ -12,9 +12,6 @@ void read_dm(
 	const int nnrg,
 	const int* trace_lo,
 #endif
-	const bool gamma_only_local,
-	const int nlocal,
-	const int nspin,
 	const int &is,
 	const std::string &fn,
 	double*** DM,
@@ -33,10 +30,7 @@ void write_dm(
 	int out_dm,
 	double*** DM,
 	const double& ef,
-	const UnitCell* ucell,
-    const int my_rank,
-    const int nspin,
-    const int nlocal);
+	const UnitCell* ucell);
 
 }
 

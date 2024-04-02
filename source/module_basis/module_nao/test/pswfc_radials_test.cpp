@@ -2,16 +2,11 @@
 #include "module_basis/module_nao/pswfc_radials.h"
 #include <fstream>
 
-#ifdef __MPI
-#include <mpi.h>
-#endif
-
 class PswfcRadialsTest : public ::testing::Test {
     protected:
         virtual void SetUp() {
-#ifdef __MPI
-            MPI_Comm_rank(MPI_COMM_WORLD, &GlobalV::MY_RANK);
-#endif
+            // code here will execute just before the test ensues 
+            // (each TEST_F)
         }
         virtual void TearDown() {
             // code here will be called just after the test completes
@@ -169,18 +164,8 @@ TEST_F(PswfcRadialsTest, Build)
 
 int main(int argc, char** argv)
 {
-
-#ifdef __MPI
-    MPI_Init(&argc, &argv);
-#endif
-
     std::cout << "Current getcwd: " << getcwd(nullptr, 0) << std::endl;
     testing::InitGoogleTest(&argc, argv);
     int result = RUN_ALL_TESTS();
-
-#ifdef __MPI
-    MPI_Finalize();
-#endif
-
     return result;
 }

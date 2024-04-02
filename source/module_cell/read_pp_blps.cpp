@@ -66,25 +66,11 @@ int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
         ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_blps", msg);
     }
 
-    if (pspcod == 8)
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            ifs.ignore(300, '\n');
-        }
-    }
-    else if (pspcod == 6)
-    {
-        for (int i = 0; i < 17; ++i)
-        {
-            ifs.ignore(300, '\n');
-        }
-    }
-    else
-    {
-        std::string msg = "Unknown pspcod: " + std::to_string(pspcod);
-        ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_blps", msg);
-    }
+    ifs.ignore(300, '\n');
+    ifs.ignore(300, '\n');
+    ifs.ignore(300, '\n');
+    ifs.ignore(300, '\n');
+    ifs.ignore(300, '\n');
 
     assert(mesh > 0);
 
@@ -97,23 +83,11 @@ int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
     ModuleBase::GlobalFunc::ZEROS(r,mesh);
     ModuleBase::GlobalFunc::ZEROS(rab,mesh);
     ModuleBase::GlobalFunc::ZEROS(vloc,mesh);
-    int num = 0;
-    if (pspcod == 8)
+    int num;
+    for(int i = 0;i < mesh; ++i)
     {
-        for(int i = 0;i < mesh; ++i)
-        {
-            ifs >> num >> this->r[i] >> this->vloc[i];
-            this->vloc[i] = this->vloc[i]*2; // Hartree to Ry
-        }
-    }
-    else if (pspcod == 6)
-    {
-        double temp = 0.;
-        for(int i = 0;i < mesh; ++i)
-        {
-            ifs >> num >> this->r[i] >> temp >> this->vloc[i];
-            this->vloc[i] = this->vloc[i]*2; // Hartree to Ry
-        }
+        ifs >> num >> this->r[i] >> this->vloc[i];
+        this->vloc[i] = this->vloc[i]*2; // Hartree to Ry
     }
     rab[0] = r[1] - r[0];
     for(int i = 1; i < mesh - 1; ++i)

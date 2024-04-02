@@ -1713,6 +1713,10 @@ void UnitCell::cal_nelec(double& nelec)
 
 void UnitCell::compare_atom_labels(std::string label1, std::string label2)
 {
+	if(label1.isEmpty()){
+		ModuleBase::WARNING_QUIT("UnitCell::compare_atom_labels","label1 is empty!");
+		return;
+	}
     if (label1 != label2) //'!( "Ag" == "Ag" || "47" == "47" || "Silver" == Silver" )'
     {	
         atom_in ai;

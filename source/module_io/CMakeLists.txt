@@ -61,9 +61,8 @@ if(ENABLE_LCAO)
       sparse_matrix.cpp
       file_reader.cpp
       csr_reader.cpp
-      to_qo_kernel.cpp
-      to_qo_mpi.cpp
-      to_qo_structures.cpp
+      to_qo.cpp
+      to_qo_tools.cpp
   )
   list(APPEND objects_advanced
       unk_overlap_lcao.cpp

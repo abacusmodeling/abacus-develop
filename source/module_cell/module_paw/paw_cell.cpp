@@ -419,14 +419,21 @@ double Paw_Cell::ass_leg_pol(const int l, const int m, const double arg)
         }
         else
         {
-            double pll;
-            for(int ll = m+2; ll < l+1; ll ++)
+
+            if (m+1<l)
             {
-                pll = (x*(2.0*ll-1.0)*tmp1-(ll+m-1.0)*polmm)/double(ll-m);
-                polmm = tmp1;
-                tmp1 = pll;
+                double pll = 0.0;
+                for(int ll = m+2; ll < l+1; ll ++)
+                {
+                    pll = (x*(2.0*ll-1.0)*tmp1-(ll+m-1.0)*polmm)/double(ll-m);
+                    polmm = tmp1;
+                    tmp1 = pll;
+                }
+                return pll;
+            } else {
+                ModuleBase::WARNING_QUIT("Paw_Cell","l is too small");
+                return 0.0;
             }
-            return pll;
         }
     }
 }

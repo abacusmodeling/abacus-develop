@@ -21,13 +21,7 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
                             Gint_Gamma& gg,
                             int& out_wfc_pw,
                             int& out_wfc_r,
-                            const K_Vectors& kv,
-                            const double nelec,
-                            const int nbands_istate,
-                            const int nbands,
-                            const int nspin,
-                            const int nlocal,
-                            const std::string& global_out_dir)
+                            const K_Vectors& kv)
 {
     ModuleBase::TITLE("IState_Envelope", "begin");
 
@@ -38,11 +32,11 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
     // if ucell is odd, it's correct,
     // if ucell is even, it's also correct.
     // +1.0e-8 in case like (2.999999999+1)/2
-    int fermi_band = static_cast<int>((nelec + 1) / 2 + 1.0e-8);
-    int bands_below = nbands_istate;
-    int bands_above = nbands_istate;
+    int fermi_band = static_cast<int>((GlobalV::nelec + 1) / 2 + 1.0e-8);
+    int bands_below = GlobalV::NBANDS_ISTATE;
+    int bands_above = GlobalV::NBANDS_ISTATE;
 
-    std::cout << " number of electrons = " << nelec << std::endl;
+    std::cout << " number of electrons = " << GlobalV::nelec << std::endl;
     std::cout << " number of occupied bands = " << fermi_band << std::endl;
     std::cout << " plot band decomposed charge density below fermi surface with "
         << bands_below << " bands." << std::endl;
@@ -59,9 +53,9 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
     // get the charge density.
 
     // (2.3) output the charge density in .cub format.
-    this->bands_picked = new bool[nbands];
-    ModuleBase::GlobalFunc::ZEROS(bands_picked, nbands);
-    for (int ib = 0; ib < nbands; ib++)
+    this->bands_picked = new bool[GlobalV::NBANDS];
+    ModuleBase::GlobalFunc::ZEROS(bands_picked, GlobalV::NBANDS);
+    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
     {
         if (ib >= fermi_band - bands_below)
         {
@@ -73,11 +67,11 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
     }
 
     //allocate grid wavefunction for gamma_only
-    std::vector<double**> wfc_gamma_grid(nspin);
-    for (int is = 0; is < nspin; ++is)
+    std::vector<double**> wfc_gamma_grid(GlobalV::NSPIN);
+    for (int is = 0; is < GlobalV::NSPIN; ++is)
     {
-        wfc_gamma_grid[is] = new double* [nbands];
-        for (int ib = 0;ib < nbands; ++ib)
+        wfc_gamma_grid[is] = new double* [GlobalV::NBANDS];
+        for (int ib = 0;ib < GlobalV::NBANDS; ++ib)
             wfc_gamma_grid[is][ib] = new double[gg.gridt->lgd];
     }
 
@@ -86,15 +80,15 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
 
     if (out_wfc_pw || out_wfc_r)
     {
-        pw_wfc_g.resize(1, nbands, kv.ngk[0]);
+        pw_wfc_g.resize(1, GlobalV::NBANDS, kv.ngk[0]);
     }
 
 
-    for (int ib = 0; ib < nbands; ib++)
+    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
     {
         if (bands_picked[ib])
         {
-            for (int is = 0; is < nspin; ++is)
+            for (int is = 0; is < GlobalV::NSPIN; ++is)
             {
                 std::cout << " Perform envelope function for band " << ib + 1 << std::endl;
                 ModuleBase::GlobalFunc::ZEROS(pes->charge->rho[is], wfcpw->nrxx);
@@ -103,9 +97,9 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
 #ifdef __MPI
                 lowf.wfc_2d_to_grid(-1, 0, psid->get_pointer(), wfc_gamma_grid[is], this->pes->ekb, this->pes->wg);
 #else
-                for (int i = 0;i < nbands;++i)
+                for (int i = 0;i < GlobalV::NBANDS;++i)
                 {
-                    for (int j = 0;j < nlocal;++j)
+                    for (int j = 0;j < GlobalV::NLOCAL;++j)
                         wfc_gamma_grid[is][i][j] = psid[0](i, j);
                 }
 #endif
@@ -114,7 +108,7 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
 
                 pes->charge->save_rho_before_sum_band(); //xiaohui add 2014-12-09
                 std::stringstream ss;
-                ss << global_out_dir << "BAND" << ib + 1 << "_s_" << is + 1 << "_ENV.cube";
+                ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_s_" << is + 1 << "_ENV.cube";
                 const double ef_tmp = this->pes->eferm.get_efval(is);
                 ModuleIO::write_rho(
 #ifdef __MPI
@@ -125,7 +119,7 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
 #endif
                     pes->charge->rho_save[is],
                     is,
-                    nspin,
+                    GlobalV::NSPIN,
                     0,
                     ss.str(),
                     rhopw->nx,
@@ -136,7 +130,7 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
                     3);
 
                 if (out_wfc_pw || out_wfc_r) //only for gamma_only now
-                    this->set_pw_wfc(wfcpw, 0, ib, nspin,
+                    this->set_pw_wfc(wfcpw, 0, ib, GlobalV::NSPIN,
                         pes->charge->rho_save, pw_wfc_g);
             }
         }
@@ -145,9 +139,9 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
     if (out_wfc_pw)
     {
         std::stringstream ssw;
-        ssw << global_out_dir << "WAVEFUNC";
+        ssw << GlobalV::global_out_dir << "WAVEFUNC";
         std::cout << " write G-space wavefunction into \"" <<
-            global_out_dir << "/" << ssw.str() << "\" files." << std::endl;
+            GlobalV::global_out_dir << "/" << ssw.str() << "\" files." << std::endl;
         ModuleIO::write_wfc_pw(ssw.str(), pw_wfc_g, kv, wfcpw);
     }
     if (out_wfc_r)
@@ -156,9 +150,9 @@ void IState_Envelope::begin(const psi::Psi<double>* psid,
     }
 
     delete[] bands_picked;
-    for (int is = 0; is < nspin; ++is)
+    for (int is = 0; is < GlobalV::NSPIN; ++is)
     {
-        for (int ib = 0;ib < nbands; ++ib)
+        for (int ib = 0;ib < GlobalV::NBANDS; ++ib)
             delete[] wfc_gamma_grid[is][ib];
         delete[] wfc_gamma_grid[is];
     }
@@ -173,13 +167,7 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
                             Gint_k& gk,
                             int& out_wf,
                             int& out_wf_r,
-                            const K_Vectors& kv,
-                            const double nelec,
-                            const int nbands_istate,
-                            const int nbands,
-                            const int nspin,
-                            const int nlocal,
-                            const std::string& global_out_dir)
+                            const K_Vectors& kv)
 {
     ModuleBase::TITLE("IState_Envelope", "begin");
 
@@ -191,11 +179,11 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
     // if ucell is even, it's also correct.
     // +1.0e-8 in case like (2.999999999+1)/2
     // if NSPIN=4, each band only one electron, fermi_band should be nelec
-    int fermi_band = nspin<4 ? static_cast<int>((nelec + 1) / 2 + 1.0e-8) : nelec;
-    int bands_below = nbands_istate;
-    int bands_above = nbands_istate;
+    int fermi_band = GlobalV::NSPIN<4 ? static_cast<int>((GlobalV::nelec + 1) / 2 + 1.0e-8) : GlobalV::nelec;
+    int bands_below = GlobalV::NBANDS_ISTATE;
+    int bands_above = GlobalV::NBANDS_ISTATE;
 
-    std::cout << " number of electrons = " << nelec << std::endl;
+    std::cout << " number of electrons = " << GlobalV::nelec << std::endl;
     std::cout << " number of occupied bands = " << fermi_band << std::endl;
     std::cout << " plot band decomposed charge density below fermi surface with "
         << bands_below << " bands." << std::endl;
@@ -209,9 +197,9 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
     // get the charge density.
 
     // (2.3) output the charge density in .cub format.
-    this->bands_picked = new bool[nbands];
-    ModuleBase::GlobalFunc::ZEROS(bands_picked, nbands);
-    for (int ib = 0; ib < nbands; ib++)
+    this->bands_picked = new bool[GlobalV::NBANDS];
+    ModuleBase::GlobalFunc::ZEROS(bands_picked, GlobalV::NBANDS);
+    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
     {
         if (ib >= fermi_band - bands_below)
         {
@@ -227,14 +215,14 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
 
     if (out_wf || out_wf_r)
     {
-        pw_wfc_g.resize(kv.nks, nbands, wfcpw->npwk_max);
+        pw_wfc_g.resize(kv.nks, GlobalV::NBANDS, wfcpw->npwk_max);
     }
 
-    for (int ib = 0; ib < nbands; ib++)
+    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
     {
         if (bands_picked[ib])
         {
-            const int nspin0 = (nspin == 2) ? 2 : 1;
+            const int nspin0 = (GlobalV::NSPIN == 2) ? 2 : 1;
             for (int ik = 0; ik < kv.nks; ++ik)    //the loop of nspin0 is included
             {
                 const int ispin = kv.isk[ik];
@@ -253,9 +241,9 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
                                     this->pes->wg,
                                     kv.kvec_c);
 #else
-                for (int i = 0;i < nbands;++i)
+                for (int i = 0;i < GlobalV::NBANDS;++i)
                 {
-                    for (int j = 0;j < nlocal;++j)
+                    for (int j = 0;j < GlobalV::NLOCAL;++j)
                         lowf.wfc_k_grid[ik][i][j] = psi[0](i, j);
                 }
 #endif
@@ -263,7 +251,7 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
                 gk.cal_env_k(ik, lowf.wfc_k_grid[ik][ib], pes->charge->rho[ispin], kv.kvec_c, kv.kvec_d);
 
                 std::stringstream ss;
-                ss << global_out_dir << "BAND" << ib + 1 << "_k_" << ik / nspin0 + 1 << "_s_" << ispin + 1 << "_ENV.cube";
+                ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_k_" << ik / nspin0 + 1 << "_s_" << ispin + 1 << "_ENV.cube";
                 const double ef_tmp = this->pes->eferm.get_efval(ispin);
                 ModuleIO::write_rho(
 #ifdef __MPI
@@ -274,7 +262,7 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
 #endif
                     pes->charge->rho[ispin],
                     ispin,
-                    nspin,
+                    GlobalV::NSPIN,
                     0,
                     ss.str(),
                     rhopw->nx,
@@ -287,7 +275,7 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
                 if (out_wf || out_wf_r) //only for gamma_only now
                 {
                     pw_wfc_g.fix_k(ik);
-                    this->set_pw_wfc(wfcpw, ik, ib, nspin,
+                    this->set_pw_wfc(wfcpw, ik, ib, GlobalV::NSPIN,
                         pes->charge->rho, pw_wfc_g);
                 }
             }
@@ -299,9 +287,9 @@ void IState_Envelope::begin(const psi::Psi<std::complex<double>>* psi,
         if (out_wf)
         {
             std::stringstream ssw;
-            ssw << global_out_dir << "WAVEFUNC";
+            ssw << GlobalV::global_out_dir << "WAVEFUNC";
             std::cout << " write G-space wavefunction into \"" <<
-                global_out_dir << "/" << ssw.str() << "\" files." << std::endl;
+                GlobalV::global_out_dir << "/" << ssw.str() << "\" files." << std::endl;
             ModuleIO::write_wfc_pw(ssw.str(), pw_wfc_g, kv, wfcpw);
         }
         if (out_wf_r)

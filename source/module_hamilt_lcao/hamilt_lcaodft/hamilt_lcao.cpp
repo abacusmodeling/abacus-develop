@@ -9,15 +9,10 @@
 #include "module_hamilt_lcao/module_deepks/LCAO_deepks.h"
 #include "operator_lcao/deepks_lcao.h"
 #endif
-#ifdef __EXX
-#include "operator_lcao/op_exx_lcao.h"
-#include "module_ri/Exx_LRI_interface.h"
-#endif
 #ifdef __ELPA
 #include "module_hsolver/diago_elpa.h"
 #endif
 #include "operator_lcao/op_dftu_lcao.h"
-#include "operator_lcao/dftu_new.h"
 #include "operator_lcao/meta_lcao.h"
 #include "operator_lcao/op_exx_lcao.h"
 #include "operator_lcao/td_ekinetic_lcao.h"
@@ -68,8 +63,7 @@ HamiltLCAO<TK, TR>::HamiltLCAO(
     Local_Orbital_Charge* loc_in,
     elecstate::Potential* pot_in,
     const K_Vectors& kv_in,
-    elecstate::DensityMatrix<TK, double>* DM_in,
-    int* exx_two_level_step)
+    elecstate::DensityMatrix<TK,double>* DM_in)
 {
     this->kv = &kv_in;
     this->classname = "HamiltLCAO";
@@ -213,30 +207,13 @@ HamiltLCAO<TK, TR>::HamiltLCAO(
         //end node should be OperatorDFTU
         if (GlobalV::dft_plus_u)
         {
-            Operator<TK>* dftu = nullptr;
-            if(GlobalV::dft_plus_u == 2) 
-            {
-                dftu = new OperatorDFTU<OperatorLCAO<TK, TR>>(
-                    LM_in,
-                    kv->kvec_d,
-                    this->hR,// no explicit call yet
-                    &(this->getHk(LM_in)),
-                    this->kv->isk
-                );
-            }
-            else
-            {
-                dftu = new DFTUNew<OperatorLCAO<TK, TR>>(
-                    LM_in,
-                    this->kv->kvec_d,
-                    this->hR,
-                    &(this->getHk(LM_in)),
-                    &GlobalC::ucell,
-                    &GlobalC::GridD,
-                    &GlobalC::dftu,
-                    LM_in->ParaV
-                );
-            }
+            Operator<TK>* dftu = new OperatorDFTU<OperatorLCAO<TK, TR>>(
+                LM_in,
+                kv->kvec_d,
+                this->hR,// no explicit call yet
+                &(this->getHk(LM_in)),
+                this->kv->isk
+            );
             this->getOperator()->add(dftu);
         }
     }
@@ -384,30 +361,13 @@ HamiltLCAO<TK, TR>::HamiltLCAO(
         }
         if (GlobalV::dft_plus_u)
         {
-            Operator<TK>* dftu = nullptr;
-            if(GlobalV::dft_plus_u == 2) 
-            {
-                dftu = new OperatorDFTU<OperatorLCAO<TK, TR>>(
-                    LM_in,
-                    kv->kvec_d,
-                    this->hR,// no explicit call yet
-                    &(this->getHk(LM_in)),
-                    this->kv->isk
-                );
-            }
-            else
-            {
-                dftu = new DFTUNew<OperatorLCAO<TK, TR>>(
-                    LM_in,
-                    this->kv->kvec_d,
-                    this->hR,
-                    &(this->getHk(LM_in)),
-                    &GlobalC::ucell,
-                    &GlobalC::GridD,
-                    &GlobalC::dftu,
-                    LM_in->ParaV
-                );
-            }
+            Operator<TK>* dftu = new OperatorDFTU<OperatorLCAO<TK, TR>>(
+                LM_in,
+                kv->kvec_d,
+                this->hR,// no explicit call yet
+                &(this->getHk(LM_in)),
+                this->kv->isk
+            );
             this->getOperator()->add(dftu);
         }
         if (GlobalV::sc_mag_switch)
@@ -422,21 +382,6 @@ HamiltLCAO<TK, TR>::HamiltLCAO(
         }
     }
 
-#ifdef __EXX
-    if (GlobalC::exx_info.info_global.cal_exx)
-    {
-        Operator<TK>* exx
-            = new OperatorEXX<OperatorLCAO<TK, TR>>(LM_in,
-                this->hR,
-                &(this->getHk(LM_in)),
-                *this->kv,
-                LM_in->Hexxd,
-                LM_in->Hexxc,
-                exx_two_level_step,
-                !GlobalC::restart.info_load.restart_exx&& GlobalC::restart.info_load.load_H);
-        this->getOperator()->add(exx);
-    }
-#endif
     // if NSPIN==2, HR should be separated into two parts, save HR into this->hRS2
     int memory_fold = 1;
     if(GlobalV::NSPIN == 2)

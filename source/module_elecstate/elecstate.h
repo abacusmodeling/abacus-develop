@@ -152,7 +152,6 @@ class ElecState
     void print_etot(const bool converged,
                     const int& iter,
                     const double& scf_thr,
-                    const double& scf_thr_kin,
                     const double& duration,
                     const int printe,
                     const double& pw_diag_thr = 0,
