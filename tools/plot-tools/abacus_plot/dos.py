@@ -146,10 +146,17 @@ class :
         else:
             self.ax.axvline(0, linestyle="--", c='b', lw=1.0)
 
+        if self.nspin == 2:
+            self.ax.axhline(0, linestyle="--", c='gray', lw=1.0)
+
+        handles, labels = self.ax.get_legend_handles_labels()
+        by_label = OrderedDict(zip(labels, handles))
         if "legend_prop" in self.plot_params.keys():
-            self.ax.legend(prop=self.plot_params["legend_prop"])
+            self.ax.legend(by_label.values(), by_label.keys(),
+                               prop=self.plot_params["legend_prop"])
         else:
-            self.ax.legend(prop={'size': 15})
+            self.ax.legend(by_label.values(),
+                               by_label.keys(), prop={'size': 15})
 
 
 class TDOS(DOS):
