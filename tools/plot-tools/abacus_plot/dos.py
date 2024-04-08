@@ -171,7 +171,7 @@ class TDOS(DOS):
             self.energy, self.dos = np.split(data, self.nspin+1, axis=1)
         elif self.nspin == 2:
             self.energy, dos_up, dos_dw = np.split(data, self.nspin+1, axis=1)
-            self.dos = np.hstack(dos_up, dos_dw)
+            self.dos = np.hstack((dos_up, dos_dw))
 
     def _shift_energy(self, efermi: float = 0, shift: bool = False, prec: float = 0.01):
         if shift:
