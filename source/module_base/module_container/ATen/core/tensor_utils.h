@@ -268,6 +268,20 @@ void _internal_output(
     }
 }
 
+template <typename T>
+T extract(const container::Tensor& tensor) {
+    if (tensor.device_type() == DeviceType::CpuDevice) {
+        return reinterpret_cast<T*>(tensor.data())[0];
+    }
+    else {
+        T result = 0;
+        TEMPLATE_ALL_2(tensor.data_type(), tensor.device_type(),
+            kernels::synchronize_memory<T, DEVICE_CPU, DEVICE_>()(
+                &result, reinterpret_cast<T*>(tensor.data()), 1))
+        return result;
+    }
+}
+
 } // namespace container
 
 #endif // ATEN_CORE_TENSOR_UTILS_H_

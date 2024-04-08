@@ -63,11 +63,11 @@
 //         EXPECT_EQ(INPUT.npart_sto, 1);
 //         EXPECT_FALSE(INPUT.cal_cond);
 //         EXPECT_EQ(INPUT.dos_nche, 100);
-//         EXPECT_EQ(INPUT.cond_nche, 20);
+//         EXPECT_DOUBLE_EQ(INPUT.cond_che_thr, 1e-8);
 //         EXPECT_DOUBLE_EQ(INPUT.cond_dw, 0.1);
 //         EXPECT_DOUBLE_EQ(INPUT.cond_wcut, 10);
 //         EXPECT_EQ(INPUT.cond_dt, 0.02);
-//         EXPECT_EQ(INPUT.cond_dtbatch, 4);
+//         EXPECT_EQ(INPUT.cond_dtbatch, 0);
 //         EXPECT_DOUBLE_EQ(INPUT.cond_fwhm, 0.4);
 //         EXPECT_TRUE(INPUT.cond_nonlocal);
 //         EXPECT_FALSE(INPUT.berry_phase);
@@ -295,7 +295,7 @@
 //         EXPECT_FALSE(INPUT.restart_save);
 //         EXPECT_FALSE(INPUT.restart_load);
 //         EXPECT_FALSE(INPUT.test_skip_ewald);
-//         EXPECT_FALSE(INPUT.dft_plus_u);
+//         EXPECT_EQ(INPUT.dft_plus_u, 0);
 //         EXPECT_FALSE(INPUT.yukawa_potential);
 //         EXPECT_DOUBLE_EQ(INPUT.yukawa_lambda, -1.0);
 //         EXPECT_EQ(INPUT.omc, 0);

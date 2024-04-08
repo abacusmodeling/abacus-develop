@@ -9,6 +9,8 @@ set(ATen_CUDA_DEPENDENCY_LIBS)
 set(ATen_ROCM_DEPENDENCY_LIBS)
 
 add_subdirectory(base/core)
+
+add_subdirectory(ATen/ops)
 add_subdirectory(ATen/core)
 add_subdirectory(ATen/kernels)
 

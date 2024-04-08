@@ -39,6 +39,7 @@ list(APPEND device_srcs
   module_hamilt_pw/hamilt_pwdft/kernels/wf_op.cpp
   module_hamilt_pw/hamilt_pwdft/kernels/vnl_op.cpp
   module_base/kernels/math_op.cpp
+  module_hamilt_general/module_xc/kernels/xc_functional_op.cpp
 )
 
 if(USE_CUDA)
@@ -57,6 +58,7 @@ if(USE_CUDA)
     module_hamilt_pw/hamilt_pwdft/kernels/cuda/wf_op.cu
     module_hamilt_pw/hamilt_pwdft/kernels/cuda/vnl_op.cu
     module_base/kernels/cuda/math_op.cu
+    module_hamilt_general/module_xc/kernels/cuda/xc_functional_op.cu
   )
 endif()
 
@@ -76,6 +78,7 @@ if(USE_ROCM)
     module_hamilt_pw/hamilt_pwdft/kernels/rocm/wf_op.hip.cu
     module_hamilt_pw/hamilt_pwdft/kernels/rocm/vnl_op.hip.cu
     module_base/kernels/rocm/math_op.hip.cu
+    module_hamilt_general/module_xc/kernels/rocm/xc_functional_op.hip.cu
   )
 endif()
 
@@ -87,14 +90,6 @@ if(USE_CUDA)
     cusolver 
     cublas 
     cufft
-  )
-  set_property(
-    TARGET device
-    PROPERTY CUDA_ARCHITECTURES
-    60 # P100
-    70 # V100
-    75 # T4
-    80 # A100
   )
 elseif(USE_ROCM)
   target_link_libraries(

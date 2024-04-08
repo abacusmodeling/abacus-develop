@@ -34,6 +34,7 @@ extern int EFIELD_FLAG; // 5 add electric field
 extern int DIP_COR_FLAG; // 7 add dipole correction
 extern bool GATE_FLAG;     // add gate field
 extern bool out_app_flag;  // whether output r(R), H(R), S(R), T(R), and dH(R) matrices in an append manner during MD  liuyu 2023-03-20
+extern int out_ndigits;
 
 extern std::string DFT_FUNCTIONAL; // 6.5 change the DFT functional from input file.
 extern double XC_TEMPERATURE;
@@ -60,6 +61,7 @@ extern bool relax_new;
 
 extern bool use_paw;
 extern bool use_uspp;
+extern bool double_grid;
 
 extern bool fixed_atoms;
 
@@ -248,7 +250,7 @@ extern double sigma_k;
 extern double nc_k;
 
 // DFTU control
-extern bool dft_plus_u;
+extern int dft_plus_u;
 // rpa related
 extern bool rpa_setorb;
 extern std::vector<std::string> rpa_orbitals;
@@ -275,8 +277,14 @@ extern std::string of_kernel_file; // The name of WT kernel file.
 extern std::string MIXING_MODE;
 extern double MIXING_BETA;
 extern int MIXING_NDIM;
+extern double MIXING_RESTART;
 extern double MIXING_GG0;
 extern bool MIXING_TAU;
+extern double MIXING_BETA_MAG;
+extern double MIXING_GG0_MAG;
+extern double MIXING_GG0_MIN;
+extern double MIXING_ANGLE;
+extern bool MIXING_DMR;
 
 //==========================================================
 // device flags added by denghui
@@ -300,8 +308,31 @@ extern bool psi_initializer;
 extern int out_chg;
 
 extern double nelec;
+extern double nelec_delta;
 extern bool out_bandgap;
 extern int out_interval;
 
+extern bool out_mat_xc; // output Vxc in KS-wfc representation for GW calculation
+
+// Deltaspin related
+extern bool sc_mag_switch; // 0: no deltaspin; 1: constrain atomic magnetic moments;
+extern bool decay_grad_switch; // 0: decay grad will be set to zero; 1: with decay grad set for some elements
+extern double sc_thr;
+extern int nsc;
+extern int nsc_min;
+extern int sc_scf_nmin;
+extern double alpha_trial;
+extern double sccut;
+extern std::string sc_file;
+
+// Quasiatomic orbital related
+extern bool qo_switch;
+extern std::string qo_basis;
+extern std::vector<std::string> qo_strategy;
+extern double qo_thr;
+extern std::vector<double> qo_screening_coeff;
+
+// radius of on-site orbitals
+extern double onsite_radius;
 } // namespace GlobalV
 #endif

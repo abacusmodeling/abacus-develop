@@ -10,7 +10,7 @@
 #else
 #include "xc_funcs.h"
 #endif	// ifdef USE_LIBXC
-
+#include "module_base/macros.h"
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
 #include "module_base/vector3.h"
@@ -19,6 +19,7 @@
 #include "module_basis/module_pw/pw_basis_k.h"
 #include "module_elecstate/module_charge/charge.h"
 #include "module_cell/unitcell.h"
+
 class XC_Functional
 {
 	public:
@@ -171,6 +172,7 @@ class XC_Functional
 // This file contains wrapper for the mGGA functionals
 // it includes 1 subroutine:
 // 1. tau_xc
+// 2. tau_xc_spin
 
 // NOTE : mGGA is realized through LIBXC
 
@@ -178,6 +180,12 @@ class XC_Functional
 	// mGGA
 	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sxc,
           double &v1xc, double &v2xc, double &v3xc);
+
+	static void tau_xc_spin(double rhoup, double rhodw, 
+			ModuleBase::Vector3<double> gdr1, ModuleBase::Vector3<double> gdr2,
+			double tauup, double taudw,
+			double &sxc, double &v1xcup, double &v1xcdw, double &v2xcup, double &v2xcdw, double &v2xcud,
+			double &v3xcup, double &v3xcdw);
 #endif 
 
 //-------------------
@@ -202,11 +210,14 @@ class XC_Functional
                          const UnitCell* ucell,
                          std::vector<double>& stress_gga,
                          const bool is_stress = 0);
-    static void grad_wfc(const std::complex<double>* rhog,
-                         const int ik,
-                         std::complex<double>* grad,
-                         const ModulePW::PW_Basis_K* wfc_basis,
-                         const double tpiba);
+	template <typename T, typename Device,
+          typename Real = typename GetTypeReal<T>::type>
+	static void grad_wfc(
+	    const int ik,
+	    const Real tpiba,
+	    const ModulePW::PW_Basis_K* wfc_basis,
+		const T* rhog,
+	    T* grad);
     static void grad_rho(const std::complex<double>* rhog,
                          ModuleBase::Vector3<double>* gdr,
                          const ModulePW::PW_Basis* rho_basis,

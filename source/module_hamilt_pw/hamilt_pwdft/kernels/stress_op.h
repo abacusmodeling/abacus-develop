@@ -3,6 +3,8 @@
 
 #include "module_psi/psi.h"
 #include <complex>
+#include <module_base/macros.h>
+
 
 namespace hamilt {
 
@@ -54,7 +56,7 @@ namespace hamilt {
         ///
         /// Input Parameters
         /// @param ctx - which device this function runs on
-        /// @param multi_proj - control flag
+        /// @param nondiagonal - control flag
         /// @param ipol - loop of 0, 1, 2
         /// @param jpol - loop of 0, 1, 2
         /// @param nkb - number of k point
@@ -69,34 +71,48 @@ namespace hamilt {
         /// @param atom_nh - GlobalC::ucell.atoms[ii].ncpp.nh
         /// @param atom_na - GlobalC::ucell.atoms[ii].na
         /// @param d_wg - input parameter wg
+        /// @param d_ekb - input parameter ekb
+        /// @param qq_nt - GlobalC::ppcell.qq_nt
         /// @param deeq - GlobalC::ppcell.deeq
         /// @param becp - intermediate matrix with GlobalV::NBANDS * nkb
         /// @param dbecp - intermediate matrix with 3 * GlobalV::NBANDS * nkb
         ///
         /// Output Parameters
         /// @param stress - output stresses
-        void operator()(
-                const Device *ctx,
-                const bool &multi_proj,
-                const int &ipol,
-                const int &jpol,
-                const int &nkb,
-                const int &nbands_occ,
-                const int &ntype,
-                const int &spin,
-                const int &wg_nc,
-                const int &ik,
-                const int &deeq_2,
-                const int &deeq_3,
-                const int &deeq_4,
-                const int *atom_nh,
-                const int *atom_na,
-                const FPTYPE *d_wg,
-                const FPTYPE *deeq,
-                const std::complex<FPTYPE> *becp,
-                const std::complex<FPTYPE> *dbecp,
-                FPTYPE *stress);
+        void operator()(const Device* ctx,
+                        const bool& nondiagonal,
+                        const int& ipol,
+                        const int& jpol,
+                        const int& nkb,
+                        const int& nbands_occ,
+                        const int& ntype,
+                        const int& spin,
+                        const int& wg_nc,
+                        const int& ik,
+                        const int& deeq_2,
+                        const int& deeq_3,
+                        const int& deeq_4,
+                        const int* atom_nh,
+                        const int* atom_na,
+                        const FPTYPE* d_wg,
+                        const FPTYPE* d_ekb,
+                        const FPTYPE* qq_nt,
+                        const FPTYPE* deeq,
+                        const std::complex<FPTYPE>* becp,
+                        const std::complex<FPTYPE>* dbecp,
+                        FPTYPE* stress);
     };
+
+template <typename T, typename Device>
+struct cal_stress_mgga_op {
+    using Real = typename GetTypeReal<T>::type;
+    void operator()(
+        const int& spin,
+        const int& nrxx,
+        const Real& w1,
+        const T * gradwfc,
+        Real * crosstaus);
+};
 
 #if __CUDA || __UT_USE_CUDA || __ROCM || __UT_USE_ROCM
 template <typename FPTYPE>
@@ -122,27 +138,28 @@ struct cal_dbecp_noevc_nl_op<FPTYPE, psi::DEVICE_GPU> {
 
 template <typename FPTYPE>
 struct cal_stress_nl_op<FPTYPE, psi::DEVICE_GPU> {
-    void operator() (
-        const psi::DEVICE_GPU *ctx,
-        const bool &multi_proj,
-        const int &ipol,
-        const int &jpol,
-        const int &nkb,
-        const int &nbands_occ,
-        const int &ntype,
-        const int &spin,
-        const int &wg_nc,
-        const int &ik,
-        const int &deeq_2,
-        const int &deeq_3,
-        const int &deeq_4,
-        const int *atom_nh,
-        const int *atom_na,
-        const FPTYPE *d_wg,
-        const FPTYPE *deeq,
-        const std::complex<FPTYPE> *becp,
-        const std::complex<FPTYPE> *dbecp,
-        FPTYPE *stress);
+    void operator()(const psi::DEVICE_GPU* ctx,
+                    const bool& nondiagonal,
+                    const int& ipol,
+                    const int& jpol,
+                    const int& nkb,
+                    const int& nbands_occ,
+                    const int& ntype,
+                    const int& spin,
+                    const int& wg_nc,
+                    const int& ik,
+                    const int& deeq_2,
+                    const int& deeq_3,
+                    const int& deeq_4,
+                    const int* atom_nh,
+                    const int* atom_na,
+                    const FPTYPE* d_wg,
+                    const FPTYPE* d_ekb,
+                    const FPTYPE* qq_nt,
+                    const FPTYPE* deeq,
+                    const std::complex<FPTYPE>* becp,
+                    const std::complex<FPTYPE>* dbecp,
+                    FPTYPE* stress);
 };
 
 #endif // __CUDA || __UT_USE_CUDA || __ROCM || __UT_USE_ROCM

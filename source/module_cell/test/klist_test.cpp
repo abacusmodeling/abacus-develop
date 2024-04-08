@@ -39,6 +39,12 @@ pseudopot_cell_vl::pseudopot_cell_vl(){}
 pseudopot_cell_vl::~pseudopot_cell_vl(){}
 pseudopot_cell_vnl::pseudopot_cell_vnl(){}
 pseudopot_cell_vnl::~pseudopot_cell_vnl(){}
+Soc::~Soc()
+{
+}
+Fcoef::~Fcoef()
+{
+}
 
 namespace GlobalC
 {
@@ -726,7 +732,7 @@ TEST_F(KlistTest, IbzKpoint)
 	ModuleSymmetry::Symmetry symm;
 	construct_ucell(stru_lib[0]);
 	GlobalV::ofs_running.open("tmp_klist_3");
-	symm.analy_sys(ucell,GlobalV::ofs_running);
+    symm.analy_sys(ucell.lat, ucell.st, ucell.atoms, GlobalV::ofs_running);
 	//read KPT
 	std::string k_file = "./support/KPT1";
 	kv->nspin = 1;
@@ -750,7 +756,7 @@ TEST_F(KlistTest, IbzKpointIsMP)
 	ModuleSymmetry::Symmetry symm;
 	construct_ucell(stru_lib[0]);
 	GlobalV::ofs_running.open("tmp_klist_4");
-	symm.analy_sys(ucell,GlobalV::ofs_running);
+    symm.analy_sys(ucell.lat, ucell.st, ucell.atoms, GlobalV::ofs_running);
 	//read KPT
 	std::string k_file = "./support/KPT1";
 	kv->nspin = 1;

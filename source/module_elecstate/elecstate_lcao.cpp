@@ -1,28 +1,23 @@
 #include "elecstate_lcao.h"
 
 #include "cal_dm.h"
-#include "module_elecstate/module_dm/cal_dm_psi.h"
 #include "module_base/timer.h"
+#include "module_elecstate/module_dm/cal_dm_psi.h"
 #include "module_hamilt_general/module_xc/xc_functional.h"
+#include "module_hamilt_lcao/module_deltaspin/spin_constrain.h"
 #include "module_hamilt_lcao/module_gint/grid_technique.h"
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 
 namespace elecstate
 {
-template <typename TK>
-int ElecStateLCAO<TK>::out_wfc_lcao = 0;
-
-template <typename TK>
-int ElecStateLCAO<TK>::out_wfc_flag = 0;
-
-template <typename TK>
-bool ElecStateLCAO<TK>::need_psi_grid = 1;
 
 template <>
 void ElecStateLCAO<double>::print_psi(const psi::Psi<double>& psi_in, const int istep)
 {
-    if (!ElecStateLCAO<double>::out_wfc_lcao)
-        return;
+	if (!ElecStateLCAO<double>::out_wfc_lcao)
+	{
+		return;
+	}
 
     // output but not do  "2d-to-grid" conversion
     double** wfc_grid = nullptr;
@@ -35,8 +30,11 @@ void ElecStateLCAO<double>::print_psi(const psi::Psi<double>& psi_in, const int 
 template <>
 void ElecStateLCAO<std::complex<double>>::print_psi(const psi::Psi<std::complex<double>>& psi_in, const int istep)
 {
-    if (!ElecStateLCAO<std::complex<double>>::out_wfc_lcao && !ElecStateLCAO<std::complex<double>>::need_psi_grid)
-        return;
+	if (!ElecStateLCAO<std::complex<double>>::out_wfc_lcao 
+			&& !ElecStateLCAO<std::complex<double>>::need_psi_grid)
+	{
+		return;
+	}
 
     // output but not do "2d-to-grid" conversion
     std::complex<double>** wfc_grid = nullptr;
@@ -45,6 +43,7 @@ void ElecStateLCAO<std::complex<double>>::print_psi(const psi::Psi<std::complex<
     {
         wfc_grid = this->lowf->wfc_k_grid[ik];
     }
+
 #ifdef __MPI
     this->lowf->wfc_2d_to_grid(istep,
                                ElecStateLCAO<std::complex<double>>::out_wfc_flag,
@@ -101,8 +100,8 @@ void ElecStateLCAO<std::complex<double>>::psiToRho(const psi::Psi<std::complex<d
     // this part for calculating DMK in 2d-block format, not used for charge now
     //    psi::Psi<std::complex<double>> dm_k_2d();
 
-    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx"
-        || GlobalV::KS_SOLVER == "lapack") // Peize Lin test 2019-05-15
+    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack"
+        || GlobalV::KS_SOLVER == "cusolver" || GlobalV::KS_SOLVER == "cg_in_lcao") // Peize Lin test 2019-05-15
     {
         //cal_dm(this->loc->ParaV, this->wg, psi, this->loc->dm_k);
         elecstate::cal_dm_psi(this->DM->get_paraV_pointer(), this->wg, psi, *(this->DM));
@@ -122,7 +121,8 @@ void ElecStateLCAO<std::complex<double>>::psiToRho(const psi::Psi<std::complex<d
 #endif
 
     }
-    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack")
+    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack"
+        || GlobalV::KS_SOLVER == "cusolver" || GlobalV::KS_SOLVER == "cg_in_lcao")
     {
         for (int ik = 0; ik < psi.get_nk(); ik++)
         {
@@ -142,15 +142,18 @@ void ElecStateLCAO<std::complex<double>>::psiToRho(const psi::Psi<std::complex<d
     //------------------------------------------------------------
 
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GK.transfer_DM2DtoGrid(this->DM->get_DMR_vector()); // transfer DM2D to DM_grid in gint
+    this->gint_k->transfer_DM2DtoGrid(this->DM->get_DMR_vector()); // transfer DM2D to DM_grid in gint
     Gint_inout inout(this->loc->DM_R, this->charge->rho, Gint_Tools::job_type::rho);
-    this->uhm->GK.cal_gint(&inout);
+    this->gint_k->cal_gint(&inout);
 
     if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
     {
-        ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[0], this->charge->nrxx);
+        for (int is = 0; is < GlobalV::NSPIN; is++)
+        {
+            ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[is], this->charge->nrxx);
+        }
         Gint_inout inout1(this->loc->DM_R, this->charge->kin_r, Gint_Tools::job_type::tau);
-        this->uhm->GK.cal_gint(&inout1);
+        this->gint_k->cal_gint(&inout1);
     }
 
     this->charge->renormalize_rho();
@@ -169,7 +172,8 @@ void ElecStateLCAO<double>::psiToRho(const psi::Psi<double>& psi)
     this->calculate_weights();
     this->calEBand();
 
-    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack")
+    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx" || GlobalV::KS_SOLVER == "lapack"
+        || GlobalV::KS_SOLVER == "cusolver" || GlobalV::KS_SOLVER == "cg_in_lcao")
     {
         ModuleBase::timer::tick("ElecStateLCAO", "cal_dm_2d");
         // get DMK in 2d-block format
@@ -189,7 +193,8 @@ void ElecStateLCAO<double>::psiToRho(const psi::Psi<double>& psi)
         for (int ik = 0; ik < psi.get_nk(); ++ik)
         {
             // for gamma_only case, no convertion occured, just for print.
-            if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
+            if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx"
+                || GlobalV::KS_SOLVER == "cusolver" || GlobalV::KS_SOLVER == "cg_in_lcao")
             {
                 psi.fix_k(ik);
                 this->print_psi(psi);
@@ -211,17 +216,21 @@ void ElecStateLCAO<double>::psiToRho(const psi::Psi<double>& psi)
     // calculate the charge density on real space grid.
     //------------------------------------------------------------
     ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-    this->uhm->GG.transfer_DM2DtoGrid(this->DM->get_DMR_vector()); // transfer DM2D to DM_grid in gint
+
+    this->gint_gamma->transfer_DM2DtoGrid(this->DM->get_DMR_vector()); // transfer DM2D to DM_grid in gint
+
     Gint_inout inout(this->loc->DM, this->charge->rho, Gint_Tools::job_type::rho);
-    this->uhm->GG.cal_gint(&inout);
+
+    this->gint_gamma->cal_gint(&inout);
+
     if (XC_Functional::get_func_type() == 3 || XC_Functional::get_func_type() == 5)
     {
         for (int is = 0; is < GlobalV::NSPIN; is++)
         {
-            ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[0], this->charge->nrxx);
+            ModuleBase::GlobalFunc::ZEROS(this->charge->kin_r[is], this->charge->nrxx);
         }
         Gint_inout inout1(this->loc->DM, this->charge->kin_r, Gint_Tools::job_type::tau);
-        this->uhm->GG.cal_gint(&inout1);
+        this->gint_gamma->cal_gint(&inout1);
     }
 
     this->charge->renormalize_rho();
@@ -236,6 +245,19 @@ void ElecStateLCAO<TK>::init_DM(const K_Vectors* kv, const Parallel_Orbitals* pa
     this->DM = new DensityMatrix<TK,double>(kv, paraV, nspin);
 }
 
+template<>
+double ElecStateLCAO<double>::get_spin_constrain_energy()
+{
+    SpinConstrain<double, psi::DEVICE_CPU>& sc = SpinConstrain<double>::getScInstance();
+    return sc.cal_escon();
+}
+
+template<>
+double ElecStateLCAO<std::complex<double>>::get_spin_constrain_energy()
+{
+    SpinConstrain<std::complex<double>, psi::DEVICE_CPU>& sc = SpinConstrain<std::complex<double>>::getScInstance();
+    return sc.cal_escon();
+}
 
 template class ElecStateLCAO<double>; // Gamma_only case
 template class ElecStateLCAO<std::complex<double>>; // multi-k case

@@ -336,10 +336,11 @@ static inline void FREE_MUL_PTR(T_element* v, const T_N_first N_first, const T_N
 	v = nullptr;
 }
 
-double ddot_real(
+template <typename T>
+T ddot_real(
         const int & dim,
-        const std::complex<double>* psi_L,
-        const std::complex<double>* psi_R,
+        const std::complex<T>* psi_L,
+        const std::complex<T>* psi_R,
         const bool reduce = true) ;
 
 //==========================================================
@@ -349,7 +350,7 @@ double ddot_real(
 //==========================================================
 static inline bool IS_COLUMN_MAJOR_KS_SOLVER()
 {
-    return GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="cusolver";
+    return GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx" || GlobalV::KS_SOLVER=="cusolver" || GlobalV::KS_SOLVER=="cg_in_lcao";
 }
 
 }//namespace GlobalFunc

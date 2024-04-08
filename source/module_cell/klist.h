@@ -6,7 +6,7 @@
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
 #include "module_base/matrix3.h"
-#include "module_cell/module_symmetry/symmetry.h"
+#include "module_cell/unitcell.h"
 
 class K_Vectors
 {
@@ -29,6 +29,7 @@ public:
     int nkstot_full;    /// number of k points in full k mesh
 
     int nmp[3];						// Number of Monhorst-Pack
+    std::vector<int> kl_segids;	// index of kline segment
 
     K_Vectors();
     ~K_Vectors();

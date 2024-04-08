@@ -25,6 +25,7 @@ void HSolverPW_SDFT::solve(hamilt::Hamilt<std::complex<double>>* pHamilt,
     const int nbands = psi.get_nbands();
     const int nks = psi.get_nk();
 
+	this->hamilt_ = pHamilt;
     // prepare for the precondition of diagonalization
     this->precondition.resize(psi.get_nbasis());
 
@@ -51,7 +52,7 @@ void HSolverPW_SDFT::solve(hamilt::Hamilt<std::complex<double>>* pHamilt,
 #ifdef __MPI
 			if(nbands > 0)
 			{
-				MPI_Bcast(&psi(ik,0,0), npwx*nbands*2, MPI_DOUBLE , 0, PARAPW_WORLD);
+				MPI_Bcast(&psi(ik,0,0), npwx*nbands, MPI_DOUBLE_COMPLEX , 0, PARAPW_WORLD);
 				MPI_Bcast(&(pes->ekb(ik, 0)), nbands, MPI_DOUBLE, 0, PARAPW_WORLD);
 			}
 #endif

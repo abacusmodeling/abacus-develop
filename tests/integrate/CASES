@@ -5,6 +5,8 @@
 101_PW_15_pseudopots_LibxcLDA
 101_PW_15_paw
 101_PW_blps_pseudopots
+101_PW_lps6_pseudopots
+101_PW_lps8_pseudopots
 101_PW_OU_pseudopots
 101_PW_upf100_Al_pseudopots
 101_PW_upf201_Al_pseudopots
@@ -12,7 +14,10 @@
 101_PW_upf201_blps_pseudopots
 101_PW_upf201_pseudopots
 101_PW_upf201_upf100_pseudopots
+101_PW_upf201_uspp_Fe
+101_PW_upf201_uspp_NaCl
 101_PW_VW_pseudopots
+101_PW_Coulomb
 102_PW_DA_davidson
 102_PW_BPCG
 102_PW_PINT_RKS
@@ -77,6 +82,8 @@
 116_PW_scan_Si2
 116_PW_scan_Si2_nspin2
 117_PW_out_pot
+118_PW_CHG_BINARY
+118_PW_WFC_BINARY
 120_PW_KP_MD_MSST
 120_PW_KP_MD_MSST_level2
 120_PW_KP_MD_NPT
@@ -129,6 +136,8 @@
 204_NO_KP_FM
 204_NO_KP_NC
 204_NO_NC_magnetic
+204_NO_KP_NC_deltaspin
+204_NO_KP_S2_deltaspin
 205_NO_FD_smearing
 205_NO_FX_smearing
 205_NO_GA_smearing
@@ -143,6 +152,7 @@
 207_NO_KP_OH2
 207_NO_KP_OHS_SPIN4
 207_NO_KP_OTdH
+207_NO_KP_OXC
 207_NO_OK
 207_NO_KP_OS
 208_NO_KP_CF_RE
@@ -169,7 +179,9 @@
 250_NO_KP_CR_VDW3
 250_NO_KP_CR_VDW3ABC
 250_NO_KP_CR_VDW3BJ
-260_NO_15_PK_PU_AF
+260_NO_DJ_PK_PU_FM
+260_NO_DJ_PK_PU_SO
+260_NO_DJ_PK_PU_S1
 270_NO_MD_1O
 270_NO_MD_2O
 281_NO_KP_HSE
@@ -189,6 +201,7 @@
 304_NO_GO_FM
 304_NO_GO_ocp
 307_NO_GO_OH
+307_NO_GO_OXC
 308_NO_GO_CF_RE
 308_NO_GO_CS_CR
 308_NO_GO_RE_MB
@@ -213,8 +226,8 @@
 384_NO_GO_S1_HSE_loop0_PU
 385_NO_GO_RE_S1_HSE
 386_NO_GO_MD_S1_HSE
-#401_NP_KP_sp
-#401_NP_KP_spd
+401_NP_KP_sp
+401_NP_KP_spd
 #501_NO_neighboring_GaAs512
 601_NO_TDDFT_H2
 601_NO_TDDFT_H2_taylor
@@ -235,6 +248,8 @@
 601_NO_TDDFT_H2_len_trigo
 601_NO_TDDFT_H2_oldedm
 601_NO_TDDFT_O3
+601_NO_TDDFT_vel_H2
+601_NO_TDDFT_vel_Si
 701_LJ_MD_Anderson
 701_LJ_MD_Berendsen
 701_LJ_MD_FIRE
@@ -315,6 +330,7 @@
 905_OF_FFT_fullpwdim_2
 905_OF_FFT_fullpw_off
 906_OF_LibxcPBE
+907_OF_LPS
 920_OF_MD_LDA
 920_OF_MD_LibxcPBE
 921_OF_CR_LDA

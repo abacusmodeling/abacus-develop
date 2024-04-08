@@ -46,7 +46,7 @@ int count_ntype(const std::string& fn)
         while (true)
         {
             ModuleBase::GlobalFunc::READ_VALUE(ifa, temp);
-            if (temp == "LATTICE_CONSTANT" || temp == "NUMERICAL_ORBITAL" || temp == "NUMERICAL_DESCRIPTOR"
+            if (temp == "LATTICE_CONSTANT" || temp == "NUMERICAL_ORBITAL" || temp == "NUMERICAL_DESCRIPTOR" || temp == "PAW_FILES"
                 || ifa.eof())
             {
                 break;
@@ -69,7 +69,7 @@ int count_ntype(const std::string& fn)
  * @param input_value_path parameter default value file path
  * @param input_value_path parameter input value file path
  */
-bool Init(const std::string& default_type_path,
+void Init(const std::string& default_type_path,
           const std::string& default_value_path,
           const std::string& input_value_path)
 {
@@ -103,10 +103,8 @@ void strtolower(char* sa, char* sb)
  * @brief Reads the default parameters from the specified file and saves them to the global variable
  *        default_parametes_type
  * @param fn Specifies the path to the file
- * @return true Read successfully
- * @return false Read failure
  */
-bool default_parametes_reader(const std::string& fn, std::map<std::string, std::string>& default_parametes_type)
+void default_parametes_reader(const std::string& fn, std::map<std::string, std::string>& default_parametes_type)
 {
     std::ifstream inputFile(fn.c_str());
     if (inputFile.is_open())
@@ -122,28 +120,24 @@ bool default_parametes_reader(const std::string& fn, std::map<std::string, std::
     }
     else
     {
-        std::cout << "Cannot open file !" << std::endl;
+        ModuleBase::WARNING_QUIT("Input", "Cannot open file" + fn);
     }
 }
 /**
  * @brief This function is used to read the input parameter file and store it as a key-value pair
  * @param fn Enter the path to the parameter file
  */
-bool input_parameters_get(const std::string& fn, std::map<std::string, InputParameter>& input)
+void input_parameters_get(const std::string& fn, std::map<std::string, InputParameter>& input)
 {
-    // The module title information is displayed
     ModuleBase::TITLE("Input", "Read");
-    // If it is not the primary node, return false
     if (GlobalV::MY_RANK != 0)
-        return false;
+        return;
 
     // Open the input parameter file
     std::ifstream ifs(fn.c_str(), std::ios::in); // "in_datas/input_parameters"
-    // If the opening fails, an error message is printed and false is returned
     if (!ifs)
     {
-        std::cout << " Can't find the INPUT file." << std::endl;
-        return false;
+        ModuleBase::WARNING_QUIT("Input", "Can't find the INPUT file at " + fn);
     }
     ifs.clear();
     ifs.seekg(0);
@@ -166,8 +160,7 @@ bool input_parameters_get(const std::string& fn, std::map<std::string, InputPara
     // If ierr is 0, the word "INPUT_PARAMETERS" is not found, and an error message is printed with false
     if (ierr == 0)
     {
-        std::cout << " Error parameter list." << std::endl;
-        return false; // return error : false
+        ModuleBase::WARNING_QUIT("Input", "INPUT_PARAMETERS statement not found.");
     }
     ifs.rdstate();
 
@@ -274,15 +267,11 @@ bool input_parameters_get(const std::string& fn, std::map<std::string, InputPara
         }
         else if (ifs.bad() != 0)
         {
-            std::cout << " Bad input parameters. " << std::endl;
-            return false;
+            ModuleBase::WARNING_QUIT("Input", "Bad input parameters.");
         }
         else if (ifs.fail() != 0)
         {
-            std::cout << " word = " << word << std::endl;
-            std::cout << " Fail to read parameters. " << std::endl;
-            ifs.clear();
-            return false;
+            ModuleBase::WARNING_QUIT("Input", "Fail to read parameters: word = " + std::string(word));
         }
         else if (ifs.good() == 0)
         {
@@ -306,11 +295,9 @@ bool input_parameters_get(const std::string& fn, std::map<std::string, InputPara
     {
         ModuleBase::WARNING_QUIT("Input", "The ntype in INPUT is not equal to the ntype counted in STRU, check it.");
     }
-
-    return true;
 }
 
-bool input_parameters_set(std::map<std::string, InputParameter> input_parameters)
+void input_parameters_set(std::map<std::string, InputParameter> input_parameters)
 {
     if (input_parameters.count("nupdown") != 0)
     {
@@ -443,6 +430,10 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     {
         INPUT.wannier_spin = static_cast<SimpleString*>(input_parameters["wannier_spin"].get())->c_str();
     }
+    else if (input_parameters.count("wannier_method") != 0)
+    {
+        INPUT.wannier_method = *static_cast<int*>(input_parameters["wannier_method"].get());
+    }
     else if (input_parameters.count("out_wannier_mmn") != 0)
     {
         INPUT.out_wannier_mmn = *static_cast<bool*>(input_parameters["out_wannier_mmn"].get());
@@ -479,6 +470,10 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     {
         INPUT.seed_sto = *static_cast<int*>(input_parameters["seed_sto"].get());
     }
+    else if (input_parameters.count("initsto_ecut") != 0)
+    {
+        INPUT.initsto_ecut = *static_cast<double*>(input_parameters["initsto_ecut"].get());
+    }
     else if (input_parameters.count("emax_sto") != 0)
     {
         INPUT.emax_sto = *static_cast<double*>(input_parameters["emax_sto"].get());
@@ -507,9 +502,9 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     {
         INPUT.cal_cond = *static_cast<bool*>(input_parameters["cal_cond"].get());
     }
-    else if (input_parameters.count("cond_nche") != 0)
+    else if (input_parameters.count("cond_che_thr") != 0)
     {
-        INPUT.cond_nche = *static_cast<int*>(input_parameters["cond_nche"].get());
+        INPUT.cond_che_thr = *static_cast<double*>(input_parameters["cond_che_thr"].get());
     }
     else if (input_parameters.count("cond_dw") != 0)
     {
@@ -526,6 +521,10 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     else if (input_parameters.count("cond_dtbatch") != 0)
     {
         INPUT.cond_dtbatch = *static_cast<int*>(input_parameters["cond_dtbatch"].get());
+    }
+    else if (input_parameters.count("cond_smear") != 0)
+    {
+        INPUT.cond_smear = *static_cast<int*>(input_parameters["cond_smear"].get());
     }
     else if (input_parameters.count("cond_fwhm") != 0)
     {
@@ -654,6 +653,10 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     else if (input_parameters.count("gamma_only_local") != 0)
     {
         INPUT.gamma_only_local = *static_cast<bool*>(input_parameters["gamma_only_local"].get());
+    }
+    else if (input_parameters.count("fft_mode") != 0)
+    {
+        INPUT.fft_mode = *static_cast<int*>(input_parameters["fft_mode"].get());
     }
     else if (input_parameters.count("ecutwfc") != 0)
     {
@@ -815,9 +818,29 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     {
         INPUT.mixing_ndim = *static_cast<int*>(input_parameters["mixing_ndim"].get());
     }
+    else if (input_parameters.count("mixing_restart") != 0)
+    {
+        INPUT.mixing_restart = *static_cast<double*>(input_parameters["mixing_restart"].get());
+    }
     else if (input_parameters.count("mixing_gg0") != 0)
     {
         INPUT.mixing_gg0 = *static_cast<double*>(input_parameters["mixing_gg0"].get());
+    }
+    else if (input_parameters.count("mixing_beta_mag") != 0)
+    {
+        INPUT.mixing_beta_mag = *static_cast<double*>(input_parameters["mixing_beta_mag"].get());
+    }
+    else if (input_parameters.count("mixing_gg0_mag") != 0)
+    {
+        INPUT.mixing_gg0_mag = *static_cast<double*>(input_parameters["mixing_gg0_mag"].get());
+    }
+    else if (input_parameters.count("mixing_gg0_min") != 0)
+    {
+        INPUT.mixing_gg0_min = *static_cast<double*>(input_parameters["mixing_gg0_min"].get());
+    }
+    else if (input_parameters.count("mixing_angle") != 0)
+    {
+        INPUT.mixing_angle = *static_cast<double*>(input_parameters["mixing_angle"].get());
     }
     else if (input_parameters.count("mixing_tau") != 0)
     {
@@ -826,6 +849,10 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     else if (input_parameters.count("mixing_dftu") != 0)
     {
         INPUT.mixing_dftu = *static_cast<bool*>(input_parameters["mixing_dftu"].get());
+    }
+    else if (input_parameters.count("mixing_dmr") != 0)
+    {
+        INPUT.mixing_dmr = *static_cast<bool*>(input_parameters["mixing_dmr"].get());
     }
     else if (input_parameters.count("init_wfc") != 0)
     {
@@ -885,7 +912,7 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     }
     else if (input_parameters.count("out_band") != 0)
     {
-        INPUT.out_band = *static_cast<bool*>(input_parameters["out_band"].get());
+        INPUT.out_band = *static_cast<std::vector<int>*>(input_parameters["out_band"].get());
     }
     else if (input_parameters.count("out_proj_band") != 0)
     {
@@ -893,7 +920,11 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     }
     else if (input_parameters.count("out_mat_hs") != 0)
     {
-        INPUT.out_mat_hs = *static_cast<bool*>(input_parameters["out_mat_hs"].get());
+        INPUT.out_mat_hs = *static_cast<std::vector<int>*>(input_parameters["out_mat_hs"].get());
+    }
+    else if (input_parameters.count("out_mat_xc") != 0)
+    {
+        INPUT.out_mat_xc = *static_cast<bool*>(input_parameters["out_mat_xc"].get());
     }
     else if (input_parameters.count("cal_syns") != 0)
     {
@@ -1260,6 +1291,10 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     {
         INPUT.out_efield = *static_cast<bool*>(input_parameters["out_efield"].get());
     }
+    else if (input_parameters.count("out_current") != 0)
+    {
+        INPUT.out_current = *static_cast<bool*>(input_parameters["out_current"].get());
+    }
     else if (input_parameters.count("td_print_eij") != 0)
     {
         INPUT.td_print_eij = *static_cast<double*>(input_parameters["td_print_eij"].get());
@@ -1386,11 +1421,11 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
     }
     else if (input_parameters.count("dft_plus_u") != 0)
     {
-        INPUT.dft_plus_u = *static_cast<bool*>(input_parameters["dft_plus_u"].get());
+        INPUT.dft_plus_u = *static_cast<int*>(input_parameters["dft_plus_u"].get());
     }
     else if (input_parameters.count("orbital_corr") != 0)
     {
-        INPUT.dft_plus_u = 0;
+        bool close_plus_u = true;
         bool dmft_flag = false;
         SimpleVector<double> vec_D = *static_cast<SimpleVector<double>*>(input_parameters["orbital_corr"].get());
         for (int i = 0; i < INPUT.ntype; i++)
@@ -1405,8 +1440,13 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
             if (INPUT.orbital_corr[i] != -1)
             {
                 dmft_flag = true;
-                INPUT.dft_plus_u = 1;
+                close_plus_u = false;
             }
+        }
+        if(close_plus_u)
+        {
+            std::cout << "No atoms are correlated!!!" << std::endl;
+            INPUT.dft_plus_u = 0;
         }
         if (!dmft_flag)
         {
@@ -1432,6 +1472,10 @@ bool input_parameters_set(std::map<std::string, InputParameter> input_parameters
                 exit(0);
             }
         }
+    }
+    else if (input_parameters.count("onsite_radius") != 0)
+    {
+        INPUT.onsite_radius = *static_cast<double*>(input_parameters["onsite_radius"].get());
     }
     else if (input_parameters.count("omc") != 0)
     {

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 #include "module_base/vector3.h"
 #include "module_md/md_para.h"
@@ -71,6 +72,7 @@ class Input
     bool towannier90; // add by jingan for wannier90
     std::string nnkpfile; // add by jingan for wannier90
     std::string wannier_spin; // add by jingan for wannier90
+    int wannier_method; // different implementation methods under Lcao basis set
     bool out_wannier_mmn;  // add by renxi for wannier90
     bool out_wannier_amn;
     bool out_wannier_unk;
@@ -84,6 +86,7 @@ class Input
     int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
     std::string nbndsto_str; // string parameter for stochastic bands
     int seed_sto; // random seed for sDFT
+    double initsto_ecut = 0.0; // maximum ecut to init stochastic bands
     double emax_sto; // Emax & Emin to normalize H
     double emin_sto;
     int bndpar; //parallel for stochastic/deterministic bands
@@ -91,7 +94,8 @@ class Input
     int method_sto; //different methods for sdft, 1: slow, less memory  2: fast, more memory
     int npart_sto; //for method_sto = 2, reduce memory
     bool cal_cond; //calculate electronic conductivities
-    int cond_nche; //orders of Chebyshev expansions for conductivities
+    double cond_che_thr; //control the error of Chebyshev expansions for conductivities
+    int cond_smear; //smearing method for conductivities 1: Gaussian 2: Lorentzian
     double cond_dw; //d\omega for conductivities
     double cond_wcut; //cutoff \omega for conductivities
     double cond_dt;  //dt to integrate conductivities
@@ -107,6 +111,7 @@ class Input
     int nspin; // LDA ; LSDA ; non-linear spin
     double nupdown = 0.0;
     double nelec; // total number of electrons
+    double nelec_delta; // change in the number of total electrons
     int lmaxmax;
 
     //==========================================================
@@ -159,6 +164,7 @@ class Input
     //==========================================================
     bool gamma_only; // for plane wave.
     bool gamma_only_local; // for local orbitals.
+    int fft_mode = 0; // fftw mode 0: estimate, 1: measure, 2: patient, 3: exhaustive
 
     double ecutwfc; // energy cutoff for wavefunctions
     double ecutrho; // energy cutoff for charge/potential
@@ -170,7 +176,7 @@ class Input
     int ncx, ncy, ncz; // three dimension of FFT charge/grid
     int nx, ny, nz; // three dimension of FFT wavefunc
     int bx, by, bz; // big mesh ball. mohan add 2011-04-21
-    int nsx, nsy, nsz; // three dimension of FFT smooth charge density
+    int ndx, ndy, ndz; // three dimension of FFT smooth charge density
 
     //==========================================================
     // technique
@@ -227,9 +233,16 @@ class Input
     std::string mixing_mode; // "plain","broyden",...
     double mixing_beta; // 0 : no_mixing
     int mixing_ndim; // used in Broyden method
-    double mixing_gg0; // used in kerker method. mohan add 2014-09-27
+    double mixing_restart; // mixing will restart once if drho is smaller than mixing_restart
+    double mixing_gg0; // used in kerker method
+    double mixing_beta_mag;
+    double mixing_gg0_mag;
+    double mixing_gg0_min;
+    double mixing_angle;
+
     bool mixing_tau; // whether to mix tau in mgga
     bool mixing_dftu; //whether to mix locale in DFT+U
+    bool mixing_dmr; // whether to mix real space density matrix
 
     //==========================================================
     // potential / charge / wavefunction / energy
@@ -249,19 +262,23 @@ class Input
     bool out_chg; // output charge density. 0: no; 1: yes
     bool out_dm; // output density matrix.
     bool out_dm1;
+    int band_print_num;
+    std::vector<int> bands_to_print;
     int out_pot; // yes or no
     int out_wfc_pw; // 0: no; 1: txt; 2: dat
     bool out_wfc_r; // 0: no; 1: yes
     int out_dos; // dos calculation. mohan add 20090909
-    bool out_band; // band calculation pengfei 2014-10-13
+    std::vector<int> out_band; // band calculation pengfei 2014-10-13
     bool out_proj_band; // projected band structure calculation jiyy add 2022-05-11
-    bool out_mat_hs; // output H matrix and S matrix in local basis.
+    std::vector<int> out_mat_hs; // output H matrix and S matrix in local basis.
+    bool out_mat_xc; // output exchange-correlation matrix in KS-orbital representation.
     bool cal_syns; // calculate asynchronous S matrix to output
     double dmax; // maximum displacement of all atoms in one step (bohr)
     bool out_mat_hs2; // LiuXh add 2019-07-16, output H(R) matrix and S(R) matrix in local basis.
     bool out_mat_dh;
     int out_interval;
     bool out_app_flag;    // whether output r(R), H(R), S(R), T(R), and dH(R) matrices in an append manner during MD  liuyu 2023-03-20
+    int out_ndigits;
     bool out_mat_t;
     bool out_mat_r; // jingan add 2019-8-14, output r(R) matrix.
     int out_wfc_lcao; // output the wave functions in local basis.
@@ -290,6 +307,7 @@ class Input
     double lcao_rmax; // rmax(a.u.) to make table.
     double search_radius; // 11.1
     bool search_pbc; // 11.2
+    double onsite_radius; // the radius of on-site orbitals
 
     //==========================================================
     // molecular dynamics
@@ -392,6 +410,7 @@ class Input
     std::string td_vext_dire; // vext direction
     bool out_dipole; // output the dipole or not
     bool out_efield; // output the efield or not
+    bool out_current; //output the current or not
 
     double td_print_eij; // threshold to output Eij elements
     int td_edm; //0: new edm method   1: old edm method
@@ -467,7 +486,7 @@ class Input
     //==========================================================
     //    DFT+U       Xin Qu added on 2020-10-29
     //==========================================================
-    bool dft_plus_u;             ///< true:DFT+U correction; false: standard DFT calculation(default)
+    int dft_plus_u;              ///< 1:DFT+U correction; 2:old DFT+U method; 0:standard DFT calculation(default)
     int* orbital_corr = nullptr; ///< which correlated orbitals need corrected ; d:2 ,f:3, do not need correction:-1
     double* hubbard_u = nullptr; ///< Hubbard Coulomb interaction parameter U(ev)
     int omc;                     ///< whether turn on occupation matrix control method or not
@@ -535,6 +554,7 @@ class Input
 	double	bessel_nao_sigma;		// spherical bessel smearing_sigma
 	std::string	bessel_nao_ecut;		// energy cutoff for spherical bessel functions(Ry)
 	double	bessel_nao_rcut;		// radial cutoff for spherical bessel functions(a.u.)
+    std::vector<double> bessel_nao_rcuts;
 	double	bessel_nao_tolerence;	// tolerence for spherical bessel root
     // the following are used when generating jle.orb
 	int		bessel_descriptor_lmax;			// lmax used in descriptor
@@ -559,9 +579,38 @@ class Input
     bool test_skip_ewald = false;
 
     //==========================================================
-    // whether to use PAW
+    // variables for non-collinear spin-constrained DFT (deltaspin)
+    //==========================================================
+    /**
+     * 0: none spin-constrained DFT;
+     * 1: constrain atomic spin;
+     */
+    bool sc_mag_switch; // the switch to open the DeltaSpin function, 0: no spin-constrained DFT; 1: constrain atomic magnetization
+    bool decay_grad_switch;// the switch to use the local approximation of gradient decay, 0: no local approximation; 1: apply the method
+    double sc_thr; // threshold for spin-constrained DFT in uB
+    int nsc; // maximum number of inner lambda loop
+    int nsc_min; // minimum number of inner lambda loop
+    int sc_scf_nmin; // minimum number of outer scf loop before initial lambda loop
+    double alpha_trial; // initial trial step size for lambda in eV/uB^2
+    double sccut; // restriction of step size in eV/uB
+    std::string sc_file; // file name for Deltaspin (json format)
+    //==========================================================
+    // variables for PAW
     //==========================================================
     bool use_paw = false;
+    //==========================================================
+    // variables for Quasiatomic Orbital analysis
+    //==========================================================
+    bool qo_switch = false;
+    std::string qo_basis = "hydrogen";
+    double qo_thr = 1e-6;
+    std::vector<std::string> qo_strategy = {};
+    std::vector<double> qo_screening_coeff = {};
+    
+    std::time_t get_start_time(void) const
+    {
+        return start_time;
+    }
 
   private:
     //==========================================================
@@ -574,6 +623,8 @@ class Input
     //        other processors)
     //==========================================================
 
+    // start time
+    std::time_t start_time;
     bool Read(const std::string &fn);
 
     void Default(void);
@@ -593,7 +644,7 @@ class Input
     {
         ifs >> var;
         std::string line;
-        getline(ifs, line);
+        getline(ifs, line); // read the rest of the line, directly discard it.
         return;
     }
     void read_kspacing(std::ifstream &ifs)
@@ -623,6 +674,26 @@ class Input
         // << std::endl;
     };
 
+    /* I hope this function would be more and more useful if want to support
+    vector/list of input */
+    template <typename T>
+    void read_value2stdvector(std::ifstream& ifs, std::vector<T>& var);
+    template <typename T>
+    typename std::enable_if<std::is_same<T, double>::value, T>::type cast_string(const std::string& str) { return std::stod(str); }
+    template <typename T>
+    typename std::enable_if<std::is_same<T, int>::value, T>::type cast_string(const std::string& str)
+    {
+        if (str == "true" || str == "1")
+            return 1;
+        else if (str == "false" || str == "0")
+            return 0;
+        else
+            return std::stoi(str);
+    }
+    template <typename T>
+    typename std::enable_if<std::is_same<T, bool>::value, T>::type cast_string(const std::string& str) { return (str == "true" || str == "1"); }
+    template <typename T>
+    typename std::enable_if<std::is_same<T, std::string>::value, T>::type cast_string(const std::string& str) { return str; }
     void strtolower(char *sa, char *sb);
     void read_bool(std::ifstream &ifs, bool &var);
 };

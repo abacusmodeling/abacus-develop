@@ -123,6 +123,10 @@ class ElecState
     double get_solvent_model_Ael();
     double get_solvent_model_Acav();
 
+    virtual double get_spin_constrain_energy() {
+        return 0.0;
+    }
+
 #ifdef __LCAO
     double get_dftu_energy();
 #endif
@@ -148,6 +152,7 @@ class ElecState
     void print_etot(const bool converged,
                     const int& iter,
                     const double& scf_thr,
+                    const double& scf_thr_kin,
                     const double& duration,
                     const int printe,
                     const double& pw_diag_thr = 0,
@@ -159,11 +164,10 @@ class ElecState
 
     void print_eigenvalue(std::ofstream& ofs);
 
-  protected:
+  public:
     // calculate ebands for all k points and all occupied bands
     void calEBand();
 
-  private:
     bool skip_weights = false;
 };
 

@@ -28,12 +28,15 @@ public:
     const Parallel_Orbitals* ParaV;
     const Grid_Technique* gridt;
 
+    /// read wavefunction coefficients: LOWF_*.txt
+    void gamma_file(psi::Psi<double>* psid, elecstate::ElecState* pelec);
     void allocate_k(const int& lgd,
-                    psi::Psi<std::complex<double>>* psi,
-                    elecstate::ElecState* pelec,
-                    const int& nks,
-                    const int& nkstot,
-                    const std::vector<ModuleBase::Vector3<double>>& kvec_c);
+        psi::Psi<std::complex<double>>* psi,
+        elecstate::ElecState* pelec,
+        const int& nks,
+        const int& nkstot,
+        const std::vector<ModuleBase::Vector3<double>>& kvec_c,
+        const int& istep);
 
     //=========================================
     // Init Cij, make it satisfy 2 conditions:
@@ -77,7 +80,10 @@ public:
                         const std::vector<ModuleBase::Vector3<double>>& kvec_c);
 #endif
 
+    int error = 0;
+
   private:
+
     template <typename T>
     int set_wfc_grid(int naroc[2],
                      int nb,
@@ -97,6 +103,7 @@ public:
 };
 
 #ifdef __MPI
+// the function should not be defined here!! mohan 2024-03-28
 template <typename T>
 int Local_Orbital_wfc::set_wfc_grid(int naroc[2],
                                     int nb,
@@ -111,22 +118,28 @@ int Local_Orbital_wfc::set_wfc_grid(int naroc[2],
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "set_wfc_grid");
     if (!wfc && !ctot)
+    {
         return 0;
+    }
     for (int j = 0; j < naroc[1]; ++j)
     {
         int igcol = globalIndex(j, nb, dim1, ipcol);
-        if (igcol >= GlobalV::NBANDS)
-            continue;
-        for (int i = 0; i < naroc[0]; ++i)
-        {
-            int igrow = globalIndex(i, nb, dim0, iprow);
-            int mu_local = this->gridt->trace_lo[igrow];
-            if (wfc && mu_local >= 0)
-            {
-                wfc[igcol][mu_local] = work[j * naroc[0] + i];
-            }
-            if (ctot && myid == 0)
-                ctot[igcol][igrow] = work[j * naroc[0] + i];
+		if (igcol >= GlobalV::NBANDS)
+		{
+			continue;
+		}
+		for (int i = 0; i < naroc[0]; ++i)
+		{
+			int igrow = globalIndex(i, nb, dim0, iprow);
+			int mu_local = this->gridt->trace_lo[igrow];
+			if (wfc && mu_local >= 0)
+			{
+				wfc[igcol][mu_local] = work[j * naroc[0] + i];
+			}
+			if (ctot && myid == 0)
+			{
+				ctot[igcol][igrow] = work[j * naroc[0] + i];
+			}
         }
     }
     return 0;

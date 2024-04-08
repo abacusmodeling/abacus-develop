@@ -17,6 +17,7 @@
     - [init\_chg](#init_chg)
     - [init\_vel](#init_vel)
     - [nelec](#nelec)
+    - [nelec\_delta](#nelec_delta)
     - [nupdown](#nupdown)
     - [dft\_functional](#dft_functional)
     - [xc\_temperature](#xc_temperature)
@@ -28,6 +29,7 @@
     - [kspacing](#kspacing)
     - [min\_dist\_coef](#min_dist_coef)
     - [device](#device)
+    - [precision](#precision)
   - [Variables related to input files](#variables-related-to-input-files)
     - [stru\_file](#stru_file)
     - [kpoint\_file](#kpoint_file)
@@ -39,12 +41,13 @@
     - [ecutwfc](#ecutwfc)
     - [ecutrho](#ecutrho)
     - [nx, ny, nz](#nx-ny-nz)
-    - [nsx, nsy, nsz](#nsx-nsy-nsz)
+    - [ndx, ndy, ndz](#ndx-ndy-ndz)
     - [pw\_seed](#pw_seed)
     - [pw\_diag\_thr](#pw_diag_thr)
     - [pw\_diag\_nmax](#pw_diag_nmax)
     - [pw\_diag\_ndim](#pw_diag_ndim)
     - [erf\_ecut](#erf_ecut)
+    - [fft\_mode](#fft_mode)
     - [erf\_height](#erf_height)
     - [erf\_sigma](#erf_sigma)
   - [Numerical atomic orbitals related variables](#numerical-atomic-orbitals-related-variables)
@@ -68,8 +71,14 @@
     - [smearing\_sigma\_temp](#smearing_sigma_temp)
     - [mixing\_type](#mixing_type)
     - [mixing\_beta](#mixing_beta)
+    - [mixing\_beta\_mag](#mixing_beta_mag)
     - [mixing\_ndim](#mixing_ndim)
+    - [mixing\_restart](#mixing_restart)
+    - [mixing\_dmr](#mixing_dmr)
     - [mixing\_gg0](#mixing_gg0)
+    - [mixing\_gg0\_mag](#mixing_gg0_mag)
+    - [mixing\_gg0\_min](#mixing_gg0_min)
+    - [mixing\_angle](#mixing_angle)
     - [mixing\_tau](#mixing_tau)
     - [mixing\_dftu](#mixing_dftu)
     - [gamma\_only](#gamma_only)
@@ -88,6 +97,7 @@
     - [emin\_sto](#emin_sto)
     - [emax\_sto](#emax_sto)
     - [seed\_sto](#seed_sto)
+    - [initsto\_ecut](#initsto_ecut)
     - [initsto\_freq](#initsto_freq)
     - [npart\_sto](#npart_sto)
   - [Geometry relaxation](#geometry-relaxation)
@@ -134,8 +144,12 @@
     - [out\_mat\_hs2](#out_mat_hs2)
     - [out\_mat\_t](#out_mat_t)
     - [out\_mat\_dh](#out_mat_dh)
+    - [out\_mat\_xc](#out_mat_xc)
     - [out\_app\_flag](#out_app_flag)
+    - [out\_ndigits](#out_ndigits)
     - [out\_interval](#out_interval)
+    - [band\_print\_num](#band_print_num)
+    - [bands\_to\_print](#bands_to_print)
     - [out\_element\_info](#out_element_info)
     - [restart\_save](#restart_save)
     - [restart\_load](#restart_load)
@@ -263,6 +277,7 @@
     - [yukawa\_potential](#yukawa_potential)
     - [yukawa\_lambda](#yukawa_lambda)
     - [omc](#omc)
+    - [onsite\_radius](#onsite_radius)
   - [vdW correction](#vdw-correction)
     - [vdw\_method](#vdw_method)
     - [vdw\_s6](#vdw_s6)
@@ -286,6 +301,7 @@
     - [gdir](#gdir)
     - [towannier90](#towannier90)
     - [nnkpfile](#nnkpfile)
+    - [wannier\_method](#wannier_method)
     - [wannier\_spin](#wannier_spin)
     - [out\_wannier\_mmn](#out_wannier_mmn)
     - [out\_wannier\_amn](#out_wannier_amn)
@@ -322,8 +338,8 @@
     - [td\_trigo\_amp](#td_trigo_amp)
     - [td\_heavi\_t0](#td_heavi_t0)
     - [td\_heavi\_amp](#td_heavi_amp)
-    - [td\_out\_dipole](#td_out_dipole)
-    - [td\_out\_efield](#td_out_efield)
+    - [out\_dipole](#out_dipole)
+    - [out\_efield](#out_efield)
     - [ocp](#ocp)
     - [ocp\_set](#ocp_set)
   - [Variables useful for debugging](#variables-useful-for-debugging)
@@ -338,11 +354,12 @@
     - [test\_skip\_ewald](#test_skip_ewald)
   - [Electronic conductivities](#electronic-conductivities)
     - [cal\_cond](#cal_cond)
-    - [cond\_nche](#cond_nche)
+    - [cond\_che\_thr](#cond_che_thr)
     - [cond\_dw](#cond_dw)
     - [cond\_wcut](#cond_wcut)
     - [cond\_dt](#cond_dt)
     - [cond\_dtbatch](#cond_dtbatch)
+    - [cond\_smear](#cond_smear)
     - [cond\_fwhm](#cond_fwhm)
     - [cond\_nonlocal](#cond_nonlocal)
   - [Implicit solvation model](#implicit-solvation-model)
@@ -351,6 +368,22 @@
     - [tau](#tau)
     - [sigma\_k](#sigma_k)
     - [nc\_k](#nc_k)
+  - [Deltaspin](#deltaspin)
+    - [sc\_mag\_switch](#sc_mag_switch)
+    - [decay\_grad\_switch](#decay_grad_switch)
+    - [sc\_thr](#sc_thr)
+    - [nsc](#nsc)
+    - [nsc\_min](#nsc_min)
+    - [sc\_scf\_nmin](#sc_scf_nmin)
+    - [alpha\_trial](#alpha_trial)
+    - [sccut](#sccut)
+    - [sc\_file](#sc_file)
+  - [Quasiatomic Orbital (QO) analysis](#quasiatomic-orbital-qo-analysis)
+    - [qo\_switch](#qo_switch)
+    - [qo\_basis](#qo_basis)
+    - [qo\_strategy](#qo_strategy)
+    - [qo\_screening\_coeff](#qo_screening_coeff)
+    - [qo\_thr](#qo_thr)
 
 [back to top](#full-list-of-input-keywords)
 
@@ -383,7 +416,7 @@ These variables are used to control general system parameters.
   - get_wf: Envelope function for LCAO basis. Please see the explanation for variable `nbands_istate`
   - md: molecular dynamics
   - test_memory : checks memory required for the calculation. The number is not quite reliable, please use it with care
-  - test_neighbour : only performs neighbouring atom search
+  - test_neighbour : only performs neighbouring atom search, please specify a positive [search_radius](#search_radius) manually.
   - gen_bessel : generates projectors (a series of Bessel functions) for DeePKS; see also keywords bessel_descriptor_lmax, bessel_descriptor_rcut and bessel_descriptor_tolerence. A file named `jle.orb` will be generated which contains the projectors. An example is provided in examples/H2O-deepks-pw
   - get_S : only works for multi-k calculation with LCAO basis. Generates and writes the overlap matrix to a file named `SR.csr` in the working directory. The format of the file will be the same as that generated by [out_mat_hs2](#out_mat_hs2)
 - **Default**: scf
@@ -408,8 +441,9 @@ These variables are used to control general system parameters.
   - 0: Only time reversal symmetry would be considered in symmetry operations, which implied k point and -k point would be treated as a single k point with twice the weight.
   - 1: Symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations. (point groups, space groups, primitive cells, and irreducible k-points)
 - **Default**: 
-  - -1: if (*[dft_fuctional](#dft_functional)==hse/hf/pbe0/scan0/opt_orb* or *[rpa](#rpa)==True*) and *[calculation](#calculation)!=nscf*. Currently symmetry is not supported in EXX (exact exchange) calculation.
-  - 0: if *[calculation](#calculation)==md/nscf/get_pchg/get_wf/get_S* or *[gamma_only]==True*
+  - 0:
+    - if *[calculation](#calculation)==md/nscf/get_pchg/get_wf/get_S* or *[gamma_only]==True*;  
+    - If (*[dft_fuctional](#dft_functional)==hse/hf/pbe0/scan0/opt_orb* or *[rpa](#rpa)==True*). Currently *symmetry==1* is not supported in EXX (exact exchange) calculation.
   - 1: else
 
 ### symmetry_prec
@@ -417,7 +451,7 @@ These variables are used to control general system parameters.
 - **Type**: Real
 - **Description**: The accuracy for symmetry judgment. Usually the default value is good enough, but if the lattice parameters or atom positions in STRU file is not accurate enough, this value should be enlarged. 
   > Note: if *[calculation](#calculation)==cell_relax*, this value can be dynamically changed corresponding to the variation of accuracy of the lattice parameters and atom positions during the relaxation. The new value will be printed in `OUT.${suffix}/running_cell-relax.log` in that case.
-- **Default**: 1.0e-5
+- **Default**: 1.0e-6
 - **Unit**:  Bohr
 
 ### symmetry_autoclose
@@ -427,7 +461,7 @@ These variables are used to control general system parameters.
 - **Description**: Control how to deal with error in symmetry analysis due to inaccurate lattice parameters or atom positions in STRU file, especially useful when *[calculation](#calculation)==cell-relax*
   - False: quit with an error message
   - True: automatically set symmetry to 0 and continue running without symmetry analysis
-- **Default**: False
+- **Default**: True
 
 ### kpar
 
@@ -484,7 +518,7 @@ These variables are used to control general system parameters.
   
   - atomic: from atomic pseudo wave functions. If they are not enough, other wave functions are initialized with random numbers.
   - atomic+random: add small random numbers on atomic pseudo-wavefunctions
-  - file: from file
+  - file: from binary files `WAVEFUNC*.dat`, which are output by setting [out_wfc_pw](#out_wfc_pw) to `2`.
   - random: random numbers
   
   with `psi_initializer 1`, two more options are supported:
@@ -498,7 +532,7 @@ These variables are used to control general system parameters.
 - **Description**: This variable is used for both plane wave set and localized orbitals set. It indicates the type of starting density.
 
   - atomic: the density is starting from the summation of the atomic density of single atoms. 
-  - file: the density will be read in from a file. Besides, when you do `nspin=1` calculation, you only need the density file SPIN1_CHG.cube. However, if you do `nspin=2` calculation, you also need the density file SPIN2_CHG.cube. The density file should be output with these names if you set out_chg = 1 in INPUT file.
+  - file: the density will be read in from a binary file `charge-density.dat` first. If it does not exist, the charge density will be read in from cube files. Besides, when you do `nspin=1` calculation, you only need the density file SPIN1_CHG.cube. However, if you do `nspin=2` calculation, you also need the density file SPIN2_CHG.cube. The density file should be output with these names if you set out_chg = 1 in INPUT file.
 - **Default**: atomic
 
 ### init_vel
@@ -517,6 +551,13 @@ These variables are used to control general system parameters.
 
   - 0.0: the total number of electrons will be calculated by the sum of valence electrons (i.e. assuming neutral system).
   - `>0.0`: this denotes the total number of electrons in the system. Must be less than 2*nbands. 
+- **Default**: 0.0
+
+### nelec_delta
+
+- **Type**: Real
+- **Description**: 
+ the total number of electrons will be calculated by `nelec`+`nelec_delta`.
 - **Default**: 0.0
 
 ### nupdown
@@ -616,6 +657,22 @@ If only one value is set (such as `kspacing 0.5`), then kspacing values of a/b/c
   - cg/bpcg/dav ks_solver: required by the `gpu` acceleration options
 - **Default**: cpu
 
+### precision
+
+- **Type**: String
+- **Description**: Specifies the precision of the PW_SCF calculation.
+
+  Available options are:
+
+  - single: single precision
+  - double: double precision
+
+  Known limitations:
+
+  - pw basis: required by the `single` precision options
+  - cg/bpcg/dav ks_solver: required by the `single` precision options
+- **Default**: double
+
 [back to top](#full-list-of-input-keywords)
 
 ## Variables related to input files
@@ -690,13 +747,19 @@ These variables are used to control the plane wave related parameters.
 ### nx, ny, nz
 
 - **Type**: Integer
-- **Description**: If set to a positive number, then the three variables specify the numbers of FFT grid points in x, y, z directions, respectively. If set to 0, the number will be calculated from ecutrho. Note: you must specify all three dimensions for this setting to be used.
+- **Description**: If set to a positive number, then the three variables specify the numbers of FFT grid points in x, y, z directions, respectively. If set to 0, the number will be calculated from ecutrho. 
+
+    Note: You must specify all three dimensions for this setting to be used.
 - **Default**: 0
 
-### nsx, nsy, nsz
+### ndx, ndy, ndz
 
 - **Type**: Integer
-- **Description**: If set to a positive number, then the three variables specify the numbers of FFT grid (for the smooth part of charge density in ultrasoft pseudopotential) points in x, y, z directions, respectively. If set to 0, the number will be calculated from ecutwfc. Note: you must specify all three dimensions for this setting to be used.
+- **Description**: If set to a positive number, then the three variables specify the numbers of FFT grid (for the dense part of charge density in ultrasoft pseudopotential) points in x, y, z directions, respectively. If set to 0, the number will be calculated from ecutwfc. 
+
+    Note: You must specify all three dimensions for this setting to be used.
+
+    Note: These parameters must be used combined with [nx,ny,nz](#nx-ny-nz). If [nx,ny,nz](#nx-ny-nz) are unset, ndx,ndy,ndz are used as [nx,ny,nz](#nx-ny-nz).
 - **Default**: 0
 
 ### pw_seed
@@ -729,6 +792,16 @@ These variables are used to control the plane wave related parameters.
 - **Description**: Used in variable-cell molecular dynamics (or in stress calculation). See [erf_sigma](#erf_sigma) in detail.
 - **Default**: 0.0
 - **Unit**: Ry
+
+### fft_mode
+
+- **Type**: Integer
+- **Description**: Set the mode of FFTW.
+  - 0: FFTW_ESTIMATE
+  - 1: FFTW_MEASURE
+  - 2: FFTW_PATIENT
+  - 3: FFTW_EXHAUSTIVE
+- **Default**: 0
 
 ### erf_height
 
@@ -798,6 +871,7 @@ These variables are used to control the numerical atomic orbitals related parame
 - **Type**: Real
 - **Description**: Searching radius in finding the neighbouring atoms. By default the radius will be automatically determined by the cutoffs of orbitals and nonlocal beta projectors.
 - **Default**: -1
+- **Unit**: Bohr
 
 ### search_pbc
 
@@ -824,7 +898,7 @@ calculations.
 - **Description**: Choose the basis set.
   - **pw**: Using plane-wave basis set only.
   - **lcao**: Using localized atomic orbital sets.
-  - **lcao_in_pw**: (Unavailable currently, it will be fixed in future versions) Expand the localized atomic set in plane-wave basis.
+  - **lcao_in_pw**: Expand the localized atomic set in plane-wave basis, non-self-consistent field calculation not tested.
 - **Default**: pw
 
 ### ks_solver
@@ -841,7 +915,7 @@ calculations.
   For atomic orbitals basis,
 
   - **genelpa**: This method should be used if you choose localized orbitals.
-  - **scalapack-gvx**: Scalapack can also be used for localized orbitals.
+  - **scalapack_gvx**: Scalapack can also be used for localized orbitals.
   - **cusolver**: (Unavailable currently, it will be fixed in future versions) This method needs building with the cusolver component for lcao and at least one gpu is available.
 
   If you set ks_solver=`genelpa` for basis_type=`pw`, the program will be stopped with an error message:
@@ -885,14 +959,16 @@ calculations.
   - **fixed**: fixed occupations (available for non-coductors only)
   - **gauss** or **gaussian**: Gaussian smearing method.
   - **mp**: methfessel-paxton smearing method; recommended for metals.
+  - **mp2**: 2-nd methfessel-paxton smearing method; recommended for metals.
+  - **mv** or **cold**: marzari-vanderbilt smearing method.
   - **fd**: Fermi-Dirac smearing method: $f=1/\{1+\exp[(E-\mu)/kT]\}$ and smearing_sigma below is the temperature $T$ (in Ry).
-- **Default**: fixed
+- **Default**: gauss
 
 ### smearing_sigma
 
 - **Type**: Real
 - **Description**: Energy range for smearing.
-- **Default**: 0.001
+- **Default**: 0.015
 - **Unit**: Ry
 
 ### smearing_sigma_temp
@@ -905,7 +981,6 @@ calculations.
 ### mixing_type
 
 - **Type**: String
-- **Availability**: `smearing_method` is not `fixed`.
 - **Description**: Charge mixing methods.
   - **plain**: Just simple mixing.
   - **pulay**: Standard Pulay method. [P. Pulay Chemical Physics Letters, (1980)](https://www.sciencedirect.com/science/article/abs/pii/0009261480803964)
@@ -919,16 +994,22 @@ calculations.
 - **Type**: Real
 - **Description**: In general, the formula of charge mixing can be written as $\rho_{new} = \rho_{old} + \beta * \rho_{update}$, where $\rho_{new}$ represents the new charge density after charge mixing, $\rho_{old}$ represents the charge density in previous step, $\rho_{update}$ is obtained through various mixing methods, and $\beta$ is set by the parameter `mixing_beta`. A lower value of 'mixing_beta' results in less influence of $\rho_{update}$ on $\rho_{new}$, making the self-consistent field (SCF) calculation more stable. However, it may require more steps to achieve convergence.
 We recommend the following options:
-  - **-10.0**: Program will auto set `mixing_beta` and `mixing_gg0` before charge mixing method starts.
-    - Default values of transition metal system are `mixing_beta=0.2` and `mixing_gg0=1.5`;
-    - Default values of metal system (bandgap <= 1.0 eV) are `mixing_beta=0.2` and `mixing_gg0=0.0`;
-    - Default values of other systems (bandgap > 1.0eV) are `mixing_beta=0.7` and `mixing_gg0=0.0`.
+  - **0.8**: `nspin=1`
+  - **0.4**: `nspin=2` and `nspin=4`
   - **0**: keep charge density unchanged, usually used for restarting with `init_chg=file` or testing.
   - **0.1 or less**: if convergence of SCF calculation is difficult to reach, please try `0 < mixing_beta < 0.1`.
   
-  Note: For low-dimensional large systems, the setup of `mixing_beta=0.1`, `mixing_ndim=20`, and `mixing_gg0=1.5` usually works well.
+  Note: For low-dimensional large systems, the setup of `mixing_beta=0.1`, `mixing_ndim=20`, and `mixing_gg0=1.0` usually works well.
 
-- **Default**: -10.0
+- **Default**: 0.8 for `nspin=1`, 0.4 for `nspin=2` and `nspin=4`.
+
+### mixing_beta_mag
+
+- **Type**: Real
+- **Description**: Mixing parameter of magnetic density.
+- **Default**: `4*mixing_beta`, but the maximum value is 1.6.
+
+Note that `mixing_beta_mag` is not euqal to `mixing_beta` means that $\rho_{up}$ and $\rho_{down}$ mix independently from each other. This setting will fail for one case where the $\rho_{up}$ and $\rho_{down}$ of the ground state refers to different Kohn-Sham orbitals. For an atomic system, the $\rho_{up}$ and $\rho_{down}$ of the ground state refers to different Kohn-Sham orbitals. We all know Kohn-Sham orbitals are orthogonal to each other. So the mixture of $\rho_{up}$ and $\rho_{down}$ should be exactly independent, otherwise SCF cannot find the ground state forever. To sum up, please make sure `mixing_beta_mag` and `mixing_gg0_mag` exactly euqal to `mixing_beta` and `mixing_gg0` if you calculate an atomic system.
 
 ### mixing_ndim
 
@@ -938,15 +1019,54 @@ We recommend the following options:
   For systems that are difficult to converge, one could try increasing the value of 'mixing_ndim' to enhance the stability of the self-consistent field (SCF) calculation.
 - **Default**: 8
 
+### mixing_restart
+
+- **Type**: double
+- **Description**: If the density difference between input and output `drho` is smaller than `mixing_restart`, SCF will restart at next step which means SCF will restart by using output charge density from perivos iteration as input charge density directly, and start a new mixing. Notice that `mixing_restart` will only take effect once in one SCF.
+  
+- **Default**: 0
+
+### mixing_dmr
+
+- **Type**: bool
+- **Availability**: Only for `mixing_restart>=0.0`
+- **Description**: At n-th iteration which is calculated by `drho<mixing_restart`, SCF will start a mixing for real-space density matrix by using the same coefficiences as the mixing of charge density.
+  
+- **Default**: false
+
 ### mixing_gg0
 
 - **Type**: Real
-- **Description**: Whether to perfom Kerker scaling.
-  -  **>0**: The high frequency wave vectors will be suppressed by multiplying a scaling factor $\frac{k^2}{k^2+gg0^2}$. Setting `mixing_gg0 = 1.5` is normally a good starting point.
+- **Description**: Whether to perfom Kerker scaling for charge density.
+  -  **>0**: The high frequency wave vectors will be suppressed by multiplying a scaling factor $\frac{k^2}{k^2+gg0^2}$. Setting `mixing_gg0 = 1.0` is normally a good starting point. Kerker preconditioner will be automatically turned off if `mixing_beta <= 0.1`.
   -  **0**: No Kerker scaling is performed.
   
   For systems that are difficult to converge, particularly metallic systems, enabling Kerker scaling may aid in achieving convergence.
+- **Default**: 1.0
+
+### mixing_gg0_mag
+
+- **Type**: Real
+- **Description**: Whether to perfom Kerker preconditioner of magnetic density. 
+  Note: we do not recommand to open Kerker preconditioner of magnetic density unless the system is too hard to converge.
 - **Default**: 0.0
+
+### mixing_gg0_min
+
+- **Type**: Real
+- **Description**: the minimum kerker coefficient 
+- **Default**: 0.1
+
+### mixing_angle
+
+- **Type**: Real
+- **Availability**: Only relevant for non-colinear calculations `nspin=4`.
+- **Description**: Normal broyden mixing can give the converged result for a given magnetic configuration. If one is not interested in the energies of a given magnetic configuration but wants to determine the ground state by relaxing the magnetic moments’ directions, one cannot rely on the standard Broyden mixing algorithm. To enhance the ability to find correct magnetic configuration for non-colinear calculations, ABACUS implements a promising mixing method proposed by J. Phys. Soc. Jpn. 82 (2013) 114706. Here, `mixing_angle` is the angle mixing parameter. In fact, only `mixing_angle=1.0` is implemented currently.
+  - **<=0**: Normal broyden mixing for $m_{x}, m_{y}, m_{z}$
+  - **>0**: Angle mixing for the modulus $|m|$ with `mixing_angle=1.0`
+- **Default**: -10.0
+
+Note: In new angle mixing, you should set `mixing_beta_mag >> mixing_beta`. The setup of `mixing_beta=0.2`, `mixing_beta_mag=1.0` usually works well.
 
 ### mixing_tau
 
@@ -1105,6 +1225,14 @@ These variables are used to control the parameters of stochastic DFT (SDFT),  mi
   - -1: the seed is decided by time(NULL).
 - **Default**: 0
 
+### initsto_ecut
+
+- **Type**: Real
+- **Availability**: [esolver_type](#esolver_type) = `sdft`
+- **Description**: Stochastic wave functions are initialized in a large box generated by "4*`initsto_ecut`". `initsto_ecut` should be larger than [ecutwfc](#ecutwfc). In this method, SDFT results are the same when using different cores. Besides, coefficients of the same G are the same when ecutwfc is rising to initsto_ecut. If it is smaller than [ecutwfc](#ecutwfc), it will be turned off.
+- **Default**: 0.0
+- **Unit**: Ry
+
 ### initsto_freq
 
 - **Type**: Integer
@@ -1117,8 +1245,8 @@ These variables are used to control the parameters of stochastic DFT (SDFT),  mi
 ### npart_sto
 
 - **Type**: Integer
-- **Availability**: [method_sto](#method_sto) = `2` and [out_dos](#out_dos) = `True`
-- **Description**: Make memory cost to 1/npart_sto times of the previous one when running the post process of SDFT like DOS.
+- **Availability**: [method_sto](#method_sto) = `2` and [out_dos](#out_dos) = `True` or [cal_cond](#cal_cond) = `True`
+- **Description**: Make memory cost to 1/npart_sto times of the previous one when running the post process of SDFT like DOS or conductivities.
 - **Default**: 1
 
 [back to top](#full-list-of-input-keywords)
@@ -1325,6 +1453,8 @@ These variables are used to control the output of properties.
   - npsin = 4: SPIN1_CHG.cube, SPIN2_CHG.cube, SPIN3_CHG.cube, and SPIN4_CHG.cube.
 
   The circle order of the charge density on real space grids is: x is the outer loop, then y and finally z (z is moving fastest).
+
+  If EXX(exact exchange) is calculated, (i.e. *[dft_fuctional](#dft_functional)==hse/hf/pbe0/scan0/opt_orb* or *[rpa](#rpa)==True*), the Hexx(R) files will be output in the folder `OUT.${suffix}` too, which can be read in NSCF calculation.
 - **Default**: False
 
 ### out_pot
@@ -1399,8 +1529,8 @@ These variables are used to control the output of properties.
 
 ### out_band
 
-- **Type**: Boolean
-- **Description**: Whether to output the band structure (in eV). For more information, refer to the [band.md](../elec_properties/band.md)
+- **Type**: Boolean Integer(optional)
+- **Description**: Whether to output the band structure (in eV), optionally output precision can be set by a second parameter, default is 8. For more information, refer to the [band.md](../elec_properties/band.md)
 - **Default**: False
 
 ### out_proj_band
@@ -1443,10 +1573,10 @@ These variables are used to control the output of properties.
 
 ### out_mat_hs
 
-- **Type**: Boolean
+- **Type**: Boolean Integer(optional)
 - **Availability**: Numerical atomic orbital basis
-- **Description**: Whether to print the upper triangular part of the Hamiltonian matrices (in Ry) and overlap matrices for each k point into files in the directory `OUT.${suffix}`. For more information, please refer to [hs_matrix.md](../elec_properties/hs_matrix.md#out_mat_hs). Also controled by [out_interval](#out_interval) and [out_app_flag](#out_app_flag).
-- **Default**: False
+- **Description**: Whether to print the upper triangular part of the Hamiltonian matrices (in Ry) and overlap matrices for each k point into files in the directory `OUT.${suffix}`. The second number controls precision. For more information, please refer to [hs_matrix.md](../elec_properties/hs_matrix.md#out_mat_hs). Also controled by [out_interval](#out_interval) and [out_app_flag](#out_app_flag).
+- **Default**: False 8
 
 ### out_mat_r
 
@@ -1476,6 +1606,13 @@ These variables are used to control the output of properties.
 - **Description**: Whether to print files containing the derivatives of the Hamiltonian matrix (in Ry/Bohr). The format will be the same as the Hamiltonian matrix $H(R)$ and overlap matrix $S(R)$ as mentioned in [out_mat_hs2](#out_mat_hs2). The name of the files will be `data-dHRx-sparse_SPIN0.csr` and so on. Also controled by [out_interval](#out_interval) and [out_app_flag](#out_app_flag).
 - **Default**: False
 
+### out_mat_xc
+
+- **Type**: Boolean
+- **Availability**: Numerical atomic orbital basis
+- **Description**: Whether to print the upper triangular part of the exchange-correlation matrices in **Kohn-Sham orbital representation** (unit: Ry): $\braket{\psi_i|V_\text{xc}^\text{(semi-)local}+V_\text{exx}+V_\text{DFTU}|\psi_j}$ for each k point into files in the directory `OUT.${suffix}`, which is useful for the subsequent GW calculation. (Note that currently DeePKS term is not included. ) The files are named `k-$k-Vxc`, the meaning of `$k`corresponding to k point and spin  is same as [hs_matrix.md](../elec_properties/hs_matrix.md#out_mat_hs).
+- **Default**: False
+
 ### out_app_flag
 
 - **Type**: Boolean
@@ -1483,12 +1620,33 @@ These variables are used to control the output of properties.
 - **Description**: Whether to output $r(R)$, $H(R)$, $S(R)$, $T(R)$, $dH(R)$, $H(k)$, $S(k)$ and $wfc(k)$ matrices in an append manner during molecular dynamics calculations. Check input parameters [out_mat_r](#out_mat_r), [out_mat_hs2](#out_mat_hs2), [out_mat_t](#out_mat_t), [out_mat_dh](#out_mat_dh), [out_mat_hs](#out_mat_hs) and [out_wfc_lcao](#out_wfc_lcao) for more information.
 - **Default**: true
 
+### out_ndigits
+
+- **Type**: Integar
+- **Availability**: `out_mat_hs 1` case presently.
+- **Description**: Controls the length of decimal part of output data, such as charge density, Hamiltonian matrix, Overlap matrix and so on.
+- **Default**: 8
+
 ### out_interval
 
 - **Type**: Integer
 - **Availability**: Numerical atomic orbital basis
 - **Description**: Control the interval for printing Mulliken population analysis, $r(R)$, $H(R)$, $S(R)$, $T(R)$, $dH(R)$, $H(k)$, $S(k)$ and $wfc(k)$ matrices during molecular dynamics calculations. Check input parameters [out_mul](#out_mul), [out_mat_r](#out_mat_r), [out_mat_hs2](#out_mat_hs2), [out_mat_t](#out_mat_t), [out_mat_dh](#out_mat_dh), [out_mat_hs](#out_mat_hs) and [out_wfc_lcao](#out_wfc_lcao) for more information, respectively.
 - **Default**: 1
+
+### band_print_num
+
+- **Type**: Integer
+- **Availability**: PW basis
+- **Description**: If you want to plot a partial charge density contributed from some chosen bands. `band_print_num` define the number of band list. The result can be found in "band*.cube".
+- **Default**: 0
+
+### bands_to_print
+
+- **Type**: vector
+- **Availability**: band_print_num > 0
+- **Description**: define which band you want to choose for partial charge density.
+- **Default**: []
 
 ### out_element_info
 
@@ -1500,16 +1658,20 @@ These variables are used to control the output of properties.
 
 - **Type**: Boolean
 - **Availability**: Numerical atomic orbital basis
-- **Description**: Whether to save charge density files and Hamiltonian matrix files per ionic step, which are used to restart calculations. According to the value of [read_file_dir](#read_file_dir):
+- **Description**: Whether to save charge density files per ionic step, which are used to restart calculations. According to the value of [read_file_dir](#read_file_dir):
   - auto: These files are saved in folder `OUT.${suffix}/restart/`;
   - other: These files are saved in folder `${read_file_dir}/restart/`.
+  
+  If EXX(exact exchange) is calculated (i.e. *[dft_fuctional](#dft_functional)==hse/hf/pbe0/scan0/opt_orb* or *[rpa](#rpa)==True*), the Hexx(k) files for each k-point will also be saved in the above folder, which can be read in EXX calculation with *[restart_load](#restart_load)==True*.
 - **Default**: False
 
 ### restart_load
 
 - **Type**: Boolean
 - **Availability**: Numerical atomic orbital basis
-- **Description**: If [restart_save](#restart_save) is set to true and an electronic iteration is finished, calculations can be restarted from the charge density file and Hamiltonian matrix file, which are saved in the former calculation. Please ensure [read_file_dir](#read_file_dir) is correct, and  the charge density file and Hamiltonian matrix file exist.
+- **Description**: If [restart_save](#restart_save) is set to true and an electronic iteration is finished, calculations can be restarted from the charge density file, which are saved in the former calculation. Please ensure [read_file_dir](#read_file_dir) is correct, and  the charge density file exist.
+
+  If EXX(exact exchange) is calculated (i.e. *[dft_fuctional](#dft_functional)==hse/hf/pbe0/scan0/opt_orb* or *[rpa](#rpa)==True*), the Hexx(k) files in the same folder for each k-point will also be read.
 - **Default**: False
 
 ### rpa
@@ -1883,15 +2045,15 @@ These variables are relevant to electric field and dipole correction
 
 - **Type**: Real
 - **Availability**: with efield_flag = True.
-- **Description**: Position of the maximum of the saw-like potential along crystal axis efield_dir, within the  unit cell, 0 < efield_pos_max < 1.
-- **Default**: 0.5
+- **Description**: Position of the maximum of the saw-like potential along crystal axis efield_dir, within the  unit cell, 0 <= efield_pos_max < 1.
+- **Default**: Autoset to `center of vacuum - width of vacuum / 20`
 
 ### efield_pos_dec
 
 - **Type**: Real
 - **Availability**: with efield_flag = True.
 - **Description**: Zone in the unit cell where the saw-like potential decreases, 0 < efield_pos_dec < 1.
-- **Default**: 0.1
+- **Default**: Autoset to `width of vacuum / 10`
 
 ### efield_amp
 
@@ -1988,14 +2150,14 @@ These variables are relevant when using hybrid functionals.
 ### exx_hybrid_step
 
 - **Type**: Integer
-- **Availability**: *[exx_seperate_loop](#exx_separate_loop)==1*
+- **Availability**: *[exx_separate_loop](#exx_separate_loop)==1*
 - **Description**: the maximal iteration number of the outer-loop, where the Fock exchange is calculated
 - **Default**: 100
 
 ### exx_mixing_beta
 
 - **Type**: Real
-- **Availability**: *[exx_seperate_loop](#exx_separate_loop)==1*
+- **Availability**: *[exx_separate_loop](#exx_separate_loop)==1*
 - **Description**: mixing_beta for densty matrix in each iteration of the outer-loop
 - **Default**: 1.0
 
@@ -2282,7 +2444,7 @@ These variables are used to control molecular dynamics calculations. For more in
 
 - **Type**: Real
 - **Description**: The target pressure used in NPT ensemble simulations, the default value of `md_plast` is `md_pfirst`. If `md_plast` is set to be different from `md_pfirst`, ABACUS will automatically change the target pressure from `md_pfirst` to `md_plast`.
-- **Default**: No default
+- **Default**: -1.0
 - **Unit**: kbar
 
 ### md_pfreq
@@ -2407,11 +2569,12 @@ These variables are used to control DFT+U correlated parameters
 
 ### dft_plus_u
 
-- **Type**: Boolean
+- **Type**: Integer
 - **Description**: Determines whether to calculate the plus U correction, which is especially important for correlated electrons.
-  - True: Calculate plus U correction.
-  - False: Do not calculate plus U correction.
-- **Default**: False
+  - 1: Calculate plus U correction with radius-adjustable localized projections (with parameter `onsite_radius`).
+  - 2: Calculate plus U correction using first zeta of NAOs as projections (this is old method for testing).
+  - 0: Do not calculate plus U correction.
+- **Default**: 0
 
 ### orbital_corr
 
@@ -2457,6 +2620,44 @@ These variables are used to control DFT+U correlated parameters
 > Note : The easiest way to create `initial_onsite.dm` is to run a DFT+U calculation, look for a file named `onsite.dm` in the OUT.prefix directory, and make replacements there. The format of the file is rather straight-forward.
 
 - **Default**: 0
+
+### onsite_radius
+
+- **Type**: Real
+- **Availability**: `dft_plus_u` is set to 1
+- **Description**: 
+
+  - The `Onsite-radius` parameter facilitates modulation of the single-zeta portion of numerical atomic orbitals for projections for DFT+U. 
+  - The modulation algorithm includes a smooth truncation applied directly to the tail of the original orbital, followed by normalization.  Consider the function:
+  $$
+  g(r;\sigma)=\begin{cases}
+  1-\exp\left(-\frac{(r-r_c)^2}{2\sigma^2}\right), & r < r_c\\
+  0, & r \geq r_c
+  \end{cases}
+  $$
+  - where $\sigma$ is a parameter that controls the smoothing interval. A normalized function truncated smoothly at $r_c$ can be represented as:
+
+  $$
+  \alpha(r) = \frac{\chi(r)g(r;\sigma)}{\langle\chi(r)g(r;\sigma), \chi(r)g(r;\sigma)\rangle}
+  $$
+
+  - To find an appropriate $\sigma$, the optimization process is as follows:
+
+  - Maximizing the overlap integral under a normalization constraint is equivalent to minimizing an error function:
+
+  $$
+  \min \langle \chi(r)-\alpha(r), \chi(r)-\alpha(r)\rangle \quad \text{subject to} \quad \langle \alpha(r),\alpha(r)\rangle=1
+  $$
+
+  - Similar to the process of generating numerical atomic orbitals, this optimization choice often induces additional oscillations in the outcome. To suppress these oscillations, we may include a derivative term in the objective function ($f'(r)\equiv \mathrm{d}f(r)/\mathrm{d}r$):
+
+  $$
+  \min \left[\gamma\langle \chi(r)-\alpha(r), \chi(r)-\alpha(r)\rangle + \langle \chi'(r)-\alpha'(r), \chi'(r)-\alpha'(r)\rangle\right] \quad \text{subject to} \quad \langle \alpha(r),\alpha(r)\rangle=1
+  $$
+
+  - where $\gamma$ is a parameter that adjusts the relative weight of the error function to the derivative error function.
+- **Unit**: Bohr
+- **Default**: 5.0 
 
 [back to top](#full-list-of-input-keywords)
 
@@ -2655,13 +2856,21 @@ These variables are used to control berry phase and wannier90 interface paramete
 - **Description**: the file name generated when running "wannier90 -pp ..." command
 - **Default**: seedname.nnkp
 
+### wannier_method
+
+- **Type**: Integer
+- **Description**: Only available on LCAO basis, using different methods to generate "\*.mmn" file and "\*.amn" file.
+  - 1: Calculated using the `lcao_in_pw` method, the calculation accuracy can be improved by increasing `ecutwfc` to maintain consistency with the pw basis set results.
+  - 2: The overlap between atomic orbitals is calculated using grid integration. The radial grid points are generated using the Gauss-Legendre method, while the spherical grid points are generated using the Lebedev-Laikov method.
+- **Default**: 1
+
 ### wannier_spin
 
 - **Type**: String
 - **Description**: the spin direction for the Wannier function calculation when nspin is set to 2
-  - "up": Calculate spin up for the Wannier function.
-  - "down": Calculate spin down for the Wannier function.
-- **Default**: "up"
+  - `up`: Calculate spin up for the Wannier function.
+  - `down`: Calculate spin down for the Wannier function.
+- **Default**: `up`
 
 ### out_wannier_mmn
 
@@ -2693,7 +2902,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 - **Description**: write the "UNK.*" file or not.
   - 0: don't write the "UNK.*" file.
   - 1: write the "UNK.*" file.
-- **Default**: 1
+- **Default**: 0
 
 ### out_wannier_wvfn_formatted
 
@@ -2701,6 +2910,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 - **Description**: write the "UNK.*" file in ASCII format or binary format.
   - 0: write the "UNK.*" file in binary format.
   - 1: write the "UNK.*" file in ASCII format (text file format).
+- **Default**: 1
 
 [back to top](#full-list-of-input-keywords)
 
@@ -2967,7 +3177,7 @@ These variables are used to control berry phase and wannier90 interface paramete
   E = 0.0 , t>t0
 - **Default**: 2.74
 
-### td_out_dipole
+### out_dipole
 
 - **Type**: Boolean
 - **Description**:
@@ -2975,10 +3185,10 @@ These variables are used to control berry phase and wannier90 interface paramete
   - False: do not output dipole.
 - **Default**: False
 
-### td_out_efield
+### out_efield
 
 - **Type**: Boolean
-- **Description**: The unit of output file is atomic unit (1 a.u. = 1 Ry/(bohr $\cdot$ e) = 51.422 V/Angstrom).
+- **Description**: output TDDFT Efield or not(V/Angstrom)
   - True: output efield.
   - False: do not output efield.
 - **Default**: False
@@ -3094,8 +3304,10 @@ $\times[f(\epsilon_{i\mathbf{k}})-f(\epsilon_{j\mathbf{k}})]\delta(\epsilon_{j\m
 They can also be computed by $j$-$j$ correlation function.
 
 $L_{mn}=\frac{2e^{m+n-2}}{3\Omega\hbar\omega}\Im[\tilde{C}_{mn}(\omega)]$
-
-$\tilde{C}_{mn}=\int_0^\infty C_{mn}(t)e^{-i\omega t}e^{-\frac{1}{2}(\Delta E)^2t^2}dt$
+Guassian smearing:
+$\tilde{C}_{mn}=\int_0^\infty C_{mn}(t)e^{-i\omega t}e^{-\frac{1}{2}s^2t^2}dt$
+Lorentzian smearing:
+$\tilde{C}_{mn}=\int_0^\infty C_{mn}(t)e^{-i\omega t}e^{-\gamma t}dt$
 
 $C_{mn}(t)=-2\theta(t)\Im\left\{Tr\left[\sqrt{\hat f}\hat{j}_m(1-\hat{f})e^{i\frac{\hat{H}}{\hbar}t}\hat{j}_ne^{-i\frac{\hat{H}}{\hbar}t}\sqrt{\hat f}\right]\right\}$,
 
@@ -3116,12 +3328,12 @@ Thermal conductivities: $\kappa = \lim_{\omega\to 0}\kappa(\omega)$.
 - **Description**: Whether to calculate electronic conductivities.
 - **Default**: False
 
-### cond_nche
+### cond_che_thr
 
-- **Type**: Integer
+- **Type**: Real
 - **Availability**: [esolver_type](#esolver_type) = `sdft`
-- **Description**: Chebyshev expansion orders for stochastic Kubo Greenwood.
-- **Default**: 20
+- **Description**: Control the error of Chebyshev expansions for conductivities.
+- **Default**: 1e-8
 
 ### cond_dw
 
@@ -3152,13 +3364,21 @@ Thermal conductivities: $\kappa = \lim_{\omega\to 0}\kappa(\omega)$.
 - **Type**: Integer
 - **Availability**: [esolver_type](#esolver_type) = `sdft`
 - **Description**: exp(iH\*dt\*cond_dtbatch) is expanded with Chebyshev expansion to calculate conductivities. It is faster but costs more memory.
-- **Default**: 4
+  - If `cond_dtbatch = 0`: Autoset this parameter to make expansion orders larger than 100.
+- **Default**: 0
+
+### cond_smear
+- **Type**: Integer
+- **Description**: Smearing method for conductivities
+  - 1: Gaussian smearing
+  - 2: Lorentzian smearing
+- **Default**: 1
 
 ### cond_fwhm
 
 - **Type**: Real
 - **Availability**: [basis_type](#basis_type) = `pw`
-- **Description**: FWHM for conductivities, $\mathrm{FWHM}=2*\sqrt{2\ln2}\cdot \Delta E$. Here, we use gaussian functions to approximate $\delta(E)\approx \frac{1}{\sqrt{2\pi}\Delta E}e^{-\frac{E^2}{2{\Delta E}^2}}$. 
+- **Description**: FWHM for conductivities. For Gaussian smearing, $\mathrm{FWHM}=2\sqrt{2\ln2}s$; for Lorentzian smearing, $\mathrm{FWHM}=2\gamma$.
 - **Default**: 0.4
 - **Unit**: eV
 
@@ -3209,5 +3429,187 @@ These variables are used to control the usage of implicit solvation model. This 
 - **Description**: the value of the electron density at which the dielectric cavity forms
 - **Default**: 0.00037
 - **Unit**: $Bohr^{-3}$
+
+[back to top](#full-list-of-input-keywords)
+
+## Deltaspin
+
+These variables are used to control the usage of deltaspin functionality.
+
+### sc_mag_switch
+
+- **Type**: boolean
+- **Description**: the switch of deltaspin functionality
+  - 0: no deltaspin
+  - 1: use the deltaspin method to constrain atomic magnetic moments
+- **Default**: 0
+
+### decay_grad_switch
+
+- **Type**: boolean
+- **Description**: the switch of decay gradient method
+  - 0: no decay gradient method
+  - 1: use the decay gradient method and set ScDecayGrad in the file specified by `sc_file`. ScDecayGrad is an element dependent parameter, which is used to control the decay rate of the gradient of the magnetic moment.
+- **Default**: 0
+
+### sc_thr
+
+- **Type**: Real
+- **Description**: the threshold of the spin constraint atomic magnetic moment
+- **Default**: 1e-6
+- **Unit**: Bohr Mag (\muB)
+
+### nsc
+
+- **Type**: Integer
+- **Description**: the maximum number of steps in the inner lambda loop
+- **Default**: 100
+
+### nsc_min
+
+- **Type**: Integer
+- **Description**: the minimum number of steps in the inner lambda loop
+- **Default**: 2
+
+### sc_scf_nmin
+
+- **Type**: Integer
+- **Description**: the minimum number of outer scf loop before initializing lambda loop
+- **Default**: 2
+
+### alpha_trial
+
+- **Type**: Real
+- **Description**: initial trial step size for lambda in eV/uB^2
+- **Default**: 0.01
+- **Unit**: eV/uB^2
+
+### sccut
+
+- **Type**: Real
+- **Description**: restriction of step size in eV/uB
+- **Default**: 3
+- **Unit**: eV/uB
+
+### sc_file
+
+- **Type**: String
+- **Description**: the file in json format to specify atomic constraining parameters. An example of the sc_file json file is shown below for the `nspin 4` case:
+```json
+[
+    {
+        "element": "Fe",
+        "itype": 0,
+        "ScDecayGrad": 0.9,
+        "ScAtomData": [
+            {
+                "index": 0,
+                "lambda": [0, 0, 0],
+                "target_mag": [2.0, 0.0, 0.0],
+                "constrain": [1,1,1]
+            },
+            {
+                "index": 1,
+                "lambda": [0, 0, 0],
+                "target_mag_val": 2.0,
+                "target_mag_angle1": 80.0,
+                "target_mag_angle2": 0.0,
+                "constrain": [1,1,1]
+            }
+        ]
+    }
+]
+```
+and
+```json
+[
+    {
+        "element": "Fe",
+        "itype": 0,
+        "ScDecayGrad": 0.9,
+        "ScAtomData": [
+            {
+                "index": 0,
+                "lambda": 0.0,
+                "target_mag": 2.0,
+                "constrain": 1
+            },
+            {
+                "index": 1,
+                "lambda": 0,
+                "target_mag": 2.0,
+                "constrain": 1
+            }
+        ]
+    }
+]
+```
+for `nspin 2` case. The difference is that `lambda`, `target_mag`, and `constrain` are scalars in `nspin 2` case, and are vectors in `nspin 4` case.
+
+- **Default**: none
+
+[back to top](#full-list-of-input-keywords)
+
+## Quasiatomic Orbital (QO) analysis
+
+These variables are used to control the usage of QO analysis. QO further compress information from LCAO: usually PW basis has dimension in million, LCAO basis has dimension below thousand, and QO basis has dimension below hundred.
+
+### qo_switch
+
+- **Type**: Boolean
+- **Description**: whether to let ABACUS output QO analysis required files
+- **Default**: 0
+
+### qo_basis
+
+- **Type**: String
+- **Description**: specify the type of atomic basis
+  - `pswfc`: use the pseudowavefunction in pseudopotential files as atomic basis. To use this option, please make sure in pseudopotential file there is pswfc in it.
+  - `hydrogen`: generate hydrogen-like atomic basis (or with Slater screening).
+  - `szv`: use the first set of zeta for each angular momentum from numerical atomic orbitals as atomic basis.
+
+  *warning: to use* `pswfc` *, please use norm-conserving pseudopotentials with pseudowavefunctions, SG15 pseudopotentials cannot support this option.*
+  *Developer notes: for ABACUS-lcao calculation, it is the most recommend to use `szv` instead of `pswfc` which is originally put forward in work of QO implementation on PW basis. The information loss always happens if `pswfc` or `hydrogen` orbitals are not well tuned, although making kpoints sampling more dense will mitigate this problem, but orbital-adjust parameters are needed to test system-by-system in this case.*
+- **Default**: `szv`
+
+### qo_strategy
+
+- **Type**: String \[String...\](optional)
+- **Description**: specify the strategy to generate radial orbitals for each atom type. If one parameter is given, will apply to all atom types. If more than one parameters are given but fewer than number of atom type, those unspecified atom type will use default value.
+
+  For `qo_basis hydrogen`
+  - `minimal-nodeless`: according to principle quantum number of the highest occupied state, generate only nodeless orbitals, for example Cu, only generate 1s, 2p, 3d and 4f orbitals (for Cu, 4s is occupied, thus $n_{max} = 4$)
+  - `minimal-valence`: according to principle quantum number of the highest occupied state, generate only orbitals with highest principle quantum number, for example Cu, only generate 4s, 4p, 4d and 4f orbitals.
+  - `full`: similarly according to the maximal principle quantum number, generate all possible orbitals, therefore for Cu, for example, will generate 1s, 2s, 2p, 3s, 3p, 3d, 4s, 4p, 4d, 4f.
+  - `energy-full`: will generate hydrogen-like orbitals according to Aufbau principle. For example the Cu (1s2 2s2 2p6 3s2 3p6 3d10 4s1), will generate these orbitals.
+  - `energy-valence`: from the highest n (principal quantum number) layer and n-1 layer, generate all occupied and possible ls (angular momentum quantum number) for only once, for example Cu, will generate 4s, 3d and 3p orbitals.
+
+  For `qo_basis pswfc` and `qo_basis szv`
+  - `all`: use all possible pseudowavefunctions/numerical atomic orbital (of first zeta) in pseudopotential/numerical atomic orbital file.
+  - `s`/`p`/`d`/...: only use s/p/d/f/...-orbital(s).
+  - `spd`: use s, p and d orbital(s). Any unordered combination is acceptable.
+  
+  *warning: for* `qo_basis hydrogen` *to use* `full`, *generation strategy may cause the space spanned larger than the one spanned by numerical atomic orbitals, in this case, must filter out orbitals in some way*
+- **Default**: for `hydrogen`: `energy-valence`, for `pswfc` and `szv`: `all`
+
+### qo_screening_coeff
+
+- **Type**: Real \[Real...\](optional)
+- **Description**: rescale the shape of radial orbitals, available for both `qo_basis hydrogen` and `qo_basis pswfc`. cases but has different meaning.
+  
+  For `qo_basis pswfc`  
+  For each atom type, screening factor $e^{-\eta|\mathbf{r}|}$ is multiplied to the pswfc to mimic the behavior of some kind of electron. $\eta$ is the screening coefficient. If only one value is given, then will apply to each atom type. If not enough values are given, will apply default value to rest of atom types. This parameter plays important role in controlling the spread of QO orbitals together with `qo_thr`.
+
+  For `qo_basis hydrogen`  
+  If any float number is given, will apply Slater screening to all atom types. Slater screening is a classic and empirical method roughly taking many-electron effect into account for obtaining more accurate results when evaluating electron affinity and ionization energy. The Coulomb potential then becomes $V(r) = -\frac{Z-\sigma}{r}$. For example the effective nuclear charge for Cu 3d electrons now reduces from 29 to 7.85, 4s from 29 to 3.70, which means Slater screening will bring about longer tailing effect. If no value is given, will not apply Slater screening.
+- **Default**: 0.1
+- **Unit**: Bohr^-1
+
+### qo_thr
+
+- **Type**: Real
+- **Description**: the convergence threshold determining the cutoff of generated orbital. Lower threshold will yield orbital with larger cutoff radius.
+- **Default**: 1.0e-6
+
 
 [back to top](#full-list-of-input-keywords)

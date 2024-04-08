@@ -29,20 +29,17 @@ AtomPair<T>::AtomPair(const int& atom_i_, const int& atom_j_, const Parallel_Orb
     }
     this->row_size = this->paraV->get_row_size(atom_i);
     this->col_size = this->paraV->get_col_size(atom_j);
-    this->ldc = this->paraV->get_col_size();
     this->R_index.resize(3, 0);
     this->current_R = 0;
     if (existed_matrix != nullptr)
     {
-        BaseMatrix<T> tmp(row_size, col_size, (existed_matrix + row_ap * ldc + col_ap));
-        tmp.set_ldc(this->ldc);
+        BaseMatrix<T> tmp(row_size, col_size, existed_matrix);
         this->values.push_back(tmp);
     }
     else
     {
         BaseMatrix<T> tmp(row_size, col_size);
         this->values.push_back(tmp);
-        this->ldc = col_size;
     }
 }
 
@@ -65,7 +62,6 @@ AtomPair<T>::AtomPair(const int& atom_i_,
     }
     this->row_size = this->paraV->get_row_size(atom_i);
     this->col_size = this->paraV->get_col_size(atom_j);
-    this->ldc = this->paraV->get_col_size();
     this->R_index.resize(3, 0);
     this->current_R = 0;
     this->R_index[0] = rx;
@@ -73,15 +69,13 @@ AtomPair<T>::AtomPair(const int& atom_i_,
     this->R_index[2] = rz;
     if (existed_matrix != nullptr)
     {
-        BaseMatrix<T> tmp(row_size, col_size, (existed_matrix + row_ap * ldc + col_ap));
-        tmp.set_ldc(this->ldc);
+        BaseMatrix<T> tmp(row_size, col_size, existed_matrix);
         this->values.push_back(tmp);
     }
     else
     {
         BaseMatrix<T> tmp(row_size, col_size);
         this->values.push_back(tmp);
-        this->ldc = col_size;
     }
 }
 // direct save whole matrix of atom-pair
@@ -103,16 +97,13 @@ AtomPair<T>::AtomPair(const int& atom_i_,
     this->current_R = 0;
     if (existed_matrix != nullptr)
     {
-        this->ldc = row_atom_begin[natom] - row_atom_begin[0];
-        BaseMatrix<T> tmp(row_size, col_size, (existed_matrix + row_ap * ldc + col_ap));
-        tmp.set_ldc(this->ldc);
+        BaseMatrix<T> tmp(row_size, col_size, existed_matrix);
         this->values.push_back(tmp);
     }
     else
     {
         BaseMatrix<T> tmp(row_size, col_size);
         this->values.push_back(tmp);
-        this->ldc = col_size;
     }
 }
 //
@@ -140,16 +131,13 @@ AtomPair<T>::AtomPair(const int& atom_i_,
     this->R_index[2] = rz;
     if (existed_matrix != nullptr)
     {
-        this->ldc = row_atom_begin[natom] - row_atom_begin[0];
-        BaseMatrix<T> tmp(row_size, col_size, (existed_matrix + row_ap * ldc + col_ap));
-        tmp.set_ldc(this->ldc);
+        BaseMatrix<T> tmp(row_size, col_size, existed_matrix);
         this->values.push_back(tmp);
     }
     else
     {
         BaseMatrix<T> tmp(row_size, col_size);
         this->values.push_back(tmp);
-        this->ldc = col_size;
     }
 }
 
@@ -160,9 +148,8 @@ AtomPair<T>::AtomPair(const int& atom_i_, const int& atom_j_) : atom_i(atom_i_),
 
 // copy constructor
 template <typename T>
-AtomPair<T>::AtomPair(const AtomPair<T>& other)
+AtomPair<T>::AtomPair(const AtomPair<T>& other, T* data_pointer)
     : R_index(other.R_index),
-      values(other.values),
       paraV(other.paraV),
       current_R(other.current_R),
       atom_i(other.atom_i),
@@ -170,18 +157,42 @@ AtomPair<T>::AtomPair(const AtomPair<T>& other)
       row_ap(other.row_ap),
       col_ap(other.col_ap),
       row_size(other.row_size),
-      col_size(other.col_size),
-      ldc(other.ldc)
+      col_size(other.col_size)
 {
+    if(data_pointer == nullptr)
+    {
+        this->values = other.values;
+    }
+    else
+    {
+        this->values.reserve(other.values.size());
+        for(int value=0;value<other.values.size();++value)
+        {
+            hamilt::BaseMatrix<T> tmp(row_size, col_size, data_pointer);
+            this->values.push_back(tmp);
+            data_pointer += this->get_size();
+        }
+    }
 }
 
 //allocate
 template <typename T>
-void AtomPair<T>::allocate(bool is_zero)
+void AtomPair<T>::allocate(T* data_array, bool is_zero)
 {
-    for(int value=0;value<this->values.size();++value)
+    if(data_array == nullptr)
     {
-        this->values[value].allocate(is_zero);
+        for(int value=0;value<this->values.size();++value)
+        {
+            this->values[value].allocate(nullptr, is_zero);
+        }
+    }
+    else
+    {
+        for(int value=0;value<this->values.size();++value)
+        {
+            this->values[value].allocate(data_array, is_zero);
+            data_array += this->get_size();
+        }
     }
 }
 
@@ -211,7 +222,6 @@ AtomPair<T>& AtomPair<T>::operator=(const AtomPair<T>& other)
         col_ap = other.col_ap;
         row_size = other.row_size;
         col_size = other.col_size;
-        ldc = other.ldc;
     }
     return *this;
 }
@@ -228,8 +238,7 @@ AtomPair<T>::AtomPair(AtomPair<T>&& other) noexcept
       row_ap(other.row_ap),
       col_ap(other.col_ap),
       row_size(other.row_size),
-      col_size(other.col_size),
-      ldc(other.ldc)
+      col_size(other.col_size)
 {
     other.paraV = nullptr;
 }
@@ -251,7 +260,6 @@ AtomPair<T>& AtomPair<T>::operator=(AtomPair<T>&& other) noexcept
         col_ap = other.col_ap;
         row_size = other.row_size;
         col_size = other.col_size;
-        ldc = other.ldc;
     }
     return *this;
 }
@@ -309,13 +317,6 @@ void AtomPair<T>::set_size(const int& col_size_in, const int& row_size_in)
     this->row_size = row_size_in;
 }
 
-// get size
-template <typename T>
-int AtomPair<T>::get_size() const
-{
-    return this->col_size * this->row_size;
-}
-
 // get paraV for check
 template <typename T>
 const Parallel_Orbitals* AtomPair<T>::get_paraV() const
@@ -367,7 +368,7 @@ BaseMatrix<T>& AtomPair<T>::get_HR_values(int rx_in, int ry_in, int rz_in)
     R_index.push_back(ry_in);
     R_index.push_back(rz_in);
     values.push_back(BaseMatrix<T>(this->row_size, this->col_size));
-    values.back().allocate(true);
+    values.back().allocate(nullptr, true);
     // return the last BaseMatrix reference in values
     return this->values.back();
 }
@@ -511,7 +512,7 @@ void AtomPair<T>::merge_to_gamma()
         {
             if(empty)
             {
-                tmp.allocate(true);
+                tmp.allocate(nullptr, true);
                 empty = false;
             }
             tmp.add_array(this->values[i].get_pointer());
@@ -519,8 +520,6 @@ void AtomPair<T>::merge_to_gamma()
     }
     this->values.clear();
     this->values.push_back(tmp);
-
-    this->ldc = this->col_size;
 
     this->current_R = 0;
 }
@@ -548,7 +547,7 @@ void AtomPair<T>::add_to_matrix(std::complex<T>* hk,
             BlasConnector::axpy(this->col_size, kphase.real(), hr_tmp, 1, hk_real_pointer, 2);
             BlasConnector::axpy(this->col_size, kphase.imag(), hr_tmp, 1, hk_imag_pointer, 2);
             hk_tmp += ld_hk;
-            hr_tmp += this->ldc;
+            hr_tmp += this->col_size;
         }
     }
     // column major
@@ -562,7 +561,7 @@ void AtomPair<T>::add_to_matrix(std::complex<T>* hk,
             BlasConnector::axpy(this->col_size, kphase.real(), hr_tmp, 1, hk_real_pointer, ld_hk_2);
             BlasConnector::axpy(this->col_size, kphase.imag(), hr_tmp, 1, hk_imag_pointer, ld_hk_2);
             hk_tmp ++;
-            hr_tmp += this->ldc;
+            hr_tmp += this->col_size;
         }
     }
 }
@@ -586,23 +585,13 @@ void AtomPair<T>::add_to_matrix(T* hk, const int ld_hk, const T& kphase, const i
                 hk_tmp[nu] += matrix.get_value(mu, nu) * kphase;
             }*/
             hk_tmp += ld_hk;
-            hr_tmp += this->ldc;
+            hr_tmp += this->col_size;
         }
     }
     // column major
     else if (hk_type == 1)
     {
         hk_tmp += this->col_ap * ld_hk + this->row_ap;
-        /*for (int nu = 0; nu < this->col_size; nu++)
-        {
-            BlasConnector::axpy(this->row_size, kphase, hr_tmp, this->ldc, hk_tmp, 1);
-            for (int mu = 0; mu < this->row_size; mu++)
-            {
-                hk_tmp[mu] += matrix.get_value(mu, nu) * kphase;
-            }
-            hk_tmp += ld_hk;
-            hr_tmp++;
-        }*/
         for (int mu = 0; mu < this->row_size; mu++)
         {
             BlasConnector::axpy(this->col_size, kphase, hr_tmp, 1, hk_tmp, ld_hk);
@@ -611,7 +600,88 @@ void AtomPair<T>::add_to_matrix(T* hk, const int ld_hk, const T& kphase, const i
                 hk_tmp[mu] += matrix.get_value(mu, nu) * kphase;
             }*/
             ++hk_tmp;
-            hr_tmp += this->ldc;
+            hr_tmp += this->col_size;
+        }
+    }
+}
+
+template <typename T>
+void AtomPair<T>::add_from_matrix(const std::complex<T>* hk,
+                                const int ld_hk,
+                                const std::complex<T>& kphase,
+                                const int hk_type)
+{
+    const BaseMatrix<T>& matrix = values[current_R];
+    T* hr_tmp = matrix.get_pointer();
+    const std::complex<T>* hk_tmp = hk;
+    const T* hk_real_pointer = nullptr;
+    const T* hk_imag_pointer = nullptr;
+    const int ld_hk_2 = ld_hk * 2;
+    // row major
+    if (hk_type == 0)
+    {
+        hk_tmp += this->row_ap * ld_hk + this->col_ap;
+        for (int mu = 0; mu < this->row_size; mu++)
+        {
+            hk_real_pointer = (T*)hk_tmp;
+            hk_imag_pointer = hk_real_pointer+1;
+            BlasConnector::axpy(this->col_size, kphase.real(), hk_real_pointer, 2, hr_tmp, 1);
+            BlasConnector::axpy(this->col_size, kphase.imag(), hk_imag_pointer, 2, hr_tmp, 1);
+            hk_tmp += ld_hk;
+            hr_tmp += this->col_size;
+        }
+    }
+    // column major
+    else if (hk_type == 1)
+    {
+        hk_tmp += this->col_ap * ld_hk + this->row_ap;
+        for (int mu = 0; mu < this->row_size; mu++)
+        {
+            hk_real_pointer = (T*)hk_tmp;
+            hk_imag_pointer = hk_real_pointer+1;
+            BlasConnector::axpy(this->col_size, kphase.real(), hk_real_pointer, ld_hk_2, hr_tmp, 1);
+            BlasConnector::axpy(this->col_size, kphase.imag(), hk_imag_pointer, ld_hk_2, hr_tmp, 1);
+            hk_tmp ++;
+            hr_tmp += this->col_size;
+        }
+    }
+}
+
+// add_to_matrix
+template <typename T>
+void AtomPair<T>::add_from_matrix(const T* hk, const int ld_hk, const T& kphase, const int hk_type)
+{
+    const BaseMatrix<T>& matrix = values[current_R];
+    T* hr_tmp = matrix.get_pointer();
+    const T* hk_tmp = hk;
+    // row major
+    if (hk_type == 0)
+    {
+        hk_tmp += this->row_ap * ld_hk + this->col_ap;
+        for (int mu = 0; mu < this->row_size; mu++)
+        {
+            BlasConnector::axpy(this->col_size, kphase, hk_tmp, 1, hr_tmp, 1);
+            /*for (int nu = 0; nu < this->col_size; nu++)
+            {
+                hk_tmp[nu] += matrix.get_value(mu, nu) * kphase;
+            }*/
+            hk_tmp += ld_hk;
+            hr_tmp += this->col_size;
+        }
+    }
+    // column major
+    else if (hk_type == 1)
+    {
+        hk_tmp += this->col_ap * ld_hk + this->row_ap;
+        for (int mu = 0; mu < this->row_size; mu++)
+        {
+            BlasConnector::axpy(this->col_size, kphase, hk_tmp, ld_hk, hr_tmp, 1);
+            /*for (int mu = 0; mu < this->row_size; mu++)
+            {
+                hk_tmp[mu] += matrix.get_value(mu, nu) * kphase;
+            }*/
+            ++hk_tmp;
+            hr_tmp += this->col_size;
         }
     }
 }
@@ -639,18 +709,10 @@ void AtomPair<T>::add_to_array(std::complex<T>* array, const std::complex<T>& kp
 }
 
 template <typename T>
-T& AtomPair<T>::get_matrix_value(const size_t& i_row_global, const size_t& j_col_global) const
+std::tuple<std::vector<int>, T*> AtomPair<T>::get_matrix_values(int ir) const
 {
-    int i_row_local = this->paraV == nullptr ? i_row_global : this->paraV->global2local_row(i_row_global);
-    int j_col_local = this->paraV == nullptr ? j_col_global : this->paraV->global2local_col(j_col_global);
-#ifdef __DEBUG
-    assert(i_row_local != -1 && j_col_local != -1);
-    assert(current_R < this->values.size());
-    assert(current_R >= 0);
-#endif
-    size_t i_row_in = i_row_local - row_ap;
-    size_t j_col_in = j_col_local - col_ap;
-    return this->values[current_R].get_value(i_row_in, j_col_in);
+    if(ir<0) ir = this->current_R;
+    return std::tuple<std::vector<int>, T*>({this->row_ap, this->row_size, this->col_ap, this->col_size}, this->values[ir].get_pointer());
 }
 
 // interface for get (rx, ry, rz) of index-th R-index in this->R_index, the return should be int[3]
@@ -717,17 +779,6 @@ T* AtomPair<T>::get_pointer(int ir) const
     assert(current_R >= 0);
 #endif
     return this->values[ir].get_pointer();
-}
-
-// get_R_size
-template <typename T>
-size_t AtomPair<T>::get_R_size() const
-{
-#ifdef __DEBUG
-    assert(this->R_index.size() / 3 == this->values.size());
-    assert(this->R_index.size() % 3 == 0);
-#endif
-    return this->R_index.size() / 3;
 }
 
 // get_memory_size

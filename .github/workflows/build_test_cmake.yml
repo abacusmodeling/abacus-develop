@@ -20,7 +20,7 @@ jobs:
             build_args: "-DENABLE_LIBXC=1 -DENABLE_DEEPKS=1 -DENABLE_LIBRI=1 -DENABLE_PAW=1"
             name: "Build extra components with GNU toolchain"
           - tag: intel
-            build_args: "-DENABLE_LIBXC=1 -DENABLE_DEEPKS=1 -DENABLE_LIBRI=1 -DENABLE_PAW=1"
+            build_args: "-DENABLE_LIBXC=1 -DENABLE_DEEPKS=1 -DENABLE_LIBRI=1"
             name: "Build extra components with Intel toolchain"
 
           - tag: cuda
@@ -30,7 +30,7 @@ jobs:
             build_args: "-DENABLE_LCAO=OFF"
             name: "Build without LCAO"
           - tag: gnu
-            build_args: "-DUSE_ELPA=0"
+            build_args: "-DUSE_ELPA=0 "
             name: "Build without ELPA"
           - tag: gnu
             build_args: "-DENABLE_MPI=0"

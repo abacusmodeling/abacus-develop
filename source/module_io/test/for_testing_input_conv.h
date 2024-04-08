@@ -1,3 +1,6 @@
+#ifndef INPUT_CONV_TEST_H
+#define INPUT_CONV_TEST_H
+
 #define private public
 
 #include "module_cell/module_symmetry/symmetry.h"
@@ -26,34 +29,6 @@
 
 bool berryphase::berry_phase_flag = false;
 
-template<>
-int elecstate::ElecStateLCAO<double>::out_wfc_lcao = 0;
-
-template<>
-int elecstate::ElecStateLCAO<std::complex<double>>::out_wfc_lcao = 0;
-
-template<> 
-bool elecstate::ElecStateLCAO<double>::need_psi_grid = 1;
-
-template<>
-bool elecstate::ElecStateLCAO<std::complex<double>>::need_psi_grid = 1;
-//
-template<>
-int hsolver::HSolverLCAO<double>::out_mat_hs = 0;
-template<>
-int hsolver::HSolverLCAO<std::complex<double>>::out_mat_hs = 0;
-template<>
-int hsolver::HSolverLCAO<double>::out_mat_hsR = 0;
-template<>
-int hsolver::HSolverLCAO<std::complex<double>>::out_mat_hsR = 0;
-template<>
-int hsolver::HSolverLCAO<double>::out_mat_t = 0;
-template<>
-int hsolver::HSolverLCAO<std::complex<double>>::out_mat_t = 0;
-template<>
-int hsolver::HSolverLCAO<double>::out_mat_dh = 0;
-template<>
-int hsolver::HSolverLCAO <std::complex<double>> ::out_mat_dh = 0;
 int Local_Orbital_Charge::out_dm = 0;
 int Local_Orbital_Charge::out_dm1 = 0;
 double module_tddft::Evolve_elec::td_force_dt;
@@ -61,6 +36,7 @@ bool module_tddft::Evolve_elec::td_vext;
 std::vector<int> module_tddft::Evolve_elec::td_vext_dire_case;
 bool module_tddft::Evolve_elec::out_dipole;
 bool module_tddft::Evolve_elec::out_efield;
+bool module_tddft::Evolve_elec::out_current;
 double module_tddft::Evolve_elec::td_print_eij;
 int module_tddft::Evolve_elec::td_edm;
 double elecstate::Gatefield::zgate = 0.5;
@@ -88,6 +64,7 @@ std::vector<int> elecstate::H_TDDFT_pw::ttype;
 int elecstate::H_TDDFT_pw::tstart;
 int elecstate::H_TDDFT_pw::tend;
 double elecstate::H_TDDFT_pw::dt;
+double elecstate::H_TDDFT_pw::dt_int;
 
 // space domain parameters
 
@@ -104,6 +81,7 @@ std::vector<double> elecstate::H_TDDFT_pw::gauss_phase;
 std::vector<double> elecstate::H_TDDFT_pw::gauss_sigma; // time(a.u.)
 std::vector<double> elecstate::H_TDDFT_pw::gauss_t0;
 std::vector<double> elecstate::H_TDDFT_pw::gauss_amp; // Ry/bohr
+std::vector<int> elecstate::H_TDDFT_pw::gauss_ncut;
 
 // trapezoid
 int elecstate::H_TDDFT_pw::trape_count;
@@ -113,6 +91,7 @@ std::vector<double> elecstate::H_TDDFT_pw::trape_t1;
 std::vector<double> elecstate::H_TDDFT_pw::trape_t2;
 std::vector<double> elecstate::H_TDDFT_pw::trape_t3;
 std::vector<double> elecstate::H_TDDFT_pw::trape_amp; // Ry/bohr
+std::vector<int> elecstate::H_TDDFT_pw::trape_ncut;
 
 // Trigonometric
 int elecstate::H_TDDFT_pw::trigo_count;
@@ -121,16 +100,13 @@ std::vector<double> elecstate::H_TDDFT_pw::trigo_omega2; // time(a.u.)^-1
 std::vector<double> elecstate::H_TDDFT_pw::trigo_phase1;
 std::vector<double> elecstate::H_TDDFT_pw::trigo_phase2;
 std::vector<double> elecstate::H_TDDFT_pw::trigo_amp; // Ry/bohr
+std::vector<int> elecstate::H_TDDFT_pw::trigo_ncut;
 
 // Heaviside
 int elecstate::H_TDDFT_pw::heavi_count;
 std::vector<double> elecstate::H_TDDFT_pw::heavi_t0;
 std::vector<double> elecstate::H_TDDFT_pw::heavi_amp; // Ry/bohr
 
-template<>
-double Force_Stress_LCAO<double>::force_invalid_threshold_ev = 0.0;
-template<>
-double Force_Stress_LCAO<std::complex<double>>::force_invalid_threshold_ev = 0.0;
 double BFGS_Basic::relax_bfgs_w1 = -1.0;
 double BFGS_Basic::relax_bfgs_w2 = -1.0;
 double Ions_Move_Basic::relax_bfgs_rmax = -1.0;
@@ -152,6 +128,12 @@ pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
 }
 pseudopot_cell_vnl::~pseudopot_cell_vnl()
+{
+}
+Soc::~Soc()
+{
+}
+Fcoef::~Fcoef()
 {
 }
 pseudopot_cell_vl::pseudopot_cell_vl()
@@ -176,18 +158,6 @@ Structure_Factor::Structure_Factor()
 {
 }
 Structure_Factor::~Structure_Factor()
-{
-}
-ModuleSymmetry::Symmetry::Symmetry()
-{
-}
-ModuleSymmetry::Symmetry::~Symmetry()
-{
-}
-ModuleSymmetry::Symmetry_Basic::Symmetry_Basic()
-{
-}
-ModuleSymmetry::Symmetry_Basic::~Symmetry_Basic()
 {
 }
 WF_atomic::WF_atomic()
@@ -267,20 +237,6 @@ Magnetism::Magnetism()
 }
 Magnetism::~Magnetism()
 {
-}
-
-void Charge_Mixing::set_mixing(const std::string& mixing_mode_in,
-                               const double& mixing_beta_in,
-                               const int& mixing_ndim_in,
-                               const double& mixing_gg0_in,
-                               const bool& mixing_tau_in)
-{
-    return;
-}
-// void Charge_Mixing::need_auto_set(){}
-void Charge_Mixing::need_auto_set()
-{
-    this->autoset = true;
 }
 void Occupy::decision(const std::string& name, const std::string& smearing_method, const double& smearing_sigma)
 {
@@ -374,10 +330,10 @@ void UnitCell::setup(const std::string& latname_in,
     }
     return;
 }
-void Structure_Factor::set(const int&)
-{
-    return;
-}
+// void Structure_Factor::set(const int&)
+// {
+//     return;
+// }
 
 namespace MD_func
 {
@@ -400,3 +356,5 @@ Charge_Mixing CHR_MIX;
 } // namespace GlobalC
 
 #undef private
+
+#endif

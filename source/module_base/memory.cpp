@@ -2,6 +2,7 @@
 // AUTHOR : mohan
 // DATE : 2008-11-18
 //==========================================================
+#include <cassert>
 #include "memory.h"
 #include "global_variable.h"
 #include "module_base/parallel_reduce.h"
@@ -230,22 +231,52 @@ void Memory::finish(std::ofstream &ofs)
 
 void Memory::print_all(std::ofstream &ofs)
 {
-//	std::cout<<"\n init_flag="<<init_flag;
-	if(!init_flag) return;
+	if(!init_flag) 
+	{
+		return;
+	}
 
-	const double small = 1.0; 
+	const double small = 1.0; // unit is MB 
 #ifdef __MPI
-    Parallel_Reduce::reduce_all(Memory::total);
+	Parallel_Reduce::reduce_all(Memory::total);
 #endif
-    ofs <<"\n NAME---------------|MEMORY(MB)--------" << std::endl;
-//	std::cout<<"\n"<<std::setw(41)<< " " <<std::setprecision(4)<<total;
-	ofs <<std::setw(20)<< "total" << std::setw(15) <<std::setprecision(4)<< Memory::total << std::endl;
+	ofs <<"\n NAME-------------------------|MEMORY(MB)--------" << std::endl;
+	ofs <<std::setw(30)<< "total" << std::setw(15) <<std::setprecision(4)<< Memory::total << std::endl;
     
+    assert(n_memory>0);
+
 	bool *print_flag = new bool[n_memory];
-	for(int i=0; i<n_memory; i++) print_flag[i] = false;
-	
+
+	for(int i=0; i<n_memory; i++) 
+	{
+		print_flag[i] = false;
+	}	
+
 	for (int i=0; i<n_memory; i++)
     {
+//		int k = 0;
+//		double tmp = -1.0;
+//		for(int j=0; j<n_memory; j++)
+//		{
+//			if(print_flag[j])
+//			{
+//				continue;
+//			}
+//			else if(tmp < consume[j])
+//			{
+//				k = j;
+//				tmp = consume[j];
+//			}
+//		}
+//		print_flag[k] = true;
+#ifdef __MPI
+//		Parallel_Reduce::reduce_all(consume[k]);
+		Parallel_Reduce::reduce_all(consume[i]);
+#endif
+	}
+
+	for (int i=0; i<n_memory; i++) // Xiaoyang fix memory record sum bug 2023/10/25
+	{
 		int k = 0;
 		double tmp = -1.0;
 		for(int j=0; j<n_memory; j++)
@@ -261,27 +292,21 @@ void Memory::print_all(std::ofstream &ofs)
 			}
 		}
 		print_flag[k] = true;
-#ifdef __MPI
-        Parallel_Reduce::reduce_all(consume[k]);
-#endif
-	    if ( consume[k] < small ) 
+		if ( consume[k] < small )
         {
-            continue;
-        }
-  		else
-  		{
-        	ofs << std::setw(20) << name[k]
-             << std::setw(15) << consume[k] << std::endl;
-
-//        	std::cout  << "\n "
-//             << std::setw(20) << class_name[k]
-//             << std::setw(20) << name[k]
-//             << std::setw(15) << consume[k];
+			continue;
 		}
-    }
-//    std::cout<<"\n ----------------------------------------------------------"<<std::endl;
+		else
+		{
+			ofs << std::setw(30) << name[k]
+            << std::setw(15) << consume[k] << std::endl;
+		}
+
+	}
+
 	ofs<<" -------------   < 1.0 MB has been ignored ----------------"<<std::endl;
     ofs<<" ----------------------------------------------------------"<<std::endl;
+
 	delete[] print_flag; //mohan fix by valgrind at 2012-04-02
 	return;
 }

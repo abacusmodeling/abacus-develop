@@ -74,6 +74,61 @@ void Paw_Cell::init_paw_cell(
         int nproj = paw_element_list[it].get_mstates();
         paw_atom_list[iat].init_paw_atom(nproj);
     }
+
+    this -> init_rhoij();
+    //this -> init_mix_dij();
+}
+
+void Paw_Cell::init_mix_dij()
+{
+    first_iter = true;
+    count = 0;
+
+    if(GlobalV::RANK_IN_POOL == 0)
+    {
+        dij_save.resize(natom);
+        for(int iat = 0; iat < natom; iat ++)
+        {
+            const int it = atom_type[iat];
+            const int nproj = paw_element_list[it].get_mstates();
+            const int size_dij = nproj * (nproj+1) / 2;
+            dij_save[iat].resize(size_dij * nspden);
+            for(int i = 0; i < size_dij * nspden; i ++)
+            {
+                dij_save[iat][i] = 0.0;
+            }
+        }
+    }
+}
+
+void Paw_Cell::init_rhoij()
+{
+    ModuleBase::TITLE("Paw_Cell","init_rhoij");
+
+    for(int iat = 0; iat < nat; iat ++)
+    {
+        const int it = atom_type[iat];
+        const int nproj = paw_element_list[it].get_mstates();
+
+        const int size_rhoij = nproj * (nproj + 1) / 2;
+
+        std::vector<double> mstate_occ = paw_element_list[it].get_mstate_occ();
+
+        std::vector<double> rhoij_in;
+        rhoij_in.resize(size_rhoij);
+        for(int i = 0; i < size_rhoij; i ++)
+        {
+            rhoij_in[i] = 0.0;
+        }
+
+        for(int iproj = 0; iproj < nproj; iproj ++)
+        {
+            int i0 = iproj * (iproj + 1) / 2;
+            rhoij_in[i0 + iproj] = mstate_occ[iproj] / GlobalV::NSPIN;
+        }
+
+        paw_atom_list[iat].set_rhoij(rhoij_in);
+    }
 }
 
 void Paw_Cell::set_eigts(const int nx_in, const int ny_in, const int nz_in,
@@ -114,9 +169,9 @@ void Paw_Cell::set_eigts(const int nx_in, const int ny_in, const int nz_in,
 
 // exp(-i(k+G)R_I) = exp(-ikR_I) exp(-iG_xR_Ix) exp(-iG_yR_Iy) exp(-iG_zR_Iz)
 void Paw_Cell::set_paw_k(
-    const int npw_in, const double * kpt,
+    const int npw_in, const int npwx_in, const double * kpt,
     const int * ig_to_ix, const int * ig_to_iy, const int * ig_to_iz,
-    const double ** kpg, const double tpiba)
+    const double ** kpg, const double tpiba, const double ** gcar)
 {
     ModuleBase::TITLE("Paw_Element","set_paw_k");
 
@@ -124,6 +179,7 @@ void Paw_Cell::set_paw_k(
     const double twopi = 2.0 * pi;
 
     this -> npw = npw_in;
+    this -> npwx = npwx_in;
 
     struc_fact.resize(nat);
     for(int iat = 0; iat < nat; iat ++)
@@ -154,6 +210,21 @@ void Paw_Cell::set_paw_k(
     for(int ipw = 0; ipw < npw; ipw ++)
     {
         gnorm[ipw] = std::sqrt(kpg[ipw][0]*kpg[ipw][0] + kpg[ipw][1]*kpg[ipw][1] + kpg[ipw][2]*kpg[ipw][2]) * tpiba;
+    }
+
+    std::complex<double> i_cplx(0.0,1.0);
+    // ig : i(G)
+    if(GlobalV::CAL_FORCE || GlobalV::CAL_STRESS)
+    {
+        ig.resize(npw);
+        for(int ipw = 0; ipw < npw; ipw ++)
+        {
+            ig[ipw].resize(3);
+            for(int i = 0; i < 3; i ++)
+            {
+                ig[ipw][i] = gcar[ipw][i] * tpiba * i_cplx;
+            }
+        }
     }
 }
 
@@ -489,10 +560,16 @@ void Paw_Cell::accumulate_rhoij(const std::complex<double> * psi, const double w
 
 #ifdef __MPI
         Parallel_Reduce::reduce_pool(ca.data(), nproj);
-#endif
 
+        if(GlobalV::RANK_IN_POOL == 0)
+        {
+            paw_atom_list[iat].set_ca(ca, weight);
+            paw_atom_list[iat].accumulate_rhoij(current_spin);
+        }
+#else
         paw_atom_list[iat].set_ca(ca, weight);
         paw_atom_list[iat].accumulate_rhoij(current_spin);
+#endif
     }
 }
 
@@ -604,4 +681,90 @@ void Paw_Cell::paw_nl_psi(const int mode, const std::complex<double> * psi, std:
             }
         }
     }
+}
+
+void Paw_Cell::paw_nl_force(const std::complex<double> * psi, const double * epsilon, const double * weight, const int nbands , double * force)
+{
+    ModuleBase::TITLE("Paw_Cell","paw_nl_force");
+
+    for(int i = 0; i < nat * 3; i ++)
+    {
+        force[i] = 0.0;
+    }
+
+    for(int iband = 0; iband < nbands; iband ++)
+    {
+        if(weight[iband] < 1e-8) continue;
+        for(int iat = 0; iat < nat; iat ++)
+        {
+            // ca : <ptilde(G)|psi(G)>
+            // = \sum_G [\int f(r)r^2j_l(r)dr] * [(-i)^l] * [ylm(\hat{G})] * [exp(-GR_I)] *psi(G)
+            // = \sum_ipw ptilde * fact * ylm * sk * psi (in the code below)
+            // This is what is called 'becp' in nonlocal pp
+            // (but complex conjugate)
+            std::vector<std::complex<double>> ca;
+            std::vector<std::vector<std::complex<double>>> dca;
+
+            const int it = atom_type[iat];
+            const int nproj = paw_element_list[it].get_mstates();
+            const int proj_start = start_iprj_ia[iat];
+
+            ca.resize(nproj);
+            dca.resize(3);
+            for(int i = 0; i < 3; i ++)
+            {
+                dca[i].resize(nproj);
+            }
+
+            for(int iproj = 0; iproj < nproj; iproj ++)
+            {
+                ca[iproj] = 0.0;
+                dca[0][iproj] = 0.0;
+                dca[1][iproj] = 0.0;
+                dca[2][iproj] = 0.0;
+                
+                // consider use blas subroutine for this part later
+                for(int ipw = 0; ipw < npw; ipw ++)
+                {
+                    std::complex<double> overlp = psi[iband*npwx+ipw] * std::conj(vkb[iproj+proj_start][ipw]);
+                    ca[iproj] += overlp;
+                    dca[0][iproj] += overlp * ig[ipw][0];
+                    dca[1][iproj] += overlp * ig[ipw][1];
+                    dca[2][iproj] += overlp * ig[ipw][2];
+                }
+            }
+
+#ifdef __MPI
+            Parallel_Reduce::reduce_pool(ca.data(), nproj);
+            Parallel_Reduce::reduce_pool(dca[0].data(), nproj);
+            Parallel_Reduce::reduce_pool(dca[1].data(), nproj);
+            Parallel_Reduce::reduce_pool(dca[2].data(), nproj);
+#endif
+            // sum_ij (D_ij - epsilon_n O_ij) ca_j
+            std::vector<std::complex<double>> v_ca;
+            v_ca.resize(nproj);
+
+            for(int iproj = 0; iproj < nproj; iproj ++)
+            {
+                v_ca[iproj] = 0.0;
+                for(int jproj = 0; jproj < nproj; jproj ++)
+                {
+                    double coeff = paw_atom_list[iat].get_dij()[current_spin][iproj*nproj+jproj] -
+                        paw_atom_list[iat].get_sij()[iproj*nproj+jproj] * epsilon[iband];
+                    v_ca[iproj] += coeff * ca[jproj];
+                }
+            }
+
+            // force += conjg(v_ca[iproj]) * d_ca[iproj]
+            // \sum_i ptilde_{iproj}(G) v_ca[iproj]
+            for(int iproj = 0; iproj < nproj; iproj ++)
+            {
+                force[iat*3] -= (v_ca[iproj] * std::conj(dca[0][iproj])).real() * weight[iband];
+                force[iat*3+1] -= (v_ca[iproj] * std::conj(dca[1][iproj])).real() * weight[iband];
+                force[iat*3+2] -= (v_ca[iproj] * std::conj(dca[2][iproj])).real() * weight[iband];
+            }
+        }
+    }
+
+    for(int i = 0; i < nat*3; i ++) force[i] = force[i] * 2.0;
 }

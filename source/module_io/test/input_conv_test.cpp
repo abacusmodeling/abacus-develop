@@ -116,6 +116,7 @@ TEST_F(InputConvTest, Conv)
 	EXPECT_EQ(elecstate::Efield::efield_amp,0);
 	EXPECT_EQ(GlobalV::GATE_FLAG,0);
 	EXPECT_EQ(GlobalV::nelec,0);
+	EXPECT_EQ(GlobalV::nelec_delta,0);
 	EXPECT_DOUBLE_EQ(elecstate::Gatefield::zgate,0.5);
 	EXPECT_EQ(elecstate::Gatefield::relax,0);
 	EXPECT_EQ(elecstate::Gatefield::block,0);
@@ -139,20 +140,20 @@ TEST_F(InputConvTest, Conv)
 	EXPECT_EQ(GlobalV::init_chg,"atomic");
 	EXPECT_EQ(GlobalV::chg_extrap,"atomic");
 	EXPECT_EQ(GlobalV::out_chg,false);
-	EXPECT_EQ(GlobalV::nelec,0.0);
     EXPECT_EQ(GlobalV::out_pot, 2);
     EXPECT_EQ(GlobalV::out_app_flag, false);
     EXPECT_EQ(GlobalV::out_bandgap, false);
     EXPECT_EQ(Local_Orbital_Charge::out_dm,false);
 	EXPECT_EQ(Local_Orbital_Charge::out_dm1,false);
-    EXPECT_EQ(hsolver::HSolverLCAO<double>::out_mat_hs, false);
-    EXPECT_EQ(hsolver::HSolverLCAO<std::complex<double>>::out_mat_hs, false);
+    EXPECT_EQ(hsolver::HSolverLCAO<double>::out_mat_hs[0], false);
+    EXPECT_EQ(hsolver::HSolverLCAO<std::complex<double>>::out_mat_hs[0], false);
     EXPECT_EQ(hsolver::HSolverLCAO<double>::out_mat_hsR, false);
     EXPECT_EQ(hsolver::HSolverLCAO<std::complex<double>>::out_mat_hsR, false);
     EXPECT_EQ(hsolver::HSolverLCAO<double>::out_mat_t, false);
     EXPECT_EQ(hsolver::HSolverLCAO<std::complex<double>>::out_mat_t, false);
     EXPECT_EQ(hsolver::HSolverLCAO<double>::out_mat_dh, INPUT.out_mat_dh);
     EXPECT_EQ(hsolver::HSolverLCAO<std::complex<double>>::out_mat_dh, INPUT.out_mat_dh);
+    EXPECT_EQ(GlobalV::out_mat_xc, false);
     EXPECT_EQ(GlobalV::out_interval, 1);
     EXPECT_EQ(elecstate::ElecStateLCAO<double>::out_wfc_lcao, false);
     EXPECT_EQ(berryphase::berry_phase_flag, false);
@@ -179,6 +180,12 @@ TEST_F(InputConvTest, Conv)
 	EXPECT_EQ(GlobalV::of_read_kernel,false);
 	EXPECT_EQ(GlobalV::of_kernel_file,"WTkernel.txt");
 	EXPECT_EQ(GlobalV::global_readin_dir,GlobalV::global_out_dir);
+	EXPECT_EQ(GlobalV::sc_mag_switch,0);
+	
+    EXPECT_TRUE(GlobalV::decay_grad_switch);
+    EXPECT_EQ(GlobalV::sc_file, "sc.json");
+	EXPECT_EQ(GlobalV::MIXING_RESTART,0.0);
+	EXPECT_EQ(GlobalV::MIXING_DMR,false);
 }
 
 TEST_F(InputConvTest, ConvRelax)
@@ -268,9 +275,9 @@ TEST_F(InputConvTest, dftplus)
 	INPUT.Default();
 	std::string input_file = "./support/INPUT";
 	INPUT.Read(input_file);
-	INPUT.dft_plus_u=true;
+	INPUT.dft_plus_u=1;
 	Input_Conv::Convert();
-	EXPECT_EQ(GlobalV::dft_plus_u,true);
+	EXPECT_EQ(GlobalV::dft_plus_u,1);
 	EXPECT_EQ(GlobalC::dftu.Yukawa,false);
 	EXPECT_EQ(GlobalC::dftu.omc,false);//
 	EXPECT_EQ(GlobalC::dftu.orbital_corr,INPUT.orbital_corr);
@@ -308,7 +315,7 @@ TEST_F(InputConvTest, nspinbeta)
 	output2 = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output2,testing::HasSubstr("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
 	EXPECT_THAT(output2,testing::HasSubstr("                         NOTICE                          "));
-	EXPECT_THAT(output2,testing::HasSubstr("force & stress not ready for soc yet!"));
+	EXPECT_THAT(output2,testing::HasSubstr("force & stress not ready for nspin=4(soc or noncollinear-spin) yet!"));
 	EXPECT_THAT(output2,testing::HasSubstr("CHECK IN FILE : warning.log"));
 	EXPECT_THAT(output2,testing::HasSubstr("TIME STATISTICS"));
 }
@@ -360,7 +367,8 @@ TEST_F(InputConvTest, restart_load)
 	INPUT.dft_functional = "hf";
 	Input_Conv::Convert();
 	EXPECT_EQ( GlobalC::restart.folder,GlobalV::global_readin_dir + "restart/");
-	EXPECT_EQ(GlobalC::restart.info_load.load_charge,true);
+    EXPECT_EQ(GlobalC::restart.info_load.load_charge, true);
+    EXPECT_EQ(GlobalC::restart.info_load.load_H, true);
 }
 
 TEST_F(InputConvTest,restart_load2 )
@@ -371,8 +379,7 @@ TEST_F(InputConvTest,restart_load2 )
 	INPUT.restart_load=true;
 	INPUT.dft_functional="b3lyp";
 	Input_Conv::Convert();
-	EXPECT_EQ(GlobalC::restart.info_load.load_charge,true);
-	EXPECT_EQ(GlobalC::restart.info_load.load_H,true);
+    EXPECT_EQ(GlobalC::restart.info_load.load_charge, true);
 }
 
 TEST_F(InputConvTest,cell_factor  )

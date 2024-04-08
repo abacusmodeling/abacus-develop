@@ -20,7 +20,6 @@ DensityMatrix<TK, TR>::~DensityMatrix()
     {
         delete it;
     }
-    this->_DMR.clear();
 }
 
 // constructor for multi-k
@@ -130,7 +129,7 @@ void DensityMatrix<TK, TR>::init_DMR(Grid_Driver* GridD_in, const UnitCell* ucel
     {
         tmp_DMR->fix_gamma();
     }
-    tmp_DMR->allocate(true);
+    tmp_DMR->allocate(nullptr, true);
     this->_DMR.push_back(tmp_DMR);
     // add another DMR if nspin==2
     if (this->_nspin == 2)
@@ -180,7 +179,7 @@ void DensityMatrix<TK, TR>::init_DMR(Record_adj& ra, const UnitCell* ucell)
     {
         tmp_DMR->fix_gamma();
     }
-    tmp_DMR->allocate(true);
+    tmp_DMR->allocate(nullptr, true);
     this->_DMR.push_back(tmp_DMR);
     // add another DMR if nspin==2
     if (this->_nspin == 2)
@@ -242,7 +241,7 @@ void DensityMatrix<TK, TR>::init_DMR(const hamilt::HContainer<TRShift>& DMR_in)
                 tmp_DMR->insert_pair(tmp_ap);
             }
         }
-        tmp_DMR->allocate(true);
+        tmp_DMR->allocate(nullptr, true);
         this->_DMR.push_back(tmp_DMR);
         if(this->_nspin == 2)
         {
@@ -263,13 +262,6 @@ hamilt::HContainer<TR>* DensityMatrix<TK, TR>::get_DMR_pointer(const int ispin) 
     return this->_DMR[ispin - 1];
 }
 
-// get _DMR pointer vector
-template <typename TK, typename TR>
-std::vector<hamilt::HContainer<TR>*> DensityMatrix<TK, TR>::get_DMR_vector() const
-{
-    return this->_DMR;
-}
-
 // get _DMK[ik] pointer
 template <typename TK, typename TR>
 TK* DensityMatrix<TK, TR>::get_DMK_pointer(const int ik) const
@@ -278,27 +270,6 @@ TK* DensityMatrix<TK, TR>::get_DMK_pointer(const int ik) const
     assert(ik < this->_nks * this->_nspin);
 #endif
     return const_cast<TK*>(this->_DMK[ik].data());
-}
-
-// get _DMK[ik] vector
-template <typename TK, typename TR>
-std::vector<std::vector<TK>> DensityMatrix<TK, TR>::get_DMK_vector() const
-{
-    return this->_DMK;
-}
-
-// get _paraV pointer
-template <typename TK, typename TR>
-const Parallel_Orbitals* DensityMatrix<TK, TR>::get_paraV_pointer() const
-{
-    return this->_paraV;
-}
-
-// get _kv pointer
-template <typename TK, typename TR>
-const K_Vectors* DensityMatrix<TK, TR>::get_kv_pointer() const
-{
-    return this->_kv;
 }
 
 // set DMK using a pointer
@@ -382,6 +353,42 @@ int DensityMatrix<TK, TR>::get_DMK_ncol() const
     return this->_paraV->ncol;
 }
 
+template <typename TK, typename TR>
+void DensityMatrix<TK, TR>::save_DMR()
+{
+    ModuleBase::TITLE("DensityMatrix", "save_DMR");
+    ModuleBase::timer::tick("DensityMatrix", "save_DMR");
+    
+    const int nnr = this->_DMR[0]->get_nnr();
+    // allocate if _DMR_save is empty 
+    if(_DMR_save.size() == 0)
+    {
+        _DMR_save.resize(this->_DMR.size());
+    }
+    // resize if _DMR_save[is].size is not equal to _DMR.size
+    for(int is = 0; is < _DMR_save.size(); is++)
+    {
+        if(_DMR_save[is].size() != nnr)
+        {
+            _DMR_save[is].resize(nnr);
+        }
+    }
+    // save _DMR to _DMR_save
+    for(int is=0;is<this->_DMR.size();is++)
+    {
+        TR* DMR_pointer = this->_DMR[is]->get_wrapper();
+        TR* DMR_save_pointer = _DMR_save[is].data();
+        // set to zero
+        ModuleBase::GlobalFunc::ZEROS(DMR_save_pointer, nnr);
+        for(int i=0;i<nnr;i++)
+        {
+            DMR_save_pointer[i] = DMR_pointer[i];
+        }
+    }
+
+    ModuleBase::timer::tick("DensityMatrix", "save_DMR");
+}
+
 // calculate DMR from DMK using add_element
 template <typename TK, typename TR>
 void DensityMatrix<TK,TR>::cal_DMR_test()
@@ -412,11 +419,11 @@ void DensityMatrix<TK,TR>::cal_DMR_test()
                 const int* r_index = tmp_ap.get_R_index(ir);
                 hamilt::BaseMatrix<TR>* tmp_matrix = tmp_ap.find_matrix(r_index[0], r_index[1], r_index[2]);
 #ifdef __DEBUG
-            if (tmp_matrix == nullptr)
-            {
-                std::cout << "tmp_matrix is nullptr" << std::endl;
-                continue;
-            }
+				if (tmp_matrix == nullptr)
+				{
+					std::cout << "tmp_matrix is nullptr" << std::endl;
+					continue;
+				}
 #endif
                 std::complex<TR> tmp_res;
                 // loop over k-points
@@ -487,44 +494,47 @@ void DensityMatrix<std::complex<double>, double>::cal_DMR()
 #endif
                 // loop over k-points
                 if(GlobalV::NSPIN !=4 )
-                for (int ik = 0; ik < this->_nks; ++ik)
-                {
-                    // cal k_phase
-                    // if TK==std::complex<double>, kphase is e^{ikR}
-                    const ModuleBase::Vector3<double> dR(r_index[0], r_index[1], r_index[2]);
-                    const double arg = (this->_kv->kvec_d[ik] * dR) * ModuleBase::TWO_PI;
-                    double sinp, cosp;
-                    ModuleBase::libm::sincos(arg, &sinp, &cosp);
-                    std::complex<double> kphase = std::complex<double>(cosp, sinp);
-                    // set DMR element
-                    double* tmp_DMR_pointer = tmp_matrix->get_pointer();
-                    std::complex<double>* tmp_DMK_pointer = this->_DMK[ik + ik_begin].data();
-                    double* DMK_real_pointer = nullptr;
-                    double* DMK_imag_pointer = nullptr;
-                    // jump DMK to fill DMR
-                    // DMR is row-major, DMK is column-major
-                    tmp_DMK_pointer += col_ap * this->_paraV->nrow + row_ap;
-                    for (int mu = 0; mu < this->_paraV->get_row_size(iat1); ++mu)
-                    {
-                        DMK_real_pointer = (double*)tmp_DMK_pointer;
-                        DMK_imag_pointer = DMK_real_pointer + 1;
-                        BlasConnector::axpy(this->_paraV->get_col_size(iat2),
-                                            kphase.real(),
-                                            DMK_real_pointer,
-                                            ld_hk2,
-                                            tmp_DMR_pointer,
-                                            1);
-                        // "-" since i^2 = -1
-                        BlasConnector::axpy(this->_paraV->get_col_size(iat2),
-                                            -kphase.imag(),
-                                            DMK_imag_pointer,
-                                            ld_hk2,
-                                            tmp_DMR_pointer,
-                                            1);
-                        tmp_DMK_pointer += 1;
-                        tmp_DMR_pointer += this->_paraV->get_col_size(iat2);
-                    }
-                }
+				{
+					for (int ik = 0; ik < this->_nks; ++ik)
+					{
+						// cal k_phase
+						// if TK==std::complex<double>, kphase is e^{ikR}
+						const ModuleBase::Vector3<double> dR(r_index[0], r_index[1], r_index[2]);
+						const double arg = (this->_kv->kvec_d[ik] * dR) * ModuleBase::TWO_PI;
+						double sinp, cosp;
+						ModuleBase::libm::sincos(arg, &sinp, &cosp);
+						std::complex<double> kphase = std::complex<double>(cosp, sinp);
+						// set DMR element
+						double* tmp_DMR_pointer = tmp_matrix->get_pointer();
+						std::complex<double>* tmp_DMK_pointer = this->_DMK[ik + ik_begin].data();
+						double* DMK_real_pointer = nullptr;
+						double* DMK_imag_pointer = nullptr;
+						// jump DMK to fill DMR
+						// DMR is row-major, DMK is column-major
+						tmp_DMK_pointer += col_ap * this->_paraV->nrow + row_ap;
+						for (int mu = 0; mu < this->_paraV->get_row_size(iat1); ++mu)
+						{
+							DMK_real_pointer = (double*)tmp_DMK_pointer;
+							DMK_imag_pointer = DMK_real_pointer + 1;
+							BlasConnector::axpy(this->_paraV->get_col_size(iat2),
+									kphase.real(),
+									DMK_real_pointer,
+									ld_hk2,
+									tmp_DMR_pointer,
+									1);
+							// "-" since i^2 = -1
+							BlasConnector::axpy(this->_paraV->get_col_size(iat2),
+									-kphase.imag(),
+									DMK_imag_pointer,
+									ld_hk2,
+									tmp_DMR_pointer,
+									1);
+							tmp_DMK_pointer += 1;
+							tmp_DMR_pointer += this->_paraV->get_col_size(iat2);
+						}
+					}
+				}
+
                 // treat DMR as pauli matrix when NSPIN=4
                 if(GlobalV::NSPIN==4)
                 {
@@ -585,7 +595,7 @@ void DensityMatrix<std::complex<double>, double>::cal_DMR()
                             // save them back to the tmp_matrix
                             target_DMR[icol + step_trace[0]] = tmp[0].real() + tmp[3].real();
                             target_DMR[icol + step_trace[1]] = tmp[1].real() + tmp[2].real();
-                            target_DMR[icol + step_trace[2]] = tmp[1].imag() - tmp[2].imag();
+                            target_DMR[icol + step_trace[2]] = - tmp[1].imag() + tmp[2].imag();// (i * (rho_updown - rho_downup)).real()
                             target_DMR[icol + step_trace[3]] = tmp[0].real() - tmp[3].real();
                         }
                         tmp_DMR_pointer += this->_paraV->get_col_size(iat2) * 2;

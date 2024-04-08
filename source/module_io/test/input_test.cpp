@@ -47,6 +47,7 @@ TEST_F(InputTest, Default)
 	EXPECT_EQ(INPUT.emax_sto,0.0);
 	EXPECT_EQ(INPUT.nche_sto,100);
         EXPECT_EQ(INPUT.seed_sto,0);
+		EXPECT_EQ(INPUT.initsto_ecut,0.0);
         EXPECT_EQ(INPUT.bndpar,1);
         EXPECT_EQ(INPUT.kpar,1);
         EXPECT_EQ(INPUT.initsto_freq,0);
@@ -54,11 +55,12 @@ TEST_F(InputTest, Default)
         EXPECT_EQ(INPUT.npart_sto,1);
         EXPECT_FALSE(INPUT.cal_cond);
         EXPECT_EQ(INPUT.dos_nche,100);
-        EXPECT_EQ(INPUT.cond_nche,20);
+        EXPECT_DOUBLE_EQ(INPUT.cond_che_thr,1e-8);
         EXPECT_DOUBLE_EQ(INPUT.cond_dw,0.1);
         EXPECT_DOUBLE_EQ(INPUT.cond_wcut,10);
         EXPECT_EQ(INPUT.cond_dt,0.02);
-		EXPECT_EQ(INPUT.cond_dtbatch,4);
+		EXPECT_EQ(INPUT.cond_dtbatch,0);
+		EXPECT_EQ(INPUT.cond_smear,1);
         EXPECT_DOUBLE_EQ(INPUT.cond_fwhm,0.4);
         EXPECT_TRUE(INPUT.cond_nonlocal);
         EXPECT_FALSE(INPUT.berry_phase);
@@ -66,9 +68,10 @@ TEST_F(InputTest, Default)
         EXPECT_FALSE(INPUT.towannier90);
         EXPECT_EQ(INPUT.nnkpfile,"seedname.nnkp");
         EXPECT_EQ(INPUT.wannier_spin,"up");
+        EXPECT_EQ(INPUT.wannier_method,1);
 		EXPECT_TRUE(INPUT.out_wannier_amn);
 		EXPECT_TRUE(INPUT.out_wannier_mmn);
-		EXPECT_TRUE(INPUT.out_wannier_unk);
+		EXPECT_FALSE(INPUT.out_wannier_unk);
 		EXPECT_TRUE(INPUT.out_wannier_eig);
         EXPECT_TRUE(INPUT.out_wannier_wvfn_formatted);
         EXPECT_DOUBLE_EQ(INPUT.kspacing[0], 0.0);
@@ -87,8 +90,8 @@ TEST_F(InputTest, Default)
         EXPECT_EQ(INPUT.symmetry,"default");
         EXPECT_FALSE(INPUT.init_vel);
         EXPECT_DOUBLE_EQ(INPUT.ref_cell_factor,1.0);
-        EXPECT_DOUBLE_EQ(INPUT.symmetry_prec, 1.0e-5);
-        EXPECT_FALSE(INPUT.symmetry_autoclose);
+        EXPECT_DOUBLE_EQ(INPUT.symmetry_prec, 1.0e-6);
+        EXPECT_TRUE(INPUT.symmetry_autoclose);
         EXPECT_EQ(INPUT.cal_force, 0);
         EXPECT_DOUBLE_EQ(INPUT.force_thr,1.0e-3);
         EXPECT_DOUBLE_EQ(INPUT.force_thr_ev2,0);
@@ -118,15 +121,16 @@ TEST_F(InputTest, Default)
         EXPECT_DOUBLE_EQ(INPUT.erf_ecut, 0.0);
         EXPECT_DOUBLE_EQ(INPUT.erf_height, 0.0);
         EXPECT_DOUBLE_EQ(INPUT.erf_sigma, 0.1);
+		EXPECT_EQ(INPUT.fft_mode,0);
         EXPECT_EQ(INPUT.nx,0);
         EXPECT_EQ(INPUT.ny,0);
         EXPECT_EQ(INPUT.nz,0);
         EXPECT_EQ(INPUT.bx,0);
         EXPECT_EQ(INPUT.by,0);
         EXPECT_EQ(INPUT.bz,0);
-        EXPECT_EQ(INPUT.nsx, 0);
-        EXPECT_EQ(INPUT.nsy, 0);
-        EXPECT_EQ(INPUT.nsz, 0);
+        EXPECT_EQ(INPUT.ndx, 0);
+        EXPECT_EQ(INPUT.ndy, 0);
+        EXPECT_EQ(INPUT.ndz, 0);
         EXPECT_EQ(INPUT.diago_proc,0);
         EXPECT_EQ(INPUT.pw_diag_nmax,50);
         EXPECT_EQ(INPUT.diago_cg_prec,1);
@@ -148,12 +152,12 @@ TEST_F(InputTest, Default)
         EXPECT_EQ(INPUT.relax_nmax,0);
         EXPECT_EQ(INPUT.out_stru,0);
         EXPECT_EQ(INPUT.occupations,"smearing");
-        EXPECT_EQ(INPUT.smearing_method,"fixed");
-        EXPECT_DOUBLE_EQ(INPUT.smearing_sigma,0.01);
+        EXPECT_EQ(INPUT.smearing_method,"gauss");
+        EXPECT_DOUBLE_EQ(INPUT.smearing_sigma,0.015);
         EXPECT_EQ(INPUT.mixing_mode,"broyden");
         EXPECT_DOUBLE_EQ(INPUT.mixing_beta,-10.0);
         EXPECT_EQ(INPUT.mixing_ndim,8);
-        EXPECT_DOUBLE_EQ(INPUT.mixing_gg0,0.00);
+        EXPECT_DOUBLE_EQ(INPUT.mixing_gg0,1.00);
         EXPECT_EQ(INPUT.init_wfc,"atomic");
         EXPECT_EQ(INPUT.mem_saver,0);
         EXPECT_EQ(INPUT.printe,100);
@@ -172,10 +176,13 @@ TEST_F(InputTest, Default)
         EXPECT_EQ(INPUT.out_wfc_pw,0);
         EXPECT_EQ(INPUT.out_wfc_r,0);
         EXPECT_EQ(INPUT.out_dos,0);
-        EXPECT_EQ(INPUT.out_band,0);
+        EXPECT_EQ(INPUT.out_band[0],0);
+		EXPECT_EQ(INPUT.out_band[1],8);
         EXPECT_EQ(INPUT.out_proj_band,0);
-        EXPECT_EQ(INPUT.out_mat_hs,0);
+        EXPECT_EQ(INPUT.out_mat_hs[0],0);
+		EXPECT_EQ(INPUT.out_mat_hs[1],8);
         EXPECT_EQ(INPUT.out_mat_hs2,0);
+        EXPECT_EQ(INPUT.out_mat_xc, 0);
         EXPECT_EQ(INPUT.out_interval,1);
         EXPECT_EQ(INPUT.out_app_flag,1);
         EXPECT_EQ(INPUT.out_mat_r,0);
@@ -206,8 +213,8 @@ TEST_F(InputTest, Default)
         EXPECT_FALSE(INPUT.efield_flag);
         EXPECT_FALSE(INPUT.dip_cor_flag);
         EXPECT_EQ(INPUT.efield_dir,2);
-        EXPECT_DOUBLE_EQ(INPUT.efield_pos_max,0.5);
-        EXPECT_DOUBLE_EQ(INPUT.efield_pos_dec,0.1);
+        EXPECT_DOUBLE_EQ(INPUT.efield_pos_max, -1.0);
+        EXPECT_DOUBLE_EQ(INPUT.efield_pos_dec, -1.0);
         EXPECT_DOUBLE_EQ(INPUT.efield_amp ,0.0);
         EXPECT_FALSE(INPUT.gate_flag);
         EXPECT_DOUBLE_EQ(INPUT.zgate,0.5);
@@ -299,9 +306,10 @@ TEST_F(InputTest, Default)
         EXPECT_FALSE(INPUT.restart_save);
         EXPECT_FALSE(INPUT.restart_load);
         EXPECT_FALSE(INPUT.test_skip_ewald);
-        EXPECT_FALSE(INPUT.dft_plus_u);
+        EXPECT_EQ(INPUT.dft_plus_u, 0);
         EXPECT_FALSE(INPUT.yukawa_potential);
         EXPECT_DOUBLE_EQ(INPUT.yukawa_lambda,-1.0);
+		EXPECT_EQ(INPUT.onsite_radius, 0.0);
         EXPECT_EQ(INPUT.omc,0);
         EXPECT_FALSE(INPUT.dft_plus_dmft);
         EXPECT_FALSE(INPUT.rpa);
@@ -368,6 +376,15 @@ TEST_F(InputTest, Default)
     EXPECT_TRUE(INPUT.mdp.dump_force);
     EXPECT_TRUE(INPUT.mdp.dump_vel);
     EXPECT_TRUE(INPUT.mdp.dump_virial);
+    EXPECT_EQ(INPUT.sc_mag_switch,0);
+    EXPECT_FALSE(INPUT.decay_grad_switch);
+    EXPECT_DOUBLE_EQ(INPUT.sc_thr, 1e-6);
+    EXPECT_EQ(INPUT.nsc, 100);
+    EXPECT_EQ(INPUT.nsc_min, 2);
+	EXPECT_EQ(INPUT.sc_scf_nmin, 2);
+    EXPECT_DOUBLE_EQ(INPUT.alpha_trial, 0.01);
+    EXPECT_DOUBLE_EQ(INPUT.sccut, 3.0);
+    EXPECT_EQ(INPUT.sc_file, "none");
 }
 
 TEST_F(InputTest, Read)
@@ -395,6 +412,7 @@ TEST_F(InputTest, Read)
 	EXPECT_EQ(INPUT.emax_sto,0.0);
 	EXPECT_EQ(INPUT.nche_sto,100);
         EXPECT_EQ(INPUT.seed_sto,0);
+		EXPECT_EQ(INPUT.initsto_ecut,0.0);
         EXPECT_EQ(INPUT.bndpar,1);
         EXPECT_EQ(INPUT.kpar,1);
         EXPECT_EQ(INPUT.initsto_freq,0);
@@ -402,7 +420,7 @@ TEST_F(InputTest, Read)
         EXPECT_EQ(INPUT.npart_sto,1);
         EXPECT_FALSE(INPUT.cal_cond);
         EXPECT_EQ(INPUT.dos_nche,100);
-        EXPECT_EQ(INPUT.cond_nche,20);
+        EXPECT_DOUBLE_EQ(INPUT.cond_che_thr,1e-8);
         EXPECT_DOUBLE_EQ(INPUT.cond_dw,0.1);
         EXPECT_DOUBLE_EQ(INPUT.cond_wcut,10);
         EXPECT_EQ(INPUT.cond_dt,0.07);
@@ -414,6 +432,7 @@ TEST_F(InputTest, Read)
         EXPECT_FALSE(INPUT.towannier90);
         EXPECT_EQ(INPUT.nnkpfile,"seedname.nnkp");
         EXPECT_EQ(INPUT.wannier_spin,"up");
+        EXPECT_EQ(INPUT.wannier_method,1);
 		EXPECT_TRUE(INPUT.out_wannier_amn);
 		EXPECT_TRUE(INPUT.out_wannier_mmn);
 		EXPECT_TRUE(INPUT.out_wannier_unk);
@@ -434,8 +453,8 @@ TEST_F(InputTest, Read)
         EXPECT_TRUE(INPUT.search_pbc);
         EXPECT_EQ(INPUT.symmetry,"1");
         EXPECT_FALSE(INPUT.init_vel);
-        EXPECT_DOUBLE_EQ(INPUT.symmetry_prec, 1.0e-5);
-        EXPECT_FALSE(INPUT.symmetry_autoclose);
+        EXPECT_DOUBLE_EQ(INPUT.symmetry_prec, 1.0e-6);
+        EXPECT_TRUE(INPUT.symmetry_autoclose);
         EXPECT_EQ(INPUT.cal_force, 0);
         EXPECT_NEAR(INPUT.force_thr,1.0e-3,1.0e-7);
         EXPECT_DOUBLE_EQ(INPUT.force_thr_ev2,0);
@@ -466,6 +485,7 @@ TEST_F(InputTest, Read)
         EXPECT_DOUBLE_EQ(INPUT.erf_height, 20.0);
         EXPECT_DOUBLE_EQ(INPUT.erf_sigma, 4.0);
         EXPECT_DOUBLE_EQ(INPUT.ecutrho, 0.0);
+		EXPECT_EQ(INPUT.fft_mode,0);
         EXPECT_EQ(INPUT.ncx,0);
         EXPECT_EQ(INPUT.ncy,0);
         EXPECT_EQ(INPUT.ncz,0);
@@ -475,9 +495,9 @@ TEST_F(InputTest, Read)
         EXPECT_EQ(INPUT.bx,2);
         EXPECT_EQ(INPUT.by,2);
         EXPECT_EQ(INPUT.bz,2);
-        EXPECT_EQ(INPUT.nsx, 0);
-        EXPECT_EQ(INPUT.nsy, 0);
-        EXPECT_EQ(INPUT.nsz, 0);
+        EXPECT_EQ(INPUT.ndx, 0);
+        EXPECT_EQ(INPUT.ndy, 0);
+        EXPECT_EQ(INPUT.ndz, 0);
         EXPECT_EQ(INPUT.diago_proc,4);
         EXPECT_EQ(INPUT.pw_diag_nmax,50);
         EXPECT_EQ(INPUT.diago_cg_prec,1);
@@ -522,10 +542,13 @@ TEST_F(InputTest, Read)
         EXPECT_EQ(INPUT.out_wfc_pw,0);
         EXPECT_EQ(INPUT.out_wfc_r,0);
         EXPECT_EQ(INPUT.out_dos,0);
-        EXPECT_EQ(INPUT.out_band,0);
+        EXPECT_EQ(INPUT.out_band[0],0);
+		EXPECT_EQ(INPUT.out_band[1],8);
         EXPECT_EQ(INPUT.out_proj_band,0);
-        EXPECT_EQ(INPUT.out_mat_hs,0);
+        EXPECT_EQ(INPUT.out_mat_hs[0],0);
+		EXPECT_EQ(INPUT.out_mat_hs[1],8);
         EXPECT_EQ(INPUT.out_mat_hs2,0);
+        EXPECT_EQ(INPUT.out_mat_xc, 0);
         EXPECT_EQ(INPUT.out_interval,1);
         EXPECT_EQ(INPUT.out_app_flag,0);
         EXPECT_EQ(INPUT.out_mat_r,0);
@@ -648,9 +671,10 @@ TEST_F(InputTest, Read)
         EXPECT_FALSE(INPUT.restart_save);
         EXPECT_FALSE(INPUT.restart_load);
         EXPECT_FALSE(INPUT.test_skip_ewald);
-        EXPECT_FALSE(INPUT.dft_plus_u);
+        EXPECT_EQ(INPUT.dft_plus_u, 0);
         EXPECT_FALSE(INPUT.yukawa_potential);
         EXPECT_DOUBLE_EQ(INPUT.yukawa_lambda,-1.0);
+		EXPECT_EQ(INPUT.onsite_radius, 0.0);
         EXPECT_EQ(INPUT.omc,0);
         EXPECT_FALSE(INPUT.dft_plus_dmft);
         EXPECT_FALSE(INPUT.rpa);
@@ -720,6 +744,15 @@ TEST_F(InputTest, Read)
     EXPECT_FALSE(INPUT.mdp.dump_force);
     EXPECT_FALSE(INPUT.mdp.dump_vel);
     EXPECT_FALSE(INPUT.mdp.dump_virial);
+    EXPECT_EQ(INPUT.sc_mag_switch, 0);
+    EXPECT_TRUE(INPUT.decay_grad_switch);
+    EXPECT_DOUBLE_EQ(INPUT.sc_thr, 1e-4);
+    EXPECT_EQ(INPUT.nsc, 50);
+	EXPECT_EQ(INPUT.nsc_min, 4);
+	EXPECT_EQ(INPUT.sc_scf_nmin, 4);
+    EXPECT_DOUBLE_EQ(INPUT.alpha_trial, 0.02);
+	EXPECT_DOUBLE_EQ(INPUT.sccut, 4.0);
+    EXPECT_EQ(INPUT.sc_file, "sc.json");
 }
 
 TEST_F(InputTest, Default_2)
@@ -754,9 +787,15 @@ TEST_F(InputTest, Default_2)
     EXPECT_DOUBLE_EQ(INPUT.erf_height, 20.0);
     EXPECT_DOUBLE_EQ(INPUT.erf_sigma, 4.0);
     INPUT.nbndsto_str = "all";
+    INPUT.nx = INPUT.ny = INPUT.nz = 4;
+    INPUT.ndx = INPUT.ndy = INPUT.ndz = 0;
     // the 1st calling
     INPUT.Default_2();
     // ^^^^^^^^^^^^^^
+    EXPECT_EQ(INPUT.ndx, 4);
+    EXPECT_EQ(INPUT.ndy, 4);
+    EXPECT_EQ(INPUT.ndz, 4);
+    EXPECT_FALSE(GlobalV::double_grid);
     EXPECT_DOUBLE_EQ(INPUT.ecutrho, 80.0);
     EXPECT_EQ(INPUT.vdw_s6, "0.75");
     EXPECT_EQ(INPUT.vdw_cutoff_radius, "56.6918");
@@ -803,9 +842,15 @@ TEST_F(InputTest, Default_2)
 	INPUT.scf_thr_type = -1;
     INPUT.nbndsto_str = "0";
     INPUT.esolver_type = "sdft";
+    INPUT.nx = INPUT.ny = INPUT.nz = 0;
+    INPUT.ndx = INPUT.ndy = INPUT.ndz = 4;
     // the 2nd calling
 	INPUT.Default_2();
 	// ^^^^^^^^^^^^^^
+    EXPECT_EQ(INPUT.nx, 4);
+    EXPECT_EQ(INPUT.ny, 4);
+    EXPECT_EQ(INPUT.nz, 4);
+    EXPECT_FALSE(GlobalV::double_grid);
     EXPECT_EQ(INPUT.chg_extrap, "first-order");
     EXPECT_EQ(INPUT.vdw_s6, "1.0");
     EXPECT_EQ(INPUT.vdw_s8, "0.722");
@@ -845,9 +890,12 @@ TEST_F(InputTest, Default_2)
 	INPUT.ks_solver = "cg";
 	GlobalV::NPROC = 8;
 	INPUT.diago_proc = 1;
-	// the 3rd calling
-	INPUT.Default_2();
-	// ^^^^^^^^^^^^^^
+    INPUT.nx = INPUT.ny = INPUT.nz = 4;
+    INPUT.ndx = INPUT.ndy = INPUT.ndz = 6;
+    // the 3rd calling
+    INPUT.Default_2();
+    // ^^^^^^^^^^^^^^
+    EXPECT_TRUE(GlobalV::double_grid);
     EXPECT_EQ(INPUT.chg_extrap, "atomic");
     EXPECT_EQ(INPUT.vdw_s6, "1.0");
     EXPECT_EQ(INPUT.vdw_s8, "0.7875");
@@ -866,14 +914,21 @@ TEST_F(InputTest, Default_2)
 	INPUT.calculation = "get_pchg";
     INPUT.chg_extrap = "default";
     INPUT.symmetry = "default";
-	// the 4th calling
-	INPUT.Default_2();
-	// ^^^^^^^^^^^^^^
-	EXPECT_EQ(GlobalV::CALCULATION,"get_pchg");
+    INPUT.ecutwfc = 10;
+    INPUT.ecutrho = 100;
+    INPUT.nx = INPUT.ny = INPUT.nz = 0;
+    INPUT.ndx = INPUT.ndy = INPUT.ndz = 0;
+    GlobalV::double_grid = false;
+    // the 4th calling
+    INPUT.Default_2();
+    // ^^^^^^^^^^^^^^
+    EXPECT_TRUE(GlobalV::double_grid);
+    EXPECT_EQ(GlobalV::CALCULATION, "get_pchg");
     EXPECT_EQ(INPUT.relax_nmax, 1);
     EXPECT_EQ(INPUT.out_stru, 0);
     EXPECT_EQ(INPUT.symmetry, "0");
-	EXPECT_EQ(INPUT.out_band,0);
+	EXPECT_EQ(INPUT.out_band[0],0);
+	EXPECT_EQ(INPUT.out_band[1],8);
 	EXPECT_EQ(INPUT.out_proj_band,0);
 	EXPECT_EQ(INPUT.cal_force,0);
 	EXPECT_EQ(INPUT.init_wfc,"file");
@@ -895,7 +950,8 @@ TEST_F(InputTest, Default_2)
     EXPECT_EQ(INPUT.relax_nmax, 1);
     EXPECT_EQ(INPUT.symmetry, "0");
     EXPECT_EQ(INPUT.out_stru, 0);
-	EXPECT_EQ(INPUT.out_band,0);
+	EXPECT_EQ(INPUT.out_band[0],0);
+	EXPECT_EQ(INPUT.out_band[1],8);
 	EXPECT_EQ(INPUT.out_proj_band,0);
 	EXPECT_EQ(INPUT.cal_force,0);
 	EXPECT_EQ(INPUT.init_wfc,"file");
@@ -983,12 +1039,15 @@ TEST_F(InputTest, Check)
     testing::internal::CaptureStdout();
     EXPECT_EXIT(INPUT.Check(), ::testing::ExitedWithCode(0), "");
     output = testing::internal::GetCapturedStdout();
-    EXPECT_THAT(output, testing::HasSubstr("ecutrho must > ecutwfc"));
-    INPUT.ecutrho = 30;
+    EXPECT_THAT(output, testing::HasSubstr("ecutrho/ecutwfc must >= 4"));
+    INPUT.ecutrho = 100.0;
+    INPUT.nx = INPUT.ny = INPUT.nz = 10;
+    INPUT.ndx = INPUT.ndy = INPUT.ndz = 8;
     testing::internal::CaptureStdout();
-    INPUT.Check();
+    EXPECT_EXIT(INPUT.Check(), ::testing::ExitedWithCode(0), "");
     output = testing::internal::GetCapturedStdout();
-    EXPECT_THAT(output, testing::HasSubstr("ecutrho < 4*ecutwfc, not recommended"));
+    EXPECT_THAT(output, testing::HasSubstr("smooth grids is denser than dense grids"));
+    INPUT.ndx = INPUT.ndy = INPUT.ndz = 11;
     //
     INPUT.nbands = -1;
     testing::internal::CaptureStdout();
@@ -1083,15 +1142,6 @@ TEST_F(InputTest, Check)
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("time interval of MD calculation should be set!"));
 	INPUT.mdp.md_dt = 1.0;
-    //
-    INPUT.mdp.md_type = "npt";
-	INPUT.mdp.md_pmode = "iso";
-	INPUT.mdp.md_pfirst = -1.0;
-	testing::internal::CaptureStdout();
-	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
-	output = testing::internal::GetCapturedStdout();
-	EXPECT_THAT(output,testing::HasSubstr("pressure of MD calculation should be set!"));
-	INPUT.mdp.md_pfirst = 1.0;
 	//
 	INPUT.mdp.md_type = "msst";
 	INPUT.mdp.msst_qmass = -1.0;
@@ -1229,6 +1279,14 @@ TEST_F(InputTest, Check)
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("Fermi Surface Plotting not implemented for plane wave now."));
 	INPUT.out_dos = 0;
+	//
+	INPUT.basis_type = "pw";
+	INPUT.sc_mag_switch = 3;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("Non-colliner Spin-constrained DFT not implemented for plane wave now."));
+	INPUT.sc_mag_switch = 0;
 	//
 	INPUT.basis_type = "lcao";
 	INPUT.ks_solver = "cg";
@@ -1466,12 +1524,13 @@ TEST_F(InputTest, Check)
 	INPUT.berry_phase = 0;
 	//
 	INPUT.towannier90 = 1;
-	INPUT.basis_type = "lcao_in_pw";
-	INPUT.ks_solver = "lapack";
-	testing::internal::CaptureStdout();
-	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
-	output = testing::internal::GetCapturedStdout();
-	EXPECT_THAT(output,testing::HasSubstr("to use towannier90, please set basis_type = pw or lcao"));
+	// due to the repair of lcao_in_pw, original warning has been deprecated, 2023/12/23, ykhuang
+	// INPUT.basis_type = "lcao_in_pw";
+	// INPUT.ks_solver = "lapack";
+	// testing::internal::CaptureStdout();
+	// EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	// output = testing::internal::GetCapturedStdout();
+	// EXPECT_THAT(output,testing::HasSubstr("to use towannier90, please set basis_type = pw or lcao"));
 	INPUT.basis_type = "pw";
 	INPUT.ks_solver = "cg";
 	//
@@ -1496,6 +1555,95 @@ TEST_F(InputTest, Check)
 	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("please set right files directory for reading in."));
+	INPUT.read_file_dir = "auto";
+	// Start to check deltaspin parameters
+	INPUT.sc_mag_switch = 1;
+	INPUT.sc_file = "none";
+	INPUT.basis_type = "lcao";
+	INPUT.ks_solver = "genelpa";
+	// warning 1 of Deltaspin
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("sc_file (json format) must be set when sc_mag_switch > 0"));
+	// warning 2 of Deltaspin
+	INPUT.sc_file = "sc.json";
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("sc_file does not exist"));
+	INPUT.sc_file = "./support/sc.json";
+	// warning 3 of Deltaspin
+	INPUT.nspin = 1;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("nspin must be 2 or 4 when sc_mag_switch > 0"));
+	INPUT.nspin = 4;
+	// warning 4 of Deltaspin
+	INPUT.calculation = "nscf";
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("calculation must be scf when sc_mag_switch > 0"));
+	INPUT.calculation = "scf";
+	// warning 5 of Deltaspin
+	INPUT.sc_thr = -1;
+		testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("sc_thr must > 0"));
+	INPUT.sc_thr = 1e-6;
+	// warning 6 of Deltaspin
+	INPUT.nsc = -1;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("nsc must > 0"));
+	INPUT.nsc = 100;
+	// warning 7 of Deltaspin
+	INPUT.nsc_min = -1;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("nsc_min must > 0"));
+	INPUT.nsc_min = 2;
+	// warning 8 of Deltapsin
+    INPUT.alpha_trial = -1;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("alpha_trial must > 0"));
+	INPUT.alpha_trial = 0.01;
+	// warning 9 of Deltapsin
+    INPUT.sccut = -1;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("sccut must > 0"));
+	INPUT.sccut = 3.0;
+	// warning 10 of Deltaspin
+	INPUT.sc_scf_nmin = -1;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("sc_scf_nmin must >= 2"));
+	INPUT.sc_scf_nmin = 2;
+	// warning 10 of Deltaspin
+	INPUT.nupdown = 4;
+	testing::internal::CaptureStdout();
+	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
+	output = testing::internal::GetCapturedStdout();
+	EXPECT_THAT(output,testing::HasSubstr("nupdown should not be set when sc_mag_switch > 0"));
+	INPUT.nupdown = 0;
+    // restore to default values
+    INPUT.nspin = 1;
+	INPUT.sc_file = "none";
+	INPUT.sc_mag_switch = 0;
+	INPUT.ks_solver = "default";
+	INPUT.basis_type = "pw";
+	// End of checking Deltaspin parameters
+
 	/*
 	testing::internal::CaptureStdout();
 	EXPECT_EXIT(INPUT.Check(),::testing::ExitedWithCode(0), "");
@@ -1504,7 +1652,140 @@ TEST_F(InputTest, Check)
 	*/
 }
 
+bool strcmp_inbuilt(const std::string& str1, const std::string& str2)
+{
+	if(str1.size() != str2.size())
+		return false;
+	for(int i=0; i<str1.size(); i++)
+	{
+		if(str1[i] != str2[i])
+			return false;
+	}
+	return true;
+}
 
+TEST_F(InputTest, ReadValue2stdvector)
+{
+	std::string input_file = "./support/INPUT_list";
+	std::ifstream ifs(input_file);
+	std::string word;
+	std::vector<int> value;
+	while(!ifs.eof())
+	{
+		ifs >> word;
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case0"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 1);
+			EXPECT_EQ(value[0], 7);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case1"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 1);
+			EXPECT_EQ(value[0], 7);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case2"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 1);
+			EXPECT_EQ(value[0], 7);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case3"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 1);
+			EXPECT_EQ(value[0], 7);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case4"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 1);
+			EXPECT_EQ(value[0], 7);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case5"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 4);
+			EXPECT_EQ(value[0], 7);
+			EXPECT_EQ(value[1], 8);
+			EXPECT_EQ(value[2], 9);
+			EXPECT_EQ(value[3], 10);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case6"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 4);
+			EXPECT_EQ(value[0], 7);
+			EXPECT_EQ(value[1], 8);
+			EXPECT_EQ(value[2], 9);
+			EXPECT_EQ(value[3], 10);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case7"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 4);
+			EXPECT_EQ(value[0], 7);
+			EXPECT_EQ(value[1], 8);
+			EXPECT_EQ(value[2], 9);
+			EXPECT_EQ(value[3], 10);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case8"))
+		{
+			value.clear(); value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, value);
+			EXPECT_EQ(value.size(), 4);
+			EXPECT_EQ(value[0], 7);
+			EXPECT_EQ(value[1], 8);
+			EXPECT_EQ(value[2], 9);
+			EXPECT_EQ(value[3], 10);
+		}
+		std::vector<std::string> str_value;
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case9"))
+		{
+			str_value.clear(); str_value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, str_value);
+			EXPECT_EQ(str_value.size(), 1);
+			EXPECT_EQ(str_value[0], "string1");
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case10"))
+		{
+			str_value.clear(); str_value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, str_value);
+			EXPECT_EQ(str_value.size(), 4);
+			EXPECT_EQ(str_value[0], "string1");
+			EXPECT_EQ(str_value[1], "string2");
+			EXPECT_EQ(str_value[2], "string3");
+			EXPECT_EQ(str_value[3], "string4");
+		}
+		std::vector<double> double_value;
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case11"))
+		{
+			double_value.clear(); double_value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, double_value);
+			EXPECT_EQ(double_value.size(), 1);
+			EXPECT_EQ(double_value[0], 1.23456789);
+		}
+		if(strcmp_inbuilt(word, "bessel_nao_rcut_case12"))
+		{
+			double_value.clear(); double_value.shrink_to_fit();
+			INPUT.read_value2stdvector(ifs, double_value);
+			EXPECT_EQ(double_value.size(), 4);
+			EXPECT_EQ(double_value[0], -1.23456789);
+			EXPECT_EQ(double_value[1], 2.3456789);
+			EXPECT_EQ(double_value[2], -3.456789);
+			EXPECT_EQ(double_value[3], 4.56789);
+		}
+	}
+}
 #undef private
 
 

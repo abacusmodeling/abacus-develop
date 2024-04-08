@@ -29,7 +29,7 @@ TEST_F(Test_Libpaw_Cell, test_paw)
     ModuleBase::Matrix3 latvec;
 
     double ecut = 10.0;
-    double ecutpaw = 40.0;
+    double ecutpaw = 10.0;
     paw_cell.set_libpaw_ecut(ecut,ecutpaw);
 
     latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
@@ -43,18 +43,15 @@ TEST_F(Test_Libpaw_Cell, test_paw)
     int nx = 30;
     int ny = 30;
     int nz = 30;
-    int nx_dg = 60;
-    int ny_dg = 60;
-    int nz_dg = 60;
 
     GlobalV::NPROC = 1;
     std::vector<int> start_z = {0};
-    std::vector<int> num_z = {nz_dg};
-    paw_cell.set_libpaw_fft(nx, ny, nz, nx_dg, ny_dg, nz_dg, start_z.data(), num_z.data());
+    std::vector<int> num_z = {nz};
+    paw_cell.set_libpaw_fft(nx, ny, nz, nx, ny, nz, start_z.data(), num_z.data());
 
     int natom = 5;
     int ntypat = 2;
-    int typat[5] = {2,1,1,1,1};
+    int typat[5] = {1,2,2,2,2};
     double xred[15] = {-0.279789547400000, 7.109405980000000E-002, 0.000000000000000E+000,
         -0.212391634800000,      -0.119543389500000,       0.000000000000000E+000,
         -0.212388153900000,       0.166411496700000,       0.165096194500000,
@@ -70,7 +67,7 @@ TEST_F(Test_Libpaw_Cell, test_paw)
     paw_cell.set_nspin(1);
 
     EXPECT_NEAR(paw_cell.get_libpaw_ecut(),10.0,1e-10);
-    EXPECT_NEAR(paw_cell.get_libpaw_ecutpaw(),40.0,1e-10);
+    EXPECT_NEAR(paw_cell.get_libpaw_ecutpaw(),10.0,1e-10);
     EXPECT_NEAR(paw_cell.get_libpaw_ucvol(),1000.0,1e-10);
     
     EXPECT_NEAR(paw_cell.get_libpaw_rprimd()[0],10.0,1e-10);
@@ -107,25 +104,21 @@ TEST_F(Test_Libpaw_Cell, test_paw)
     EXPECT_EQ(paw_cell.get_libpaw_ngfft()[1],30);
     EXPECT_EQ(paw_cell.get_libpaw_ngfft()[2],30);
 
-    EXPECT_EQ(paw_cell.get_libpaw_ngfftdg()[0],60);
-    EXPECT_EQ(paw_cell.get_libpaw_ngfftdg()[1],60);
-    EXPECT_EQ(paw_cell.get_libpaw_ngfftdg()[2],60);
-
     EXPECT_EQ(paw_cell.get_libpaw_natom(),5);
     EXPECT_EQ(paw_cell.get_libpaw_ntypat(),2);
 
-    EXPECT_EQ(paw_cell.get_libpaw_typat()[0],2);
-    EXPECT_EQ(paw_cell.get_libpaw_typat()[1],1);
-    EXPECT_EQ(paw_cell.get_libpaw_typat()[2],1);
-    EXPECT_EQ(paw_cell.get_libpaw_typat()[3],1);
-    EXPECT_EQ(paw_cell.get_libpaw_typat()[4],1);
+    EXPECT_EQ(paw_cell.get_libpaw_typat()[0],1);
+    EXPECT_EQ(paw_cell.get_libpaw_typat()[1],2);
+    EXPECT_EQ(paw_cell.get_libpaw_typat()[2],2);
+    EXPECT_EQ(paw_cell.get_libpaw_typat()[3],2);
+    EXPECT_EQ(paw_cell.get_libpaw_typat()[4],2);
 
-    EXPECT_EQ(paw_cell.get_libpaw_filename_list()[0],'H');
+    EXPECT_EQ(paw_cell.get_libpaw_filename_list()[0],'C');
     EXPECT_EQ(paw_cell.get_libpaw_filename_list()[1],'.');
     EXPECT_EQ(paw_cell.get_libpaw_filename_list()[2],'x');
     EXPECT_EQ(paw_cell.get_libpaw_filename_list()[3],'m');
     EXPECT_EQ(paw_cell.get_libpaw_filename_list()[4],'l');
-    EXPECT_EQ(paw_cell.get_libpaw_filename_list()[264],'C');
+    EXPECT_EQ(paw_cell.get_libpaw_filename_list()[264],'H');
     EXPECT_EQ(paw_cell.get_libpaw_filename_list()[265],'.');
     EXPECT_EQ(paw_cell.get_libpaw_filename_list()[266],'x');
     EXPECT_EQ(paw_cell.get_libpaw_filename_list()[267],'m');
@@ -138,7 +131,7 @@ TEST_F(Test_Libpaw_Cell, test_paw)
 
     paw_cell.prepare_paw();
 
-    int nfft = nx_dg * ny_dg * nz_dg;
+    int nfft = nx * ny * nz;
 
     double *vloc, *ncoret;
     double *vks, *vxc;
@@ -157,30 +150,31 @@ TEST_F(Test_Libpaw_Cell, test_paw)
 
 // Will fix this part later; now I'm using C++ order so all the results
 // are different from previously generated
-/*
+
     paw_cell.get_vloc_ncoret(vloc, ncoret);
-    std::ifstream ifs("fort.26");
+    std::ifstream ifs_vloc("vloc.dat");
 
     for(int i = 0; i < nfft; i++)
     {
         double tmp;
-        ifs >> tmp;
+        ifs_vloc >> tmp;
         EXPECT_NEAR(tmp,vloc[i],1e-10);
     }
 
+    std::ifstream ifs_ncoret("ncoret.dat");
     for(int i = 0; i < nfft; i++)
     {
         double tmp;
-        ifs >> tmp;
+        ifs_ncoret >> tmp;
         EXPECT_NEAR(tmp,ncoret[i],1e-10);
     }
 
     paw_cell.init_rho(rho);
-    std::ifstream ifs1("fort.101");
+    std::ifstream ifs_rho0("rho0.dat");
     for(int i = 0; i < nfft; i++)
     {
         double tmp;
-        ifs1 >> tmp;
+        ifs_rho0 >> tmp;
         EXPECT_NEAR(tmp,rho[0][i],1e-10);
     }
 
@@ -210,7 +204,7 @@ TEST_F(Test_Libpaw_Cell, test_paw)
 
     paw_cell.get_nhat(nhat,nhatgr);
 
-    std::ifstream ifs_nhat("fort.19");
+    std::ifstream ifs_nhat("nhat.dat");
     for(int i=0; i<nfft; i++)
     {
         double tmp;
@@ -236,7 +230,7 @@ TEST_F(Test_Libpaw_Cell, test_paw)
     {
         dij = new double[size_rhoij[iat]];
 
-        paw_cell.get_dij(iat,size_rhoij[iat],dij);
+        paw_cell.extract_dij(iat,size_rhoij[iat],dij);
 
         for(int i=0; i<size_rhoij[iat]; i++)
         {
@@ -247,7 +241,7 @@ TEST_F(Test_Libpaw_Cell, test_paw)
 
         delete[] dij;
     }
-*/
+
     delete[] rho[0];
     delete[] rho;
     delete[] vloc;

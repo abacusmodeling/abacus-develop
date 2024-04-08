@@ -44,7 +44,7 @@ ModuleBase::matrix ModuleIO::cal_mulliken(const std::vector<std::vector<double>>
         const char N_char = 'N';
         const int one_int = 1;
         const double one_float = 1.0, zero_float = 0.0;        
-        pdgemm_(&T_char,
+        pdgemm_(&N_char,
                 &T_char,
                 &GlobalV::NLOCAL,
                 &GlobalV::NLOCAL,
@@ -132,8 +132,8 @@ ModuleBase::matrix ModuleIO::cal_mulliken(const std::vector<std::vector<std::com
     // std::vector<std::vector<double>> MecMulP(GlobalV::NSPIN, std::vector<double>(nlocal, 0));
     // std::vector<std::vector<double>> orbMulP(GlobalV::NSPIN, std::vector<double>(nlocal, 0));
     ModuleBase::matrix MecMulP, orbMulP;
-    MecMulP.create(GlobalV::NSPIN, nlocal);
-    orbMulP.create(GlobalV::NSPIN, nlocal);
+    MecMulP.create(GlobalV::NSPIN, nlocal, true);
+    orbMulP.create(GlobalV::NSPIN, nlocal, true);
 
     for(size_t ik = 0; ik != kv.nks; ++ik)
     {
@@ -149,14 +149,14 @@ ModuleBase::matrix ModuleIO::cal_mulliken(const std::vector<std::vector<std::com
         }
 
         ModuleBase::ComplexMatrix mud;
-        mud.create(LM->ParaV->ncol, LM->ParaV->nrow);
+        mud.create(LM->ParaV->ncol, LM->ParaV->nrow, true);
 
 #ifdef __MPI
         const char T_char = 'T';
         const char N_char = 'N';
         const int one_int = 1;
         const std::complex<double> one_float = {1.0, 0.0}, zero_float = {0.0, 0.0};        
-        pzgemm_(&T_char,
+        pzgemm_(&N_char,
                 &T_char,
                 &GlobalV::NLOCAL,
                 &GlobalV::NLOCAL,
@@ -208,14 +208,16 @@ ModuleBase::matrix ModuleIO::cal_mulliken(const std::vector<std::vector<std::com
                         const int ir = LM->ParaV->global2local_row(k1);
                         const int ic = LM->ParaV->global2local_col(k2);
                         MecMulP(1, j) += mud(ic, ir).real();
-                        MecMulP(2, j) += mud(ic, ir).imag();
+                        // M_y = i(M_{up,down} - M_{down,up}) = -(M_{up,down} - M_{down,up}).imag()
+                        MecMulP(2, j) -= mud(ic, ir).imag(); 
                     }
                     if(LM->ParaV->in_this_processor(k2, k1))
                     {
                         const int ir = LM->ParaV->global2local_row(k2);
                         const int ic = LM->ParaV->global2local_col(k1);
                         MecMulP(1, j) += mud(ic, ir).real();
-                        MecMulP(2, j) -= mud(ic, ir).imag();
+                        // M_y = i(M_{up,down} - M_{down,up}) = -(M_{up,down} - M_{down,up}).imag()
+                        MecMulP(2, j) += mud(ic, ir).imag();
                     }
                     if(LM->ParaV->in_this_processor(k2, k2))
                     {
@@ -308,6 +310,7 @@ void ModuleIO::out_mulliken(const int& step, LCAO_Matrix* LM, const elecstate::E
         }
 		os << " Total charge:\t" << sch << std::endl;
 		os << "Decomposed Mulliken populations" << std::endl;
+        GlobalV::ofs_running << std::endl <<std::endl;
 
         for (size_t i = 0; i != GlobalC::ucell.nat; ++i)
         {
@@ -424,6 +427,7 @@ void ModuleIO::out_mulliken(const int& step, LCAO_Matrix* LM, const elecstate::E
             {
                 os << "Total Charge on atom:  " << GlobalC::ucell.atoms[t].label <<  std::setw(20) << total_charge <<std::endl;
                 os << "Total Magnetism on atom:  " << GlobalC::ucell.atoms[t].label <<  std::setw(20) << ModuleIO::output_cut(atom_mag) <<std::endl;
+                GlobalV::ofs_running << "Total Magnetism on atom:  " << GlobalC::ucell.atoms[t].label <<  std::setw(20) << std::setprecision(10) << atom_mag <<std::endl;
             }
             else if (GlobalV::NSPIN==4)
             {
@@ -436,9 +440,13 @@ void ModuleIO::out_mulliken(const int& step, LCAO_Matrix* LM, const elecstate::E
                 os << "Total Magnetism on atom:  " << GlobalC::ucell.atoms[t].label <<  std::setw(20) 
                 << "("  << spin2 << ", " << spin3 << ", " << spin4 << ")" 
                 <<std::endl;
+                GlobalV::ofs_running << "Total Magnetism on atom:  " << GlobalC::ucell.atoms[t].label <<  std::setw(10)
+                << "("  << std::setprecision(10) << spin2 << ", " << std::setprecision(10) << spin3 << ", " << std::setprecision(10) << spin4 << ")"
+                <<std::endl;
             }
             os << std::endl <<std::endl;
         }
+        GlobalV::ofs_running << std::endl <<std::endl;
         os.close();
         ModuleIO::write_orb_info(&(GlobalC::ucell));
     }

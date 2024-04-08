@@ -43,9 +43,9 @@ class Paw_Cell
     // exp(-i(k+G)R_I) = exp(-ikR_I) exp(-iG_xR_Ix) exp(-iG_yR_Iy) exp(-iG_zR_Iz)
     // as well as the spherical harmonics Ylm(k+G), and gnorm
     void set_paw_k(
-        const int npw_in, const double * kpt,
+        const int npw_in, const int npwx_in, const double * kpt,
         const int * ig_to_ix, const int * ig_to_iy, const int * ig_to_iz,
-        const double ** kpg, const double tpiba);
+        const double ** kpg, const double tpiba, const double ** gcar);
 
     // This is one of the core functionalities of this class, which reads a wavefunction
     // psi(G), calculates its overlap with all projectors <psi(G)|ptilde(G)>,
@@ -53,6 +53,8 @@ class Paw_Cell
     // Note k-point information is not passed here, but prepared in set_paw_k
     void accumulate_rhoij(const std::complex<double> * psi, const double weight);
     void reset_rhoij();
+
+    void init_rhoij(); // set rhoij according to occupation number in xml file
 
     // returns rhoij for each atom
     //std::vector<std::vector<double>> get_rhoij();
@@ -130,7 +132,7 @@ class Paw_Cell
 
     // FFT grid
     int nx, ny, nz;
-    int npw;
+    int npw, npwx; // #. of pw for current k point, max #. of pw for all k points
 
     // The reciprocal space projectors; it is called vkb
     // to be consistent with non-local PP
@@ -160,6 +162,9 @@ class Paw_Cell
     // I'd rather also calculate it once and save it
     std::vector<double> gnorm;
 
+    // i(G), used in force calculation
+    std::vector<std::vector<std::complex<double>>> ig;
+
     void set_ylm(const int npw_in, const double ** kpg);
 
     std::vector<int> isk;
@@ -174,10 +179,17 @@ class Paw_Cell
     // mode = 0 : V_{NL}|psi>, mode = 1 : (S+I)|psi>
     void paw_nl_psi(const int mode, const std::complex<double> * psi, std::complex<double> * vnlpsi);
 
+    
+    void paw_nl_force(const std::complex<double> * psi, const double * epsilon, const double * weight, const int nbands , double * force);
+
+    // set by providing dij explicitly
     void set_dij(const int iat, double** dij_in){paw_atom_list[iat].set_dij(dij_in);}
+    // set by extracting dij from libpaw_interface
     void set_dij();
 
+    // set by providing sij explicitly
     void set_sij(const int iat, double* sij_in){paw_atom_list[iat].set_sij(sij_in);}
+    // set by extracting sij from libpaw_interface
     void set_sij();
 
 // Part III. Passing info for the initialization of PAW
@@ -230,6 +242,15 @@ class Paw_Cell
     double calculate_ecore();
 
     private:
+
+    bool first_iter;
+    int count;
+
+    void init_mix_dij();
+    void mix_dij(const int iat, double*dij_libpaw);
+
+    std::vector<std::vector<double>> dij_save;
+
 // Info to be passed to libpaw_interface:
 // 1. ecut, ecutpaw : kinetic energy cutoff of the planewave basis set
 // there will be one coarse grid for density/potential, and a fine grid for PAW
@@ -266,8 +287,9 @@ class Paw_Cell
     void set_rhoij(int iat, int nrhoijsel, int size_rhoij, int* rhoijselect, double* rhoijp);
     void get_nhat(double** nhat, double* nhatgr);
     void calculate_dij(double* vks, double* vxc);
-    void get_dij(int iat, int size_dij, double* dij);
-    void get_sij(int iat, int size_sij, double* sij);
+    void extract_dij(int iat, int size_dij, double* dij);
+    void extract_sij(int iat, int size_sij, double* sij);
+    void calculate_force(double* vks, double* vxc, double* rhor, double* force);
 
 // Part V. Relevant for parallel computing
 // Note about the parallelization of PAW: ABINIT supports the parallelization based on

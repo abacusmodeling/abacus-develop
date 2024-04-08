@@ -31,12 +31,77 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 	}
 }
 
+void Local_Orbital_wfc::gamma_file(psi::Psi<double>* psid, elecstate::ElecState* pelec)
+{
+    ModuleBase::TITLE("Local_Orbital_Charge", "gamma_file");
+    std::cout << " Read in gamma point wave function files " << std::endl;
+
+    double** ctot;
+
+    //allocate psi
+    int ncol = this->ParaV->ncol_bands;
+
+    if (GlobalV::KS_SOLVER == "genelpa" 
+     || GlobalV::KS_SOLVER == "lapack_gvx" 
+     || GlobalV::KS_SOLVER == "scalapack_gvx" 
+     || GlobalV::KS_SOLVER == "cg_in_lcao"
+#ifdef __CUSOLVER_LCAO
+        || GlobalV::KS_SOLVER == "cusolver"
+#endif
+        )
+    {
+        ncol = this->ParaV->ncol;
+    }
+
+    if (psid == nullptr)
+    {
+        ModuleBase::WARNING_QUIT("gamma_file", "psid should be allocated first!");
+    }
+    else
+    {
+        psid->resize(GlobalV::NSPIN, ncol, this->ParaV->nrow);
+    }
+    ModuleBase::GlobalFunc::ZEROS(psid->get_pointer(), psid->size());
+
+    for (int is = 0; is < GlobalV::NSPIN; ++is)
+    {
+        this->error = ModuleIO::read_wfc_nao(ctot, is, GlobalV::GAMMA_ONLY_LOCAL, GlobalV::NB2D, GlobalV::NBANDS, 
+                                             GlobalV::NLOCAL, GlobalV::global_readin_dir, this->ParaV, psid, pelec);
+#ifdef __MPI
+        Parallel_Common::bcast_int(this->error);
+#endif
+        switch (this->error)
+        {
+        case 1:
+            std::cout << "Can't find the wave function file: LOWF_GAMMA_S" << is + 1 << ".txt" << std::endl;
+            break;
+        case 2:
+            std::cout << "In wave function file, band number doesn't match" << std::endl;
+            break;
+        case 3:
+            std::cout << "In wave function file, nlocal doesn't match" << std::endl;
+            break;
+        case 4:
+            std::cout << "In k-dependent wave function file, k point is not correct" << std::endl;
+            break;
+        default:
+            std::cout << " Successfully read in wave functions " << is << std::endl;
+        }
+        if (this->error)
+        {
+            std::cout << "WARNING: Failed to read in wavefunction, use default initialization instead." << std::endl;
+            break;
+        }
+    }//loop ispin
+}
+
 void Local_Orbital_wfc::allocate_k(const int& lgd,
     psi::Psi<std::complex<double>>* psi,
     elecstate::ElecState* pelec,
     const int& nks,
     const int& nkstot,
-    const std::vector<ModuleBase::Vector3<double>>& kvec_c)
+    const std::vector<ModuleBase::Vector3<double>>& kvec_c,
+    const int& istep)
 {
     this->nks = nks;
 
@@ -65,10 +130,8 @@ void Local_Orbital_wfc::allocate_k(const int& lgd,
 	}
 	// allocate the second part.
 	//if(lgd != 0) xiaohui modify 2015-02-04, fixed memory bug
-	//if(lgd != 0 && this->complex_flag == false)
 	if(lgd != 0)
 	{
-		//std::cout<<"lgd="<<lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<std::endl; //delete 2015-09-06, xiaohui
 		const int page=GlobalV::NBANDS*lgd;
 		this->wfc_k_grid2=new std::complex<double> [nks*page];
 		ModuleBase::GlobalFunc::ZEROS(wfc_k_grid2, nks*page);
@@ -77,12 +140,8 @@ void Local_Orbital_wfc::allocate_k(const int& lgd,
 			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
 				this->wfc_k_grid[ik][ib] = &wfc_k_grid2[ik*page+ib*lgd];
-				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"wfc_k_grid address: "<<wfc_k_grid[ik][ib]<<" wfc_k_grid2 address: "<<&wfc_k_grid2[ik*page+ib*lgd]<<std::endl;
 			}
-			//std::cout<<"set wfc_k_grid pointer success, ik: "<<ik<<std::endl;
 			ModuleBase::Memory::record("LOWF::wfc_k_grid", sizeof(std::complex<double>) * GlobalV::NBANDS*GlobalV::NLOCAL);
-			//ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MemoryForWaveFunctions (MB)",mem);
-			//std::cout<<"wfc_k_grid["<<ik<<"] use "<<mem<<" MB"<<std::endl;
 			this->complex_flag = true;
 		}
 	}
@@ -92,40 +151,48 @@ void Local_Orbital_wfc::allocate_k(const int& lgd,
     }
     else if (INPUT.init_wfc == "file")
     {
-        int error;
+		if (istep > 0)
+		{
+			return;
+		}
         std::cout << " Read in wave functions files: " << nkstot << std::endl;
-        if(psi == nullptr)
+        if (psi == nullptr)
         {
-            ModuleBase::WARNING_QUIT("allocate_k","psi should be allocated first!");
+            ModuleBase::WARNING_QUIT("allocate_k", "psi should be allocated first!");
         }
         else
         {
             psi->resize(nkstot, this->ParaV->ncol_bands, this->ParaV->nrow);
         }
-		for(int ik=0; ik<nkstot; ++ik)
-		{
-            GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
+        for (int ik = 0; ik < nkstot; ++ik)
+        {
             std::complex<double>** ctot;
-            error = ModuleIO::read_wfc_nao_complex(ctot, ik, kvec_c[ik], this->ParaV, psi, pelec);
+            this->error = ModuleIO::read_wfc_nao_complex(ctot, ik, GlobalV::NB2D, GlobalV::NBANDS, GlobalV::NLOCAL, 
+                                    GlobalV::global_readin_dir, kvec_c[ik], this->ParaV, psi, pelec);
 #ifdef __MPI
-            Parallel_Common::bcast_int(error);
+            Parallel_Common::bcast_int(this->error);
 #endif
-            GlobalV::ofs_running << " Error=" << error << std::endl;
-            if(error==1)
+            switch (this->error)
             {
-                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+            case 1:
+                std::cout << "Can't find the wave function file: LOWF_K_" << ik + 1 << ".txt" << std::endl;
+                break;
+            case 2:
+                std::cout << "In wave function file, band number doesn't match" << std::endl;
+                break;
+            case 3:
+                std::cout << "In wave function file, nlocal doesn't match" << std::endl;
+                break;
+            case 4:
+                std::cout << "In k-dependent wave function file, k point is not correct" << std::endl;
+                break;
+            default:
+                std::cout << " Successfully read in wave functions " << ik + 1 << std::endl;
             }
-            else if(error==2)
+            if (this->error)
             {
-                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
-            }
-            else if(error==3)
-            {
-                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
-            }
-            else if(error==4)
-            {
-                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+                std::cout << "WARNING: Failed to read in wavefunction, use default initialization instead." << std::endl;
+                break;
             }
         }
     }
@@ -136,6 +203,8 @@ void Local_Orbital_wfc::allocate_k(const int& lgd,
 
 	return;
 }
+
+
 int Local_Orbital_wfc::globalIndex(int localindex, int nblk, int nprocs, int myproc)
 {
     int iblock, gIndex;
@@ -160,13 +229,13 @@ void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
                                        const ModuleBase::matrix& wg)
 {
     ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
-    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
+    ModuleBase::timer::tick("Local_Orbital_wfc","wfc_2d_to_grid");
 
     const Parallel_Orbitals* pv = this->ParaV;
     const int inc = 1;
-    int  myid;
+    int myid=0;
     MPI_Comm_rank(pv->comm_2D, &myid);
-    int info;
+    int info=0;
     
     //calculate maxnloc for bcasting 2d-wfc
     long maxnloc; // maximum number of elements in local matrix
@@ -203,14 +272,18 @@ void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
             info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
             info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
 
-            if (out_wfc_lcao)
-                info = this->set_wfc_grid(naroc, pv->nb,
-                    pv->dim0, pv->dim1, iprow, ipcol,
-                    work, wfc_grid, myid, ctot);
-            else
-                info = this->set_wfc_grid(naroc, pv->nb,
-                        pv->dim0, pv->dim1, iprow, ipcol,
-                        work, wfc_grid);
+			if (out_wfc_lcao)
+			{
+				info = this->set_wfc_grid(naroc, pv->nb,
+						pv->dim0, pv->dim1, iprow, ipcol,
+						work, wfc_grid, myid, ctot);
+			}
+			else
+			{
+				info = this->set_wfc_grid(naroc, pv->nb,
+						pv->dim0, pv->dim1, iprow, ipcol,
+						work, wfc_grid);
+			}
 
         }//loop ipcol
     }//loop iprow
@@ -256,7 +329,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
         delete[] ctot;
     }
     delete[] work;
-    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
+    ModuleBase::timer::tick("Local_Orbital_wfc","wfc_2d_to_grid");
 }
 
 void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
@@ -268,17 +341,17 @@ void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
                                        const ModuleBase::matrix& wg,
                                        const std::vector<ModuleBase::Vector3<double>>& kvec_c)
 {
-    ModuleBase::TITLE(" Local_Orbital_wfc", "wfc_2d_to_grid");
-    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
+    ModuleBase::TITLE("Local_Orbital_wfc", "wfc_2d_to_grid");
+    ModuleBase::timer::tick("Local_Orbital_wfc","wfc_2d_to_grid");
 
     const Parallel_Orbitals* pv = this->ParaV;
     const int inc = 1;
-    int  myid;
+    int myid=0;
     MPI_Comm_rank(pv->comm_2D, &myid);
-    int info;
+    int info=0;
     
     //calculate maxnloc for bcasting 2d-wfc
-    long maxnloc; // maximum number of elements in local matrix
+    long maxnloc=0; // maximum number of elements in local matrix
     info=MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
     info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
     std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
@@ -295,7 +368,7 @@ void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
         ModuleBase::Memory::record("LOWF::ctot", sizeof(std::complex<double>) * GlobalV::NBANDS * GlobalV::NLOCAL);
     }
     
-    int naroc[2]; // maximum number of row or column
+    int naroc[2] = {0}; // maximum number of row or column
     for(int iprow=0; iprow<pv->dim0; ++iprow)
     {
         for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
@@ -312,15 +385,19 @@ void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
             info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
             info = MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
             
-            if (out_wfc_lcao)
-                info = this->set_wfc_grid(naroc, pv->nb,
-                    pv->dim0, pv->dim1, iprow, ipcol,
-                    work, wfc_grid, myid, ctot);
-            else
-                // mohan update 2021-02-12, delte BFIELD option
-                info = this->set_wfc_grid(naroc, pv->nb,
-                        pv->dim0, pv->dim1, iprow, ipcol,
-                        work, wfc_grid);
+			if (out_wfc_lcao)
+			{
+				info = this->set_wfc_grid(naroc, pv->nb,
+						pv->dim0, pv->dim1, iprow, ipcol,
+						work, wfc_grid, myid, ctot);
+			}
+			else
+			{
+				// mohan update 2021-02-12, delte BFIELD option
+				info = this->set_wfc_grid(naroc, pv->nb,
+						pv->dim0, pv->dim1, iprow, ipcol,
+						work, wfc_grid);
+			}
         }//loop ipcol
     }//loop iprow
 
@@ -367,6 +444,6 @@ void Local_Orbital_wfc::wfc_2d_to_grid(const int istep,
         delete[] ctot;
     }
     delete[] work;
-    ModuleBase::timer::tick(" Local_Orbital_wfc","wfc_2d_to_grid");
+    ModuleBase::timer::tick("Local_Orbital_wfc","wfc_2d_to_grid");
 }
 #endif

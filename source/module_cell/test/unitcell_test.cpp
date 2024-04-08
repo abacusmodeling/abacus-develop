@@ -58,6 +58,10 @@ Magnetism::~Magnetism()
  *     - step_it(): periodically set it to 0 when it reaches ntype -1 
  *     - step_iait(): return true only the above two conditions are true
  *     - step_jajtiait(): return ture only two of the above function (for i and j) are true
+ *   - GetAtomCounts
+ *     - get_atomCounts(): get atomCounts, which is a map from atom type to atom number
+ *   - GetOrbitalCounts
+ *     - get_orbitalCounts(): get orbitalCounts, which is a map from atom type to orbital number
  *   - CheckDTau
  *     - check_dtau(): move all atomic coordinates into the first unitcell, i.e. in between [0,1)
  *   - CheckTau
@@ -566,6 +570,46 @@ TEST_F(UcellTest,Index)
 	}
 }
 
+TEST_F(UcellTest,GetAtomCounts)
+{
+	UcellTestPrepare utp = UcellTestLib["C1H2-Index"];
+	GlobalV::relax_new = utp.relax_new;
+	ucell = utp.SetUcellInfo();
+	//test set_iat2itia
+	ucell->set_iat2itia();
+	std::map<int, int> atomCounts = ucell->get_atomCounts();
+	EXPECT_EQ(atomCounts[0],1);
+	EXPECT_EQ(atomCounts[1],2);
+}
+
+TEST_F(UcellTest,GetOrbitalCounts)
+{
+	UcellTestPrepare utp = UcellTestLib["C1H2-Index"];
+	GlobalV::relax_new = utp.relax_new;
+	ucell = utp.SetUcellInfo();
+	//test set_iat2itia
+	ucell->set_iat2itia();
+	std::map<int, int> orbitalCounts = ucell->get_orbitalCounts();
+	EXPECT_EQ(orbitalCounts[0],9);
+	EXPECT_EQ(orbitalCounts[1],9);
+}
+
+TEST_F(UcellTest, GetLnchiCounts)
+{
+    UcellTestPrepare utp = UcellTestLib["C1H2-Index"];
+    GlobalV::relax_new = utp.relax_new;
+    ucell = utp.SetUcellInfo();
+    // test set_iat2itia
+    ucell->set_iat2itia();
+    std::map<int, std::map<int, int>> LnchiCounts = ucell->get_lnchiCounts();
+    EXPECT_EQ(LnchiCounts[0][0], 1);
+    EXPECT_EQ(LnchiCounts[0][1], 1);
+    EXPECT_EQ(LnchiCounts[0][2], 1);
+    EXPECT_EQ(LnchiCounts[1][0], 1);
+    EXPECT_EQ(LnchiCounts[1][1], 1);
+    EXPECT_EQ(LnchiCounts[1][2], 1);
+}
+
 TEST_F(UcellTest,CheckDTau)
 {
 	UcellTestPrepare utp = UcellTestLib["C1H2-CheckDTau"];
@@ -700,7 +744,8 @@ TEST_F(UcellTest,PrintSTRU)
 	//Cartesian type of coordinates
 	std::string fn = "C1H2_STRU";
 	int type = 1; // for Cartesian
-	int level = 1; //print velocity in STRU
+	int level = 1;
+    GlobalV::CALCULATION = "md"; // print velocity in STRU
 	ucell->print_stru_file(fn,type,level);
 	std::ifstream ifs;
 	ifs.open("C1H2_STRU");
@@ -1334,6 +1379,60 @@ TEST_F(UcellTest,ReadAtomPositionsCAU)
 	delete[] ucell->magnet.start_magnetization;
 	ucell->magnet.start_magnetization = new double[ucell->ntype];
 	ucell->read_atom_positions(ifa,ofs_running,ofs_warning);
+	ofs_running.close();
+	ofs_warning.close();
+	ifa.close();
+	remove("read_atom_positions.tmp");
+	remove("read_atom_positions.warn");
+}
+
+TEST_F(UcellTest,ReadAtomPositionsAutosetMag)
+{
+	std::string fn = "./support/STRU_MgO";
+	std::ifstream ifa(fn.c_str());
+	std::ofstream ofs_running;
+	std::ofstream ofs_warning;
+	ofs_running.open("read_atom_positions.tmp");
+	ofs_warning.open("read_atom_positions.warn");
+	//mandatory preliminaries
+	ucell->ntype = 2;
+	ucell->atoms = new Atom[ucell->ntype];
+	ucell->set_atom_flag = true;
+	GlobalV::test_pseudo_cell = 2;
+	GlobalV::BASIS_TYPE = "lcao";
+	GlobalV::deepks_setorb = true;
+	GlobalV::NSPIN = 2;
+	EXPECT_NO_THROW(ucell->read_atom_species(ifa,ofs_running));
+	EXPECT_DOUBLE_EQ(ucell->latvec.e11,4.27957);
+	EXPECT_DOUBLE_EQ(ucell->latvec.e22,4.27957);
+	EXPECT_DOUBLE_EQ(ucell->latvec.e33,4.27957);
+	//mandatory preliminaries
+	delete[] ucell->magnet.start_magnetization;
+	ucell->magnet.start_magnetization = new double[ucell->ntype];
+	ucell->read_atom_positions(ifa,ofs_running,ofs_warning);
+	for (int it = 0;it < ucell->ntype; it++)
+	{
+		for (int ia = 0;ia < ucell->atoms[it].na; ia++)
+		{
+			EXPECT_DOUBLE_EQ(ucell->atoms[it].mag[ia],1.0);
+			EXPECT_DOUBLE_EQ(ucell->atoms[it].m_loc_[ia].x,1.0);
+		}
+	}
+	//for nspin == 4
+	GlobalV::NSPIN = 4;
+	delete[] ucell->magnet.start_magnetization;
+	ucell->magnet.start_magnetization = new double[ucell->ntype];
+	ucell->read_atom_positions(ifa,ofs_running,ofs_warning);
+	for (int it = 0;it < ucell->ntype; it++)
+	{
+		for (int ia = 0;ia < ucell->atoms[it].na; ia++)
+		{
+			EXPECT_DOUBLE_EQ(ucell->atoms[it].mag[ia],sqrt(pow(1.0,2)+pow(1.0,2)+pow(1.0,2)));
+			EXPECT_DOUBLE_EQ(ucell->atoms[it].m_loc_[ia].x,1.0);
+			EXPECT_DOUBLE_EQ(ucell->atoms[it].m_loc_[ia].y,1.0);
+			EXPECT_DOUBLE_EQ(ucell->atoms[it].m_loc_[ia].z,1.0);
+		}
+	}
 	ofs_running.close();
 	ofs_warning.close();
 	ifa.close();

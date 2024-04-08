@@ -25,7 +25,7 @@
 namespace ModuleESolver
 {
 
-    void ESolver_DP::Init(Input& inp, UnitCell& ucell)
+    void ESolver_DP::init(Input& inp, UnitCell& ucell)
     {
         ucell_ = &ucell;
         dp_potential = 0;
@@ -59,7 +59,7 @@ namespace ModuleESolver
         assert(ucell.nat == iat);
     }
 
-    void ESolver_DP::Run(const int istep, UnitCell& ucell)
+    void ESolver_DP::run(const int istep, UnitCell& ucell)
     {
         ModuleBase::TITLE("ESolver_DP", "Run");
         ModuleBase::timer::tick("ESolver_DP", "Run");
@@ -122,24 +122,33 @@ namespace ModuleESolver
         ModuleBase::timer::tick("ESolver_DP", "Run");
     }
 
-    double ESolver_DP::cal_Energy()
+    double ESolver_DP::cal_energy()
     {
         return dp_potential;
     }
 
-    void ESolver_DP::cal_Force(ModuleBase::matrix& force)
+    void ESolver_DP::cal_force(ModuleBase::matrix& force)
     {
         force = dp_force;
         ModuleIO::print_force(GlobalV::ofs_running, *ucell_, "TOTAL-FORCE (eV/Angstrom)", force, false);
     }
 
-    void ESolver_DP::cal_Stress(ModuleBase::matrix& stress)
+    void ESolver_DP::cal_stress(ModuleBase::matrix& stress)
     {
         stress = dp_virial;
+
+        // external stress
+        double unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI, 3) * 1.0e-8;
+        double external_stress[3] = {GlobalV::PRESS1, GlobalV::PRESS2, GlobalV::PRESS3};
+        for (int i = 0; i < 3; i++)
+        {
+            stress(i, i) -= external_stress[i] / unit_transform;
+        }
+
         ModuleIO::print_stress("TOTAL-STRESS", stress, true, false);
     }
 
-    void ESolver_DP::postprocess()
+    void ESolver_DP::post_process(void)
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << std::setprecision(16);

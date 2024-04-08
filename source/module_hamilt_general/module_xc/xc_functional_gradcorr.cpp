@@ -9,7 +9,13 @@
 //  and gives the spin up and spin down components of the charge.
 
 #include "xc_functional.h"
+#include "module_base/timer.h"
 #include "module_basis/module_pw/pw_basis_k.h"
+
+#include <ATen/core/tensor.h>
+#include <ATen/core/tensor_map.h>
+#include <ATen/core/tensor_types.h>
+#include <module_hamilt_general/module_xc/kernels/xc_functional_op.h>
 
 // from gradcorr.f90
 void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v,
@@ -227,9 +233,10 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v,
 			if(arho > epsr)
 			{
 				grho2a = gdr1[ir].norm2();
-
+				
+				//normally values in rhotmp can either be >= 0 or < 0.
 				if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
-				if( rhotmp1[ir] < 0.0 ) segno = -1.0;
+				else segno = -1.0;
 				if (use_libxc && is_stress)
 				{
 #ifdef USE_LIBXC
@@ -290,9 +297,21 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v,
 		{
 			if(use_libxc)
 			{
+#ifdef USE_LIBXC
 				double sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud;
-				XC_Functional::gcxc_spin_libxc(rhotmp1[ir], rhotmp2[ir], gdr1[ir], gdr2[ir], 
-					sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud);
+				if(func_type == 3 || func_type == 5) //the gradcorr part to stress of mGGA
+				{
+					double v3xcup, v3xcdw;
+					double atau1 = chr->kin_r[0][ir]/2.0;
+					double atau2 = chr->kin_r[1][ir]/2.0;
+					XC_Functional::tau_xc_spin( rhotmp1[ir], rhotmp2[ir], gdr1[ir], gdr2[ir], 
+						atau1, atau2, sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud, v3xcup, v3xcdw);
+				}
+				else
+				{
+					XC_Functional::gcxc_spin_libxc(rhotmp1[ir], rhotmp2[ir], gdr1[ir], gdr2[ir], 
+						sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud);
+				}
 				if(is_stress)
 				{
 					double tt1[3],tt2[3];
@@ -330,6 +349,7 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v,
 					local_vtxcgc = local_vtxcgc + ModuleBase::e2 * v1xcdw * ( rhotmp2[ir] - chr->rho_core[ir] * fac );
 					local_etxcgc = local_etxcgc + ModuleBase::e2 * sxc;
 				}
+#endif
 			}
 			else
 			{
@@ -571,40 +591,45 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v,
 	return;
 }
 
-void XC_Functional::grad_wfc(const std::complex<double>* rhog,
-                             const int ik,
-                             std::complex<double>* grad,
-                             const ModulePW::PW_Basis_K* wfc_basis,
-                             const double tpiba)
+template <typename T, typename Device, typename Real>
+void XC_Functional::grad_wfc(
+    const int ik,
+    const Real tpiba,
+    const ModulePW::PW_Basis_K* wfc_basis,
+	const T* rhog,
+    T* grad)
 {
+    using ct_Device = typename ct::PsiToContainer<Device>::type;
 	const int npw_k = wfc_basis->npwk[ik];
-	std::complex<double> *Porter = new std::complex<double> [wfc_basis->nmaxgr];
+	
+	auto porter = std::move(ct::Tensor(
+        ct::DataTypeToEnum<T>::value, ct::DeviceTypeToEnum<ct_Device>::value, {wfc_basis->nmaxgr}));
+	auto gcar = ct::TensorMap(
+		&wfc_basis->gcar[0][0], ct::DataType::DT_DOUBLE, ct::DeviceType::CpuDevice, {wfc_basis->nks * wfc_basis->npwk_max, 3}).to_device<ct_Device>();
+	auto kvec_c = ct::TensorMap(
+		&wfc_basis->kvec_c[0][0],ct::DataType::DT_DOUBLE, ct::DeviceType::CpuDevice, {wfc_basis->nks, 3}).to_device<ct_Device>();
+	
+	auto xc_functional_grad_wfc_solver 
+		= hamilt::xc_functional_grad_wfc_op<T, Device>();
 
-	for(int ipol=0; ipol<3; ipol++)
-	{
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 1024)
-#endif
-		for(int ig=0; ig<npw_k; ++ig)
-		{
-			// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
-			double kplusg = wfc_basis->getgpluskcar(ik,ig)[ipol] * tpiba;
-			// calculate the charge density gradient in reciprocal space.
-			Porter[ig] = std::complex<double>(0.0,kplusg) * rhog[ig];
-		}
+	for(int ipol=0; ipol<3; ipol++) {
+		xc_functional_grad_wfc_solver(
+            ik, ipol, npw_k, wfc_basis->npwk_max, // Integers
+			tpiba,	// Double
+            gcar.template data<Real>(),   // Array of Real
+            kvec_c.template data<Real>(), // Array of double
+			rhog, porter.data<T>());    // Array of std::complex<double>
 
 		// bring the gdr from G --> R
-		wfc_basis->recip2real(Porter, Porter, ik);
+		Device * ctx = nullptr;
+		wfc_basis->recip_to_real(ctx, porter.data<T>(), porter.data<T>(), ik);
 
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 1024)
-#endif
-        for (int ir = 0; ir < wfc_basis->nrxx; ++ir)
-            grad[ipol * wfc_basis->nrxx + ir] = Porter[ir];
-    }//end loop ipol
-	delete[] Porter;
-	return;
+		xc_functional_grad_wfc_solver(
+            ipol, wfc_basis->nrxx,	// Integers
+			porter.data<T>(), grad);	// Array of std::complex<double>
+    }
 }
+
 
 void XC_Functional::grad_rho(const std::complex<double>* rhog,
                              ModuleBase::Vector3<double>* gdr,
@@ -723,3 +748,7 @@ void XC_Functional::noncolin_rho(double *rhoout1, double *rhoout2, double *neg,
 	return;
 }
 
+template void XC_Functional::grad_wfc<std::complex<double>, psi::DEVICE_CPU, double>(const int ik, const double tpiba, const ModulePW::PW_Basis_K* wfc_basis, const std::complex<double>* rhog, std::complex<double>* grad);
+#if __CUDA || __ROCM
+template void XC_Functional::grad_wfc<std::complex<double>, psi::DEVICE_GPU, double>(const int ik, const double tpiba, const ModulePW::PW_Basis_K* wfc_basis, const std::complex<double>* rhog, std::complex<double>* grad);
+#endif // __CUDA || __ROCM

@@ -6,7 +6,7 @@
 #SBATCH -e compile.err
 
 # JamesMisaka in 2023-09-16
-# install abacus by gnu-toolchain
+# install abacus dependency by gnu-toolchain
 # one can use mpich or openmpi
 # libtorch and libnpy are for deepks support, which can be =no
 
@@ -18,6 +18,7 @@
 --with-fftw=install \
 --with-elpa=install \
 --with-cereal=install \
+--with-rapidjson=no \
 --with-libtorch=no \
 --with-libnpy=no \
 --with-libri=no \

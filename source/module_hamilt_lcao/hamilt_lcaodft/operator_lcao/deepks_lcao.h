@@ -16,7 +16,7 @@ namespace hamilt
 /// The DeePKS class template inherits from class T
 /// it is used to calculate the Deep Potential Kohn-Sham correction from DeePKS method
 /// Template parameters:
-/// - T: base class, it would be OperatorLCAO<TK> or OperatorPW<TK>
+/// - T: base class, it would be OperatorLCAO<TK>
 /// - TR: data type of real space Hamiltonian, it would be double or std::complex<double>
 template <class T>
 class DeePKS : public T
@@ -40,8 +40,17 @@ class DeePKS<OperatorLCAO<TK, TR>> : public OperatorLCAO<TK, TR>
                             elecstate::DensityMatrix<TK,double>* DM_in);
     ~DeePKS();
 
+    /**
+     * @brief contribute the DeePKS correction to real space Hamiltonian
+     * this function is used for update hR and H_V_delta
+    */
     virtual void contributeHR() override;
 #ifdef __DEEPKS
+    /**
+     * @brief contribute the DeePKS correction for each k-point to ld.H_V_delta or ld.H_V_delta_k
+     * this function is not used for update hK, but for DeePKS module
+     * @param ik: the index of k-point
+    */
     virtual void contributeHk(int ik) override;
 #endif
 
@@ -71,17 +80,13 @@ class DeePKS<OperatorLCAO<TK, TR>> : public OperatorLCAO<TK, TR>
     /**
      * @brief calculate the HR local matrix of <I,J,R> atom pair
      */
-    void cal_HR_IJR(const int& iat1,
-                    const int& iat2,
-                    const int& T0,
-                    const Parallel_Orbitals* paraV,
-                    const std::unordered_map<int, std::vector<double>>& nlm1_all,
-                    const std::unordered_map<int, std::vector<double>>& nlm2_all,
-                    const int* L0s,
-                    const double** gedms,
-                    const int size_gedms,
-                    TR* data_pointer);
+    void cal_HR_IJR(const double* hr_in,
+        const int& row_size,
+        const int& col_size,
+        TR* data_pointer);
 
+    void pre_calculate_nlm(const int iat0, std::vector<std::unordered_map<int, std::vector<double>>>& nlm_in);
+    std::vector<std::vector<std::unordered_map<int, std::vector<double>>>> nlm_tot;
     /**
      * @brief initialize H_V_delta, search the nearest neighbor atoms
      * used for calculate the DeePKS real space Hamiltonian correction with specific <I,J,R> atom-pairs

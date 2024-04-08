@@ -78,23 +78,17 @@ void DiagoIterAssist<T, Device>::diagH_subspace(
         hcc,
         nstart
     );
+    delmem_complex_op()(ctx, hphi);
 
-    gemm_op<T, Device>()(
-        ctx,
-        'C',
-        'N',
-        nstart,
-        nstart,
-        dmin,
-        &one,
-        ppsi,
-        dmax,
-        ppsi,
-        dmax,
-        &zero,
-        scc,
-        nstart
-    );
+    // allocated spsi
+    T* sphi = nullptr;
+    resmem_complex_op()(ctx, sphi, nstart * dmax, "DiagSub::spsi");
+    setmem_complex_op()(ctx, sphi, 0, nstart * dmax);
+    // do sPsi for all bands
+    pHamilt->sPsi(ppsi, sphi, dmax, dmin, nstart);
+
+    gemm_op<T, Device>()(ctx, 'C', 'N', nstart, nstart, dmin, &one, ppsi, dmax, sphi, dmax, &zero, scc, nstart);
+    delmem_complex_op()(ctx, sphi);
 
     if (GlobalV::NPROC_IN_POOL > 1)
     {
@@ -190,7 +184,6 @@ void DiagoIterAssist<T, Device>::diagH_subspace(
     delmem_complex_op()(ctx, hcc);
     delmem_complex_op()(ctx, scc);
     delmem_complex_op()(ctx, vcc);
-    delmem_complex_op()(ctx, hphi);
 
     ModuleBase::timer::tick("DiagoIterAssist", "diagH_subspace");
 }
@@ -205,7 +198,7 @@ void DiagoIterAssist<T, Device>::diagH_subspace_init(
     Real *en)
 {
     ModuleBase::TITLE("DiagoIterAssist", "diagH_subspace_init");
-    ModuleBase::timer::tick("DiagoIterAssist", "diagH_subspace");
+    ModuleBase::timer::tick("DiagoIterAssist", "diagH_subspace_init");
 
     // two case:
     // 1. pw base: nstart = n_band, psi(nbands * npwx)
@@ -246,10 +239,23 @@ void DiagoIterAssist<T, Device>::diagH_subspace_init(
     // ================================================
     // std::vector<T> hpsi(psi_temp.get_nbands() * psi_temp.get_nbasis());
 
-
     // do hPsi for all bands
     psi::Range all_bands_range(1, psi_temp.get_current_k(), 0, psi_temp.get_nbands()-1);
     hpsi_info hpsi_in(&psi_temp, all_bands_range, hpsi);
+    if(pHamilt->ops == nullptr)
+    {
+        ModuleBase::WARNING("DiagoIterAssist::diagH_subspace_init",
+         "Severe warning: Operators in Hamilt are not allocated yet, will return value of psi to evc directly\n");
+        for(int iband = 0; iband < evc.get_nbands(); iband++)
+        {
+            for(int ig = 0; ig < evc.get_nbasis(); ig++)
+            {
+                evc(iband, ig) = psi[iband * evc.get_nbasis() + ig];
+            }
+            en[iband] = 0.0;
+        }
+        return;
+    }
     pHamilt->ops->hPsi(hpsi_in);
 
     gemm_op<T, Device>()(
@@ -268,23 +274,17 @@ void DiagoIterAssist<T, Device>::diagH_subspace_init(
         hcc,
         nstart
     );
+    delmem_complex_op()(ctx, hpsi);
 
-    gemm_op<T, Device>()(
-        ctx,
-        'C',
-        'N',
-        nstart,
-        nstart,
-        dmin,
-        &one,
-        ppsi,
-        dmax,
-        ppsi,
-        dmax,
-        &zero,
-        scc,
-        nstart
-    );
+    // allocated spsi
+    T* spsi = nullptr;
+    resmem_complex_op()(ctx, spsi, psi_temp.get_nbands() * psi_temp.get_nbasis(), "DiagSub::spsi");
+    setmem_complex_op()(ctx, spsi, 0, psi_temp.get_nbands() * psi_temp.get_nbasis());
+    // do sPsi for all bands
+    pHamilt->sPsi(ppsi, spsi, psi_temp.get_nbasis(), psi_temp.get_current_nbas(), psi_temp.get_nbands());
+
+    gemm_op<T, Device>()(ctx, 'C', 'N', nstart, nstart, dmin, &one, ppsi, dmax, spsi, dmax, &zero, scc, nstart);
+    delmem_complex_op()(ctx, spsi);
 
     if (GlobalV::NPROC_IN_POOL > 1)
     {
@@ -382,8 +382,7 @@ void DiagoIterAssist<T, Device>::diagH_subspace_init(
     delmem_complex_op()(ctx, hcc);
     delmem_complex_op()(ctx, scc);
     delmem_complex_op()(ctx, vcc);
-    delmem_complex_op()(ctx, hpsi);
-    ModuleBase::timer::tick("DiagoIterAssist", "diagH_subspace");
+    ModuleBase::timer::tick("DiagoIterAssist", "diagH_subspace_init");
 }
 
 template<typename T, typename Device>
@@ -396,8 +395,8 @@ void DiagoIterAssist<T, Device>::diagH_LAPACK(
     Real *e, // always in CPU
     T* vcc)
 {
-    ModuleBase::TITLE("DiagoIterAssist", "LAPACK_subspace");
-    ModuleBase::timer::tick("DiagoIterAssist", "LAPACK_subspace");
+    ModuleBase::TITLE("DiagoIterAssist", "diagH_LAPACK");
+    ModuleBase::timer::tick("DiagoIterAssist", "diagH_LAPACK");
 
     Real* eigenvalues = nullptr;
     resmem_var_op()(ctx, eigenvalues, nstart);
@@ -435,7 +434,7 @@ void DiagoIterAssist<T, Device>::diagH_LAPACK(
     //     dngvx_op<Real, Device>()(ctx, nstart, ldh, hcc, scc, nbands, res, vcc);
     // }
 
-    ModuleBase::timer::tick("DiagoIterAssist", "LAPACK_subspace");
+    ModuleBase::timer::tick("DiagoIterAssist", "diagH_LAPACK");
 }
 
 template<typename T, typename Device>

@@ -25,7 +25,8 @@ ELPA_Solver::ELPA_Solver(const bool isReal,
                          const int nev,
                          const int narows,
                          const int nacols,
-                         const int* desc)
+                         const int* desc,
+                         const bool reuse_handle_0)
 {
     this->isReal = isReal;
     this->comm = comm;
@@ -62,6 +63,14 @@ ELPA_Solver::ELPA_Solver(const bool isReal,
     elpa_init(20210430);
 
     handle_id = ++total_handle;
+
+    //delete the old elpa_handle and reuse the handle_id=0
+    if(reuse_handle_0 && total_handle>0)
+    {
+        NEW_ELPA_HANDLE_POOL.erase(0);
+        handle_id = 0;
+    }
+
     elpa_t handle;
 
     handle = elpa_allocate(&error);
@@ -206,6 +215,7 @@ void ELPA_Solver::exit()
         logfile.close();
     int error;
     elpa_deallocate(NEW_ELPA_HANDLE_POOL[handle_id], &error);
+    elpa_uninit(&error);
 }
 
 int ELPA_Solver::read_cpuflag()
@@ -432,7 +442,7 @@ int ELPA_Solver::read_complex_kernel()
 
 int ELPA_Solver::allocate_work()
 {
-    unsigned long nloc = narows * nacols; // local size
+    unsigned long nloc = static_cast<unsigned long>(narows) * nacols; // local size
     unsigned long maxloc; // maximum local size
     MPI_Allreduce(&nloc, &maxloc, 1, MPI_UNSIGNED_LONG, MPI_MAX, comm);
     maxloc = nloc;

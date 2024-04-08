@@ -43,7 +43,20 @@ class HSolver
     {
         return;
     }
-
+    /// @brief solve function for lcao_in_pw
+    /// @param phm interface to hamilt
+    /// @param ppsi reference to psi
+    /// @param pes interface to elecstate
+    /// @param transform transformation matrix between lcao and pw
+    /// @param skip_charge 
+    virtual void solve(hamilt::Hamilt<T, Device>* phm,
+                       psi::Psi<T, Device>& ppsi,
+                       elecstate::ElecState* pes,
+                       psi::Psi<T, Device>& transform,
+                       const bool skip_charge = false)
+    {
+        return;
+    }
     virtual void solve(hamilt::Hamilt<T, Device>* phm,
                        psi::Psi<T, Device>& ppsi,
                        elecstate::ElecState* pes,
@@ -59,7 +72,7 @@ class HSolver
 
     std::string classname = "none";
     // choose method of DiagH for solve Hamiltonian matrix
-    // cg, dav, elpa, scalapack-gvx, cusolver
+    // cg, dav, elpa, scalapack_gvx, cusolver
     std::string method = "none";
   public:
     Real diag_ethr=0.0; //threshold for diagonalization

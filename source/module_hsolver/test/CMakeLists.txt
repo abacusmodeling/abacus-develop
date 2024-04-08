@@ -12,16 +12,16 @@ AddTest(
 )
 AddTest(
   TARGET HSolver_cg
-  LIBS ${math_libs} base psi device
-  SOURCES diago_cg_test.cpp ../diago_cg.cpp  ../diago_iter_assist.cpp  
+  LIBS ${math_libs} base psi device container
+  SOURCES diago_cg_test.cpp ../diago_cg.cpp  ../diago_iter_assist.cpp  ../diagh_consts.cpp
           ../../module_basis/module_pw/test/test_tool.cpp
           ../../module_hamilt_general/operator.cpp
           ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
 )
 AddTest(
   TARGET HSolver_cg_float
-  LIBS ${math_libs} base psi device
-  SOURCES diago_cg_float_test.cpp ../diago_cg.cpp  ../diago_iter_assist.cpp  
+  LIBS ${math_libs} base psi device container
+  SOURCES diago_cg_float_test.cpp ../diago_cg.cpp  ../diago_iter_assist.cpp   ../diagh_consts.cpp
           ../../module_basis/module_pw/test/test_tool.cpp
           ../../module_hamilt_general/operator.cpp
           ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
@@ -29,7 +29,7 @@ AddTest(
 AddTest(
   TARGET HSolver_dav
   LIBS ${math_libs} base psi device
-  SOURCES diago_david_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp 
+  SOURCES diago_david_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp  ../diagh_consts.cpp
           ../../module_basis/module_pw/test/test_tool.cpp
           ../../module_hamilt_general/operator.cpp
           ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
@@ -37,16 +37,24 @@ AddTest(
 AddTest(
   TARGET HSolver_dav_float
   LIBS ${math_libs} base psi device
-  SOURCES diago_david_float_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp 
+  SOURCES diago_david_float_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp  ../diagh_consts.cpp
           ../../module_basis/module_pw/test/test_tool.cpp
           ../../module_hamilt_general/operator.cpp
           ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
 )
 if(ENABLE_LCAO)
 AddTest(
+  TARGET HSolver_cg_real
+  LIBS ${math_libs} base psi device container
+  SOURCES diago_cg_float_test.cpp ../diago_cg.cpp  ../diago_iter_assist.cpp   ../diagh_consts.cpp
+          ../../module_basis/module_pw/test/test_tool.cpp
+          ../../module_hamilt_general/operator.cpp
+          ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
+)
+AddTest(
   TARGET HSolver_dav_real
   LIBS ${math_libs} base psi device
-  SOURCES diago_david_real_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp 
+  SOURCES diago_david_real_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp  ../diagh_consts.cpp
           ../../module_basis/module_pw/test/test_tool.cpp
           ../../module_hamilt_general/operator.cpp
           ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
@@ -62,13 +70,13 @@ AddTest(
 AddTest(
   TARGET HSolver_pw
   LIBS ${math_libs} psi device base container
-  SOURCES test_hsolver_pw.cpp ../hsolver_pw.cpp ../diago_bpcg.cpp
+  SOURCES test_hsolver_pw.cpp ../hsolver_pw.cpp ../diago_bpcg.cpp ../diago_iter_assist.cpp
 )
 
 AddTest(
   TARGET HSolver_sdft
   LIBS ${math_libs} psi device base container
-  SOURCES test_hsolver_sdft.cpp ../hsolver_pw_sdft.cpp ../hsolver_pw.cpp ../diago_bpcg.cpp
+  SOURCES test_hsolver_sdft.cpp ../hsolver_pw_sdft.cpp ../hsolver_pw.cpp ../diago_bpcg.cpp ../diago_iter_assist.cpp
 )
 
 if(ENABLE_LCAO)
@@ -86,7 +94,16 @@ if(ENABLE_LCAO)
     )
   endif()
 endif()
-
+if (USE_CUDA AND USE_CUSOLVER_LCAO)
+AddTest(
+  TARGET HSolver_LCAO_cusolver
+  LIBS ${math_libs}  base psi device 
+  SOURCES diago_lcao_cusolver_test.cpp ../diago_cusolver.cpp ../diago_blas.cpp 
+  ../kernels/math_kernel_op.cpp
+  ../kernels/dngvd_op.cpp
+  ../kernels/cuda/diag_cusolver.cu
+)
+endif()
 install(FILES H-KPoints-Si2.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(FILES H-GammaOnly-Si2.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(FILES S-KPoints-Si2.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

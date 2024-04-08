@@ -4,7 +4,6 @@ if(POLICY CMP0135) # https://cmake.org/cmake/help/git-stage/policy/CMP0135.html
 endif()
 
 project(ABACUS
-    VERSION 3.0.0
     DESCRIPTION "ABACUS is an electronic structure package based on DFT."
     HOMEPAGE_URL "https://github.com/deepmodeling/abacus-develop"
     LANGUAGES CXX
@@ -15,7 +14,7 @@ option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(USE_CUDA "Enable support to CUDA for PW." OFF)
 option(ENABLE_FLOAT_FFTW "Enable support to single precision FFTW library." OFF)
-# option(USE_CUSOLVER_LCAO "Enable support to CUSOLVER for LCAO." OFF) # broken
+#option(USE_CUSOLVER_LCAO "Enable support to CUSOLVER for LCAO." OFF)
 option(USE_ROCM "Enable support to ROCm." OFF)
 option(USE_OPENMP "Enable OpenMP in ABACUS." ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
@@ -34,7 +33,40 @@ option(DEBUG_INFO "Print message for developers to debug." OFF)
 option(ENABLE_NATIVE_OPTIMIZATION "Enable compilation optimization for the native machine's CPU type" OFF)
 option(COMMIT_INFO "Print commit information in log" ON)
 option(ENABLE_FFT_TWO_CENTER "Enable FFT-based two-center integral method." ON)
+option(ENABLE_GOOGLEBENCH "Enable GOOGLE-benchmark usage." OFF)
+option(ENABLE_RAPIDJSON "Enable rapid-json usage." OFF)
 
+
+
+# enable json support
+if(ENABLE_RAPIDJSON)
+  find_package(RapidJSON)
+  if(NOT RapidJSON_FOUND)
+    message(WARNING "Rapidjson is not found, trying downloading from github, or you can install Rapidjson first and reinstall abacus.")
+    include(FetchContent)
+    FetchContent_Declare(
+      rapidjson
+      GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+      GIT_TAG "origin/master"
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE
+    )
+    set(RAPIDJSON_BUILD_TESTS OFF CACHE INTERNAL "")
+    set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE INTERNAL "")
+    FetchContent_MakeAvailable(rapidjson)
+    set(RapidJSON_INCLUDE_PATH "${rapidjson_SOURCE_DIR}/include")
+  endif()
+  add_compile_definitions(__RAPIDJSON)
+  add_definitions(-DRAPIDJSON_HAS_CXX11_NOEXCEPT=0)
+  include_directories(${RapidJSON_INCLUDE_PATH})
+endif()
+
+
+if (USE_CUDA)
+  set(USE_CUSOLVER_LCAO ON)
+else()
+  set(USE_CUSOLVER_LCAO OFF)
+endif()
 # get commit info
 if(COMMIT_INFO)
   find_package(Git)
@@ -58,8 +90,9 @@ You can install Git first and reinstall abacus.")
       RESULT_VARIABLE GIT_COMMIT_DATE_RESULT
     )
     if(GIT_COMMIT_HASH_RESULT EQUAL 0 AND GIT_COMMIT_DATE_RESULT EQUAL 0)
-      set(COMMIT "${GIT_COMMIT_HASH} (${GIT_COMMIT_DATE})")
-      add_definitions("-DCOMMIT=\"${COMMIT}\"")
+      add_definitions(-DCOMMIT_INFO)
+      file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/commit.h" "#define COMMIT \"${GIT_COMMIT_HASH} (${GIT_COMMIT_DATE})\"\n")
+      include_directories(${CMAKE_CURRENT_BINARY_DIR})
       message(STATUS "Current commit hash: ${GIT_COMMIT_HASH}")
       message(STATUS "Last commit date: ${GIT_COMMIT_DATE}")
     else()
@@ -111,6 +144,11 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+macro(set_if_higher VARIABLE VALUE)
+	if(${VARIABLE} LESS ${VALUE})
+		set(${VARIABLE} ${VALUE})
+	endif()
+endmacro()
 if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
   message(WARNING "GCC4 is not fully supported.")
 endif()
@@ -213,8 +251,6 @@ if(CMAKE_CUDA_COMPILER)
   else()
     if(NOT USE_CUDA AND NOT USE_CUSOLVER_LCAO)
       message(STATUS "CUDA components detected, but both USE_CUDA and USE_CUSOLVER_LCAO set to OFF. NOT building CUDA version of ABACUS.")
-    elseif (USE_CUDA AND USE_CUSOLVER_LCAO)
-      message(FATAL_ERROR "USE_CUDA and USE_CUSOLVER_LCAO set, but now they not allowed to coexist.")
     endif()
   endif()
 else() # CUDA not found
@@ -227,19 +263,41 @@ endif()
 
 if(USE_CUDA OR USE_CUSOLVER_LCAO)
   cmake_minimum_required(VERSION 3.18) # required by `CUDA_ARCHITECTURES` below
-  set(CMAKE_CXX_STANDARD 14)
+  set_if_higher(CMAKE_CXX_STANDARD 14)
   set(CMAKE_CXX_EXTENSIONS ON)
   set(CMAKE_CUDA_STANDARD ${CMAKE_CXX_STANDARD})
   set(CMAKE_CUDA_STANDARD_REQUIRED ON)
   set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
+  if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    find_package(CUDAToolkit REQUIRED)
+    # check https://gitlab.kitware.com/cmake/cmake/-/blob/master/Modules/Internal/CMakeCUDAArchitecturesAll.cmake
+    # for available architechures in different CUDA versions
+    set(CMAKE_CUDA_ARCHITECTURES
+      60 # P100
+      70 # V100
+      # Add your CUDA arch here
+      # Check the Compute Capability version of your GPU at:
+      # https://en.wikipedia.org/wiki/CUDA#GPUs_supported
+    )
+    if (CUDAToolkit_VERSION VERSION_GREATER_EQUAL 10.0)
+      list(APPEND CMAKE_CUDA_ARCHITECTURES 75) # T4
+    endif()
+    if (CUDAToolkit_VERSION VERSION_GREATER_EQUAL 11.0)
+      list(APPEND CMAKE_CUDA_ARCHITECTURES 80) # A100
+    endif()
+    if (CUDAToolkit_VERSION VERSION_GREATER_EQUAL 11.1)
+      list(APPEND CMAKE_CUDA_ARCHITECTURES 86)
+    endif()
+    if (CUDAToolkit_VERSION VERSION_GREATER_EQUAL 11.8)
+      list(APPEND CMAKE_CUDA_ARCHITECTURES 89 90)
+    endif()
+  endif()
   enable_language(CUDA)
+  # ${ABACUS_BIN_NAME} is added before CUDA is enabled
   set_property(
     TARGET ${ABACUS_BIN_NAME}
     PROPERTY CUDA_ARCHITECTURES
-    60 # P100
-    70 # V100
-    75 # T4
-    80 # A100
+    ${CMAKE_CUDA_ARCHITECTURES}
   )
   target_link_libraries(${ABACUS_BIN_NAME}
     -lcudart
@@ -262,7 +320,7 @@ endif()
 # Warning: CMake add support to HIP in version 3.21. This is rather a new version.
 # Use cmake with AMD-ROCm: https://rocmdocs.amd.com/en/latest/Installation_Guide/Using-CMake-with-AMD-ROCm.html
 if(USE_ROCM)
-  if (NOT DEFINED ROCM_PATH )
+  if(NOT DEFINED ROCM_PATH )
     set (ROCM_PATH "/opt/rocm"  CACHE STRING "Default ROCM installation directory." )
   endif ()
   if(NOT DEFINED HIP_PATH)
@@ -303,8 +361,8 @@ if(USE_ROCM)
 endif()
 
 if(ENABLE_ASAN)
-  if (CMAKE_CXX_COMPILER_ID MATCHES Intel)
-    message(FATAL_ERROR "Address Sanitizer is not supported on Intel compiler.")
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+    message(FATAL_ERROR "Address Sanitizer is not supported on Intel Classic compiler. Use Intel oneAPI compiler (icpx) instead.")
   endif()
   add_compile_options(
     -fsanitize=address
@@ -335,10 +393,11 @@ if(MKLROOT)
     list(APPEND math_libs -lifcore)
   endif()
 else()
+
   find_package(FFTW3 REQUIRED)
-  find_package(LAPACK REQUIRED)
+  find_package(Lapack REQUIRED)
   include_directories(${FFTW3_INCLUDE_DIRS})
-  list(APPEND math_libs FFTW3::FFTW3 LAPACK::LAPACK)
+  list(APPEND math_libs FFTW3::FFTW3 LAPACK::LAPACK BLAS::BLAS)
 
   if(ENABLE_LCAO)
     find_package(ScaLAPACK REQUIRED)
@@ -367,8 +426,14 @@ if (ENABLE_FLOAT_FFTW)
 endif()
 
 if(ENABLE_DEEPKS)
-  set(CMAKE_CXX_STANDARD 14)
+  # Torch uses outdated components to detech CUDA arch, causing failure on latest CUDA kits.
+  # Set CMake variable TORCH_CUDA_ARCH_LIST in the form of "major.minor" if required.
   find_package(Torch REQUIRED)
+  if(NOT Torch_VERSION VERSION_LESS "2.1.0")
+    set_if_higher(CMAKE_CXX_STANDARD 17)
+  elseif(NOT Torch_VERSION VERSION_LESS "1.5.0")
+    set_if_higher(CMAKE_CXX_STANDARD 14)
+  endif()
   include_directories(${TORCH_INCLUDE_DIRS})
   target_link_libraries(${ABACUS_BIN_NAME} deepks)
   list(APPEND math_libs ${TORCH_LIBRARIES})
@@ -418,7 +483,7 @@ if(DEFINED LIBRI_DIR)
   set(ENABLE_LIBRI ON)
 endif()
 if(ENABLE_LIBRI)
-  set(CMAKE_CXX_STANDARD 14)
+  set_if_higher(CMAKE_CXX_STANDARD 14)
   if(LIBRI_DIR)
     include_directories(${LIBRI_DIR}/include)
   elseif(GIT_SUBMODULE)
@@ -469,11 +534,8 @@ if(DEFINED Libxc_DIR)
   set(ENABLE_LIBXC ON)
 endif()
 if(ENABLE_LIBXC)
-  find_package(Libxc REQUIRED HINTS
-    ${Libxc_DIR}/share/cmake/Libxc
-    ${Libxc_DIR}/lib/cmake/Libxc
-    ${Libxc_DIR}/lib64/cmake/Libxc
-  )
+  # use `cmake/FindLibxc.cmake` to detect Libxc installation with `pkg-config`
+  find_package(Libxc REQUIRED)
   message(STATUS "Found Libxc: version " ${Libxc_VERSION})
   if(${Libxc_VERSION} VERSION_LESS 5.1.7)
     message(FATAL_ERROR "LibXC >= 5.1.7 is required.")
@@ -527,8 +589,27 @@ if(INFO)
   # modifications on blas_connector and lapack_connector
 endif()
 
+#  Add performance test in abacus
+IF (ENABLE_GOOGLEBENCH)
+  set(BUILD_TESTING ON)
+  find_package(benchmark HINTS ${BENCHMARK_DIR})
+  if(NOT ${benchmark_FOUND})
+    set(BENCHMARK_USE_BUNDLED_GTEST OFF)
+    include(FetchContent)
+    FetchContent_Declare(
+      benchmark
+      GIT_REPOSITORY https://github.com/google/benchmark.git
+      GIT_TAG "origin/main"
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE 
+    )
+    set(BENCHMARK_ENABLE_TESTING OFF)
+    FetchContent_MakeAvailable(benchmark)
+  endif()
+endif()
+
 IF (BUILD_TESTING)
-  set(CMAKE_CXX_STANDARD 14) # Required in orbital
+  set_if_higher(CMAKE_CXX_STANDARD 14) # Required in orbital
   include(CTest)
   enable_testing()
   find_package(GTest HINTS /usr/local/lib/ ${GTEST_DIR})
@@ -556,8 +637,14 @@ IF (BUILD_TESTING)
     endif()
 
     #dependencies & link library
-    target_link_libraries(${UT_TARGET} ${UT_LIBS}
-      Threads::Threads GTest::gtest_main GTest::gmock_main)
+    if(ENABLE_GOOGLEBENCH)
+      target_link_libraries(${UT_TARGET} ${UT_LIBS}
+        Threads::Threads GTest::gtest_main GTest::gmock_main benchmark::benchmark)
+      else()
+        target_link_libraries(${UT_TARGET} ${UT_LIBS}
+          Threads::Threads GTest::gtest_main GTest::gmock_main)
+    endif()
+      
     if(USE_OPENMP)
       target_link_libraries(${UT_TARGET} OpenMP::OpenMP_CXX)
     endif()
@@ -567,6 +654,7 @@ IF (BUILD_TESTING)
       WORKING_DIRECTORY $<TARGET_FILE_DIR:${UT_TARGET}>
     )
   endfunction(AddTest)
+
 endif()
 
 add_subdirectory(source)
@@ -612,6 +700,7 @@ if(ENABLE_LCAO)
       gint
       dftu
       hcontainer
+      deltaspin
       numerical_atomic_orbitals
   )
   if (USE_ELPA)
@@ -636,4 +725,10 @@ install(PROGRAMS ${ABACUS_BIN_PATH}
 
 if(ENABLE_COVERAGE)
   coverage_evaluate()
+endif()
+
+
+if(ENABLE_RAPIDJSON)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    json_output)
 endif()

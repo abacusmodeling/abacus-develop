@@ -7,8 +7,8 @@ namespace ModuleIO
 Output_DM::Output_DM(const Grid_Technique& GridT,
                      int is,
                      int iter,
-                     const int& precision,
-                     const int& out_dm,
+                     int precision,
+                     int out_dm,
                      double*** DM,
                      const double& ef,
                      const UnitCell* ucell,
@@ -47,6 +47,9 @@ void Output_DM::write()
         _out_dm,
         _DM,
         _ef,
-        _ucell);
+        _ucell,
+        GlobalV::MY_RANK,
+        GlobalV::NSPIN,
+        GlobalV::NLOCAL);
 }
 } // namespace ModuleIO

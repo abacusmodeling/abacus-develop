@@ -68,6 +68,7 @@ void Input::Print(const std::string &fn) const
                                  "accuracy for symmetry"); // LiuXh add 2021-08-12, accuracy for symmetry
     ModuleBase::GlobalFunc::OUTP(ofs, "symmetry_autoclose", symmetry_autoclose, "whether to close symmetry automatically when error occurs in symmetry analysis");
     ModuleBase::GlobalFunc::OUTP(ofs, "nelec", nelec, "input number of electrons");
+    ModuleBase::GlobalFunc::OUTP(ofs, "nelec_delta", nelec_delta, "change in the number of total electrons");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_mul", GlobalV::out_mul, " mulliken  charge or not"); // qifeng add 2019/9/10
     ModuleBase::GlobalFunc::OUTP(ofs, "noncolin", noncolin, "using non-collinear-spin");
     ModuleBase::GlobalFunc::OUTP(ofs, "lspinorb", lspinorb, "consider the spin-orbit interaction");
@@ -85,6 +86,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "cal_force", cal_force, "if calculate the force at the end of the electronic iteration");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_freq_ion", out_freq_ion, "the frequency ( >= 0 ) of ionic step to output charge density and wavefunction. 0: output only when ion steps are finished");
     ModuleBase::GlobalFunc::OUTP(ofs, "device", device, "the computing device for ABACUS");
+    ModuleBase::GlobalFunc::OUTP(ofs, "precision", precision, "the computing precision for ABACUS");
 
     ofs << "\n#Parameters (2.PW)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "ecutwfc", ecutwfc, "#energy cutoff for wave functions");
@@ -95,6 +97,7 @@ void Input::Print(const std::string &fn) const
                                  erf_height,
                                  "#the height of the energy step for reciprocal vectors");
     ModuleBase::GlobalFunc::OUTP(ofs, "erf_sigma", erf_sigma, "#the width of the energy step for reciprocal vectors");
+    ModuleBase::GlobalFunc::OUTP(ofs, "fft_mode", fft_mode, "#mode of FFTW");
     if (ks_solver == "cg")
     {
         ModuleBase::GlobalFunc::OUTP(ofs, "pw_diag_nmax", pw_diag_nmax, "max iteration number for cg");
@@ -121,7 +124,7 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "out_wfc_pw", out_wfc_pw, "output wave functions");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_wfc_r", out_wfc_r, "output wave functions in realspace");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_dos", out_dos, "output energy and dos");
-    ModuleBase::GlobalFunc::OUTP(ofs, "out_band", out_band, "output energy and band structure");
+    ModuleBase::GlobalFunc::OUTP(ofs, "out_band", out_band[0], "output energy and band structure (with precision "+std::to_string(out_band[1])+")");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_proj_band", out_proj_band, "output projected band structure");
     ModuleBase::GlobalFunc::OUTP(ofs, "restart_save", restart_save, "print to disk every step for restart");
     ModuleBase::GlobalFunc::OUTP(ofs, "restart_load", restart_load, "restart from disk");
@@ -129,9 +132,9 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "nx", nx, "number of points along x axis for FFT grid");
     ModuleBase::GlobalFunc::OUTP(ofs, "ny", ny, "number of points along y axis for FFT grid");
     ModuleBase::GlobalFunc::OUTP(ofs, "nz", nz, "number of points along z axis for FFT grid");
-    ModuleBase::GlobalFunc::OUTP(ofs, "nsx", nsx, "number of points along x axis for FFT smooth grid");
-    ModuleBase::GlobalFunc::OUTP(ofs, "nsy", nsy, "number of points along y axis for FFT smooth grid");
-    ModuleBase::GlobalFunc::OUTP(ofs, "nsz", nsz, "number of points along z axis for FFT smooth grid");
+    ModuleBase::GlobalFunc::OUTP(ofs, "ndx", ndx, "number of points along x axis for FFT smooth grid");
+    ModuleBase::GlobalFunc::OUTP(ofs, "ndy", ndy, "number of points along y axis for FFT smooth grid");
+    ModuleBase::GlobalFunc::OUTP(ofs, "ndz", ndz, "number of points along z axis for FFT smooth grid");
     ModuleBase::GlobalFunc::OUTP(ofs,
                                  "cell_factor",
                                  cell_factor,
@@ -146,13 +149,15 @@ void Input::Print(const std::string &fn) const
     ModuleBase::GlobalFunc::OUTP(ofs, "emin_sto", emin_sto, "trial energy to guess the lower bound of eigen energies of the Hamitonian operator");
     ModuleBase::GlobalFunc::OUTP(ofs, "emax_sto", emax_sto, "trial energy to guess the upper bound of eigen energies of the Hamitonian operator");
     ModuleBase::GlobalFunc::OUTP(ofs, "seed_sto", seed_sto, "the random seed to generate stochastic orbitals");
+    ModuleBase::GlobalFunc::OUTP(ofs, "initsto_ecut", initsto_ecut, "maximum ecut to init stochastic bands");
     ModuleBase::GlobalFunc::OUTP(ofs, "initsto_freq", initsto_freq, "frequency to generate new stochastic orbitals when running md");
     ModuleBase::GlobalFunc::OUTP(ofs, "cal_cond", cal_cond, "calculate electronic conductivities");
-    ModuleBase::GlobalFunc::OUTP(ofs, "cond_nche", cond_nche, "orders of Chebyshev expansions for conductivities");
+    ModuleBase::GlobalFunc::OUTP(ofs, "cond_che_thr", cond_che_thr, "control the error of Chebyshev expansions for conductivities");
     ModuleBase::GlobalFunc::OUTP(ofs, "cond_dw", cond_dw, "frequency interval for conductivities");
     ModuleBase::GlobalFunc::OUTP(ofs, "cond_wcut", cond_wcut, "cutoff frequency (omega) for conductivities");
     ModuleBase::GlobalFunc::OUTP(ofs, "cond_dt", cond_dt, "t interval to integrate Onsager coefficiencies");
     ModuleBase::GlobalFunc::OUTP(ofs, "cond_dtbatch", cond_dtbatch, "exp(iH*dt*cond_dtbatch) is expanded with Chebyshev expansion.");
+    ModuleBase::GlobalFunc::OUTP(ofs, "cond_smear", cond_smear, "Smearing method for conductivities");
     ModuleBase::GlobalFunc::OUTP(ofs, "cond_fwhm", cond_fwhm, "FWHM for conductivities");
     ModuleBase::GlobalFunc::OUTP(ofs, "cond_nonlocal", cond_nonlocal, "Nonlocal effects for conductivities");
     
@@ -219,9 +224,10 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
     ModuleBase::GlobalFunc::OUTP(ofs, "lcao_dk", lcao_dk, "delta k for 1D integration in LCAO");
     ModuleBase::GlobalFunc::OUTP(ofs, "lcao_dr", lcao_dr, "delta r for 1D integration in LCAO");
     ModuleBase::GlobalFunc::OUTP(ofs, "lcao_rmax", lcao_rmax, "max R for 1D two-center integration table");
-    ModuleBase::GlobalFunc::OUTP(ofs, "out_mat_hs", out_mat_hs, "output H and S matrix");
+    ModuleBase::GlobalFunc::OUTP(ofs, "out_mat_hs", out_mat_hs[0], "output H and S matrix (with precision "+std::to_string(out_mat_hs[1])+")");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_mat_hs2", out_mat_hs2, "output H(R) and S(R) matrix");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_mat_dh", out_mat_dh, "output of derivative of H(R) matrix");
+    ModuleBase::GlobalFunc::OUTP(ofs, "out_mat_xc", out_mat_xc, "output exchange-correlation matrix in KS-orbital representation");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_interval", out_interval, "interval for printing H(R) and S(R) matrix during MD");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_app_flag", out_app_flag, "whether output r(R), H(R), S(R), T(R), and dH(R) matrices in an append manner during MD");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_mat_t", out_mat_t, "output T(R) matrix");
@@ -243,9 +249,15 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_type", mixing_mode, "plain; pulay; broyden");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_beta", mixing_beta, "mixing parameter: 0 means no new charge");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_ndim", mixing_ndim, "mixing dimension in pulay or broyden");
+    ModuleBase::GlobalFunc::OUTP(ofs, "mixing_restart", mixing_restart, "threshold to restart mixing during SCF");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_gg0", mixing_gg0, "mixing parameter in kerker");
+    ModuleBase::GlobalFunc::OUTP(ofs, "mixing_beta_mag", mixing_beta_mag, "mixing parameter for magnetic density");
+    ModuleBase::GlobalFunc::OUTP(ofs, "mixing_gg0_mag", mixing_gg0_mag, "mixing parameter in kerker");
+    ModuleBase::GlobalFunc::OUTP(ofs, "mixing_gg0_min", mixing_gg0_min, "the minimum kerker coefficient");
+    ModuleBase::GlobalFunc::OUTP(ofs, "mixing_angle", mixing_angle, "angle mixing parameter for non-colinear calculations");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_tau", mixing_tau, "whether to mix tau in mGGA calculation");
     ModuleBase::GlobalFunc::OUTP(ofs, "mixing_dftu", mixing_dftu, "whether to mix locale in DFT+U calculation");
+    ModuleBase::GlobalFunc::OUTP(ofs, "mixing_dmr", mixing_dmr, "whether to mix real-space density matrix");
 
     ofs << "\n#Parameters (8.DOS)" << std::endl;
     ModuleBase::GlobalFunc::OUTP(ofs, "dos_emin_ev", dos_emin_ev, "minimal range for dos");
@@ -393,6 +405,7 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
     ModuleBase::GlobalFunc::OUTP(ofs, "td_vext_dire", td_vext_dire, "extern potential direction");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_dipole", out_dipole, "output dipole or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_efield", out_dipole, "output dipole or not");
+    ModuleBase::GlobalFunc::OUTP(ofs, "out_current", out_current, "output current or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "ocp", GlobalV::ocp, "change occupation or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "ocp_set", GlobalV::ocp_set, "set occupation");
 
@@ -405,6 +418,7 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
     ModuleBase::GlobalFunc::OUTP(ofs, "towannier90", towannier90, "use wannier90 code interface or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "nnkpfile", nnkpfile, "the wannier90 code nnkp file name");
     ModuleBase::GlobalFunc::OUTP(ofs, "wannier_spin", wannier_spin, "calculate spin in wannier90 code interface");
+    ModuleBase::GlobalFunc::OUTP(ofs, "wannier_method", wannier_method, "different implementation methods under Lcao basis set");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_wannier_mmn", out_wannier_mmn, "output .mmn file or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_wannier_amn", out_wannier_amn, "output .amn file or not");
     ModuleBase::GlobalFunc::OUTP(ofs, "out_wannier_unk", out_wannier_unk, "output UNK. file or not");
@@ -436,11 +450,12 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
     ModuleBase::GlobalFunc::OUTP(ofs, "of_read_kernel", of_read_kernel, "If set to 1, the kernel of WT KEDF will be filled from file of_kernel_file, not from formula. Only usable for WT KEDF");
     ModuleBase::GlobalFunc::OUTP(ofs, "of_kernel_file", of_kernel_file, "The name of WT kernel file.");
 
-    ofs << "\n#Parameters (19.dft+u)" << std::endl;
-    ModuleBase::GlobalFunc::OUTP(ofs, "dft_plus_u", dft_plus_u, "true:DFT+U correction; false: standard DFT calcullation(default)");
+    ofs << "\n#Parameters (20.dft+u)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs, "dft_plus_u", dft_plus_u, "1/2:new/old DFT+U correction method; 0: standard DFT calcullation(default)");
     ModuleBase::GlobalFunc::OUTP(ofs, "yukawa_lambda", yukawa_lambda, "default:0.0");
     ModuleBase::GlobalFunc::OUTP(ofs, "yukawa_potential", yukawa_potential, "default: false");
     ModuleBase::GlobalFunc::OUTP(ofs, "omc", omc, "the mode of occupation matrix control");
+    ModuleBase::GlobalFunc::OUTP(ofs, "onsite_radius", onsite_radius, "radius of the sphere for onsite projection (Bohr)");
     ofs << std::setw(20) << "hubbard_u ";
     for (int i = 0; i < ntype; i++)
     {
@@ -456,6 +471,7 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
 
 
     ofs << "\n#Parameters (21.spherical bessel)" << std::endl;
+
    ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_ecut",		bessel_nao_ecut, "energy cutoff for spherical bessel functions(Ry)");
    ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_tolerence",bessel_nao_tolerence, "tolerence for spherical bessel root");
    ModuleBase::GlobalFunc::OUTP(ofs, "bessel_nao_rcut",		bessel_nao_rcut, "radial cutoff for spherical bessel functions(a.u.)");
@@ -467,7 +483,23 @@ ModuleBase::GlobalFunc::OUTP(ofs, "out_bandgap", out_bandgap, "if true, print ou
    ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_rcut",		bessel_descriptor_rcut, "radial cutoff for spherical bessel functions(a.u.)");
    ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_smooth",	bessel_descriptor_smooth, "spherical bessel smooth or not");
    ModuleBase::GlobalFunc::OUTP(ofs, "bessel_descriptor_sigma",		bessel_descriptor_sigma, "spherical bessel smearing_sigma");
-
+   /// deltaspin variables
+   ofs << "\n#Parameters (22.non-collinear spin-constrained DFT)" << std::endl;
+   ModuleBase::GlobalFunc::OUTP(ofs, "sc_mag_switch", sc_mag_switch, "0: no spin-constrained DFT; 1: constrain atomic magnetization");
+   ModuleBase::GlobalFunc::OUTP(ofs, "decay_grad_switch", decay_grad_switch, "switch to control gradient break condition");
+   ModuleBase::GlobalFunc::OUTP(ofs, "sc_thr", sc_thr, "Convergence criterion of spin-constrained iteration (RMS) in uB");
+   ModuleBase::GlobalFunc::OUTP(ofs, "nsc", nsc, "Maximal number of spin-constrained iteration");
+   ModuleBase::GlobalFunc::OUTP(ofs, "nsc_min", nsc_min, "Minimum number of spin-constrained iteration");
+    ModuleBase::GlobalFunc::OUTP(ofs, "sc_scf_nmin", sc_scf_nmin, "Minimum number of outer scf loop before initializing lambda loop");
+   ModuleBase::GlobalFunc::OUTP(ofs, "alpha_trial", alpha_trial, "Initial trial step size for lambda in eV/uB^2");
+   ModuleBase::GlobalFunc::OUTP(ofs, "sccut", sccut, "Maximal step size for lambda in eV/uB");
+   ModuleBase::GlobalFunc::OUTP(ofs, "sc_file", sc_file, "file name for parameters used in non-collinear spin-constrained DFT (json format)");
+    
+    ofs << "\n#Parameters (23.Quasiatomic Orbital analysis)" << std::endl;
+    ModuleBase::GlobalFunc::OUTP(ofs, "qo_switch", qo_switch, "0: no QO analysis; 1: QO analysis");
+    ModuleBase::GlobalFunc::OUTP(ofs, "qo_basis", qo_basis, "type of QO basis function: hydrogen: hydrogen-like basis, pswfc: read basis from pseudopotential");
+    ModuleBase::GlobalFunc::OUTP(ofs, "qo_thr", qo_thr, "accuracy for evaluating cutoff radius of QO basis function");
+  
     ofs.close();
     return;
 }

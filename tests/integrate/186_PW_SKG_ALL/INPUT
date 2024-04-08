@@ -32,12 +32,12 @@ smearing_sigma			0.6
 #Parameters (5.Mixing)
 mixing_type		broyden
 mixing_beta		0.4
+mixing_gg0      0.0
 
 cal_cond      1
-cond_nche  18
 cond_fwhm   16
 cond_wcut        20
 cond_dw          0.02
 cond_dt          0.237464
-cond_dtbatch     1
+cond_dtbatch     0
 cond_nonlocal    0

@@ -301,6 +301,47 @@ void UnitCell::set_iat2itia(void)
     return;
 }
 
+std::map<int, int> UnitCell::get_atomCounts() const
+{
+	std::map<int, int> atomCounts;
+	for (int it = 0; it < this->ntype; it++)
+	{
+		atomCounts.insert(std::pair<int, int>(it, this->atoms[it].na));
+	}
+	return atomCounts;
+}
+
+std::map<int, int> UnitCell::get_orbitalCounts() const
+{
+	std::map<int, int> orbitalCounts;
+	for (int it = 0; it < this->ntype; it++)
+	{
+		orbitalCounts.insert(std::pair<int, int>(it, this->atoms[it].nw));
+	}
+	return orbitalCounts;
+}
+
+std::map<int, std::map<int, int>> UnitCell::get_lnchiCounts() const
+{
+    std::map<int, std::map<int, int>> lnchiCounts;
+    for (int it = 0; it < this->ntype; it++)
+    {
+        for (int L = 0; L < this->atoms[it].nwl + 1; L++)
+        {
+            // Check if the key 'it' exists in the outer map
+            if (lnchiCounts.find(it) == lnchiCounts.end())
+            {
+                // If it doesn't exist, initialize an empty inner map
+                lnchiCounts[it] = std::map<int, int>();
+            }
+            int l_nchi = this->atoms[it].l_nchi[L];
+            // Insert the key-value pair into the inner map
+            lnchiCounts[it].insert(std::pair<int, int>(L, l_nchi));
+        }
+    }
+    return lnchiCounts;
+}
+
 void UnitCell::update_pos_tau(const double* pos)
 {
     int iat = 0;
@@ -1139,7 +1180,7 @@ void UnitCell::setup_cell_after_vc(std::ofstream &log)
     {
         log << std::endl;
         ModuleBase::GlobalFunc::OUT(log, "Volume (Bohr^3)", this->omega);
-        ModuleBase::GlobalFunc::OUT(log, "Volume (A^3))", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
+        ModuleBase::GlobalFunc::OUT(log, "Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
     }
 
     lat0_angstrom = lat0 * 0.529177;
@@ -1661,6 +1702,12 @@ void UnitCell::cal_nelec(double& nelec)
 			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "AUTOSET number of electrons: ", nelec);
 		}
     }
+	if (GlobalV::nelec_delta != 0)
+	{
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "nelec_delta is NOT zero, please make sure you know what you are doing! nelec_delta: ", GlobalV::nelec_delta);
+		nelec += GlobalV::nelec_delta;
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "nelec now: ", nelec);
+	}
     return;
 }
 

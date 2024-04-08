@@ -11,14 +11,24 @@ if(ENABLE_LCAO)
         operator_lcao/overlap_new.cpp
         operator_lcao/ekinetic_new.cpp
         operator_lcao/nonlocal_new.cpp
+        operator_lcao/td_ekinetic_lcao.cpp
+        operator_lcao/td_nonlocal_lcao.cpp
+        operator_lcao/sc_lambda_lcao.cpp
+        operator_lcao/dftu_lcao.cpp
         FORCE_STRESS.cpp
         FORCE_gamma.cpp
         FORCE_gamma_edm.cpp
         FORCE_gamma_tvnl.cpp
         FORCE_gamma_vl.cpp
         FORCE_k.cpp
+        foverlap_k.cpp
+        ftvnl_dphi_k.cpp
+        fvl_dphi_k.cpp
+        fvnl_dbeta_k.cpp
         LCAO_gen_fixedH.cpp
         LCAO_hamilt.cpp
+        grid_init.cpp
+        sparse_format.cpp
         LCAO_matrix.cpp
         LCAO_nnr.cpp
         record_adj.cpp

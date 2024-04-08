@@ -55,7 +55,7 @@ out_pot                        2 #output realspace potential
 out_wfc_pw                     0 #output wave functions
 out_wfc_r                      0 #output wave functions in realspace
 out_dos                        0 #output energy and dos
-out_band                       false #output energy and band structure
+out_band                       0 #output energy and band structure
 out_proj_band                  FaLse #output projected band structure
 restart_save                   f #print to disk every step for restart
 restart_load                   F #restart from disk
@@ -74,9 +74,10 @@ nche_sto                       100 #Chebyshev expansion orders
 emin_sto                       0 #trial energy to guess the lower bound of eigen energies of the Hamitonian operator
 emax_sto                       0 #trial energy to guess the upper bound of eigen energies of the Hamitonian operator
 seed_sto                       0 #the random seed to generate stochastic orbitals
+initsto_ecut                   0 #maximum ecut to init stochastic bands
 initsto_freq                   0 #frequency to generate new stochastic orbitals when running md
 cal_cond                       0 #calculate electronic conductivities
-cond_nche                      20 #orders of Chebyshev expansions for conductivities
+cond_che_thr                   1e-08 #control the error of Chebyshev expansions for conductivities
 cond_dw                        0.1 #frequency interval for conductivities
 cond_wcut                      10 #cutoff frequency (omega) for conductivities
 cond_dt                        0.07 #control the t interval
@@ -322,6 +323,7 @@ gdir                           3 #calculate the polarization in the direction of
 towannier90                    0 #use wannier90 code interface or not
 nnkpfile                       seedname.nnkp #the wannier90 code nnkp file name
 wannier_spin                   up #calculate spin in wannier90 code interface
+wannier_method                 1 #different implementation methods under Lcao basis set
 out_wannier_mmn                1 #output .mmn file or not
 out_wannier_amn                1 #output .amn file or not
 out_wannier_unk                1 #output UNK. file or not

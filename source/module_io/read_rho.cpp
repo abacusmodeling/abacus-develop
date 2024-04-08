@@ -4,9 +4,13 @@
 
 bool ModuleIO::read_rho(
 #ifdef __MPI
-		Parallel_Grid* Pgrid,
+    	Parallel_Grid* Pgrid,
 #endif
-		const int &is,
+		int my_rank,
+		std::string esolver_type,
+		int rank_in_stogroup,
+		const int& is,
+		std::ofstream& ofs_running,
 		const int &nspin,
 		const std::string &fn,
 		double* rho,
@@ -17,11 +21,15 @@ bool ModuleIO::read_rho(
 		const UnitCell* ucell,
 		int &prenspin)
 {
-	ModuleIO::read_cube(
+    return ModuleIO::read_cube(
 #ifdef __MPI
 		Pgrid,
 #endif
+		my_rank,
+		esolver_type,
+		rank_in_stogroup,
 		is,
+		ofs_running,
 		nspin,
 		fn,
 		rho,
@@ -30,7 +38,5 @@ bool ModuleIO::read_rho(
 		nz,
 		ef,
 		ucell,
-		prenspin);
-		
-	return true;
+        prenspin);
 }

@@ -14,6 +14,7 @@ struct fenergy
 {
     double etot = 0.0;     ///< the total free energy
     double etot_old = 0.0; ///< old total free energy
+    double etot_delta = 0.0; // the difference of total energy between two steps = etot - etot_old
 
     double eband = 0.0;          ///< the band energy
     double deband = 0.0;         ///< correction for variational energy
@@ -38,6 +39,11 @@ struct fenergy
 
     double edftu = 0.0;       ///< DFT+U energy
     double edeepks_scf = 0.0; /// DeePKS energy
+
+    double escon = 0.0; ///< spin constraint energy
+
+    double ekinetic = 0.0;      /// kinetic energy, used in OFDFT
+    double eion_elec = 0.0;     /// ion-electron interaction energy, used in OFDFT
 
     double calculate_etot();
     double calculate_harris();

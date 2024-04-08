@@ -30,7 +30,8 @@ void pseudo::set_pseudo(const Pseudopot_upf& upf)
 	this->set_pseudo_atom(upf);
 	this->set_pseudo_vl(upf);
 
-
+	if (nbeta == 0)
+		return;
 	delete[] lll;
 	lll = new int[nbeta];
 	assert(lll != 0);
@@ -99,7 +100,7 @@ void pseudo::set_pseudo_h(const Pseudopot_upf &upf)
 	
 	// mohan update 2021-02-22
 	//  max number of points in the atomic radial mesh
-	int ndmx = 2000; 
+	int ndmx = 200000; 
 	if (this->mesh > ndmx)
 	{
 		std::cout << "\n set_pseudo_h, too many grid points,";
@@ -218,7 +219,6 @@ void pseudo::set_pseudo_atom(const Pseudopot_upf &upf)
 	delete[] rho_atc;
 	rho_atc = new double[mesh];
 	assert(rho_atc != 0);
-	ModuleBase::GlobalFunc::ZEROS(rho_atc, mesh);
 
 	for (int i = 0;i < nchi;i++)
 	{
@@ -292,7 +292,10 @@ void pseudo::set_pseudo_vl(const Pseudopot_upf &upf)
 	vloc_at = new double[mesh];
 	assert(vloc_at != 0);
 
-	for (int i = 0;i < mesh;i++)
+    if (upf.coulomb_potential)
+        return;
+
+    for (int i = 0;i < mesh;i++)
 	{
 		vloc_at[i] = upf.vloc[i];
 	}

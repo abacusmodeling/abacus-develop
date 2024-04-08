@@ -20,6 +20,12 @@
 
 #include <module_psi/kernels/types.h>
 
+#if defined(__CUDACC__)
+#include <base/macros/cuda.h>
+#elif defined(__HIPCC__)
+#include <base/macros/rocm.h>
+#endif // defined(__CUDACC__) || defined(__HIPCC__)
+
 namespace container {
 
 template <typename T, int Accuracy>
@@ -118,6 +124,20 @@ struct PsiToContainer<psi::DEVICE_GPU> {
     using type = container::DEVICE_GPU; /**< The return type specialization for std::complex<double>. */
 };
 
+template <typename T> 
+struct ContainerToPsi {
+    using type = T; /**< The return type based on the input type. */
+};
+
+template <>
+struct ContainerToPsi<container::DEVICE_CPU> {
+    using type = psi::DEVICE_CPU; /**< The return type specialization for std::complex<float>. */
+};
+
+template <>
+struct ContainerToPsi<container::DEVICE_GPU> {
+    using type = psi::DEVICE_GPU; /**< The return type specialization for std::complex<double>. */
+};
 
 
 /**
@@ -195,6 +215,18 @@ template <>
 struct DataTypeToEnum<std::complex<double>> {
     static constexpr DataType value = DataType::DT_COMPLEX_DOUBLE;
 };
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+template <>
+struct DataTypeToEnum<thrust::complex<float>> {
+    static constexpr DataType value = DataType::DT_COMPLEX;
+};
+
+template <>
+struct DataTypeToEnum<thrust::complex<double>> {
+    static constexpr DataType value = DataType::DT_COMPLEX_DOUBLE;
+};
+#endif // defined(__CUDACC__) || defined(__HIPCC__)
 
 /**
  * @brief Overloaded operator<< for the Tensor class.

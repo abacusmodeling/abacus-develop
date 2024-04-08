@@ -83,6 +83,8 @@ class Charge
 
     void renormalize_rho(void);
 
+    double sum_rho(void) const;
+
     void save_rho_before_sum_band(void);
 
 	// for non-linear core correction
@@ -129,9 +131,8 @@ class Charge
     int nxyz; // total nuber of r vectors
     int ngmc; // number of g vectors in this processor
     int nspin; // number of spins
-    ModulePW::PW_Basis* rhopw = nullptr;
+    ModulePW::PW_Basis* rhopw = nullptr;// When double_grid is used, rhopw = rhodpw (dense grid)
   private:
-    double sum_rho(void) const;
 
     void destroy();    // free arrays  liuyu 2023-03-12
 

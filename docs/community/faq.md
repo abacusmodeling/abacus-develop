@@ -70,7 +70,7 @@ This is usually caused by overloading of CPUs' memory without specifying thread 
 
 **2. My relaxation failed. How to deal with it?**
 
-This is usually caused by the difficulty in converging charge density. Reducing charge mixing coefficient (`mixing_beta`) might help. For large systems up to hundreds of atoms, it is suggested to choose the Kerker mixing method by setting parameter "mixing_gg0" as "1.5".
+This is usually caused by the difficulty in converging charge density. Reducing charge mixing coefficient (`mixing_beta`) might help. For large systems up to hundreds of atoms, it is suggested to choose the Kerker mixing method by setting parameter "mixing_gg0" as "1.0".
 
 Sometimes, loose convergence threshold of charge density (parameter "scf_thr") will cause atomic forces not correctly enough, please set it at most "1e-7" for relaxation calculation.
 
@@ -106,5 +106,9 @@ write(cs_stru, cs_atoms, format='abacus', pp=pp, basis=basis)
 **3. What is the convergence criterion for the SCF process in ABACUS?**
 
 ABACUS applies the density difference between two SCF steps (labeled as `DRHO` in the screen output) as the convergence criterion, which is considered as a more robust choice compared with the energy difference. `DRHO` is calculated via `DRHO = |rho(G)-rho_previous(G)|^2`. Note that the energy difference between two SCF steps (labed as `EDIFF`) is also printed out in the screen output.
+
+**4. Why EDIFF is much slower than DRHO?
+
+For metaGGA calculations, it is normal because in addition to charge density, kinetic density also needs to be considered in metaGGA calculations. In this case, you can try set `mixing_tau = true`. If you find EDIFF is much slower than DRHO for non-metaGGA calculations, please start a new issue to us.
 
 [back to top](#frequently-asked-questions)

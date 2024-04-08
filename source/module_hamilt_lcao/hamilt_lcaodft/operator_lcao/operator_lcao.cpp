@@ -16,7 +16,7 @@ void OperatorLCAO<double, double>::get_hs_pointers()
 {
     ModuleBase::timer::tick("OperatorLCAO", "get_hs_pointers");
     this->hmatrix_k = this->LM->Hloc.data();
-    if ((this->new_e_iteration && ik == 0) || hsolver::HSolverLCAO<double>::out_mat_hs)
+    if ((this->new_e_iteration && ik == 0) || hsolver::HSolverLCAO<double>::out_mat_hs[0])
     {
         if (this->smatrix_k == nullptr)
         {
@@ -177,8 +177,18 @@ void OperatorLCAO<TK, TR>::init(const int ik_in)
         {
             //only HK should be updated when cal_type=lcao_dftu
             //in cal_type=lcao_dftu, HK only need to update from one node
+            if(!this->hr_done)
+            {
+                //in cal_type=lcao_deepks, HR should be updated
+                this->contributeHR();
+            }
+            break;
+        }
+        case lcao_sc_lambda:
+        {
+            //update HK only
+            //in cal_type=lcao_sc_mag, HK only need to be updated
             this->contributeHk(ik_in);
-
             break;
         }
         case lcao_exx:
@@ -189,6 +199,22 @@ void OperatorLCAO<TK, TR>::init(const int ik_in)
 
             //update HK next
             //in cal_type=lcao_exx, HK only need to update from one node
+            this->contributeHk(ik_in);
+
+            break;
+        }
+        case lcao_tddft_velocity:
+        {
+            if(!this->hr_done)
+            {
+                //in cal_type=lcao_fixed, HR should be updated by each sub-chain nodes
+                OperatorLCAO<TK, TR>* last = this;
+                while(last != nullptr)
+                {
+                    last->contributeHR();
+                    last = dynamic_cast<OperatorLCAO<TK, TR>*>(last->next_sub_op);
+                }
+            }
             this->contributeHk(ik_in);
 
             break;

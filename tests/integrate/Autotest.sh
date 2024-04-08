@@ -74,6 +74,11 @@ check_out(){
     # check every 'key' word
     #------------------------------------------------------
     for key in $properties; do
+    
+        if [ $key == "totaltimeref" ]; then
+            # echo "time=$cal ref=$ref"
+            break
+        fi
 
         #--------------------------------------------------
         # calculated value
@@ -90,11 +95,6 @@ check_out(){
         # and reference value
         #--------------------------------------------------
         deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",x-y}'`
-
-        if [ $key == "totaltimeref" ]; then
-            # echo "time=$cal ref=$ref"
-            break
-        fi
 
 
         #--------------------------------------------------
@@ -186,6 +186,12 @@ if [ "$sanitize" == true ]; then
 fi
 
 for dir in $testdir; do
+    if [ ! -d $dir ];then
+        echo -e "\e[0;31m[ERROR     ]\e[0m $dir is not a directory.\n"
+        let fatal++
+        fatal_case_list+=$dir'\n'
+        continue
+    fi
     cd $dir
     echo -e "\e[0;32m[ RUN      ]\e[0m $dir"
     TIMEFORMAT='[----------] Time elapsed: %R seconds'

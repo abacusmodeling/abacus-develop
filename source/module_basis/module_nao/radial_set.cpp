@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstring>
 #include <memory>
+#include <fstream>
 
 #include "module_base/spherical_bessel_transformer.h"
 
@@ -81,6 +82,19 @@ RadialSet& RadialSet::operator=(const RadialSet& rhs)
     return *this;
 }
 
+void RadialSet::to_numerical_orbital(Numerical_Orbital& no, const int nk_legacy, const double lcao_dk) const
+{
+    delete[] no.chi();
+
+    no.chi() = new Numerical_Orbital_Lm[nchi_];
+    for (int i = 0; i < nchi_; i++)
+    {
+        chi_[i].to_numerical_orbital_lm(no.chi()[i], nk_legacy, lcao_dk);
+    }
+
+    no.set_orbital_info(itype_, symbol_, lmax_, nzeta_, nchi_);
+}
+
 void RadialSet::set_rcut_max()
 {
     rcut_max_ = 0.0;
@@ -145,7 +159,7 @@ void RadialSet::set_grid(const bool for_r_space, const int ngrid, const double* 
     {
         chi_[i].set_grid(for_r_space, ngrid, grid, mode);
     }
-    rcut_max_ = grid[ngrid - 1];
+    set_rcut_max();
 }
 
 void RadialSet::set_uniform_grid(const bool for_r_space,
@@ -158,7 +172,7 @@ void RadialSet::set_uniform_grid(const bool for_r_space,
     {
         chi_[i].set_uniform_grid(for_r_space, ngrid, cutoff, mode, enable_fft);
     }
-    rcut_max_ = cutoff;
+    set_rcut_max();
 }
 
 void RadialSet::cleanup()
@@ -177,4 +191,64 @@ void RadialSet::cleanup()
 
     delete[] index_map_;
     index_map_ = nullptr;
+}
+
+void RadialSet::write_abacus_orb(const std::string& file_name, const int rank) const
+{
+    std::ofstream file_to;
+    file_to.open(file_name, std::ios::out);
+
+    std::vector<std::string> sublayers = {"S", "P", "D", "F", "G", "H", "I", "J", "K"};
+    if(file_to.good())
+    {
+        for(int i = 0; i < 75; ++i)
+        {
+            file_to << "-";
+        }
+        file_to << std::endl;
+        // left aligned
+        file_to << std::left << std::setw(28) << "Element" << symbol_ << std::endl;
+        file_to << std::left << std::setw(28) << "Energy Cutoff(Ry)" << std::to_string(int(100.0)) << std::endl;
+        // rcut .1f, not scientific
+        file_to << std::left << std::setw(28) << "Radius Cutoff(a.u.)" 
+                << std::fixed << std::setprecision(1) << rcut_max_ << std::endl;
+        file_to << std::left << std::setw(28) << "Lmax" << lmax_ << std::endl;
+        for(int l = 0; l <= lmax_; ++l)
+        {
+            std::string title = "Number of " + sublayers[l] + "orbital-->";
+            file_to << std::left << std::setw(28) << title << nzeta_[l] << std::endl;
+        }
+        for(int i = 0; i < 75; ++i)
+        {
+            file_to << "-";
+        }
+        file_to << std::endl;
+        file_to << "SUMMARY  END\n\n";
+        file_to << std::left << std::setw(28) << "Mesh" << std::setprecision(0) << int(rcut_max_/0.01) + 1 << std::endl;
+        file_to << std::left << std::setw(28) << "dr" << std::setprecision(2) << 0.01 << std::endl;
+
+        for(int l = 0; l <= lmax_; l++)
+        {
+            for(int izeta = 0; izeta < nzeta_[l]; izeta++)
+            {
+                file_to << std::right << std::setw(20) << "Type"
+                        << std::right << std::setw(20) << "L"
+                        << std::right << std::setw(20) << "N" << std::endl;
+                file_to << std::right << std::setw(20) << std::to_string(0)
+                        << std::right << std::setw(20) << std::to_string(l)
+                        << std::right << std::setw(20) << std::to_string(izeta);
+                for(int i = 0; i < int(rcut_max_/0.01) + 1; i++)
+                {
+                    if(i % 4 == 0)
+                    {
+                        file_to << std::endl;
+                    }
+                    file_to << std::left << std::setw(22) << std::setprecision(14) << std::scientific 
+                            << chi_[index(l, izeta)].rvalue()[i];
+                }
+                file_to << std::endl;
+            }
+        }
+    }
+    file_to.close();
 }

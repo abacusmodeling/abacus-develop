@@ -136,6 +136,7 @@ void Input_Conv::read_td_efield()
     elecstate::H_TDDFT_pw::tend = INPUT.td_tend;
 
     elecstate::H_TDDFT_pw::dt = INPUT.mdp.md_dt / ModuleBase::AU_to_FS;
+    elecstate::H_TDDFT_pw::dt_int = elecstate::H_TDDFT_pw::dt;
 
     // space domain parameters
 
@@ -153,7 +154,21 @@ void Input_Conv::read_td_efield()
     elecstate::H_TDDFT_pw::gauss_t0 = convert_units(INPUT.td_gauss_t0, 1.0);
     elecstate::H_TDDFT_pw::gauss_amp
         = convert_units(INPUT.td_gauss_amp, ModuleBase::BOHR_TO_A / ModuleBase::Ry_to_eV); // Ry/bohr
-
+    //init ncut for velocity gauge integral
+    for(auto omega: elecstate::H_TDDFT_pw::gauss_omega)
+    {
+        int ncut = int(100.0 * omega * elecstate::H_TDDFT_pw::dt / ModuleBase::PI);
+        if(ncut%2 == 0)
+        {
+            ncut += 2;
+        }
+        else
+        {
+            ncut += 1;
+        }
+        if(elecstate::H_TDDFT_pw::stype == 0)ncut=1;
+        elecstate::H_TDDFT_pw::gauss_ncut.push_back(ncut);
+    }
     // trapezoid
     elecstate::H_TDDFT_pw::trape_omega
         = convert_units(INPUT.td_trape_freq, 2 * ModuleBase::PI * ModuleBase::AU_to_FS); // time(a.u.)^-1
@@ -163,7 +178,21 @@ void Input_Conv::read_td_efield()
     elecstate::H_TDDFT_pw::trape_t3 = convert_units(INPUT.td_trape_t3, 1.0);
     elecstate::H_TDDFT_pw::trape_amp
         = convert_units(INPUT.td_trape_amp, ModuleBase::BOHR_TO_A / ModuleBase::Ry_to_eV); // Ry/bohr
-
+    //init ncut for velocity gauge integral
+    for(auto omega: elecstate::H_TDDFT_pw::trape_omega)
+    {
+        int ncut = int(100.0 * omega * elecstate::H_TDDFT_pw::dt / ModuleBase::PI);
+        if(ncut%2 == 0)
+        {
+            ncut += 2;
+        }
+        else
+        {
+            ncut += 1;
+        }
+        if(elecstate::H_TDDFT_pw::stype == 0)ncut=1;
+        elecstate::H_TDDFT_pw::trape_ncut.push_back(ncut);
+    }
     // Trigonometric
     elecstate::H_TDDFT_pw::trigo_omega1
         = convert_units(INPUT.td_trigo_freq1, 2 * ModuleBase::PI * ModuleBase::AU_to_FS); // time(a.u.)^-1
@@ -173,7 +202,21 @@ void Input_Conv::read_td_efield()
     elecstate::H_TDDFT_pw::trigo_phase2 = convert_units(INPUT.td_trigo_phase2, 1.0);
     elecstate::H_TDDFT_pw::trigo_amp
         = convert_units(INPUT.td_trigo_amp, ModuleBase::BOHR_TO_A / ModuleBase::Ry_to_eV); // Ry/bohr
-
+    //init ncut for velocity gauge integral
+    for(auto omega: elecstate::H_TDDFT_pw::trigo_omega1)
+    {
+        int ncut = int(100.0 * omega * elecstate::H_TDDFT_pw::dt / ModuleBase::PI);
+        if(ncut%2 == 0)
+        {
+            ncut += 2;
+        }
+        else
+        {
+            ncut += 1;
+        }
+        if(elecstate::H_TDDFT_pw::stype == 0)ncut=1;
+        elecstate::H_TDDFT_pw::trigo_ncut.push_back(ncut);
+    }
     // Heaviside
     elecstate::H_TDDFT_pw::heavi_t0 = convert_units(INPUT.td_heavi_t0, 1.0);
     elecstate::H_TDDFT_pw::heavi_amp
@@ -274,6 +317,13 @@ void Input_Conv::Convert(void)
         GlobalV::NSTOGROUP = INPUT.bndpar;
     }
     GlobalV::precision_flag = INPUT.precision;
+    if (GlobalV::device_flag == "cpu" and GlobalV::precision_flag == "single") {
+        // cpu single precision is not supported while float_fftw lib is not available
+        #ifndef __ENABLE_FLOAT_FFTW
+            ModuleBase::WARNING_QUIT("Input_Conv", "Single precision with cpu is not supported while float_fftw lib is not available; \
+            \n Please recompile with cmake flag \"-DENABLE_FLOAT_FFTW=ON\".\n");
+        #endif // __ENABLE_FLOAT_FFTW
+    }
     GlobalV::CALCULATION = INPUT.calculation;
     GlobalV::ESOLVER_TYPE = INPUT.esolver_type;
 
@@ -364,14 +414,16 @@ void Input_Conv::Convert(void)
         GlobalC::dftu.omc = INPUT.omc;
         GlobalC::dftu.orbital_corr = INPUT.orbital_corr;
         GlobalC::dftu.mixing_dftu = INPUT.mixing_dftu;
-        if (!INPUT.yukawa_potential)
+        if (INPUT.yukawa_potential && INPUT.hubbard_u == nullptr)
         {
             // Duradev's rotational invariant formulation is implemented
             // where only an effective U given by U-J is used
             // unit is in eV
-            GlobalC::dftu.U = INPUT.hubbard_u;
+            INPUT.hubbard_u = new double[GlobalC::ucell.ntype];
         }
+        GlobalC::dftu.U = INPUT.hubbard_u;
     }
+    GlobalV::onsite_radius = INPUT.onsite_radius;
 #endif
     //--------------------------------------------
     // added by zhengdy-soc
@@ -394,12 +446,12 @@ void Input_Conv::Convert(void)
 
         if (INPUT.cal_force || INPUT.cal_stress)
         {
-            ModuleBase::WARNING_QUIT("input_conv", "force & stress not ready for soc yet!");
+            ModuleBase::WARNING_QUIT("input_conv", "force & stress not ready for nspin=4(soc or noncollinear-spin) yet!");
         }
 
         if(INPUT.gamma_only_local)
         {
-            ModuleBase::WARNING_QUIT("input_conv", "soc does not support gamma only calculation");
+            ModuleBase::WARNING_QUIT("input_conv", "nspin=4(soc or noncollinear-spin) does not support gamma only calculation");
         }
     }
     else
@@ -457,6 +509,7 @@ void Input_Conv::Convert(void)
     }
     module_tddft::Evolve_elec::out_dipole = INPUT.out_dipole;
     module_tddft::Evolve_elec::out_efield = INPUT.out_efield;
+    module_tddft::Evolve_elec::out_current = INPUT.out_current;
     module_tddft::Evolve_elec::td_print_eij = INPUT.td_print_eij;
     module_tddft::Evolve_elec::td_edm = INPUT.td_edm;
     read_td_efield();
@@ -504,11 +557,11 @@ void Input_Conv::Convert(void)
             || dft_functional_lower == "opt_orb" || dft_functional_lower == "scan0")
         {
             GlobalC::restart.info_load.load_charge = true;
+            GlobalC::restart.info_load.load_H = true;
         }
         else
         {
             GlobalC::restart.info_load.load_charge = true;
-            GlobalC::restart.info_load.load_H = true;
         }
     }
 
@@ -615,9 +668,11 @@ void Input_Conv::Convert(void)
     GlobalV::chg_extrap = INPUT.chg_extrap; // xiaohui modify 2015-02-01
     GlobalV::out_chg = INPUT.out_chg;
     GlobalV::nelec = INPUT.nelec;
+    GlobalV::nelec_delta = INPUT.nelec_delta;
     GlobalV::out_pot = INPUT.out_pot;
     GlobalV::out_app_flag = INPUT.out_app_flag;
-
+    GlobalV::out_ndigits = INPUT.out_ndigits;
+    
     GlobalV::out_bandgap = INPUT.out_bandgap; // QO added for bandgap printing
     GlobalV::out_interval = INPUT.out_interval;
 #ifdef __LCAO
@@ -631,6 +686,7 @@ void Input_Conv::Convert(void)
     hsolver::HSolverLCAO<std::complex<double>>::out_mat_hsR = INPUT.out_mat_hs2; // LiuXh add 2019-07-16
     hsolver::HSolverLCAO<std::complex<double>>::out_mat_t = INPUT.out_mat_t;
     hsolver::HSolverLCAO<std::complex<double>>::out_mat_dh = INPUT.out_mat_dh;
+    GlobalV::out_mat_xc = INPUT.out_mat_xc;
     if (GlobalV::GAMMA_ONLY_LOCAL)
     {
         elecstate::ElecStateLCAO<double>::out_wfc_lcao = INPUT.out_wfc_lcao;
@@ -724,13 +780,40 @@ void Input_Conv::Convert(void)
     GlobalV::of_read_kernel = INPUT.of_read_kernel;
     GlobalV::of_kernel_file = INPUT.of_kernel_file;
 
+    //-----------------------------------------------
+    // Deltaspin related parameters
+    //-----------------------------------------------
+    GlobalV::sc_mag_switch = INPUT.sc_mag_switch;
+    GlobalV::decay_grad_switch = INPUT.decay_grad_switch;
+    GlobalV::sc_thr = INPUT.sc_thr;
+    GlobalV::nsc = INPUT.nsc;
+    GlobalV::nsc_min = INPUT.nsc_min;
+    GlobalV::sc_scf_nmin = INPUT.sc_scf_nmin;
+    GlobalV::alpha_trial = INPUT.alpha_trial;
+    GlobalV::sccut = INPUT.sccut;
+    GlobalV::sc_file = INPUT.sc_file;
+
     // mixing parameters
     GlobalV::MIXING_MODE = INPUT.mixing_mode;
     GlobalV::MIXING_BETA = INPUT.mixing_beta;
     GlobalV::MIXING_NDIM = INPUT.mixing_ndim;
+    GlobalV::MIXING_RESTART = INPUT.mixing_restart;
     GlobalV::MIXING_GG0 = INPUT.mixing_gg0;
+    GlobalV::MIXING_BETA_MAG = INPUT.mixing_beta_mag;
+    GlobalV::MIXING_GG0_MAG = INPUT.mixing_gg0_mag;
+    GlobalV::MIXING_GG0_MIN = INPUT.mixing_gg0_min;
+    GlobalV::MIXING_ANGLE = INPUT.mixing_angle;
     GlobalV::MIXING_TAU = INPUT.mixing_tau;
+    GlobalV::MIXING_DMR = INPUT.mixing_dmr;
     
+    //-----------------------------------------------
+    // Quasiatomic Orbital analysis
+    //-----------------------------------------------
+    GlobalV::qo_switch = INPUT.qo_switch;
+    GlobalV::qo_basis = INPUT.qo_basis;
+    GlobalV::qo_strategy = INPUT.qo_strategy;
+    GlobalV::qo_thr = INPUT.qo_thr;
+    GlobalV::qo_screening_coeff = INPUT.qo_screening_coeff;
     ModuleBase::timer::tick("Input_Conv", "Convert");
     return;
 }
