@@ -407,7 +407,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	assert( this->nr_uniform > 0);
 	std::vector<double> vec_jl(nr);
     *jl = vec_jl.data();
-	vector<double> vec_integrated_func(nr);
+	std::vector<double> vec_integrated_func(nr);
     *integrated_func = vec_integrated_func.data();
 	const double pref = sqrt( 2.0 / ModuleBase::PI );
 	//Sbt method
