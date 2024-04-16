@@ -584,8 +584,8 @@ void ORB_gen_tables::snap_psibeta_half_tddft(
 
 	int ridial_grid_num = 140;
     int angular_grid_num = 110;
-    double *r_ridial = new double[ridial_grid_num];
-    double *weights_ridial = new double[ridial_grid_num];
+    vector<double> *r_ridial(ridial_grid_num);
+    vector<double> *weights_ridial(ridial_grid_num);
     
 	int index = 0;
 	for (int nb = 0; nb < nproj; nb++)
@@ -686,8 +686,6 @@ void ORB_gen_tables::snap_psibeta_half_tddft(
 		}
 	}
 
-	delete[] r_ridial;
-    delete[] weights_ridial;
 	assert(index == natomwfc);
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta_half_tddft");
 
