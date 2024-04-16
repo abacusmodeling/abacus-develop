@@ -36,7 +36,8 @@ void Numerical_Orbital::set_orbital_info
 	this->lmax = lmax_in;
 
 	// (2) set nchi and total nchi.
-	vector<int> this->nchi(this->lmax+1);
+	std::vector<int> vec_nchi(this->lmax+1);
+    this->nchi = vec_nchi.data();
 	for (int i = 0; i < this->lmax + 1; i++)
 	{
 		this->nchi[i] = nchi_in[i];
