@@ -338,6 +338,7 @@ void Input::Default(void)
     deepks_scf = 0;
     deepks_bandgap = 0;
     deepks_out_unittest = 0;
+    deepks_equiv = 0;
 
     out_pot = 0;
     out_wfc_pw = 0;
@@ -1411,6 +1412,10 @@ bool Input::Read(const std::string& fn)
         else if (strcmp("deepks_scf", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
             read_bool(ifs, deepks_scf);
+        }
+        else if (strcmp("deepks_equiv", word) == 0)
+        {
+            read_bool(ifs, deepks_equiv);
         }
         else if (strcmp("deepks_bandgap", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
@@ -3578,6 +3583,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(deepks_bandgap);
     Parallel_Common::bcast_bool(deepks_out_unittest);
     Parallel_Common::bcast_string(deepks_model);
+    Parallel_Common::bcast_bool(deepks_equiv);
 
     Parallel_Common::bcast_int(out_pot);
     Parallel_Common::bcast_int(out_wfc_pw);
