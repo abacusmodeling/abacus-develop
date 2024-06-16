@@ -271,7 +271,7 @@ void Gint::cal_gint(Gint_inout* inout)
 				}
 			}
 
-#pragma omp for
+#pragma omp parallel for schedule(dynamic)
 #endif
                 // entering the main loop of grid points
                 for (int grid_index = 0; grid_index < this->nbxx; grid_index++)
