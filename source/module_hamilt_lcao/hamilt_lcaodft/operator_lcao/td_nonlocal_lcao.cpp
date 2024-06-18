@@ -23,7 +23,7 @@ hamilt::TDNonlocal<hamilt::OperatorLCAO<TK, TR>>::TDNonlocal(
     const Parallel_Orbitals* paraV)
     : hamilt::OperatorLCAO<TK, TR>(LM_in, kvec_d_in, hR_in, hK_in), uot_(uot)
 {
-    this->cal_type = lcao_tddft_velocity;
+    this->cal_type = calculation_type::lcao_tddft_velocity;
     this->ucell = ucell_in;
     this->LM = LM_in;
     this->Grid = GridD_in;
