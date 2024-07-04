@@ -170,7 +170,6 @@ void ESolver_KS_LCAO<TK, TR>::beforesolver(const int istep) {
             GlobalV::GAMMA_ONLY_LOCAL ? &(this->GG) : nullptr,
             GlobalV::GAMMA_ONLY_LOCAL ? nullptr : &(this->GK),
             &(this->LM),
-            &(this->LOC),
             this->pelec->pot,
             this->kv,
             two_center_bundle_,
