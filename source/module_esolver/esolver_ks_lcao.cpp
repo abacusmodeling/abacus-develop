@@ -10,7 +10,8 @@
 #include "module_io/output_sk.h"
 #include "module_io/to_qo.h"
 #include "module_io/write_HS.h"
-#include "module_io/write_Vxc.hpp"
+#include "module_io/write_vxc.hpp"
+#include "module_io/write_eband_terms.hpp"
 #include "module_io/write_istate_info.h"
 #include "module_io/write_proj_band_lcao.h"
 #include "module_parameter/parameter.h"
@@ -514,6 +515,32 @@ void ESolver_KS_LCAO<TK, TR>::after_all_runners()
             this->kv,
             this->pelec->wg,
             GlobalC::GridD
+#ifdef __EXX
+            , this->exx_lri_double ? &this->exx_lri_double->Hexxs : nullptr
+            , this->exx_lri_complex ? &this->exx_lri_complex->Hexxs : nullptr
+#endif
+        );
+    }
+
+    if (PARAM.inp.out_eband_terms)
+    {
+        ModuleIO::write_eband_terms<TK, TR>(GlobalV::NSPIN,
+            GlobalV::NLOCAL,
+            GlobalV::DRANK,
+            &this->ParaV,
+            *this->psi,
+            GlobalC::ucell,
+            this->sf,
+            *this->pw_rho,
+            *this->pw_rhod,
+            GlobalC::ppcell.vloc,
+            *this->pelec->charge,
+            this->GG,
+            this->GK,
+            this->kv,
+            this->pelec->wg,
+            GlobalC::GridD,
+            this->two_center_bundle_
 #ifdef __EXX
             , this->exx_lri_double ? &this->exx_lri_double->Hexxs : nullptr
             , this->exx_lri_complex ? &this->exx_lri_complex->Hexxs : nullptr
