@@ -851,8 +851,11 @@ void ESolver_KS_LCAO<TK, TR>::update_pot(const int istep, const int iter)
             // calculation, noted by zhengdy-soc
             if (this->psi != nullptr && (istep % PARAM.inp.out_interval == 0))
             {
-                hamilt::MatrixBlock<TK> h_mat, s_mat;
+                hamilt::MatrixBlock<TK> h_mat;
+                hamilt::MatrixBlock<TK> s_mat;
+
                 this->p_hamilt->matrix(h_mat, s_mat);
+
                 if (hsolver::HSolverLCAO<TK>::out_mat_hs[0])
                 {
                     ModuleIO::save_mat(istep,
@@ -881,7 +884,7 @@ void ESolver_KS_LCAO<TK, TR>::update_pot(const int istep, const int iter)
 #ifdef __DEEPKS
                 if(GlobalV::deepks_out_labels && GlobalV::deepks_v_delta)
                 {
-                    GlobalC::ld.save_h_mat(h_mat.p,this->ParaV.nloc);
+                    DeePKS_domain::save_h_mat(h_mat.p, this->ParaV.nloc);
                 }
 #endif
             }
