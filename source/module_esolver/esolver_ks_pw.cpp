@@ -166,7 +166,6 @@ void ESolver_KS_PW<T, Device>::before_all_runners(const Input_para& inp, UnitCel
     }
 }
 
-
 template <typename T, typename Device>
 void ESolver_KS_PW<T, Device>::before_scf(const int istep)
 {
@@ -353,9 +352,11 @@ void ESolver_KS_PW<T, Device>::hamilt2density(const int istep, const int iter, c
         hsolver::DiagoIterAssist<T, Device>::PW_DIAG_THR = ethr;
         hsolver::DiagoIterAssist<T, Device>::PW_DIAG_NMAX = GlobalV::PW_DIAG_NMAX;
 
-        this->phsol->solve(this->p_hamilt,    // hamilt::Hamilt<T, Device>* pHamilt,
-                           this->kspw_psi[0], // psi::Psi<T, Device>& psi,
-                           this->pelec,       // elecstate::ElecState<T, Device>* pelec,
+      
+        hsolver::HSolverPW<T, Device> hsolver_pw_obj(this->pw_wfc, &this->wf, this->init_psi);
+        hsolver_pw_obj.solve(this->p_hamilt,      // hamilt::Hamilt<T, Device>* pHamilt,
+                           this->kspw_psi[0],        // psi::Psi<T, Device>& psi,
+                           this->pelec,               // elecstate::ElecState<T, Device>* pelec,
                            PARAM.inp.ks_solver,
                            PARAM.inp.calculation,
                            PARAM.inp.basis_type,
@@ -370,6 +371,8 @@ void ESolver_KS_PW<T, Device>::hamilt2density(const int istep, const int iter, c
                            hsolver::DiagoIterAssist<T, Device>::PW_DIAG_THR,
 
                            false);
+      
+        this->init_psi = true;
 
         if (PARAM.inp.out_bandgap)
         {
