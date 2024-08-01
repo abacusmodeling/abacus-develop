@@ -217,8 +217,7 @@ void Input_Conv::Convert()
 
     GlobalV::device_flag = base_device::information::get_device_flag(PARAM.inp.device,
                                                                      PARAM.inp.ks_solver,
-                                                                     PARAM.inp.basis_type,
-                                                                     PARAM.globalv.gamma_only_local);
+                                                                     PARAM.inp.basis_type);
 
     if (GlobalV::device_flag == "gpu" && PARAM.inp.basis_type == "pw")
     {
