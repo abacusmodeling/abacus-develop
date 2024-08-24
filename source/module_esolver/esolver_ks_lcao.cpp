@@ -26,6 +26,7 @@
 #include "module_elecstate/module_charge/symmetry_rho.h"
 #include "module_elecstate/occupy.h"
 #include "module_hamilt_lcao/hamilt_lcaodft/LCAO_domain.h" // need divide_HS_in_frag
+#include "module_hamilt_lcao/hamilt_lcaodft/hs_matrix_k.hpp"
 #include "module_hamilt_lcao/module_dftu/dftu.h"
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 #include "module_io/print_info.h"
@@ -1253,6 +1254,38 @@ void ESolver_KS_LCAO<TK, TR>::after_scf(const int istep)
                        GlobalV::MY_RANK,
                        GlobalV::NPROC);
         tqo.calculate();
+    }
+
+    if (PARAM.inp.out_mat_tk[0])
+    {
+        hamilt::HS_Matrix_K<TK> hsk(&pv, true);
+        hamilt::HContainer<TR> hR(&pv);
+        hamilt::Operator<TK>* ekinetic = 
+            new hamilt::EkineticNew<hamilt::OperatorLCAO<TK, TR>>(&hsk,
+                                                                  this->kv.kvec_d,
+                                                                  &hR,
+                                                                  &GlobalC::ucell,
+                                                                  &GlobalC::GridD,
+                                                                  two_center_bundle_.kinetic_orb.get());
+
+        const int nspin_k = (GlobalV::NSPIN == 2 ? 2 : 1);
+        for (int ik = 0; ik < this->kv.get_nks() / nspin_k; ++ik)
+        {
+            ekinetic->init(ik);
+            ModuleIO::save_mat(0,
+                               hsk.get_hk(),
+                               GlobalV::NLOCAL,
+                               false,
+                               PARAM.inp.out_mat_tk[1],
+                               1,
+                               GlobalV::out_app_flag,
+                               "T",
+                               "data-" + std::to_string(ik),
+                               this->pv,
+                               GlobalV::DRANK);
+        }
+
+        delete ekinetic;
     }
 }
 
