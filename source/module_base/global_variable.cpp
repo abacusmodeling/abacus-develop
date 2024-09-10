@@ -76,7 +76,6 @@ std::string global_kpoint_card = "KPT";
 
 
 // std::string global_pseudo_type = "auto";
-std::string global_epm_pseudo_card;
 std::string global_out_dir;
 std::string global_readin_dir; // zhengdy modified
 std::string global_stru_dir;
@@ -90,40 +89,15 @@ std::ofstream ofs_device; // output device info
 //----------------------------------------------------------
 // EXPLAIN : test level for each class
 //----------------------------------------------------------
-int test_input = 0;
-int test_winput = 0;
-int test_kpoint = 0;
-int test_atom = 0;
-int test_unitcell = 0;
-int test_symmetry = 0;
-
-int test_pw = 0;
-
-int test_wf = 0;
-int test_charge = 0;
-int test_potential = 0;
-int test_energy = 0;
 //----------------------------------------------------------
 // module_hamilt_lcao/hamilt_lcaodft
 //----------------------------------------------------------
-int test_atom_input = 0;
-int test_grid = 0;        // 4 now
-int test_grid_driver = 0; // 4 now
-int test_overlap = 0;
-int TEST_FORCE = 0;  // mohan add 2011-03-18
-int TEST_STRESS = 0; // zhengdy add 2018-05-16
-int test_gridt = 0;  // mohan add 2011-03-17
 //----------------------------------------------------------
 // src_pseudo
 //----------------------------------------------------------
-int test_pseudo_cell = 0; // 2 : output readin data
-int test_pp = 0;          // pp: pseudopotential
-int test_kmesh = 0;
-int test_relax_method = 0;
 //----------------------------------------------------------
 // src_tools
 //----------------------------------------------------------
-int test_deconstructor = 0;
 
 // added by zhengdy-soc
 bool NONCOLIN = false;

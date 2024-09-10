@@ -128,40 +128,16 @@ extern std::ofstream ofs_device;
 //==========================================================
 // EXPLAIN : test level for each class
 //==========================================================
-extern int test_input;
-extern int test_winput;
-extern int test_kpoint;
-extern int test_atom;
-extern int test_unitcell;
-extern int test_symmetry;
 
-extern int test_pw;
-
-extern int test_wf;
-extern int test_charge;
-extern int test_potential;
-extern int test_energy;
 //==========================================================
 // src_onscaling
 //==========================================================
-extern int test_atom_input;
-extern int test_grid;
-extern int test_grid_driver;
-extern int test_overlap;
-extern int TEST_FORCE;  // mohan add 2011-03-18
-extern int TEST_STRESS; // zhengdy add 2018-05-16
-extern int test_gridt;  // mohan add 2011-03-17
 //==========================================================
 // src_pseudo
 //==========================================================
-extern int test_pseudo_cell;
-extern int test_pp;
-extern int test_kmesh;
-extern int test_relax_method;
 //==========================================================
 // src_tools
 //==========================================================
-extern int test_deconstructor;
 
 
 extern bool deepks_out_labels; // (need libnpy) prints energy and force labels

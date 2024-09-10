@@ -28,7 +28,7 @@
 #endif
 
 UnitCell::UnitCell() {
-    if (GlobalV::test_unitcell) {
+    if (test_unitcell) {
         ModuleBase::TITLE("unitcell", "Constructor");
 }
     Coordinate = "Direct";
@@ -88,7 +88,7 @@ UnitCell::~UnitCell() {
 #include "module_base/parallel_common.h"
 #ifdef __MPI
 void UnitCell::bcast_unitcell() {
-    if (GlobalV::test_unitcell) {
+    if (test_unitcell) {
         ModuleBase::TITLE("UnitCell", "bcast_unitcell");
 }
     Parallel_Common::bcast_string(Coordinate);
@@ -169,7 +169,7 @@ void UnitCell::bcast_unitcell2() {
 #endif
 
 void UnitCell::print_cell(std::ofstream& ofs) const {
-    if (GlobalV::test_unitcell) {
+    if (test_unitcell) {
         ModuleBase::TITLE("UnitCell", "print_cell");
 }
 
@@ -195,7 +195,7 @@ void UnitCell::print_cell(std::ofstream& ofs) const {
 /*
 void UnitCell::print_cell_xyz(const std::string& fn) const
 {
-    if (GlobalV::test_unitcell)
+    if (test_unitcell)
         ModuleBase::TITLE("UnitCell", "print_cell_xyz");
 
     if (GlobalV::MY_RANK != 0)
@@ -1095,7 +1095,7 @@ void UnitCell::set_iat2iwt(const int& npol_in) {
 // Demand : atoms[].msh
 //======================
 void UnitCell::cal_meshx() {
-    if (GlobalV::test_pseudo_cell) {
+    if (PARAM.inp.test_pseudo_cell) {
         ModuleBase::TITLE("UnitCell", "cal_meshx");
 }
     this->meshx = 0;
@@ -1116,7 +1116,7 @@ void UnitCell::cal_meshx() {
 // 			atoms[].na
 //=========================
 void UnitCell::cal_natomwfc(std::ofstream& log) {
-    if (GlobalV::test_pseudo_cell) {
+    if (PARAM.inp.test_pseudo_cell) {
         ModuleBase::TITLE("UnitCell", "cal_natomwfc");
 }
 

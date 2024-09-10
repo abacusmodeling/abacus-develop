@@ -109,7 +109,7 @@ void Ions_Move_BFGS::restart_bfgs(const double& lat0)
         }
         trust_radius_old = sqrt(trust_radius_old);
 
-        if (GlobalV::test_relax_method)
+        if (PARAM.inp.test_relax_method)
         {
             ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "trust_radius_old (bohr)", trust_radius_old);
         }
@@ -224,7 +224,7 @@ void Ions_Move_BFGS::bfgs_routine(const double& lat0)
             // get optimized trust radius
             trust_radius = -0.5 * dE0s * trust_radius_old / den;
 
-            if (GlobalV::test_relax_method)
+            if (PARAM.inp.test_relax_method)
             {
                 ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "dE0s", dE0s);
                 ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "den", den);

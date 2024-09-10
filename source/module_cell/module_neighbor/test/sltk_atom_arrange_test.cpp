@@ -1,5 +1,8 @@
 #include "../sltk_atom_arrange.h"
 
+#define private public
+#include "module_parameter/parameter.h"
+#undef private
 #include <iostream>
 #include <string>
 
@@ -48,9 +51,8 @@ Magnetism::~Magnetism()
 
 void SetGlobalV()
 {
-    GlobalV::test_grid = 0;
-    GlobalV::test_grid_driver = 0;
-    GlobalV::test_deconstructor = 0;
+    PARAM.input.test_grid = false;
+    PARAM.input.test_deconstructor = false;
 }
 
 class SltkAtomArrangeTest : public testing::Test
@@ -108,7 +110,7 @@ TEST_F(SltkAtomArrangeTest, setsrNL)
 TEST_F(SltkAtomArrangeTest, Search)
 {
     ucell->check_dtau();
-    Grid_Driver grid_d(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
+    Grid_Driver grid_d(PARAM.input.test_deconstructor, PARAM.input.test_grid);
     ofs.open("test.out");
     bool test_only = true;
     atom_arrange::search(pbc, ofs, grid_d, *ucell, radius, test_atom_in, test_only);
@@ -124,7 +126,7 @@ TEST_F(SltkAtomArrangeTest, Search)
 TEST_F(SltkAtomArrangeTest, Filteradjs)
 {
     ucell->check_dtau();
-    Grid_Driver grid_d(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
+    Grid_Driver grid_d(PARAM.input.test_deconstructor, PARAM.input.test_grid);
     ofs.open("test.out");
     bool test_only = true;
     atom_arrange::search(pbc, ofs, grid_d, *ucell, radius, test_atom_in, test_only);

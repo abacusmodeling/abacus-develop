@@ -80,8 +80,7 @@ class UcellTest : public ::testing::Test
         pp_dir = "./support/";
         PARAM.input.pseudo_rcut = 15.0;
         PARAM.input.dft_functional = "default";
-        GlobalV::test_unitcell = 1;
-        GlobalV::test_pseudo_cell = 1;
+        PARAM.input.test_pseudo_cell = 1;
         GlobalV::NSPIN = 1;
         PARAM.input.basis_type = "pw";
     }

@@ -1,5 +1,4 @@
 #include "VL_in_pw.h"
-
 #include "module_parameter/parameter.h"
 #include "module_base/libm/libm.h"
 #include "module_base/math_integral.h"
@@ -78,8 +77,8 @@ void pseudopot_cell_vl::init_vloc(ModuleBase::matrix& vloc_in, const ModulePW::P
 
 void pseudopot_cell_vl::allocate(const int ngg)
 {
+	if(PARAM.inp.test_pp>0) ModuleBase::TITLE("pseudopot_cell_vl","allocate");
 	if(PARAM.inp.use_paw) return;
-	if(GlobalV::test_pp>0) ModuleBase::TITLE("pseudopot_cell_vl","allocate");
 	this->vloc.create(GlobalC::ucell.ntype, ngg);
 
 	delete[] numeric;

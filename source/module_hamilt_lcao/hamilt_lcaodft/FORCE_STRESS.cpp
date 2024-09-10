@@ -1,5 +1,6 @@
 #include "FORCE_STRESS.h"
 
+#include "module_parameter/parameter.h"
 #include "module_hamilt_lcao/module_dftu/dftu.h" //Quxin add for DFT+U on 20201029
 #include "module_hamilt_pw/hamilt_pwdft/global.h"
 #include "module_io/output_log.h"
@@ -489,8 +490,8 @@ void Force_Stress_LCAO<T>::getForceStress(const bool isforce,
             //-----------------------------
             // this->print_force("OVERLAP    FORCE",foverlap,1,ry);
             ModuleIO::print_force(GlobalV::ofs_running, GlobalC::ucell, "OVERLAP    FORCE", foverlap, false);
-            //  this->print_force("TVNL_DPHI  force",ftvnl_dphi,GlobalV::TEST_FORCE);
-            //  this->print_force("VNL_DBETA  force",fvnl_dbeta,GlobalV::TEST_FORCE);
+            //  this->print_force("TVNL_DPHI  force",ftvnl_dphi,PARAM.inp.test_force);
+            //  this->print_force("VNL_DBETA  force",fvnl_dbeta,PARAM.inp.test_force);
             // this->print_force("T_VNL      FORCE",ftvnl,1,ry);
             ModuleIO::print_force(GlobalV::ofs_running, GlobalC::ucell, "T_VNL      FORCE", ftvnl, false);
             ModuleIO::print_force(GlobalV::ofs_running, GlobalC::ucell, "VL_dPHI    FORCE", fvl_dphi, false);
@@ -498,7 +499,7 @@ void Force_Stress_LCAO<T>::getForceStress(const bool isforce,
             // this->print_force("VL_dVL     FORCE",fvl_dvl,1,ry);
             ModuleIO::print_force(GlobalV::ofs_running, GlobalC::ucell, "VL_dVL     FORCE", fvl_dvl, false);
             ModuleIO::print_force(GlobalV::ofs_running, GlobalC::ucell, "EWALD      FORCE", fewalds, false);
-            // 	this->print_force("VLOCAL     FORCE",fvlocal,GlobalV::TEST_FORCE);
+            // 	this->print_force("VLOCAL     FORCE",fvlocal,PARAM.inp.test_force);
             // this->print_force("EWALD      FORCE",fewalds,1,ry);
             ModuleIO::print_force(GlobalV::ofs_running, GlobalC::ucell, "NLCC       FORCE", fcc, false);
             ModuleIO::print_force(GlobalV::ofs_running, GlobalC::ucell, "SCC        FORCE", fscc, false);
@@ -689,30 +690,30 @@ void Force_Stress_LCAO<T>::getForceStress(const bool isforce,
             GlobalV::ofs_running << "\n PARTS OF STRESS: " << std::endl;
             GlobalV::ofs_running << std::setiosflags(std::ios::showpos);
             GlobalV::ofs_running << std::setiosflags(std::ios::fixed) << std::setprecision(10) << std::endl;
-            ModuleIO::print_stress("OVERLAP  STRESS", soverlap, GlobalV::TEST_STRESS, ry);
+            ModuleIO::print_stress("OVERLAP  STRESS", soverlap, PARAM.inp.test_stress, ry);
             // test
-            ModuleIO::print_stress("T        STRESS", stvnl_dphi, GlobalV::TEST_STRESS, ry);
-            ModuleIO::print_stress("VNL      STRESS", svnl_dbeta, GlobalV::TEST_STRESS, ry);
+            ModuleIO::print_stress("T        STRESS", stvnl_dphi, PARAM.inp.test_stress, ry);
+            ModuleIO::print_stress("VNL      STRESS", svnl_dbeta, PARAM.inp.test_stress, ry);
 
-            ModuleIO::print_stress("T_VNL    STRESS", stvnl, GlobalV::TEST_STRESS, ry);
+            ModuleIO::print_stress("T_VNL    STRESS", stvnl, PARAM.inp.test_stress, ry);
 
-            ModuleIO::print_stress("VL_dPHI  STRESS", svl_dphi, GlobalV::TEST_STRESS, ry);
-            ModuleIO::print_stress("VL_dVL   STRESS", sigmadvl, GlobalV::TEST_STRESS, ry);
-            ModuleIO::print_stress("HAR      STRESS", sigmahar, GlobalV::TEST_STRESS, ry);
+            ModuleIO::print_stress("VL_dPHI  STRESS", svl_dphi, PARAM.inp.test_stress, ry);
+            ModuleIO::print_stress("VL_dVL   STRESS", sigmadvl, PARAM.inp.test_stress, ry);
+            ModuleIO::print_stress("HAR      STRESS", sigmahar, PARAM.inp.test_stress, ry);
 
-            ModuleIO::print_stress("EWALD    STRESS", sigmaewa, GlobalV::TEST_STRESS, ry);
-            ModuleIO::print_stress("cc       STRESS", sigmacc, GlobalV::TEST_STRESS, ry);
-            //		ModuleIO::print_stress("NLCC       STRESS",sigmacc,GlobalV::TEST_STRESS,ry);
-            ModuleIO::print_stress("XC       STRESS", sigmaxc, GlobalV::TEST_STRESS, ry);
+            ModuleIO::print_stress("EWALD    STRESS", sigmaewa, PARAM.inp.test_stress, ry);
+            ModuleIO::print_stress("cc       STRESS", sigmacc, PARAM.inp.test_stress, ry);
+            //		ModuleIO::print_stress("NLCC       STRESS",sigmacc,PARAM.inp.test_stress,ry);
+            ModuleIO::print_stress("XC       STRESS", sigmaxc, PARAM.inp.test_stress, ry);
             if (vdw_solver != nullptr)
             {
-                ModuleIO::print_stress("VDW      STRESS", sigmaxc, GlobalV::TEST_STRESS, ry);
+                ModuleIO::print_stress("VDW      STRESS", sigmaxc, PARAM.inp.test_stress, ry);
             }
             if (PARAM.inp.dft_plus_u)
             {
-                ModuleIO::print_stress("DFTU     STRESS", stress_dftu, GlobalV::TEST_STRESS, ry);
+                ModuleIO::print_stress("DFTU     STRESS", stress_dftu, PARAM.inp.test_stress, ry);
             }
-            ModuleIO::print_stress("TOTAL    STRESS", scs, GlobalV::TEST_STRESS, ry);
+            ModuleIO::print_stress("TOTAL    STRESS", scs, PARAM.inp.test_stress, ry);
 
         } // end of test
         GlobalV::ofs_running << std::setiosflags(std::ios::left);

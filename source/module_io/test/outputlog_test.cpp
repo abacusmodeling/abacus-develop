@@ -217,7 +217,7 @@ TEST(OutputVacuumLevelTest, OutputVacuumLevel)
 TEST(PrintForce, PrintForce)
 {
     UnitCell ucell;
-    GlobalV::TEST_FORCE = 1;
+    PARAM.input.test_force = 1;
     std::string name = "test";
     ModuleBase::matrix force(2, 3);
     force(0, 0) = 1.0;

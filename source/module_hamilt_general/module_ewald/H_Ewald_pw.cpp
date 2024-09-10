@@ -1,4 +1,5 @@
 #include "H_Ewald_pw.h"
+#include "module_parameter/parameter.h"
 #include "module_base/mymath.h" // use heapsort
 #include "module_parameter/parameter.h"
 #include "dnrm2.h"
@@ -53,7 +54,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
     // buffer variable
     // used to optimize alpha
 
-	if(GlobalV::test_energy) 
+	if(PARAM.inp.test_energy) 
     {
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"mxr",mxr);
     }
@@ -82,7 +83,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
             charge += cell.atoms[it].na * cell.atoms[it].ncpp.zv;//mohan modify 2007-11-7
         }
     }
-    if(GlobalV::test_energy) 
+    if(PARAM.inp.test_energy) 
     {
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total ionic charge",charge);
     }
@@ -103,7 +104,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
                      erfc(sqrt(cell.tpiba2 * rho_basis->ggecut / 4.0 / alpha));
     }
     while (upperbound > 1.0e-7);
-    if(GlobalV::test_energy) 
+    if(PARAM.inp.test_energy) 
     {
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"alpha",alpha);
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Upper bound",upperbound);
@@ -185,7 +186,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
     ewaldr = 0.0;
 #ifdef __MPI
     rmax = 4.0 / sqrt(alpha) / cell.lat0;
-    if(GlobalV::test_energy) 
+    if(PARAM.inp.test_energy) 
     {
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rmax(unit lat0)",rmax);
     }
@@ -221,7 +222,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
             // at-->cell.latvec, bg-->G
             // and sum to the real space part
 
-            if(GlobalV::test_energy>1)
+            if(PARAM.inp.test_energy>1)
             {
                 ModuleBase::GlobalFunc::OUT("dtau.x",dtau.x);
                 ModuleBase::GlobalFunc::OUT("dtau.y",dtau.y);
@@ -244,7 +245,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
                             erfc(sqrt(alpha) * rr) / rr;
                 }
             }
-            if (GlobalV::test_energy>1) 
+            if (PARAM.inp.test_energy>1) 
             {
                 ModuleBase::GlobalFunc::OUT("ewaldr",ewaldr);
             }
@@ -254,7 +255,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
     if (rho_basis->ig_gge0 >= 0)
     {	
         rmax = 4.0 / sqrt(alpha) / cell.lat0;
-		if(GlobalV::test_energy) ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rmax(unit lat0)",rmax);
+		if(PARAM.inp.test_energy) ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rmax(unit lat0)",rmax);
         // with this choice terms up to ZiZj*erfc(4) are counted (erfc(4)=2x10^-8
         int nt1=0;
         int nt2=0;
@@ -274,7 +275,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
                         // at-->cell.latvec, bg-->G
                         // and sum to the real space part
 
-                        if (GlobalV::test_energy>1)
+                        if (PARAM.inp.test_energy>1)
                         {
                             ModuleBase::GlobalFunc::OUT("dtau.x",dtau.x);
                             ModuleBase::GlobalFunc::OUT("dtau.y",dtau.y);
@@ -297,7 +298,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
                                         erfc(sqrt(alpha) * rr) / rr;
                             }
                         } // enddo
-                        if (GlobalV::test_energy>1) ModuleBase::GlobalFunc::OUT("ewaldr",ewaldr);
+                        if (PARAM.inp.test_energy>1) ModuleBase::GlobalFunc::OUT("ewaldr",ewaldr);
                     } // enddo
                 } // enddo
             } // nt2
@@ -310,7 +311,7 @@ double H_Ewald_pw::compute_ewald(const UnitCell& cell,
 	// mohan fix bug 2010-07-26
     Parallel_Reduce::reduce_pool(ewalds);
 
-    if (GlobalV::test_energy>1)
+    if (PARAM.inp.test_energy>1)
     {
         ModuleBase::GlobalFunc::OUT("ewaldg",ewaldg);
         ModuleBase::GlobalFunc::OUT("ewaldr",ewaldr);
@@ -401,7 +402,7 @@ void H_Ewald_pw::rgen(
 
     nm3 = (int)(dnrm2(3, bg1, 1) * rmax + 2);
 
-    if (GlobalV::test_energy>1)
+    if (PARAM.inp.test_energy>1)
     {
         ModuleBase::GlobalFunc::OUT("nm1",nm1);
         ModuleBase::GlobalFunc::OUT("nm2",nm2);
