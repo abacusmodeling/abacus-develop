@@ -156,16 +156,20 @@ void ESolver_KS_LCAO<TK, TR>::before_all_runners(const Input_para& inp, UnitCell
     // DMR is not initialized here, it will be constructed in each before_scf
     dynamic_cast<elecstate::ElecStateLCAO<TK>*>(this->pelec)->init_DM(&this->kv, &(this->pv), PARAM.inp.nspin);
 
-    // 5) initialize Hamilt in LCAO
-    // * allocate H and S matrices according to computational resources
-    // * set the 'trace' between local H/S and global H/S
-    LCAO_domain::divide_HS_in_frag(PARAM.globalv.gamma_only_local, pv, this->kv.get_nks(), orb_);
+    //! 5) initialize the Hamiltonian (H) and overlap (S) matrices in LCAO basis
+    //! set the 'trace' between local H/S and global H/S
+    LCAO_domain::divide_HS_in_frag(PARAM.globalv.gamma_only_local, 
+                                   pv, 
+                                   this->kv.get_nks(), 
+                                   orb_);
 
 #ifdef __EXX
     // 6) initialize exx
     // PLEASE simplify the Exx_Global interface
-    if (PARAM.inp.calculation == "scf" || PARAM.inp.calculation == "relax" || PARAM.inp.calculation == "cell-relax"
-        || PARAM.inp.calculation == "md")
+    if (PARAM.inp.calculation == "scf" ||
+        PARAM.inp.calculation == "relax" || 
+        PARAM.inp.calculation == "cell-relax" || 
+        PARAM.inp.calculation == "md")
     {
         if (GlobalC::exx_info.info_global.cal_exx)
         {
@@ -188,11 +192,15 @@ void ESolver_KS_LCAO<TK, TR>::before_all_runners(const Input_para& inp, UnitCell
     // 7) initialize DFT+U
     if (PARAM.inp.dft_plus_u)
     {
-        GlobalC::dftu.init(ucell, &this->pv, this->kv.get_nks(), orb_);
+        GlobalC::dftu.init(ucell, 
+                           &this->pv, 
+                           this->kv.get_nks(), 
+                           orb_);
     }
 
     // 8) initialize ppcell
-    GlobalC::ppcell.init_vloc(GlobalC::ppcell.vloc, this->pw_rho);
+    GlobalC::ppcell.init_vloc(GlobalC::ppcell.vloc, 
+                              this->pw_rho);
 
     // 9) inititlize the charge density
     this->pelec->charge->allocate(PARAM.inp.nspin);
@@ -214,15 +222,16 @@ void ESolver_KS_LCAO<TK, TR>::before_all_runners(const Input_para& inp, UnitCell
     // 11) initialize deepks
     if (PARAM.inp.deepks_scf)
     {
-        // load the DeePKS model from deep neural network
+        //! load the DeePKS model from deep neural network
         GlobalC::ld.load_model(PARAM.inp.deepks_model);
-        // read pdm from file for NSCF or SCF-restart, do it only once in whole calculation
+        
+        //! read pdm from file for NSCF or SCF-restart, do it only once in whole calculation
         GlobalC::ld.read_projected_DM((PARAM.inp.init_chg == "file"), PARAM.inp.deepks_equiv, *orb_.Alpha);
     }
 #endif
 
-    // 12) set occupations
-    // tddft does not need to set occupations in the first scf
+    //! 12) set occupations
+    //! tddft does not need to set occupations in the first scf
     if (PARAM.inp.ocp && inp.esolver_type != "tddft")
     {
         this->pelec->fixed_weights(PARAM.inp.ocp_kb, PARAM.inp.nbands, PARAM.inp.nelec);
@@ -344,7 +353,9 @@ void ESolver_KS_LCAO<TK, TR>::after_all_runners()
     GlobalV::ofs_running << " !FINAL_ETOT_IS " << this->pelec->f_en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
-    if (PARAM.inp.out_dos != 0 || PARAM.inp.out_band[0] != 0 || PARAM.inp.out_proj_band != 0)
+    if (PARAM.inp.out_dos != 0 || 
+        PARAM.inp.out_band[0] != 0 || 
+        PARAM.inp.out_proj_band != 0)
     {
         GlobalV::ofs_running << "\n\n\n\n";
         GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -376,14 +387,21 @@ void ESolver_KS_LCAO<TK, TR>::after_all_runners()
                              << std::endl;
         GlobalV::ofs_running << "\n\n\n\n";
     }
+    
     // qianrui modify 2020-10-18
-    if (PARAM.inp.calculation == "scf" || PARAM.inp.calculation == "md" || PARAM.inp.calculation == "relax")
+    if (PARAM.inp.calculation == "scf" || 
+        PARAM.inp.calculation == "md" || 
+        PARAM.inp.calculation == "relax")
     {
-        ModuleIO::write_istate_info(this->pelec->ekb, this->pelec->wg, this->kv, &(GlobalC::Pkpoints));
+        ModuleIO::write_istate_info(this->pelec->ekb, 
+                                    this->pelec->wg, 
+                                    this->kv, 
+                                    &(GlobalC::Pkpoints));
     }
 
     const int nspin0 = (PARAM.inp.nspin == 2) ? 2 : 1;
 
+    //! print out band information
     if (PARAM.inp.out_band[0])
     {
         for (int is = 0; is < nspin0; is++)
@@ -400,9 +418,10 @@ void ESolver_KS_LCAO<TK, TR>::after_all_runners()
                                 this->kv,
                                 &(GlobalC::Pkpoints));
         }
-    } // out_band
+    }
 
-    if (PARAM.inp.out_proj_band) // Projeced band structure added by jiyy-2022-4-20
+    //! Projeced band structure added by jiyy-2022-4-20
+    if (PARAM.inp.out_proj_band)
     {
         ModuleIO::write_proj_band_lcao(this->psi, this->pv, this->pelec, this->kv, GlobalC::ucell, this->p_hamilt);
     }
@@ -572,25 +591,6 @@ void ESolver_KS_LCAO<TK, TR>::iter_init(const int istep, const int iter)
             // calculate the local potential(rho) again.
             // the grid integration will do in later grid integration.
 
-            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // a puzzle remains here.
-            // if I don't renew potential,
-            // The scf_thr is very small.
-            // OneElectron, Hartree and
-            // Exc energy are all correct
-            // except the band energy.
-            //
-            // solved by mohan 2010-09-10
-            // there are there rho here:
-            // rho1: formed by read in orbitals.
-            // rho2: atomic rho, used to construct H
-            // rho3: generated by after diagonalize
-            // here converged because rho3 and rho1
-            // are very close.
-            // so be careful here, make sure
-            // rho1 and rho2 are the same rho.
-            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             if (PARAM.inp.nspin == 4)
             {
                 GlobalC::ucell.cal_ux();
@@ -686,16 +686,17 @@ void ESolver_KS_LCAO<TK, TR>::hamilt2density_single(int istep, int iter, double 
 {
     ModuleBase::TITLE("ESolver_KS_LCAO", "hamilt2density_single");
 
-    // reset energy
+    //! reset energy
     this->pelec->f_en.eband = 0.0;
     this->pelec->f_en.demet = 0.0;
     bool skip_charge = PARAM.inp.calculation == "nscf" ? true : false;
 
-    // run the inner lambda loop to contrain atomic moments with the DeltaSpin method
+    //! run the inner lambda loop to contrain atomic moments with the DeltaSpin method
     bool skip_solve = false;
     if (PARAM.inp.sc_mag_switch)
     {
         spinconstrain::SpinConstrain<TK>& sc = spinconstrain::SpinConstrain<TK>::getScInstance();
+        
         if(!sc.mag_converged() && this->drho>0 && this->drho < PARAM.inp.sc_scf_thr)
         {
             // optimize lambda to get target magnetic moments, but the lambda is not near target
@@ -853,8 +854,7 @@ void ESolver_KS_LCAO<TK, TR>::iter_finish(const int istep, int& iter)
 {
     ModuleBase::TITLE("ESolver_KS_LCAO", "iter_finish");
 
-    // 6) calculate the local occupation number matrix and energy correction in
-    // DFT+U
+    // 6) calculate local occupation number matrix and energy correction in DFT+U
     if (PARAM.inp.dft_plus_u)
     {
         // only old DFT+U method should calculated energy correction in esolver,
@@ -926,15 +926,8 @@ void ESolver_KS_LCAO<TK, TR>::iter_finish(const int istep, int& iter)
                                                                                iter,
                                                                                istep,
                                                                                this->conv_esolver)
-                                                  : this->exc->exx_iter_finish(this->kv,
-                                                                               GlobalC::ucell,
-                                                                               *this->p_hamilt,
-                                                                               *this->pelec,
-                                                                               *this->p_chgmix,
-                                                                               this->scf_ene_thr,
-                                                                               iter,
-                                                                               istep,
-                                                                               this->conv_esolver);
+            : this->exc->exx_iter_finish(this->kv,GlobalC::ucell,*this->p_hamilt,*this->pelec,
+                *this->p_chgmix,this->scf_ene_thr,iter,istep,this->conv_esolver);
         }
     }
 #endif
