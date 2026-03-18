@@ -68,11 +68,13 @@ void Stochastic_WF<T, Device>::init_sto_orbitals(const int seed_in)
 {
     if (seed_in == 0 || seed_in == -1)
     {
-        srand((unsigned)time(nullptr) + GlobalV::MY_RANK * 10000); // GlobalV global variables are reserved
+        srand(static_cast<unsigned>(time(nullptr))
+              + GlobalV::MY_RANK * GlobalConst::RANDOM_SEED_OFFSET); // GlobalV global variables are reserved
     }
     else
     {
-        srand((unsigned)std::abs(seed_in) + (GlobalV::MY_BNDGROUP * GlobalV::NPROC_IN_BNDGROUP + GlobalV::RANK_IN_BPGROUP) * 10000);
+        srand((unsigned)std::abs(seed_in)
+              + (GlobalV::MY_BNDGROUP * GlobalV::NPROC_IN_BNDGROUP + GlobalV::RANK_IN_BPGROUP) * 10000);
     }
 
     this->allocate_chi0();
@@ -374,9 +376,7 @@ void Stochastic_WF<T, Device>::sync_chi0()
     Device* ctx = {};
     if (base_device::get_device_type<Device>(ctx) == base_device::GpuDevice)
     {
-        syncmem_h2d_op()(this->chi0->get_pointer(),
-                         this->chi0_cpu->get_pointer(),
-                         this->chi0_cpu->size());
+        syncmem_h2d_op()(this->chi0->get_pointer(), this->chi0_cpu->get_pointer(), this->chi0_cpu->size());
     }
 }
 
