@@ -1,5 +1,5 @@
 #include "sto_wf.h"
-
+#include <random>
 #include "source_base/memory.h"
 #include "source_io/module_parameter/parameter.h"
 
@@ -136,11 +136,13 @@ void Stochastic_WF<T, Device>::update_sto_orbitals(const int seed_in)
 {
     const int nchi = PARAM.inp.nbands_sto;
     this->chi0_cpu->fix_k(0);
+    static std::mt19937 gen(std::random_device{}());
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
     if (seed_in >= 0)
     {
         for (int i = 0; i < this->chi0_cpu->size(); ++i)
-        {
-            const double phi = 2 * ModuleBase::PI * rand() / double(RAND_MAX);
+	{
+	    const double phi = 2 * ModuleBase::PI * dist(gen);
             this->chi0_cpu->get_pointer()[i] = std::complex<double>(cos(phi), sin(phi)) / sqrt(double(nchi));
         }
     }
@@ -148,7 +150,7 @@ void Stochastic_WF<T, Device>::update_sto_orbitals(const int seed_in)
     {
         for (int i = 0; i < this->chi0_cpu->size(); ++i)
         {
-            if (rand() / double(RAND_MAX) < 0.5)
+            if (dist(gen) < 0.5)
             {
                 this->chi0_cpu->get_pointer()[i] = -1.0 / sqrt(double(nchi));
             }
