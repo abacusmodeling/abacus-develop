@@ -1,5 +1,5 @@
 #include "./input.h"
-
+#include <string>  
 void Input::readInput()
 {
     std::ifstream ifs("nnINPUT", std::ios::in);
@@ -9,7 +9,7 @@ void Input::readInput()
         exit(0);
     }
 
-    char word[80];
+    std::string word;
     int ierr = 0;
 
     ifs.rdstate();
