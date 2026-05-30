@@ -312,63 +312,180 @@ void dm_2d_to_gint(
         }
     } else  // NSPIN=4 case
     {
+        if (std::is_same<TGint, double>::value && std::is_same<TDM, double>::value)
+        {
+            dm_2d_to_gint_nspin4_blocked(
+                *reinterpret_cast<const std::vector<HContainer<double>*>*>(&dm),
+                *reinterpret_cast<std::vector<HContainer<double>>*>(&dm_gint),
+                gint_info);
+        }else
+        {
+            // is=0:↑↑, 1:↑↓, 2:↓↑, 3:↓↓
+            const int row_set[4] = {0, 0, 1, 1};
+            const int col_set[4] = {0, 1, 0, 1};
+            int mg = dm[0]->get_paraV()->get_global_row_size()/2;
+            int ng = dm[0]->get_paraV()->get_global_col_size()/2;
+            int nb = dm[0]->get_paraV()->get_block_size()/2;
+            const UnitCell* ucell = gint_info.get_ucell();
+            auto ijr_info = dm[0]->get_ijr_info();
+    #ifdef __MPI
+            int blacs_ctxt = dm[0]->get_paraV()->blacs_ctxt;
+            std::vector<int> iat2iwt(ucell->nat);
+            for (int iat = 0; iat < ucell->nat; iat++) {
+                iat2iwt[iat] = ucell->get_iat2iwt()[iat]/2;
+            }
+            Parallel_Orbitals pv{};
+            pv.set(mg, ng, nb, blacs_ctxt);
+            pv.set_atomic_trace(iat2iwt.data(), ucell->nat, mg);
+            HContainer<TDM> dm2d_tmp(&pv, nullptr, &ijr_info);
+    #else
+            auto* dm2d_tmp = new hamilt::HContainer<TDM>(ucell->nat);
+            dm2d_tmp -> insert_ijrs(&ijr_info, *ucell);
+            dm2d_tmp -> allocate(nullptr, true);
+    #endif
+            for (int is = 0; is < 4; is++){
+                for (int iap = 0; iap < dm[0]->size_atom_pairs(); ++iap) {
+                    auto& ap = dm[0]->get_atom_pair(iap);
+                    int iat1 = ap.get_atom_i();
+                    int iat2 = ap.get_atom_j();
+                    for (int ir = 0; ir < ap.get_R_size(); ++ir) {
+                        const ModuleBase::Vector3<int> r_index = ap.get_R_index(ir);
+    #ifdef __MPI
+                        TDM* matrix_out = dm2d_tmp.find_matrix(iat1, iat2, r_index)->get_pointer();
+    #else
+                        TDM* matrix_out = dm2d_tmp->find_matrix(iat1, iat2, r_index)->get_pointer();
+    #endif
+                        TDM* matrix_in = ap.get_pointer(ir);
+                        for (int irow = 0; irow < ap.get_row_size()/2; irow ++) {
+                            for (int icol = 0; icol < ap.get_col_size()/2; icol ++) {
+                                int index_i = irow* ap.get_col_size()/2 + icol;
+                                int index_j = (irow*2+row_set[is]) * ap.get_col_size() + icol*2+col_set[is];
+                                matrix_out[index_i] = matrix_in[index_j];
+                            }
+                        }
+                    }
+                }
+    #ifdef __MPI
+                gather_dm(dm2d_tmp, dm_gint[is], gint_info);
+    #else
+                gather_dm(*dm2d_tmp, dm_gint[is], gint_info);
+    #endif
+            }//is=4
+    #ifndef __MPI
+            delete dm2d_tmp;
+    #endif
+        }   
+    }
+    ModuleBase::timer::end("Gint", "dm_2d_to_gint");
+}
 
-        // is=0:↑↑, 1:↑↓, 2:↓↑, 3:↓↓
-        const int row_set[4] = {0, 0, 1, 1};
-        const int col_set[4] = {0, 1, 0, 1};
-        int mg = dm[0]->get_paraV()->get_global_row_size()/2;
-        int ng = dm[0]->get_paraV()->get_global_col_size()/2;
-        int nb = dm[0]->get_paraV()->get_block_size()/2;
-        const UnitCell* ucell = gint_info.get_ucell();
-        auto ijr_info = dm[0]->get_ijr_info();
+// ============================================================
+// dm_2d_to_gint_nspin4_blocked — 分块优化版本（nspin=4, double）
+// 仅替换内部重排循环，外部数据流与原始代码完全一致
+// ============================================================
+void dm_2d_to_gint_nspin4_blocked(
+    const std::vector<HContainer<double>*>& dm,
+    std::vector<HContainer<double>>& dm_gint,
+    const GintInfo& gint_info,
+    int tile_size)
+{
+    ModuleBase::TITLE("Gint", "dm_2d_to_gint_blocked");
+    ModuleBase::timer::start("Gint", "dm_2d_to_gint_blocked");
+
+    const int row_set[4] = {0, 0, 1, 1};
+    const int col_set[4] = {0, 1, 0, 1};
+
+    const UnitCell* ucell = gint_info.get_ucell();
+    auto ijr_info = dm[0]->get_ijr_info();
+
 #ifdef __MPI
-        int blacs_ctxt = dm[0]->get_paraV()->blacs_ctxt;
-        std::vector<int> iat2iwt(ucell->nat);
-        for (int iat = 0; iat < ucell->nat; iat++) {
-            iat2iwt[iat] = ucell->get_iat2iwt()[iat]/2;
-        }
-        Parallel_Orbitals pv{};
-        pv.set(mg, ng, nb, blacs_ctxt);
-        pv.set_atomic_trace(iat2iwt.data(), ucell->nat, mg);
-        HContainer<TDM> dm2d_tmp(&pv, nullptr, &ijr_info);
+    int mg = dm[0]->get_paraV()->get_global_row_size() / 2;
+    int ng = dm[0]->get_paraV()->get_global_col_size() / 2;
+    int nb = dm[0]->get_paraV()->get_block_size() / 2;
+    int blacs_ctxt = dm[0]->get_paraV()->blacs_ctxt;
+    std::vector<int> iat2iwt(ucell->nat);
+    for (int iat = 0; iat < ucell->nat; iat++)
+    {
+        iat2iwt[iat] = ucell->get_iat2iwt()[iat] / 2;
+    }
+    Parallel_Orbitals pv{};
+    pv.set(mg, ng, nb, blacs_ctxt);
+    pv.set_atomic_trace(iat2iwt.data(), ucell->nat, mg);
+    HContainer<double> dm2d_tmp(&pv, nullptr, &ijr_info);
 #else
-        auto* dm2d_tmp = new hamilt::HContainer<TDM>(ucell->nat);
-        dm2d_tmp -> insert_ijrs(&ijr_info, *ucell);
-        dm2d_tmp -> allocate(nullptr, true);
+    HContainer<double> dm2d_tmp(ucell->nat);
+    dm2d_tmp.insert_ijrs(&ijr_info, *ucell);
+    dm2d_tmp.allocate(nullptr, true);
 #endif
-         for (int is = 0; is < 4; is++){
-            for (int iap = 0; iap < dm[0]->size_atom_pairs(); ++iap) {
-                auto& ap = dm[0]->get_atom_pair(iap);
-                int iat1 = ap.get_atom_i();
-                int iat2 = ap.get_atom_j();
-                for (int ir = 0; ir < ap.get_R_size(); ++ir) {
-                    const ModuleBase::Vector3<int> r_index = ap.get_R_index(ir);
+
+    for (int is = 0; is < 4; is++)
+    {
+        // ==========================================
+        // 步骤 1: 从 2D 循环分布矩阵抽取 2×2 子块
+        // （与原始代码逻辑完全相同，保持数据流一致）
+        // ==========================================
+        #pragma omp parallel for schedule(dynamic, 1)
+        for (int iap = 0; iap < dm[0]->size_atom_pairs(); ++iap)
+        {
+            auto& ap = dm[0]->get_atom_pair(iap);
+            int iat1 = ap.get_atom_i();
+            int iat2 = ap.get_atom_j();
+            int half_row = ap.get_row_size() / 2;
+            int half_col = ap.get_col_size() / 2;
+            int full_col = ap.get_col_size();
+
+            for (int ir = 0; ir < ap.get_R_size(); ++ir)
+            {
+                const ModuleBase::Vector3<int> r_index = ap.get_R_index(ir);
+                const double* __restrict matrix_in = ap.get_pointer(ir);
 #ifdef __MPI
-                    TDM* matrix_out = dm2d_tmp.find_matrix(iat1, iat2, r_index)->get_pointer();
+                double* __restrict matrix_out =
+                    dm2d_tmp.find_matrix(iat1, iat2, r_index)->get_pointer();
 #else
-                    TDM* matrix_out = dm2d_tmp->find_matrix(iat1, iat2, r_index)->get_pointer();
+                double* __restrict matrix_out =
+                    dm2d_tmp.find_matrix(iat1, iat2, r_index)->get_pointer();
 #endif
-                    TDM* matrix_in = ap.get_pointer(ir);
-                    for (int irow = 0; irow < ap.get_row_size()/2; irow ++) {
-                        for (int icol = 0; icol < ap.get_col_size()/2; icol ++) {
-                            int index_i = irow* ap.get_col_size()/2 + icol;
-                            int index_j = (irow*2+row_set[is]) * ap.get_col_size() + icol*2+col_set[is];
-                            matrix_out[index_i] = matrix_in[index_j];
+
+                // ==========================================
+                // 步骤 2: 分块重排（核心优化点）
+                // 块内同时处理当前自旋分量
+                // ==========================================
+                for (int i_tile = 0; i_tile < half_row; i_tile += tile_size)
+                {
+                    int i_end = std::min(i_tile + tile_size, half_row);
+                    for (int j_tile = 0; j_tile < half_col; j_tile += tile_size)
+                    {
+                        int j_end = std::min(j_tile + tile_size, half_col);
+
+                        for (int irow = i_tile; irow < i_end; irow++)
+                        {
+                            int idx_out_base = irow * half_col;
+                            int idx_in_base =
+                                (irow * 2 + row_set[is]) * full_col + col_set[is];
+
+                            // 内层循环：连续读取 matrix_in（stride=2，cache 友好）
+                            for (int icol = j_tile; icol < j_end; icol++)
+                            {
+                                matrix_out[idx_out_base + icol] =
+                                    matrix_in[idx_in_base + icol * 2];
+                            }
                         }
                     }
                 }
             }
+        }
+
+        // ==========================================
+        // 步骤 3: MPI 同步（与原始代码完全相同）
+        // ==========================================
 #ifdef __MPI
-            gather_dm(dm2d_tmp, dm_gint[is], gint_info);
+        gather_dm(dm2d_tmp, dm_gint[is], gint_info);
 #else
-            gather_dm(*dm2d_tmp, dm_gint[is], gint_info);
-#endif
-        }//is=4
-#ifndef __MPI
-        delete dm2d_tmp;
+        gather_dm(dm2d_tmp, dm_gint[is], gint_info);
 #endif
     }
-    ModuleBase::timer::end("Gint", "dm_2d_to_gint");
+
+    ModuleBase::timer::end("Gint", "dm_2d_to_gint_blocked");
 }
 
 int globalIndex(int localindex, int nblk, int nprocs, int myproc)
