@@ -53,14 +53,23 @@ void Gint_rho::cal_rho_(
     const std::vector<HContainer<Real>>& dm_gint_vec,
     const std::vector<double*>& rho_data) const
 {
+    int max_phi_len = 0;
+    for (int i = 0; i < gint_info_->get_bgrids_num(); i++)
+    {
+        const auto& biggrid = gint_info_->get_biggrids()[i];
+        if (biggrid->get_atoms().empty()) continue;
+        int len = biggrid->get_mgrids_num() * biggrid->get_phi_len();
+        if (len > max_phi_len) max_phi_len = len;
+    }
+
 #pragma omp parallel
     {
         PhiOperator phi_op;
-        std::vector<Real> phi;
+        std::vector<Real> phi(max_phi_len);
         // phi_dm is always double: phi_mul_dm writes the cast-to-double result
         // into it, and phi_dot_phi reads it as fp64 (so the rho reduction's
         // right-hand side is uniformly fp64 even on the fp32 path).
-        std::vector<double> phi_dm;
+        std::vector<double> phi_dm(max_phi_len);
 #pragma omp for schedule(dynamic)
         for (int i = 0; i < gint_info_->get_bgrids_num(); i++)
         {
@@ -70,9 +79,6 @@ void Gint_rho::cal_rho_(
                 continue;
             }
             phi_op.set_bgrid(biggrid);
-            const int phi_len = phi_op.get_rows() * phi_op.get_cols();
-            phi.resize(phi_len);
-            phi_dm.resize(phi_len);
             phi_op.set_phi(phi.data());
             for (int is = 0; is < nspin_; is++)
             {

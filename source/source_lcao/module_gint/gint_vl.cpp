@@ -61,11 +61,20 @@ void Gint_vl::cal_gint_impl_()
     const Real* vr_eff = get_vr_eff_data_(
         vr_eff_, gint_info_->get_local_mgrid_num(), vr_eff_buffer);
 
+    int max_phi_len = 0;
+    for (int i = 0; i < gint_info_->get_bgrids_num(); i++)
+    {
+        const auto& biggrid = gint_info_->get_biggrids()[i];
+        if (biggrid->get_atoms().empty()) continue;
+        int len = biggrid->get_mgrids_num() * biggrid->get_phi_len();
+        if (len > max_phi_len) max_phi_len = len;
+    }
+
 #pragma omp parallel
     {
         PhiOperator phi_op;
-        std::vector<Real> phi;
-        std::vector<Real> phi_vldr3;
+        std::vector<Real> phi(max_phi_len);
+        std::vector<Real> phi_vldr3(max_phi_len);
 #pragma omp for schedule(dynamic)
         for (int i = 0; i < gint_info_->get_bgrids_num(); i++)
         {
@@ -75,9 +84,6 @@ void Gint_vl::cal_gint_impl_()
                 continue;
             }
             phi_op.set_bgrid(biggrid);
-            const int phi_len = phi_op.get_rows() * phi_op.get_cols();
-            phi.resize(phi_len);
-            phi_vldr3.resize(phi_len);
             phi_op.set_phi(phi.data());
             phi_op.phi_mul_vldr3(vr_eff, static_cast<Real>(dr3_), phi.data(), phi_vldr3.data());
             phi_op.phi_mul_phi(phi.data(), phi_vldr3.data(), hr_gint, PhiOperator::TriPart::Upper);
