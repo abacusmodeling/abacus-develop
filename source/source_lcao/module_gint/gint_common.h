@@ -27,6 +27,12 @@ namespace ModuleGint
         const GintInfo& gint_info,
         const std::vector<HContainer<TDM>*>& dm,
         std::vector<HContainer<TGint>>& dm_gint);
+    
+    void dm_2d_to_gint_nspin4_blocked(
+        const std::vector<HContainer<double>*>& dm,
+        std::vector<HContainer<double>>& dm_gint,
+        const GintInfo& gint_info,
+        int tile_size = 64);
 
     template<typename T>
     void wfc_2d_to_gint(const T* wfc_2d, int nbands, int nlocal, const Parallel_Orbitals& pv, T* wfc_grid, const GintInfo& gint_info);
