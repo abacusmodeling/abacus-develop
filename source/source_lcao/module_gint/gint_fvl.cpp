@@ -27,15 +27,24 @@ void Gint_fvl::init_dm_gint_()
 
 void Gint_fvl::cal_fvl_svl_()
 {
+    int max_phi_len = 0;
+    for (int i = 0; i < gint_info_->get_bgrids_num(); i++)
+    {
+        const auto& biggrid = gint_info_->get_biggrids()[i];
+        if (biggrid->get_atoms().empty()) continue;
+        int len = biggrid->get_mgrids_num() * biggrid->get_phi_len();
+        if (len > max_phi_len) max_phi_len = len;
+    }
+
 #pragma omp parallel
     {
         PhiOperator phi_op;
-        std::vector<double> phi;
-        std::vector<double> phi_vldr3;
-        std::vector<double> phi_vldr3_dm;
-        std::vector<double> dphi_x;
-        std::vector<double> dphi_y;
-        std::vector<double> dphi_z;
+        std::vector<double> phi(max_phi_len);
+        std::vector<double> phi_vldr3(max_phi_len);
+        std::vector<double> phi_vldr3_dm(max_phi_len);
+        std::vector<double> dphi_x(max_phi_len);
+        std::vector<double> dphi_y(max_phi_len);
+        std::vector<double> dphi_z(max_phi_len);
         ModuleBase::matrix* fvl_thread = nullptr;
         ModuleBase::matrix* svl_thread = nullptr;
         if(isforce_)
@@ -57,13 +66,6 @@ void Gint_fvl::cal_fvl_svl_()
                 continue;
             }
             phi_op.set_bgrid(biggrid);
-            const int phi_len = phi_op.get_rows() * phi_op.get_cols();
-            phi.resize(phi_len);
-            phi_vldr3.resize(phi_len);
-            phi_vldr3_dm.resize(phi_len);
-            dphi_x.resize(phi_len);
-            dphi_y.resize(phi_len);
-            dphi_z.resize(phi_len);
             phi_op.set_phi_dphi(phi.data(), dphi_x.data(), dphi_y.data(), dphi_z.data());
             for (int is = 0; is < nspin_; is++)
             {

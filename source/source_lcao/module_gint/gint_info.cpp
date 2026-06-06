@@ -5,6 +5,9 @@
 #include "gint_info.h"
 #include "gint_type.h"
 #include "source_base/memory_recorder.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 namespace ModuleGint
 {
@@ -72,16 +75,110 @@ GintInfo::~GintInfo()
 void GintInfo::init_atoms_(int ntype, const Atom* atoms, const Numerical_Orbital* Phi)
 {
     ModuleBase::timer::start("GintInfo", "init_atoms");
-    int iat = 0;
     is_atom_in_proc_.resize(ucell_->nat, false);
     atoms_.resize(ucell_->nat);
     orbs_.resize(ntype);
 
+    for(int i = 0; i < ntype; i++)
+    {
+        orbs_[i] = Phi[i];
+    }
+
+#ifdef _OPENMP
+    const int nthreads = omp_get_max_threads();
+    std::vector<std::map<int, std::vector<const GintAtom*>>> thread_bgrid_adds(nthreads);
+
+    #pragma omp parallel
+    {
+        int tid = omp_get_thread_num();
+        auto& local_adds = thread_bgrid_adds[tid];
+
+        #pragma omp for schedule(dynamic)
+        for (int iat_global = 0; iat_global < ucell_->nat; iat_global++)
+        {
+            const int it = ucell_->iat2it[iat_global];
+            const int ia = ucell_->iat2ia[iat_global];
+            const auto& atom = atoms[it];
+            const auto* orb = &orbs_[it];
+
+            // rcut extends to the maximum big grids in x, y, z directions
+            Vec3i ext_bgrid = biggrid_info_->max_ext_bgrid_num(atom.Rcut);
+
+            Vec3d fraction;
+            fraction.x = atom.taud[ia].x * unitcell_info_->get_nbx();
+            fraction.y = atom.taud[ia].y * unitcell_info_->get_nby();
+            fraction.z = atom.taud[ia].z * unitcell_info_->get_nbz();
+            const Vec3i atom_bgrid_idx(static_cast<int>(fraction.x),
+                                       static_cast<int>(fraction.y),
+                                       static_cast<int>(fraction.z));
+            const Vec3d delta(fraction.x - atom_bgrid_idx.x,
+                              fraction.y - atom_bgrid_idx.y,
+                              fraction.z - atom_bgrid_idx.z);
+            const Vec3d tau_in_biggrid = biggrid_info_->get_cartesian_coord(delta);
+
+            const Vec3i ucell_idx_atom = unitcell_info_->get_unitcell_idx(atom_bgrid_idx);
+            auto& r_to_atom = atoms_[iat_global];
+
+            for(int bgrid_x = atom_bgrid_idx.x - ext_bgrid.x; bgrid_x <= atom_bgrid_idx.x + ext_bgrid.x; bgrid_x++)
+            {
+                for(int bgrid_y = atom_bgrid_idx.y - ext_bgrid.y; bgrid_y <= atom_bgrid_idx.y + ext_bgrid.y; bgrid_y++)
+                {
+                    for(int bgrid_z = atom_bgrid_idx.z - ext_bgrid.z; bgrid_z <= atom_bgrid_idx.z + ext_bgrid.z; bgrid_z++)
+                    {
+                        // get the extended biggrid idx of the affected biggrid
+                        const Vec3i ext_bgrid_idx(bgrid_x, bgrid_y, bgrid_z);
+                        const Vec3i norm_bgrid_idx = unitcell_info_->map_ext_idx_to_ucell(ext_bgrid_idx);
+                        if(localcell_info_->is_bgrid_in_lcell(norm_bgrid_idx) == false)
+                        {
+                            continue;
+                        }
+                        const int bgrid_local_idx = localcell_info_->get_bgrid_local_idx_1D(norm_bgrid_idx);
+                        // get the unitcell idx of the big grid
+                        const Vec3i ucell_idx_bgrid = unitcell_info_->get_unitcell_idx(ext_bgrid_idx);
+
+                        // The index of the unitcell containing the biggrid relative to the unitcell containing the atom.
+                        const Vec3i ucell_idx_rel = ucell_idx_bgrid - ucell_idx_atom;
+                        auto found = r_to_atom.find(ucell_idx_rel);
+                        // if the gint_atom is not in the map,
+                        // it means this is the first time we find this atom may affect some biggrids,
+                        // add it to the r_to_atom map
+                        if(found == r_to_atom.end())
+                        {
+                            Vec3i ext_atom_bgrid_idx(atom_bgrid_idx.x - ucell_idx_bgrid.x * unitcell_info_->get_nbx(),
+                                                     atom_bgrid_idx.y - ucell_idx_bgrid.y * unitcell_info_->get_nby(),
+                                                     atom_bgrid_idx.z - ucell_idx_bgrid.z * unitcell_info_->get_nbz());
+                            r_to_atom.insert(std::make_pair(ucell_idx_rel,
+                                GintAtom(&atom, it, ia, iat_global, ext_atom_bgrid_idx, ucell_idx_rel, tau_in_biggrid, orb, ucell_)));
+                        }
+                        local_adds[bgrid_local_idx].push_back(&r_to_atom.at(ucell_idx_rel));
+                        is_atom_in_proc_[iat_global] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    for (int tid = 0; tid < nthreads; tid++)
+    {
+        for (auto& kv : thread_bgrid_adds[tid])
+        {
+            const int bgrid_idx = kv.first;
+            auto& atom_list = kv.second;
+            for (auto* atom_ptr : atom_list)
+            {
+                if (biggrids_[bgrid_idx]->is_atom_on_bgrid(atom_ptr))
+                {
+                    biggrids_[bgrid_idx]->add_atom(atom_ptr);
+                }
+            }
+        }
+    }
+#else
 // TODO: USE OPENMP TO PARALLELIZE THIS LOOP
+    int iat = 0;
     for(int i = 0; i < ntype; i++)
     {
         const auto& atom = atoms[i];
-        orbs_[i] = Phi[i];
         const auto *orb = &orbs_[i];
 
         // rcut extends to the maximum big grids in x, y, z directions
@@ -146,6 +243,7 @@ void GintInfo::init_atoms_(int ntype, const Atom* atoms, const Numerical_Orbital
             iat++;
         }
     }
+#endif
     ModuleBase::timer::end("GintInfo", "init_atoms");
 }
 
