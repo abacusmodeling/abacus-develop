@@ -6,7 +6,12 @@ install(FILES c6.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 install(FILES r0.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 AddTest(
-  TARGET vdwTest
+  TARGET MODULE_HAMILT_vdwTest
   LIBS parameter ${math_libs} base device vdw 
   SOURCES vdw_test.cpp 
 )
+
+if(ENABLE_DFTD4)
+  target_compile_definitions(MODULE_HAMILT_vdwTest PRIVATE __DFTD4)
+  target_link_libraries(MODULE_HAMILT_vdwTest dftd4::dftd4)
+endif()

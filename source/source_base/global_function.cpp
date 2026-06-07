@@ -16,6 +16,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <cerrno>
+#include "source_base/fs_compat.h"
+
 namespace ModuleBase
 {
 namespace GlobalFunc
@@ -61,20 +64,14 @@ void OUT(std::ofstream &ofs, const std::string &name)
 void MAKE_DIR(const std::string &fn)
 {
     //	ModuleBase::TITLE("global_function","MAKE_DIR");
-    #ifndef __SW
     if (GlobalV::MY_RANK == 0)
     {
-        std::stringstream ss;
-        ss << " test -d " << fn << " || mkdir " << fn;
-        //----------------------------------------------------------
-        // EXPLAIN : 'system' function return '0' if success
-        //----------------------------------------------------------
-        if (system(ss.str().c_str()))
+        int ret = ModuleBase::make_directory(fn);
+        if (ret != 0 && errno != EEXIST)
         {
             ModuleBase::WARNING_QUIT("MAKE_DIR", fn);
         }
     }
-    #endif
     return;
 }
 

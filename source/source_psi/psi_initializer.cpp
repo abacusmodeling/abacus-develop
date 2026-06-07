@@ -1,6 +1,6 @@
 #include "psi_initializer.h"
 
-#include "source_base/memory.h"
+#include "source_base/parallel_global.h"
 // basic functions support
 #include "source_base/timer.h"
 #include "source_base/tool_quit.h"
@@ -32,7 +32,7 @@ void psi_initializer<T>::initialize(const Structure_Factor* sf,
 template <typename T>
 void psi_initializer<T>::random_t(T* psi, const int iw_start, const int iw_end, const int ik, const int mode)
 {
-    ModuleBase::timer::tick("psi_init", "random_t");
+    ModuleBase::timer::start("psi_init", "random_t");
     assert(mode <= 1);
     assert(iw_start >= 0);
     const int ng = this->pw_wfc_->npwk[ik];
@@ -88,11 +88,27 @@ void psi_initializer<T>::random_t(T* psi, const int iw_start, const int iw_end, 
              // then distribute the data to all processors in the pool
                     stick_to_pool(stickrr.data(), ir, tmprr.data());
                     stick_to_pool(stickarg.data(), ir, tmparg.data());
+#else
+                    // Serial build: there is no pool to distribute to, so copy
+                    // the stick directly into the gathered arrays, mirroring the
+                    // rank-0 branch of stick_to_pool(). Without this, tmprr/tmparg
+                    // stay zero-initialized and the seeded (pw_seed>0) random
+                    // wavefunctions become all-zero, which later trips
+                    // Gram-Schmidt with "psi_norm <= 0.0".
+                    {
+                        const int is = this->ixy2is_[ir];
+                        const int nz_loc = this->pw_wfc_->nz;
+                        for (int iz = 0; iz < nz_loc; ++iz)
+                        {
+                            tmprr[is * nz_loc + iz] = stickrr[iz];
+                            tmparg[is * nz_loc + iz] = stickarg[iz];
+                        }
+                    }
 #endif
                 }
                 // then for each g-component, initialize the wavefunction value
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(T))
+#pragma omp parallel for schedule(static)
 #endif
                 for (int ig = 0; ig < ng; ig++)
                 {
@@ -104,7 +120,7 @@ void psi_initializer<T>::random_t(T* psi, const int iw_start, const int iw_end, 
                     psi_slice[ig] = this->template cast_to_T<T>(std::complex<double>(rr * cos(arg), rr * sin(arg)));
                 }
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(T))
+#pragma omp parallel for schedule(static)
 #endif
                 for (int ig = ng; ig < npwk_max; ++ig)
                 {
@@ -151,7 +167,7 @@ void psi_initializer<T>::random_t(T* psi, const int iw_start, const int iw_end, 
             for (int ipol = 0; ipol < npol; ipol++)
             {
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(T))
+#pragma omp parallel for schedule(static)
 #endif
                 for (int ig = 0; ig < ng; ig++)
                 {
@@ -163,14 +179,14 @@ void psi_initializer<T>::random_t(T* psi, const int iw_start, const int iw_end, 
             }
         }
     }
-    ModuleBase::timer::tick("psi_init", "random_t");
+    ModuleBase::timer::end("psi_init", "random_t");
 }
 
 #ifdef __MPI
 template <typename T>
 void psi_initializer<T>::stick_to_pool(Real* stick, const int& ir, Real* out) const
 {
-    ModuleBase::timer::tick("psi_init", "stick_to_pool");
+    ModuleBase::timer::start("psi_init", "stick_to_pool");
     MPI_Status ierror;
     const int is = this->ixy2is_[ir];
     const int ip = this->pw_wfc_->fftixy2ip[ir];
@@ -218,7 +234,7 @@ void psi_initializer<T>::stick_to_pool(Real* stick, const int& ir, Real* out) co
         }
     }
 
-    ModuleBase::timer::tick("psi_init", "stick_to_pool");
+    ModuleBase::timer::end("psi_init", "stick_to_pool");
     return;
 }
 #endif
