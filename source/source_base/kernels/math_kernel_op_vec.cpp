@@ -1,5 +1,7 @@
 #include "source_base/kernels/math_kernel_op.h"
 #include "source_base/module_external/blas_connector.h"
+#include "source_base/parallel_reduce.h"
+#include "source_base/tool_threading.h"
 
 
 namespace ModuleBase
@@ -23,13 +25,14 @@ struct vector_mul_real_op<T, base_device::DEVICE_CPU>
     using Real = typename GetTypeReal<T>::type;
     void operator()(const int dim, T* result, const T* vector, const Real constant)
     {
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(Real))
-#endif
-        for (int i = 0; i < dim; i++)
-        {
-            result[i] = vector[i] * constant;
-        }
+        ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+            int beg = 0, len = 0;
+            ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, dim, (int)(4096 / sizeof(T)), beg, len);
+            for (int i = beg; i < beg + len; i++)
+            {
+                result[i] = vector[i] * constant;
+            }
+        });
     }
 };
 
@@ -41,23 +44,25 @@ struct vector_mul_vector_op<T, base_device::DEVICE_CPU>
     {
         if (add)
         {
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(Real))
-#endif
-            for (int i = 0; i < dim; i++)
-            {
-                result[i] += vector1[i] * vector2[i];
-            }
+            ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+                int beg = 0, len = 0;
+                ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, dim, (int)(4096 / sizeof(T)), beg, len);
+                for (int i = beg; i < beg + len; i++)
+                {
+                    result[i] += vector1[i] * vector2[i];
+                }
+            });
         }
         else
         {
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(Real))
-#endif
-            for (int i = 0; i < dim; i++)
-            {
-                result[i] = vector1[i] * vector2[i];
-            }
+            ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+                int beg = 0, len = 0;
+                ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, dim, (int)(4096 / sizeof(T)), beg, len);
+                for (int i = beg; i < beg + len; i++)
+                {
+                    result[i] = vector1[i] * vector2[i];
+                }
+            });
         }
     }
 };
@@ -68,13 +73,14 @@ struct vector_div_constant_op<T, base_device::DEVICE_CPU>
     using Real = typename GetTypeReal<T>::type;
     void operator()(const int& dim, T* result, const T* vector, const Real constant)
     {
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(Real))
-#endif
-        for (int i = 0; i < dim; i++)
-        {
-            result[i] = vector[i] / constant;
-        }
+        ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+            int beg = 0, len = 0;
+            ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, dim, (int)(4096 / sizeof(T)), beg, len);
+            for (int i = beg; i < beg + len; i++)
+            {
+                result[i] = vector[i] / constant;
+            }
+        });
     }
 };
 
@@ -84,13 +90,14 @@ struct vector_div_vector_op<T, base_device::DEVICE_CPU>
     using Real = typename GetTypeReal<T>::type;
     void operator()(const int& dim, T* result, const T* vector1, const Real* vector2)
     {
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 4096 / sizeof(Real))
-#endif
-        for (int i = 0; i < dim; i++)
-        {
-            result[i] = vector1[i] / vector2[i];
-        }
+        ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+            int beg = 0, len = 0;
+            ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, dim, (int)(4096 / sizeof(T)), beg, len);
+            for (int i = beg; i < beg + len; i++)
+            {
+                result[i] = vector1[i] / vector2[i];
+            }
+        });
     }
 };
 
@@ -120,13 +127,14 @@ struct vector_add_vector_op<T, base_device::DEVICE_CPU>
                     const T* vector2,
                     const Real constant2)
     {
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static, 8192 / sizeof(T))
-#endif
-        for (int i = 0; i < dim; i++)
-        {
-            result[i] = vector1[i] * constant1 + vector2[i] * constant2;
-        }
+        ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+            int beg = 0, len = 0;
+            ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, dim, (int)(4096 / sizeof(T)), beg, len);
+            for (int i = beg; i < beg + len; i++)
+            {
+                result[i] = vector1[i] * constant1 + vector2[i] * constant2;
+            }
+        });
     }
 };
 

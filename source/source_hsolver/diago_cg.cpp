@@ -9,6 +9,7 @@
 #include <source_base/parallel_reduce.h>
 #include <source_base/timer.h>
 #include <source_base/tool_title.h>             // ModuleBase::TITLE
+#include <source_base/tool_threading.h>
 #include <source_base/global_function.h>        // ModuleBase::GlobalFunc::NOTE
 #include <source_hsolver/diago_cg.h>
 

@@ -4,6 +4,7 @@
 #include "source_base/memory.h"
 #include "source_base/module_device/device.h"
 #include "source_base/timer.h"
+#include "source_base/tool_threading.h"
 #include "source_hsolver/kernels/dngvd_op.h"
 #include "source_base/kernels/math_kernel_op.h"
 #include "source_hsolver/kernels/bpcg_kernel_op.h" // normalize_op, precondition_op, apply_eigenvalues_op
@@ -604,14 +605,18 @@ void Diago_DavSubspace<T, Device>::diag_zhegvx(const int& nbase,
                 std::vector<std::vector<T>> h_diag(nbase, std::vector<T>(nbase, *this->zero));
                 std::vector<std::vector<T>> s_diag(nbase, std::vector<T>(nbase, *this->zero));
 
-                for (size_t i = 0; i < nbase; i++)
-                {
-                    for (size_t j = 0; j < nbase; j++)
+                ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+                    int beg = 0, len = 0;
+                    ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, (int)nbase, 8, beg, len);
+                    for (int i = beg; i < beg + len; i++)
                     {
-                        h_diag[i][j] = hcc[i * this->nbase_x + j];
-                        s_diag[i][j] = scc[i * this->nbase_x + j];
+                        for (size_t j = 0; j < nbase; j++)
+                        {
+                            h_diag[i][j] = hcc[i * this->nbase_x + j];
+                            s_diag[i][j] = scc[i * this->nbase_x + j];
+                        }
                     }
-                }
+                });
                 dngvx_op<T, Device>()(this->ctx,
                                       nbase,
                                       this->nbase_x,
@@ -621,22 +626,26 @@ void Diago_DavSubspace<T, Device>::diag_zhegvx(const int& nbase,
                                       (*eigenvalue_iter).data(),
                                       this->vcc);
                 // reset:
-                for (size_t i = 0; i < nbase; i++)
-                {
-                    for (size_t j = 0; j < nbase; j++)
+                ModuleBase::OMP_PARALLEL([&](int num_thread, int thread_id) {
+                    int beg = 0, len = 0;
+                    ModuleBase::BLOCK_TASK_DIST_1D(num_thread, thread_id, (int)nbase, 8, beg, len);
+                    for (int i = beg; i < beg + len; i++)
                     {
-                        hcc[i * this->nbase_x + j] = h_diag[i][j];
-                        scc[i * this->nbase_x + j] = s_diag[i][j];
-                    }
+                        for (size_t j = 0; j < nbase; j++)
+                        {
+                            hcc[i * this->nbase_x + j] = h_diag[i][j];
+                            scc[i * this->nbase_x + j] = s_diag[i][j];
+                        }
 
-                    for (size_t j = nbase; j < this->nbase_x; j++)
-                    {
-                        hcc[i * this->nbase_x + j] = *this->zero;
-                        hcc[j * this->nbase_x + i] = *this->zero;
-                        scc[i * this->nbase_x + j] = *this->zero;
-                        scc[j * this->nbase_x + i] = *this->zero;
+                        for (size_t j = nbase; j < this->nbase_x; j++)
+                        {
+                            hcc[i * this->nbase_x + j] = *this->zero;
+                            hcc[j * this->nbase_x + i] = *this->zero;
+                            scc[i * this->nbase_x + j] = *this->zero;
+                            scc[j * this->nbase_x + i] = *this->zero;
+                        }
                     }
-                }
+                });
             }
         }
         else
