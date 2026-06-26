@@ -26,6 +26,12 @@ if [ ! -f "$TEST_EXE" ]; then
     exit 1
 fi
 
+# MPI launcher options
+MPI_RUN_CMD="mpirun"
+if mpirun --help 2>&1 | grep -q -- '--allow-run-as-root'; then
+    MPI_RUN_CMD="mpirun --allow-run-as-root"
+fi
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -51,7 +57,7 @@ run_mpi_test() {
     echo "[TEST] $label (nprocs=$nprocs)"
     echo "============================================================"
 
-    if OMP_NUM_THREADS=1 mpirun --allow-run-as-root -np "$nprocs" "$TEST_EXE" 2>&1; then
+    if OMP_NUM_THREADS=1 $MPI_RUN_CMD -np "$nprocs" "$TEST_EXE" 2>&1; then
         echo -e "${GREEN}[  PASSED  ]${NC} $label with $nprocs processes"
         PASS_COUNT=$((PASS_COUNT + 1))
     else

@@ -8,6 +8,7 @@
 #include <mpi.h>
 #include <chrono>
 #include <fstream>
+#include <cstring>
 
 #include "../diag_hs_para.h"
 #include "source_hsolver/kernels/hegvd_op.h"
@@ -352,6 +353,40 @@ int main(int argc, char** argv) {
     int myrank;
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
+    bool run_perf = false;
+    int perf_ndim = 240;
+    int perf_nb = 32;
+    int perf_nbands = 120;
+    int perf_case_numb = 3;
+    int perf_loop_numb = 3;
+    for (int i = 1; i < argc; ++i) {
+        if (std::strcmp(argv[i], "--perf") == 0) {
+            run_perf = true;
+            if (i + 1 < argc) perf_ndim = std::atoi(argv[++i]);
+            if (i + 1 < argc) perf_nb = std::atoi(argv[++i]);
+            if (i + 1 < argc) perf_nbands = std::atoi(argv[++i]);
+            if (i + 1 < argc) perf_case_numb = std::atoi(argv[++i]);
+            if (i + 1 < argc) perf_loop_numb = std::atoi(argv[++i]);
+            break;
+        }
+    }
+
+    if (run_perf) {
+        if (myrank == 0) {
+            std::cout << "[INFO] Running MPI performance benchmark..." << std::endl;
+        }
+        std::cout << "[INFO] Benchmark params: ndim=" << perf_ndim
+                  << " nb=" << perf_nb
+                  << " nbands=" << perf_nbands
+                  << " case_numb=" << perf_case_numb
+                  << " loop_numb=" << perf_loop_numb << std::endl;
+        test_performance<std::complex<double>>(perf_ndim, perf_nb, perf_nbands,
+                                               MPI_COMM_WORLD, perf_case_numb,
+                                               perf_loop_numb);
+        MPI_Finalize();
+        return 0;
+    }
+
     testing::InitGoogleTest(&argc, argv);
     ::testing::TestEventListeners& listeners = ::testing::UnitTest::GetInstance()->listeners();
 
@@ -365,11 +400,10 @@ int main(int argc, char** argv) {
         std::cout << "ERROR:some tests are not passed" << std::endl;
         MPI_Finalize();
         return result;
-	}
+    }
 
     MPI_Finalize();
-
-	return 0;
+    return 0;
 }
 
 #endif // TEST_DIAGO_PXXXGVX_H
