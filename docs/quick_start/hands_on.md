@@ -44,7 +44,7 @@ O                       #Name of element
 0.0  0.5  0.0  0 0 0    #x,y,z, move_x, move_y, move_z
 ```
 
-Next, the `INPUT` file is required, which sets all key parameters to direct ABACUS how to calculte and what to output:
+Next, the `INPUT` file is required, which sets all key parameters to direct ABACUS how to calculate and what to output:
 ```
 INPUT_PARAMETERS
 suffix                  MgO
