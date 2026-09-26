@@ -292,6 +292,18 @@ if(DEFINED DeePMD_DIR)
   list(APPEND _abacus_feature_include_dirs ${DeePMD_DIR}/include)
 endif()
 
+if(DEFINED PLUMED_ROOT)
+  # PLUMED plugin (https://www.plumed.org).  The wrapper library is linked
+  # together with the kernel library it depends on (protected from the default
+  # --as-needed of some toolchains so that the kernel also ends up in the
+  # DT_NEEDED entries of the executable).
+  list(APPEND _abacus_feature_libs ${PLUMED_LIBRARY} ${CMAKE_DL_LIBS})
+  if(PLUMED_KERNEL_LIBRARY)
+    list(APPEND _abacus_feature_libs "-Wl,--no-as-needed" ${PLUMED_KERNEL_LIBRARY} "-Wl,--as-needed")
+  endif()
+  list(APPEND _abacus_feature_include_dirs ${PLUMED_ROOT}/include)
+endif()
+
 if(DEFINED NEP_DIR AND NEP_FOUND)
   list(APPEND _abacus_feature_libs NEP::nep)
 endif()
@@ -538,6 +550,7 @@ add_subdirectory(source_hsolver)
 add_subdirectory(source_basis/module_ao)
 add_subdirectory(source_basis/module_nao)
 add_subdirectory(source_md)
+add_subdirectory(source_plumed)
 add_subdirectory(source_basis/module_pw)
 add_subdirectory(source_esolver)
 add_subdirectory(source_io)
@@ -688,6 +701,7 @@ target_link_libraries(
     neighbor_search
     neighbor
     md
+    plumed_interface
     planewave
     symmetry
     cell
@@ -739,6 +753,12 @@ if(ENABLE_RAPIDJSON)
 endif()
 
 # External closure: feature consumers precede numerical providers and runtimes.
+if(DEFINED PLUMED_ROOT)
+  # let the executable locate libplumed.so and its kernel library through its
+  # own rpath (no LD_LIBRARY_PATH needed at run time)
+  set_target_properties(${ABACUS_BIN_NAME} PROPERTIES BUILD_RPATH ${PLUMED_ROOT}/lib)
+endif()
+
 target_link_libraries(${ABACUS_BIN_NAME} PRIVATE abacus::link_libs)
 
 # Torch includes some LAPACK routines, but with floating-point exceptions.

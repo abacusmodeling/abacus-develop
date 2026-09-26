@@ -246,6 +246,31 @@ Note that md_tlast is only used in NVT/NPT simulations. If md_tlast is unset or 
         this->add_item(item);
     }
     {
+        Input_Item item("plumed");
+        item.annotation = "use PLUMED for collective variables and enhanced sampling";
+        item.category = "Molecular dynamics";
+        item.type = "Boolean";
+        item.description = "Whether to use PLUMED (https://www.plumed.org) to compute collective variables, "
+                           "biasing potentials and free-energy methods during an MD run. ABACUS must be "
+                           "compiled with -DPLUMED_ROOT=<prefix of a PLUMED installation> to enable this feature.";
+        item.default_value = "False";
+        item.unit = "";
+        read_sync_bool(input.mdp.plumed);
+        this->add_item(item);
+    }
+    {
+        Input_Item item("plumed_file");
+        item.annotation = "input file of PLUMED";
+        item.category = "Molecular dynamics";
+        item.type = "String";
+        item.description = "The input file of PLUMED, read when `plumed` is enabled. Relative paths are "
+                           "resolved against the working directory of the run.";
+        item.default_value = "plumed.dat";
+        item.unit = "";
+        read_sync_string(input.mdp.plumed_file);
+        this->add_item(item);
+    }
+    {
         Input_Item item("md_seed");
         item.annotation = "random seed for MD";
         item.category = "Molecular dynamics";

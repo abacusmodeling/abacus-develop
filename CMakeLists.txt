@@ -617,6 +617,18 @@ if(DEFINED DeePMD_DIR)
   find_package(DeePMD REQUIRED)
 endif()
 
+if(DEFINED PLUMED_ROOT)
+  # PLUMED plugin for collective variables and enhanced sampling
+  # (https://www.plumed.org).  PLUMED_ROOT is the prefix of an installed
+  # PLUMED (created with `./configure --prefix=... && make install`).
+  message(STATUS "PLUMED support is enabled. PLUMED_ROOT = " ${PLUMED_ROOT})
+  find_library(PLUMED_LIBRARY NAMES plumed PATHS ${PLUMED_ROOT}/lib NO_DEFAULT_PATH)
+  find_library(PLUMED_KERNEL_LIBRARY NAMES plumedKernel PATHS ${PLUMED_ROOT}/lib NO_DEFAULT_PATH)
+  if(NOT PLUMED_LIBRARY)
+    message(FATAL_ERROR "PLUMED_ROOT is set but libplumed was not found in ${PLUMED_ROOT}/lib.")
+  endif()
+endif()
+
 if(DEFINED NEP_DIR)
   find_package(NEP REQUIRED)
 endif()
