@@ -67,6 +67,9 @@ struct MD_para
                              ///< not. liuyu 2023-03-01
     bool dump_virial = true; ///< output lattice virial into the file MD_dump or
                              ///< not. liuyu 2023-03-01
+    bool plumed = false; ///< use PLUMED for collective variables and enhanced
+                         ///< sampling (requires ABACUS compiled with PLUMED)
+    std::string plumed_file = "plumed.dat"; ///< input file of PLUMED
 };
 
 #endif // MD_PARA_H

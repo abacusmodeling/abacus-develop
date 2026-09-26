@@ -2649,6 +2649,18 @@ These variables are used to control molecular dynamics calculations. For more in
 - **Description**: Whether to output lattice virials into the file `OUT.${suffix}/MD_dump`.
 - **Default**: True
 
+### plumed
+
+- **Type**: Boolean
+- **Description**: Whether to use PLUMED (https://www.plumed.org) to compute collective variables, biasing potentials and free-energy methods during an MD run. ABACUS must be configured with `-DPLUMED_ROOT=<prefix of a PLUMED installation>` to enable this feature.
+- **Default**: False
+
+### plumed_file
+
+- **Type**: String
+- **Description**: The input file of PLUMED, read when [`plumed`](#plumed) is enabled. Relative paths are resolved against the working directory of the run.
+- **Default**: plumed.dat
+
 ### md_seed
 
 - **Type**: Integer

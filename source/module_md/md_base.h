@@ -85,6 +85,15 @@ class MD_base
     double potential=0.0;               ///< potential energy
     double kinetic;                     ///< kinetic energy
 
+    /**
+     * @brief get the current time step used by the integrator (in atomic units
+     * of time, hbar/E_hartree)
+     */
+    double get_md_dt() const
+    {
+        return md_dt;
+    }
+
   protected:
     const MD_para& mdp; ///< input parameters used in md
     UnitCell& ucell;    ///< unitcell information

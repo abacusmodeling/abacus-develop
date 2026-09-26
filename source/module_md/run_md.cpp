@@ -1,5 +1,7 @@
 #include "run_md.h"
 
+#include <vector>
+
 #include "module_parameter/parameter.h"
 #include "fire.h"
 #include "langevin.h"
@@ -7,12 +9,43 @@
 #include "module_base/global_file.h"
 #include "module_base/timer.h"
 #include "module_io/print_info.h"
+#include "module_plumed/plumed_interface.h"
 #include "msst.h"
 #include "nhchain.h"
 #include "verlet.h"
 
 namespace Run_MD
 {
+
+namespace
+{
+/// @brief collect the absolute Cartesian positions (in Bohr) of all the atoms
+void collect_atomic_positions(const UnitCell& ucell, ModuleBase::Vector3<double>* positions)
+{
+    int iat = 0;
+    for (int it = 0; it < ucell.ntype; ++it)
+    {
+        for (int ia = 0; ia < ucell.atoms[it].na; ++ia)
+        {
+            /// the UnitCell stores tau in units of the lattice constant lat0
+            positions[iat] = ucell.atoms[it].tau[ia] * ucell.lat0;
+            ++iat;
+        }
+    }
+}
+
+/// @brief collect the cell matrix (in Bohr) in the row-major layout expected
+/// by PLUMED (row i is the i-th lattice vector)
+void collect_cell(const UnitCell& ucell, double* cell)
+{
+    /// the UnitCell stores the lattice vectors without the lattice constant
+    const double* latvec = &ucell.latvec.e11;
+    for (int i = 0; i < 9; ++i)
+    {
+        cell[i] = latvec[i] * ucell.lat0;
+    }
+}
+} // namespace
 
 void md_line(UnitCell& unit_in, ModuleESolver::ESolver* p_esolver, const Parameter& param_in)
 {
@@ -46,12 +79,42 @@ void md_line(UnitCell& unit_in, ModuleESolver::ESolver* p_esolver, const Paramet
         ModuleBase::WARNING_QUIT("md_line", "no such md_type!");
     }
 
+    /// interface to PLUMED: no-op unless `plumed` is set in INPUT and ABACUS
+    /// was compiled with PLUMED support (-DPLUMED_ROOT=...)
+    ModulePlumed::PlumedInterface plumed;
+
+    /// absolute Cartesian positions (Bohr) and cell (Bohr) handed over to
+    /// PLUMED; note that the UnitCell stores tau and latvec in units of the
+    /// lattice constant lat0 and that mdrun->pos only stores the displacement
+    /// of the current MD step
+    std::vector<ModuleBase::Vector3<double>> plumed_pos(unit_in.nat);
+    double plumed_cell[9];
+
     /// md cycle
     while ((mdrun->step_ + mdrun->step_rst_) <= param_in.mdp.md_nstep && !mdrun->stop)
     {
         if (mdrun->step_ == 0)
         {
             mdrun->setup(p_esolver, PARAM.globalv.global_readin_dir);
+
+            if (param_in.mdp.plumed)
+            {
+                plumed.init(param_in.mdp.plumed_file,
+                            unit_in.nat,
+                            mdrun->get_md_dt(),
+                            mdrun->allmass,
+                            param_in.globalv.myrank);
+                /// the initial configuration already carries positions and
+                /// forces, so PLUMED can be called right away
+                collect_atomic_positions(unit_in, plumed_pos.data());
+                collect_cell(unit_in, plumed_cell);
+                plumed.move(mdrun->step_ + mdrun->step_rst_,
+                            plumed_pos.data(),
+                            mdrun->force,
+                            plumed_cell,
+                            mdrun->potential,
+                            param_in.inp.cal_stress ? mdrun->virial.c : nullptr);
+            }
         }
         else
         {
@@ -66,6 +129,21 @@ void md_line(UnitCell& unit_in, ModuleESolver::ESolver* p_esolver, const Paramet
                                   mdrun->force,
                                   param_in.inp.cal_stress,
                                   mdrun->virial);
+
+            if (plumed.active())
+            {
+                /// let PLUMED compute the collective variables and add the
+                /// biasing forces to mdrun->force; they are used by the second
+                /// half of the current step and by the first half of the next
+                collect_atomic_positions(unit_in, plumed_pos.data());
+                collect_cell(unit_in, plumed_cell);
+                plumed.move(mdrun->step_ + mdrun->step_rst_,
+                            plumed_pos.data(),
+                            mdrun->force,
+                            plumed_cell,
+                            mdrun->potential,
+                            param_in.inp.cal_stress ? mdrun->virial.c : nullptr);
+            }
 
             mdrun->second_half();
 
@@ -121,7 +199,11 @@ void md_line(UnitCell& unit_in, ModuleESolver::ESolver* p_esolver, const Paramet
         mdrun->step_++;
     }
 
+    /// flush the COLVAR and other PLUMED output files
+    plumed.finalize();
+
     delete mdrun;
+
     ModuleBase::timer::tick("Run_MD", "md_line");
     return;
 }

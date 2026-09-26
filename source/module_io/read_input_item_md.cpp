@@ -402,5 +402,17 @@ void ReadInput::item_md()
         read_sync_bool(input.mdp.dump_virial);
         this->add_item(item);
     }
+    {
+        Input_Item item("plumed");
+        item.annotation = "use PLUMED for collective variables and enhanced sampling";
+        read_sync_bool(input.mdp.plumed);
+        this->add_item(item);
+    }
+    {
+        Input_Item item("plumed_file");
+        item.annotation = "input file of PLUMED";
+        read_sync_string(input.mdp.plumed_file);
+        this->add_item(item);
+    }
 }
 } // namespace ModuleIO

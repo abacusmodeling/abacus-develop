@@ -632,6 +632,32 @@ if(DEFINED DeePMD_DIR)
   endif()
 endif()
 
+if(DEFINED PLUMED_ROOT)
+  # enhanced sampling through the PLUMED plugin (https://www.plumed.org); only
+  # the MD driver makes use of it.  PLUMED_ROOT is the prefix of a PLUMED
+  # installation (created with `./configure --prefix=... && make install`),
+  # with the library in ${PLUMED_ROOT}/lib and the header in
+  # ${PLUMED_ROOT}/include/plumed/wrapper/Plumed.h.
+  message(STATUS "PLUMED support is enabled. PLUMED_ROOT = " ${PLUMED_ROOT})
+  add_compile_definitions(USE_PLUMED)
+  include_directories(${PLUMED_ROOT}/include)
+  find_library(PLUMED_LIBRARY NAMES plumed PATHS ${PLUMED_ROOT}/lib NO_DEFAULT_PATH)
+  if(NOT PLUMED_LIBRARY)
+    message(FATAL_ERROR "PLUMED_ROOT is set but libplumed was not found in ${PLUMED_ROOT}/lib.")
+  endif()
+  # The kernel library (a dependency of the wrapper library) is linked
+  # explicitly so that the executable locates it through its own rpath,
+  # without requiring LD_LIBRARY_PATH at run time.  Its symbols are not
+  # referenced directly, so it must be protected from the default
+  # --as-needed of some toolchains.
+  find_library(PLUMED_KERNEL_LIBRARY NAMES plumedKernel PATHS ${PLUMED_ROOT}/lib NO_DEFAULT_PATH)
+  target_link_libraries(${ABACUS_BIN_NAME} ${PLUMED_LIBRARY} ${CMAKE_DL_LIBS})
+  if(PLUMED_KERNEL_LIBRARY)
+    target_link_libraries(${ABACUS_BIN_NAME} "-Wl,--no-as-needed" ${PLUMED_KERNEL_LIBRARY} "-Wl,--as-needed")
+  endif()
+  set_target_properties(${ABACUS_BIN_NAME} PROPERTIES BUILD_RPATH ${PLUMED_ROOT}/lib)
+endif()
+
 if(DEFINED TensorFlow_DIR)
   find_package(TensorFlow REQUIRED)
   include_directories(${TensorFlow_DIR}/include)
@@ -722,6 +748,7 @@ target_link_libraries(
   cell
   symmetry
   md
+  plumed_interface
   planewave
   surchem
   neighbor
