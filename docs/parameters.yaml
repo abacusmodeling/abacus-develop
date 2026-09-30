@@ -1536,6 +1536,22 @@ parameters:
     default_value: "True"
     unit: ""
     availability: ""
+  - name: plumed
+    category: Molecular dynamics
+    type: Boolean
+    description: |
+      Whether to use PLUMED (https://www.plumed.org) to compute collective variables, biasing potentials and free-energy methods during an MD run. ABACUS must be compiled with -DPLUMED_ROOT=<prefix of a PLUMED installation> to enable this feature.
+    default_value: "False"
+    unit: ""
+    availability: ""
+  - name: plumed_file
+    category: Molecular dynamics
+    type: String
+    description: |
+      The input file of PLUMED, read when `plumed` is enabled. Relative paths are resolved against the working directory of the run.
+    default_value: plumed.dat
+    unit: ""
+    availability: ""
   - name: md_seed
     category: Molecular dynamics
     type: Integer

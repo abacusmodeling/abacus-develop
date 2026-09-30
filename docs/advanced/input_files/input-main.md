@@ -363,6 +363,8 @@
     - [dump\_force](#dump_force)
     - [dump\_vel](#dump_vel)
     - [dump\_virial](#dump_virial)
+    - [plumed](#plumed)
+    - [plumed\_file](#plumed_file)
     - [md\_seed](#md_seed)
     - [md\_tfreq](#md_tfreq)
     - [md\_tchain](#md_tchain)
@@ -3597,6 +3599,18 @@
 - **Type**: Boolean
 - **Description**: Whether to output lattice virials into the file OUT.${suffix}/MD_dump.
 - **Default**: True
+
+### plumed
+
+- **Type**: Boolean
+- **Description**: Whether to use PLUMED (https://www.plumed.org) to compute collective variables, biasing potentials and free-energy methods during an MD run. ABACUS must be compiled with -DPLUMED_ROOT=&lt;prefix of a PLUMED installation&gt; to enable this feature.
+- **Default**: False
+
+### plumed_file
+
+- **Type**: String
+- **Description**: The input file of PLUMED, read when `plumed` is enabled. Relative paths are resolved against the working directory of the run.
+- **Default**: plumed.dat
 
 ### md_seed
 
